@@ -62,7 +62,7 @@ namespace _CombatSystem
         /// Used to resume [<see cref="_Tick"/>] (which was paused by an [<seealso cref="CombatingEntity"/>] when
         /// it reaches its top [<seealso cref="ICombatTemporalStats.InitiativePercentage"/>])
         /// </summary>
-        public void OnEntityTriggerFinish()
+        public void ResumeFromTempoTrigger()
         {
             _entityPaused = false;
             Timing.ResumeCoroutines(_loopHandle);
@@ -79,61 +79,78 @@ namespace _CombatSystem
                 float deltaIncrement = Time.deltaTime * TempoModifier;
                 foreach (CombatingEntity entity in _characters)
                 {
-                    Debug.Log("Ticking");
                     CharacterCombatData stats = entity.CombatStats;
-                    stats.InitiativePercentage += deltaIncrement * stats.SpeedAmount;
 
-                    float initiativePercentage = SMaths.SRange.Percentage(
-                        stats.InitiativePercentage,
-                        0, initiativeCheck);
-                    EntitiesBar[entity].FillBar(initiativePercentage);
-                    if (stats.InitiativePercentage < initiativeCheck) continue;
-                    stats.InitiativePercentage = 0;
-
-
-                    stats.InitiativePercentage = initiativeCheck;
-                    OnInitiativeTrigger(entity);
-                    stats.RefillInitiativeActions();
-                    while (stats.ActionsLefts > 0)
+                    IncreaseInitiative(); void IncreaseInitiative()
                     {
-                        OnEntityPause();
-                        yield return Timing.WaitForOneFrame;
-                        OnActionDone(entity);
-                        stats.ActionsLefts--;
+                        stats.InitiativePercentage += deltaIncrement * stats.SpeedAmount;
+
+                        float initiativePercentage = SMaths.SRange.Percentage(
+                            stats.InitiativePercentage,
+                            0, initiativeCheck);
+                        EntitiesBar[entity].FillBar(initiativePercentage);
                     }
+
+                    if (stats.InitiativePercentage < initiativeCheck) continue;
+
+                    // Invoke Triggers and LOOP
+                    OnInitiativeTrigger(entity);
+                    //TODO make it as a dedicated class/handler (CharacterActionsHandler)
+                    LoopAllActions(); void LoopAllActions()
+                    {
+                        stats.RefillInitiativeActions();
+                        while (stats.ActionsLefts > 0)
+                        {
+                            OnEntityPause();
+                            OnActionDone(entity);
+                            stats.ActionsLefts--;
+                        }
+                        stats.ActionsLefts = 0;
+                        stats.InitiativePercentage = 0;
+                    }
+                    
+                    // Finish LOOP
                     OnFinishTrigger(entity);
-                    stats.ActionsLefts = 0;
-                    DoCheckIfRoundPassed(entity);
+                    DoCheckIfRoundPassed(); void DoCheckIfRoundPassed()
+                    {
+                        if (!_roundTracker.Contains(entity)) return;
+                        if (_roundTracker.Count <= 1) //this means is the last one
+                        {
+                            RefillRoundTracker();
+                            _triggerHandler.OnRoundCompleted(_characters, entity);
+                        }
+                        else
+                        {
+                            _roundTracker.Remove(entity);
+                        }
+                    }
                 }
 
                 yield return Timing.WaitForSeconds(deltaIncrement);
             }
 
+            
+
             void OnInitiativeTrigger(CombatingEntity entity)
             {
+                _triggerHandler.OnInitiativeTrigger(entity);
+
 #if UNITY_EDITOR
                 Debug.Log($"Character TEMPO - {entity.CharacterName}"); 
 #endif
-                _triggerHandler.OnInitiativeTrigger(entity);
             }
 
-            void OnActionDone(CombatingEntity entity) => _triggerHandler.OnActionDone(entity);
-
-            void OnFinishTrigger(CombatingEntity entity) => _triggerHandler.OnFinisAllActions(entity);
-
-            void DoCheckIfRoundPassed(CombatingEntity triggerEntity)
+            void OnActionDone(CombatingEntity entity)
             {
-                if (!_roundTracker.Contains(triggerEntity)) return;
-                if (_roundTracker.Count <= 1) //this means that the triggerEntity is the last one
-                {
-                    RefillRoundTracker();
-                    _triggerHandler.OnRoundCompleted(_characters,triggerEntity);
-                }
-                else
-                {
-                    _roundTracker.Remove(triggerEntity);
-                }
+                _triggerHandler.OnActionDone(entity);
             }
+
+            void OnFinishTrigger(CombatingEntity entity)
+            {
+                _triggerHandler.OnFinisAllActions(entity);
+            }
+
+            
         }
 
         private void RefillRoundTracker()
@@ -145,25 +162,25 @@ namespace _CombatSystem
             }
         }
 
-        public void OnStart()
+        public void OnCombatStart()
         {
             Timing.KillCoroutines(_loopHandle);
             _loopHandle = Timing.RunCoroutine(_Tick());
         }
 
-        public void OnFinish(CombatingTeam removeEnemies)
+        public void OnCombatFinish(CombatingTeam removeEnemies)
         {
             Timing.KillCoroutines(_loopHandle);
             EntitiesBar.Clear();
         }
 
-        public void OnPause()
+        public void OnCombatPause()
         {
             if(_entityPaused) return;
             Timing.PauseCoroutines(_loopHandle);
         }
 
-        public void OnResume()
+        public void OnCombatResume()
         {
             if(_entityPaused) return;
             Timing.ResumeCoroutines(_loopHandle);

@@ -8,6 +8,9 @@ namespace Skills
 {
     public static class UtilsSkill
     {
+
+        public const int PredictedAmountOfSkillsPerState = 4 + 2 + 1; // 4 Unique + 2 common + 1 Ultimate
+        public const int PredictedTotalOfSkills = PredictedAmountOfSkillsPerState * 3; // *3 types of states
         public static void DoDamage(float damage, ICharacterFullStats stats)
         {
             float normalizedReduction = 1 - (stats.DamageReduction);
@@ -59,5 +62,6 @@ namespace Skills
                     return skills.NeutralSkills;
             }
         }
+
     }
 }

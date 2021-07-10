@@ -16,7 +16,12 @@ namespace Skills
             float damage = user.CombatStats.AttackPower;
             damage *= effectModifier;
 
+#if UNITY_EDITOR
+            Debug.Log($"Damage Effect: {target.CharacterName} => {damage}");
+#endif
+
             UtilsSkill.DoDamage(damage,target.CombatStats);
+            target.Listeners.UpdateTemporalStats();
         }
 
     }

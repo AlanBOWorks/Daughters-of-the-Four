@@ -15,6 +15,8 @@ namespace Characters
             new TeamTransforms();
         [SerializeField] private TeamTransforms enemyFaction =
             new TeamTransforms();
+        [Title("Back Up")]
+        [SerializeField] private GameObject onNullSpawnPrefab;
 
         public ICharacterArchetypes<Transform> PlayerFaction => playerFaction;
         public ICharacterArchetypes<Transform> EnemyFaction => enemyFaction;
@@ -36,6 +38,14 @@ namespace Characters
             
             void AddEntities(CombatingTeam team, TeamTransforms transforms)
             {
+#if UNITY_EDITOR
+                if (team.Count != CharacterArchetypes.AmountOfArchetypes)
+                {
+                    throw new NotImplementedException("Can't spawn all entities",
+                        new IndexOutOfRangeException($"Not enough elements: {team.Count}"));
+                } 
+#endif
+
                 InvokeEntity(team.FrontLiner,transforms.FrontLiner);
                 InvokeEntity(team.MidLiner, transforms.MidLiner);
                 InvokeEntity(team.BackLiner, transforms.BackLiner);
@@ -49,17 +59,19 @@ namespace Characters
 #if UNITY_EDITOR
                     Debug.LogWarning("Invoking NULL prefab"); 
 #endif
-                    return;
+                    prefab = onNullSpawnPrefab;
                 }
                 
                 UCharacterHolder holder = spawner.SpawnEntity(prefab);
-                entity.Holder = holder;
-                holder.transform.position = spawnTransform.position;
+                holder.Injection(entity);
+                Transform holderTransform = holder.transform;
+                holderTransform.position = spawnTransform.position;
+                holderTransform.rotation = spawnTransform.rotation;
             }
         }
 
 
-        public void OnFinish(CombatingTeam removeEnemies)
+        public void OnCombatFinish(CombatingTeam removeEnemies)
         {
             EntityHolderSpawner spawner = CharacterSystemSingleton.Spawner;
             foreach (CombatingEntity enemy in removeEnemies)

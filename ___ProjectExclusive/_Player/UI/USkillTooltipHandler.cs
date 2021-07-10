@@ -1,8 +1,9 @@
 ﻿using Sirenix.OdinInspector;
+using Skills;
 using TMPro;
 using UnityEngine;
 
-namespace Skills
+namespace _Player
 {
     public class USkillTooltipHandler : MonoBehaviour
     {
@@ -12,8 +13,6 @@ namespace Skills
         [Button]
         public void HandleButton(USkillButton button)
         {
-            transform.position = button.transform.position;
-
             // Skill data
             skillName.text = button.CurrentSkill.SkillName;
         }

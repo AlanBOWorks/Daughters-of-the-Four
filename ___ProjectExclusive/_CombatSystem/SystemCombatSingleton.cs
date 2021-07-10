@@ -18,7 +18,7 @@ namespace _CombatSystem
             Invoker = new SystemInvoker();
             Characters = new CombatCharactersHolder();
             TempoHandler = new TempoHandler(new CharacterTempoHandler());
-            SkillUseHandler = new SkillUseHandler();
+            actionSkillHandler = new ActionSkillHandler();
 
             // Locals declarations that wont be used further than durante the CombatInvoker
             var combatControlDeclaration = new CombatControlDeclaration();
@@ -28,13 +28,13 @@ namespace _CombatSystem
             Invoker.SubscribeListener(TempoHandler);
             Invoker.SubscribeListener(combatControlDeclaration);
 
-            TempoHandler.Subscribe(SkillUseHandler);
+            TempoHandler.Subscribe(actionSkillHandler);
         }
 
         // Useful objects will remain in the Singleton as well
         public static bool IsCombatActive => Invoker.CombatHandle.IsRunning;
         [ShowInInspector]
-        public static SkillUseHandler SkillUseHandler;
+        public static ActionSkillHandler actionSkillHandler;
         [ShowInInspector]
         public static CombatCharactersHolder Characters;
         [ShowInInspector]

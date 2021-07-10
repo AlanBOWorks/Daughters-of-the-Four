@@ -34,17 +34,20 @@ namespace Characters
 
         [ShowInInspector]
         public CharacterCombatData CombatStats { get; private set; }
-
         /// <summary>
         /// Used to track the damage received, heals, etc.
         /// </summary>
         public SerializedCombatStatsFull ReceivedStats { get; private set; }
+        public readonly CharacterListeners Listeners;
 
         [ShowInInspector, NonSerialized] 
-        public CharacterPosition PositionTracker;
+        public CharacterAreas areasTracker;
 
         [ShowInInspector]
         public ISkillPositions<List<CombatSkill>> Skills { get; private set; }
+
+        public ICharacterCombatAnimator CombatAnimator;
+
         /// <summary>
         /// Keeps track of the entity's allies and enemies
         /// </summary>
@@ -54,15 +57,29 @@ namespace Characters
         public bool IsAlive() => CombatStats.MortalityPoints > 0;
         public bool IsConscious() => IsAlive(); //TODO change it to HP or Mortality based in combat state
 
-        public CombatingEntity(string characterName, 
-            GameObject prefab)
+        public CombatingEntity(string characterName, GameObject prefab, 
+            ICharacterCombatAnimator combatAnimator)
         {
             CharacterName = characterName;
             InstantiationPrefab = prefab;
             ReceivedStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
+            Listeners = new CharacterListeners(this);
+            CombatAnimator = combatAnimator;
         }
+        /// <summary>
+        /// Initialize this object with a provisional [<see cref="ICharacterCombatAnimator"/>] of type
+        /// [<seealso cref="ProvisionalCharacterAnimator"/>]
+        /// </summary>
+        public CombatingEntity(string characterName, GameObject prefab) 
+            : this(characterName,prefab, ProvisionalCharacterAnimator.ProvisionalAnimator)
+        { }
 
-        public void Injection(CharacterCombatData combatStats) => CombatStats = combatStats;
+        public void Injection(CharacterCombatData combatStats)
+        {
+            if(CombatStats != null)
+                throw new ArgumentException("Can't inject stats when the Entity already has its Stats");
+            CombatStats = combatStats;
+        } 
         public void Injection(ISkillPositions<List<Skill>> injectedSkills)
         {
             if(injectedSkills == null) return;
@@ -130,6 +147,7 @@ namespace Characters
         public SerializedCombatStatsFull BurstStats { get; protected set; }
 
         public int ActionsLefts = 0;
+
         public void RefillInitiativeActions()
         {
             // It's addition and not override by (=) because another character could add/remove actions

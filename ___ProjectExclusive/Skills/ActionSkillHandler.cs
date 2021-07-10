@@ -1,33 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using _CombatSystem;
+using _Player;
 using Characters;
+using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Skills
 {
-    public class SkillUseHandler : ICombatAfterPreparationListener,ITempoListener
+    public class ActionSkillHandler : ICombatAfterPreparationListener,ITempoListener
     {
         [ShowInInspector]
         private CombatingEntity _currentUser;
-        public readonly Dictionary<CombatingEntity, SkillUsage> LastSkills;
         [ShowInInspector]
-        private readonly List<CombatingEntity> _currentSkillTargets;
+        private readonly SkillTargets _currentSkillTargets;
 
-        public SkillUseHandler()
+        public bool SkipAnimations = false;
+
+        public ActionSkillHandler()
         {
             int sizeAllocation = CharacterUtils.PredictedAmountOfCharactersInBattle;
-            LastSkills = new Dictionary<CombatingEntity, SkillUsage>(sizeAllocation);
-            _currentSkillTargets = new List<CombatingEntity>(sizeAllocation); // it could be a whole targets
+            _currentSkillTargets = new SkillTargets(sizeAllocation); // it could be a whole targets
         }
 
         public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
         {
-            LastSkills.Clear();
-            foreach (CombatingEntity entity in allEntities)
-            {
-                LastSkills.Add(entity, new SkillUsage());
-            }
+            
         }
 
 
@@ -43,19 +42,74 @@ namespace Skills
         public void OnFinisAllActions(CombatingEntity entity)
         {
             _currentUser = null;
+            _currentSkillTargets.UsingSkill = null;
+            _currentSkillTargets.Clear();
         }
 
-        public void DoSkill(CombatSkill skill, CombatingEntity target)
+        private CoroutineHandle _doSkillHandle;
+        public void DoSkill(CombatingEntity target)
         {
-            var skillUsage = LastSkills[_currentUser];
-            skillUsage.OnTarget = target;
-            skillUsage.Skill = skill;
-            //TODO pass this to an SkullUsageHandler
+            _doSkillHandle =
+                Timing.RunCoroutineSingleton(_DoSkill(target), _doSkillHandle,SingletonBehavior.Wait);
+        }
+
+        private IEnumerator<float> _DoSkill(CombatingEntity target)
+        {
+            CombatSkill skill = _currentSkillTargets.UsingSkill;
+            if (skill is null)
+            {
+                throw new NullReferenceException("DoSkills() was invoked before preparation");
+            }
+
+            skill.OnSkillUsage();
+            PlayerEntitySingleton.SkillButtonsHandler.GetButton(skill).HandleOnUse();
+
+
+            var skillEffects = skill.GetEffects();
+            if (skillEffects is null || skillEffects.Count <= 0)
+            {
+#if UNITY_EDITOR
+                Debug.LogError("Skill doesn't have an effect");
+#endif                
+                yield break;
+            }
+
+            //>>>>>>>>>>>>>>>>>>> DO Main Effect
+            List<CombatingEntity> effectTargets;
+            var mainEffect = skillEffects[0];
+            DoEffectOnTargets(mainEffect);
+            yield return Timing.WaitUntilDone(_currentUser.CombatAnimator
+                ._DoAnimation(_currentUser, effectTargets, _currentSkillTargets.UsingSkill));
+
+
+
+            //>>>>>>>>>>>>>>>>>>> DO Secondary Effects
+            // 1 since the main Effect is skillEffects[0]
+            for (int i = 1; i < skillEffects.Count; i++)
+            {
+                DoEffectOnTargets(skillEffects[i]);
+            }
+
+
+            //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
+            CombatSystemSingleton.TempoHandler.ResumeFromTempoTrigger();
+
+
+            //////////////////////
+            void DoEffectOnTargets(EffectParams effect)
+            {
+                effectTargets = UtilsTargets.GetEffectTargets(effect, target);
+                foreach (CombatingEntity effectTarget in effectTargets)
+                {
+                    effect.DoEffect(_currentUser, effectTarget);
+                }
+            }
         }
 
         public List<CombatingEntity> GetPossibleTargets(CombatSkill skill)
         {
             _currentSkillTargets.Clear();
+            _currentSkillTargets.UsingSkill = skill;
             PrepareTargets();
             return _currentSkillTargets;
 
@@ -101,7 +155,7 @@ namespace Skills
                 {
                     CombatingTeam enemyTeam = user.CharacterGroup.Enemies;
                     AddIfCan(enemyTeam.FrontLiner);
-                    if (_currentUser.PositionTracker.CombatPosition !=
+                    if (_currentUser.areasTracker.CombatPosition !=
                         CharacterArchetypes.PositionType.InEnemyTeam) return;
                     
                     var enemyAttacker 
@@ -128,9 +182,10 @@ namespace Skills
 
     }
 
-    public class SkillUsage
+    public class SkillTargets : List<CombatingEntity>
     {
-        public CombatSkill Skill;
-        public CombatingEntity OnTarget;
+        public CombatSkill UsingSkill;
+        public SkillTargets(int memoryAlloc) : base(memoryAlloc)
+        {}
     }
 }

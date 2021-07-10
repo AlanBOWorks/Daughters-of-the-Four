@@ -14,7 +14,14 @@ namespace Skills
         {
             float heal = user.CombatStats.HealPower;
             heal *= effectModifier;
+
+#if UNITY_EDITOR
+            Debug.Log($"Heal Effect: {target.CharacterName} => {heal}");
+#endif
+
+
             UtilsSkill.DoHeal(heal,target.CombatStats);
+            target.Listeners.UpdateTemporalStats();
 
         }
     }

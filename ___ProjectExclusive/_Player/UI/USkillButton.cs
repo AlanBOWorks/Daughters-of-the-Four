@@ -2,11 +2,12 @@
 using Characters;
 using MPUIKIT;
 using Sirenix.OdinInspector;
+using Skills;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Skills
+namespace _Player
 {
     public class USkillButton : MonoBehaviour, IPointerClickHandler,
         IPointerEnterHandler, IPointerExitHandler
@@ -29,6 +30,11 @@ namespace Skills
             private set => CurrentSkill.SkillState = value;
         }
 
+        private bool IsInvalid()
+        {
+            return CurrentSkill == null || CurrentEntity == null;
+
+        }
 
         public void Injection(CombatingEntity entity, CombatSkill skill)
         {
@@ -41,16 +47,24 @@ namespace Skills
             selectedIcon.gameObject.SetActive(set);
         }
 
-        private void InjectInHandler(ref USkillButton handlerButton)
+        public void HandleOnUse()
         {
+            ToggleSelectedIcon(false);
+        }
+
+        private void InjectInHandler()
+        {
+            var handler = Behaviour.Handler;
+            var handlerButton = handler.CurrentSelectedButton;
+
             if (handlerButton == null)
             {
-                handlerButton = this;
+                handler.CurrentSelectedButton = this;
             }
             else
             {
                 handlerButton.OnDeselectSkill();
-                handlerButton = this;
+                handler.CurrentSelectedButton = this;
             }
 
         }
@@ -63,6 +77,7 @@ namespace Skills
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if(IsInvalid()) return;
             PointerEventData.InputButton input = eventData.button;
             switch (input)
             {
@@ -94,11 +109,11 @@ namespace Skills
             switch (SkillState)
             {
                 case CombatSkill.State.Idle:
-                    InjectInHandler(ref Behaviour.Handler.currentSelectedButton);
+                    InjectInHandler();
                     OnSelectSkill();
                     break;
                 case CombatSkill.State.Selected:
-                    Behaviour.Handler.currentSelectedButton = null;
+                    Behaviour.Handler.CurrentSelectedButton = null;
                     OnDeselectSkill();
                     break;
                 case CombatSkill.State.Cooldown:
@@ -106,16 +121,14 @@ namespace Skills
                 default:
                     throw new NotImplementedException("Skill Button Click not Implemented");
             }
-
-
-
-            
         }
 
 
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            if (IsInvalid()) return;
+
             USkillTooltipHandler handler = Behaviour.SkillTooltip;
             handler.HandleButton(this);
             handler.gameObject.SetActive(true);
@@ -123,6 +136,8 @@ namespace Skills
 
         public void OnPointerExit(PointerEventData eventData)
         {
+            if (IsInvalid()) return;
+
             USkillTooltipHandler handler = Behaviour.SkillTooltip;
             handler.gameObject.SetActive(false);
         }

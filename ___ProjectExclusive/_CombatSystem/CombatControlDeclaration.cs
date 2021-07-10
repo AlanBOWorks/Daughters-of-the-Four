@@ -22,16 +22,16 @@ namespace _CombatSystem
                 for (var i = 0; i < entities.Count; i++)
                 {
                     var entity = entities[i];
-                    if (entity.PositionTracker != null)
+                    if (entity.areasTracker != null)
                     {
-                        entity.PositionTracker.CombatPosition =
+                        entity.areasTracker.CombatPosition =
                             CharacterArchetypes.PositionType.InTeam; //Resets if already have tracker
                     }
                     else
                     {
-                        CharacterPosition position
-                            = new CharacterPosition(CharacterArchetypes.GetTeamPosition(i));
-                        entity.PositionTracker = position;
+                        CharacterAreas areas
+                            = new CharacterAreas(CharacterArchetypes.GetTeamPosition(i));
+                        entity.areasTracker = areas;
                     }
                 }
             }
@@ -130,12 +130,13 @@ namespace _CombatSystem
         }
     }
 
-    public class CharacterPosition
+    public class CharacterAreas
     {
         public CharacterArchetypes.TeamPosition PositionInTeam;
         public CharacterArchetypes.PositionType CombatPosition;
+        public CharacterArchetypes.RangeType RangeType;
 
-        public CharacterPosition(CharacterArchetypes.TeamPosition positionInTeam)
+        public CharacterAreas(CharacterArchetypes.TeamPosition positionInTeam)
         {
             PositionInTeam = positionInTeam;
             CombatPosition = CharacterArchetypes.PositionType.InTeam;

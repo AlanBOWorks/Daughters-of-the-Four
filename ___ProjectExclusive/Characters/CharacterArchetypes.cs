@@ -35,6 +35,13 @@ namespace Characters
         {
             return (PositionType)index;
         }
+        [Flags]
+        public enum RangeType
+        {
+            Melee,
+            Range,
+            Hybrid = Melee | Range
+        }
 
         public static bool IsValid<T>(ICharacterArchetypesData<T> data) where T : class
         {

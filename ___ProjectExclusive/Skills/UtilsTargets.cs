@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using _CombatSystem;
 using Characters;
+using UnityEngine;
 
 namespace Skills
 {
     public static class UtilsTargets
     {
-        
-        public static List<CombatingEntity> GetEffectTargets(CombatingEntity target, EffectParams effect)
+        public static List<CombatingEntity> GetEffectTargets(EffectParams effect, CombatingEntity target)
         {
             List<CombatingEntity> applyEffectOn;
             SEffectBase.EffectTarget targetType = effect.GetEffectTarget();
@@ -17,7 +18,6 @@ namespace Skills
             CharacterSelfGroup targetGroup = target.CharacterGroup;
             switch (targetType)
             {
-                default:
                 case SEffectBase.EffectTarget.Target:
                     applyEffectOn = targetGroup.Self;
                     break;
@@ -27,6 +27,8 @@ namespace Skills
                 case SEffectBase.EffectTarget.TargetTeamExcluded:
                     applyEffectOn = targetGroup.TeamNotSelf;
                     break;
+                default:
+                    throw new ArgumentException($"Target type is not defined: {(int) targetType}");
             }
 
             return applyEffectOn;

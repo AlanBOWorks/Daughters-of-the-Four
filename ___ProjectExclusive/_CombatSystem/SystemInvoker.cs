@@ -101,7 +101,7 @@ namespace _CombatSystem
                 {
                     foreach (ICombatStartListener listener in _onStartListeners)
                     {
-                        listener.OnStart();
+                        listener.OnCombatStart();
                     }
                 }
 
@@ -126,7 +126,7 @@ namespace _CombatSystem
         {
             foreach (ICombatPauseListener listener in _onPauseListeners)
             {
-                listener.OnPause();
+                listener.OnCombatPause();
             }
         }
 
@@ -135,7 +135,7 @@ namespace _CombatSystem
         {
             foreach (ICombatPauseListener listener in _onPauseListeners)
             {
-                listener.OnResume();
+                listener.OnCombatResume();
             }
         }
 
@@ -186,17 +186,17 @@ namespace _CombatSystem
 
     public interface ICombatStartListener : IInvokerListenerBase
     {
-        void OnStart();
+        void OnCombatStart();
     }
 
     public interface ICombatPauseListener : IInvokerListenerBase
     {
-        void OnPause();
-        void OnResume();
+        void OnCombatPause();
+        void OnCombatResume();
     }
 
     public interface ICombatFinishListener : IInvokerListenerBase
     {
-        void OnFinish(CombatingTeam removeEnemies);
+        void OnCombatFinish(CombatingTeam removeEnemies);
     }
 }

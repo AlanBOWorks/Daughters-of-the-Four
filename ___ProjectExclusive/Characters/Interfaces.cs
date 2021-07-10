@@ -27,6 +27,7 @@ namespace Characters
         float BuffPower { get; set; }
     }
 
+
     public interface IVitalityStats
     {
         float MaxHealth { get; set; }

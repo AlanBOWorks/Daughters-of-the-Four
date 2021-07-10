@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using _CombatSystem;
 using Characters;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace _Player
@@ -9,13 +10,14 @@ namespace _Player
     public class PlayerCombatElementsPools :ICombatPreparationListener, ICombatAfterPreparationListener, ICombatFinishListener
     {
         public IPlayerCombatPool<UCharacterUIHolder> CharacterUIPool { set; private get; }
-        private readonly PlayerCombatDictionary _entitiesDictionary;
+        [ShowInInspector] 
+        public readonly Dictionary<CombatingEntity, PlayerCombatElement> EntitiesDictionary;
 
-        public PlayerCombatElementsPools(PlayerCombatDictionary entitiesDictionary)
+        public PlayerCombatElementsPools()
         {
-            _entitiesDictionary = entitiesDictionary;
-
-            CombatSystemSingleton.Invoker.SubscribeListener(this);
+            int amountOfCharacters = CharacterUtils.PredictedAmountOfCharactersInBattle;
+            EntitiesDictionary = 
+                new Dictionary<CombatingEntity, PlayerCombatElement>(amountOfCharacters);
         }
 
         public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities,
@@ -25,35 +27,36 @@ namespace _Player
             {
                 var uiHolder = CharacterUIPool.PoolDoInjection(entity);
                 var element = new PlayerCombatElement(uiHolder);
-                _entitiesDictionary.Add(entity,element);
+                EntitiesDictionary.Add(entity,element);
             }
         }
 
-        public void OnFinish(CombatingTeam removeEnemies)
+        public void OnCombatFinish(CombatingTeam removeEnemies)
         {
-            foreach (KeyValuePair<CombatingEntity, PlayerCombatElement> pair in _entitiesDictionary)
+            foreach (KeyValuePair<CombatingEntity, PlayerCombatElement> pair in EntitiesDictionary)
             {
                 var entity = pair.Key;
                 var element = pair.Value;
                 CharacterUIPool.ReturnElement(element.UIHolder);
-                _entitiesDictionary.Remove(entity);
+                EntitiesDictionary.Remove(entity);
             }
         }
 
 
         public void OnBeforeStart(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
         {
-            if (_entitiesDictionary.Count > 0)
+            if (EntitiesDictionary.Count > 0)
             {
-                foreach (KeyValuePair<CombatingEntity, PlayerCombatElement> pair in _entitiesDictionary)
+                foreach (KeyValuePair<CombatingEntity, PlayerCombatElement> pair in EntitiesDictionary)
                 {
                     Debug.LogError($"Element in Player's Pool: {pair.Key.CharacterName}");
                 }
                 throw new SystemException("Elements weren't cleaned properly beforehand the Combat",
-                    new IndexOutOfRangeException($"Amount of not disposed elements: {_entitiesDictionary.Count}"));
+                    new IndexOutOfRangeException($"Amount of not disposed elements: {EntitiesDictionary.Count}"));
             }
                
         }
+
     }
 
     /// <summary>
@@ -73,6 +76,10 @@ namespace _Player
             UIHolder = uiHolder;
         }
 
+        public UTargetButton GetTargetButton()
+        {
+            return UIHolder.TargetButton;
+        }
     }
 
     /// <summary>
@@ -85,9 +92,4 @@ namespace _Player
         void ReturnElement(T element);
     }
 
-    public class PlayerCombatDictionary : Dictionary<CombatingEntity, PlayerCombatElement> 
-    {
-        public PlayerCombatDictionary(int length) : base(length)
-        { }
-    }
 }

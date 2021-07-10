@@ -31,6 +31,7 @@ namespace _Player
         {
             targetTooltip.Injection(entity);
             feetTooltip.Injection(entity);
+            targetButton.Injection(entity);
         }
         public void RePosition(Vector3 worldPosition)
         {

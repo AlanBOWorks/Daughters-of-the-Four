@@ -1,4 +1,5 @@
 ﻿using System;
+using _Player;
 using UnityEngine;
 
 namespace _CombatSystem
@@ -10,6 +11,7 @@ namespace _CombatSystem
         private void Awake()
         {
             CombatSystemSingleton.ParamsVariable = combatParams;
+            PlayerEntitySingleton.DoSubscriptionsToCombatSystem();
         }
 
         private void Start()

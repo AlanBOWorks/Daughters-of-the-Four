@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using _CombatSystem;
 using Characters;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using Skills;
 using UnityEditor;
+using UnityEngine;
 
 namespace _Player
 {
@@ -13,18 +16,31 @@ namespace _Player
 
         private PlayerEntitySingleton()
         {
-            CombatDictionary = new PlayerCombatDictionary(CharacterUtils.PredictedAmountOfCharactersInBattle);
-            CombatElementsPools = new PlayerCombatElementsPools(CombatDictionary);
+            CombatElementsPools = new PlayerCombatElementsPools();
+            TargetsHandler = new PlayerTargetsHandler();
+
+#if UNITY_EDITOR
+            Debug.Log("Player Singleton Created");
+#endif
         }
         public static PlayerEntitySingleton Instance { get; } = new PlayerEntitySingleton();
 
-        public static PlayerCombatDictionary CombatDictionary = null;
-        [ShowInInspector] 
+        public static Dictionary<CombatingEntity, PlayerCombatElement> CombatDictionary
+            => CombatElementsPools.EntitiesDictionary;
+        [ShowInInspector]
         public static PlayerCombatElementsPools CombatElementsPools;
+        public static PlayerTargetsHandler TargetsHandler;
+
         [ShowInInspector]
         public static USkillButtonsHandler SkillButtonsHandler = null;
         [ShowInInspector]
         public static IPlayerArchetypesData<SPlayerCharacterEntityVariable> SelectedCharacters = null;
+
+        public static void DoSubscriptionsToCombatSystem()
+        {
+            var invoker = CombatSystemSingleton.Invoker;
+            invoker.SubscribeListener(CombatElementsPools);
+        }
     }
 
 

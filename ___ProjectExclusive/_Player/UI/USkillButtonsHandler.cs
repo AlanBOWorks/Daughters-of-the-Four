@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
 
-namespace Skills
+namespace _Player
 {
     public class USkillButtonsHandler : MonoBehaviour, IEquipSkill<USkillButton>, IPlayerTempoListener
     {
@@ -27,8 +27,28 @@ namespace Skills
         public USkillButton CommonSkillSecondary => commonSecondary;
         public List<USkillButton> UniqueSkills => skillButtons;
 
-        [NonSerialized,ShowInInspector,DisableInEditorMode,DisableInPlayMode] 
-        public USkillButton currentSelectedButton;
+        [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
+        private USkillButton _currentSelectedButton;
+        public USkillButton CurrentSelectedButton
+        {
+            get => _currentSelectedButton;
+            set
+            {
+                _currentSelectedButton = value;
+                if (_currentSelectedButton == null)
+                {
+                    PlayerEntitySingleton.TargetsHandler.HideSkillTargets();
+                }
+                else
+                {
+                    PlayerEntitySingleton.TargetsHandler.ShowSkillTargets(value.CurrentSkill);
+                }
+            }
+        }
+
+
+        private Dictionary<CombatSkill, USkillButton> _skillButtons;
+        public USkillButton GetButton(CombatSkill skill) => _skillButtons[skill];
 
         [Button ("Serialize Children"),HideInPlayMode]
         private void SerializeButtons()
@@ -36,11 +56,16 @@ namespace Skills
             skillButtons.AddRange(GetComponentsInChildren<USkillButton>());
         }
 
+
+
         private void Awake()
         {
             buttonsBehaviour.Handler = this;
             PlayerEntitySingleton.SkillButtonsHandler = this;
             CombatSystemSingleton.TempoHandler.Subscribe(this);
+            int predictedAmountOfButtons = UtilsSkill.PredictedAmountOfSkillsPerState;
+            _skillButtons 
+                = new Dictionary<CombatSkill, USkillButton>(predictedAmountOfButtons);
 
             gameObject.SetActive(false);
             InjectBehaviour();
@@ -58,6 +83,7 @@ namespace Skills
         private void UpdateCharacterSkills(CombatingEntity entity)
         {
             List<CombatSkill> uniqueSkills = UtilsSkill.GetSkillsByTeamState(entity);
+            _skillButtons.Clear();
             if(uniqueSkills == null) return;
             int skillsAmount = uniqueSkills.Count;
 
@@ -65,8 +91,11 @@ namespace Skills
             // Show
             for (i = 0; i < skillsAmount; i++)
             {
-                skillButtons[i].Injection(entity,uniqueSkills[i]);
-                skillButtons[i].gameObject.SetActive(true);
+                var skill = uniqueSkills[i];
+                var button = skillButtons[i];
+                button.Injection(entity,skill);
+                button.gameObject.SetActive(true);
+                _skillButtons.Add(skill,button);
             }
             // Hide the rest
             for (; i < skillButtons.Count; i++)
@@ -104,7 +133,8 @@ namespace Skills
         {
             DisableButtons(entity);
         }
+
+        
     }
 
-    public class CharacterSkillButtonsHandler { }
 }

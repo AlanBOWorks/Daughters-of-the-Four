@@ -127,12 +127,12 @@ namespace _Player
             transform.position = canvasCamera.WorldToScreenPoint(worldPosition);
         }
 
-        public void OnFinish(CombatingTeam removeEnemies)
+        public void OnCombatFinish(CombatingTeam removeEnemies)
         {
             gameObject.SetActive(false);
             currentEntity = null;
         }
-        public void OnStart()
+        public void OnCombatStart()
         {
             gameObject.SetActive(true);
         }
