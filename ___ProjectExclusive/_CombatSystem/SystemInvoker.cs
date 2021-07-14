@@ -147,6 +147,7 @@ namespace _CombatSystem
 
             entity.Injection(variable.GenerateData());
             entity.Injection(variable.skillsPreset);
+            entity.Injection(variable.sharedSkillsPreset);
             return entity;
         }
     }

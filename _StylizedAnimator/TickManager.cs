@@ -63,7 +63,7 @@ namespace StylizedAnimator
 
         public void AddTicker(IStylizedTicker ticker)
         {
-            AddTicker(ticker,_parameters.DefaultInjectionIndex);
+            AddTicker(ticker,_parameters.DefaultTickTier);
         }
 
         public void RemoveTicker(IStylizedTicker ticker)

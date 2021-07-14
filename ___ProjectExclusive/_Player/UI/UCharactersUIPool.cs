@@ -4,32 +4,31 @@ using _CombatSystem;
 using _Player;
 using Characters;
 using MEC;
+using SharedLibrary;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace _Player
 {
-    public class UCharactersUIPool : MonoBehaviour, IPlayerCombatPool<UCharacterUIHolder>
+    public class UCharactersUIPool : MonoBehaviour, IPlayerCombatPool<UCharacterUIHolder>,
+        ICameraSingletonListener
     {
         [Title("References")] 
-        [SerializeField] private UTeamsSpawner spawner = null;
-        [SerializeField] private Camera canvasCamera = null;
+        [SerializeField] private UCombatTeamsSpawner spawner = null;
         [SerializeField] private Transform instantiationParent = null;
 
-        [TitleGroup("Pooling")] [SerializeField, HideInPlayMode]
+        [TitleGroup("Pooling")] 
+        [SerializeField, HideInPlayMode]
         private UCharacterUIHolder holderPrefab = null;
 
         private Stack<UCharacterUIHolder> _holders;
 
-
         private void Awake()
         {
-            int allocationAmount = CharacterUtils.PredictedAmountOfCharactersInBattle;
-            _holders = new Stack<UCharacterUIHolder>(allocationAmount);
-            DoPooling(allocationAmount, true);
-
-            PlayerEntitySingleton.CombatElementsPools.CharacterUIPool = this;
+            CameraSingleton.Subscribe(this);
         }
+
+        
 
         public UCharacterUIHolder PoolDoInjection(CombatingEntity entity)
         {
@@ -45,7 +44,7 @@ namespace _Player
             holder.gameObject.SetActive(false);
         }
 
-        private void DoPooling(int poolAmount, bool initialPosition = false)
+        private void DoPooling(Camera canvasCamera, int poolAmount, bool initialPosition = false)
         {
             for (int i = 0; i < poolAmount; i++)
             {
@@ -80,6 +79,21 @@ namespace _Player
             }
         }
 
+        public void OnCameraInitiation(Camera injection)
+        {
+            int allocationAmount = CharacterUtils.PredictedAmountOfCharactersInBattle;
+            _holders = new Stack<UCharacterUIHolder>(allocationAmount);
+            DoPooling(injection, allocationAmount, true);
+
+            PlayerEntitySingleton.CombatElementsPools.CharacterUIPool = this;
+        }
+        public void OnCameraChange(Camera injection)
+        {
+            foreach (UCharacterUIHolder holder in _holders)
+            {
+                holder.Injection(injection);
+            }
+        }
     }
 
     public abstract class UCharacterOverTooltipBase : MonoBehaviour,ICombatStartListener, ICombatFinishListener
@@ -111,16 +125,12 @@ namespace _Player
             if(currentEntity == null) return;
 
             UCharacterHolder holder = currentEntity.Holder;
-
-
-
             if (holder == null || canvasCamera == null) return;
 
-
-
-            Transform onTransform = holder.GetTooltipTransform();
-            RePosition(onTransform.position);
+            RePosition(GetUIPosition(holder));
         }
+
+        protected abstract Vector3 GetUIPosition(UCharacterHolder holder);
 
         public void RePosition(Vector3 worldPosition)
         {

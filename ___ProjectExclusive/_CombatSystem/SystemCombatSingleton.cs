@@ -15,20 +15,41 @@ namespace _CombatSystem
 
         private CombatSystemSingleton()
         {
+            CharacterTempoHandler tempoHandler;
+            SafetyBackupSkillsInjection backupSkillsInjection;
+            InitializeSystem();
+
             Invoker = new SystemInvoker();
             Characters = new CombatCharactersHolder();
-            TempoHandler = new TempoHandler(new CharacterTempoHandler());
+            TempoHandler = new TempoHandler(tempoHandler);
             actionSkillHandler = new ActionSkillHandler();
+            ActionsLooper = new ActionsLooper(tempoHandler);
 
             // Locals declarations that wont be used further than durante the CombatInvoker
             var combatControlDeclaration = new CombatControlDeclaration();
+            var skillCooldown = new SkillCooldownHandler();
 
             //---- Injections ----
             Invoker.SubscribeListener(Characters);
             Invoker.SubscribeListener(TempoHandler);
             Invoker.SubscribeListener(combatControlDeclaration);
+            Invoker.SubscribeListener(backupSkillsInjection);
 
             TempoHandler.Subscribe(actionSkillHandler);
+            TempoHandler.Subscribe(skillCooldown);
+
+            void InitializeSystem()
+            {
+#if UNITY_EDITOR
+                tempoHandler = new CharacterTempoHandler(true);
+#else
+                tempoHandler = new CharacterTempoHandler(false);
+#endif
+
+                backupSkillsInjection = new SafetyBackupSkillsInjection();
+
+            }
+
         }
 
         // Useful objects will remain in the Singleton as well
@@ -45,7 +66,8 @@ namespace _CombatSystem
         public static SystemInvoker Invoker;
         [ShowInInspector]
         public static TempoHandler TempoHandler;
-
+        [ShowInInspector] 
+        public static ActionsLooper ActionsLooper;
         [ShowInInspector]
         public static SCombatParams ParamsVariable = null;
 

@@ -68,8 +68,9 @@ namespace Skills
             CurrentCooldown = 0; // this value could be less than 0 by other skills
         }
 
-        public void IdleIfColdDownIsZero()
+        public void OnCharacterFinish()
         {
+            OnCharacterAction();
             if(CurrentCooldown > 0) return;
             SkillState = State.Idle;
         }
@@ -95,5 +96,8 @@ namespace Skills
         public string SkillName => preset.SkillName; //could be modified by a special name in some cases
         public Sprite Icon => preset.Icon; // could be modified by another icon when upgraded or something
         public List<EffectParams> GetEffects() => preset.Effects;
+
+        public SEffectBase.EffectType GetMainType() => Preset.MainEffectType;
+        public SEffectBase.EffectTarget GetMainTarget() => Preset.MainEffectTarget;
     }
 }

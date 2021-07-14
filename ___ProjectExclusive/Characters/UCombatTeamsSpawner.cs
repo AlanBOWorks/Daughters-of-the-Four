@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Characters;
 using _CombatSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Characters
 {
-    public class UTeamsSpawner : MonoBehaviour, ICharacterFaction<ICharacterArchetypes<Transform>>,
+    public class UCombatTeamsSpawner : MonoBehaviour, ICharacterFaction<ICharacterArchetypes<Transform>>,
         ICombatPreparationListener, ICombatFinishListener
     {
         [TitleGroup("Spawn Points")]
@@ -25,6 +24,7 @@ namespace Characters
         private void Awake()
         {
             CombatSystemSingleton.Invoker.SubscribeListener(this);
+            CharacterSystemSingleton.CombatSpawner = this;
         }
 
         [TitleGroup("Params")]
@@ -32,7 +32,7 @@ namespace Characters
         public void OnBeforeStart(CombatingTeam playerEntities, CombatingTeam enemyEntities,
             CharacterArchetypesList<CombatingEntity> allEntities)
         {
-            EntityHolderSpawner spawner = CharacterSystemSingleton.Spawner;
+            EntityHolderSpawner spawner = CharacterSystemSingleton.CharactersSpawner;
             AddEntities(playerEntities,playerFaction);
             AddEntities(enemyEntities,enemyFaction);
             
@@ -73,7 +73,7 @@ namespace Characters
 
         public void OnCombatFinish(CombatingTeam removeEnemies)
         {
-            EntityHolderSpawner spawner = CharacterSystemSingleton.Spawner;
+            EntityHolderSpawner spawner = CharacterSystemSingleton.CharactersSpawner;
             foreach (CombatingEntity enemy in removeEnemies)
             {
                 spawner.DeSpawn(enemy);

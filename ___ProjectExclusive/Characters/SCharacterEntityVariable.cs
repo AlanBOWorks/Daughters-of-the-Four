@@ -18,6 +18,7 @@ namespace Characters
         public GameObject CharacterPrefab => characterPrefab;
 
         public SCharacterSkillsPreset skillsPreset = null;
+        public SCharacterSharedSkillsPreset sharedSkillsPreset = null;
 
         public Transform CharacterHolderReference
         {

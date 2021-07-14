@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using PathologicalGames;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -12,66 +13,27 @@ namespace Characters
     /// </summary>
     public class EntityHolderSpawner
     {
-        private readonly Dictionary<GameObject, SpawnPool> _prefabPools;
+        private readonly SpawnPool _characterPool;
 
-        private const int PredictedAmountOfEntities = 16;
+        public static string PoolKey = "CharactersPool";
         public EntityHolderSpawner()
         {
-            _prefabPools = new Dictionary<GameObject, SpawnPool>(PredictedAmountOfEntities);
+            _characterPool = PoolManager.Pools.Create(PoolKey);
         }
 
         //TODO make it spawn based an scene; on change scene remove from Dictionary those elements
         public UCharacterHolder SpawnEntity([NotNull]GameObject prefab)
         {
-            bool canPool = CanPool(prefab);
-            UCharacterHolder spawn = canPool 
-                ? _prefabPools[prefab].Dequeue() 
-                : InstantiateCharacter(prefab);
+            var pooledElement = _characterPool.Spawn(prefab);
+            pooledElement.gameObject.SetActive(true);
 
-            spawn.gameObject.SetActive(true);
-            return spawn;
+            return pooledElement.GetComponent<UCharacterHolder>();
         }
 
         public void DeSpawn(CombatingEntity entity)
         {
-            SpawnPool pool =
-                _prefabPools[entity.InstantiationPrefab];
-
-            UCharacterHolder holder = entity.Holder;
-            holder.gameObject.SetActive(false);
-            pool.Enqueue(holder);
+            var element = entity.Holder.transform;
+            _characterPool.Despawn(element);
         }
-
-
-        private bool CanPool(GameObject prefab)
-        {
-            return _prefabPools.ContainsKey(prefab) && _prefabPools[prefab].Count > 0;
-        }
-
-        private UCharacterHolder InstantiateCharacter(GameObject prefab)
-        {
-            UCharacterHolder holder = 
-                Object.Instantiate(prefab).GetComponent<UCharacterHolder>();
-            
-            AddToDictionary(prefab,holder);
-            return holder;
-        }
-
-        private void AddToDictionary(GameObject prefab, UCharacterHolder holder)
-        {
-            SpawnPool pool;
-            if (_prefabPools.ContainsKey(prefab))
-            {
-                pool = _prefabPools[prefab];
-            }
-            else
-            {
-                pool = new SpawnPool();
-                _prefabPools[prefab] = pool;
-            }
-            pool.Enqueue(holder);
-        }
-
-        internal class SpawnPool : Queue<UCharacterHolder> {}
     }
 }

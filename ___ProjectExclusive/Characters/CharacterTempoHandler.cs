@@ -24,19 +24,19 @@ namespace Characters
             CanControlEnemies = canControlEnemies;
             _roundListeners = new Queue<IRoundListener>(PredictedAmountOfListeners);
 
-            _triggerHandler = new OnTriggerHandler(_listeners,_playerListeners);
+            _onTriggerHandler = new OnTriggerHandler(_listeners,_playerListeners);
             _onActionDoneHandler = new OnActionDoneHandler(_listeners,_playerListeners);
             _onFinishAllHandler = new OnFinishAllHandler(_listeners,_playerListeners);
         }
 
-        private readonly OnTriggerHandler _triggerHandler;
+        private readonly OnTriggerHandler _onTriggerHandler;
         public void OnInitiativeTrigger(CombatingEntity entity)
         {
-            _triggerHandler.DoActions(entity,CanControlEnemies);
+            _onTriggerHandler.DoActions(entity,CanControlEnemies);
         }
 
         private readonly OnActionDoneHandler _onActionDoneHandler;
-        public void OnActionDone(CombatingEntity entity)
+        public void OnDoMoreActions(CombatingEntity entity)
         {
             _onActionDoneHandler.DoActions(entity,CanControlEnemies);
         }
@@ -44,6 +44,7 @@ namespace Characters
         private readonly OnFinishAllHandler _onFinishAllHandler;
         public void OnFinisAllActions(CombatingEntity entity)
         {
+            Debug.Log("Finish Triggers");
             _onFinishAllHandler.DoActions(entity,CanControlEnemies);
         }
 
@@ -64,6 +65,7 @@ namespace Characters
             _roundListeners.Enqueue(listener);
         }
 
+        //This is mainly for checking if is a Player Controllable and if so call the necessary Queue
         internal abstract class HandlerBase
         {
             private readonly Queue<ITempoListener> _listeners;
@@ -110,7 +112,7 @@ namespace Characters
 
             protected override void OnListenerAction(ITempoListener listener, CombatingEntity entity)
             {
-                listener.OnActionDone(entity);
+                listener.OnDoMoreActions(entity);
             }
         }
         internal class OnFinishAllHandler : HandlerBase

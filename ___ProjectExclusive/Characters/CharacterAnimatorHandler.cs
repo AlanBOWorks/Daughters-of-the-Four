@@ -9,7 +9,25 @@ namespace Characters
 
     public class CharacterAnimatorHandler 
     {
-        
+        public static void DoReactAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill)
+        {
+            foreach (CombatingEntity target in targets)
+            {
+                DoReaction(target);
+            }
+
+
+            void DoReaction(CombatingEntity target)
+            {
+                if (target == user) return;
+                if (skill.GetMainType() != SEffectBase.EffectType.Offensive)
+                {
+                    target.CombatAnimator.ReceiveSupport(user, target, skill);
+                }
+                else
+                    target.CombatAnimator.ReceiveAttack(user, target, skill);
+            }
+        }
     }
 
     /// <summary>
@@ -23,37 +41,40 @@ namespace Characters
         public ProvisionalCharacterAnimator()
         {}
 
+        public void DoInitialAnimation()
+        {
+            
+        }
+
         public IEnumerator<float> _DoAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill)
         {
-            MoveUser();
-            foreach (CombatingEntity target in targets)
-            {
-                MoveTarget(target);
-            }
+            ProvisionalAnimation();
+            CharacterAnimatorHandler.DoReactAnimation(user,targets,skill);
             yield return Timing.WaitForSeconds(2);
 
-            void MoveUser()
+            void ProvisionalAnimation()
             {
                 user.Holder.transform.DOPunchPosition(Vector3.up, 1,3);
             }
-
-            void MoveTarget(CombatingEntity target)
-            {
-                target.CombatAnimator.ReceiveAction(user, target, skill);
-            }
-
         }
 
-        public void ReceiveAction(CombatingEntity actor, CombatingEntity target, CombatSkill skill)
+        public void ReceiveSupport(CombatingEntity actor, CombatingEntity target, CombatSkill skill)
         {
             target.Holder.transform.DOPunchPosition(Vector3.right , 1.4f);
             Debug.Log("Receiving skill: "+ target.CharacterName);
+        }
+        public void ReceiveAttack(CombatingEntity actor, CombatingEntity target, CombatSkill skill)
+        {
+            target.Holder.transform.DOPunchPosition(Vector3.forward, 1.4f);
+            Debug.Log("Receiving skill: " + target.CharacterName);
         }
     }
 
     public interface ICharacterCombatAnimator
     {
+        void DoInitialAnimation();
         IEnumerator<float> _DoAnimation(CombatingEntity user, List<CombatingEntity> targets,CombatSkill skill);
-        void ReceiveAction(CombatingEntity actor, CombatingEntity receiver, CombatSkill skill);
+        void ReceiveSupport(CombatingEntity actor, CombatingEntity receiver, CombatSkill skill);
+        void ReceiveAttack(CombatingEntity actor, CombatingEntity receiver, CombatSkill skill);
     }
 }

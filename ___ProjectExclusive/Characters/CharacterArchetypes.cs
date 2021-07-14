@@ -102,19 +102,24 @@ namespace Characters
 
         public static T GetElement<T>(ICharacterArchetypesData<T> elements, int index)
         {
-            switch (index)
+            return GetElement(elements, (TeamPosition) index);
+        }
+        public static T GetElement<T>(ICharacterArchetypesData<T> elements, TeamPosition archetype)
+        {
+            switch (archetype)
             {
-                default:
-                    throw new NotImplementedException("Index case not implemented.",
-                        new IndexOutOfRangeException($"{index} is out range"));
-                case CharacterArchetypes.FrontLinerIndex:
+                case TeamPosition.FrontLine:
                     return elements.FrontLiner;
-                case CharacterArchetypes.MidLinerIndex:
+                case TeamPosition.MidLine:
                     return elements.MidLiner;
-                case CharacterArchetypes.BackLinerIndex:
+                case TeamPosition.BackLine:
                     return elements.BackLiner;
+                default:
+                    throw new NotImplementedException("Invalid archetype", 
+                        new NotImplementedException($"Index of {archetype}"));
             }
         }
+
     }
 
     public class CharacterArchetypesList<T> : List<T>, ICharacterArchetypes<T>

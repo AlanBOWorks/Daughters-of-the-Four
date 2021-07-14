@@ -3,6 +3,7 @@ using Characters;
 using MPUIKIT;
 using Sirenix.OdinInspector;
 using Skills;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,6 +18,7 @@ namespace _Player
         // TODO animations by states
 
         [SerializeField] private Image selectedIcon = null;
+        [SerializeField] private TextMeshProUGUI cooldownHolder = null;
 
         public SkillButtonBehaviour Behaviour { set; private get; }
 
@@ -40,6 +42,31 @@ namespace _Player
         {
             CurrentEntity = entity;
             CurrentSkill = skill;
+
+        }
+
+        public void Show()
+        {
+            gameObject.SetActive(true);
+            UpdateCooldown();
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public void UpdateCooldown()
+        {
+            if (CurrentSkill.IsInCooldown())
+            {
+                cooldownHolder.transform.parent.gameObject.SetActive(true);
+                cooldownHolder.text = CurrentSkill.CurrentCooldown.ToString();
+            }
+            else
+            {
+                cooldownHolder.transform.parent.gameObject.SetActive(false);
+            }
         }
 
         public void ToggleSelectedIcon(bool set)
@@ -50,6 +77,7 @@ namespace _Player
         public void HandleOnUse()
         {
             ToggleSelectedIcon(false);
+            //TODO show cooldownOnUse
         }
 
         private void InjectInHandler()
@@ -57,15 +85,13 @@ namespace _Player
             var handler = Behaviour.Handler;
             var handlerButton = handler.CurrentSelectedButton;
 
-            if (handlerButton == null)
-            {
-                handler.CurrentSelectedButton = this;
-            }
-            else
+            if (handlerButton != null && handlerButton.SkillState != CombatSkill.State.Cooldown)
             {
                 handlerButton.OnDeselectSkill();
-                handler.CurrentSelectedButton = this;
             }
+
+            handler.CurrentSelectedButton = this;
+
 
         }
 
@@ -91,7 +117,6 @@ namespace _Player
 
         private void OnSelectSkill()
         {
-            //TODO call targetsHandler
             SkillState = CombatSkill.State.Selected;
             ToggleSelectedIcon(true);
 
@@ -99,7 +124,6 @@ namespace _Player
 
         private void OnDeselectSkill()
         {
-            //TODO cancel targetsHandler
             SkillState = CombatSkill.State.Idle;
             ToggleSelectedIcon(false);
         }

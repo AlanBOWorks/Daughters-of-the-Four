@@ -16,8 +16,8 @@ namespace StylizedAnimator
         public StylizedTickManager.FrameRateType FrameRateType => _frameRateType;
 
 
-        [SerializeField] private int _defaultInjectionIndex = 3;
-        public int DefaultInjectionIndex => _defaultInjectionIndex;
+        [SerializeField, SuffixLabel("ºTier")] private int defaultTickTier = 3;
+        public int DefaultTickTier => defaultTickTier;
 
 #if UNITY_EDITOR
         [SerializeField,HideInPlayMode] private bool _debugOnTick = true;

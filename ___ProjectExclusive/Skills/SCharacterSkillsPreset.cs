@@ -13,6 +13,9 @@ namespace Skills
         [SerializeField] private List<Skill> attackingSkills;
         [SerializeField] private List<Skill> neutralSkills;
         [SerializeField] private List<Skill> defendingSkills;
+        [SerializeField] private SCharacterSharedSkillsPreset sharedSkills;
+
+        public ISkillShared<Skill> SkillShared => sharedSkills;
 
         public List<Skill> AttackingSkills => attackingSkills;
         public List<Skill> NeutralSkills => neutralSkills;
@@ -21,23 +24,16 @@ namespace Skills
 
     public class PositionCombatSkills : ISkillPositions<List<CombatSkill>>
     {
-        public List<CombatSkill> CommonSkills { get; }
-
-        public CombatSkill Ultimate { get; }
-
         public List<CombatSkill> AttackingSkills { get; }
         public List<CombatSkill> NeutralSkills { get; }
         public List<CombatSkill> DefendingSkills { get; }
 
 
-        public PositionCombatSkills(ISkillPositions<List<Skill>> presets, [CanBeNull] CombatSkill ultimate)
+        public PositionCombatSkills(ISkillPositions<List<Skill>> presets)
         {
             AttackingSkills = GenerateList(presets.AttackingSkills);
             NeutralSkills = GenerateList(presets.NeutralSkills);
             DefendingSkills = GenerateList(presets.DefendingSkills);
-
-            CommonSkills = new List<CombatSkill>();
-            Ultimate = ultimate;
 
             List<CombatSkill> GenerateList(List<Skill> skills)
             {

@@ -13,21 +13,23 @@ namespace _CombatSystem
     public class SCombatParams : ScriptableObject
     {
         [Title("Skills")]
-        [SerializeField] private SCharacterSkillsPreset commonSkills;
-        [SerializeField] private Skills archetypesSkills = new Skills();
-        public ICharacterArchetypesData<SCharacterSkillsPreset> ArchetypesSkills => archetypesSkills;
+        [SerializeField] private Skills backupSkills = new Skills();
+        /// <summary>
+        /// Used when a character doesn't have skills
+        /// </summary>
+        public ICharacterArchetypesData<SCharacterSharedSkillsPreset> ArchetypesBackupSkills => backupSkills;
 
         [Serializable]
-        internal class Skills : ICharacterArchetypesData<SCharacterSkillsPreset>
+        internal class Skills : ICharacterArchetypesData<SCharacterSharedSkillsPreset>
         {
-            [SerializeField] private SCharacterSkillsPreset vanguard;
-            [SerializeField] private SCharacterSkillsPreset attacker;
-            [SerializeField] private SCharacterSkillsPreset support;
+            [SerializeField] private SCharacterSharedSkillsPreset vanguard;
+            [SerializeField] private SCharacterSharedSkillsPreset attacker;
+            [SerializeField] private SCharacterSharedSkillsPreset support;
 
             [TitleGroup("Characters")]
-            public SCharacterSkillsPreset FrontLiner => vanguard;
-            public SCharacterSkillsPreset MidLiner => attacker;
-            public SCharacterSkillsPreset BackLiner => support;
+            public SCharacterSharedSkillsPreset FrontLiner => vanguard;
+            public SCharacterSharedSkillsPreset MidLiner => attacker;
+            public SCharacterSharedSkillsPreset BackLiner => support;
         }
 
         private void Awake()

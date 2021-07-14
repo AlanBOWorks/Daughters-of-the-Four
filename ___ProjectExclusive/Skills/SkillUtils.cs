@@ -50,7 +50,7 @@ namespace Skills
         public static List<CombatSkill> GetSkillsByTeamState(CombatingEntity entity)
         {
             var state = entity.CharacterGroup.Team.Data.State;
-            var skills = entity.Skills;
+            var skills = entity.UniqueSkills;
             if (skills == null) return null;
             switch (state)
             {
@@ -63,5 +63,23 @@ namespace Skills
             }
         }
 
+        public static SEffectBase.EffectType GetType(CombatSkill skill)
+        {
+            return skill.Preset.MainEffectType;
+        }
+
+        public static void DoParse<T>(ISkillPositions<T> skills, Action<T> action)
+        {
+            action(skills.AttackingSkills);
+            action(skills.NeutralSkills);
+            action(skills.DefendingSkills);
+        }
+
+        public static void DoParse<T>(ISkillShared<T> skills, Action<T> action)
+        {
+            action(skills.UltimateSkill);
+            action(skills.CommonSkillFirst);
+            action(skills.CommonSkillSecondary);
+        }
     }
 }

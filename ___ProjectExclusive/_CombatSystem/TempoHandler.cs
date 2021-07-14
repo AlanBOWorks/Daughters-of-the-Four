@@ -52,22 +52,25 @@ namespace _CombatSystem
         }
 
 
-        private bool _entityPaused;
-        private void OnEntityPause()
-        {
-            _entityPaused = true;
-            Timing.PauseCoroutines(_loopHandle);
-        }
+        private bool _entityTriggers;
         /// <summary>
         /// Used to resume [<see cref="_Tick"/>] (which was paused by an [<seealso cref="CombatingEntity"/>] when
         /// it reaches its top [<seealso cref="ICombatTemporalStats.InitiativePercentage"/>])
         /// </summary>
         public void ResumeFromTempoTrigger()
         {
-            _entityPaused = false;
+            _entityTriggers = false;
+            ForcedBarUpdate();
             Timing.ResumeCoroutines(_loopHandle);
         }
 
+        private void ForcedBarUpdate()
+        {
+            foreach (KeyValuePair<CombatingEntity, ITempoFiller> pair in EntitiesBar)
+            {
+                pair.Value.FillBar(pair.Key.CombatStats.InitiativePercentage);
+            }
+        }
 
         private CoroutineHandle _loopHandle;
         private IEnumerator<float> _Tick()
@@ -79,6 +82,7 @@ namespace _CombatSystem
                 float deltaIncrement = Time.deltaTime * TempoModifier;
                 foreach (CombatingEntity entity in _characters)
                 {
+                    Debug.Log("x--- Ticking ---x");
                     CharacterCombatData stats = entity.CombatStats;
 
                     IncreaseInitiative(); void IncreaseInitiative()
@@ -92,25 +96,14 @@ namespace _CombatSystem
                     }
 
                     if (stats.InitiativePercentage < initiativeCheck) continue;
-
+                    stats.InitiativePercentage = 0;
                     // Invoke Triggers and LOOP
                     OnInitiativeTrigger(entity);
-                    //TODO make it as a dedicated class/handler (CharacterActionsHandler)
-                    LoopAllActions(); void LoopAllActions()
-                    {
-                        stats.RefillInitiativeActions();
-                        while (stats.ActionsLefts > 0)
-                        {
-                            OnEntityPause();
-                            OnActionDone(entity);
-                            stats.ActionsLefts--;
-                        }
-                        stats.ActionsLefts = 0;
-                        stats.InitiativePercentage = 0;
-                    }
-                    
+                    _entityTriggers = true;
+                    Timing.PauseCoroutines(_loopHandle);
+                    yield return Timing.WaitForOneFrame;
+
                     // Finish LOOP
-                    OnFinishTrigger(entity);
                     DoCheckIfRoundPassed(); void DoCheckIfRoundPassed()
                     {
                         if (!_roundTracker.Contains(entity)) return;
@@ -133,22 +126,13 @@ namespace _CombatSystem
 
             void OnInitiativeTrigger(CombatingEntity entity)
             {
-                _triggerHandler.OnInitiativeTrigger(entity);
+                CombatSystemSingleton.ActionsLooper.StartUsingActions(entity);
 
 #if UNITY_EDITOR
                 Debug.Log($"Character TEMPO - {entity.CharacterName}"); 
 #endif
             }
 
-            void OnActionDone(CombatingEntity entity)
-            {
-                _triggerHandler.OnActionDone(entity);
-            }
-
-            void OnFinishTrigger(CombatingEntity entity)
-            {
-                _triggerHandler.OnFinisAllActions(entity);
-            }
 
             
         }
@@ -176,13 +160,13 @@ namespace _CombatSystem
 
         public void OnCombatPause()
         {
-            if(_entityPaused) return;
+            if(_entityTriggers) return;
             Timing.PauseCoroutines(_loopHandle);
         }
 
         public void OnCombatResume()
         {
-            if(_entityPaused) return;
+            if(_entityTriggers) return;
             Timing.ResumeCoroutines(_loopHandle);
         }
     }
@@ -197,7 +181,7 @@ namespace _CombatSystem
     public interface ITempoListener
     {
         void OnInitiativeTrigger(CombatingEntity entity);
-        void OnActionDone(CombatingEntity entity);
+        void OnDoMoreActions(CombatingEntity entity);
         void OnFinisAllActions(CombatingEntity entity);
     }
 

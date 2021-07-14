@@ -11,12 +11,12 @@ namespace Characters
         public static CharacterSystemSingleton Instance { get; } = new CharacterSystemSingleton();
 
         private CharacterSystemSingleton()
-        {
-            Spawner = new EntityHolderSpawner();
-        }
-
+        {}
         [ShowInInspector]
-        public static EntityHolderSpawner Spawner;
+        public static EntityHolderSpawner CharactersSpawner;
+        [ShowInInspector] 
+        public static UCombatTeamsSpawner CombatSpawner;
+        
 
     }
 

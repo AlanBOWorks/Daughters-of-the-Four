@@ -30,6 +30,7 @@ namespace _Player
             {
                 case PointerEventData.InputButton.Left:
                     PlayerEntitySingleton.TargetsHandler.HideSkillTargets();
+                    PlayerEntitySingleton.SkillButtonsHandler.HideButtons();
                     CombatSystemSingleton.actionSkillHandler.DoSkill(_currentEntity);
                     break;
                     

@@ -11,11 +11,15 @@ namespace Skills
         T DefendingSkills { get; }
     }
 
-    public interface IEquipSkill<T>
+    public interface ISkillShared<out T> 
     {
         T UltimateSkill { get; }
         T CommonSkillFirst { get; }
         T CommonSkillSecondary { get; }
+    }
+
+    public interface IEquipSkill<T> : ISkillShared<T>
+    {
         List<T> UniqueSkills { get; }
     }
 }

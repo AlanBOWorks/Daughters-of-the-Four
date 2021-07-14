@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using _CombatSystem;
 using _Player;
+using JetBrains.Annotations;
 using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
@@ -44,7 +46,12 @@ namespace Characters
         public CharacterAreas areasTracker;
 
         [ShowInInspector]
-        public ISkillPositions<List<CombatSkill>> Skills { get; private set; }
+        public ISkillShared<CombatSkill> SharedSkills { get; private set; }
+        [ShowInInspector]
+        public ISkillPositions<List<CombatSkill>> UniqueSkills { get; private set; }
+
+        [ShowInInspector]
+        public CombatCharacterSkills AllSkills { get; private set; }
 
         public ICharacterCombatAnimator CombatAnimator;
 
@@ -65,6 +72,7 @@ namespace Characters
             ReceivedStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
             Listeners = new CharacterListeners(this);
             CombatAnimator = combatAnimator;
+            AllSkills = new CombatCharacterSkills();
         }
         /// <summary>
         /// Initialize this object with a provisional [<see cref="ICharacterCombatAnimator"/>] of type
@@ -83,10 +91,74 @@ namespace Characters
         public void Injection(ISkillPositions<List<Skill>> injectedSkills)
         {
             if(injectedSkills == null) return;
-            this.Skills = new PositionCombatSkills(injectedSkills, null);
+            this.UniqueSkills = new PositionCombatSkills(injectedSkills);
+            AllSkills.Add(UniqueSkills);
         }
 
+        public void Injection(ISkillShared<Skill> injectedSkills)
+        {
+            if(injectedSkills == null) return;
+            SharedSkills = new SharedCombatSkills(injectedSkills);
+            AllSkills.Add(SharedSkills);
+        }
 
+       
+
+        public void DoBackupSharedSkillsInjection()
+        {
+            var archetype = this.areasTracker.PositionInTeam;
+            var backUp
+                = CombatSystemSingleton.ParamsVariable.ArchetypesBackupSkills;
+            var skills = CharacterArchetypes.GetElement(backUp, archetype);
+            Injection(new SharedCombatSkills(skills));
+        }
+
+    }
+
+    public class CombatCharacterSkills : List<CombatSkill>
+    {
+        public ISkillShared<CombatSkill> SharedSkills { get; private set; }
+        public ISkillPositions<List<CombatSkill>> UniqueSkills { get; private set; }
+
+        public CombatCharacterSkills()
+        {}
+
+        public CombatCharacterSkills(ISkillShared<CombatSkill> shared)
+        {
+            Add(shared);
+        }
+
+        public CombatCharacterSkills(ISkillPositions<List<CombatSkill>> uniqueSkills)
+        {
+            Add(uniqueSkills);
+        }
+
+        public CombatCharacterSkills(
+            ISkillShared<CombatSkill> shared, 
+            ISkillPositions<List<CombatSkill>> uniqueSkills) :
+            this(shared)
+        {
+            Add(uniqueSkills);
+        }
+
+        
+
+        public void Add([NotNull]ISkillShared<CombatSkill> shared)
+        {
+            if(SharedSkills != null) return;
+            SharedSkills = shared;
+            Add(shared.UltimateSkill);
+            Add(shared.CommonSkillFirst);
+            Add(shared.CommonSkillSecondary);
+        }
+        public void Add([NotNull] ISkillPositions<List<CombatSkill>> uniqueSkills)
+        {
+            if(UniqueSkills !=null) return;
+            UniqueSkills = uniqueSkills;
+            AddRange(uniqueSkills.AttackingSkills);
+            AddRange(uniqueSkills.NeutralSkills);
+            AddRange(uniqueSkills.DefendingSkills);
+        }
     }
 
     public static class UtilsStats

@@ -35,7 +35,7 @@ namespace Skills
             _currentUser = entity;
         }
 
-        public void OnActionDone(CombatingEntity entity)
+        public void OnDoMoreActions(CombatingEntity entity)
         {
         }
 
@@ -92,7 +92,7 @@ namespace Skills
 
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
-            CombatSystemSingleton.TempoHandler.ResumeFromTempoTrigger();
+            CombatSystemSingleton.ActionsLooper.ActionDone();
 
 
             //////////////////////
