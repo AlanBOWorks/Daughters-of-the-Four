@@ -6,12 +6,11 @@ using UnityEngine;
 
 namespace _Player
 {
-    public class PlayerTargetsHandler
+    public class PlayerTargetsHandler : IPlayerSkillListener
     {
-        public void ShowSkillTargets(CombatSkill skill)
+        private static void ShowSkillTargets(CombatSkill skill)
         {
-            HideSkillTargets();
-            var skillHandler = CombatSystemSingleton.actionSkillHandler;
+            var skillHandler = CombatSystemSingleton.performSkillHandler;
             var possibleTargets
                 = skillHandler.GetPossibleTargets(skill);
 
@@ -23,7 +22,7 @@ namespace _Player
             }
         }
 
-        public void HideSkillTargets()
+        private static void HideSkillTargets()
         {
             var playerElements 
                 = PlayerEntitySingleton.CombatDictionary;
@@ -31,6 +30,22 @@ namespace _Player
             {
                 playerElement.Value.GetTargetButton().Hide();
             }
+        }
+
+        public void OnSkillSelect(CombatSkill selectedSkill)
+        {
+            HideSkillTargets();
+            ShowSkillTargets(selectedSkill);
+        }
+
+        public void OnSkillDeselect(CombatSkill deselectSkill)
+        {
+            HideSkillTargets();
+        }
+
+        public void OnSubmitSkill(CombatSkill submitSkill)
+        {
+            HideSkillTargets();
         }
     }
 }

@@ -10,8 +10,9 @@ using UnityEngine.UI;
 
 namespace _Player
 {
-    public class USkillButton : MonoBehaviour, IPointerClickHandler,
-        IPointerEnterHandler, IPointerExitHandler
+    public class USkillButton : MonoBehaviour, 
+        IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler,
+        IPlayerButtonListener
     {
 
         // TODO Icon
@@ -45,6 +46,24 @@ namespace _Player
 
         }
 
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (IsInvalid()) return;
+
+            USkillTooltipHandler skillTooltip = Behaviour.SkillTooltip;
+            skillTooltip.HandleButton(this);
+            skillTooltip.gameObject.SetActive(true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (IsInvalid()) return;
+
+            USkillTooltipHandler skillTooltip = Behaviour.SkillTooltip;
+            skillTooltip.gameObject.SetActive(false);
+        }
+
+
         public void Show()
         {
             gameObject.SetActive(true);
@@ -61,7 +80,11 @@ namespace _Player
             if (CurrentSkill.IsInCooldown())
             {
                 cooldownHolder.transform.parent.gameObject.SetActive(true);
-                cooldownHolder.text = CurrentSkill.CurrentCooldown.ToString();
+                int cooldownAmount = CurrentSkill.CurrentCooldown;
+                if (cooldownAmount > 0)
+                    cooldownHolder.text = CurrentSkill.CurrentCooldown.ToString();
+                else
+                    cooldownHolder.text = "X";
             }
             else
             {
@@ -72,27 +95,6 @@ namespace _Player
         public void ToggleSelectedIcon(bool set)
         {
             selectedIcon.gameObject.SetActive(set);
-        }
-
-        public void HandleOnUse()
-        {
-            ToggleSelectedIcon(false);
-            //TODO show cooldownOnUse
-        }
-
-        private void InjectInHandler()
-        {
-            var handler = Behaviour.Handler;
-            var handlerButton = handler.CurrentSelectedButton;
-
-            if (handlerButton != null && handlerButton.SkillState != CombatSkill.State.Cooldown)
-            {
-                handlerButton.OnDeselectSkill();
-            }
-
-            handler.CurrentSelectedButton = this;
-
-
         }
 
         //TODO do mouse handling
@@ -115,30 +117,17 @@ namespace _Player
             }
         }
 
-        private void OnSelectSkill()
-        {
-            SkillState = CombatSkill.State.Selected;
-            ToggleSelectedIcon(true);
-
-        }
-
-        private void OnDeselectSkill()
-        {
-            SkillState = CombatSkill.State.Idle;
-            ToggleSelectedIcon(false);
-        }
 
         private void HandleLeftClick()
         {
             switch (SkillState)
             {
                 case CombatSkill.State.Idle:
-                    InjectInHandler();
-                    OnSelectSkill();
+                    Debug.Log("Selecting");
+                    PlayerEntitySingleton.SkillButtonsHandler.OnSkillSelect(this);
                     break;
                 case CombatSkill.State.Selected:
-                    Behaviour.Handler.CurrentSelectedButton = null;
-                    OnDeselectSkill();
+                    PlayerEntitySingleton.SkillButtonsHandler.OnSkillDeselect(this);
                     break;
                 case CombatSkill.State.Cooldown:
                     break;
@@ -148,22 +137,22 @@ namespace _Player
         }
 
 
-
-        public void OnPointerEnter(PointerEventData eventData)
+        public void OnSkillSelect(USkillButton selectedSkill)
         {
-            if (IsInvalid()) return;
-
-            USkillTooltipHandler handler = Behaviour.SkillTooltip;
-            handler.HandleButton(this);
-            handler.gameObject.SetActive(true);
+            SkillState = CombatSkill.State.Selected;
+            ToggleSelectedIcon(true);
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        public void OnSkillDeselect(USkillButton deselectSkill)
         {
-            if (IsInvalid()) return;
+            SkillState = CombatSkill.State.Idle;
+            ToggleSelectedIcon(false);
+        }
 
-            USkillTooltipHandler handler = Behaviour.SkillTooltip;
-            handler.gameObject.SetActive(false);
+        public void OnSubmitSkill(USkillButton submitSkill)
+        {
+            SkillState = CombatSkill.State.Cooldown;
+            ToggleSelectedIcon(false);
         }
     }
 

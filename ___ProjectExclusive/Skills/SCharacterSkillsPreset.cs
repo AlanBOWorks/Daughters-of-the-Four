@@ -24,8 +24,11 @@ namespace Skills
 
     public class PositionCombatSkills : ISkillPositions<List<CombatSkill>>
     {
+        [ShowInInspector]
         public List<CombatSkill> AttackingSkills { get; }
+        [ShowInInspector]
         public List<CombatSkill> NeutralSkills { get; }
+        [ShowInInspector]
         public List<CombatSkill> DefendingSkills { get; }
 
 

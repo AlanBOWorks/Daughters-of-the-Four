@@ -15,15 +15,14 @@ namespace _CombatSystem
 
         private CombatSystemSingleton()
         {
-            CharacterTempoHandler tempoHandler;
+            TempoHandlerBase tempoHandlerBase;
             SafetyBackupSkillsInjection backupSkillsInjection;
             InitializeSystem();
 
             Invoker = new SystemInvoker();
             Characters = new CombatCharactersHolder();
-            TempoHandler = new TempoHandler(tempoHandler);
-            actionSkillHandler = new ActionSkillHandler();
-            ActionsLooper = new ActionsLooper(tempoHandler);
+            TempoHandler = new TempoHandler(tempoHandlerBase);
+            performSkillHandler = new PerformSkillHandler();
 
             // Locals declarations that wont be used further than durante the CombatInvoker
             var combatControlDeclaration = new CombatControlDeclaration();
@@ -35,13 +34,13 @@ namespace _CombatSystem
             Invoker.SubscribeListener(combatControlDeclaration);
             Invoker.SubscribeListener(backupSkillsInjection);
 
-            TempoHandler.Subscribe(actionSkillHandler);
+            TempoHandler.Subscribe(performSkillHandler);
             TempoHandler.Subscribe(skillCooldown);
 
             void InitializeSystem()
             {
 #if UNITY_EDITOR
-                tempoHandler = new CharacterTempoHandler(true);
+                tempoHandlerBase = new TempoHandlerBase();
 #else
                 tempoHandler = new CharacterTempoHandler(false);
 #endif
@@ -55,7 +54,7 @@ namespace _CombatSystem
         // Useful objects will remain in the Singleton as well
         public static bool IsCombatActive => Invoker.CombatHandle.IsRunning;
         [ShowInInspector]
-        public static ActionSkillHandler actionSkillHandler;
+        public static PerformSkillHandler performSkillHandler;
         [ShowInInspector]
         public static CombatCharactersHolder Characters;
         [ShowInInspector]
@@ -66,8 +65,7 @@ namespace _CombatSystem
         public static SystemInvoker Invoker;
         [ShowInInspector]
         public static TempoHandler TempoHandler;
-        [ShowInInspector] 
-        public static ActionsLooper ActionsLooper;
+
         [ShowInInspector]
         public static SCombatParams ParamsVariable = null;
 

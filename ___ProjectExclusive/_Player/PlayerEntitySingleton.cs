@@ -16,20 +16,22 @@ namespace _Player
 
         private PlayerEntitySingleton()
         {
+            PlayerCombatEvents = new PlayerCombatEvents();
             CombatElementsPools = new PlayerCombatElementsPools();
-            TargetsHandler = new PlayerTargetsHandler();
+            var targetsHandler = new PlayerTargetsHandler();
 
-#if UNITY_EDITOR
-            Debug.Log("Player Singleton Created");
-#endif
+            //Injections
+            PlayerCombatEvents.Subscribe(targetsHandler);
         }
         public static PlayerEntitySingleton Instance { get; } = new PlayerEntitySingleton();
 
         public static Dictionary<CombatingEntity, PlayerCombatElement> CombatDictionary
             => CombatElementsPools.EntitiesDictionary;
+
+        [ShowInInspector] 
+        public static PlayerCombatEvents PlayerCombatEvents;
         [ShowInInspector]
         public static PlayerCombatElementsPools CombatElementsPools;
-        public static PlayerTargetsHandler TargetsHandler;
 
         [ShowInInspector]
         public static USkillButtonsHandler SkillButtonsHandler = null;
@@ -40,6 +42,9 @@ namespace _Player
         {
             var invoker = CombatSystemSingleton.Invoker;
             invoker.SubscribeListener(CombatElementsPools);
+
+            var tempoHandler = CombatSystemSingleton.TempoHandler;
+            tempoHandler.Inject(PlayerCombatEvents);
         }
     }
 

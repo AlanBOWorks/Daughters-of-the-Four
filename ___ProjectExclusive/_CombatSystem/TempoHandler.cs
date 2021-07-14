@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _Player;
 using Characters;
 using MEC;
 using Sirenix.OdinInspector;
@@ -7,13 +8,16 @@ using UnityEngine;
 
 namespace _CombatSystem
 {
-    public class TempoHandler : ICombatFullListener
+    public class TempoHandler : ICombatFullListener, ITempoHandler
     {
         private CharacterArchetypesList<CombatingEntity> _characters;
         [Range(0,10),SuffixLabel("deltas")]
         public float TempoModifier = 1f;
 
-        [ShowInInspector, DisableInPlayMode] private ITempoTriggerHandler _triggerHandler;
+        [ShowInInspector, DisableInPlayMode]
+        public ITempoTriggerHandler TriggerBasicHandler { get; private set; }
+        [ShowInInspector, DisableInPlayMode] 
+        public ITempoTriggerHandler PlayerTempoHandler { get; private set; }
 
         public readonly Dictionary<CombatingEntity, ITempoFiller> EntitiesBar;
 
@@ -24,24 +28,42 @@ namespace _CombatSystem
         /// </summary>
         private readonly List<CombatingEntity> _roundTracker;
 
-        public void Subscribe(ITempoListener listener)
+        private readonly bool _canControlAll;
+        public TempoHandler(ITempoTriggerHandler basicHandler, bool canControlAll = true)
         {
-            _triggerHandler.Subscribe(listener);
-        }
-
-        public void Subscribe(IRoundListener listener)
-        {
-            _triggerHandler.Subscribe(listener);
-        }
-
-        public TempoHandler(ITempoTriggerHandler handler)
-        {
-            _triggerHandler = handler;
+            TriggerBasicHandler = basicHandler;
             int memoryAllocation = CharacterUtils.PredictedAmountOfCharactersInBattle;
             EntitiesBar = new Dictionary<CombatingEntity, ITempoFiller>(
                 memoryAllocation);
             _roundTracker = new List<CombatingEntity>(memoryAllocation);
+
+            _canControlAll = canControlAll;
         }
+
+        public void Inject(ITempoTriggerHandler playerTriggerHandler)
+        {
+            PlayerTempoHandler = playerTriggerHandler;
+        }
+        public void Subscribe(ITempoListener listener)
+        {
+            if (PlayerTempoHandler != null && listener is IPlayerTempoListener)
+            {
+                PlayerTempoHandler.TempoListeners.Add(listener);
+                return;
+            }
+            TriggerBasicHandler.TempoListeners.Add(listener);
+        }
+
+        public void Subscribe(IRoundListener listener)
+        {
+            if (PlayerTempoHandler != null && listener is IPlayerRoundListener)
+            {
+                PlayerTempoHandler.RoundListeners.Add(listener);
+                return;
+            }
+            TriggerBasicHandler.RoundListeners.Add(listener);
+        }
+
         public void OnBeforeStart(
             CombatingTeam playerEntities,
             CombatingTeam enemyEntities,
@@ -98,7 +120,8 @@ namespace _CombatSystem
                     if (stats.InitiativePercentage < initiativeCheck) continue;
                     stats.InitiativePercentage = 0;
                     // Invoke Triggers and LOOP
-                    OnInitiativeTrigger(entity);
+                    StartUsingActions(entity);
+
                     _entityTriggers = true;
                     Timing.PauseCoroutines(_loopHandle);
                     yield return Timing.WaitForOneFrame;
@@ -110,7 +133,7 @@ namespace _CombatSystem
                         if (_roundTracker.Count <= 1) //this means is the last one
                         {
                             RefillRoundTracker();
-                            _triggerHandler.OnRoundCompleted(_characters, entity);
+                            TriggerBasicHandler.OnRoundCompleted(_characters, entity);
                         }
                         else
                         {
@@ -121,20 +144,20 @@ namespace _CombatSystem
 
                 yield return Timing.WaitForSeconds(deltaIncrement);
             }
+        }
 
-            
-
-            void OnInitiativeTrigger(CombatingEntity entity)
+        private void StartUsingActions(CombatingEntity entity)
+        {
+            var stats = entity.CombatStats;
+            stats.RefillInitiativeActions();
+            if (stats.ActionsLefts <= 0)
             {
-                CombatSystemSingleton.ActionsLooper.StartUsingActions(entity);
-
-#if UNITY_EDITOR
-                Debug.Log($"Character TEMPO - {entity.CharacterName}"); 
-#endif
+                OnFinisAllActions(entity); //If the entity doesn't have actions then just invoke OnFinish
             }
-
-
-            
+            else
+            {
+                OnInitiativeTrigger(entity);
+            }
         }
 
         private void RefillRoundTracker()
@@ -169,14 +192,67 @@ namespace _CombatSystem
             if(_entityTriggers) return;
             Timing.ResumeCoroutines(_loopHandle);
         }
+
+        private bool IsForPlayer(CombatingEntity entity)
+        {
+            return _canControlAll || CharacterUtils.IsAPlayerEntity(entity);
+        }
+
+        public void OnInitiativeTrigger(CombatingEntity entity)
+        {
+            TriggerBasicHandler.OnInitiativeTrigger(entity);
+            if (IsForPlayer(entity))
+            {
+                PlayerTempoHandler.OnInitiativeTrigger(entity);
+            }
+        }
+        /// <summary>
+        /// Is just <see cref="OnDoMoreActions"/> but just for <seealso cref="Skills.PerformSkillHandler"/>
+        /// (so it more clear who does the step to the next Action OR calls the finish implicitly)
+        /// </summary>
+        public void OnSkillActionFinish(CombatingEntity entity) => OnDoMoreActions(entity);
+        public void OnDoMoreActions(CombatingEntity entity)
+        {
+            var currentStats = entity.CombatStats;
+            currentStats.ActionsLefts--;
+            if (currentStats.ActionsLefts > 0)
+            {
+                TriggerBasicHandler.OnDoMoreActions(entity);
+                if (IsForPlayer(entity))
+                    PlayerTempoHandler.OnDoMoreActions(entity);
+            }
+            else
+            {
+                currentStats.ActionsLefts = 0;
+                OnFinisAllActions(entity);
+            }
+        }
+
+        public void OnFinisAllActions(CombatingEntity entity)
+        {
+            TriggerBasicHandler.OnFinisAllActions(entity);
+            if (IsForPlayer(entity))
+                PlayerTempoHandler.OnFinisAllActions(entity);
+
+            ResumeFromTempoTrigger();
+        }
+
+        public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
+        {
+            TriggerBasicHandler.OnRoundCompleted(allEntities,lastEntity);
+            PlayerTempoHandler.OnRoundCompleted(allEntities,lastEntity);
+        }
+
+
     }
 
-    public interface ITempoTriggerHandler : ITempoListener, IRoundListener
+    public interface ITempoTriggerHandler : ITempoHandler
     {
-        void Subscribe(ITempoListener listener);
-        void Subscribe(IRoundListener listener);
-
+        List<ITempoListener> TempoListeners { get; }
+        List<IRoundListener> RoundListeners { get; }
     }
+    public interface ITempoHandler : ITempoListener, IRoundListener 
+    { }
 
     public interface ITempoListener
     {

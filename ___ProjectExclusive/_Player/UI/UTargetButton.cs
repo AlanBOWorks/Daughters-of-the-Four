@@ -25,15 +25,13 @@ namespace _Player
         public void OnPointerClick(PointerEventData eventData)
         {
             var button = eventData.button;
-            Debug.Log("Click Target");
             switch (button)
             {
                 case PointerEventData.InputButton.Left:
-                    PlayerEntitySingleton.TargetsHandler.HideSkillTargets();
-                    PlayerEntitySingleton.SkillButtonsHandler.HideButtons();
-                    CombatSystemSingleton.actionSkillHandler.DoSkill(_currentEntity);
+                    PlayerEntitySingleton.SkillButtonsHandler.OnSubmitSkill();
+                    CombatSystemSingleton.performSkillHandler.DoSkill(_currentEntity);
                     break;
-                    
+                    //TODO left click?
                 default:
                     break;
             }

@@ -9,7 +9,8 @@ using UnityEngine;
 
 namespace _Player
 {
-    public class USkillButtonsHandler : MonoBehaviour, IEquipSkill<USkillButton>, IPlayerTempoListener
+    public class USkillButtonsHandler : MonoBehaviour, IEquipSkill<USkillButton>, 
+        IPlayerTempoListener, IPlayerButtonListener
     {
         [TitleGroup("Params")] 
         [SerializeField]
@@ -29,26 +30,10 @@ namespace _Player
 
         [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
         private USkillButton _currentSelectedButton;
-        public USkillButton CurrentSelectedButton
-        {
-            get => _currentSelectedButton;
-            set
-            {
-                _currentSelectedButton = value;
-                if (_currentSelectedButton == null)
-                {
-                    PlayerEntitySingleton.TargetsHandler.HideSkillTargets();
-                }
-                else
-                {
-                    PlayerEntitySingleton.TargetsHandler.ShowSkillTargets(value.CurrentSkill);
-                }
-            }
-        }
+       
 
         [ShowInInspector]
         private Dictionary<CombatSkill, USkillButton> _skillButtons;
-        public USkillButton GetButton(CombatSkill skill) => _skillButtons[skill];
 
         [Button ("Serialize Children"),HideInPlayMode]
         private void SerializeButtons()
@@ -58,11 +43,13 @@ namespace _Player
 
 
 
-        private void Awake()
+        private void Start()
         {
             buttonsBehaviour.Handler = this;
             PlayerEntitySingleton.SkillButtonsHandler = this;
-            CombatSystemSingleton.TempoHandler.Subscribe(this);
+            var combatEvents = PlayerEntitySingleton.PlayerCombatEvents;
+            combatEvents.Subscribe(this);
+            
             int predictedAmountOfButtons = UtilsSkill.PredictedAmountOfSkillsPerState;
             _skillButtons 
                 = new Dictionary<CombatSkill, USkillButton>(predictedAmountOfButtons);
@@ -87,29 +74,10 @@ namespace _Player
             }
         }
 
-        public void OnInitiativeTrigger(CombatingEntity entity)
-        {
-            UpdateUniqueSkills(entity);
-            UpdateSharedSkills(entity);
-            ShowButtons();
-        }
 
-        public void OnDoMoreActions(CombatingEntity entity)
-        {
-            UpdateUniqueSkills(entity);
-            UpdateSharedSkills(entity);
-            ShowButtons();
-        }
-
-        public void OnFinisAllActions(CombatingEntity entity)
-        {
-            HideButtons();
-        }
-
-        private void UpdateUniqueSkills(CombatingEntity entity)
+        private void InjectUniqueSkills(CombatingEntity entity)
         {
             List<CombatSkill> uniqueSkills = UtilsSkill.GetSkillsByTeamState(entity);
-            _skillButtons.Clear();
             if(uniqueSkills == null)
             {
 #if UNITY_EDITOR
@@ -142,7 +110,7 @@ namespace _Player
         }
 
         private Action<CombatSkill, USkillButton> _sharedParsingAction;
-        private void UpdateSharedSkills(CombatingEntity entity)
+        private void InjectSharedSkills(CombatingEntity entity)
         {
             if (_sharedParsingAction == null) 
                 _sharedParsingAction = DoParsingInjection;
@@ -158,6 +126,14 @@ namespace _Player
                     return;
                 }
                 InjectSkillOnButton(entity,skill,button);
+            }
+        }
+
+        private void UpdateSkills()
+        {
+            foreach (KeyValuePair<CombatSkill, USkillButton> pair in _skillButtons)
+            {
+                pair.Value.UpdateCooldown();
             }
         }
 
@@ -181,8 +157,60 @@ namespace _Player
             //TODO hide animation
         }
 
+        public void OnInitiativeTrigger(CombatingEntity entity)
+        {
+            _skillButtons.Clear();
+            InjectUniqueSkills(entity);
+            InjectSharedSkills(entity);
+            ShowButtons();
+        }
 
-        
+        public void OnDoMoreActions(CombatingEntity entity)
+        {
+            UpdateSkills();
+            ShowButtons();
+        }
+
+        public void OnFinisAllActions(CombatingEntity entity)
+        {
+            HideButtons();
+        }
+
+        public void OnSkillSelect(USkillButton selectedSkill)
+        {
+            //if some other skill, then disable it first
+            if (_currentSelectedButton != null) 
+            {
+                OnSkillDeselect(_currentSelectedButton);
+            }
+
+            _currentSelectedButton = selectedSkill;
+            selectedSkill.OnSkillSelect(selectedSkill);
+
+            var combatSkill = selectedSkill.CurrentSkill;
+
+            PlayerEntitySingleton.PlayerCombatEvents.OnSkillSelect(combatSkill);
+        }
+
+        public void OnSkillDeselect(USkillButton deselectSkill)
+        {
+            //if is the same means that the player wants to disable
+            if (deselectSkill == _currentSelectedButton) 
+            {
+                _currentSelectedButton = null;
+            }
+            deselectSkill.OnSkillDeselect(deselectSkill);
+            PlayerEntitySingleton.PlayerCombatEvents.OnSkillDeselect(deselectSkill.CurrentSkill);
+        }
+
+        public void OnSubmitSkill() => OnSubmitSkill(_currentSelectedButton);
+        public void OnSubmitSkill(USkillButton submitSkill)
+        {
+            HideButtons();
+            submitSkill.OnSubmitSkill(submitSkill);
+            PlayerEntitySingleton.PlayerCombatEvents.OnSubmitSkill(submitSkill.CurrentSkill);
+            _currentSelectedButton = null;
+        }
     }
 
 }

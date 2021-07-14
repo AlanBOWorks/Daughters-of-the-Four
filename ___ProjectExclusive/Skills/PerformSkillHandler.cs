@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Skills
 {
-    public class ActionSkillHandler : ICombatAfterPreparationListener,ITempoListener
+    public class PerformSkillHandler : ICombatAfterPreparationListener,ITempoListener
     {
         [ShowInInspector]
         private CombatingEntity _currentUser;
@@ -18,7 +18,7 @@ namespace Skills
 
         public bool SkipAnimations = false;
 
-        public ActionSkillHandler()
+        public PerformSkillHandler()
         {
             int sizeAllocation = CharacterUtils.PredictedAmountOfCharactersInBattle;
             _currentSkillTargets = new SkillTargets(sizeAllocation); // it could be a whole targets
@@ -62,7 +62,6 @@ namespace Skills
             }
 
             skill.OnSkillUsage();
-            PlayerEntitySingleton.SkillButtonsHandler.GetButton(skill).HandleOnUse();
 
 
             var skillEffects = skill.GetEffects();
@@ -92,7 +91,7 @@ namespace Skills
 
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
-            CombatSystemSingleton.ActionsLooper.ActionDone();
+            CombatSystemSingleton.TempoHandler.OnSkillActionFinish(_currentUser);
 
 
             //////////////////////
@@ -188,4 +187,5 @@ namespace Skills
         public SkillTargets(int memoryAlloc) : base(memoryAlloc)
         {}
     }
+
 }
