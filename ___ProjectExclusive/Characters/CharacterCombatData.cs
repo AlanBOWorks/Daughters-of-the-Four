@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Characters
 {
@@ -26,7 +27,26 @@ namespace Characters
     /// exists while there's a Combat and contains the core data for the combating part
     /// </summary>
     public class CombatingEntity
-    {
+    { public CombatingEntity(string characterName, GameObject prefab,
+            ICharacterCombatAnimator combatAnimator)
+        {
+            CharacterName = characterName;
+            InstantiationPrefab = prefab;
+            ReceivedStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
+            SpecialBuffHolders = new CharacterBuffHolders(this);
+            Events = new CombatCharacterEvents(this);
+
+            CombatAnimator = combatAnimator;
+            AllSkills = new CombatCharacterSkills();
+        }
+        /// <summary>
+        /// Initialize this object with a provisional [<see cref="ICharacterCombatAnimator"/>] of type
+        /// [<seealso cref="ProvisionalCharacterAnimator"/>]
+        /// </summary>
+        public CombatingEntity(string characterName, GameObject prefab)
+            : this(characterName, prefab, ProvisionalCharacterAnimator.ProvisionalAnimator)
+        { }
+
         [ShowInInspector,GUIColor(.3f,.5f,1)]
         public readonly string CharacterName;
 
@@ -40,10 +60,15 @@ namespace Characters
         /// Used to track the damage received, heals, etc.
         /// </summary>
         public SerializedCombatStatsFull ReceivedStats { get; private set; }
-        public readonly CharacterListeners Listeners;
+
+        [ShowInInspector]
+        public readonly CharacterBuffHolders SpecialBuffHolders;
 
         [ShowInInspector, NonSerialized] 
-        public CharacterAreas areasTracker;
+        public CombatAreasData AreasDataTracker;
+
+        [ShowInInspector, NonSerialized] 
+        public CombatCharacterEvents Events;
 
         [ShowInInspector]
         public ISkillShared<CombatSkill> SharedSkills { get; private set; }
@@ -61,26 +86,13 @@ namespace Characters
         [ShowInInspector]
         public CharacterSelfGroup CharacterGroup { get; set; }
 
+        public bool CanAct()
+        {
+            return IsAlive() && CombatStats.ActionsLefts > 0;
+        }
         public bool IsAlive() => CombatStats.MortalityPoints > 0;
         public bool IsConscious() => IsAlive(); //TODO change it to HP or Mortality based in combat state
 
-        public CombatingEntity(string characterName, GameObject prefab, 
-            ICharacterCombatAnimator combatAnimator)
-        {
-            CharacterName = characterName;
-            InstantiationPrefab = prefab;
-            ReceivedStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
-            Listeners = new CharacterListeners(this);
-            CombatAnimator = combatAnimator;
-            AllSkills = new CombatCharacterSkills();
-        }
-        /// <summary>
-        /// Initialize this object with a provisional [<see cref="ICharacterCombatAnimator"/>] of type
-        /// [<seealso cref="ProvisionalCharacterAnimator"/>]
-        /// </summary>
-        public CombatingEntity(string characterName, GameObject prefab) 
-            : this(characterName,prefab, ProvisionalCharacterAnimator.ProvisionalAnimator)
-        { }
 
         public void Injection(CharacterCombatData combatStats)
         {
@@ -101,12 +113,15 @@ namespace Characters
             SharedSkills = new SharedCombatSkills(injectedSkills);
             AllSkills.Add(SharedSkills);
         }
-
+        public void Injection(CombatingTeam team)
+        {
+            AreasDataTracker.Injection(team.Data);
+        }
        
 
         public void DoBackupSharedSkillsInjection()
         {
-            var archetype = this.areasTracker.PositionInTeam;
+            var archetype = this.AreasDataTracker.PositionInTeam;
             var backUp
                 = CombatSystemSingleton.ParamsVariable.ArchetypesBackupSkills;
             var skills = CharacterArchetypes.GetElement(backUp, archetype);
@@ -161,49 +176,6 @@ namespace Characters
         }
     }
 
-    public static class UtilsStats
-    {
-        public static CharacterCombatStatsBasic ZeroValuesBasic = new CharacterCombatStatsBasic(0);
-        public static CharacterCombatStatsFull ZeroValuesFull = new CharacterCombatStatsFull(0);
-
-        public static float StatsFormula(float baseStat, float buffStat, float burstStat)
-        {
-            return (baseStat + buffStat) * (1 + burstStat);
-        }
-
-        public static float GrowFormula(float baseStat, float growStat, float upgradeAmount)
-        {
-            return baseStat + growStat * upgradeAmount;
-        }
-
-        public static void CopyStats(ICharacterBasicStats injection, ICharacterBasicStats copyFrom)
-        {
-            injection.AttackPower = copyFrom.AttackPower;
-            injection.DeBuffPower = copyFrom.DeBuffPower;
-            injection.HealPower = copyFrom.HealPower;
-
-            injection.BuffPower = copyFrom.BuffPower;
-            injection.MaxHealth = copyFrom.MaxHealth;
-            injection.MaxMortalityPoints = copyFrom.MaxMortalityPoints;
-            injection.DamageReduction = copyFrom.DamageReduction;
-
-            injection.Enlightenment = copyFrom.Enlightenment;
-            injection.CriticalChance = copyFrom.CriticalChance;
-            injection.SpeedAmount = copyFrom.SpeedAmount;
-        }
-
-        public static void CopyStats(ICharacterFullStats injection, ICharacterFullStats copyFrom)
-        {
-            CopyStats(injection as ICharacterBasicStats, copyFrom);
-            injection.HealthPoints = copyFrom.HealthPoints;
-            injection.ShieldAmount = copyFrom.ShieldAmount;
-
-            injection.MortalityPoints = copyFrom.MortalityPoints;
-            injection.HarmonyAmount = copyFrom.HarmonyAmount;
-            injection.InitiativePercentage = copyFrom.InitiativePercentage;
-            injection.ActionsPerInitiative = copyFrom.ActionsPerInitiative;
-        }
-    }
 
     public class CharacterCombatData : ICharacterFullStats
     {
@@ -222,9 +194,7 @@ namespace Characters
 
         public void RefillInitiativeActions()
         {
-            // It's addition and not override by (=) because another character could add/remove actions
-            // using a special skill
-            ActionsLefts += ActionsPerInitiative;
+            UtilsCombatStats.AddActionAmount(this, ActionsPerInitiative);
         }
 
         public CharacterCombatData(ICharacterFullStats presetStats)
@@ -725,6 +695,18 @@ namespace Characters
         {
             UtilsStats.CopyStats(this, copyFrom);
         }
+
+        private const float MaxInitialInitiative = .8f;
+        private const float DefaultInitialInitiative = .6f;
+        public void AddInitialInitiative(float randomMax = DefaultInitialInitiative)
+        {
+            float initiativeAddition = Random.value * randomMax;
+            InitiativePercentage += initiativeAddition;
+            if (InitiativePercentage > MaxInitialInitiative)
+                InitiativePercentage = MaxInitialInitiative;
+        }
+
+
     }
 
     /// <summary>

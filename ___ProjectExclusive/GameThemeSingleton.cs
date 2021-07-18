@@ -42,5 +42,24 @@ namespace ___ProjectExclusive
         public Color Text;
     }
 
+    public static class UtilsGameTheme
+    {
+        public const float KThousand = 1000;
+        public const float KDivisor = 1 / KThousand;
+        public static string GetNumericalPrint(float value)
+        {
+            string generated;
 
+            if (value < 1000)
+            {
+                generated = $"{value:0000}";
+            }
+            else
+            {
+                generated = $"{value * KDivisor:000}K";
+            }
+
+            return generated;
+        }
+    }
 }

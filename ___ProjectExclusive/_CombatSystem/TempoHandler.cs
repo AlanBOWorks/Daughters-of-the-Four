@@ -4,18 +4,27 @@ using _Player;
 using Characters;
 using MEC;
 using Sirenix.OdinInspector;
+using SMaths;
 using UnityEngine;
 
 namespace _CombatSystem
 {
-    public class TempoHandler : ICombatFullListener, ITempoHandler
+    public class TempoHandler : ICombatFullListener, ITempoFullListener, ISkippedTempoListener
     {
+        public enum TickType
+        {
+            OnBeforeSequence,
+            OnAction,
+            OnSequence,
+            OnRound
+        }
+
         private CharacterArchetypesList<CombatingEntity> _characters;
         [Range(0,10),SuffixLabel("deltas")]
         public float TempoModifier = 1f;
 
         [ShowInInspector, DisableInPlayMode]
-        public ITempoTriggerHandler TriggerBasicHandler { get; private set; }
+        public TempoHandlerBase TriggerBasicHandler { get; private set; }
         [ShowInInspector, DisableInPlayMode] 
         public ITempoTriggerHandler PlayerTempoHandler { get; private set; }
 
@@ -29,10 +38,10 @@ namespace _CombatSystem
         private readonly List<CombatingEntity> _roundTracker;
 
         private readonly bool _canControlAll;
-        public TempoHandler(ITempoTriggerHandler basicHandler, bool canControlAll = true)
+        public TempoHandler(TempoHandlerBase basicHandler, bool canControlAll = true)
         {
             TriggerBasicHandler = basicHandler;
-            int memoryAllocation = CharacterUtils.PredictedAmountOfCharactersInBattle;
+            int memoryAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
             EntitiesBar = new Dictionary<CombatingEntity, ITempoFiller>(
                 memoryAllocation);
             _roundTracker = new List<CombatingEntity>(memoryAllocation);
@@ -63,6 +72,17 @@ namespace _CombatSystem
             }
             TriggerBasicHandler.RoundListeners.Add(listener);
         }
+
+        public void Subscribe(ISkippedTempoListener listener)
+        {
+            if (PlayerTempoHandler != null && listener is IPlayerRoundListener)
+            {
+                PlayerTempoHandler.SkippedListeners.Add(listener);
+                return;
+            }
+            TriggerBasicHandler.SkippedListeners.Add(listener);
+        }
+
 
         public void OnBeforeStart(
             CombatingTeam playerEntities,
@@ -97,28 +117,42 @@ namespace _CombatSystem
         private CoroutineHandle _loopHandle;
         private IEnumerator<float> _Tick()
         {
+            // >>>> PREPARATIONS
             yield return Timing.WaitForOneFrame; //To ensure that everything is initialized
+            const float initiativeCheck = GlobalCombatParams.InitiativeCheck;
+            const float speedModifier = GlobalCombatParams.SpeedStatModifier;
+            ForcedBarUpdate();
+
+            // >>>> COMBAT LOOP
             while (_characters != null)
             {
-                float initiativeCheck = GlobalCombatParams.InitiativeCheck;
                 float deltaIncrement = Time.deltaTime * TempoModifier;
                 foreach (CombatingEntity entity in _characters)
                 {
                     Debug.Log("x--- Ticking ---x");
                     CharacterCombatData stats = entity.CombatStats;
 
-                    IncreaseInitiative(); void IncreaseInitiative()
+                    //Increase Initiative
                     {
-                        stats.InitiativePercentage += deltaIncrement * stats.SpeedAmount;
+                        stats.InitiativePercentage += deltaIncrement * stats.SpeedAmount * speedModifier;
 
-                        float initiativePercentage = SMaths.SRange.Percentage(
+                        float initiativePercentage = SRange.Percentage(
                             stats.InitiativePercentage,
                             0, initiativeCheck);
                         EntitiesBar[entity].FillBar(initiativePercentage);
                     }
 
                     if (stats.InitiativePercentage < initiativeCheck) continue;
+                    //Stats refill
                     stats.InitiativePercentage = 0;
+                    stats.RefillInitiativeActions();
+
+                    if (!entity.CanAct())
+                    {
+                        OnSkippedEntity(entity);
+                        continue;
+                    }
+
                     // Invoke Triggers and LOOP
                     StartUsingActions(entity);
 
@@ -146,18 +180,17 @@ namespace _CombatSystem
             }
         }
 
+        public static void CallUpdateOnInitiativeBar(CombatingEntity entity)
+        {
+            var entitiesBar 
+                = CombatSystemSingleton.TempoHandler.EntitiesBar;
+            entitiesBar[entity].FillBar(entity.CombatStats.InitiativePercentage);
+        }
+
         private void StartUsingActions(CombatingEntity entity)
         {
             var stats = entity.CombatStats;
-            stats.RefillInitiativeActions();
-            if (stats.ActionsLefts <= 0)
-            {
-                OnFinisAllActions(entity); //If the entity doesn't have actions then just invoke OnFinish
-            }
-            else
-            {
-                OnInitiativeTrigger(entity);
-            }
+            OnInitiativeTrigger(entity);
         }
 
         private void RefillRoundTracker()
@@ -195,7 +228,7 @@ namespace _CombatSystem
 
         private bool IsForPlayer(CombatingEntity entity)
         {
-            return _canControlAll || CharacterUtils.IsAPlayerEntity(entity);
+            return _canControlAll || UtilsCharacter.IsAPlayerEntity(entity);
         }
 
         public void OnInitiativeTrigger(CombatingEntity entity)
@@ -243,22 +276,48 @@ namespace _CombatSystem
             PlayerTempoHandler.OnRoundCompleted(allEntities,lastEntity);
         }
 
+        public void OnSkippedEntity(CombatingEntity entity)
+        {
+            TriggerBasicHandler.OnSkippedEntity(entity);
+            if (IsForPlayer(entity))
+                PlayerTempoHandler.OnSkippedEntity(entity);
 
+        }
     }
 
-    public interface ITempoTriggerHandler : ITempoHandler
+    public interface ITempoTypes<out T>
+    {
+        T OnBeforeSequence { get; }
+        T OnAction { get; }
+        T OnSequence { get; }
+        T OnRound { get; }
+    }
+
+    public interface ITempoTriggerHandler : ITempoFullListener, ISkippedTempoListener
     {
         List<ITempoListener> TempoListeners { get; }
         List<IRoundListener> RoundListeners { get; }
+        List<ISkippedTempoListener> SkippedListeners { get; }
     }
-    public interface ITempoHandler : ITempoListener, IRoundListener 
+    public interface ITempoFullListener : ITempoListener, IRoundListener 
     { }
+
+    public interface ISkippedTempoListener
+    {
+        void OnSkippedEntity(CombatingEntity entity);
+    }
 
     public interface ITempoListener
     {
         void OnInitiativeTrigger(CombatingEntity entity);
         void OnDoMoreActions(CombatingEntity entity);
         void OnFinisAllActions(CombatingEntity entity);
+    }
+    public interface ITempoListenerVoid
+    {
+        void OnInitiativeTrigger();
+        void OnDoMoreActions();
+        void OnFinisAllActions();
     }
 
     public interface ITempoFiller
@@ -269,5 +328,9 @@ namespace _CombatSystem
     public interface IRoundListener
     {
         void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity);
+    }
+    public interface IRoundListenerVoid
+    {
+        void OnRoundCompleted();
     }
 }

@@ -81,7 +81,7 @@ namespace _Player
 
         public void OnCameraInitiation(Camera injection)
         {
-            int allocationAmount = CharacterUtils.PredictedAmountOfCharactersInBattle;
+            int allocationAmount = UtilsCharacter.PredictedAmountOfCharactersInBattle;
             _holders = new Stack<UCharacterUIHolder>(allocationAmount);
             DoPooling(injection, allocationAmount, true);
 

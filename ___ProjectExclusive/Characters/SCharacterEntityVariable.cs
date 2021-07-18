@@ -19,6 +19,8 @@ namespace Characters
 
         public SCharacterSkillsPreset skillsPreset = null;
         public SCharacterSharedSkillsPreset sharedSkillsPreset = null;
+        [TitleGroup("Stats")] 
+        public CharacterArchetypes.RangeType rangeType = CharacterArchetypes.RangeType.Melee;
 
         public Transform CharacterHolderReference
         {

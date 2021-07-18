@@ -50,7 +50,7 @@ namespace _Player
             var combatEvents = PlayerEntitySingleton.PlayerCombatEvents;
             combatEvents.Subscribe(this);
             
-            int predictedAmountOfButtons = UtilsSkill.PredictedAmountOfSkillsPerState;
+            int predictedAmountOfButtons = UtilsCombatStats.PredictedAmountOfSkillsPerState;
             _skillButtons 
                 = new Dictionary<CombatSkill, USkillButton>(predictedAmountOfButtons);
 
@@ -77,7 +77,7 @@ namespace _Player
 
         private void InjectUniqueSkills(CombatingEntity entity)
         {
-            List<CombatSkill> uniqueSkills = UtilsSkill.GetSkillsByTeamState(entity);
+            List<CombatSkill> uniqueSkills = UtilsSkill.GetSkillsByStance(entity);
             if(uniqueSkills == null)
             {
 #if UNITY_EDITOR
@@ -148,12 +148,21 @@ namespace _Player
         public void ShowButtons()
         {
             gameObject.SetActive(true);
+            foreach (KeyValuePair<CombatSkill, USkillButton> button in _skillButtons)
+            {
+                button.Value.Show();
+            }
             //TODO show animation
         }
 
         public void HideButtons()
         {
             gameObject.SetActive(false);
+
+            foreach (KeyValuePair<CombatSkill, USkillButton> button in _skillButtons)
+            {
+                button.Value.Hide();
+            }
             //TODO hide animation
         }
 
@@ -167,8 +176,7 @@ namespace _Player
 
         public void OnDoMoreActions(CombatingEntity entity)
         {
-            UpdateSkills();
-            ShowButtons();
+            OnInitiativeTrigger(entity);
         }
 
         public void OnFinisAllActions(CombatingEntity entity)

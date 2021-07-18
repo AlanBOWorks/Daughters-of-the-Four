@@ -151,7 +151,9 @@ namespace _Player
 
         public void OnSubmitSkill(USkillButton submitSkill)
         {
-            SkillState = CombatSkill.State.Cooldown;
+            // SkillState = CombatSkill.State.Cooldown; <<<< Don't use this; 
+            // The cooldown is call by [PerformSkillHandler] since the AI uses this as well for 
+            // its skill usages (and also could bypass the skill cost <= 0 check)
             ToggleSelectedIcon(false);
         }
     }

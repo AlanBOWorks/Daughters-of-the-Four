@@ -104,7 +104,9 @@ namespace _CombatSystem
         {
             Data = new TeamCombatData(this);
         }
+
         public readonly TeamCombatData Data;
+        //TODO make an event to send every member a change State to the necessary Stance
     }
 
 }

@@ -9,17 +9,20 @@ namespace Characters
 {
     public class TempoHandlerBase : ITempoTriggerHandler
     {
-        [field: ShowInInspector]
+        [ShowInInspector]
         public List<ITempoListener> TempoListeners { get; }
-        [field: ShowInInspector]
+        [ShowInInspector]
         public List<IRoundListener> RoundListeners { get; }
 
-        private const int PredictedAmountOfListeners = 4;
+        [ShowInInspector]
+        public List<ISkippedTempoListener> SkippedListeners { get; }
+
 
         public TempoHandlerBase()
         {
-            TempoListeners = new List<ITempoListener>(PredictedAmountOfListeners);
-            RoundListeners = new List<IRoundListener>(PredictedAmountOfListeners);
+            TempoListeners = new List<ITempoListener>();
+            RoundListeners = new List<IRoundListener>();
+            SkippedListeners = new List<ISkippedTempoListener>();
         }
 
         public void Subscribe(ITempoListener listener)
@@ -60,7 +63,6 @@ namespace Characters
 
         public void OnFinisAllActions(CombatingEntity entity)
         {
-            Debug.Log("Finish Triggers");
             foreach (ITempoListener listener in TempoListeners)
             {
                 listener.OnFinisAllActions(entity);
@@ -70,10 +72,21 @@ namespace Characters
         {
             foreach (IRoundListener listener in RoundListeners)
             {
-                listener.OnRoundCompleted(allEntities,lastEntity);
+                listener.OnRoundCompleted(allEntities, lastEntity);
             }
         }
 
+        public void OnSkippedEntity(CombatingEntity entity)
+        {
+            //TODO make something more concrete about this
+#if UNITY_EDITOR
+            Debug.LogWarning($"Skipped character: {entity.CharacterName}");
+#endif
+            foreach (var listener in SkippedListeners)
+            {
+                listener.OnSkippedEntity(entity);
+            }
+        }
     }
 
 }

@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using Animancer;
 using Characters;
 using MEC;
+using Sirenix.OdinInspector;
 using Skills;
+using StylizedAnimator;
 using UnityEngine;
 
 namespace ___ProjectExclusive.Animators
 {
     public class UAnimancerCombatAnimator : MonoBehaviour, ICharacterCombatAnimator
     {
+        [InfoBox("It's recommendable having this in the same level than UCharacterHolder")]
         [SerializeField] private AnimancerComponent animancer;
         [SerializeField] private SCombatAnimationsStates animations = null;
         private AnimancerState _currentState;
         private Func<bool> _isAnimationFinish;
         private Action _returnToIdle;
+        private AnimancerTicker _stylizedAnimancerTicker;
 
         public void Awake()
         {
@@ -36,6 +40,9 @@ namespace ___ProjectExclusive.Animators
             {
                 state.Events.Add(onAnimationEnd);
             }
+
+            _stylizedAnimancerTicker = new AnimancerTicker(animancer);
+            _stylizedAnimancerTicker.InjectInManager(StylizedTickManager.HigherFrameRate.Twos);
         }
 
         public void DoInitialAnimation()
@@ -55,7 +62,6 @@ namespace ___ProjectExclusive.Animators
 
         public IEnumerator<float> _DoAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill)
         {
-            Debug.Log($"Skill type: {UtilsSkill.GetType(skill)}");
             if (UtilsSkill.GetType(skill) == SEffectBase.EffectType.Offensive)
             {
                 _currentState = animancer.Play(animations.GetOffensive());

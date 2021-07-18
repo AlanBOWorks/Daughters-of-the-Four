@@ -22,20 +22,31 @@ namespace _CombatSystem
             Invoker = new SystemInvoker();
             Characters = new CombatCharactersHolder();
             TempoHandler = new TempoHandler(tempoHandlerBase);
-            performSkillHandler = new PerformSkillHandler();
+            PerformSkillHandler = new PerformSkillHandler();
 
             // Locals declarations that wont be used further than durante the CombatInvoker
             var combatControlDeclaration = new CombatControlDeclaration();
             var skillCooldown = new SkillCooldownHandler();
+            var roundCheckHandler = new RoundCheckHandler();
+            var specialBuffHandler = new SpecialBuffHandler();
 
             //---- Injections ----
             Invoker.SubscribeListener(Characters);
             Invoker.SubscribeListener(TempoHandler);
             Invoker.SubscribeListener(combatControlDeclaration);
             Invoker.SubscribeListener(backupSkillsInjection);
+            Invoker.SubscribeListener(roundCheckHandler);
 
-            TempoHandler.Subscribe(performSkillHandler);
+            TempoHandler.Subscribe(PerformSkillHandler);
             TempoHandler.Subscribe(skillCooldown);
+
+            TempoHandler.Subscribe((IRoundListener) specialBuffHandler);
+            TempoHandler.Subscribe((ITempoListener) specialBuffHandler);
+
+            TempoHandler.Subscribe((ITempoListener) roundCheckHandler);
+            TempoHandler.Subscribe((ISkippedTempoListener) roundCheckHandler);
+
+
 
             void InitializeSystem()
             {
@@ -54,11 +65,14 @@ namespace _CombatSystem
         // Useful objects will remain in the Singleton as well
         public static bool IsCombatActive => Invoker.CombatHandle.IsRunning;
         [ShowInInspector]
-        public static PerformSkillHandler performSkillHandler;
+        public static PerformSkillHandler PerformSkillHandler;
         [ShowInInspector]
         public static CombatCharactersHolder Characters;
         [ShowInInspector]
         public static CombatTeamsHandler TeamsDataHandler;
+
+        [ShowInInspector] 
+        public static CombatCharacterEvents CharacterChangesEvent;
 
         // This are not invoked that usually
         [ShowInInspector]
@@ -75,8 +89,12 @@ namespace _CombatSystem
 
     public static class GlobalCombatParams
     {
-        public const float InitiativeCheck = 100;
-        public const int PredictedAmountOfCharacters = CharacterUtils.PredictedAmountOfCharactersInBattle;
+
+        public const float InitiativeCheck = 1;
+        public const float SpeedStatModifier = InitiativeCheck * 0.01f;
+        public const int PredictedAmountOfCharacters = UtilsCharacter.PredictedAmountOfCharactersInBattle;
+        public const int ActionsPerInitiativeCap = 8;
+        public const int ActionsLowerCap = -2;
     }
 
 

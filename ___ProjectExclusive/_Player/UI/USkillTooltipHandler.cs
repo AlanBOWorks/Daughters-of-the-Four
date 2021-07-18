@@ -50,7 +50,7 @@ namespace _Player
         private void HandleDescription(CombatSkill skill)
         {
             string description;
-            string cooldown = $"Cooldown: {skill.cooldownAmount}\n";
+            string cooldown = $"Cooldown: {skill.cooldownCost}\n";
             description = cooldown;
 
             string type = $"Type: {skill.Preset.MainEffectType}\n";

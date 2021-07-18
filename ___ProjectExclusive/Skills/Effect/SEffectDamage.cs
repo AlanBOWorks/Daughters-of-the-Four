@@ -9,8 +9,6 @@ namespace Skills
         menuName = "Combat/Effects/Damage")]
     public class SEffectDamage : SEffectBase
     {
-        public override EffectType GetEffectType() => EffectType.Offensive;
-
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
             float damage = user.CombatStats.AttackPower;
@@ -20,8 +18,8 @@ namespace Skills
             Debug.Log($"Damage Effect: {target.CharacterName} => {damage}");
 #endif
 
-            UtilsSkill.DoDamage(damage,target.CombatStats);
-            target.Listeners.UpdateTemporalStats();
+            UtilsCombatStats.DoDamageTo(target.CombatStats, damage);
+            target.Events.InvokeTemporalStatChange();
         }
 
     }

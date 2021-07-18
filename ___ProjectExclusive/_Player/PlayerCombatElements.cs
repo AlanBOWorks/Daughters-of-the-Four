@@ -15,7 +15,7 @@ namespace _Player
 
         public PlayerCombatElementsPools()
         {
-            int amountOfCharacters = CharacterUtils.PredictedAmountOfCharactersInBattle;
+            int amountOfCharacters = UtilsCharacter.PredictedAmountOfCharactersInBattle;
             EntitiesDictionary = 
                 new Dictionary<CombatingEntity, PlayerCombatElement>(amountOfCharacters);
         }

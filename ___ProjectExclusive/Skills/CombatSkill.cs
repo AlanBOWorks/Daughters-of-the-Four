@@ -13,7 +13,7 @@ namespace Skills
         public CombatSkill(Skill injection, bool isInCooldown = false)
         {
             this.preset = injection.Preset;
-            cooldownAmount = injection.cooldownAmount;
+            cooldownCost = injection.cooldownCost;
             SkillState = isInCooldown 
                 ? State.Cooldown 
                 : State.Idle;
@@ -40,7 +40,8 @@ namespace Skills
             /// </summary>
             Cooldown
         }
-        [ShowInInspector]
+
+        [ShowInInspector] 
         public State SkillState;
 
         public bool IsInCooldown()
@@ -53,8 +54,17 @@ namespace Skills
 
         public void OnSkillUsage()
         {
-            if(cooldownAmount <= 0) return; //Cost 0 can be used multiples times in the same "round"
-            CurrentCooldown = cooldownAmount;
+            // >>>> Cost 0 can be used multiples times in the same initiative
+            // >>>> Cost 1 can only be refreshed after the sequence is finish
+            //
+            // For characters with only 1 action per initiative is the same, but for 
+            // others with >=2 actions there's a huge difference within cost 0 and cost 1
+            if (cooldownCost <= 0) 
+            {
+                SkillState = State.Idle;
+                return; 
+            }
+            CurrentCooldown = cooldownCost;
             SkillState = State.Cooldown;
         }
         public void OnCharacterAction()
@@ -87,7 +97,11 @@ namespace Skills
         [TitleGroup("Variable")]
         [SerializeField] protected SSkillPreset preset = null;
         [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
-        public int cooldownAmount = 1;
+        public int cooldownCost = 1;
+
+
+        public float CriticalAddition => preset.criticalAddition;
+        public bool CanCrit => preset.canCrit;
 
         /// <summary>
         /// Used for to extract preset data or KeyReferences

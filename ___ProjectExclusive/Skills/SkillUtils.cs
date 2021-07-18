@@ -8,55 +8,16 @@ namespace Skills
 {
     public static class UtilsSkill
     {
-
-        public const int PredictedAmountOfSkillsPerState = 4 + 2 + 1; // 4 Unique + 2 common + 1 Ultimate
-        public const int PredictedTotalOfSkills = PredictedAmountOfSkillsPerState * 3; // *3 types of states
-        public static void DoDamage(float damage, ICharacterFullStats stats)
+        public static List<CombatSkill> GetSkillsByStance(CombatingEntity entity)
         {
-            float normalizedReduction = 1 - (stats.DamageReduction);
-            if (normalizedReduction < 0) normalizedReduction = 0;
-            damage *= normalizedReduction;
-            stats.HealthPoints = CalculateHealth(stats.HealthPoints);
-            stats.MortalityPoints = CalculateHealth(stats.MortalityPoints);
-
-            float CalculateHealth(float health)
-            {
-                health -= damage;
-                if (health >= 0)
-                    damage = 0;
-                else
-                {
-                    damage = -health;
-                    health = 0;
-                }
-
-                return health;
-            }
-        }
-
-        public static void DoHeal(float heal, ICharacterFullStats stats)
-        {
-            stats.HealthPoints += heal;
-            if (stats.HealthPoints > stats.MaxHealth)
-                stats.HealthPoints = stats.MaxHealth;
-        }
-
-        public static void SetInitiative(float targetValue, ICombatTemporalStats stats)
-        {
-            targetValue = Mathf.Clamp(targetValue, 0, 100);
-            stats.InitiativePercentage = targetValue;
-        }
-
-        public static List<CombatSkill> GetSkillsByTeamState(CombatingEntity entity)
-        {
-            var state = entity.CharacterGroup.Team.Data.State;
+            var state = entity.AreasDataTracker.GetCurrentPositionState();
             var skills = entity.UniqueSkills;
             if (skills == null) return null;
             switch (state)
             {
-                case TeamCombatData.States.Attacking:
+                case TeamCombatData.Stance.Attacking:
                     return skills.AttackingSkills;
-                case TeamCombatData.States.Defending:
+                case TeamCombatData.Stance.Defending:
                     return skills.DefendingSkills;
                 default:
                     return skills.NeutralSkills;

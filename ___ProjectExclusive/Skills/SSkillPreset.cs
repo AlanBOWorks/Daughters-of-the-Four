@@ -10,7 +10,7 @@ namespace Skills
     /// Global presets to get generic values; <br></br>
     /// <seealso cref="Skill"/> are the specific skills for individual <seealso cref="SCharacterSkillsPreset"/>
     /// </summary>
-    [CreateAssetMenu(fileName = "-SKILL - N (0) [Preset]",
+    [CreateAssetMenu(fileName = "N (T) - SKILL L - [Preset]",
         menuName = "Combat/Skill Preset")]
     public class SSkillPreset : ScriptableObject
     {
@@ -22,18 +22,28 @@ namespace Skills
         [SerializeField] private Sprite icon = null;
         public Sprite Icon => icon;
 
-        public SEffectBase.EffectType MainEffectType => effects[0].GetEffectType();
-        public SEffectBase.EffectTarget MainEffectTarget => effects[0].GetEffectTarget();
+        [TitleGroup("Stats")]
+        public bool canCrit = true;
+        [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"),ShowIf("canCrit")]
+        public float criticalAddition = 0f;
+        
 
         [TitleGroup("Effects")]
         [SerializeField]
         private List<EffectParams> effects = new List<EffectParams>(1);
         public List<EffectParams> Effects => effects;
+        public SEffectBase.EffectType MainEffectType => effects[0].GetEffectType();
+        public SEffectBase.EffectTarget MainEffectTarget => effects[0].GetEffectTarget();
+
+
     }
 
     public abstract class SEffectBase : ScriptableObject
     {
-        public abstract EffectType GetEffectType();
+
+        [SerializeField] protected EffectType effectType = EffectType.Support;
+
+        public EffectType GetEffectType() => effectType;
         public abstract void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1);
 
 
@@ -72,9 +82,9 @@ namespace Skills
         private SEffectBase.EffectTarget effectTarget = SEffectBase.EffectTarget.Target;
         public SEffectBase.EffectTarget GetEffectTarget() => effectTarget;
 
-        public void DoEffect(CombatingEntity user, CombatingEntity target)
+        public void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier)
         {
-            effectPreset.DoEffect(user,target,power);
+            effectPreset.DoEffect(user,target,power * randomModifier);
         }
 
         //There could be additional parameters such randomness, area, etc

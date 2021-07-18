@@ -47,6 +47,7 @@ namespace StylizedAnimator
             Timing.PauseCoroutines(_tickingHandle);
         }
 
+        public const int DefaultInvokerIndex = 2;
         public void AddTicker(IStylizedTicker ticker, int invokerIndex)
         {
             invokerIndex = ClampIndex(invokerIndex);
@@ -196,7 +197,7 @@ namespace StylizedAnimator
 
     public class DebugStylizedTicker : IStylizedTicker
     {
-        private string _debugName;
+        private readonly string _debugName;
         public DebugStylizedTicker(string debugName)
         {
             _debugName = debugName;

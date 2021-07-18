@@ -6,7 +6,7 @@ namespace StylizedAnimator
     {
         public abstract void DoTick(float deltaVariation);
 
-        public void InjectInManager(int startInIndex = 0)
+        public void InjectInManager(int startInIndex = StylizedTickManager.DefaultInvokerIndex)
         {
             TickManagerSingleton.Instance.Entity.MainManager.AddTicker(this, startInIndex);
         }

@@ -8,7 +8,7 @@ namespace Characters
         menuName = "Variable/Enemy/Character Entity")]
     public class SEnemyCharacterEntityVariable : SCharacterEntityVariable
     {
-        [Title("Stats")]
+        [TitleGroup("Stats")]
         [SerializeField]
         private CharacterCombatStatsFull presetStats = new CharacterCombatStatsFull();
 

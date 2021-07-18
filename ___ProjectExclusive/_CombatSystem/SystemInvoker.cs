@@ -70,6 +70,9 @@ namespace _CombatSystem
             {
                 playerEntities.InjectParse(playerSelections, GenerateEntity);
                 enemyEntities.InjectParse(enemyFightPreset, GenerateEntity);
+                DoInjectionTeams(playerEntities);
+                DoInjectionTeams(enemyEntities);
+
                 CombatingTeam allEntities; 
                 GenerateAllEntities();
                 // This phase could be loaded asynchronously while the player is preparing the characters
@@ -113,6 +116,14 @@ namespace _CombatSystem
                     allEntities.AddRange(playerEntities);
                     allEntities.AddRange(enemyEntities);
                 }
+
+                void DoInjectionTeams(CombatingTeam team)
+                {
+                    foreach (CombatingEntity entity in team)
+                    {
+                        entity.Injection(team);
+                    }
+                }
             }
         }
 
@@ -142,12 +153,24 @@ namespace _CombatSystem
 
         private static CombatingEntity GenerateEntity(SCharacterEntityVariable variable)
         {
+            // Instantiate
             CombatingEntity entity = new CombatingEntity(variable.characterName,
                 variable.CharacterPrefab);
+            
+            // Declare
+            var combatData = variable.GenerateData();
+            var characterAreaData = new CombatAreasData(variable.rangeType);
 
-            entity.Injection(variable.GenerateData());
+            //Inject
+            entity.Injection(combatData);
             entity.Injection(variable.skillsPreset);
             entity.Injection(variable.sharedSkillsPreset);
+            entity.AreasDataTracker = characterAreaData;
+
+
+            // Do extras
+            combatData.BaseStats.AddInitialInitiative();
+
             return entity;
         }
     }

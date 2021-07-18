@@ -8,8 +8,6 @@ namespace Skills
         menuName = "Combat/Effects/Heal")]
     public class SEffectHeal : SEffectBase
     {
-        public override EffectType GetEffectType() => EffectType.Support;
-
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
             float heal = user.CombatStats.HealPower;
@@ -20,9 +18,8 @@ namespace Skills
 #endif
 
 
-            UtilsSkill.DoHeal(heal,target.CombatStats);
-            target.Listeners.UpdateTemporalStats();
-
+            UtilsCombatStats.DoHealTo(target.CombatStats,heal);
+            target.Events.InvokeTemporalStatChange();
         }
     }
 }

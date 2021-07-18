@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using _CombatSystem;
 using Characters;
+using Skills;
 using UnityEngine;
 
-namespace Skills
+namespace _CombatSystem
 {
     public class SkillCooldownHandler : ITempoListener
     {
@@ -24,7 +25,6 @@ namespace Skills
 
         private static void ReduceCooldown(List<CombatSkill> skills)
         {
-            Debug.Log("Reduce cooldowns");
             foreach (var skill in skills)
             {
                 skill.OnCharacterAction();
@@ -33,7 +33,6 @@ namespace Skills
 
         private static void CheckAndResetIdle(List<CombatSkill> skills)
         {
-            Debug.Log("Cooldown Zeros?");
             foreach (var skill in skills)
             {
                 skill.OnCharacterFinish();

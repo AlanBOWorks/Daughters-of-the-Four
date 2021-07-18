@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _CombatSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -25,22 +26,54 @@ namespace Characters
         }
 
 
-        public enum PositionType
+        public enum FieldPosition
         {
             InTeam,
             InEnemyTeam,
             OutFormation
         }
-        public static PositionType GetPosition(int index)
+        public static FieldPosition GetPosition(int index)
         {
-            return (PositionType)index;
+            return (FieldPosition)index;
         }
-        [Flags]
         public enum RangeType
         {
+            /// <summary>
+            /// Can only target closeRange foes
+            /// </summary>
             Melee,
+            /// <summary>
+            /// Can only target ranged foes
+            /// </summary>
             Range,
-            Hybrid = Melee | Range
+            /// <summary>
+            /// Are the combination of <see cref="Melee"/> and <see cref="Range"/>
+            /// </summary>
+            Hybrid
+        }
+
+        /// <summary>
+        /// Used for determinate if a <see cref="RangeType.Range"/> is in close position towards an enemy
+        /// </summary>
+        public static bool IsInCloseRange(FieldPosition user, FieldPosition enemy)
+        {
+            switch (user)
+            {
+                case FieldPosition.InTeam:
+                    return enemy == FieldPosition.InEnemyTeam;
+                case FieldPosition.InEnemyTeam:
+                    return enemy == FieldPosition.InTeam;
+                case FieldPosition.OutFormation:
+                default:
+                    throw new NotImplementedException("Position is not implemented for CloseRange");
+            }
+        }
+        /// <summary>
+        /// <inheritdoc cref="IsInCloseRange(FieldPosition,FieldPosition)"/>
+        /// </summary>
+        public static bool IsInCloseRange(CombatingEntity user, CombatingEntity enemy)
+        {
+            return IsInCloseRange(user.AreasDataTracker.combatFieldPosition, enemy.AreasDataTracker.combatFieldPosition);
         }
 
         public static bool IsValid<T>(ICharacterArchetypesData<T> data) where T : class

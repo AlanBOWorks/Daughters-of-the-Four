@@ -61,12 +61,10 @@ namespace Characters
         public void ReceiveSupport(CombatingEntity actor, CombatingEntity target, CombatSkill skill)
         {
             target.Holder.transform.DOPunchPosition(Vector3.right , 1.4f);
-            Debug.Log("Receiving skill: "+ target.CharacterName);
         }
         public void ReceiveAttack(CombatingEntity actor, CombatingEntity target, CombatSkill skill)
         {
             target.Holder.transform.DOPunchPosition(Vector3.forward, 1.4f);
-            Debug.Log("Receiving skill: " + target.CharacterName);
         }
     }
 

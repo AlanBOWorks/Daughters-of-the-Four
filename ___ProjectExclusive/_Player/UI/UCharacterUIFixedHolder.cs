@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using ___ProjectExclusive;
 using _CombatSystem;
 using _Player;
 using Characters;
@@ -45,18 +46,19 @@ namespace _Player
             OnVitalityChange(stats);
             OnTemporalStatsChange(stats);
 
-            entity.Listeners.SubscribeListener(this);
+            entity.Events.SubscribeListener(this);
         }
 
 
         public void OnVitalityChange(IVitalityStats currentStats)
         {
-            maxHealth.text = currentStats.MaxHealth.ToString(CultureInfo.InvariantCulture);
+
+            maxHealth.text = UtilsGameTheme.GetNumericalPrint(currentStats.MaxHealth);
         }
 
         public void OnTemporalStatsChange(ICombatTemporalStats currentStats)
         {
-            healthAmount.text = currentStats.HealthPoints.ToString(CultureInfo.InvariantCulture);
+            healthAmount.text = UtilsGameTheme.GetNumericalPrint(currentStats.HealthPoints);
         }
     }
 

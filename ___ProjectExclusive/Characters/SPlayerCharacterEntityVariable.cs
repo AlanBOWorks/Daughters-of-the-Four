@@ -11,17 +11,17 @@ namespace Characters
         menuName = "Variable/Player/Character Entity")]
     public class SPlayerCharacterEntityVariable : SCharacterEntityVariable
     {
-        [Title("Stats")]
+        [TitleGroup("Stats")]
         [SerializeField]
         private CharacterUpgradeStats upgradedStats = new CharacterUpgradeStats();
         public CharacterUpgradeStats UpgradedStats => upgradedStats;
 
-        [HorizontalGroup("Stats")]
+        [HorizontalGroup("Combat Stats")]
         [SerializeField,Tooltip("Initial stats from level 0 (this values are constant)")]
         private PlayerCharacterCombatStats initialStats = new PlayerCharacterCombatStats();
         public PlayerCharacterCombatStats InitialStats => initialStats;
 
-        [HorizontalGroup("Stats"),Tooltip("Additional stats that grows the character's power per level")]
+        [HorizontalGroup("Combat Stats"),Tooltip("Additional stats that grows the character's power per level")]
         [SerializeField, GUIColor(.5f, .9f, .8f)]
         private PlayerCharacterCombatStats growStats = new PlayerCharacterCombatStats(0);
         public PlayerCharacterCombatStats GrowStats => growStats;
