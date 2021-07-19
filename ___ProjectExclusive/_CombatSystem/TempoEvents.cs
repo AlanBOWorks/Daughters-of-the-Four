@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-using _CombatSystem;
-using _Player;
-using MEC;
+using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Characters
+namespace _CombatSystem
 {
-    public class TempoHandlerBase : ITempoTriggerHandler
+    public class TempoEvents : ITempoTriggerHandler
     {
         [ShowInInspector]
         public List<ITempoListener> TempoListeners { get; }
@@ -18,7 +16,7 @@ namespace Characters
         public List<ISkippedTempoListener> SkippedListeners { get; }
 
 
-        public TempoHandlerBase()
+        public TempoEvents()
         {
             TempoListeners = new List<ITempoListener>();
             RoundListeners = new List<IRoundListener>();

@@ -46,7 +46,7 @@ namespace _Player
             OnVitalityChange(stats);
             OnTemporalStatsChange(stats);
 
-            entity.Events.SubscribeListener(this);
+            entity.Events.Subscribe(this);
         }
 
 

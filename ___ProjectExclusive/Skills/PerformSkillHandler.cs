@@ -53,6 +53,10 @@ namespace Skills
             _doSkillHandle =
                 Timing.RunCoroutineSingleton(_DoSkill(target), _doSkillHandle,SingletonBehavior.Wait);
         }
+        public static void SendDoSkill(CombatingEntity target)
+        {
+            CombatSystemSingleton.PerformSkillHandler.DoSkill(target);
+        }
 
         private IEnumerator<float> _DoSkill(CombatingEntity target)
         {
@@ -137,10 +141,17 @@ namespace Skills
             }
         }
 
-        public List<CombatingEntity> GetPossibleTargets(CombatSkill skill)
+        public List<CombatingEntity> HandlePossibleTargets(CombatSkill skill)
         {
             return UtilsTargets.GetPossibleTargets(skill, _currentUser, _currentSkillTargets);
         }
+
+        public static List<CombatingEntity> SendHandlePossibleTargets(CombatSkill skill)
+        {
+            return CombatSystemSingleton.PerformSkillHandler.HandlePossibleTargets(skill);
+        }
+
+
     }
 
     public class SkillTargets : List<CombatingEntity>

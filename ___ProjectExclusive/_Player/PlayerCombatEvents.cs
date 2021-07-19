@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace _Player
 {
-    public class PlayerCombatEvents : TempoHandlerBase, IPlayerSkillListener
+    public class PlayerCombatEvents : TempoEvents, IPlayerSkillListener
     {
         public readonly List<IPlayerSkillListener> SkillListeners;
 

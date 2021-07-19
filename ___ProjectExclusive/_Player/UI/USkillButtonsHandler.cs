@@ -20,12 +20,14 @@ namespace _Player
         [SerializeField] private USkillButton ultimateButton = null;
         [SerializeField] private USkillButton commonFirst = null;
         [SerializeField] private USkillButton commonSecondary = null;
+        [SerializeField] private USkillButton waitButton = null;
         [Title("Unique")]
         [SerializeField] private List<USkillButton> skillButtons = new List<USkillButton>();
 
         public USkillButton UltimateSkill => ultimateButton;
         public USkillButton CommonSkillFirst => commonFirst;
         public USkillButton CommonSkillSecondary => commonSecondary;
+        public USkillButton WaitSkill => waitButton;
         public List<USkillButton> UniqueSkills => skillButtons;
 
         [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
@@ -71,13 +73,14 @@ namespace _Player
                 ultimateButton.Behaviour = this.buttonsBehaviour;
                 commonFirst.Behaviour = this.buttonsBehaviour;
                 commonSecondary.Behaviour = this.buttonsBehaviour;
+                waitButton.Behaviour = this.buttonsBehaviour;
             }
         }
 
 
         private void InjectUniqueSkills(CombatingEntity entity)
         {
-            List<CombatSkill> uniqueSkills = UtilsSkill.GetSkillsByStance(entity);
+            List<CombatSkill> uniqueSkills = UtilsSkill.GetUniqueByStance(entity);
             if(uniqueSkills == null)
             {
 #if UNITY_EDITOR
@@ -116,7 +119,7 @@ namespace _Player
                 _sharedParsingAction = DoParsingInjection;
 
             ISkillShared<CombatSkill> skillShared = entity.SharedSkills;
-            SharedCombatSkills.DoParse(skillShared,this, _sharedParsingAction);
+            UtilsSkill.DoParse(skillShared,this, _sharedParsingAction);
 
             void DoParsingInjection(CombatSkill skill, USkillButton button)
             {

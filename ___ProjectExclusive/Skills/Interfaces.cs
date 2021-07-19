@@ -16,6 +16,7 @@ namespace Skills
         T UltimateSkill { get; }
         T CommonSkillFirst { get; }
         T CommonSkillSecondary { get; }
+        T WaitSkill { get; }
     }
 
     public interface IEquipSkill<T> : ISkillShared<T>

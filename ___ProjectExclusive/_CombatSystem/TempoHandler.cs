@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _Enemies;
 using _Player;
 using Characters;
 using MEC;
@@ -24,9 +25,10 @@ namespace _CombatSystem
         public float TempoModifier = 1f;
 
         [ShowInInspector, DisableInPlayMode]
-        public TempoHandlerBase TriggerBasicHandler { get; private set; }
+        public TempoEvents TriggerBasicHandler { get; private set; }
         [ShowInInspector, DisableInPlayMode] 
         public ITempoTriggerHandler PlayerTempoHandler { get; private set; }
+        public ICombatEnemyController EnemyController { get; private set; }
 
         public readonly Dictionary<CombatingEntity, ITempoFiller> EntitiesBar;
 
@@ -37,8 +39,9 @@ namespace _CombatSystem
         /// </summary>
         private readonly List<CombatingEntity> _roundTracker;
 
-        private readonly bool _canControlAll;
-        public TempoHandler(TempoHandlerBase basicHandler, bool canControlAll = true)
+        [ShowInInspector]
+        private bool _canControlAll;
+        public TempoHandler(TempoEvents basicHandler, bool canControlAll = false)
         {
             TriggerBasicHandler = basicHandler;
             int memoryAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
@@ -52,6 +55,16 @@ namespace _CombatSystem
         public void Inject(ITempoTriggerHandler playerTriggerHandler)
         {
             PlayerTempoHandler = playerTriggerHandler;
+        }
+
+        public void Inject(ICombatEnemyController enemyController)
+        {
+            if (enemyController == null)
+                EnemyController = CombatEnemyControllerRandom.GenericEnemyController;
+            else
+            {
+                EnemyController = enemyController;
+            }
         }
         public void Subscribe(ITempoListener listener)
         {
@@ -212,6 +225,7 @@ namespace _CombatSystem
         {
             Timing.KillCoroutines(_loopHandle);
             EntitiesBar.Clear();
+            EnemyController = null;
         }
 
         public void OnCombatPause()
@@ -237,6 +251,10 @@ namespace _CombatSystem
             if (IsForPlayer(entity))
             {
                 PlayerTempoHandler.OnInitiativeTrigger(entity);
+            }
+            else
+            {
+                EnemyController.DoControlOn(entity);
             }
         }
         /// <summary>

@@ -45,17 +45,17 @@ namespace Skills
         }
 
         public static List<CombatingEntity> GetPossibleTargets(CombatSkill skill,
-            CombatingEntity user, SkillTargets skillTargets)
+            CombatingEntity user, SkillTargets injectInList)
         {
-            skillTargets.UsingSkill = skill;
-            return GetPossibleTargets(skill, user, skillTargets as List<CombatingEntity>);
+            injectInList.UsingSkill = skill;
+            return GetPossibleTargets(skill, user, injectInList as List<CombatingEntity>);
         }
         public static List<CombatingEntity> GetPossibleTargets(CombatSkill skill, 
-            CombatingEntity user, List<CombatingEntity> skillTargets)
+            CombatingEntity user, List<CombatingEntity> InjectInList)
         {
-            skillTargets.Clear();
+            InjectInList.Clear();
             PrepareTargets();
-            return skillTargets;
+            return InjectInList;
 
             void PrepareTargets()
             {
@@ -65,7 +65,7 @@ namespace Skills
 
                 if (effectType == SEffectBase.EffectType.SelfOnly)
                 {
-                    skillTargets.Add(user);
+                    InjectInList.Add(user);
                     return;
                 }
 
@@ -91,7 +91,7 @@ namespace Skills
                 {
                     foreach (CombatingEntity entity in targets)
                     {
-                        skillTargets.Add(entity);
+                        InjectInList.Add(entity);
                     }
                 }
 
@@ -151,7 +151,7 @@ namespace Skills
                     void AddIfConscious(CombatingEntity entity)
                     {
                         if(entity.IsConscious())
-                            skillTargets.Add(entity);
+                            InjectInList.Add(entity);
                     }
                 }
             }

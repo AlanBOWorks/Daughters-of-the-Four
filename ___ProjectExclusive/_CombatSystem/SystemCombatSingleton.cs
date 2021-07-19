@@ -15,7 +15,7 @@ namespace _CombatSystem
 
         private CombatSystemSingleton()
         {
-            TempoHandlerBase tempoHandlerBase;
+            TempoEvents tempoHandlerBase;
             SafetyBackupSkillsInjection backupSkillsInjection;
             InitializeSystem();
 
@@ -23,6 +23,8 @@ namespace _CombatSystem
             Characters = new CombatCharactersHolder();
             TempoHandler = new TempoHandler(tempoHandlerBase);
             PerformSkillHandler = new PerformSkillHandler();
+            CharacterChangesEvent = new CombatCharacterEventsBase();
+            CombatConditionChecker = new CombatConditionsChecker();
 
             // Locals declarations that wont be used further than durante the CombatInvoker
             var combatControlDeclaration = new CombatControlDeclaration();
@@ -46,12 +48,12 @@ namespace _CombatSystem
             TempoHandler.Subscribe((ITempoListener) roundCheckHandler);
             TempoHandler.Subscribe((ISkippedTempoListener) roundCheckHandler);
 
-
+            CharacterChangesEvent.Subscribe(CombatConditionChecker);
 
             void InitializeSystem()
             {
 #if UNITY_EDITOR
-                tempoHandlerBase = new TempoHandlerBase();
+                tempoHandlerBase = new TempoEvents();
 #else
                 tempoHandler = new CharacterTempoHandler(false);
 #endif
@@ -72,7 +74,9 @@ namespace _CombatSystem
         public static CombatTeamsHandler TeamsDataHandler;
 
         [ShowInInspector] 
-        public static CombatCharacterEvents CharacterChangesEvent;
+        public static CombatConditionsChecker CombatConditionChecker;
+        [ShowInInspector] 
+        public static CombatCharacterEventsBase CharacterChangesEvent;
 
         // This are not invoked that usually
         [ShowInInspector]
@@ -93,6 +97,7 @@ namespace _CombatSystem
         public const float InitiativeCheck = 1;
         public const float SpeedStatModifier = InitiativeCheck * 0.01f;
         public const int PredictedAmountOfCharacters = UtilsCharacter.PredictedAmountOfCharactersInBattle;
+        public const int PredictedAmountOfTeamCharacters = CharacterArchetypes.AmountOfArchetypes;
         public const int ActionsPerInitiativeCap = 8;
         public const int ActionsLowerCap = -2;
     }

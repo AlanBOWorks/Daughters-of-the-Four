@@ -1,5 +1,6 @@
 ﻿using System;
 using Characters;
+using Skills;
 
 namespace _CombatSystem
 {
@@ -33,6 +34,22 @@ namespace _CombatSystem
                     return archetype.GetNeutral();
                 case Stance.Defending:
                     return archetype.GetDefending();
+                default:
+                    throw new ArgumentException("Can't get Stance from the passed arguments",
+                        new NotImplementedException($"Target stance is not implemented: {stance}"));
+            }
+        }
+
+        public static T GetStance<T>(ISkillPositions<T> skills, Stance stance) where T : class 
+        {
+            switch (stance)
+            {
+                case Stance.Attacking:
+                    return skills.AttackingSkills;
+                case Stance.Neutral:
+                    return skills.NeutralSkills;
+                case Stance.Defending:
+                    return skills.DefendingSkills;
                 default:
                     throw new ArgumentException("Can't get Stance from the passed arguments",
                         new NotImplementedException($"Target stance is not implemented: {stance}"));

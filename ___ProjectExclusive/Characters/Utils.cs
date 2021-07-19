@@ -72,9 +72,10 @@ namespace Characters
         {
             damage = CalculateNormalizationDamage();
 
-            stats.HealthPoints = CalculateHealth(stats.HealthPoints);
+            stats.ShieldAmount = CalculateDamageOnVitality(stats.ShieldAmount);
+            stats.HealthPoints = CalculateDamageOnVitality(stats.HealthPoints);
             if(canDamageMortality)
-                stats.MortalityPoints = CalculateHealth(stats.MortalityPoints);
+                stats.MortalityPoints = CalculateDamageOnVitality(stats.MortalityPoints);
 
 
             float CalculateNormalizationDamage()
@@ -83,17 +84,17 @@ namespace Characters
                 if (normalizedReduction < 0) normalizedReduction = 0;
                 return damage * normalizedReduction;
             }
-            float CalculateHealth(float health)
+            float CalculateDamageOnVitality(float vitalityStat)
             {
-                health -= damage;
-                if (health >= 0) damage = 0;
+                vitalityStat -= damage;
+                if (vitalityStat >= 0) damage = 0;
                 else
                 {
-                    damage = -health;
-                    health = 0;
+                    damage = -vitalityStat;
+                    vitalityStat = 0;
                 }
 
-                return health;
+                return vitalityStat;
             }
         }
 

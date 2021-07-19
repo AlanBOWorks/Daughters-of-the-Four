@@ -68,14 +68,10 @@ namespace _CombatSystem
 
             IEnumerator<float> _DoCombat()
             {
-                playerEntities.InjectParse(playerSelections, GenerateEntity);
-                enemyEntities.InjectParse(enemyFightPreset, GenerateEntity);
-                DoInjectionTeams(playerEntities);
-                DoInjectionTeams(enemyEntities);
-
-                CombatingTeam allEntities; 
-                GenerateAllEntities();
                 // This phase could be loaded asynchronously while the player is preparing the characters
+                CombatingTeam allEntities;
+                InitializationPhase();
+                InitializeCombatConditions();
                 Debug.Log("x--- Preparing Combat");
                 PreparationPhase();
 
@@ -85,7 +81,48 @@ namespace _CombatSystem
                 StartPhase();
                 Debug.Log("x--- In Combat");
 
+                void InitializationPhase()
+                {
+                    playerEntities.InjectParse(playerSelections, GenerateEntity);
+                    enemyEntities.InjectParse(enemyFightPreset, GenerateEntity);
+                    DoInjectionTeams(playerEntities);
+                    DoInjectionTeams(enemyEntities);
 
+                    GenerateAllEntities();
+                }
+
+                void InitializeCombatConditions()
+                {
+                    GenericCombatConditions genericCombatConditions = null;
+
+                    IWinCombatCondition winCombatCondition;
+                    if (enemyFightPreset.IsWinConditionValid())
+                        winCombatCondition = enemyFightPreset;
+                    else
+                    {
+                        genericCombatConditions = CreateGenerics();
+                        winCombatCondition = genericCombatConditions;
+                    }
+
+                    ILoseCombatCondition loseCombatCondition;
+                    if (enemyFightPreset.IsLoseConditionValid())
+                    {
+                        loseCombatCondition = enemyFightPreset;
+                    }
+                    else
+                    {
+                        loseCombatCondition = genericCombatConditions ?? CreateGenerics();
+                    }
+
+                    var conditionChecker = CombatSystemSingleton.CombatConditionChecker;
+                    conditionChecker.WinCombatCondition = winCombatCondition;
+                    conditionChecker.LoseCombatCondition = loseCombatCondition;
+
+                    GenericCombatConditions CreateGenerics()
+                    {
+                        return new GenericCombatConditions(playerEntities, enemyEntities);
+                    }
+                }
 
                 void PreparationPhase()
                 {
@@ -98,6 +135,8 @@ namespace _CombatSystem
                     {
                         listener.OnAfterPreparation(playerEntities,enemyEntities,allEntities);
                     }
+
+                    CombatSystemSingleton.TempoHandler.Inject(enemyFightPreset.GetCombatController());
                 }
 
                 void StartPhase()
@@ -162,10 +201,10 @@ namespace _CombatSystem
             var characterAreaData = new CombatAreasData(variable.rangeType);
 
             //Inject
-            entity.Injection(combatData);
-            entity.Injection(variable.skillsPreset);
-            entity.Injection(variable.sharedSkillsPreset);
             entity.AreasDataTracker = characterAreaData;
+            entity.Injection(combatData);
+            entity.Injection(variable.sharedSkillsPreset);
+            entity.Injection(variable.skillsPreset);
 
 
             // Do extras

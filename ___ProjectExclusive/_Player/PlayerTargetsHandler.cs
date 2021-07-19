@@ -12,7 +12,7 @@ namespace _Player
         {
             var skillHandler = CombatSystemSingleton.PerformSkillHandler;
             var possibleTargets
-                = skillHandler.GetPossibleTargets(skill);
+                = skillHandler.HandlePossibleTargets(skill);
 
             var playerElements
                 = PlayerEntitySingleton.CombatDictionary;

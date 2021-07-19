@@ -37,7 +37,7 @@ namespace Characters
             Events = new CombatCharacterEvents(this);
 
             CombatAnimator = combatAnimator;
-            AllSkills = new CombatCharacterSkills();
+            CombatSkills = new CombatCharacterSkills();
         }
         /// <summary>
         /// Initialize this object with a provisional [<see cref="ICharacterCombatAnimator"/>] of type
@@ -70,13 +70,11 @@ namespace Characters
         [ShowInInspector, NonSerialized] 
         public CombatCharacterEvents Events;
 
-        [ShowInInspector]
-        public ISkillShared<CombatSkill> SharedSkills { get; private set; }
-        [ShowInInspector]
-        public ISkillPositions<List<CombatSkill>> UniqueSkills { get; private set; }
+        public IEquipSkill<CombatSkill> SharedSkills => CombatSkills.SharedSkills;
+        public ISkillPositions<List<CombatSkill>> UniqueSkills => CombatSkills.UniqueSkills;
 
         [ShowInInspector]
-        public CombatCharacterSkills AllSkills { get; private set; }
+        public CombatCharacterSkills CombatSkills { get; private set; }
 
         public ICharacterCombatAnimator CombatAnimator;
 
@@ -88,11 +86,22 @@ namespace Characters
 
         public bool CanAct()
         {
-            return IsAlive() && CombatStats.ActionsLefts > 0;
+            return IsAlive() && CombatStats.ActionsLefts > 0 && CanUseSkills();
         }
         public bool IsAlive() => CombatStats.MortalityPoints > 0;
         public bool IsConscious() => IsAlive(); //TODO change it to HP or Mortality based in combat state
 
+        public bool CanUseSkills()
+        {
+            var currentSkills = UtilsSkill.GetSkillsByStance(this);
+            foreach (CombatSkill skill in currentSkills)
+            {
+                if (!skill.IsInCooldown())
+                    return true;
+            }
+
+            return false;
+        }
 
         public void Injection(CharacterCombatData combatStats)
         {
@@ -100,80 +109,134 @@ namespace Characters
                 throw new ArgumentException("Can't inject stats when the Entity already has its Stats");
             CombatStats = combatStats;
         } 
-        public void Injection(ISkillPositions<List<Skill>> injectedSkills)
-        {
-            if(injectedSkills == null) return;
-            this.UniqueSkills = new PositionCombatSkills(injectedSkills);
-            AllSkills.Add(UniqueSkills);
-        }
+        
 
         public void Injection(ISkillShared<Skill> injectedSkills)
         {
-            if(injectedSkills == null) return;
-            SharedSkills = new SharedCombatSkills(injectedSkills);
-            AllSkills.Add(SharedSkills);
+            if(injectedSkills == null)
+            {
+                injectedSkills = GetBackUpSkillShared();
+            }
+
+            var sharedSkills = new SharedCombatSkills(injectedSkills);
+            CombatSkills.Add(sharedSkills);
         }
+        public void Injection(ISkillPositions<List<Skill>> injectedSkills)
+        {
+            if(SharedSkills == null)
+                throw new ArgumentException("Trying to inject Unique skills while" +
+                                            "there's not Shared skills",
+                    new NullReferenceException("Initialize Shared before injecting Unique Skills"));
+
+            if (injectedSkills == null) return;
+            var uniqueSkills = new PositionCombatSkills(injectedSkills);
+            CombatSkills.Add(uniqueSkills);
+        }
+
         public void Injection(CombatingTeam team)
         {
             AreasDataTracker.Injection(team.Data);
         }
        
 
-        public void DoBackupSharedSkillsInjection()
+        public ISkillShared<Skill> GetBackUpSkillShared()
         {
             var archetype = this.AreasDataTracker.PositionInTeam;
             var backUp
                 = CombatSystemSingleton.ParamsVariable.ArchetypesBackupSkills;
-            var skills = CharacterArchetypes.GetElement(backUp, archetype);
-            Injection(new SharedCombatSkills(skills));
+            return CharacterArchetypes.GetElement(backUp, archetype);
         }
 
     }
 
-    public class CombatCharacterSkills : List<CombatSkill>
+    public class CombatCharacterSkills : ISkillPositions<List<CombatSkill>>,
+        IStanceArchetype<List<CombatSkill>>
     {
-        public ISkillShared<CombatSkill> SharedSkills { get; private set; }
+        public List<CombatSkill> AllSkills { get; private set; }
+        [ShowInInspector]
+        public IEquipSkill<CombatSkill> SharedSkills { get; private set; }
+        [ShowInInspector]
         public ISkillPositions<List<CombatSkill>> UniqueSkills { get; private set; }
+        [ShowInInspector]
+        public List<CombatSkill> AttackingSkills { get; }
+        [ShowInInspector]
+        public List<CombatSkill> NeutralSkills { get; }
+        [ShowInInspector]
+        public List<CombatSkill> DefendingSkills { get; }
+        public List<CombatSkill> GetAttacking() => AttackingSkills;
+        public List<CombatSkill> GetNeutral() => NeutralSkills;
+        public List<CombatSkill> GetDefending() => DefendingSkills;
 
         public CombatCharacterSkills()
-        {}
+        {
+            AllSkills = new List<CombatSkill>();
+            AttackingSkills = new List<CombatSkill>();
+            NeutralSkills = new List<CombatSkill>();
+            DefendingSkills = new List<CombatSkill>();
+        }
 
-        public CombatCharacterSkills(ISkillShared<CombatSkill> shared)
+        public CombatCharacterSkills(IEquipSkill<CombatSkill> shared) : this()
         {
             Add(shared);
         }
 
-        public CombatCharacterSkills(ISkillPositions<List<CombatSkill>> uniqueSkills)
+        public CombatCharacterSkills(ISkillPositions<List<CombatSkill>> uniqueSkills) : this()
         {
             Add(uniqueSkills);
         }
 
         public CombatCharacterSkills(
-            ISkillShared<CombatSkill> shared, 
+            IEquipSkill<CombatSkill> shared, 
             ISkillPositions<List<CombatSkill>> uniqueSkills) :
             this(shared)
         {
             Add(uniqueSkills);
         }
 
-        
-
-        public void Add([NotNull]ISkillShared<CombatSkill> shared)
+        public void Add([NotNull] IEquipSkill<CombatSkill> shared)
         {
-            if(SharedSkills != null) return;
             SharedSkills = shared;
-            Add(shared.UltimateSkill);
-            Add(shared.CommonSkillFirst);
-            Add(shared.CommonSkillSecondary);
+           
+            UtilsSkill.DoParse(shared,DoInjection);
+            void DoInjection(CombatSkill skill)
+            {
+                if (skill == null || skill.Preset == null) return;
+                AllSkills.Add(skill);
+            }
         }
         public void Add([NotNull] ISkillPositions<List<CombatSkill>> uniqueSkills)
         {
             if(UniqueSkills !=null) return;
             UniqueSkills = uniqueSkills;
-            AddRange(uniqueSkills.AttackingSkills);
-            AddRange(uniqueSkills.NeutralSkills);
-            AddRange(uniqueSkills.DefendingSkills);
+            InjectStanceSkills(AttackingSkills, TeamCombatData.Stance.Attacking);
+            InjectStanceSkills(NeutralSkills,TeamCombatData.Stance.Neutral);
+            InjectStanceSkills(DefendingSkills,TeamCombatData.Stance.Defending);
+
+            UtilsSkill.DoParse(uniqueSkills,DoInjection);
+            void DoInjection(List<CombatSkill> skills)
+            {
+                AllSkills.AddRange(skills);
+            }
         }
+
+        public void InjectStanceSkills(List<CombatSkill> onList,
+            TeamCombatData.Stance currentStance, bool addWait = true)
+        {
+            List<CombatSkill> stanceList = TeamCombatData.GetStance(UniqueSkills, currentStance);
+            foreach (CombatSkill skill in stanceList)
+            {
+                onList.Add(skill);
+            }
+
+            foreach (CombatSkill skill in SharedSkills.UniqueSkills)
+            {
+                onList.Add(skill);
+            }
+
+            if (!addWait)
+                onList.Remove(SharedSkills.WaitSkill);
+        }
+
     }
 
 

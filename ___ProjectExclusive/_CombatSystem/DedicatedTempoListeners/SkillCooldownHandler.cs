@@ -15,12 +15,12 @@ namespace _CombatSystem
 
         public void OnDoMoreActions(CombatingEntity entity)
         {
-            ReduceCooldown(entity.AllSkills);
+            ReduceCooldown(entity.CombatSkills.AllSkills);
         }
 
         public void OnFinisAllActions(CombatingEntity entity)
         {
-            CheckAndResetIdle(entity.AllSkills);
+            CheckAndResetIdle(entity.CombatSkills.AllSkills);
         }
 
         private static void ReduceCooldown(List<CombatSkill> skills)

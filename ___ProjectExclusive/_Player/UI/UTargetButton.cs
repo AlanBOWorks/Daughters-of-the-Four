@@ -1,6 +1,7 @@
 ﻿using System;
 using _CombatSystem;
 using Characters;
+using Skills;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,8 +9,8 @@ namespace _Player
 {
     public class UTargetButton : MonoBehaviour, IPointerClickHandler
     {
-        private CombatingEntity _currentEntity; //TODO inject this
-        public void Injection(CombatingEntity entity) => _currentEntity = entity;
+        private CombatingEntity _currentTarget; //TODO inject this
+        public void Injection(CombatingEntity entity) => _currentTarget = entity;
 
         public void Show()
         {
@@ -29,7 +30,7 @@ namespace _Player
             {
                 case PointerEventData.InputButton.Left:
                     PlayerEntitySingleton.SkillButtonsHandler.OnSubmitSkill();
-                    CombatSystemSingleton.PerformSkillHandler.DoSkill(_currentEntity);
+                    PerformSkillHandler.SendDoSkill(_currentTarget);
                     break;
                     //TODO left click?
                 default:

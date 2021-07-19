@@ -15,7 +15,7 @@ namespace _Player
         public override void Injection(CombatingEntity entity)
         {
             base.Injection(entity);
-            entity.Events.SubscribeListener(this);
+            entity.Events.Subscribe(this);
 
             OnAreaStateChange(entity.AreasDataTracker);
         }

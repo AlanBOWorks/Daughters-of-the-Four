@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -15,13 +16,15 @@ namespace Skills
         [SerializeField] private Skill ultimateSkill;
         [SerializeField] private Skill commonSkillFirst;
         [SerializeField] private Skill commonSkillSecondary;
+        [SerializeField] private Skill waitSkill;
 
         public Skill UltimateSkill => ultimateSkill;
         public Skill CommonSkillFirst => commonSkillFirst;
         public Skill CommonSkillSecondary => commonSkillSecondary;
+        public Skill WaitSkill => waitSkill;
     }
 
-    public class SharedCombatSkills : ISkillShared<CombatSkill>
+    public class SharedCombatSkills : List<CombatSkill>, IEquipSkill<CombatSkill>
     {
         [ShowInInspector]
         public CombatSkill UltimateSkill { get; }
@@ -30,32 +33,30 @@ namespace Skills
         [ShowInInspector]
         public CombatSkill CommonSkillSecondary { get; }
 
+        public CombatSkill WaitSkill { get; }
+
         public SharedCombatSkills(ISkillShared<Skill> skills)
         {
             UltimateSkill = GenerateSkill(skills.UltimateSkill, true);
             CommonSkillFirst = GenerateSkill(skills.CommonSkillFirst,false);
             CommonSkillSecondary = GenerateSkill(skills.CommonSkillSecondary, false);
+            WaitSkill = GenerateSkill(skills.WaitSkill, false);
         }
 
         public SharedCombatSkills(SCharacterSharedSkillsPreset variableSkills)
-        {
-            UltimateSkill = GenerateSkill(variableSkills.UltimateSkill, true);
-            CommonSkillFirst = GenerateSkill(variableSkills.CommonSkillFirst, false);
-            CommonSkillSecondary = GenerateSkill(variableSkills.CommonSkillSecondary, false);
-        }
+        : this(variableSkills as ISkillShared<Skill>)
+        { }
 
         private CombatSkill GenerateSkill(Skill skill, bool isInCooldown)
         {
-            return skill is null ? null : new CombatSkill(skill, isInCooldown);
+            if (skill is null)
+                return null;
+
+            var generatedSkill = new CombatSkill(skill, isInCooldown);
+            Add(generatedSkill);
+            return generatedSkill;
         }
 
-
-        public static void DoParse<TParse>(ISkillShared<CombatSkill> skills, ISkillShared<TParse> parsing,
-            Action<CombatSkill,TParse> action)
-        {
-            action(skills.UltimateSkill, parsing.UltimateSkill);
-            action(skills.CommonSkillFirst, parsing.CommonSkillFirst);
-            action(skills.CommonSkillSecondary, parsing.CommonSkillSecondary);
-        }
+        public List<CombatSkill> UniqueSkills => this;
     }
 }

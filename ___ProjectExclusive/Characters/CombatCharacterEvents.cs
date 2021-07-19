@@ -21,59 +21,96 @@ namespace Characters
     /// [<seealso cref="ITempoListener"/>]:
     /// is deterministic and will only be invoked in one specific Entity that was triggered.
     /// </summary>
-    public class CombatCharacterEvents 
+    public class CombatCharacterEventsBase 
     {
         [ShowInInspector]
-        private readonly Queue<IVitalityChangeListener> _onVitalityChange;
+        private readonly List<IVitalityChangeListener> _onVitalityChange;
         [ShowInInspector]
-        private readonly Queue<ITemporalStatsChangeListener> _onTemporalStatsChange;
+        private readonly List<ITemporalStatsChangeListener> _onTemporalStatsChange;
         [ShowInInspector]
-        private readonly Queue<IAreaStateChangeListener> _onAreaChange;
+        private readonly List<IAreaStateChangeListener> _onAreaChange;
 
-        private readonly CombatingEntity _user;
-        public CombatCharacterEvents(CombatingEntity user)
+        public CombatCharacterEventsBase()
         {
-            _user = user;
-            _onVitalityChange = new Queue<IVitalityChangeListener>();
-            _onTemporalStatsChange = new Queue<ITemporalStatsChangeListener>();
-            _onAreaChange = new Queue<IAreaStateChangeListener>();
+            _onVitalityChange = new List<IVitalityChangeListener>();
+            _onTemporalStatsChange = new List<ITemporalStatsChangeListener>();
+            _onAreaChange = new List<IAreaStateChangeListener>();
         }
 
-        public void SubscribeListener(ICharacterListener listener)
+        public void Subscribe(ICharacterListener listener)
         {
             if(listener is IVitalityChangeListener vitalityListener)
-                _onVitalityChange.Enqueue(vitalityListener);
+                _onVitalityChange.Add(vitalityListener);
             if(listener is ITemporalStatsChangeListener temporalStatListener)
-                _onTemporalStatsChange.Enqueue(temporalStatListener);
+                _onTemporalStatsChange.Add(temporalStatListener);
             if(listener is IAreaStateChangeListener areaStateListener)
-                _onAreaChange.Enqueue(areaStateListener);
+                _onAreaChange.Add(areaStateListener);
         }
 
-       
-        public void InvokeVitalityChange()
+        public void RemoveListener(ICharacterListener listener)
         {
-            IVitalityStats onStats = _user.CombatStats;
+            if (listener is IVitalityChangeListener vitalityListener)
+                _onVitalityChange.Remove(vitalityListener);
+            if (listener is ITemporalStatsChangeListener temporalStatListener)
+                _onTemporalStatsChange.Remove(temporalStatListener);
+            if (listener is IAreaStateChangeListener areaStateListener)
+                _onAreaChange.Remove(areaStateListener);
+        }
+
+
+        public void InvokeVitalityChange(CombatingEntity entity)
+        {
+            IVitalityStats onStats = entity.CombatStats;
             foreach (IVitalityChangeListener listener in _onVitalityChange)
             {
                 listener.OnVitalityChange(onStats);
             }
         }
-        public void InvokeTemporalStatChange()
+
+        public void InvokeTemporalStatChange(CombatingEntity entity)
         {
-            ICombatTemporalStats onStats = _user.CombatStats;
+            ICombatTemporalStats onStats = entity.CombatStats;
             foreach (ITemporalStatsChangeListener listener in _onTemporalStatsChange)
             {
                 listener.OnTemporalStatsChange(onStats);
             }
         }
-        public void InvokeAreaChange()
+        public void InvokeAreaChange(CombatingEntity entity)
         {
-            CombatAreasData areasData = _user.AreasDataTracker;
+            CombatAreasData areasData = entity.AreasDataTracker;
             foreach (IAreaStateChangeListener listener in _onAreaChange)
             {
                 listener.OnAreaStateChange(areasData);
             }
         }
+    }
+
+    public class CombatCharacterEvents : CombatCharacterEventsBase
+    {
+        private readonly CombatingEntity _user;
+        public CombatCharacterEvents(CombatingEntity user)
+        {
+            _user = user;
+        }
+
+        public void InvokeVitalityChange()
+        {
+            InvokeVitalityChange(_user);
+            CombatSystemSingleton.CharacterChangesEvent.InvokeVitalityChange(_user);
+        }
+
+        public void InvokeTemporalStatChange()
+        {
+            InvokeTemporalStatChange(_user);
+            CombatSystemSingleton.CharacterChangesEvent.InvokeTemporalStatChange(_user);
+        }
+
+        public void InvokeAreaChange()
+        {
+            InvokeAreaChange(_user);
+            CombatSystemSingleton.CharacterChangesEvent.InvokeAreaChange(_user);
+        }
+
     }
 
     /// <summary>
