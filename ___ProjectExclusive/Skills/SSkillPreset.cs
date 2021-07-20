@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Skills
 {
@@ -26,16 +27,16 @@ namespace Skills
         public bool canCrit = true;
         [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"),ShowIf("canCrit")]
         public float criticalAddition = 0f;
-        
+
+        [SerializeField] protected bool canTargetSelf = false;
+        public bool CanTargetSelf() => canTargetSelf;
+
 
         [TitleGroup("Effects")]
         [SerializeField]
         private List<EffectParams> effects = new List<EffectParams>(1);
         public List<EffectParams> Effects => effects;
-        public SEffectBase.EffectType MainEffectType => effects[0].GetEffectType();
-        public SEffectBase.EffectTarget MainEffectTarget => effects[0].GetEffectTarget();
-
-
+        public EffectParams GetMainEffect() => effects[0];
     }
 
     public abstract class SEffectBase : ScriptableObject
@@ -43,9 +44,19 @@ namespace Skills
 
         [SerializeField] protected EffectType effectType = EffectType.Support;
 
+
         public EffectType GetEffectType() => effectType;
+
+
         public abstract void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1);
 
+        /// <summary>
+        /// Checks if the effect has fail in the random check
+        /// </summary>
+        protected static bool FailRandom(float effectModifier)
+        {
+            return Random.value > effectModifier || effectModifier <= 0;
+        }
 
         public enum EffectType
         {

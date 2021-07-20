@@ -142,7 +142,6 @@ namespace _CombatSystem
                 float deltaIncrement = Time.deltaTime * TempoModifier;
                 foreach (CombatingEntity entity in _characters)
                 {
-                    Debug.Log("x--- Ticking ---x");
                     CharacterCombatData stats = entity.CombatStats;
 
                     //Increase Initiative
@@ -156,6 +155,7 @@ namespace _CombatSystem
                     }
 
                     if (stats.InitiativePercentage < initiativeCheck) continue;
+                    yield return Timing.WaitForOneFrame;
                     //Stats refill
                     stats.InitiativePercentage = 0;
                     stats.RefillInitiativeActions();
@@ -188,7 +188,6 @@ namespace _CombatSystem
                         }
                     }
                 }
-
                 yield return Timing.WaitForSeconds(deltaIncrement);
             }
         }
@@ -266,11 +265,15 @@ namespace _CombatSystem
         {
             var currentStats = entity.CombatStats;
             currentStats.ActionsLefts--;
-            if (currentStats.ActionsLefts > 0)
+            if (entity.CanAct())
             {
                 TriggerBasicHandler.OnDoMoreActions(entity);
                 if (IsForPlayer(entity))
                     PlayerTempoHandler.OnDoMoreActions(entity);
+                else
+                {
+                    EnemyController.DoControlOn(entity);
+                }
             }
             else
             {

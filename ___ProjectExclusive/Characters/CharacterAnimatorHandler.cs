@@ -36,6 +36,7 @@ namespace Characters
     /// </summary>
     public class ProvisionalCharacterAnimator : ICharacterCombatAnimator
     {
+        //TODO make a true Provisional Animator for Skip animations (with Idle animations)
         public static ProvisionalCharacterAnimator ProvisionalAnimator = new ProvisionalCharacterAnimator();
 
         public ProvisionalCharacterAnimator()

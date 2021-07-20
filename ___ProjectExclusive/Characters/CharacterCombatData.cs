@@ -27,25 +27,15 @@ namespace Characters
     /// exists while there's a Combat and contains the core data for the combating part
     /// </summary>
     public class CombatingEntity
-    { public CombatingEntity(string characterName, GameObject prefab,
-            ICharacterCombatAnimator combatAnimator)
+    { public CombatingEntity(string characterName, GameObject prefab)
         {
             CharacterName = characterName;
             InstantiationPrefab = prefab;
             ReceivedStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
             SpecialBuffHolders = new CharacterBuffHolders(this);
             Events = new CombatCharacterEvents(this);
-
-            CombatAnimator = combatAnimator;
-            CombatSkills = new CombatCharacterSkills();
         }
-        /// <summary>
-        /// Initialize this object with a provisional [<see cref="ICharacterCombatAnimator"/>] of type
-        /// [<seealso cref="ProvisionalCharacterAnimator"/>]
-        /// </summary>
-        public CombatingEntity(string characterName, GameObject prefab)
-            : this(characterName, prefab, ProvisionalCharacterAnimator.ProvisionalAnimator)
-        { }
+        
 
         [ShowInInspector,GUIColor(.3f,.5f,1)]
         public readonly string CharacterName;
@@ -74,7 +64,7 @@ namespace Characters
         public ISkillPositions<List<CombatSkill>> UniqueSkills => CombatSkills.UniqueSkills;
 
         [ShowInInspector]
-        public CombatCharacterSkills CombatSkills { get; private set; }
+        public CombatSkills CombatSkills { get; private set; }
 
         public ICharacterCombatAnimator CombatAnimator;
 
@@ -84,24 +74,18 @@ namespace Characters
         [ShowInInspector]
         public CharacterSelfGroup CharacterGroup { get; set; }
 
+        /// <summary>
+        /// If is Conscious, has actions left and at least can use any skill
+        /// </summary>
         public bool CanAct()
         {
-            return IsAlive() && CombatStats.ActionsLefts > 0 && CanUseSkills();
+            // In order of [false] possibilities 
+            return IsConscious() && CombatStats.ActionsLefts > 0 && CanUseSkills();
         }
         public bool IsAlive() => CombatStats.MortalityPoints > 0;
         public bool IsConscious() => IsAlive(); //TODO change it to HP or Mortality based in combat state
+        public bool CanUseSkills() => UtilsSkill.CanUseSkills(this);
 
-        public bool CanUseSkills()
-        {
-            var currentSkills = UtilsSkill.GetSkillsByStance(this);
-            foreach (CombatSkill skill in currentSkills)
-            {
-                if (!skill.IsInCooldown())
-                    return true;
-            }
-
-            return false;
-        }
 
         public void Injection(CharacterCombatData combatStats)
         {
@@ -111,27 +95,11 @@ namespace Characters
         } 
         
 
-        public void Injection(ISkillShared<Skill> injectedSkills)
+        public void Injection(CombatSkills combatSkills)
         {
-            if(injectedSkills == null)
-            {
-                injectedSkills = GetBackUpSkillShared();
-            }
-
-            var sharedSkills = new SharedCombatSkills(injectedSkills);
-            CombatSkills.Add(sharedSkills);
+            CombatSkills = combatSkills;
         }
-        public void Injection(ISkillPositions<List<Skill>> injectedSkills)
-        {
-            if(SharedSkills == null)
-                throw new ArgumentException("Trying to inject Unique skills while" +
-                                            "there's not Shared skills",
-                    new NullReferenceException("Initialize Shared before injecting Unique Skills"));
-
-            if (injectedSkills == null) return;
-            var uniqueSkills = new PositionCombatSkills(injectedSkills);
-            CombatSkills.Add(uniqueSkills);
-        }
+        
 
         public void Injection(CombatingTeam team)
         {
@@ -149,95 +117,6 @@ namespace Characters
 
     }
 
-    public class CombatCharacterSkills : ISkillPositions<List<CombatSkill>>,
-        IStanceArchetype<List<CombatSkill>>
-    {
-        public List<CombatSkill> AllSkills { get; private set; }
-        [ShowInInspector]
-        public IEquipSkill<CombatSkill> SharedSkills { get; private set; }
-        [ShowInInspector]
-        public ISkillPositions<List<CombatSkill>> UniqueSkills { get; private set; }
-        [ShowInInspector]
-        public List<CombatSkill> AttackingSkills { get; }
-        [ShowInInspector]
-        public List<CombatSkill> NeutralSkills { get; }
-        [ShowInInspector]
-        public List<CombatSkill> DefendingSkills { get; }
-        public List<CombatSkill> GetAttacking() => AttackingSkills;
-        public List<CombatSkill> GetNeutral() => NeutralSkills;
-        public List<CombatSkill> GetDefending() => DefendingSkills;
-
-        public CombatCharacterSkills()
-        {
-            AllSkills = new List<CombatSkill>();
-            AttackingSkills = new List<CombatSkill>();
-            NeutralSkills = new List<CombatSkill>();
-            DefendingSkills = new List<CombatSkill>();
-        }
-
-        public CombatCharacterSkills(IEquipSkill<CombatSkill> shared) : this()
-        {
-            Add(shared);
-        }
-
-        public CombatCharacterSkills(ISkillPositions<List<CombatSkill>> uniqueSkills) : this()
-        {
-            Add(uniqueSkills);
-        }
-
-        public CombatCharacterSkills(
-            IEquipSkill<CombatSkill> shared, 
-            ISkillPositions<List<CombatSkill>> uniqueSkills) :
-            this(shared)
-        {
-            Add(uniqueSkills);
-        }
-
-        public void Add([NotNull] IEquipSkill<CombatSkill> shared)
-        {
-            SharedSkills = shared;
-           
-            UtilsSkill.DoParse(shared,DoInjection);
-            void DoInjection(CombatSkill skill)
-            {
-                if (skill == null || skill.Preset == null) return;
-                AllSkills.Add(skill);
-            }
-        }
-        public void Add([NotNull] ISkillPositions<List<CombatSkill>> uniqueSkills)
-        {
-            if(UniqueSkills !=null) return;
-            UniqueSkills = uniqueSkills;
-            InjectStanceSkills(AttackingSkills, TeamCombatData.Stance.Attacking);
-            InjectStanceSkills(NeutralSkills,TeamCombatData.Stance.Neutral);
-            InjectStanceSkills(DefendingSkills,TeamCombatData.Stance.Defending);
-
-            UtilsSkill.DoParse(uniqueSkills,DoInjection);
-            void DoInjection(List<CombatSkill> skills)
-            {
-                AllSkills.AddRange(skills);
-            }
-        }
-
-        public void InjectStanceSkills(List<CombatSkill> onList,
-            TeamCombatData.Stance currentStance, bool addWait = true)
-        {
-            List<CombatSkill> stanceList = TeamCombatData.GetStance(UniqueSkills, currentStance);
-            foreach (CombatSkill skill in stanceList)
-            {
-                onList.Add(skill);
-            }
-
-            foreach (CombatSkill skill in SharedSkills.UniqueSkills)
-            {
-                onList.Add(skill);
-            }
-
-            if (!addWait)
-                onList.Remove(SharedSkills.WaitSkill);
-        }
-
-    }
 
 
     public class CharacterCombatData : ICharacterFullStats

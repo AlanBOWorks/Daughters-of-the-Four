@@ -16,7 +16,6 @@ namespace _CombatSystem
         private CombatSystemSingleton()
         {
             TempoEvents tempoHandlerBase;
-            SafetyBackupSkillsInjection backupSkillsInjection;
             InitializeSystem();
 
             Invoker = new SystemInvoker();
@@ -36,7 +35,6 @@ namespace _CombatSystem
             Invoker.SubscribeListener(Characters);
             Invoker.SubscribeListener(TempoHandler);
             Invoker.SubscribeListener(combatControlDeclaration);
-            Invoker.SubscribeListener(backupSkillsInjection);
             Invoker.SubscribeListener(roundCheckHandler);
 
             TempoHandler.Subscribe(PerformSkillHandler);
@@ -57,9 +55,6 @@ namespace _CombatSystem
 #else
                 tempoHandler = new CharacterTempoHandler(false);
 #endif
-
-                backupSkillsInjection = new SafetyBackupSkillsInjection();
-
             }
 
         }
@@ -86,8 +81,6 @@ namespace _CombatSystem
 
         [ShowInInspector]
         public static SCombatParams ParamsVariable = null;
-
-
     }
 
 

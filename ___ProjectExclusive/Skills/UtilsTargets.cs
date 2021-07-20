@@ -51,26 +51,28 @@ namespace Skills
             return GetPossibleTargets(skill, user, injectInList as List<CombatingEntity>);
         }
         public static List<CombatingEntity> GetPossibleTargets(CombatSkill skill, 
-            CombatingEntity user, List<CombatingEntity> InjectInList)
+            CombatingEntity user, List<CombatingEntity> injectInList)
         {
-            InjectInList.Clear();
+            injectInList.Clear();
             PrepareTargets();
-            return InjectInList;
+            return injectInList;
 
             void PrepareTargets()
             {
                 var skillPreset = skill.Preset;
-                SEffectBase.EffectType effectType = skillPreset.MainEffectType;
+                var mainEffect = skillPreset.GetMainEffect();
+
+                SEffectBase.EffectType effectType = mainEffect.GetEffectType();
 
 
                 if (effectType == SEffectBase.EffectType.SelfOnly)
                 {
-                    InjectInList.Add(user);
+                    injectInList.Add(user);
                     return;
                 }
 
 
-                SEffectBase.EffectTarget targetType = skillPreset.MainEffectTarget;
+                SEffectBase.EffectTarget targetType = mainEffect.GetEffectTarget();
                 if (targetType == SEffectBase.EffectTarget.All)
                 {
                     AddByPredefinedTargets(CombatSystemSingleton.Characters.AllEntities);
@@ -87,14 +89,18 @@ namespace Skills
                     }
                 }
 
+                if (!skillPreset.CanTargetSelf())
+                {
+                    injectInList.Remove(user);
+                }
+
                 void AddByPredefinedTargets(List<CombatingEntity> targets)
                 {
                     foreach (CombatingEntity entity in targets)
                     {
-                        InjectInList.Add(entity);
+                        injectInList.Add(entity);
                     }
                 }
-
                 void AddByEnemyTeam()
                 {
 
@@ -151,7 +157,7 @@ namespace Skills
                     void AddIfConscious(CombatingEntity entity)
                     {
                         if(entity.IsConscious())
-                            InjectInList.Add(entity);
+                            injectInList.Add(entity);
                     }
                 }
             }

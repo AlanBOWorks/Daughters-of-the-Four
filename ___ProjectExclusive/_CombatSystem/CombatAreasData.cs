@@ -26,10 +26,12 @@ namespace _CombatSystem
             set => positionState.IsForcedState = value;
         }
 
-        public CombatAreasData(CharacterArchetypes.RangeType rangeType,
+        public CombatAreasData(CharacterArchetypes.TeamPosition positionInTeam,
+            CharacterArchetypes.RangeType rangeType,
             CharacterArchetypes.FieldPosition initialFieldPosition = CharacterArchetypes.FieldPosition.InTeam,
             TeamCombatData.Stance initialStance = TeamCombatData.Stance.Neutral)
         {
+            PositionInTeam = positionInTeam;
             combatFieldPosition = initialFieldPosition;
             RangeType = rangeType;
             positionState = new PositionState(initialStance,false);

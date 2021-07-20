@@ -10,7 +10,7 @@ namespace Skills
     {
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
-            if(Random.value >= effectModifier) return;
+            if(FailRandom(effectModifier)) return;
             var targetStance = target.AreasDataTracker.PositionStance;
             UtilsArea.ToggleStance(user,targetStance);
 

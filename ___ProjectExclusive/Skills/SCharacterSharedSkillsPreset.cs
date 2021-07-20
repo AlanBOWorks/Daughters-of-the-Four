@@ -22,6 +22,7 @@ namespace Skills
         public Skill CommonSkillFirst => commonSkillFirst;
         public Skill CommonSkillSecondary => commonSkillSecondary;
         public Skill WaitSkill => waitSkill;
+       
     }
 
     public class SharedCombatSkills : List<CombatSkill>, IEquipSkill<CombatSkill>
@@ -34,6 +35,9 @@ namespace Skills
         public CombatSkill CommonSkillSecondary { get; }
 
         public CombatSkill WaitSkill { get; }
+
+        private int _amount;
+        public int GetSharedAmount() => _amount;
 
         public SharedCombatSkills(ISkillShared<Skill> skills)
         {
@@ -52,11 +56,12 @@ namespace Skills
             if (skill is null)
                 return null;
 
+            _amount++;
             var generatedSkill = new CombatSkill(skill, isInCooldown);
             Add(generatedSkill);
             return generatedSkill;
         }
 
-        public List<CombatSkill> UniqueSkills => this;
+        public List<CombatSkill> AllSkills => this;
     }
 }

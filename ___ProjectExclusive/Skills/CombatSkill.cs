@@ -111,7 +111,7 @@ namespace Skills
         public Sprite Icon => preset.Icon; // could be modified by another icon when upgraded or something
         public List<EffectParams> GetEffects() => preset.Effects;
 
-        public SEffectBase.EffectType GetMainType() => Preset.MainEffectType;
-        public SEffectBase.EffectTarget GetMainTarget() => Preset.MainEffectTarget;
+        public SEffectBase.EffectType GetMainType() => preset.GetMainEffect().GetEffectType();
+        public SEffectBase.EffectTarget GetMainTarget() => preset.GetMainEffect().GetEffectTarget();
     }
 }

@@ -1,13 +1,11 @@
 ﻿using Characters;
+using Skills;
 using UnityEngine;
 
 namespace _CombatSystem
 {
-    public class SafetyBackupSkillsInjection : ICombatAfterPreparationListener
+    public static class BackUpCombatObjects
     {
-        public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
-        {
-            //TODO any necessary backUP
-        }
+        
     }
 }

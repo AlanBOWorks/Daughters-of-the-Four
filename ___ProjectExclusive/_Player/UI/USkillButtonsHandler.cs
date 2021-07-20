@@ -28,7 +28,7 @@ namespace _Player
         public USkillButton CommonSkillFirst => commonFirst;
         public USkillButton CommonSkillSecondary => commonSecondary;
         public USkillButton WaitSkill => waitButton;
-        public List<USkillButton> UniqueSkills => skillButtons;
+        public List<USkillButton> AllSkills => skillButtons;
 
         [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
         private USkillButton _currentSelectedButton;

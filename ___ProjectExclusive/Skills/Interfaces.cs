@@ -21,6 +21,6 @@ namespace Skills
 
     public interface IEquipSkill<T> : ISkillShared<T>
     {
-        List<T> UniqueSkills { get; }
+        List<T> AllSkills { get; }
     }
 }

@@ -5,6 +5,7 @@ using Characters;
 using _Player;
 using MEC;
 using Sirenix.OdinInspector;
+using Skills;
 using UnityEngine;
 
 namespace _CombatSystem
@@ -70,6 +71,8 @@ namespace _CombatSystem
             {
                 // This phase could be loaded asynchronously while the player is preparing the characters
                 CombatingTeam allEntities;
+                CharacterArchetypes.TeamPosition entityPosition;
+
                 InitializationPhase();
                 InitializeCombatConditions();
                 Debug.Log("x--- Preparing Combat");
@@ -80,15 +83,35 @@ namespace _CombatSystem
                 Debug.Log("x--- Starting Combat");
                 StartPhase();
                 Debug.Log("x--- In Combat");
+                Debug.Log("x--- Finish Combat ---X");
+
 
                 void InitializationPhase()
                 {
+                    entityPosition = CharacterArchetypes.TeamPosition.FrontLine;
                     playerEntities.InjectParse(playerSelections, GenerateEntity);
+
+                    entityPosition = CharacterArchetypes.TeamPosition.FrontLine;
                     enemyEntities.InjectParse(enemyFightPreset, GenerateEntity);
+
                     DoInjectionTeams(playerEntities);
                     DoInjectionTeams(enemyEntities);
 
                     GenerateAllEntities();
+                }
+                void GenerateAllEntities()
+                {
+                    int length = playerEntities.Count + enemyEntities.Count;
+                    allEntities = new CombatingTeam(length);
+                    allEntities.AddRange(playerEntities);
+                    allEntities.AddRange(enemyEntities);
+                }
+                void DoInjectionTeams(CombatingTeam team)
+                {
+                    foreach (CombatingEntity entity in team)
+                    {
+                        entity.Injection(team);
+                    }
                 }
 
                 void InitializeCombatConditions()
@@ -147,21 +170,35 @@ namespace _CombatSystem
                     }
                 }
 
-
-                void GenerateAllEntities()
+                CombatingEntity GenerateEntity(SCharacterEntityVariable variable)
                 {
-                    int length = playerEntities.Count + enemyEntities.Count;
-                    allEntities = new CombatingTeam(length);
-                    allEntities.AddRange(playerEntities);
-                    allEntities.AddRange(enemyEntities);
-                }
+                    // Instantiate
+                    CombatingEntity entity = new CombatingEntity(variable.characterName,
+                        variable.CharacterPrefab);
 
-                void DoInjectionTeams(CombatingTeam team)
-                {
-                    foreach (CombatingEntity entity in team)
-                    {
-                        entity.Injection(team);
-                    }
+
+                    // x----- CombatData
+                    var combatData = variable.GenerateData();
+                    entity.Injection(combatData);
+
+                    // x----- Area
+                    var characterAreaData = new CombatAreasData(entityPosition, variable.rangeType);
+                    entity.AreasDataTracker = characterAreaData;
+
+
+                    // x----- Skills
+                    var sharedSkills = variable.sharedSkillsPreset;
+                    var uniqueSkills = variable.skillsPreset;
+
+
+                    var combatSkills = new CombatSkills(
+                        entity,
+                        sharedSkills,
+                        uniqueSkills);
+                    entity.Injection(combatSkills);
+
+                    entityPosition++;
+                    return entity;
                 }
             }
         }
@@ -190,28 +227,6 @@ namespace _CombatSystem
         }
 
 
-        private static CombatingEntity GenerateEntity(SCharacterEntityVariable variable)
-        {
-            // Instantiate
-            CombatingEntity entity = new CombatingEntity(variable.characterName,
-                variable.CharacterPrefab);
-            
-            // Declare
-            var combatData = variable.GenerateData();
-            var characterAreaData = new CombatAreasData(variable.rangeType);
-
-            //Inject
-            entity.AreasDataTracker = characterAreaData;
-            entity.Injection(combatData);
-            entity.Injection(variable.sharedSkillsPreset);
-            entity.Injection(variable.skillsPreset);
-
-
-            // Do extras
-            combatData.BaseStats.AddInitialInitiative();
-
-            return entity;
-        }
     }
 
 

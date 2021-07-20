@@ -8,6 +8,45 @@ namespace Skills
 {
     public static class UtilsSkill
     {
+
+        public static bool CanUseSkills(CombatingEntity entity)
+        {
+            var sharedSkills = entity.SharedSkills;
+            if (!sharedSkills.WaitSkill.IsInCooldown())
+            {
+                return true;
+            }
+            if (!sharedSkills.CommonSkillFirst.IsInCooldown())
+            {
+                return true;
+            }
+            if (!sharedSkills.CommonSkillSecondary.IsInCooldown())
+            {
+                return true;
+            }
+
+            var currentSkills = GetSkillsByStance(entity);
+            foreach (CombatSkill skill in currentSkills)
+            {
+                if (!skill.IsInCooldown())
+                    return true;
+            }
+
+            if (sharedSkills.UltimateSkill != null && !sharedSkills.UltimateSkill.IsInCooldown())
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static SCharacterSharedSkillsPreset GetBackUpSkills(CharacterArchetypes.TeamPosition position)
+        {
+            var backUpElements 
+                = CombatSystemSingleton.ParamsVariable.ArchetypesBackupSkills;
+            return CharacterArchetypes.GetElement(backUpElements, position);
+        }
+
         public static List<CombatSkill> GetUniqueByStance(CombatingEntity entity)
         {
             var state = entity.AreasDataTracker.GetCurrentPositionState();
@@ -29,16 +68,25 @@ namespace Skills
 
         public static SEffectBase.EffectType GetType(CombatSkill skill)
         {
-            return skill.Preset.MainEffectType;
+            return skill.Preset.GetMainEffect().GetEffectType();
         }
         
-
         public static void DoParse<T>(ISkillPositions<T> skills, Action<T> action)
         {
             action(skills.AttackingSkills);
             action(skills.NeutralSkills);
             action(skills.DefendingSkills);
         }
+
+        public static void DoParse<T, TParse>(ISkillPositions<T> skills, ISkillPositions<TParse> parsing,
+            Action<T, TParse> action)
+        {
+            action(skills.AttackingSkills, parsing.AttackingSkills);
+            action(skills.NeutralSkills, parsing.NeutralSkills);
+            action(skills.DefendingSkills, parsing.DefendingSkills);
+        }
+
+
 
         public static void DoParse<T>(ISkillShared<T> skills, Action<T> action)
         {

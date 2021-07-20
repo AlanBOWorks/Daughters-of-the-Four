@@ -13,7 +13,7 @@ namespace Skills
 
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
-            if(Random.value >= effectModifier) return;
+            if(FailRandom(effectModifier)) return;
             
             UtilsArea.ToggleStance(target,targetStance);
             target.Events.InvokeAreaChange();

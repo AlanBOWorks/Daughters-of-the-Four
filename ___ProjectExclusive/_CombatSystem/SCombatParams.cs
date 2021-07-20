@@ -14,6 +14,16 @@ namespace _CombatSystem
     {
         [Title("Skills")]
         [SerializeField] private Skills backupSkills = new Skills();
+        public SkipAnimationsType skipAnimationsType = SkipAnimationsType.None;
+
+
+        public enum SkipAnimationsType
+        {
+            None,
+            Enemy,
+            All
+        }
+
         /// <summary>
         /// Used when a character doesn't have skills
         /// </summary>

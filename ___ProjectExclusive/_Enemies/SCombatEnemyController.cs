@@ -28,18 +28,19 @@ namespace _Enemies
         public void DoControlOn(CombatingEntity entity)
         {
             ISkillShared<CombatSkill> skillShared = entity.SharedSkills;
-            if (Random.value < UseWaitChance)
-            {
-                DoSkill(skillShared.WaitSkill);
-                return;
-            }
-
+            
             var ultimate = skillShared.UltimateSkill;
             if (ultimate.Preset != null && !ultimate.IsInCooldown())
             {
                 DoSkill(ultimate);
                 return;
             }
+            if (Random.value < UseWaitChance)
+            {
+                DoSkill(skillShared.WaitSkill);
+                return;
+            }
+
 
             _possibleSkills.Clear();
             UtilsEnemyController.DoInjectionOfSkills(_possibleSkills,entity);
@@ -78,8 +79,6 @@ namespace _Enemies
     {
         public static void DoInjectionOfSkills(List<CombatSkill> possibleSkills, CombatingEntity entity)
         {
-
-
             ISkillShared<CombatSkill> skillShared = entity.SharedSkills;
             AddSharedType(skillShared.CommonSkillFirst);
             AddSharedType(skillShared.CommonSkillSecondary);
