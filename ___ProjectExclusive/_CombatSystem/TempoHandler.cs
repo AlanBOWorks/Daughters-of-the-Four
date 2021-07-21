@@ -24,8 +24,11 @@ namespace _CombatSystem
         [Range(0,10),SuffixLabel("deltas")]
         public float TempoModifier = 1f;
 
-        [ShowInInspector, DisableInPlayMode]
-        public TempoEvents TriggerBasicHandler { get; private set; }
+        [HideInEditorMode,HideInPlayMode]
+        public readonly CombatConditionsChecker CombatConditionChecker;
+
+        [ShowInInspector, DisableInPlayMode] 
+        public readonly TempoEvents TriggerBasicHandler;
         [ShowInInspector, DisableInPlayMode] 
         public ITempoTriggerHandler PlayerTempoHandler { get; private set; }
         public ICombatEnemyController EnemyController { get; private set; }
@@ -41,15 +44,15 @@ namespace _CombatSystem
 
         [ShowInInspector]
         private bool _canControlAll;
-        public TempoHandler(TempoEvents basicHandler, bool canControlAll = false)
+        public TempoHandler()
         {
-            TriggerBasicHandler = basicHandler;
+            TriggerBasicHandler  = new TempoEvents();
             int memoryAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
             EntitiesBar = new Dictionary<CombatingEntity, ITempoFiller>(
                 memoryAllocation);
             _roundTracker = new List<CombatingEntity>(memoryAllocation);
-
-            _canControlAll = canControlAll;
+            CombatConditionChecker = new CombatConditionsChecker();
+            CombatSystemSingleton.CombatConditionChecker = CombatConditionChecker;
         }
 
         public void Inject(ITempoTriggerHandler playerTriggerHandler)
@@ -102,22 +105,13 @@ namespace _CombatSystem
             CombatingTeam enemyEntities,
             CharacterArchetypesList<CombatingEntity> allEntities)
         {
+            CombatConditionChecker.OnAfterPreparation(playerEntities,enemyEntities,allEntities);
             _characters = allEntities;
             RefillRoundTracker();
         }
 
 
-        private bool _entityTriggers;
-        /// <summary>
-        /// Used to resume [<see cref="_Tick"/>] (which was paused by an [<seealso cref="CombatingEntity"/>] when
-        /// it reaches its top [<seealso cref="ICombatTemporalStats.InitiativePercentage"/>])
-        /// </summary>
-        public void ResumeFromTempoTrigger()
-        {
-            _entityTriggers = false;
-            ForcedBarUpdate();
-            Timing.ResumeCoroutines(_loopHandle);
-        }
+        
 
         private void ForcedBarUpdate()
         {
@@ -134,6 +128,7 @@ namespace _CombatSystem
             yield return Timing.WaitForOneFrame; //To ensure that everything is initialized
             const float initiativeCheck = GlobalCombatParams.InitiativeCheck;
             const float speedModifier = GlobalCombatParams.SpeedStatModifier;
+            _entityTriggers = false;
             ForcedBarUpdate();
 
             // >>>> COMBAT LOOP
@@ -220,8 +215,9 @@ namespace _CombatSystem
             _loopHandle = Timing.RunCoroutine(_Tick());
         }
 
-        public void OnCombatFinish(CombatingTeam removeEnemies)
+        public void OnCombatFinish(CombatingEntity lastEntity, bool isPlayerWin)
         {
+            OnFinisAllActions(lastEntity);
             Timing.KillCoroutines(_loopHandle);
             EntitiesBar.Clear();
             EnemyController = null;
@@ -260,7 +256,27 @@ namespace _CombatSystem
         /// Is just <see cref="OnDoMoreActions"/> but just for <seealso cref="Skills.PerformSkillHandler"/>
         /// (so it more clear who does the step to the next Action OR calls the finish implicitly)
         /// </summary>
-        public void OnSkillActionFinish(CombatingEntity entity) => OnDoMoreActions(entity);
+        public void OnSkillActionFinish(CombatingEntity entity)
+        {
+            CombatConditionsChecker.FinishState finishCheck =
+                CombatConditionChecker.HandleFinish();
+            switch (finishCheck)
+            {
+                case CombatConditionsChecker.FinishState.StillInCombat:
+                    OnDoMoreActions(entity);
+                    break;
+                case CombatConditionsChecker.FinishState.PlayerWin:
+                    CombatSystemSingleton.Invoker.OnCombatFinish(entity, true);
+                    break;
+                case CombatConditionsChecker.FinishState.EnemyWin:
+                    CombatSystemSingleton.Invoker.OnCombatFinish(entity, false);
+                    break;
+                default:
+                    throw new ArgumentException($"An invalid type of finish state was invoked: {finishCheck}");
+            }
+
+
+        } 
         public void OnDoMoreActions(CombatingEntity entity)
         {
             var currentStats = entity.CombatStats;
@@ -288,9 +304,10 @@ namespace _CombatSystem
             if (IsForPlayer(entity))
                 PlayerTempoHandler.OnFinisAllActions(entity);
 
-            ResumeFromTempoTrigger();
+            if(_loopHandle.IsRunning)
+                ResumeFromTempoTrigger();
         }
-
+        
         public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {
             TriggerBasicHandler.OnRoundCompleted(allEntities,lastEntity);
@@ -302,7 +319,18 @@ namespace _CombatSystem
             TriggerBasicHandler.OnSkippedEntity(entity);
             if (IsForPlayer(entity))
                 PlayerTempoHandler.OnSkippedEntity(entity);
+        }
 
+        private bool _entityTriggers;
+        /// <summary>
+        /// Used to resume [<see cref="_Tick"/>] (which was paused by an [<seealso cref="CombatingEntity"/>] when
+        /// it reaches its top [<seealso cref="ICombatTemporalStats.InitiativePercentage"/>])
+        /// </summary>
+        private void ResumeFromTempoTrigger()
+        {
+            _entityTriggers = false;
+            ForcedBarUpdate();
+            Timing.ResumeCoroutines(_loopHandle);
         }
     }
 

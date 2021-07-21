@@ -20,6 +20,8 @@ namespace Characters
         public ICharacterArchetypes<Transform> PlayerFaction => playerFaction;
         public ICharacterArchetypes<Transform> EnemyFaction => enemyFaction;
 
+        private CombatingTeam _playerTeam;
+        private CombatingTeam _enemyTeam;
 
         private void Awake()
         {
@@ -33,6 +35,9 @@ namespace Characters
             CharacterArchetypesList<CombatingEntity> allEntities)
         {
             EntityHolderSpawner spawner = CharacterSystemSingleton.CharactersSpawner;
+            _playerTeam = playerEntities;
+            _enemyTeam = enemyEntities;
+
             AddEntities(playerEntities,playerFaction);
             AddEntities(enemyEntities,enemyFaction);
             
@@ -45,10 +50,7 @@ namespace Characters
                         new IndexOutOfRangeException($"Not enough elements: {team.Count}"));
                 } 
 #endif
-
-                InvokeEntity(team.FrontLiner,transforms.FrontLiner);
-                InvokeEntity(team.MidLiner, transforms.MidLiner);
-                InvokeEntity(team.BackLiner, transforms.BackLiner);
+                CharacterArchetypes.DoParse(team,transforms,InvokeEntity);                
             }
             void InvokeEntity(CombatingEntity entity, Transform spawnTransform)
             {
@@ -71,13 +73,26 @@ namespace Characters
         }
 
 
-        public void OnCombatFinish(CombatingTeam removeEnemies)
+
+        public void OnCombatFinish(CombatingEntity lastEntity, bool isPlayerWin)
         {
+            //TODO provisional with DeSpawn >> Change to animations instead
             EntityHolderSpawner spawner = CharacterSystemSingleton.CharactersSpawner;
-            foreach (CombatingEntity enemy in removeEnemies)
+
+            RemoveEntities(_enemyTeam);
+            RemoveEntities(_playerTeam);
+
+
+            void RemoveEntities(CombatingTeam team)
             {
-                spawner.DeSpawn(enemy);
+                CharacterArchetypes.DoAction(team,RemoveEntity);
             }
+
+            void RemoveEntity(CombatingEntity entity)
+            {
+                spawner.DeSpawn(entity);
+            }
+
         }
     }
 

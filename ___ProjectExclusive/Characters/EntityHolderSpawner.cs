@@ -22,7 +22,7 @@ namespace Characters
         }
 
         //TODO make it spawn based an scene; on change scene remove from Dictionary those elements
-        public UCharacterHolder SpawnEntity([NotNull]GameObject prefab)
+        public UCharacterHolder SpawnEntity(GameObject prefab)
         {
             var pooledElement = _characterPool.Spawn(prefab);
             pooledElement.gameObject.SetActive(true);

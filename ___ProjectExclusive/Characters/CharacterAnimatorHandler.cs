@@ -39,8 +39,6 @@ namespace Characters
         //TODO make a true Provisional Animator for Skip animations (with Idle animations)
         public static ProvisionalCharacterAnimator ProvisionalAnimator = new ProvisionalCharacterAnimator();
 
-        public ProvisionalCharacterAnimator()
-        {}
 
         public void DoInitialAnimation()
         {

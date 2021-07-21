@@ -84,16 +84,33 @@ namespace Characters
         public static bool IsValid<T>(T[] elements) => elements.Length == AmountOfArchetypes;
         public static bool IsValid<T>(List<T> elements) => elements.Count == AmountOfArchetypes;
 
-        public delegate TParse InjectionFunc<in T, out TParse>(T original);
         public delegate T ParsingFunc<out T,in TParse>(TParse element);
         public static void DoInjection<T, TParse>(
             ICharacterArchetypesData<T> original,
             ICharacterArchetypesInjection<TParse> injectIn,
-            InjectionFunc<T, TParse> parseFunc)
+            Func<T, TParse> parseFunc)
         {
             injectIn.FrontLiner = parseFunc(original.FrontLiner);
             injectIn.MidLiner = parseFunc(original.MidLiner);
             injectIn.BackLiner = parseFunc(original.BackLiner);
+        }
+
+        public static void DoAction<T>(
+            ICharacterArchetypesData<T> elements,
+            Action<T> action)
+        {
+            action(elements.FrontLiner);
+            action(elements.MidLiner);
+            action(elements.BackLiner);
+        }
+        public static void DoParse<T, TParse>(
+            ICharacterArchetypesData<T> elements,
+            ICharacterArchetypesData<TParse> parsing,
+            Action<T, TParse> action)
+        {
+            action(elements.FrontLiner, parsing.FrontLiner);
+            action(elements.MidLiner, parsing.MidLiner);
+            action(elements.BackLiner, parsing.BackLiner);
         }
 
         public static CharacterArchetypesList<T> ParseToList<T,TParse>

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace _CombatSystem
 {
-    public class SystemInvoker
+    public class SystemInvoker : ICombatFinishListener
     {
         [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
         private readonly Queue<ICombatPreparationListener> _preparationListeners;
@@ -69,6 +69,7 @@ namespace _CombatSystem
 
             IEnumerator<float> _DoCombat()
             {
+                #region <<< COMBAT REGION >>>>
                 // This phase could be loaded asynchronously while the player is preparing the characters
                 CombatingTeam allEntities;
                 CharacterArchetypes.TeamPosition entityPosition;
@@ -81,10 +82,9 @@ namespace _CombatSystem
                 // Small wait for secure some loads
                 yield return Timing.WaitForSeconds(1f);
                 Debug.Log("x--- Starting Combat");
+                // TODO make an starting animation
                 StartPhase();
                 Debug.Log("x--- In Combat");
-                Debug.Log("x--- Finish Combat ---X");
-
 
                 void InitializationPhase()
                 {
@@ -156,7 +156,7 @@ namespace _CombatSystem
 
                     foreach (ICombatAfterPreparationListener listener in _afterPreparationListeners)
                     {
-                        listener.OnAfterPreparation(playerEntities,enemyEntities,allEntities);
+                        listener.OnAfterPreparation(playerEntities, enemyEntities, allEntities);
                     }
 
                     CombatSystemSingleton.TempoHandler.Inject(enemyFightPreset.GetCombatController());
@@ -200,12 +200,10 @@ namespace _CombatSystem
                     entityPosition++;
                     return entity;
                 }
-            }
-        }
+                #endregion
 
-        public void FinishCombat()
-        {
-            Timing.KillCoroutines(CombatHandle);
+
+            }
         }
 
         [Button(ButtonSizes.Large),HideInEditorMode, GUIColor(.9f,.8f,.8f)]
@@ -227,6 +225,15 @@ namespace _CombatSystem
         }
 
 
+        public void OnCombatFinish(CombatingEntity lastEntity, bool isPlayerWin)
+        {
+            Debug.Log("x--- Finish Combat ---X");
+            foreach (ICombatFinishListener listener in _onFinishListeners)
+            {
+                listener.OnCombatFinish(lastEntity,isPlayerWin);
+            }
+
+        }
     }
 
 
@@ -275,6 +282,10 @@ namespace _CombatSystem
 
     public interface ICombatFinishListener : IInvokerListenerBase
     {
-        void OnCombatFinish(CombatingTeam removeEnemies);
+        void OnCombatFinish(CombatingEntity lastEntity,bool isPlayerWin);
+        // TODO AfterFinishAnimation()
+        // TODO AfterConfirmFinish()
     }
+
+
 }

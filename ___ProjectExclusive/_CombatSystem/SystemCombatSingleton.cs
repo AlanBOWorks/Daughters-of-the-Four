@@ -15,15 +15,12 @@ namespace _CombatSystem
 
         private CombatSystemSingleton()
         {
-            TempoEvents tempoHandlerBase;
-            InitializeSystem();
 
             Invoker = new SystemInvoker();
             Characters = new CombatCharactersHolder();
-            TempoHandler = new TempoHandler(tempoHandlerBase);
+            TempoHandler = new TempoHandler();
             PerformSkillHandler = new PerformSkillHandler();
             CharacterChangesEvent = new CombatCharacterEventsBase();
-            CombatConditionChecker = new CombatConditionsChecker();
 
             // Locals declarations that wont be used further than durante the CombatInvoker
             var combatControlDeclaration = new CombatControlDeclaration();
@@ -45,22 +42,8 @@ namespace _CombatSystem
 
             TempoHandler.Subscribe((ITempoListener) roundCheckHandler);
             TempoHandler.Subscribe((ISkippedTempoListener) roundCheckHandler);
-
-            CharacterChangesEvent.Subscribe(CombatConditionChecker);
-
-            void InitializeSystem()
-            {
-#if UNITY_EDITOR
-                tempoHandlerBase = new TempoEvents();
-#else
-                tempoHandler = new CharacterTempoHandler(false);
-#endif
-            }
-
         }
 
-        // Useful objects will remain in the Singleton as well
-        public static bool IsCombatActive => Invoker.CombatHandle.IsRunning;
         [ShowInInspector]
         public static PerformSkillHandler PerformSkillHandler;
         [ShowInInspector]
@@ -69,8 +52,6 @@ namespace _CombatSystem
         public static CombatTeamsHandler TeamsDataHandler;
 
         [ShowInInspector] 
-        public static CombatConditionsChecker CombatConditionChecker;
-        [ShowInInspector] 
         public static CombatCharacterEventsBase CharacterChangesEvent;
 
         // This are not invoked that usually
@@ -78,6 +59,9 @@ namespace _CombatSystem
         public static SystemInvoker Invoker;
         [ShowInInspector]
         public static TempoHandler TempoHandler;
+
+        [ShowInInspector] 
+        public static CombatConditionsChecker CombatConditionChecker;
 
         [ShowInInspector]
         public static SCombatParams ParamsVariable = null;

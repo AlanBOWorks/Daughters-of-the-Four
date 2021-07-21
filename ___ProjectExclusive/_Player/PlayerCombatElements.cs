@@ -31,15 +31,15 @@ namespace _Player
             }
         }
 
-        public void OnCombatFinish(CombatingTeam removeEnemies)
+        public void OnCombatFinish(CombatingEntity lastEntity, bool isPlayerWin)
         {
             foreach (KeyValuePair<CombatingEntity, PlayerCombatElement> pair in EntitiesDictionary)
             {
-                var entity = pair.Key;
                 var element = pair.Value;
                 CharacterUIPool.ReturnElement(element.UIHolder);
-                EntitiesDictionary.Remove(entity);
             }
+
+            EntitiesDictionary.Clear();
         }
 
 
