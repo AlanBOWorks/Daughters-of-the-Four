@@ -12,9 +12,9 @@ namespace _Player
         [SerializeField] 
         private CharacterStanceTooltip stanceTooltip = new CharacterStanceTooltip();
 
-        public override void Injection(CombatingEntity entity)
+        public override void Injection(CombatingEntity entity, bool isPlayer)
         {
-            base.Injection(entity);
+            base.Injection(entity, isPlayer);
             entity.Events.Subscribe(this);
 
             OnAreaStateChange(entity.AreasDataTracker);

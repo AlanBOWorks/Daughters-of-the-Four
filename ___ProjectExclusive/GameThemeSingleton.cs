@@ -10,36 +10,41 @@ namespace ___ProjectExclusive
 
         private GameThemeSingleton()
         {
-            _entity = new GameThemeEntity();
         }
         public static GameThemeSingleton Instance { get; } = new GameThemeSingleton();
 
-        private readonly GameThemeEntity _entity;
-        public GameThemeEntity Entity => _entity;
+        [ShowInInspector]
+        public static GameThemeColors ThemeColors;
 
-        public void Injection(SGameThemeSingleton variable)
+        public void Injection(SGameTheme variable)
         {
-            _entity.Variable = variable;
+            ThemeColors = variable.ThemeColors;
         }
-
     }
 
     [Serializable]
-    public class GameThemeEntity
+    public class GameThemeColors
     {
-        [SerializeReference] 
-        public SGameThemeSingleton Variable = null;
+        public TextColors textColors = new TextColors();
+        public PlayerColors playerColors = new PlayerColors();
     }
-
 
 
 
     [Serializable]
-    public struct CharacterColors
+    public class TextColors
     {
-        public Color MainColor;
-        public Color Neutral;
-        public Color Text;
+        public Color mainColor = new Color(.4f, .4f, .4f);
+        public Color neutral = new Color(.4f, .4f, .4f);
+        public Color text = new Color(0.1f,0.1f,0.1f);
+    }
+
+    [Serializable]
+    public class PlayerColors
+    {
+        public Color controllableColor = new Color(.2f,.6f,.8f);
+        public Color enemyColor = new Color(.9f, .2f, .4f);
+        public Color neutralColor = new Color(.4f,.4f,.4f);
     }
 
     public static class UtilsGameTheme

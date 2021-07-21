@@ -27,10 +27,10 @@ namespace _Player
             targetTooltip.Injection(projectionCamera);
             feetTooltip.Injection(projectionCamera);
         }
-        public void Injection(CombatingEntity entity)
+        public void Injection(CombatingEntity entity, bool isPlayer)
         {
-            targetTooltip.Injection(entity);
-            feetTooltip.Injection(entity);
+            targetTooltip.Injection(entity, isPlayer);
+            feetTooltip.Injection(entity, isPlayer);
             targetButton.Injection(entity);
         }
         public void RePosition(Vector3 worldPosition)

@@ -12,9 +12,9 @@ namespace Characters
         [SerializeField]
         private CharacterCombatStatsFull presetStats = new CharacterCombatStatsFull();
 
-        public override CharacterCombatData GenerateData()
+        public override CharacterCombatData GenerateCombatData()
         {
-            return new CharacterCombatData(presetStats);
+            return UtilsStats.GenerateCombatData(presetStats);
         }
     }
 }

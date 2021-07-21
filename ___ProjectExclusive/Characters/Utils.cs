@@ -61,6 +61,24 @@ namespace Characters
             injection.InitiativePercentage = copyFrom.InitiativePercentage;
             injection.ActionsPerInitiative = copyFrom.ActionsPerInitiative;
         }
+
+        public static void CopyStats(IStatsUpgradable injection, IStatsUpgradable copyFrom)
+        {
+            injection.VitalityAmount = copyFrom.VitalityAmount;
+            injection.Enlightenment = copyFrom.Enlightenment;
+            injection.OffensivePower = copyFrom.OffensivePower;
+            injection.SupportPower = copyFrom.SupportPower;
+        }
+
+        public static CharacterCombatData GenerateCombatData(ICharacterFullStats stats)
+        {
+            return new CharacterCombatData(stats);
+        }
+        public static CharacterCombatData GenerateCombatData(IPlayerCharacterStats playerStats)
+        {
+            var copyStats = new PlayerCharacterCombatStats(playerStats);
+            return new CharacterCombatData(copyStats);
+        }
     }
 
     public static class UtilsCombatStats
@@ -68,22 +86,29 @@ namespace Characters
         public const int PredictedAmountOfSkillsPerState = 4 + 2 + 1; // 4 Unique + 2 common + 1 Ultimate
         public const int PredictedTotalOfSkills = PredictedAmountOfSkillsPerState * 3; // *3 types of states
 
+        public static float CalculateFinalDamage(
+            CharacterCombatData attacker, 
+            ICharacterFullStats receiver, float damageModifier)
+        {
+            float baseDamage = attacker.BaseStats.AttackPower;
+            float damageVariation = attacker.BuffStats.AttackPower
+                                    + attacker.BurstStats.AttackPower
+                                    - receiver.DamageReduction;
+            baseDamage += baseDamage * damageVariation;
+
+            float total = baseDamage * damageModifier;
+            if (total < 0) total = 0;
+
+            return total;
+        }
+
         public static void DoDamageTo(ICharacterFullStats stats, float damage, bool canDamageMortality = false)
         {
-            damage = CalculateNormalizationDamage();
-
             stats.ShieldAmount = CalculateDamageOnVitality(stats.ShieldAmount);
             stats.HealthPoints = CalculateDamageOnVitality(stats.HealthPoints);
             if(canDamageMortality)
                 stats.MortalityPoints = CalculateDamageOnVitality(stats.MortalityPoints);
 
-
-            float CalculateNormalizationDamage()
-            {
-                float normalizedReduction = 1 - (stats.DamageReduction);
-                if (normalizedReduction < 0) normalizedReduction = 0;
-                return damage * normalizedReduction;
-            }
             float CalculateDamageOnVitality(float vitalityStat)
             {
                 vitalityStat -= damage;

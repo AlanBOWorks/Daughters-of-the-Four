@@ -170,32 +170,25 @@ namespace _CombatSystem
                     }
                 }
 
-                CombatingEntity GenerateEntity(SCharacterEntityVariable variable)
+
+                CombatingEntity GenerateEntity(ICharacterCombatProvider variable)
                 {
                     // Instantiate
-                    CombatingEntity entity = new CombatingEntity(variable.characterName,
+                    CombatingEntity entity = new CombatingEntity(variable.CharacterName,
                         variable.CharacterPrefab);
 
 
                     // x----- CombatData
-                    var combatData = variable.GenerateData();
+                    var combatData = variable.GenerateCombatData();
                     entity.Injection(combatData);
 
                     // x----- Area
-                    var characterAreaData = new CombatAreasData(entityPosition, variable.rangeType);
+                    var characterAreaData = new CombatAreasData(entityPosition, variable.RangeType);
                     entity.AreasDataTracker = characterAreaData;
 
 
                     // x----- Skills
-                    var sharedSkills = variable.sharedSkillsPreset;
-                    var uniqueSkills = variable.skillsPreset;
-
-
-                    var combatSkills = new CombatSkills(
-                        entity,
-                        sharedSkills,
-                        uniqueSkills);
-                    entity.Injection(combatSkills);
+                    variable.GenerateCombatSkills(entity);
 
                     entityPosition++;
                     return entity;

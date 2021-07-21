@@ -9,7 +9,7 @@ namespace Characters
 {
     [CreateAssetMenu(fileName = "_Character Entity_ - N [Player Variable]",
         menuName = "Variable/Player/Character Entity")]
-    public class SPlayerCharacterEntityVariable : SCharacterEntityVariable
+    public class SPlayerCharacterEntityVariable : SCharacterEntityVariable, IPlayerCharacterStats
     {
         [TitleGroup("Stats")]
         [SerializeField]
@@ -25,12 +25,7 @@ namespace Characters
         [SerializeField, GUIColor(.5f, .9f, .8f)]
         private PlayerCharacterCombatStats growStats = new PlayerCharacterCombatStats(0);
         public PlayerCharacterCombatStats GrowStats => growStats;
-        
 
-        public override CharacterCombatData GenerateData()
-        {
-            return new PlayerCharacterCombatData(initialStats, growStats, upgradedStats);
-        }
 
         [Button("Inject in DataBase")]
         private void Awake()
@@ -45,6 +40,17 @@ namespace Characters
             DataBaseSingleton.Instance.PlayerDataBase.
                 RemoveVariable(this);
         }
+
+        public override CharacterCombatData GenerateCombatData()
+        {
+            return UtilsStats.GenerateCombatData(this);
+        }
     }
 
+    public interface IPlayerCharacterStats
+    {
+        CharacterUpgradeStats UpgradedStats { get; }
+        PlayerCharacterCombatStats InitialStats { get; }
+        PlayerCharacterCombatStats GrowStats { get; }
+    }
 }

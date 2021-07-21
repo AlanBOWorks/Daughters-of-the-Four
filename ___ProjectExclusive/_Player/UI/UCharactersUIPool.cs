@@ -30,10 +30,10 @@ namespace _Player
 
         
 
-        public UCharacterUIHolder PoolDoInjection(CombatingEntity entity)
+        public UCharacterUIHolder PoolDoInjection(CombatingEntity entity, bool isPlayer)
         {
             var holder = _holders.Pop();
-            holder.Injection(entity);
+            holder.Injection(entity, isPlayer);
             holder.gameObject.SetActive(true);
             return holder;
         }
@@ -109,7 +109,7 @@ namespace _Player
             gameObject.SetActive(false);
         }
 
-        public virtual void Injection(CombatingEntity entity)
+        public virtual void Injection(CombatingEntity entity, bool isPlayer)
         {
             if (currentEntity != null) return;
             currentEntity = entity;

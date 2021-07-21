@@ -128,7 +128,7 @@ namespace _CombatSystem
             yield return Timing.WaitForOneFrame; //To ensure that everything is initialized
             const float initiativeCheck = GlobalCombatParams.InitiativeCheck;
             const float speedModifier = GlobalCombatParams.SpeedStatModifier;
-            _entityTriggers = false;
+            _isEntityPause = false;
             ForcedBarUpdate();
 
             // >>>> COMBAT LOOP
@@ -164,7 +164,7 @@ namespace _CombatSystem
                     // Invoke Triggers and LOOP
                     StartUsingActions(entity);
 
-                    _entityTriggers = true;
+                    _isEntityPause = true;
                     Timing.PauseCoroutines(_loopHandle);
                     yield return Timing.WaitForOneFrame;
 
@@ -223,15 +223,17 @@ namespace _CombatSystem
             EnemyController = null;
         }
 
+        public void DoPause() => OnCombatPause();
         public void OnCombatPause()
         {
-            if(_entityTriggers) return;
+            if(_isEntityPause) return;
             Timing.PauseCoroutines(_loopHandle);
         }
 
+        public void DoResume() => OnCombatResume();
         public void OnCombatResume()
         {
-            if(_entityTriggers) return;
+            if(_isEntityPause) return;
             Timing.ResumeCoroutines(_loopHandle);
         }
 
@@ -321,14 +323,14 @@ namespace _CombatSystem
                 PlayerTempoHandler.OnSkippedEntity(entity);
         }
 
-        private bool _entityTriggers;
+        private bool _isEntityPause;
         /// <summary>
         /// Used to resume [<see cref="_Tick"/>] (which was paused by an [<seealso cref="CombatingEntity"/>] when
         /// it reaches its top [<seealso cref="ICombatTemporalStats.InitiativePercentage"/>])
         /// </summary>
         private void ResumeFromTempoTrigger()
         {
-            _entityTriggers = false;
+            _isEntityPause = false;
             ForcedBarUpdate();
             Timing.ResumeCoroutines(_loopHandle);
         }

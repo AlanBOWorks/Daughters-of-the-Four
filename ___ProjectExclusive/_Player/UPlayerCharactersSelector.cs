@@ -14,7 +14,9 @@ namespace _Player
         [SerializeField] private SPlayerCharacterEntityVariable _midLiner;
         [SerializeField] private SPlayerCharacterEntityVariable _backLiner;
 
-        public static void DoSelect(IPlayerArchetypesData<SPlayerCharacterEntityVariable> selected)
+        public bool autoSelectionOnStart = true;
+
+        public static void DoSelect(IPlayerArchetypesData<ICharacterCombatProvider> selected)
         {
             PlayerEntitySingleton.SelectedCharacters = selected;
         }
@@ -24,12 +26,13 @@ namespace _Player
             if(!CharacterArchetypes.IsValid(this))
                 throw new ArgumentException("Invalid selected characters; Some roles are not selected");
 
-            DoSelect(this);
+            var playableCharacters = new PlayableCharactersSelected(this);
+            DoSelect(playableCharacters);
         }
 
         private void Start()
         {
-            if (CharacterArchetypes.IsValid(this))
+            if (autoSelectionOnStart)
             {
                 DoSelectOfCurrent();
             }
@@ -54,5 +57,24 @@ namespace _Player
         }
     }
 
-
+    /// <summary>
+    /// A wrapper for creating and holding data that can be altered through GamePlay without fear.<br></br>
+    /// On before/after play should be saved in a persistent data holder (JSON?). This
+    /// should be managed by the <see cref="PlayableCharacter"/> class itself
+    /// </summary>
+    internal class PlayableCharactersSelected : IPlayerArchetypes<PlayableCharacter>
+    {
+        public PlayableCharactersSelected(ICharacterArchetypesData<SPlayerCharacterEntityVariable> variable)
+        {
+            FrontLiner = new PlayableCharacter(variable.FrontLiner);
+            MidLiner = new PlayableCharacter(variable.MidLiner);
+            BackLiner = new PlayableCharacter(variable.BackLiner);
+        }
+        [ShowInInspector]
+        public PlayableCharacter FrontLiner { get; set; }
+        [ShowInInspector]
+        public PlayableCharacter MidLiner { get; set; }
+        [ShowInInspector]
+        public PlayableCharacter BackLiner { get; set; }
+    }
 }

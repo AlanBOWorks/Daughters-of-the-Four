@@ -11,8 +11,10 @@ namespace Skills
     {
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
-            float damage = user.CombatStats.AttackPower;
-            damage *= effectModifier;
+            float damage = UtilsCombatStats.CalculateFinalDamage(
+                user.CombatStats, 
+                target.CombatStats,
+                effectModifier);
 
 #if UNITY_EDITOR
             Debug.Log($"Damage Effect: {target.CharacterName} => {damage}");

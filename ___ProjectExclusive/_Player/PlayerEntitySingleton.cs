@@ -36,7 +36,7 @@ namespace _Player
         [ShowInInspector]
         public static USkillButtonsHandler SkillButtonsHandler = null;
         [ShowInInspector]
-        public static IPlayerArchetypesData<SPlayerCharacterEntityVariable> SelectedCharacters = null;
+        public static IPlayerArchetypesData<ICharacterCombatProvider> SelectedCharacters = null;
 
         public static void DoSubscriptionsToCombatSystem()
         {

@@ -268,17 +268,6 @@ namespace Characters
         }
     }
 
-    public class PlayerCharacterCombatData : CharacterCombatData
-    {
-        public PlayerCharacterCombatData(
-            CharacterCombatStatsFull initialStats,
-            CharacterCombatStatsFull growStats, 
-            IStatsUpgradable upgrades) 
-            : base(new PlayerCharacterCombatStats(initialStats,growStats, upgrades))
-        {
-        }
-    }
-
     public class SerializedCombatStatsFull : SerializedCombatStatsBasic, ICharacterFullStats
     {
         public SerializedCombatStatsFull(ICharacterFullStats serializeThis) : base(FullStatsLength)
@@ -664,6 +653,41 @@ namespace Characters
         public PlayerCharacterCombatStats(int overrideByDefault) : base(overrideByDefault)
         {}
 
+        public PlayerCharacterCombatStats(PlayerCharacterCombatStats copyFrom)
+        {
+            AttackPower = copyFrom.AttackPower;
+            DeBuffPower = copyFrom.DeBuffPower;
+
+
+            HealPower = copyFrom.HealPower;
+            BuffPower = copyFrom.BuffPower;
+
+
+            MaxHealth = copyFrom.MaxHealth;
+            MaxMortalityPoints = copyFrom.MaxMortalityPoints;
+            DamageReduction = copyFrom.DamageReduction;
+            DeBuffReduction = copyFrom.DeBuffReduction;
+
+
+
+            Enlightenment = copyFrom.Enlightenment;
+            CriticalChance = copyFrom.CriticalChance;
+            SpeedAmount = copyFrom.SpeedAmount;
+
+
+            HealthPoints = copyFrom.HealthPoints;
+            ShieldAmount = copyFrom.ShieldAmount;
+            MortalityPoints = copyFrom.MortalityPoints;
+            HarmonyAmount = copyFrom.HarmonyAmount;
+            InitiativePercentage = copyFrom.InitiativePercentage;
+
+            ActionsPerInitiative = copyFrom.ActionsPerInitiative;
+        }
+
+        public PlayerCharacterCombatStats(IPlayerCharacterStats playerCharacterStats)
+        : this(playerCharacterStats.InitialStats,playerCharacterStats.GrowStats,playerCharacterStats.UpgradedStats)
+        { }
+
         public PlayerCharacterCombatStats(ICharacterFullStats initialStats,ICharacterFullStats growStats, IStatsUpgradable currentUpgrades)
         {
             AttackPower = UtilsStats.GrowFormula(
@@ -726,6 +750,14 @@ namespace Characters
         [SerializeField] private float supportPower;
         [SerializeField] private float vitalityAmount;
         [SerializeField] private float enlightenment;
+
+        public CharacterUpgradeStats()
+        {}
+
+        public CharacterUpgradeStats(IStatsUpgradable copyFrom)
+        {
+            UtilsStats.CopyStats(this,copyFrom);
+        }
 
         public float OffensivePower
         {

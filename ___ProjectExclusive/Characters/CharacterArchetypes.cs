@@ -84,7 +84,6 @@ namespace Characters
         public static bool IsValid<T>(T[] elements) => elements.Length == AmountOfArchetypes;
         public static bool IsValid<T>(List<T> elements) => elements.Count == AmountOfArchetypes;
 
-        public delegate T ParsingFunc<out T,in TParse>(TParse element);
         public static void DoInjection<T, TParse>(
             ICharacterArchetypesData<T> original,
             ICharacterArchetypesInjection<TParse> injectIn,
@@ -114,7 +113,7 @@ namespace Characters
         }
 
         public static CharacterArchetypesList<T> ParseToList<T,TParse>
-            (ICharacterArchetypesData<TParse> parsing, ParsingFunc<T, TParse> parsingFunc)
+            (ICharacterArchetypesData<TParse> parsing, Func<TParse,T> parsingFunc)
         {
             CharacterArchetypesList<T> generated = new CharacterArchetypesList<T>
             {
@@ -204,7 +203,7 @@ namespace Characters
 
         public void InjectParse<TParse>(
             ICharacterArchetypesData<TParse> references,
-            CharacterArchetypes.ParsingFunc<T, TParse> parsingFunc)
+            Func<TParse,T> parsingFunc)
         {
             T frontLiner = parsingFunc(references.FrontLiner);
             T midLiner = parsingFunc(references.MidLiner);

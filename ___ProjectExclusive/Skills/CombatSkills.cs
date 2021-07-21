@@ -31,6 +31,7 @@ namespace Skills
 
         public CombatSkills(CombatingEntity user,ISkillShared<Skill> shared, ISkillPositions<List<Skill>> uniqueSkills)
         {
+            user.Injection(this);
             if (shared == null)
             {
                 shared = UtilsSkill.GetBackUpSkills(user.AreasDataTracker.PositionInTeam);

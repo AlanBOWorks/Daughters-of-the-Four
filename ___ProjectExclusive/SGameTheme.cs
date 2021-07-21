@@ -1,16 +1,17 @@
-﻿using Sirenix.OdinInspector;
+﻿using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace ___ProjectExclusive
 {
     [CreateAssetMenu(fileName = "Game Theme [Singleton]",
         menuName = "Singleton/Game Theme")]
-    public class SGameThemeSingleton : ScriptableObject
+    public class SGameTheme : ScriptableObject
     {
 #if UNITY_EDITOR
-        [SerializeField] private GameThemeEntity _singleton = GameThemeSingleton.Instance.Entity;
+        [SerializeField] private GameThemeColors themeColors = new GameThemeColors();
 #endif
-
+        public GameThemeColors ThemeColors => themeColors;
 
         [Button]
         public void InjectInSingleton()
@@ -18,4 +19,5 @@ namespace ___ProjectExclusive
             GameThemeSingleton.Instance.Injection(this);
         }
     }
+
 }

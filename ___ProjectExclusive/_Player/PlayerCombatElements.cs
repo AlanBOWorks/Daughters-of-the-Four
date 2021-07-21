@@ -23,11 +23,17 @@ namespace _Player
         public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities,
             CharacterArchetypesList<CombatingEntity> allEntities)
         {
-            foreach (CombatingEntity entity in allEntities)
+            DoPool(playerEntities, true);
+            DoPool(enemyEntities,false);
+
+            void DoPool(CombatingTeam team, bool isPlayer)
             {
-                var uiHolder = CharacterUIPool.PoolDoInjection(entity);
-                var element = new PlayerCombatElement(uiHolder);
-                EntitiesDictionary.Add(entity,element);
+                foreach (CombatingEntity entity in team)
+                {
+                    var uiHolder = CharacterUIPool.PoolDoInjection(entity, isPlayer);
+                    var element = new PlayerCombatElement(uiHolder);
+                    EntitiesDictionary.Add(entity, element);
+                }
             }
         }
 
@@ -88,7 +94,7 @@ namespace _Player
     /// </summary>
     public interface IPlayerCombatPool<T> where T : UnityEngine.Object
     {
-        T PoolDoInjection(CombatingEntity entity);
+        T PoolDoInjection(CombatingEntity entity, bool isPlayer);
         void ReturnElement(T element);
     }
 

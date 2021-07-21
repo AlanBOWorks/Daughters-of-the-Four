@@ -1,20 +1,22 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace ___ProjectExclusive
 {
     public class UGameTheme : MonoBehaviour
     {
-        [SerializeField] 
-        private SGameThemeSingleton _theme = null;
+        [SerializeField,HideInPlayMode] 
+        private SGameTheme theme = null;
+
+        [DisableInEditorMode,ShowInInspector]
+        private GameThemeSingleton _singleton = GameThemeSingleton.Instance; 
+
 
         private void Awake()
         {
-            GameThemeSingleton.Instance.Injection(_theme);
+            theme.InjectInSingleton();
         }
 
-        private void Start()
-        {
-            Destroy(gameObject);
-        }
+
     }
 }
