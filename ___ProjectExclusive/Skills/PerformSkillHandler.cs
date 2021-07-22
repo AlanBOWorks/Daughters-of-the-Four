@@ -17,8 +17,6 @@ namespace Skills
         [ShowInInspector]
         private readonly SkillTargets _currentSkillTargets;
 
-        public bool SkipAnimations = false;
-
         public PerformSkillHandler()
         {
             int sizeAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
@@ -61,6 +59,7 @@ namespace Skills
         private IEnumerator<float> _DoSkill(CombatingEntity target)
         {
             CombatSkill skill = _currentSkillTargets.UsingSkill;
+            var skillPreset = skill.Preset;
             if (skill is null)
             {
                 throw new NullReferenceException("DoSkills() was invoked before preparation");
@@ -69,8 +68,7 @@ namespace Skills
             skill.OnSkillUsage();
 
 
-            var skillEffects = skill.GetEffects();
-            if (skillEffects is null || skillEffects.Count <= 0)
+            if (skillPreset.GetEffectAmount() <= 0)
             {
 #if UNITY_EDITOR
                 Debug.LogError("Skill doesn't have an effect");
@@ -97,7 +95,7 @@ namespace Skills
 
             //>>>>>>>>>>>>>>>>>>> DO Main Effect
             List<CombatingEntity> effectTargets;
-            var mainEffect = skillEffects[0];
+            var mainEffect = skillPreset.GetMainEffect();
             DoEffectOnTargets(mainEffect);
             yield return Timing.WaitUntilDone(_currentUser.CombatAnimator
                 ._DoAnimation(_currentUser, effectTargets, _currentSkillTargets.UsingSkill));
@@ -106,9 +104,9 @@ namespace Skills
 
             //>>>>>>>>>>>>>>>>>>> DO Secondary Effects
             // 1 since the main Effect is skillEffects[0]
-            for (int i = 1; i < skillEffects.Count; i++)
+            for (int i = 1; i < skillPreset.GetEffectAmount(); i++)
             {
-                DoEffectOnTargets(skillEffects[i]);
+                DoEffectOnTargets(skillPreset.GetEffect(i));
             }
 
 
@@ -117,12 +115,17 @@ namespace Skills
 
 
             //////////////////////
-            void DoEffectOnTargets(EffectParams effect)
+            void DoEffectOnTargets(IEffect effect)
             {
-                effectTargets = UtilsTargets.GetEffectTargets(effect,_currentUser, target);
+                effectTargets 
+                    = UtilsTargets.GetEffectTargets(_currentUser, target,effect.GetEffectTarget());
                 foreach (CombatingEntity effectTarget in effectTargets)
                 {
-                    UpdateRandomness();
+                    if (effect.CanPerformRandom())
+                        UpdateRandomness();
+                    else
+                        randomModifier = 1;   
+
                     effect.DoEffect(_currentUser, effectTarget,randomModifier);
                 }
             }

@@ -13,7 +13,16 @@ namespace Skills
     /// </summary>
     [CreateAssetMenu(fileName = "N (T) - SKILL L - [Preset]",
         menuName = "Combat/Skill Preset")]
-    public class SSkillPreset : ScriptableObject
+    public class SSkillPreset : SSkillPresetBase
+    {
+        [TitleGroup("Effects")]
+        [SerializeField]
+        private List<EffectParams> effects = new List<EffectParams>(1);
+        public override IEffect GetEffect(int index) => effects[index];
+        public override int GetEffectAmount() => effects.Count;
+    }
+
+    public abstract class SSkillPresetBase : ScriptableObject
     {
         [TitleGroup("Details")]
         [SerializeField, TextArea] private string skillName = "NULL";
@@ -25,29 +34,30 @@ namespace Skills
 
         [TitleGroup("Stats")]
         public bool canCrit = true;
-        [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"),ShowIf("canCrit")]
+        [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
         public float criticalAddition = 0f;
 
+        [TitleGroup("Targeting")]
         [SerializeField] protected bool canTargetSelf = false;
         public bool CanTargetSelf() => canTargetSelf;
+        [SerializeField] protected SkillType skillType = SkillType.Support;
+        public SkillType GetSkillType() => skillType;
+        public enum SkillType
+        {
+            SelfOnly,
+            Offensive,
+            Support,
+            Other = SelfOnly
+        }
 
+        public IEffect GetMainEffect() => GetEffect(0);
+        public abstract IEffect GetEffect(int index);
+        public abstract int GetEffectAmount();
 
-        [TitleGroup("Effects")]
-        [SerializeField]
-        private List<EffectParams> effects = new List<EffectParams>(1);
-        public List<EffectParams> Effects => effects;
-        public EffectParams GetMainEffect() => effects[0];
     }
 
     public abstract class SEffectBase : ScriptableObject
     {
-
-        [SerializeField] protected EffectType effectType = EffectType.Support;
-
-
-        public EffectType GetEffectType() => effectType;
-
-
         public abstract void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1);
 
         /// <summary>
@@ -58,13 +68,6 @@ namespace Skills
             return Random.value > effectModifier || effectModifier <= 0;
         }
 
-        public enum EffectType
-        {
-            SelfOnly,
-            Offensive,
-            Support,
-            Other = SelfOnly
-        }
         public enum EffectTarget
         {
             Target,
@@ -73,6 +76,9 @@ namespace Skills
             /// </summary>
             TargetTeamExcluded,
             TargetTeam,
+            Self,
+            SelfTeam,
+            SelfTeamNotIncluded,
             All
         }
 
@@ -81,23 +87,39 @@ namespace Skills
 
     //its a class instead a struct because it's gone be used by a lot of entities as a reference
     [Serializable]
-    public class EffectParams 
+    public class EffectParams : EffectParamsBase
     {
         [Title("Preset")]
         public SEffectBase effectPreset;
-        [TitleGroup("Stats"), Range(0, 1000), SuffixLabel("%00")]
-        public float power = 1;
-        //TODO Conditionals (Chance, condition to apply effect, etc)
-        public SEffectBase.EffectType GetEffectType() => effectPreset.GetEffectType();
-        [SerializeField] 
-        private SEffectBase.EffectTarget effectTarget = SEffectBase.EffectTarget.Target;
-        public SEffectBase.EffectTarget GetEffectTarget() => effectTarget;
-
-        public void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier)
+        public override void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier)
         {
             effectPreset.DoEffect(user,target,power * randomModifier);
         }
 
         //There could be additional parameters such randomness, area, etc
+    }
+
+    [Serializable]
+    public abstract class EffectParamsBase : IEffect
+    {
+        [TitleGroup("Stats"), Range(0, 1000), SuffixLabel("%00")]
+        public float power = 1;
+        //TODO Conditionals (Chance, condition to apply effect, etc)
+        [SerializeField]
+        private SEffectBase.EffectTarget effectTarget = SEffectBase.EffectTarget.Target;
+        public SEffectBase.EffectTarget GetEffectTarget() => effectTarget;
+
+        [Tooltip("If the effect will apply a small variation into the [Power] value")]
+        public bool applyRandomness = true;
+        public bool CanPerformRandom() => applyRandomness;
+
+        public abstract void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier);
+    }
+
+    public interface IEffect
+    {
+        void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier);
+        SEffectBase.EffectTarget GetEffectTarget();
+        bool CanPerformRandom();
     }
 }

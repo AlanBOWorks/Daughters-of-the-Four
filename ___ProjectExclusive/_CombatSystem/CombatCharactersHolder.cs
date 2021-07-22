@@ -92,9 +92,8 @@ namespace _CombatSystem
             Team = team;
             Enemies = enemies;
 
-            TeamNotSelf = new List<CombatingEntity>(team.Count -1);
-            TeamNotSelf.AddRange(team);
-            TeamNotSelf.Remove(Self[0]);
+            TeamNotSelf = new List<CombatingEntity>(team);
+            TeamNotSelf.Remove(self);
         }
     }
 

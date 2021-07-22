@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using _CombatSystem;
 using _Player;
 using JetBrains.Annotations;
+using Passives;
 using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
@@ -53,6 +54,9 @@ namespace Characters
 
         [ShowInInspector]
         public readonly CharacterBuffHolders SpecialBuffHolders;
+        [ShowInInspector]
+        public PassivesHolder PassivesHolder { get; private set; }
+
 
         [ShowInInspector, NonSerialized] 
         public CombatAreasData AreasDataTracker;
@@ -73,6 +77,7 @@ namespace Characters
         /// </summary>
         [ShowInInspector]
         public CharacterSelfGroup CharacterGroup { get; set; }
+
 
         /// <summary>
         /// If is Conscious, has actions left and at least can use any skill
@@ -105,7 +110,11 @@ namespace Characters
         {
             AreasDataTracker.Injection(team.Data);
         }
-       
+
+        public void Injection(PassivesHolder passivesHolder)
+        {
+            PassivesHolder = passivesHolder;
+        }
 
         public ISkillShared<Skill> GetBackUpSkillShared()
         {
@@ -127,7 +136,7 @@ namespace Characters
         /// This remains active for the whole fight
         /// </summary>
         [ShowInInspector]
-        public CharacterCombatStatsBasic BuffStats { get; protected set; }
+        public CharacterCombatStatsFull BuffStats { get; protected set; }
 
         [ShowInInspector]
         public SerializedCombatStatsFull BurstStats { get; protected set; }
@@ -142,7 +151,7 @@ namespace Characters
         public CharacterCombatData(ICharacterFullStats presetStats)
         {
             BaseStats = new CharacterCombatStatsFull(presetStats as ICharacterFullStats);
-            BuffStats = new CharacterCombatStatsBasic(0);
+            BuffStats = new CharacterCombatStatsFull(0);
             BurstStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
 
             BaseStats.HealthPoints = BaseStats.MaxHealth;
@@ -204,7 +213,7 @@ namespace Characters
 
         public float InitiativePercentage
         {
-            get => BaseStats.InitiativePercentage;
+            get => BaseStats.InitiativePercentage + BurstStats.InitiativePercentage;
             set => BaseStats.InitiativePercentage = value;
         }
 
@@ -281,6 +290,11 @@ namespace Characters
             ActionsPerInitiative = serializeThis.ActionsPerInitiative;
         }
 
+        public SerializedCombatStatsFull(SerializedCombatStatsFull serializeThis) : base(serializeThis)
+        {
+            ActionsPerInitiative = serializeThis.ActionsPerInitiative;
+        }
+
         public float HealthPoints
         {
             get => this[HealthPointsIndex];
@@ -308,7 +322,7 @@ namespace Characters
         }
         public int ActionsPerInitiative { get; set; }
 
-        public const int HealthPointsIndex = BasicStatsLength+1;
+        public const int HealthPointsIndex = BasicStatsLength;
         public const int ShieldAmountIndex = HealthPointsIndex+1;
         public const int MortalityPointsIndex = ShieldAmountIndex+1;
         public const int HarmonyAmountIndex = MortalityPointsIndex+1;
@@ -330,6 +344,10 @@ namespace Characters
         public SerializedCombatStatsBasic(ICharacterBasicStats serializeThis) : base(BasicStatsLength)
         {
             InjectValues(serializeThis);
+        }
+
+        public SerializedCombatStatsBasic(SerializedCombatStatsBasic serializeThis) : base(serializeThis)
+        {
         }
 
         protected void InjectValues(ICharacterBasicStats serializeThis)

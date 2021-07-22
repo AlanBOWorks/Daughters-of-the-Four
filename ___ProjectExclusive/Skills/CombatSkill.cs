@@ -95,7 +95,7 @@ namespace Skills
     public class Skill
     {
         [TitleGroup("Variable")]
-        [SerializeField] protected SSkillPreset preset = null;
+        [SerializeField] protected SSkillPresetBase preset = null;
         [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
         public int cooldownCost = 1;
 
@@ -106,12 +106,10 @@ namespace Skills
         /// <summary>
         /// Used for to extract preset data or KeyReferences
         /// </summary>
-        public SSkillPreset Preset => preset;
+        public SSkillPresetBase Preset => preset;
         public string SkillName => preset.SkillName; //could be modified by a special name in some cases
         public Sprite Icon => preset.Icon; // could be modified by another icon when upgraded or something
-        public List<EffectParams> GetEffects() => preset.Effects;
-
-        public SEffectBase.EffectType GetMainType() => preset.GetMainEffect().GetEffectType();
+        public SSkillPresetBase.SkillType GetMainType() => preset.GetSkillType();
         public SEffectBase.EffectTarget GetMainTarget() => preset.GetMainEffect().GetEffectTarget();
     }
 }

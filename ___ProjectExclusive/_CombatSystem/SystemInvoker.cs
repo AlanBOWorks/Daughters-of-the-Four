@@ -4,6 +4,7 @@ using ___ProjectExclusive._Enemies;
 using Characters;
 using _Player;
 using MEC;
+using Passives;
 using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
@@ -168,7 +169,14 @@ namespace _CombatSystem
                     {
                         listener.OnCombatStart();
                     }
+
+                    foreach (CombatingEntity entity in allEntities)
+                    {
+                        entity.PassivesHolder.DoOpeningPassives(entity);
+                    }
                 }
+
+
 
 
                 CombatingEntity GenerateEntity(ICharacterCombatProvider variable)
@@ -189,6 +197,10 @@ namespace _CombatSystem
 
                     // x----- Skills
                     variable.GenerateCombatSkills(entity);
+
+                    // x----- Passives
+                    var passiveHolder = new PassivesHolder(variable.GetPassivesHolder());
+                    entity.Injection(passiveHolder);
 
                     entityPosition++;
                     return entity;

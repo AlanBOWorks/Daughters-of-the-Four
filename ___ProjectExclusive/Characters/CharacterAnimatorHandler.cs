@@ -20,7 +20,7 @@ namespace Characters
             void DoReaction(CombatingEntity target)
             {
                 if (target == user) return;
-                if (skill.GetMainType() != SEffectBase.EffectType.Offensive)
+                if (skill.GetMainType() != SSkillPreset.SkillType.Offensive)
                 {
                     target.CombatAnimator.ReceiveSupport(user, target, skill);
                 }

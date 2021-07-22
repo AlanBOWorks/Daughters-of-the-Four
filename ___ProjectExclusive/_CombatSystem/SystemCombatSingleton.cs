@@ -27,6 +27,7 @@ namespace _CombatSystem
             var skillCooldown = new SkillCooldownHandler();
             var roundCheckHandler = new RoundCheckHandler();
             var specialBuffHandler = new SpecialBuffHandler();
+            var burstResetHandler = new BuffResetHandler();
 
             //---- Injections ----
             Invoker.SubscribeListener(Characters);
@@ -34,14 +35,21 @@ namespace _CombatSystem
             Invoker.SubscribeListener(combatControlDeclaration);
             Invoker.SubscribeListener(roundCheckHandler);
 
+            // Round check first since is better to finish the combat before all other unnecessary task
+            TempoHandler.Subscribe((ITempoListener)roundCheckHandler);
+            TempoHandler.Subscribe((ISkippedTempoListener)roundCheckHandler);
+
+
             TempoHandler.Subscribe(PerformSkillHandler);
             TempoHandler.Subscribe(skillCooldown);
 
             TempoHandler.Subscribe((IRoundListener) specialBuffHandler);
             TempoHandler.Subscribe((ITempoListener) specialBuffHandler);
 
-            TempoHandler.Subscribe((ITempoListener) roundCheckHandler);
-            TempoHandler.Subscribe((ISkippedTempoListener) roundCheckHandler);
+            TempoHandler.Subscribe((ITempoListener) burstResetHandler);
+            TempoHandler.Subscribe((ISkippedTempoListener)burstResetHandler);
+
+
         }
 
         [ShowInInspector]

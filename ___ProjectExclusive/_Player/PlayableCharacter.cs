@@ -1,4 +1,5 @@
 ﻿using Characters;
+using Passives;
 using Skills;
 using UnityEngine;
 
@@ -15,11 +16,13 @@ namespace _Player
         public CharacterUpgradeStats UpgradedStats { get; }
         public PlayerCharacterCombatStats InitialStats => Variable.InitialStats;
         public PlayerCharacterCombatStats GrowStats => Variable.GrowStats;
+        public readonly PassivesHolder PassivesHolder;
 
         public PlayableCharacter(SPlayerCharacterEntityVariable variable)
         {
             Variable = variable;
             UpgradedStats = new CharacterUpgradeStats(variable.UpgradedStats);
+            PassivesHolder = new PassivesHolder(variable.GetPassivesHolder());
         }
         // TODO make an constructor or injector for the SaveFile.JSON
 
@@ -40,5 +43,6 @@ namespace _Player
             
             return Variable.GenerateCombatSkills(injection);
         }
+        public PassivesHolder GetPassivesHolder() => PassivesHolder;
     }
 }

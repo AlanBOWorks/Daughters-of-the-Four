@@ -25,7 +25,7 @@ namespace Characters
 
         public static float StatsFormula(float baseStat, float buffStat, float burstStat)
         {
-            return (baseStat + buffStat) * (1 + burstStat);
+            return baseStat + baseStat * (buffStat + burstStat);
         }
 
         public static float GrowFormula(float baseStat, float growStat, float upgradeAmount)
@@ -102,12 +102,15 @@ namespace Characters
             return total;
         }
 
-        public static void DoDamageTo(ICharacterFullStats stats, float damage, bool canDamageMortality = false)
+        /// <returns>The damage left</returns>
+        public static float DoDamageTo(ICharacterFullStats stats, float damage, bool canDamageMortality = false)
         {
             stats.ShieldAmount = CalculateDamageOnVitality(stats.ShieldAmount);
             stats.HealthPoints = CalculateDamageOnVitality(stats.HealthPoints);
             if(canDamageMortality)
                 stats.MortalityPoints = CalculateDamageOnVitality(stats.MortalityPoints);
+
+            return damage;
 
             float CalculateDamageOnVitality(float vitalityStat)
             {
@@ -193,10 +196,12 @@ namespace Characters
             var areaData = entity.AreasDataTracker;
             if (areaData.IsForceStance)
             {
+                Debug.Log("Restore stance");
                 areaData.ForceStateFinish();
             }
             else
             {
+                Debug.Log($"{entity.CharacterName} >> Change stance: {targetStance}");
                 areaData.ForceState(targetStance);
             }
         }

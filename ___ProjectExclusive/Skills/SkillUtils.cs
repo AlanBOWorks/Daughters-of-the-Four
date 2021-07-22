@@ -66,9 +66,9 @@ namespace Skills
                 : TeamCombatData.GetStance((IStanceArchetype<List<CombatSkill>>)skills, state);
         }
 
-        public static SEffectBase.EffectType GetType(CombatSkill skill)
+        public static SSkillPreset.SkillType GetType(CombatSkill skill)
         {
-            return skill.Preset.GetMainEffect().GetEffectType();
+            return skill.Preset.GetSkillType();
         }
         
         public static void DoParse<T>(ISkillPositions<T> skills, Action<T> action)

@@ -14,7 +14,7 @@ namespace Skills
         {
             float statAddition = user.CombatStats.BuffPower - BuffStatLowerCap;
             if (statAddition < 0) statAddition = 0;
-            int modification = (int) (effectModifier + statAddition);
+            int modification = (int) (effectModifier + statAddition + .1f);
 #if UNITY_EDITOR
             Debug.Log($"Addition Effect: {target.CharacterName} => {modification}");
 #endif

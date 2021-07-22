@@ -1,4 +1,5 @@
 ﻿using System;
+using Passives;
 using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
@@ -22,6 +23,9 @@ namespace Characters
         public SCharacterSkillsPreset UniqueSkillsPreset => skillsPreset;
         public SCharacterSharedSkillsPreset SharedSkillsPreset => sharedSkillsPreset;
 
+        [TitleGroup("Passives")]
+        [SerializeField] private PassivesHolder passivesHolder = new PassivesHolder();
+        public PassivesHolder GetPassivesHolder() => passivesHolder;
 
         [TitleGroup("Stats")] 
         public CharacterArchetypes.RangeType rangeType = CharacterArchetypes.RangeType.Melee;
@@ -54,6 +58,7 @@ namespace Characters
         CharacterArchetypes.RangeType RangeType { get; }
         CharacterCombatData GenerateCombatData();
         CombatSkills GenerateCombatSkills(CombatingEntity injection);
+        PassivesHolder GetPassivesHolder( );
     }
 }
 

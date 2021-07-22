@@ -5,19 +5,25 @@ namespace Skills
 {
     public abstract class SEffectBuffBase : SEffectBase
     {
-        [SerializeField] private bool isBurstType = false;
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
-            if (isBurstType)
-                DoBurst(user, target.CombatStats.BurstStats, effectModifier);
-            else
-                DoBuff(user, target.CombatStats.BuffStats, effectModifier);
+            ICharacterBasicStats stats = target.CombatStats.BuffStats;
+            DoBuff(user,stats,effectModifier);
         }
 
-        protected abstract void DoBurst(CombatingEntity user, 
-            ICharacterFullStats burstStats, float effectModifier);
+        public void DoEffect(CombatingEntity user, CombatingEntity target, bool isBurstType,
+            float effectModifier = 1)
+        {
+            ICharacterBasicStats stats =
+                isBurstType
+                    ? (ICharacterBasicStats) target.CombatStats.BurstStats
+                    : target.CombatStats.BuffStats;
 
-        protected abstract void DoBuff(CombatingEntity user,
+            DoBuff(user, stats, effectModifier);
+        }
+
+
+       protected abstract void DoBuff(CombatingEntity user,
             ICharacterBasicStats buffStats, float effectModifier);
     }
 }

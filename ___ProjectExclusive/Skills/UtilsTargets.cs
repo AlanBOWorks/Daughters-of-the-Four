@@ -8,37 +8,35 @@ namespace Skills
 {
     public static class UtilsTargets
     {
-        public static List<CombatingEntity> GetEffectTargets(EffectParams effect,CombatingEntity user, CombatingEntity target)
+        public static List<CombatingEntity> GetEffectTargets(CombatingEntity user, CombatingEntity target, SEffectBase.EffectTarget targetType)
         {
             List<CombatingEntity> applyEffectOn;
-            SEffectBase.EffectTarget targetType = effect.GetEffectTarget();
-            if (targetType == SEffectBase.EffectTarget.All)
-                return CombatSystemSingleton.Characters.AllEntities;
-
-            CharacterSelfGroup targetGroup;
-            if (effect.GetEffectType() == SEffectBase.EffectType.SelfOnly)
-            {
-                targetGroup = user.CharacterGroup;
-            }
-            else
-            {
-                targetGroup = target.CharacterGroup;
-            }
-
 
             switch (targetType)
             {
+                case SEffectBase.EffectTarget.All:
+                return CombatSystemSingleton.Characters.AllEntities;
+
                 case SEffectBase.EffectTarget.Target:
-                    applyEffectOn = targetGroup.Self;
+                    applyEffectOn = target.CharacterGroup.Self;
                     break;
                 case SEffectBase.EffectTarget.TargetTeam:
-                    applyEffectOn = targetGroup.Team;
+                    applyEffectOn = target.CharacterGroup.Team;
                     break;
                 case SEffectBase.EffectTarget.TargetTeamExcluded:
-                    applyEffectOn = targetGroup.TeamNotSelf;
+                    applyEffectOn = target.CharacterGroup.TeamNotSelf;
+                    break;
+                case SEffectBase.EffectTarget.Self:
+                    applyEffectOn = user.CharacterGroup.Self;
+                    break;
+                case SEffectBase.EffectTarget.SelfTeam:
+                    applyEffectOn = user.CharacterGroup.Team;
+                    break;
+                case SEffectBase.EffectTarget.SelfTeamNotIncluded:
+                    applyEffectOn = user.CharacterGroup.TeamNotSelf;
                     break;
                 default:
-                    throw new ArgumentException($"Target type is not defined: {(int) targetType}");
+                    throw new ArgumentException($"Target type is not defined: {targetType}");
             }
 
             return applyEffectOn;
@@ -50,7 +48,7 @@ namespace Skills
             injectInList.UsingSkill = skill;
             return GetPossibleTargets(skill, user, injectInList as List<CombatingEntity>);
         }
-        public static List<CombatingEntity> GetPossibleTargets(CombatSkill skill, 
+        public static List<CombatingEntity> GetPossibleTargets(Skill skill, 
             CombatingEntity user, List<CombatingEntity> injectInList)
         {
             injectInList.Clear();
@@ -62,10 +60,10 @@ namespace Skills
                 var skillPreset = skill.Preset;
                 var mainEffect = skillPreset.GetMainEffect();
 
-                SEffectBase.EffectType effectType = mainEffect.GetEffectType();
+                SSkillPresetBase.SkillType skillType = skill.GetMainType();
 
 
-                if (effectType == SEffectBase.EffectType.SelfOnly)
+                if (skillType == SSkillPresetBase.SkillType.SelfOnly)
                 {
                     injectInList.Add(user);
                     return;
@@ -79,7 +77,7 @@ namespace Skills
                 }
                 else
                 {
-                    if (effectType == SEffectBase.EffectType.Support)
+                    if (skillType == SSkillPresetBase.SkillType.Support)
                     {
                         AddByPredefinedTargets(user.CharacterGroup.Team);
                     }

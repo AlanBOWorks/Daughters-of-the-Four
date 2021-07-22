@@ -62,7 +62,7 @@ namespace ___ProjectExclusive.Animators
 
         public IEnumerator<float> _DoAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill)
         {
-            if (UtilsSkill.GetType(skill) == SEffectBase.EffectType.Offensive)
+            if (UtilsSkill.GetType(skill) == SSkillPreset.SkillType.Offensive)
             {
                 _currentState = animancer.Play(animations.GetOffensive());
             }
