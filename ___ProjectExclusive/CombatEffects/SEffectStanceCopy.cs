@@ -1,10 +1,10 @@
 ﻿using Characters;
 using UnityEngine;
 
-namespace Skills
+namespace CombatEffects
 {
 
-    [CreateAssetMenu(fileName = "Stance Copy - N [Preset]",
+    [CreateAssetMenu(fileName = "Stance Copy (SELF) [Preset]",
         menuName = "Combat/Effects/Stance Copy")]
     public class SEffectStanceCopy : SEffectBase
     {

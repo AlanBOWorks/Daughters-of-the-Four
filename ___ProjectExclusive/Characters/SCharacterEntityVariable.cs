@@ -14,7 +14,7 @@ namespace Characters
         public string CharacterName => characterName;
 
         [Title("Instantiation")]
-        [SerializeField]
+        [SerializeField,AssetsOnly]
         private GameObject characterPrefab = null;
         public GameObject CharacterPrefab => characterPrefab;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Characters;
+using CombatEffects;
 using UnityEngine;
 
 namespace Passives

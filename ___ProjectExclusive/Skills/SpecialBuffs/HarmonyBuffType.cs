@@ -2,6 +2,7 @@
 using _CombatSystem;
 using Characters;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 
 namespace Skills

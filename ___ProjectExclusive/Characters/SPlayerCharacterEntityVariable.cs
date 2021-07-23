@@ -1,8 +1,6 @@
-﻿using System;
-using ___ProjectExclusive;
-using ___ProjectExclusive.Animators;
-using _Player;
+﻿using ___ProjectExclusive;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 
 namespace Characters

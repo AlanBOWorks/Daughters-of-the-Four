@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Characters;
-using _CombatSystem;
-using _Player;
 using Sirenix.OdinInspector;
 using Skills;
+using Stats;
 using UnityEngine;
 
 namespace _Player

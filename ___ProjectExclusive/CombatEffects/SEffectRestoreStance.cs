@@ -1,9 +1,9 @@
 ﻿using Characters;
 using UnityEngine;
 
-namespace Skills
+namespace CombatEffects
 {
-    [CreateAssetMenu(fileName = "Restore Stance Effect - N [Preset]",
+    [CreateAssetMenu(fileName = "Restore Stance Effect [Preset]",
         menuName = "Combat/Effects/Restore Stance")]
     public class SEffectRestoreStance : SEffectBase
     {

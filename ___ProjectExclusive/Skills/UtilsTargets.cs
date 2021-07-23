@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using _CombatSystem;
 using Characters;
+using CombatEffects;
 using UnityEngine;
 
 namespace Skills
 {
     public static class UtilsTargets
     {
-        public static List<CombatingEntity> GetEffectTargets(CombatingEntity user, CombatingEntity target, SEffectBase.EffectTarget targetType)
+        public static List<CombatingEntity> GetEffectTargets(
+            CombatingEntity user, 
+            CombatingEntity target, 
+            SEffectBase.EffectTarget targetType)
         {
             List<CombatingEntity> applyEffectOn;
 

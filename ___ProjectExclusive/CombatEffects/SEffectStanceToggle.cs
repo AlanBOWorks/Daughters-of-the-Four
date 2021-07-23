@@ -1,9 +1,10 @@
-﻿using _CombatSystem;
+﻿using System;
+using _CombatSystem;
 using Characters;
-using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
 
-namespace Skills
+namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "Stance Toggle - N [Preset]",
         menuName = "Combat/Effects/Stance Toggle")]
@@ -17,6 +18,14 @@ namespace Skills
 
             UtilsArea.ToggleStance(target,targetStance);
             target.Events.InvokeAreaChange();
+        }
+
+
+
+        private void OnValidate()
+        {
+            name = $"Stance Toggle - {targetStance.ToString().ToUpper()} [Preset]";
+            RenameAsset();
         }
     }
 }

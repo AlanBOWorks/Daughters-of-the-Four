@@ -1,8 +1,8 @@
-﻿using _CombatSystem;
-using Characters;
+﻿using Characters;
+using Stats;
 using UnityEngine;
 
-namespace Skills
+namespace CombatEffects
 {
 
     [CreateAssetMenu(fileName = "ActionModifier Effect - N [Preset]",

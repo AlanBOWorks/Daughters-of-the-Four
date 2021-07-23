@@ -1,5 +1,6 @@
 ﻿using System;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 
 namespace Characters

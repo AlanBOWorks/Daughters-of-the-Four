@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using _CombatSystem;
-using _Player;
 using Characters;
+using CombatEffects;
 using MEC;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 using Random = UnityEngine.Random;
 

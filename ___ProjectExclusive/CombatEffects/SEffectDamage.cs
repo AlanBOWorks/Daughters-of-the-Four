@@ -1,11 +1,11 @@
-﻿using System;
-using Characters;
+﻿using Characters;
+using Stats;
 using UnityEngine;
 
-namespace Skills
+namespace CombatEffects
 {
 
-    [CreateAssetMenu(fileName = "Damage Effect - N [Preset]",
+    [CreateAssetMenu(fileName = "Damage Effect [Preset]",
         menuName = "Combat/Effects/Damage")]
     public class SEffectDamage : SEffectBase
     {

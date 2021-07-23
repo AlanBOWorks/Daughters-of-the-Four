@@ -2,6 +2,7 @@
 using _CombatSystem;
 using Sirenix.OdinInspector;
 using Skills;
+using Stats;
 
 namespace Characters
 {

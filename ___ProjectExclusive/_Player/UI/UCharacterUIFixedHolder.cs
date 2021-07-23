@@ -4,9 +4,9 @@ using ___ProjectExclusive;
 using _CombatSystem;
 using _Player;
 using Characters;
+using Stats;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace _Player
 {

@@ -1,7 +1,8 @@
 ﻿using Characters;
+using Stats;
 using UnityEngine;
 
-namespace Skills
+namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "Wait Effect [Preset]",
         menuName = "Combat/Effects/Waits")]

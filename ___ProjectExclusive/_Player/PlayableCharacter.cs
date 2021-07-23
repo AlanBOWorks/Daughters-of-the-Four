@@ -1,6 +1,7 @@
 ﻿using Characters;
 using Passives;
 using Skills;
+using Stats;
 using UnityEngine;
 
 namespace _Player

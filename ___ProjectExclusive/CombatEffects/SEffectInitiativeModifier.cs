@@ -1,12 +1,13 @@
 ﻿using _CombatSystem;
 using Characters;
+using Stats;
 using UnityEngine;
 
-namespace Skills
+namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "Initiative Modifier- N [Preset]",
         menuName = "Combat/Effects/Initiative Modifier")]
-    public class SEffectInitiativeModifier :SEffectBase
+    public class SEffectInitiativeModifier : SEffectBase
     {
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {

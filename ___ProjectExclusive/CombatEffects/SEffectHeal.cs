@@ -1,8 +1,8 @@
-﻿using System;
-using Characters;
+﻿using Characters;
+using Stats;
 using UnityEngine;
 
-namespace Skills
+namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "Heal Effect - N [Preset]",
         menuName = "Combat/Effects/Heal")]

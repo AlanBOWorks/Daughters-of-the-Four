@@ -1,5 +1,7 @@
 ﻿using Characters;
+using CombatEffects;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 
 namespace Passives

@@ -1,8 +1,9 @@
-﻿using Characters;
+﻿
+using Characters;
 using Skills;
 using UnityEngine;
 
-namespace Passives
+namespace CombatEffects
 {
     public abstract class SInjectionPassiveBase : ScriptableObject
     {

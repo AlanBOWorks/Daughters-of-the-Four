@@ -1,30 +1,26 @@
 ﻿using System;
 using Characters;
+using Stats;
 using UnityEngine;
 
-namespace Skills
+namespace CombatEffects
 {
-    [CreateAssetMenu(fileName = "Offensive Buff Effect - N [Preset]",
+    [CreateAssetMenu(fileName = "Offensive Buff - N [Preset]",
         menuName = "Combat/Effects/Offensive Buff")]
     public class SEffectBuffOffensive : SEffectBuffBase
     {
-        [SerializeField] private BuffType buffType = BuffType.AttackPower;
+        [SerializeField] private UtilsOffensiveStats.BuffType buffType = UtilsOffensiveStats.BuffType.AttackPower;
 
-        public enum BuffType
-        {
-            AttackPower,
-            DeBuffPower
-        }
 
         protected override void DoBuff(CombatingEntity user, ICharacterBasicStats buffStats, float effectModifier)
         {
             effectModifier *= user.CombatStats.BuffPower;
             switch (buffType)
             {
-                case BuffType.AttackPower:
+                case UtilsOffensiveStats.BuffType.AttackPower:
                     buffStats.AttackPower += effectModifier;
                     break;
-                case BuffType.DeBuffPower:
+                case UtilsOffensiveStats.BuffType.DeBuffPower:
                     buffStats.DeBuffPower += effectModifier;
                     break;
                 default:
@@ -34,5 +30,9 @@ namespace Skills
 
         }
 
+        protected override string GetToolTip()
+        {
+            return UtilsOffensiveStats.GetTooltip(buffType);
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Characters;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
+using Stats;
 using UnityEditor;
 using UnityEngine;
 
