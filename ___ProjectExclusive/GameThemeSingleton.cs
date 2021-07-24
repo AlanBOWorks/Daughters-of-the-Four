@@ -1,5 +1,6 @@
 ﻿using System;
 using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
 
 namespace ___ProjectExclusive
@@ -65,6 +66,15 @@ namespace ___ProjectExclusive
             }
 
             return generated;
+        }
+    }
+
+    public static class UtilsGame
+    {
+        public static void UpdateAssetName(ScriptableObject asset)
+        {
+            string assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+            AssetDatabase.RenameAsset(assetPath, asset.name);
         }
     }
 }

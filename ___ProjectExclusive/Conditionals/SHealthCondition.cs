@@ -15,7 +15,7 @@ namespace CombatConditions
 
         [SerializeField, Tooltip("If the [target check] has more HP than the [check value]")] 
         private bool isBiggerCheck = true;
-        public override bool CanApply(CombatConditionArguments arguments,float healthCheck)
+        public override bool CanApply(ref EffectArguments arguments,float healthCheck)
         {
             var checkEntity = isUserCheck
                 ? arguments.User

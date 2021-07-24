@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Characters;
 using CombatConditions;
+using Passives;
 using Sirenix.OdinInspector;
 using Skills;
 using UnityEditor;
@@ -61,17 +63,18 @@ namespace CombatEffects
         protected SEffectBase.EffectTarget effectTarget 
             = SEffectBase.EffectTarget.Target;
 
-
         public SEffectBase.EffectTarget GetEffectTarget() => effectTarget;
         public bool CanPerformRandom() => applyRandomness;
+        protected bool HasEffects() => effectPreset != null;
+
     }
     [Serializable]
     public class EffectParams : EffectParamsBase, IEffect
     {
-        [TitleGroup("Conditions")]
-        [SerializeField]
-        private ConditionParam[] effectConditions = new ConditionParam[0];
-        protected bool HasEffects() => effectConditions.Length > 0;
+        [TitleGroup("Conditions")] 
+        [SerializeField, ShowIf("HasEffects")]
+        private ConditionParam effectCondition;
+
         [SerializeField, ShowIf("HasEffects")]
         private FailEffectParams[] onFailEffects = new FailEffectParams[0];
 
@@ -79,16 +82,18 @@ namespace CombatEffects
         {
             bool canApplyEffect = true;
             float powerVariation = power * randomModifier;
-            if (HasEffects())
+            float originalPowerVariation = powerVariation;
+            EffectArguments effectArguments
+                = new EffectArguments(user, target, effectPreset);
+            if (effectCondition.HasCondition())
             {
-                CombatConditionArguments conditionArguments
-                    = new CombatConditionArguments(user, target, effectPreset);
-
-                canApplyEffect = UtilsConditions.CanApplyConditions(effectConditions, conditionArguments);
+                canApplyEffect = effectCondition.CanApplyCondition(ref effectArguments);
             }
 
             if (canApplyEffect)
             {
+                DoPassiveVariation(user.PassivesHolder.ActionPassives);
+                DoPassiveVariation(target.PassivesHolder.ReactionPassives);
                 effectPreset.DoEffect(user, target, powerVariation);
             }
             else
@@ -97,6 +102,17 @@ namespace CombatEffects
                 foreach (var failEffect in failEffects)
                 {
                     failEffect.DoEffect(user, target, randomModifier);
+                }
+            }
+
+            void DoPassiveVariation(IEnumerable<SCombatPassivePreset> passives)
+            {
+                foreach (SCombatPassivePreset passive in passives)
+                {
+                    passive.DoPassiveFilter(
+                        ref effectArguments, 
+                        ref powerVariation, 
+                        originalPowerVariation);
                 }
             }
         }
@@ -129,4 +145,20 @@ namespace CombatEffects
         SEffectBase.EffectTarget GetEffectTarget();
         bool CanPerformRandom();
     }
+
+
+    public struct EffectArguments
+    {
+        public readonly CombatingEntity User;
+        public readonly CombatingEntity Target;
+        public readonly SEffectBase Effect;
+
+        public EffectArguments(CombatingEntity user, CombatingEntity target, SEffectBase effect)
+        {
+            User = user;
+            Target = target;
+            Effect = effect;
+        }
+    }
+
 }

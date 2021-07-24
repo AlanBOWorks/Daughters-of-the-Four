@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ___ProjectExclusive;
 using Characters;
 using CombatEffects;
 using Sirenix.OdinInspector;
@@ -69,9 +70,7 @@ namespace Skills
                 string typeString = " ((" + mainEffect.GetEffectTarget().ToString().ToUpper() + ")) ";
                 name = skillName +  typeString + " - SKILL - [Preset]";
             }
-
-            string assetPath = AssetDatabase.GetAssetPath(this.GetInstanceID());
-            AssetDatabase.RenameAsset(assetPath, name);
+            UtilsGame.UpdateAssetName(this);
         }
     }
 

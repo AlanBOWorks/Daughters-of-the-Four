@@ -1,4 +1,6 @@
-﻿using Characters;
+﻿using System;
+using ___ProjectExclusive;
+using Characters;
 using CombatEffects;
 using Sirenix.OdinInspector;
 using Stats;
@@ -6,11 +8,10 @@ using UnityEngine;
 
 namespace Passives
 {
-    [CreateAssetMenu(fileName = "N (Simple) - Temporal Stats PASSIVE C - [Preset]",
+    [CreateAssetMenu(fileName = "N (Simple) - Temporal Stats PASSIVE - [Preset]",
         menuName = "Combat/Passive/Temporal Stats Boots")]
     public class SPassiveTemporalStatsBoost : SInjectionPassiveBase, ICombatTemporalStats
     {
-
         [TitleGroup("Params")]
         [InfoBox("If false this is a Base Buff Type", InfoMessageType.Warning)]
         [SerializeField] private bool isBurstType = false;
@@ -26,6 +27,13 @@ namespace Passives
         [SerializeField] private float harmonyAmount;
         [SerializeField] private float initiativePercentage;
         [SerializeField] private int actionsPerInitiative;
+
+        private const string TemporalStatsPrefix = " - Temporal Stat - ";
+        private void OnValidate()
+        {
+            name = PassiveName.ToUpper() + TemporalStatsPrefix + InjectionNamePrefix;
+            UtilsGame.UpdateAssetName(this);
+        }
 
         public override void InjectPassive(CombatingEntity target)
         {
@@ -81,5 +89,7 @@ namespace Passives
             get => actionsPerInitiative;
             set => actionsPerInitiative = value;
         }
+
+
     }
 }
