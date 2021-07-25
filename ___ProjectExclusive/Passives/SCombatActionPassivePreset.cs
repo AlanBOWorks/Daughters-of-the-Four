@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Passives
 {
-    [CreateAssetMenu(fileName = "N - Combat Action Passive - [Preset]",
-        menuName = "Combat/Passive/Combat Action Passive Preset")]
+    [CreateAssetMenu(fileName = "N - ACTION Type - Combat Passive [Preset]",
+        menuName = "Combat/Passive/Preset/Action Passive Preset")]
     public class SCombatActionPassivePreset : SCombatPassivePreset
     {
         private const string ActionPassivePrefix = " - ACTION Type ";

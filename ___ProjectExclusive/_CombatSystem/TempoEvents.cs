@@ -82,7 +82,7 @@ namespace _CombatSystem
 
         public void OnSkippedEntity(CombatingEntity entity)
         {
-            //TODO make something more concrete about this
+            //TODO make something more concrete about this like UI pop up
 #if UNITY_EDITOR
             Debug.LogWarning($"Skipped character: {entity.CharacterName}");
 #endif

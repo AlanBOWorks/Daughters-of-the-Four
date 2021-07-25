@@ -5,15 +5,21 @@ using UnityEngine;
 
 namespace Passives
 {
-    public abstract class SInjectionPassiveBase : ScriptableObject, IPassiveTooltip
+    public abstract class SInjectionPassiveBase : SPassiveEffectInjection, IPassiveTooltip
     {
         [SerializeField,Delayed]
         private string passiveName = "NULL";
         public string PassiveName => passiveName;
 
-        public abstract void InjectPassive(CombatingEntity target);
 
-        protected const string InjectionNamePrefix = "Injection Passive [Preset]";
+        protected new const string InjectionNamePrefix = "Injection Passive [Preset]";
+    }
+
+    public abstract class SPassiveEffectInjection : ScriptableObject
+    {
+        public abstract void InjectPassive(CombatingEntity target, float modifier = 1);
+
+        protected const string InjectionNamePrefix = "Injection Passive [Effect]";
     }
 
     public interface IPassiveTooltip

@@ -206,7 +206,7 @@ namespace _CombatSystem
                     var harmonyVariable = variable.GetHarmonyPassive();
                     if (harmonyVariable != null)
                     {
-                        //TODO make a generic HarmonyBuff by type
+                        //TODO make a backup HarmonyBuff for empty by type (Archetype based)
                         var harmonyBuffer = new HarmonyBuffInvoker(entity, harmonyVariable);
                         entity.Injection(harmonyBuffer);
                     }

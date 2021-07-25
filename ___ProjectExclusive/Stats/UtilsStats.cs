@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using _CombatSystem;
 using Characters;
 using Skills;
@@ -9,6 +7,63 @@ using UnityEngine;
 
 namespace Stats 
 {
+    public static class EnumStats
+    {
+        public const int AttackIndex = 0;
+        public const int DeBuffIndex = AttackIndex + 1;
+        public enum Offensive
+        {
+            Attack = AttackIndex,
+            DeBuff = DeBuffIndex
+        }
+
+        public const int HealIndex = 10;
+        public const int BuffIndex = HealIndex + 1; 
+        public enum Support
+        {
+            Heal = HealIndex,
+            Buff = BuffIndex
+        }
+
+        public const int MaxHealthIndex = 100;
+        public const int MaxMortalityIndex = MaxHealthIndex + 1;
+        public const int DamageReductionIndex = MaxMortalityIndex + 1;
+        public const int DeBuffReductionIndex = DamageReductionIndex + 1;
+        public enum Vitality
+        {
+            MaxHealth = MaxHealthIndex,
+            MaxMortality = MaxMortalityIndex,
+            DamageReduction = DamageReductionIndex,
+            DeDuffReduction = DeBuffReductionIndex
+        }
+
+        public const int EnlightenmentIndex = 1000;
+        public const int CriticalIndex = EnlightenmentIndex + 1;
+        public const int SpeedIndex = CriticalIndex + 1;
+        public enum Special
+        {
+            Enlightenment = EnlightenmentIndex,
+            Critical = CriticalIndex,
+            Speed = SpeedIndex
+        }
+
+        public const int HealthIndex = 10000;
+        public const int ShieldIndex = HealthIndex + 1;
+        public const int MortalityIndex = ShieldIndex + 1;
+        public const int HarmonyIndex = MortalityIndex + 1;
+        public const int InitiativeIndex = HarmonyIndex + 1;
+        public const int ActionsIndex = InitiativeIndex + 1;
+        public enum Combat
+        {
+            Health = HealthIndex,
+            Shield = ShieldIndex,
+            Mortality = MortalityIndex,
+            Harmony = HarmonyIndex,
+            Initiative = InitiativeIndex,
+            Actions = ActionsIndex
+        }
+    }
+
     public static class UtilsStats
     {
         public static CharacterCombatStatsBasic ZeroValuesBasic = new CharacterCombatStatsBasic(0);

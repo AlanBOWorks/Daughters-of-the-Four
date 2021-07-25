@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Passives
 {
-    [CreateAssetMenu(fileName = "Damage Reduction - Passive Effect",
+    [CreateAssetMenu(fileName = "Damage Reduction - Action Passive [Effect]",
         menuName = "Combat/Passive/Effect/Damage Reduction")]
     public class SDamageReductionPassive : SPassiveEffect
     {

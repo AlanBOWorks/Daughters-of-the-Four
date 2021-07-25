@@ -1,55 +1,58 @@
 
 using System;
-using _CombatSystem;
+using ___ProjectExclusive;
 using Characters;
-using Skills;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Passives
 {
-    public abstract class SHarmonyPassive : SInjectionPassiveBase
+
+    [CreateAssetMenu(fileName = "N - Harmony PASSIVE - [Preset]",
+        menuName = "Combat/Passive/Preset/Harmony Passive")]
+    public class SHarmonyPassive : ScriptableObject
     {
-        private const float FirstTier = 30;
-        private const float SecondTier = 60;
-        private const float FinalTier = 90;
-        public override void InjectPassive(CombatingEntity target)
+        [SerializeField] 
+        private string passiveName = "NULL";
+
+        [SerializeField] private PassiveParams[] onPositiveHarmony;
+        [SerializeField] private PassiveParams[] onNegative;
+
+        public void OnPositiveHarmony(CombatingEntity target, float modifier)
+            => DoPassives(onPositiveHarmony, target, modifier);
+
+        public void OnNegativeHarmony(CombatingEntity target, float modifier)
+            => DoPassives(onNegative, target, modifier);
+
+        private static void DoPassives(PassiveParams[] passives, CombatingEntity target, float modifier)
         {
-            float currentHarmony = target.CombatStats.HarmonyAmount;
-            bool isNegative = currentHarmony < 0;
-            Action<float> invokeHarmony;
-            if (isNegative)
+            if(passives.Length < 1) return;
+            foreach (PassiveParams passive in passives)
             {
-                currentHarmony = -currentHarmony;
-                // if is negative, convert to positive so the tier check is the same,
-                // but keep the boolean for later
-                invokeHarmony = OnNegativeHarmony;
+                passive.InjectPassive(target,modifier);
             }
-            else
-            {
-                invokeHarmony = OnPositiveHarmony;
-            }
-
-            if (currentHarmony < FinalTier)
-            {
-                return;
-            }
-            if (currentHarmony < SecondTier)
-            {
-                invokeHarmony(1);
-                return;
-            }
-            if (currentHarmony < FinalTier)
-            {
-                invokeHarmony(2);
-                return;
-            }
-
-            invokeHarmony(3);
-
         }
 
-        public abstract void OnPositiveHarmony(float modifier);
-        public abstract void OnNegativeHarmony(float modifier);
+        private const string HarmonyPassivePrefix = " - Harmony PASSIVE - [Preset]";
+        [Button]
+        private void UpdateAssetName()
+        {
+            name = passiveName + HarmonyPassivePrefix;
+            UtilsGame.UpdateAssetName(this);
+        }
+
+        [Serializable]
+        private class PassiveParams
+        {
+            public SPassiveEffectInjection passive;
+            [SuffixLabel("%00"), Range(0,10)]
+            public float passiveValue = 1;
+
+            public void InjectPassive(CombatingEntity entity, float modifier)
+            {
+                passive.InjectPassive(entity,modifier * passiveValue);
+            }
+        }
     }
 
     public class HarmonyBuffInvoker
@@ -63,9 +66,42 @@ namespace Passives
             _passive = passive;
         }
 
+        private const float FirstTier = .30f;
+        private const float SecondTier = .60f;
+        private const float FinalTier = .90f;
         public void DoHarmonyCheck()
         {
-            _passive.InjectPassive(_entity);
+            var target = _entity;
+            float currentHarmony = target.CombatStats.HarmonyAmount;
+            Action<CombatingEntity, float> invokeHarmony;
+            if (currentHarmony > 0)
+            {
+                invokeHarmony = _passive.OnPositiveHarmony;
+            }
+            else
+            {
+                invokeHarmony = _passive.OnNegativeHarmony;
+                currentHarmony = -currentHarmony;
+                // if is negative, convert to positive so the tier check is the same,
+                // but keep the boolean for later
+            }
+
+            if (currentHarmony < FirstTier)
+            {
+                return;
+            }
+            if (currentHarmony < SecondTier)
+            {
+                invokeHarmony(target, 1);
+                return;
+            }
+            if (currentHarmony < FinalTier)
+            {
+                invokeHarmony(target, 2);
+                return;
+            }
+
+            invokeHarmony(target, 3);
         }
     }
 }

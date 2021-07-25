@@ -219,13 +219,17 @@ namespace Characters
 
         public float InitiativePercentage
         {
-            get => BaseStats.InitiativePercentage + BurstStats.InitiativePercentage;
+            get => BaseStats.InitiativePercentage 
+                   + BuffStats.InitiativePercentage 
+                   + BurstStats.InitiativePercentage;
             set => BaseStats.InitiativePercentage = value;
         }
 
         public int ActionsPerInitiative
         {
-            get => BaseStats.ActionsPerInitiative + BurstStats.ActionsPerInitiative;
+            get => BaseStats.ActionsPerInitiative 
+                   + BuffStats.ActionsPerInitiative
+                   + BurstStats.ActionsPerInitiative;
             set => BaseStats.ActionsPerInitiative = value;
         }
 
