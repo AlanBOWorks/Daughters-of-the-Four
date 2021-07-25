@@ -14,7 +14,7 @@ namespace Skills
     /// <seealso cref="Skill"/> are the specific skills for individual <seealso cref="SCharacterSkillsPreset"/>
     /// </summary>
     [CreateAssetMenu(fileName = "N (T) - SKILL L - [Preset]",
-        menuName = "Combat/Skill Preset")]
+        menuName = "Combat/Skill/Skill Preset")]
     public class SSkillPreset : SSkillPresetBase
     {
         
@@ -35,6 +35,11 @@ namespace Skills
         public bool canCrit = true;
         [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
         public float criticalAddition = 0f;
+        [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
+        [SerializeField]
+        private int cooldownCost = 1;
+        public int CoolDownCost => cooldownCost;
+
 
         [TitleGroup("Targeting")]
         [SerializeField] protected bool canTargetSelf = false;
@@ -57,20 +62,30 @@ namespace Skills
         public IEffect GetEffect(int index) => effects[index];
         public int GetEffectAmount() => effects.Length;
 
-        private void OnValidate()
+        [Button(ButtonSizes.Large)]
+        protected virtual void UpdateAssetName()
+        {
+            ValidateEffects();
+            var mainEffect = GetMainEffect();
+            if (mainEffect != null)
+            {
+                name = ValidationName(mainEffect);
+            }
+            UtilsGame.UpdateAssetName(this);
+        }
+
+        protected void ValidateEffects()
         {
             foreach (EffectParams effectParams in effects)
             {
                 effectParams.OnValidateEffects();
             }
+        }
 
-            var mainEffect = GetMainEffect();
-            if (mainEffect != null)
-            {
-                string typeString = " ((" + mainEffect.GetEffectTarget().ToString().ToUpper() + ")) ";
-                name = skillName +  typeString + " - SKILL - [Preset]";
-            }
-            UtilsGame.UpdateAssetName(this);
+        protected string ValidationName(IEffect mainEffect)
+        {
+            string typeString = $" - [{cooldownCost}] - (" + mainEffect.GetEffectTarget().ToString().ToUpper() + ") ";
+            return skillName + typeString + " - [SKILL Preset]";
         }
     }
 

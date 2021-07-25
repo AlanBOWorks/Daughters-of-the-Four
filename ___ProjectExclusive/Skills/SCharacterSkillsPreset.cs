@@ -6,50 +6,20 @@ using UnityEngine;
 
 namespace Skills
 {
-    [CreateAssetMenu(fileName = "Skills - N [Preset]",
-        menuName = "Combat/Skills Preset")]
-    public class SCharacterSkillsPreset : ScriptableObject, ISkillPositions<List<Skill>>
+    [CreateAssetMenu(fileName = "N - Character Skills [Preset]",
+        menuName = "Combat/Skill/Character Skills Preset")]
+    public class SCharacterSkillsPreset : ScriptableObject, ISkillPositions<List<SkillPreset>>
     {
-        [SerializeField] private List<Skill> attackingSkills;
-        [SerializeField] private List<Skill> neutralSkills;
-        [SerializeField] private List<Skill> defendingSkills;
-        [SerializeField] private SCharacterSharedSkillsPreset sharedSkills;
+        [SerializeField] private SSkillSetPreset attackingSkills;
+        [SerializeField] private SSkillSetPreset neutralSkills;
+        [SerializeField] private SSkillSetPreset defendingSkills;
 
-        public ISkillShared<Skill> SkillShared => sharedSkills;
 
-        public List<Skill> AttackingSkills => attackingSkills;
-        public List<Skill> NeutralSkills => neutralSkills;
-        public List<Skill> DefendingSkills => defendingSkills;
+        public List<SkillPreset> AttackingSkills => attackingSkills?.GetSkills();
+        public List<SkillPreset> NeutralSkills => neutralSkills?.GetSkills();
+        public List<SkillPreset> DefendingSkills => defendingSkills?.GetSkills();
+
     }
 
-    public class PositionCombatSkills : ISkillPositions<List<CombatSkill>>
-    {
-        [ShowInInspector]
-        public List<CombatSkill> AttackingSkills { get; }
-        [ShowInInspector]
-        public List<CombatSkill> NeutralSkills { get; }
-        [ShowInInspector]
-        public List<CombatSkill> DefendingSkills { get; }
-
-
-        public PositionCombatSkills(ISkillPositions<List<Skill>> presets)
-        {
-            AttackingSkills = GenerateList(presets.AttackingSkills);
-            NeutralSkills = GenerateList(presets.NeutralSkills);
-            DefendingSkills = GenerateList(presets.DefendingSkills);
-
-            List<CombatSkill> GenerateList(List<Skill> skills)
-            {
-                List<CombatSkill> generated = new List<CombatSkill>(skills.Count);
-                foreach (Skill skill in skills)
-                {
-                    generated.Add(new CombatSkill(skill));
-                }
-
-                return generated;
-            }
-        }
-
-    }
 
 }

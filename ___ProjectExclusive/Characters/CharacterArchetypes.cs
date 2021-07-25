@@ -19,6 +19,13 @@ namespace Characters
             MidLine = MidLinerIndex,
             BackLine = BackLinerIndex
         }
+        public enum RoleArchetype
+        {
+            Vanguard = FrontLinerIndex,
+            Attacker = MidLinerIndex,
+            Support = BackLinerIndex
+        }
+
 
         public static TeamPosition GetTeamPosition(int indexEquivalent)
         {

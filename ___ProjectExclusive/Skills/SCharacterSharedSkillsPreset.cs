@@ -10,19 +10,19 @@ namespace Skills
     /// of the Character
     /// </summary>
     [CreateAssetMenu(fileName = "Skills Shared - N [Preset]",
-        menuName = "Combat/Skills Shared Preset")]
-    public class SCharacterSharedSkillsPreset : ScriptableObject, ISkillShared<Skill>
+        menuName = "Combat/Skill/Skills Shared Preset")]
+    public class SCharacterSharedSkillsPreset : ScriptableObject, ISkillShared<SkillPreset>
     {
-        [SerializeField] private Skill ultimateSkill;
-        [SerializeField] private Skill commonSkillFirst;
-        [SerializeField] private Skill commonSkillSecondary;
-        [SerializeField] private Skill waitSkill;
+        [SerializeField] private SkillPreset ultimateSkill;
+        [SerializeField] private SkillPreset commonSkillFirst;
+        [SerializeField] private SkillPreset commonSkillSecondary;
+        [SerializeField] private SkillPreset waitSkill;
 
-        public Skill UltimateSkill => ultimateSkill;
-        public Skill CommonSkillFirst => commonSkillFirst;
-        public Skill CommonSkillSecondary => commonSkillSecondary;
-        public Skill WaitSkill => waitSkill;
-       
+        public SkillPreset UltimateSkill => ultimateSkill;
+        public SkillPreset CommonSkillFirst => commonSkillFirst;
+        public SkillPreset CommonSkillSecondary => commonSkillSecondary;
+        public SkillPreset WaitSkill => waitSkill;
+
     }
 
     public class SharedCombatSkills : List<CombatSkill>, IEquipSkill<CombatSkill>
@@ -39,7 +39,7 @@ namespace Skills
         private int _amount;
         public int GetSharedAmount() => _amount;
 
-        public SharedCombatSkills(ISkillShared<Skill> skills)
+        public SharedCombatSkills(ISkillShared<SkillPreset> skills)
         {
             UltimateSkill = GenerateSkill(skills.UltimateSkill, true);
             CommonSkillFirst = GenerateSkill(skills.CommonSkillFirst,false);
@@ -48,10 +48,10 @@ namespace Skills
         }
 
         public SharedCombatSkills(SCharacterSharedSkillsPreset variableSkills)
-        : this(variableSkills as ISkillShared<Skill>)
+        : this(variableSkills as ISkillShared<SkillPreset>)
         { }
 
-        private CombatSkill GenerateSkill(Skill skill, bool isInCooldown)
+        private CombatSkill GenerateSkill(SkillPreset skill, bool isInCooldown)
         {
             if (skill is null)
                 return null;

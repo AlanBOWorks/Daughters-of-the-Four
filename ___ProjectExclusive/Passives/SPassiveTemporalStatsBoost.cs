@@ -29,7 +29,9 @@ namespace Passives
         [SerializeField] private int actionsPerInitiative;
 
         private const string TemporalStatsPrefix = " - Temporal Stat - ";
-        private void OnValidate()
+
+        [Button(ButtonSizes.Large)]
+        private void UpdateName()
         {
             name = PassiveName.ToUpper() + TemporalStatsPrefix + InjectionNamePrefix;
             UtilsGame.UpdateAssetName(this);

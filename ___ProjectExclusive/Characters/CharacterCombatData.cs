@@ -39,16 +39,17 @@ namespace Characters
         [ShowInInspector,GUIColor(.3f,.5f,1)]
         public readonly string CharacterName;
 
-        public GameObject InstantiationPrefab { get; }
+        public readonly GameObject InstantiationPrefab;
         [ShowInInspector, NonSerialized] 
         public UCharacterHolder Holder;
 
         [ShowInInspector]
         public CharacterCombatData CombatStats { get; private set; }
+
         /// <summary>
         /// Used to track the damage received, heals, etc.
         /// </summary>
-        public SerializedCombatStatsFull ReceivedStats { get; private set; }
+        public readonly SerializedCombatStatsFull ReceivedStats;
 
         [ShowInInspector]
         public readonly CharacterBuffHolders SpecialBuffHolders;
@@ -60,7 +61,9 @@ namespace Characters
         public CombatAreasData AreasDataTracker;
 
         [ShowInInspector, NonSerialized] 
-        public CombatCharacterEvents Events;
+        public readonly CombatCharacterEvents Events;
+        [ShowInInspector]
+        public HarmonyBuffInvoker HarmonyBuffInvoker { get; private set; }
 
         public IEquipSkill<CombatSkill> SharedSkills => CombatSkills.SharedSkills;
         public ISkillPositions<List<CombatSkill>> UniqueSkills => CombatSkills.UniqueSkills;
@@ -75,7 +78,7 @@ namespace Characters
         /// </summary>
         [ShowInInspector]
         public CharacterSelfGroup CharacterGroup { get; set; }
-
+        
 
         /// <summary>
         /// If is Conscious, has actions left and at least can use any skill
@@ -114,7 +117,12 @@ namespace Characters
             PassivesHolder = passivesHolder;
         }
 
-        public ISkillShared<Skill> GetBackUpSkillShared()
+        public void Injection(HarmonyBuffInvoker harmonyBuffInvoker)
+        {
+            HarmonyBuffInvoker = harmonyBuffInvoker;
+        }
+
+        public ISkillShared<SkillPreset> GetBackUpSkillShared()
         {
             var archetype = this.AreasDataTracker.PositionInTeam;
             var backUp

@@ -74,7 +74,9 @@ namespace ___ProjectExclusive
         public static void UpdateAssetName(ScriptableObject asset)
         {
             string assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
-            AssetDatabase.RenameAsset(assetPath, asset.name);
+            var errorLog = AssetDatabase.RenameAsset(assetPath, asset.name);
+            Debug.Log(errorLog);
+
         }
     }
 }

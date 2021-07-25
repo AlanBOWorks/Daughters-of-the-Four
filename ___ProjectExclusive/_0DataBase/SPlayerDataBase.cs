@@ -38,7 +38,7 @@ namespace ___ProjectExclusive
     }
 
     [Serializable]
-    public class PlayerDataBase : ISerializationCallbackReceiver
+    public class PlayerDataBase 
     {
         [SerializeReference] 
         public SPlayerDataBase serializationReference = null;
@@ -77,7 +77,7 @@ namespace ___ProjectExclusive
             _charactersData = new Dictionary<SPlayerCharacterEntityVariable, CharacterData>(4);
         }
 
-        internal struct CharacterData
+        internal class CharacterData
         {
             public SPlayerCharacterEntityVariable variable;
             [HorizontalGroup("Stats")]
@@ -93,20 +93,6 @@ namespace ___ProjectExclusive
                 initialStats = variable.InitialStats;
                 growStats = variable.GrowStats;
                 upgradedStats = variable.UpgradedStats;
-            }
-        }
-
-        public void OnBeforeSerialize()
-        {
-            
-        }
-
-        public void OnAfterDeserialize()
-        {
-            _charactersData = new Dictionary<SPlayerCharacterEntityVariable, CharacterData>(charactersKey.Count);
-            foreach (SPlayerCharacterEntityVariable variable in charactersKey)
-            {
-                _charactersData.Add(variable, new CharacterData(variable));
             }
         }
     }

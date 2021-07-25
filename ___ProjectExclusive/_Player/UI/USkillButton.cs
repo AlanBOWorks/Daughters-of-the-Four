@@ -30,7 +30,7 @@ namespace _Player
         public CombatSkill.State SkillState
         {
             get => CurrentSkill.SkillState;
-            private set => CurrentSkill.SkillState = value;
+            private set => CurrentSkill.SwitchState(value);
         }
 
         private bool IsInvalid()
@@ -120,10 +120,13 @@ namespace _Player
 
         private void HandleLeftClick()
         {
+            if (CurrentSkill.IsInCooldown())
+                return;
+            
+
             switch (SkillState)
             {
                 case CombatSkill.State.Idle:
-                    Debug.Log("Selecting");
                     PlayerEntitySingleton.SkillButtonsHandler.OnSkillSelect(this);
                     break;
                 case CombatSkill.State.Selected:

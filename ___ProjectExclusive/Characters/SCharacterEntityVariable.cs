@@ -27,6 +27,10 @@ namespace Characters
         [SerializeField] private PassivesHolder passivesHolder = new PassivesHolder();
         public PassivesHolder GetPassivesHolder() => passivesHolder;
 
+        [SerializeField] private SHarmonyPassive harmonyPassive = null;
+        public SHarmonyPassive GetHarmonyPassive() => harmonyPassive;
+
+
         [TitleGroup("Stats")] 
         public CharacterArchetypes.RangeType rangeType = CharacterArchetypes.RangeType.Melee;
         public CharacterArchetypes.RangeType RangeType => rangeType;
@@ -58,7 +62,8 @@ namespace Characters
         CharacterArchetypes.RangeType RangeType { get; }
         CharacterCombatData GenerateCombatData();
         CombatSkills GenerateCombatSkills(CombatingEntity injection);
-        PassivesHolder GetPassivesHolder( );
+        PassivesHolder GetPassivesHolder();
+        SHarmonyPassive GetHarmonyPassive();
     }
 }
 

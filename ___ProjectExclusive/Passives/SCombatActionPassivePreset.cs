@@ -1,4 +1,5 @@
 ﻿using ___ProjectExclusive;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Passives
@@ -8,7 +9,10 @@ namespace Passives
     public class SCombatActionPassivePreset : SCombatPassivePreset
     {
         private const string ActionPassivePrefix = " - ACTION Type ";
-        protected override void OnValidate()
+
+        [Button(ButtonSizes.Large)]
+
+        protected override void UpdateAssetName()
         {
             name = PassiveName.ToUpper() + ActionPassivePrefix + InjectionNamePrefix;
             UtilsGame.UpdateAssetName(this);

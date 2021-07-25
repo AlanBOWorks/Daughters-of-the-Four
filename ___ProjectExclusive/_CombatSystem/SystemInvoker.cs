@@ -201,6 +201,15 @@ namespace _CombatSystem
                     // x----- Passives
                     var passiveHolder = new PassivesHolder(variable.GetPassivesHolder());
                     entity.Injection(passiveHolder);
+                    
+                    // x----- Harmony Buffer
+                    var harmonyVariable = variable.GetHarmonyPassive();
+                    if (harmonyVariable != null)
+                    {
+                        //TODO make a generic HarmonyBuff by type
+                        var harmonyBuffer = new HarmonyBuffInvoker(entity, harmonyVariable);
+                        entity.Injection(harmonyBuffer);
+                    }
 
                     entityPosition++;
                     return entity;

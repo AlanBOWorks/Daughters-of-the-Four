@@ -9,17 +9,19 @@ namespace Skills
     /// <summary>
     /// Are temporal <see cref="Skill"/> that can be modified in runtime without worry
     /// </summary>
-    public class CombatSkill : Skill
+    public class CombatSkill : SkillBase
     {
-        public CombatSkill(Skill injection, bool isInCooldown = false)
+        public CombatSkill(SkillPreset injection, bool isInCooldown = false)
         {
             this.preset = injection.Preset;
-            cooldownCost = injection.cooldownCost;
+            if(preset != null)
+                CooldownCost = preset.CoolDownCost + injection.coolDownVariation;
             SkillState = isInCooldown 
                 ? State.Cooldown 
                 : State.Idle;
         }
 
+        public int CooldownCost;
         /// <summary>
         /// After use, this coldDown will be used for disable the skill until reach 0
         /// </summary>
@@ -42,8 +44,13 @@ namespace Skills
             Cooldown
         }
 
-        [ShowInInspector] 
-        public State SkillState;
+        [ShowInInspector]
+        public State SkillState { get; private set; }
+
+        public void SwitchState(State target)
+        {
+            SkillState = target;
+        }
 
         public bool IsInCooldown()
         {
@@ -60,12 +67,12 @@ namespace Skills
             //
             // For characters with only 1 action per initiative is the same, but for 
             // others with >=2 actions there's a huge difference within cost 0 and cost 1
-            if (cooldownCost <= 0) 
+            if (CooldownCost <= 0) 
             {
                 SkillState = State.Idle;
                 return; 
             }
-            CurrentCooldown = cooldownCost;
+            CurrentCooldown = CooldownCost;
             SkillState = State.Cooldown;
         }
         public void OnCharacterAction()
@@ -93,21 +100,20 @@ namespace Skills
     /// this could even be modified for 'upgrade mechanics'
     /// </summary>
     [Serializable]
-    public class Skill
+    public class SkillPreset : SkillBase
+    {
+        [Range(-100,100),SuffixLabel("Actions"), Tooltip("Adds to the preset cooldown amount")]
+        public int coolDownVariation = 0;
+    }
+
+    public abstract class SkillBase
     {
         [TitleGroup("Variable")]
         [SerializeField] protected SSkillPresetBase preset = null;
-        [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
-        public int cooldownCost = 1;
-
 
         public float CriticalAddition => preset.criticalAddition;
         public bool CanCrit => preset.canCrit;
-
-        /// <summary>
-        /// Used for to extract preset data or KeyReferences
-        /// </summary>
-        public SSkillPresetBase Preset => preset;
+        public virtual SSkillPresetBase Preset => preset;
         public string SkillName => preset.SkillName; //could be modified by a special name in some cases
         public Sprite Icon => preset.Icon; // could be modified by another icon when upgraded or something
         public SSkillPresetBase.SkillType GetMainType() => preset.GetSkillType();

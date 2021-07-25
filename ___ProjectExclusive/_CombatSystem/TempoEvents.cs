@@ -15,10 +15,16 @@ namespace _CombatSystem
         [ShowInInspector]
         public List<ISkippedTempoListener> SkippedListeners { get; }
 
+        public readonly TempoFixedEvents FixedEvents;
 
         public TempoEvents()
         {
-            TempoListeners = new List<ITempoListener>();
+            FixedEvents = new TempoFixedEvents();
+
+            TempoListeners = new List<ITempoListener>()
+            {
+                FixedEvents
+            };
             RoundListeners = new List<IRoundListener>();
             SkippedListeners = new List<ISkippedTempoListener>();
         }

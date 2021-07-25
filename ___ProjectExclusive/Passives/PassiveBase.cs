@@ -1,9 +1,9 @@
 ﻿
 using Characters;
-using Skills;
+using CombatEffects;
 using UnityEngine;
 
-namespace CombatEffects
+namespace Passives
 {
     public abstract class SInjectionPassiveBase : ScriptableObject, IPassiveTooltip
     {

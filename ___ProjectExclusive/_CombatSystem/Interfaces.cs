@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using Characters;
-using NUnit.Framework;
 using Skills;
-using UnityEngine;
 
 namespace _CombatSystem
 {

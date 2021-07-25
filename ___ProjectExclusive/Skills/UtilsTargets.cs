@@ -52,7 +52,7 @@ namespace Skills
             injectInList.UsingSkill = skill;
             return GetPossibleTargets(skill, user, injectInList as List<CombatingEntity>);
         }
-        public static List<CombatingEntity> GetPossibleTargets(Skill skill, 
+        public static List<CombatingEntity> GetPossibleTargets(SkillBase skill, 
             CombatingEntity user, List<CombatingEntity> injectInList)
         {
             injectInList.Clear();

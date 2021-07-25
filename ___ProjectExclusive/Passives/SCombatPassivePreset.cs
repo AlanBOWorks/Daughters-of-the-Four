@@ -31,7 +31,8 @@ namespace Passives
         }
 
         protected const string InjectionNamePrefix = " - Combat Passive [Preset]";
-        protected virtual void OnValidate()
+        [Button(ButtonSizes.Large)]
+        protected virtual void UpdateAssetName()
         {
             name = PassiveName.ToUpper() + InjectionNamePrefix;
             UtilsGame.UpdateAssetName(this);

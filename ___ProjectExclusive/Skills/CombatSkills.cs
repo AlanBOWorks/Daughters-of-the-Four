@@ -29,7 +29,7 @@ namespace Skills
         public List<CombatSkill> GetNeutral() => NeutralSkills;
         public List<CombatSkill> GetDefending() => DefendingSkills;
 
-        public CombatSkills(CombatingEntity user,ISkillShared<Skill> shared, ISkillPositions<List<Skill>> uniqueSkills)
+        public CombatSkills(CombatingEntity user,ISkillShared<SkillPreset> shared, ISkillPositions<List<SkillPreset>> uniqueSkills)
         {
             user.Injection(this);
             if (shared == null)
@@ -69,12 +69,12 @@ namespace Skills
             if(!isUniqueNull)
                 AddUniqueSkills(uniqueSkills);
 
-            int GetSkillsCount(List<Skill> skills)
+            int GetSkillsCount(List<SkillPreset> skills)
             {
                 return skills?.Count ?? 0;
             }
 
-            void SumBySkill(Skill check)
+            void SumBySkill(SkillPreset check)
             {
                 if (check != null && check.Preset != null)
                     allCount++;
@@ -82,14 +82,14 @@ namespace Skills
         }
 
 
-        private void AddSharedSkills(ISkillShared<Skill> shared)
+        private void AddSharedSkills(ISkillShared<SkillPreset> shared)
         {
             if(shared == null)
                 throw new ArgumentException("Shared skills are null; BackUp skills weren't invoked still");
             SharedSkills = new SharedCombatSkills(shared);
 
             UtilsSkill.DoParse(shared, DoInjection);
-            void DoInjection(Skill skill)
+            void DoInjection(SkillPreset skill)
             {
                 if (skill == null || skill.Preset == null) return;
                 var combatSkill = new CombatSkill(skill);
@@ -97,15 +97,16 @@ namespace Skills
             }
         }
 
-        private void AddUniqueSkills(ISkillPositions<List<Skill>> uniqueSkills)
+        private void AddUniqueSkills(ISkillPositions<List<SkillPreset>> uniqueSkills)
         {
             UtilsSkill.DoParse(uniqueSkills, this, InjectStanceSkills);
 
         }
 
-        private void InjectStanceSkills(List<Skill> injectedSkills, List<CombatSkill> onPositionCombatSkills)
+        private void InjectStanceSkills(List<SkillPreset> injectedSkills, List<CombatSkill> onPositionCombatSkills)
         {
-            foreach (Skill skill in injectedSkills)
+            if(injectedSkills == null) return;
+            foreach (SkillPreset skill in injectedSkills)
             {
                 var combatSkill = new CombatSkill(skill);
                 onPositionCombatSkills.Add(combatSkill);
