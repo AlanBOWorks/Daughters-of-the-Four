@@ -6,7 +6,7 @@ namespace Passives
 {
     [CreateAssetMenu(fileName = "N - REACTION Type - Combat Passive [Preset]",
         menuName = "Combat/Passive/Preset/Reaction Passive Preset")]
-    public class SCombatReactionPassivePreset : SCombatPassivePreset
+    public class SReactionPassiveFilterPreset : SPassiveFilterPreset
     {
         private const string ActionPassivePrefix = " - REACTION Type ";
         [Button(ButtonSizes.Large)]

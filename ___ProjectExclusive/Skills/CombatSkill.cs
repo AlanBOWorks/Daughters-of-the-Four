@@ -109,11 +109,11 @@ namespace Skills
     public abstract class SkillBase
     {
         [TitleGroup("Variable")]
-        [SerializeField] protected SSkillPresetBase preset = null;
+        [SerializeField] protected SSkillPreset preset = null;
 
         public float CriticalAddition => preset.criticalAddition;
         public bool CanCrit => preset.canCrit;
-        public virtual SSkillPresetBase Preset => preset;
+        public virtual SSkillPreset Preset => preset;
         public string SkillName => preset.SkillName; //could be modified by a special name in some cases
         public Sprite Icon => preset.Icon; // could be modified by another icon when upgraded or something
         public SSkillPresetBase.SkillType GetMainType() => preset.GetSkillType();

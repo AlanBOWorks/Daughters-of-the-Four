@@ -2,6 +2,7 @@
 using System;
 using ___ProjectExclusive;
 using Characters;
+using CombatEffects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -15,21 +16,21 @@ namespace Passives
         [SerializeField] 
         private string passiveName = "NULL";
 
-        [SerializeField] private PassiveParams[] onPositiveHarmony;
-        [SerializeField] private PassiveParams[] onNegative;
+        [SerializeField] private EffectParams[] onPositiveHarmony;
+        [SerializeField] private EffectParams[] onNegative;
 
-        public void OnPositiveHarmony(CombatingEntity target, float modifier)
-            => DoPassives(onPositiveHarmony, target, modifier);
+        public void OnPositiveHarmony(CombatingEntity user,CombatingEntity target, float modifier)
+            => DoPassives(onPositiveHarmony,user, target, modifier);
 
-        public void OnNegativeHarmony(CombatingEntity target, float modifier)
-            => DoPassives(onNegative, target, modifier);
+        public void OnNegativeHarmony(CombatingEntity user, CombatingEntity target, float modifier)
+            => DoPassives(onNegative, user, target, modifier);
 
-        private static void DoPassives(PassiveParams[] passives, CombatingEntity target, float modifier)
+        private static void DoPassives(EffectParams[] passives, CombatingEntity user, CombatingEntity target, float modifier)
         {
             if(passives.Length < 1) return;
-            foreach (PassiveParams passive in passives)
+            foreach (EffectParams passive in passives)
             {
-                passive.InjectPassive(target,modifier);
+                passive.DoEffect(user,target,modifier);
             }
         }
 
@@ -41,18 +42,6 @@ namespace Passives
             UtilsGame.UpdateAssetName(this);
         }
 
-        [Serializable]
-        private class PassiveParams
-        {
-            public SPassiveEffectInjection passive;
-            [SuffixLabel("%00"), Range(0,10)]
-            public float passiveValue = 1;
-
-            public void InjectPassive(CombatingEntity entity, float modifier)
-            {
-                passive.InjectPassive(entity,modifier * passiveValue);
-            }
-        }
     }
 
     public class HarmonyBuffInvoker
@@ -73,7 +62,7 @@ namespace Passives
         {
             var target = _entity;
             float currentHarmony = target.CombatStats.HarmonyAmount;
-            Action<CombatingEntity, float> invokeHarmony;
+            Action<CombatingEntity, CombatingEntity, float> invokeHarmony;
             if (currentHarmony > 0)
             {
                 invokeHarmony = _passive.OnPositiveHarmony;
@@ -92,16 +81,16 @@ namespace Passives
             }
             if (currentHarmony < SecondTier)
             {
-                invokeHarmony(target, 1);
+                invokeHarmony(_entity,target, 1);
                 return;
             }
             if (currentHarmony < FinalTier)
             {
-                invokeHarmony(target, 2);
+                invokeHarmony(_entity, target, 2);
                 return;
             }
 
-            invokeHarmony(target, 3);
+            invokeHarmony(_entity, target, 3);
         }
     }
 }

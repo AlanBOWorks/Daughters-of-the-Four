@@ -239,7 +239,7 @@ namespace Stats
 
         public static string GetBuffTooltip(bool isBuff)
         {
-            return (isBuff) ? BuffTooltip : BurstTooltip;
+            return (isBuff) ? BurstTooltip : BuffTooltip;
         }
 
         public static string GetDeBuffTooltip(bool isBuff)
@@ -251,30 +251,5 @@ namespace Stats
         {
             return (isPositive) ? GetBuffTooltip(isBuff) : GetDeBuffTooltip(isBuff);
         }
-    }
-
-
-    public static class UtilsOffensiveStats
-    {
-        public enum BuffType
-        {
-            AttackPower,
-            DeBuffPower
-        }
-
-        public static string GetTooltip(BuffType buffType)
-        {
-            switch (buffType)
-            {
-                case BuffType.AttackPower:
-                    return AttackTooltip;
-                case BuffType.DeBuffPower:
-                    return DeBuffTooltip;
-                default:
-                    throw new NotImplementedException($"Buff type [{buffType}] is not implemented");
-            }
-        }
-        public const string AttackTooltip = "Attack";
-        public const string DeBuffTooltip = "DeBuff";
     }
 }

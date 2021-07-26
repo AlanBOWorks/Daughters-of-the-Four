@@ -7,20 +7,21 @@ namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "Offensive Buff - N [Preset]",
         menuName = "Combat/Effects/Offensive Buff")]
-    public class SEffectBuffOffensive : SEffectBuffBase
+    public class SOffensiveStatBuffEffect : SEffectBuffBase
     {
-        [SerializeField] private UtilsOffensiveStats.BuffType buffType = UtilsOffensiveStats.BuffType.AttackPower;
+        [SerializeField] private EnumStats.Offensive buffType 
+            = EnumStats.Offensive.Attack;
 
 
-        protected override void DoBuff(CombatingEntity user, ICharacterBasicStats buffStats, float effectModifier)
+        protected void DoBuff(CombatingEntity user, ICharacterBasicStats buffStats, float effectModifier)
         {
             effectModifier *= user.CombatStats.BuffPower;
             switch (buffType)
             {
-                case UtilsOffensiveStats.BuffType.AttackPower:
+                case EnumStats.Offensive.Attack:
                     buffStats.AttackPower += effectModifier;
                     break;
-                case UtilsOffensiveStats.BuffType.DeBuffPower:
+                case EnumStats.Offensive.DeBuff:
                     buffStats.DeBuffPower += effectModifier;
                     break;
                 default:
@@ -30,9 +31,15 @@ namespace CombatEffects
 
         }
 
-        protected override string GetToolTip()
+        private const string OffensivePrefix = " Offensive Stat - ";
+        protected override string GetPrefix()
         {
-            return UtilsOffensiveStats.GetTooltip(buffType);
+            return OffensivePrefix + buffType.ToString().ToUpper();
+        }
+
+        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        {
+            DoBuff(user,GetBuff(target),effectModifier);
         }
     }
 }

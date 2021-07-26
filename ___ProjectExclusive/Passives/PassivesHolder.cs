@@ -7,46 +7,74 @@ using UnityEngine;
 namespace Passives
 {
     [Serializable]
-    public class PassivesHolder
+    public class PassivesHolder : PassivesHolderBase
     {
         [SerializeField] 
-        private List<SInjectionPassiveBase> openingPassives;
+        private List<SEffectBuffBase> openingPassives;
         /// <summary>
         /// Passives that only counts in the opening phase
         /// </summary>
-        public List<SInjectionPassiveBase> OpeningPassives => openingPassives;
+        public List<SEffectBuffBase> OpeningPassives => openingPassives;
 
-        [SerializeField]
-        private List<SCombatActionPassivePreset> actionPassives;
-        public List<SCombatActionPassivePreset> ActionPassives => actionPassives;
-
-        [SerializeField] 
-        private List<SCombatReactionPassivePreset> reactionPassives;
-        public List<SCombatReactionPassivePreset> ReactionPassives => reactionPassives;
-
-        public PassivesHolder()
+       
+        public PassivesHolder() : base()
         {
-            openingPassives = new List<SInjectionPassiveBase>();
-            actionPassives = new List<SCombatActionPassivePreset>();
-            reactionPassives = new List<SCombatReactionPassivePreset>();
+            openingPassives = new List<SEffectBuffBase>();
         }
 
-        public PassivesHolder(PassivesHolder copyFrom)
+        public PassivesHolder(PassivesHolder copyFrom) : base(copyFrom)
         {
             //Opening are not altered during combat since it just once
             openingPassives = copyFrom.OpeningPassives; 
-            actionPassives = new List<SCombatActionPassivePreset>(copyFrom.ActionPassives);
-            reactionPassives = new List<SCombatReactionPassivePreset>(copyFrom.reactionPassives);
         }
 
-        public void DoOpeningPassives(CombatingEntity user)
+        public void DoOpeningPassives(CombatingEntity user) 
+            => DoOpeningPassives(user, openingPassives);
+
+    }
+
+    [Serializable]
+    public class PassivesHolderBase
+    {
+
+        [SerializeField]
+        private List<SActionPassiveFilterPreset> actionFilterPassives;
+        public List<SActionPassiveFilterPreset> ActionFilterPassives => actionFilterPassives;
+
+        [SerializeField]
+        private List<SReactionPassiveFilterPreset> reactionFilterPassives;
+        public List<SReactionPassiveFilterPreset> ReactionFilterPassives => reactionFilterPassives;
+
+        public PassivesHolderBase()
         {
-            foreach (SInjectionPassiveBase passive in openingPassives)
+            actionFilterPassives = new List<SActionPassiveFilterPreset>();
+            reactionFilterPassives = new List<SReactionPassiveFilterPreset>();
+        }
+
+        public PassivesHolderBase(PassivesHolder copyFrom)
+        {
+            //Opening are not altered during combat since it just once
+            actionFilterPassives = new List<SActionPassiveFilterPreset>(copyFrom.ActionFilterPassives);
+            reactionFilterPassives = new List<SReactionPassiveFilterPreset>(copyFrom.reactionFilterPassives);
+        }
+
+        public PassivesHolderBase(
+            PassivesHolder copyFrom, CombatingEntity user, List<SEffectBuffBase> openingPassives)
+        : this(copyFrom)
+        {
+            DoOpeningPassives(user,openingPassives);
+        }
+
+
+        public void DoOpeningPassives(CombatingEntity user, List<SEffectBuffBase> openingPassives)
+        {
+            if(openingPassives == null || openingPassives.Count <= 0) return;
+
+            foreach (SEffectBuffBase buffEffect in openingPassives)
             {
-                passive.InjectPassive(user);
+                buffEffect.DoEffect(user,user);
             }
         }
-
     }
 
 }

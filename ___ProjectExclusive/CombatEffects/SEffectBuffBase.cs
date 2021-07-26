@@ -1,4 +1,5 @@
 ﻿using Characters;
+using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
 
@@ -8,28 +9,25 @@ namespace CombatEffects
     {
         [SerializeField] protected bool isBurstType = false;
 
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+
+        protected ICharacterBasicStats GetBuff(CombatingEntity target)
         {
             ICharacterBasicStats stats =
                 isBurstType
                     ? (ICharacterBasicStats)target.CombatStats.BurstStats
                     : target.CombatStats.BuffStats;
-
-            DoBuff(user, stats, effectModifier);
+            return stats;
         }
 
-        protected abstract void DoBuff(CombatingEntity user,
-            ICharacterBasicStats buffStats, float effectModifier);
 
-
-
-        private void OnValidate()
+        [Button(ButtonSizes.Large)]
+        private void UpdateAssetName()
         {
             string burstType = UtilityBuffStats.GetBuffTooltip(isBurstType);
-            name = $"Offensive {burstType.ToUpper()} " +
-                   $"- {GetToolTip().ToUpper()} - [Preset]";
+            name = $"{burstType.ToUpper()}" +
+                   $"{GetPrefix()} [ Buff Effect ]";
             RenameAsset();
         }
-        protected abstract string GetToolTip();
+        protected abstract string GetPrefix();
     }
 }

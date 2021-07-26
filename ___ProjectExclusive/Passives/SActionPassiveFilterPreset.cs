@@ -6,7 +6,7 @@ namespace Passives
 {
     [CreateAssetMenu(fileName = "N - ACTION Type - Combat Passive [Preset]",
         menuName = "Combat/Passive/Preset/Action Passive Preset")]
-    public class SCombatActionPassivePreset : SCombatPassivePreset
+    public class SActionPassiveFilterPreset : SPassiveFilterPreset
     {
         private const string ActionPassivePrefix = " - ACTION Type ";
 

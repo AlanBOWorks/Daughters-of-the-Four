@@ -54,7 +54,7 @@ namespace Characters
         [ShowInInspector]
         public readonly CharacterBuffHolders SpecialBuffHolders;
         [ShowInInspector]
-        public PassivesHolder PassivesHolder { get; private set; }
+        public PassivesHolderBase PassivesHolder { get; private set; }
 
 
         [ShowInInspector, NonSerialized] 
@@ -112,7 +112,7 @@ namespace Characters
             AreasDataTracker.Injection(team.Data);
         }
 
-        public void Injection(PassivesHolder passivesHolder)
+        public void Injection(PassivesHolderBase passivesHolder)
         {
             PassivesHolder = passivesHolder;
         }

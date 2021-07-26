@@ -12,7 +12,7 @@ using Random = UnityEngine.Random;
 namespace CombatEffects
 {
 
-    public abstract class SEffectBase : ScriptableObject
+    public abstract class SEffectBase : ScriptableObject, IEffectBase
     {
         public abstract void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1);
 
@@ -53,7 +53,7 @@ namespace CombatEffects
         [SerializeField] protected SEffectBase effectPreset;
 
         [TitleGroup("Stats")]
-        [Range(0, 10), SuffixLabel("%00")]
+        [Range(-10, 10), SuffixLabel("%00")]
         public float power = 1;
         [Tooltip("If the effect will apply a small variation into the [Power] value")]
         public bool applyRandomness = true;
@@ -65,7 +65,6 @@ namespace CombatEffects
 
         public SEffectBase.EffectTarget GetEffectTarget() => effectTarget;
         public bool CanPerformRandom() => applyRandomness;
-        protected bool HasEffects() => effectPreset != null;
 
     }
     [Serializable]
@@ -75,8 +74,11 @@ namespace CombatEffects
         [SerializeField, ShowIf("HasEffects")]
         private ConditionParam effectCondition;
 
-        [SerializeField, ShowIf("HasEffects")]
+        [SerializeField, ShowIf("HasCondition")]
         private FailEffectParams[] onFailEffects = new FailEffectParams[0];
+
+        protected bool HasEffects() => effectPreset != null;
+        protected bool HasCondition() => effectCondition.HasCondition();
 
         public void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier)
         {
@@ -92,8 +94,8 @@ namespace CombatEffects
 
             if (canApplyEffect)
             {
-                DoPassiveVariation(user.PassivesHolder.ActionPassives);
-                DoPassiveVariation(target.PassivesHolder.ReactionPassives);
+                DoPassiveVariation(user.PassivesHolder.ActionFilterPassives);
+                DoPassiveVariation(target.PassivesHolder.ReactionFilterPassives);
                 effectPreset.DoEffect(user, target, powerVariation);
             }
             else
@@ -105,9 +107,9 @@ namespace CombatEffects
                 }
             }
 
-            void DoPassiveVariation(IEnumerable<SCombatPassivePreset> passives)
+            void DoPassiveVariation(IEnumerable<SPassiveFilterPreset> passives)
             {
-                foreach (SCombatPassivePreset passive in passives)
+                foreach (SPassiveFilterPreset passive in passives)
                 {
                     passive.DoPassiveFilter(
                         ref effectArguments, 
@@ -139,11 +141,15 @@ namespace CombatEffects
 
     }
 
-    public interface IEffect
+    public interface IEffect : IEffectBase
     {
-        void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier);
         SEffectBase.EffectTarget GetEffectTarget();
         bool CanPerformRandom();
+    }
+
+    public interface IEffectBase
+    { 
+        void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier);
     }
 
 

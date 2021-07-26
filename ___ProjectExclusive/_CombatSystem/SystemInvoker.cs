@@ -170,10 +170,11 @@ namespace _CombatSystem
                         listener.OnCombatStart();
                     }
 
+                    /*
                     foreach (CombatingEntity entity in allEntities)
                     {
                         entity.PassivesHolder.DoOpeningPassives(entity);
-                    }
+                    }*/
                 }
 
 
@@ -199,7 +200,9 @@ namespace _CombatSystem
                     variable.GenerateCombatSkills(entity);
 
                     // x----- Passives
-                    var passiveHolder = new PassivesHolder(variable.GetPassivesHolder());
+                    var passivesHolderVariable = variable.GetPassivesHolder();
+                    var passiveHolder = new PassivesHolderBase(
+                        passivesHolderVariable,entity,passivesHolderVariable.OpeningPassives);
                     entity.Injection(passiveHolder);
                     
                     // x----- Harmony Buffer

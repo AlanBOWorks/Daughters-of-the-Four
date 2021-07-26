@@ -17,7 +17,15 @@ namespace Skills
         menuName = "Combat/Skill/Skill Preset")]
     public class SSkillPreset : SSkillPresetBase
     {
-        
+        [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
+        [SerializeField]
+        private int cooldownCost = 1;
+        public int CoolDownCost => cooldownCost;
+
+        protected override string ValidationName(IEffect mainEffect)
+        {
+            return " - [{ cooldownCost}] - " + base.ValidationName(mainEffect);
+        }
     }
 
     public abstract class SSkillPresetBase : ScriptableObject
@@ -35,11 +43,7 @@ namespace Skills
         public bool canCrit = true;
         [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
         public float criticalAddition = 0f;
-        [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
-        [SerializeField]
-        private int cooldownCost = 1;
-        public int CoolDownCost => cooldownCost;
-
+        
 
         [TitleGroup("Targeting")]
         [SerializeField] protected bool canTargetSelf = false;
@@ -69,7 +73,8 @@ namespace Skills
             var mainEffect = GetMainEffect();
             if (mainEffect != null)
             {
-                name = ValidationName(mainEffect);
+                string typeString = ValidationName(mainEffect);
+                name = skillName + typeString + " - [SKILL Preset]";
             }
             UtilsGame.UpdateAssetName(this);
         }
@@ -82,10 +87,9 @@ namespace Skills
             }
         }
 
-        protected string ValidationName(IEffect mainEffect)
+        protected virtual string ValidationName(IEffect mainEffect)
         {
-            string typeString = $" - [{cooldownCost}] - (" + mainEffect.GetEffectTarget().ToString().ToUpper() + ") ";
-            return skillName + typeString + " - [SKILL Preset]";
+            return "(" + mainEffect.GetEffectTarget().ToString().ToUpper() + ") ";
         }
     }
 

@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Passives
 {
-    [CreateAssetMenu(fileName = "Damage Reduction - Action Passive [Effect]",
-        menuName = "Combat/Passive/Effect/Damage Reduction")]
-    public class SDamageReductionPassive : SPassiveEffect
+    [CreateAssetMenu(fileName = "Damage Reduction [Passive Filter]",
+        menuName = "Combat/Passive/Filter/Damage Reduction")]
+    public class SDamageReductionFilter : SPassiveFilter
     {
         public override void DoPassiveFilter(
             ref float currentValue, 

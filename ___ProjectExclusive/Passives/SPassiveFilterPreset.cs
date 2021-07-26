@@ -7,9 +7,7 @@ using UnityEngine;
 
 namespace Passives
 {
-
-   
-    public abstract class SCombatPassivePreset : ScriptableObject, IPassiveEffect
+    public abstract class SPassiveFilterPreset : ScriptableObject, IPassiveEffect
     {
         [SerializeField, Delayed] 
         private string passiveName = "NULL";
@@ -43,8 +41,8 @@ namespace Passives
     internal struct PassiveParam : IPassiveEffect
     {
         [Title("Effect")]
-        [SerializeField] private SPassiveEffect effect;
-        [SerializeField,ShowIf("effect")]
+        [SerializeField] private SPassiveFilter passiveFilter;
+        [SerializeField,ShowIf("passiveFilter")]
         [SuffixLabel("00%"), Range(0, 10)] private float effectValue;
 
         [Title("Conditions")]
@@ -56,13 +54,13 @@ namespace Passives
         {
             if (condition == null || condition.CanApply(ref arguments, conditionValue))
             {
-                if(effect.CanApplyPassive(arguments.Effect))
-                    effect.DoPassiveFilter(ref currentValue,originalValue, effectValue);
+                if(passiveFilter.CanApplyPassive(arguments.Effect))
+                    passiveFilter.DoPassiveFilter(ref currentValue,originalValue, effectValue);
             }
         }
     }
 
-    public abstract class SPassiveEffect : ScriptableObject
+    public abstract class SPassiveFilter : ScriptableObject
     {
         public abstract void DoPassiveFilter
             (ref float currentValue, float originalValue, float effectValue);
