@@ -13,13 +13,16 @@ namespace CombatEffects
             float heal = user.CombatStats.HealPower;
             heal *= effectModifier;
 
+            DoEffect(target,heal);
+        }
+
+        public override void DoEffect(CombatingEntity target, float heal)
+        {
+            UtilsCombatStats.DoHealTo(target.CombatStats, heal);
+            target.Events.InvokeTemporalStatChange();
 #if UNITY_EDITOR
             Debug.Log($"Heal Effect: {target.CharacterName} => {heal}");
 #endif
-
-
-            UtilsCombatStats.DoHealTo(target.CombatStats,heal);
-            target.Events.InvokeTemporalStatChange();
         }
     }
 }

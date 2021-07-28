@@ -66,7 +66,20 @@ namespace Skills
                 : TeamCombatData.GetStance((IStanceArchetype<List<CombatSkill>>)skills, state);
         }
 
-        public static SSkillPreset.SkillType GetType(CombatSkill skill)
+        public static T GetElement<T>(ISkillPositions<T> elements, CombatingEntity entity)
+        {
+            var state = entity.AreasDataTracker.GetCurrentPositionState();
+            return state switch
+            {
+                TeamCombatData.Stance.Attacking => elements.AttackingSkills,
+                TeamCombatData.Stance.Neutral => elements.NeutralSkills,
+                TeamCombatData.Stance.Defending => elements.DefendingSkills,
+                _ => throw new NotImplementedException("Not implemented stance was invoked" +
+                                                       $"in the GetElement for [{typeof(T)}]")
+            };
+        }
+
+        public static SSkillPresetBase.SkillType GetType(CombatSkill skill)
         {
             return skill.Preset.GetSkillType();
         }

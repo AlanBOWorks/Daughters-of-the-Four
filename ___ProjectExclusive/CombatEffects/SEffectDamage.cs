@@ -16,13 +16,18 @@ namespace CombatEffects
                 target.CombatStats,
                 effectModifier);
 
-#if UNITY_EDITOR
-            Debug.Log($"Damage Effect: {target.CharacterName} => {damage}");
-#endif
+            DoEffect(target,damage);
+        }
+
+        public override void DoEffect(CombatingEntity target, float damage)
+        {
 
             UtilsCombatStats.DoDamageTo(target.CombatStats, damage);
             target.Events.InvokeTemporalStatChange();
-        }
 
+#if UNITY_EDITOR
+            Debug.Log($"Damage Effect: {target.CharacterName} => {damage}");
+#endif
+        }
     }
 }

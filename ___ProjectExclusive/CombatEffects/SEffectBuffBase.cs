@@ -7,15 +7,24 @@ namespace CombatEffects
 {
     public abstract class SEffectBuffBase : SEffectBase
     {
+        [InfoBox("$FalseBurstTooltip")]
         [SerializeField] protected bool isBurstType = false;
 
-
-        protected ICharacterBasicStats GetBuff(CombatingEntity target)
+        protected virtual ICharacterFullStats GetBuff(CombatingEntity target)
         {
-            ICharacterBasicStats stats =
+            ICharacterFullStats stats =
                 isBurstType
-                    ? (ICharacterBasicStats)target.CombatStats.BurstStats
+                    ? (ICharacterFullStats) target.CombatStats.BurstStats
                     : target.CombatStats.BuffStats;
+            return stats;
+        }
+
+        protected ICharacterFullStats GetBurstOrBase(CombatingEntity target)
+        {
+            ICharacterFullStats stats =
+                isBurstType
+                    ? (ICharacterFullStats)target.CombatStats.BurstStats
+                    : target.CombatStats.BaseStats;
             return stats;
         }
 
@@ -29,5 +38,12 @@ namespace CombatEffects
             RenameAsset();
         }
         protected abstract string GetPrefix();
+
+        protected const string IsBuffPrefix = "False is [Buff] Type";
+        protected const string IsBasePrefix = "False is [Base] Type";
+        protected virtual string FalseBurstTooltip()
+        {
+            return IsBuffPrefix;
+        }
     }
 }

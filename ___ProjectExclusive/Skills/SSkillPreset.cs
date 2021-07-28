@@ -4,8 +4,10 @@ using ___ProjectExclusive;
 using Characters;
 using CombatEffects;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Skills
 {
@@ -62,9 +64,33 @@ namespace Skills
         [TitleGroup("Effects")]
         [SerializeField]
         private EffectParams[] effects = new EffectParams[1];
+        public EffectParams[] GetEffects => effects;
         public IEffect GetMainEffect() => effects[0];
-        public IEffect GetEffect(int index) => effects[index];
-        public int GetEffectAmount() => effects.Length;
+
+        public void DoEffects(CombatingEntity user, CombatingEntity target)
+        {
+            float randomValue = Random.value;
+            bool isCritical =
+                UtilsCombatStats.IsCriticalPerformance(user.CombatStats, this, randomValue);
+            UtilsCombatStats.UpdateRandomness(ref randomValue,isCritical);
+            foreach (EffectParams effect in effects)
+            {
+                effect.DoEffect(user,target, randomValue);
+            }
+        }
+
+        public void DoEffects(CombatingEntity target)
+        {
+            float randomValue = Random.value;
+            bool isCritical =
+                UtilsCombatStats.IsCriticalPerformance(this, randomValue);
+            UtilsCombatStats.UpdateRandomness(ref randomValue, isCritical);
+            foreach (EffectParams effect in effects)
+            {
+                effect.DoDirectEffect(target, randomValue);
+            }
+        }
+
 
         [Button(ButtonSizes.Large)]
         protected virtual void UpdateAssetName()

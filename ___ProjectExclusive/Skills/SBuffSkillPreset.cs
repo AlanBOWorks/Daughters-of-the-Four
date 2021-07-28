@@ -7,8 +7,5 @@ namespace Skills
     [CreateAssetMenu(fileName = "N (T) - BUFF Skill L - [Preset]",
         menuName = "Combat/Buff Preset")]
     public class SBuffSkillPreset : SSkillPresetBase
-    {
-
-    }
-
+    { }
 }

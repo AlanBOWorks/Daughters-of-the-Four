@@ -11,36 +11,26 @@ namespace Characters
         [Title("Narrative")]
         [GUIColor(.5f, .8f, 1f)]
         public string characterName = "NULL";
-        public string CharacterName => characterName;
 
         [Title("Instantiation")]
         [SerializeField,AssetsOnly]
         private GameObject characterPrefab = null;
-        public GameObject CharacterPrefab => characterPrefab;
 
         public SCharacterSkillsPreset skillsPreset = null;
         public SCharacterSharedSkillsPreset sharedSkillsPreset = null;
-        public SCharacterSkillsPreset UniqueSkillsPreset => skillsPreset;
-        public SCharacterSharedSkillsPreset SharedSkillsPreset => sharedSkillsPreset;
 
         [TitleGroup("Passives")]
-        [SerializeField] private PassivesHolder passivesHolder = new PassivesHolder();
-        public PassivesHolder GetPassivesHolder() => passivesHolder;
-
-        [SerializeField] private SHarmonyPassive harmonyPassive = null;
-        public SHarmonyPassive GetHarmonyPassive() => harmonyPassive;
-
+        [SerializeField] 
+        private OpeningPassives openingPassives = new OpeningPassives();
+        [SerializeField]
+        private FilterPassivesHolder sharedFilterPassives = new FilterPassivesHolder();
+        [SerializeField] 
+        private PassivesHolder filterPassivesHolder = new PassivesHolder();
+        [SerializeField] 
+        private SHarmonyPassive harmonyPassive = null;
 
         [TitleGroup("Stats")] 
         public CharacterArchetypes.RangeType rangeType = CharacterArchetypes.RangeType.Melee;
-        public CharacterArchetypes.RangeType RangeType => rangeType;
-
-
-        public Transform CharacterHolderReference
-        {
-            get;
-            private set;
-        }
 
         public Transform SceneInstantiateCharacter(Vector3 position, Quaternion rotation)
         {
@@ -52,8 +42,19 @@ namespace Characters
         public abstract CharacterCombatData GenerateCombatData();
         public CombatSkills GenerateCombatSkills(CombatingEntity injection)
         {
-            return new CombatSkills(injection,sharedSkillsPreset,UniqueSkillsPreset);
+            return new CombatSkills(injection,sharedSkillsPreset, skillsPreset);
         }
+
+        public string CharacterName => characterName;
+        public Transform CharacterHolderReference { get; private set; }
+        public GameObject CharacterPrefab => characterPrefab;
+        public SCharacterSkillsPreset UniqueSkillsPreset => skillsPreset;
+        public SCharacterSharedSkillsPreset SharedSkillsPreset => sharedSkillsPreset;
+        public OpeningPassives GetOpeningPassives() => openingPassives;
+        public IPassivesFiltersHolder GetSharedFilterPassives() => sharedFilterPassives;
+        public PassivesHolder GetPassivesHolder() => filterPassivesHolder;
+        public SHarmonyPassive GetHarmonyPassive() => harmonyPassive;
+        public CharacterArchetypes.RangeType RangeType => rangeType;
     }
 
     public interface ICharacterCombatProvider : ICharacterLore
@@ -62,6 +63,8 @@ namespace Characters
         CharacterArchetypes.RangeType RangeType { get; }
         CharacterCombatData GenerateCombatData();
         CombatSkills GenerateCombatSkills(CombatingEntity injection);
+        OpeningPassives GetOpeningPassives();
+        IPassivesFiltersHolder GetSharedFilterPassives();
         PassivesHolder GetPassivesHolder();
         SHarmonyPassive GetHarmonyPassive();
     }

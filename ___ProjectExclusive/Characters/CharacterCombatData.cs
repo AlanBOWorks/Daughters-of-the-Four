@@ -54,7 +54,7 @@ namespace Characters
         [ShowInInspector]
         public readonly CharacterBuffHolders SpecialBuffHolders;
         [ShowInInspector]
-        public PassivesHolderBase PassivesHolder { get; private set; }
+        public CombatPassivesHolder PassivesHolder { get; private set; }
 
 
         [ShowInInspector, NonSerialized] 
@@ -112,7 +112,7 @@ namespace Characters
             AreasDataTracker.Injection(team.Data);
         }
 
-        public void Injection(PassivesHolderBase passivesHolder)
+        public void Injection(CombatPassivesHolder passivesHolder)
         {
             PassivesHolder = passivesHolder;
         }
@@ -213,7 +213,7 @@ namespace Characters
         }
         public float HarmonyAmount
         {
-            get => BaseStats.HarmonyAmount;
+            get => BaseStats.HarmonyAmount + BurstStats.HarmonyAmount;
             set => BaseStats.HarmonyAmount = value;
         }
 

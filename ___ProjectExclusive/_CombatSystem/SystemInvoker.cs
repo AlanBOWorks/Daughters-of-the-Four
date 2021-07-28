@@ -201,8 +201,8 @@ namespace _CombatSystem
 
                     // x----- Passives
                     var passivesHolderVariable = variable.GetPassivesHolder();
-                    var passiveHolder = new PassivesHolderBase(
-                        passivesHolderVariable,entity,passivesHolderVariable.OpeningPassives);
+                    var passiveHolder 
+                        = new CombatPassivesHolder(entity,passivesHolderVariable,variable.GetSharedFilterPassives());
                     entity.Injection(passiveHolder);
                     
                     // x----- Harmony Buffer
@@ -213,6 +213,9 @@ namespace _CombatSystem
                         var harmonyBuffer = new HarmonyBuffInvoker(entity, harmonyVariable);
                         entity.Injection(harmonyBuffer);
                     }
+
+                    var openingPassives = variable.GetOpeningPassives();
+                    openingPassives?.DoOpeningPassives(entity);
 
                     entityPosition++;
                     return entity;

@@ -15,6 +15,8 @@ namespace CombatEffects
     public abstract class SEffectBase : ScriptableObject, IEffectBase
     {
         public abstract void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1);
+        public abstract void DoEffect(CombatingEntity target, float effectModifier);
+
 
         /// <summary>
         /// Checks if the effect has fail in the random check
@@ -100,6 +102,8 @@ namespace CombatEffects
             }
             else
             {
+                // If it can apply the effect simply go to fail state and calculate from there;
+                // It's not necessary apply the target.passives since there's no effect to calculate
                 var failEffects = onFailEffects;
                 foreach (var failEffect in failEffects)
                 {
@@ -117,6 +121,13 @@ namespace CombatEffects
                         originalPowerVariation);
                 }
             }
+        }
+        public void DoDirectEffect(CombatingEntity target, float randomModifier)
+        {
+            float powerVariation = power;
+            if (applyRandomness)
+                powerVariation *= randomModifier;
+            effectPreset.DoEffect(target,powerVariation);
         }
 
         public void OnValidateEffects()

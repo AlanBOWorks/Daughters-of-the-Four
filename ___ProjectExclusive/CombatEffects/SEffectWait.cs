@@ -10,6 +10,11 @@ namespace CombatEffects
     {
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
+            DoEffect(target,effectModifier);
+        }
+
+        public override void DoEffect(CombatingEntity target, float effectModifier)
+        {
             UtilsCombatStats.SetInitiative(target.CombatStats, effectModifier);
             UtilsCombatStats.SetActionAmount(target.CombatStats);
         }

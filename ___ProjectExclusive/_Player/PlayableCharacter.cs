@@ -44,8 +44,10 @@ namespace _Player
             
             return Variable.GenerateCombatSkills(injection);
         }
-        public PassivesHolder GetPassivesHolder() => PassivesHolder;
 
+        public OpeningPassives GetOpeningPassives() => Variable.GetOpeningPassives();
+        public IPassivesFiltersHolder GetSharedFilterPassives() => Variable.GetSharedFilterPassives();
+        public PassivesHolder GetPassivesHolder() => PassivesHolder;
         public SHarmonyPassive GetHarmonyPassive() => Variable.GetHarmonyPassive();
     }
 }

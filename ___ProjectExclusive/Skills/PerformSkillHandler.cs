@@ -67,9 +67,11 @@ namespace Skills
             }
 
             skill.OnSkillUsage();
+            var effects = skillPreset.GetEffects;
+            var mainEffect = effects[0];
 
 
-            if (skillPreset.GetEffectAmount() <= 0)
+            if (effects.Length <= 0)
             {
 #if UNITY_EDITOR
                 Debug.LogError("Skill doesn't have an effect");
@@ -96,7 +98,6 @@ namespace Skills
 
             //>>>>>>>>>>>>>>>>>>> DO Main Effect
             List<CombatingEntity> effectTargets;
-            var mainEffect = skillPreset.GetMainEffect();
             DoEffectOnTargets(mainEffect);
             yield return Timing.WaitUntilDone(_currentUser.CombatAnimator
                 ._DoAnimation(_currentUser, effectTargets, _currentSkillTargets.UsingSkill));
@@ -105,9 +106,9 @@ namespace Skills
 
             //>>>>>>>>>>>>>>>>>>> DO Secondary Effects
             // 1 since the main Effect is skillEffects[0]
-            for (int i = 1; i < skillPreset.GetEffectAmount(); i++)
+            for (int i = 1; i < effects.Length; i++)
             {
-                DoEffectOnTargets(skillPreset.GetEffect(i));
+                DoEffectOnTargets(effects[i]);
             }
 
 

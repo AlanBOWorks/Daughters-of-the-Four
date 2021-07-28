@@ -7,9 +7,14 @@ namespace CombatEffects
         menuName = "Combat/Effects/Restore Stance")]
     public class SEffectRestoreStance : SEffectBase
     {
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        public override void DoEffect(CombatingEntity user, CombatingEntity target, float randomCheck = 1)
         {
-            if(FailRandom(effectModifier)) return;
+            DoEffect(target, randomCheck);
+        }
+
+        public override void DoEffect(CombatingEntity target, float randomCheck)
+        {
+            if (FailRandom(randomCheck)) return;
             target.AreasDataTracker.ForceStateFinish();
 
             target.Events.InvokeAreaChange();

@@ -4,9 +4,16 @@ using Characters;
 using Skills;
 using SMaths;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Stats 
 {
+    public static class StatsCap
+    {
+        public const float MinHarmony = -1;
+        public const float MaxHarmony = 1;
+    }
+
     public static class EnumStats
     {
         public const int AttackIndex = 0;
@@ -215,10 +222,29 @@ namespace Stats
             SetActionAmount(stats, stats.ActionsLefts + addition);
         }
 
+        public static void AddHarmony(ICombatTemporalStats stats, float addition)
+        {
+            float targetHarmony = stats.HarmonyAmount + addition;
+            stats.HarmonyAmount = Mathf.Clamp(
+                targetHarmony, 
+                StatsCap.MinHarmony, StatsCap.MaxHarmony);
+        }
+
         public static bool IsCriticalPerformance(ICharacterBasicStats stats, CombatSkill skill, float criticalCheck)
         {
             if (!skill.CanCrit) return false;
             return criticalCheck < stats.CriticalChance + skill.CriticalAddition;
+        }
+
+        public static bool IsCriticalPerformance(ICharacterBasicStats stats, SSkillPresetBase skill, float criticalCheck)
+        {
+            if (!skill.canCrit) return false;
+            return criticalCheck < stats.CriticalChance + skill.criticalAddition;
+        }
+        public static bool IsCriticalPerformance(SSkillPresetBase skill, float criticalCheck)
+        {
+            if (!skill.canCrit) return false;
+            return criticalCheck < skill.criticalAddition;
         }
 
         public const float RandomLow = .8f;
@@ -227,6 +253,16 @@ namespace Stats
         public static float CalculateRandomModifier(float randomCheck)
         {
             return Mathf.Lerp(RandomLow, RandomHigh, randomCheck);
+        }
+        public static float UpdateRandomness( ref float randomValue, bool isCritical)
+        {
+            if (isCritical)
+            {
+                return RandomHigh;
+            }
+
+            randomValue = Random.value;
+            return CalculateRandomModifier(randomValue);
         }
     }
 

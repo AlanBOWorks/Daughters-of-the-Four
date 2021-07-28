@@ -16,6 +16,7 @@ namespace Passives
         [SerializeField] 
         private string passiveName = "NULL";
 
+        [InfoBox("Effects apply in tiers; +- > x0,x1,x2,x3")]
         [SerializeField] private EffectParams[] onPositiveHarmony;
         [SerializeField] private EffectParams[] onNegative;
 

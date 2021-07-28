@@ -45,6 +45,9 @@ namespace Stats
 
     public interface ISpecialStats
     {
+        /// <summary>
+        /// Affects Harmony
+        /// </summary>
         float Enlightenment { get; set; }
         float CriticalChance { get; set; }
         float SpeedAmount { get; set; }

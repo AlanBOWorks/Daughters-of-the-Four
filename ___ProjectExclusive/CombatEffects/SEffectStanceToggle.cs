@@ -1,6 +1,7 @@
 ﻿using System;
 using _CombatSystem;
 using Characters;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,17 +13,21 @@ namespace CombatEffects
     {
         [SerializeField] private TeamCombatData.Stance targetStance = TeamCombatData.Stance.Neutral;
 
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        public override void DoEffect(CombatingEntity user, CombatingEntity target, float randomCheck = 1)
         {
-            if(FailRandom(effectModifier)) return;
+            DoEffect(target, randomCheck);
+        }
 
-            UtilsArea.ToggleStance(target,targetStance);
+        public override void DoEffect(CombatingEntity target, float randomCheck)
+        {
+            if (FailRandom(randomCheck)) return;
+
+            UtilsArea.ToggleStance(target, targetStance);
             target.Events.InvokeAreaChange();
         }
 
-
-
-        private void OnValidate()
+        [Button(ButtonSizes.Large)]
+        private void UpdateAssetName()
         {
             name = $"Stance Toggle - {targetStance.ToString().ToUpper()} [Preset]";
             RenameAsset();
