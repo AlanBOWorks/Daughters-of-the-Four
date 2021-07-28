@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using _CombatSystem;
 using Characters;
+using CombatEffects;
 using Skills;
 using UnityEngine;
 
 namespace Passives
 {
-    public class CombatPassivesHolder : PassivesHolder, IPassivesFiltersHolder
+    public class CombatPassivesHolder : PassivesHolder, IPassivesFiltersHolder, IPassivesFilterHandler
     {
         public readonly CombatingEntity User;
+        private readonly HarmonyBuffInvoker _harmonyPassive;
 
         public CombatPassivesHolder(CombatingEntity user, 
-            PassivesHolder copyFrom, IPassivesFiltersHolder sharedPassives) 
+            PassivesHolder copyFrom, IPassivesFiltersHolder sharedPassives,
+            HarmonyBuffInvoker harmonyBuffInvoker) 
             : base(copyFrom)
         {
             User = user;
@@ -28,8 +32,14 @@ namespace Passives
                 NeutralSkills.ReactionFilterPassives.Add(reactionPassive);
                 DefendingSkills.ReactionFilterPassives.Add(reactionPassive);
             }
+
+            _harmonyPassive = harmonyBuffInvoker;
         }
 
+        private ITeamCombatControlHandler GetTeamControl()
+        {
+            return User.CharacterGroup.Team.ControlHolder;
+        }
 
         public List<SActionPassiveFilterPreset> ActionFilterPassives
         {
@@ -52,6 +62,63 @@ namespace Passives
         {
             var holder = UtilsSkill.GetElement(this, User);
             return holder.GetFilters();
+        }
+
+
+        public void DoActionPassiveFilter
+            (ref EffectArguments arguments, ref float currentValue, float originalValue)
+        {
+            var passives = ActionFilterPassives;
+            foreach (SActionPassiveFilterPreset passive in passives)
+            {
+                passive.DoPassiveFilter(
+                    ref arguments,
+                    ref currentValue,
+                    originalValue);
+            }
+
+            _harmonyPassive?.DoActionPassiveFilter(
+                ref arguments,
+                ref currentValue,
+                originalValue);
+
+            var teamPassives 
+                = GetTeamControl().GetCurrentPassives().ActionFilterPassives;
+            foreach (SActionPassiveFilterPreset passive in teamPassives)
+            {
+                passive.DoPassiveFilter(
+                    ref arguments,
+                    ref currentValue,
+                    originalValue);
+            }
+        }
+
+        public void DoReActionPassiveFilter
+            (ref EffectArguments arguments, ref float currentValue, float originalValue)
+        {
+            var passives = ReactionFilterPassives;
+            foreach (SReactionPassiveFilterPreset passive in passives)
+            {
+                passive.DoPassiveFilter(
+                    ref arguments,
+                    ref currentValue,
+                    originalValue);
+            }
+
+            _harmonyPassive?.DoReActionPassiveFilter(
+                ref arguments,
+                ref currentValue,
+                originalValue);
+
+            var teamPassives
+                = GetTeamControl().GetCurrentPassives().ReactionFilterPassives;
+            foreach (SReactionPassiveFilterPreset passive in teamPassives)
+            {
+                passive.DoPassiveFilter(
+                    ref arguments,
+                    ref currentValue,
+                    originalValue);
+            }
         }
     }
 
@@ -88,6 +155,8 @@ namespace Passives
     [Serializable]
     public class FilterPassivesHolder : IPassivesFiltersHolder
     {
+        public static FilterPassivesHolder EmptyHolder = new FilterPassivesHolder();
+
         [SerializeField]
         private List<SActionPassiveFilterPreset> actionFilterPassives;
         public List<SActionPassiveFilterPreset> ActionFilterPassives => actionFilterPassives;
@@ -119,20 +188,20 @@ namespace Passives
     public class OpeningPassives
     {
         [SerializeField]
-        private List<SBuffSkillPreset> passives;
+        private List<SOpeningPassivesPreset> passives;
 
         public OpeningPassives(int size = 0)
         {
-            passives = new List<SBuffSkillPreset>(size);
+            passives = new List<SOpeningPassivesPreset>(size);
         }
 
-        public void AddPassive(SBuffSkillPreset passive)
+        public void AddPassive(SOpeningPassivesPreset passive)
         {
             if (passives.Contains(passive)) return;
             passives.Add(passive);
         }
 
-        public void RemovePassive(SBuffSkillPreset passive)
+        public void RemovePassive(SOpeningPassivesPreset passive)
         {
             passives.Remove(passive);
         }
@@ -140,9 +209,9 @@ namespace Passives
         public void DoOpeningPassives(CombatingEntity user)
         {
             if (passives.Count <= 0) return;
-            foreach (SBuffSkillPreset buffEffect in passives)
+            foreach (SOpeningPassivesPreset buffEffect in passives)
             {
-                buffEffect.DoEffects(user);
+                buffEffect.DoDirectEffects(user,user);
             }
         }
 
@@ -154,6 +223,15 @@ namespace Passives
         List<SActionPassiveFilterPreset> ActionFilterPassives { get; }
         List<SReactionPassiveFilterPreset> ReactionFilterPassives { get; }
         PassivesFilters GetFilters();
+    }
+
+    public interface IPassivesFilterHandler
+    {
+        void DoActionPassiveFilter
+            (ref EffectArguments arguments, ref float currentValue, float originalValue);
+
+        void DoReActionPassiveFilter
+            (ref EffectArguments arguments, ref float currentValue, float originalValue);
     }
 
     public struct PassivesFilters : IPassivesFiltersHolder

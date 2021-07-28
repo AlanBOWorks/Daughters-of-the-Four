@@ -30,23 +30,8 @@ namespace Skills
         }
     }
 
-    public abstract class SSkillPresetBase : ScriptableObject
+    public abstract class SSkillPresetBase : SEffectSetPreset
     {
-        [TitleGroup("Details")]
-        [SerializeField,Delayed] 
-        private string skillName = "NULL";
-        public string SkillName => skillName;
-
-        [TitleGroup("Details")]
-        [SerializeField] private Sprite icon = null;
-        public Sprite Icon => icon;
-
-        [TitleGroup("Stats")]
-        public bool canCrit = true;
-        [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
-        public float criticalAddition = 0f;
-        
-
         [TitleGroup("Targeting")]
         [SerializeField] protected bool canTargetSelf = false;
         public bool CanTargetSelf() => canTargetSelf;
@@ -59,6 +44,23 @@ namespace Skills
             Support,
             Other = SelfOnly
         }
+    }
+
+    public abstract class SEffectSetPreset : ScriptableObject
+    {
+        [TitleGroup("Details")]
+        [SerializeField, Delayed]
+        protected string skillName = "NULL";
+        public string SkillName => skillName;
+
+        [TitleGroup("Details")]
+        [SerializeField] private Sprite icon = null;
+        public Sprite Icon => icon;
+
+        [TitleGroup("Stats")]
+        public bool canCrit = true;
+        [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
+        public float criticalAddition = 0f;
 
 
         [TitleGroup("Effects")]
@@ -67,19 +69,10 @@ namespace Skills
         public EffectParams[] GetEffects => effects;
         public IEffect GetMainEffect() => effects[0];
 
-        public void DoEffects(CombatingEntity user, CombatingEntity target)
-        {
-            float randomValue = Random.value;
-            bool isCritical =
-                UtilsCombatStats.IsCriticalPerformance(user.CombatStats, this, randomValue);
-            UtilsCombatStats.UpdateRandomness(ref randomValue,isCritical);
-            foreach (EffectParams effect in effects)
-            {
-                effect.DoEffect(user,target, randomValue);
-            }
-        }
-
-        public void DoEffects(CombatingEntity target)
+        /// <summary>
+        /// Use this for doing the effect directly without animations nor waits
+        /// </summary>
+        public void DoDirectEffects(CombatingEntity user, CombatingEntity target)
         {
             float randomValue = Random.value;
             bool isCritical =
@@ -87,7 +80,11 @@ namespace Skills
             UtilsCombatStats.UpdateRandomness(ref randomValue, isCritical);
             foreach (EffectParams effect in effects)
             {
-                effect.DoDirectEffect(target, randomValue);
+                var targets = UtilsTargets.GetEffectTargets(user, target, effect.GetEffectTarget());
+                foreach (CombatingEntity effectTarget in targets)
+                {
+                    effect.DoDirectEffect(effectTarget,randomValue);
+                }
             }
         }
 
@@ -99,8 +96,7 @@ namespace Skills
             var mainEffect = GetMainEffect();
             if (mainEffect != null)
             {
-                string typeString = ValidationName(mainEffect);
-                name = skillName + typeString + " - [SKILL Preset]";
+                name = FullAssetName(mainEffect);
             }
             UtilsGame.UpdateAssetName(this);
         }
@@ -113,10 +109,13 @@ namespace Skills
             }
         }
 
+        protected virtual string FullAssetName(IEffect mainEffect)
+        {
+            return skillName + ValidationName(mainEffect) + " - [SKILL Preset]";
+        }
         protected virtual string ValidationName(IEffect mainEffect)
         {
             return "(" + mainEffect.GetEffectTarget().ToString().ToUpper() + ") ";
         }
     }
-
 }

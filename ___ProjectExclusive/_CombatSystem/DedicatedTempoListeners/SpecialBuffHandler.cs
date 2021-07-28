@@ -8,24 +8,24 @@ namespace _CombatSystem
     {
         public void OnInitiativeTrigger(CombatingEntity entity)
         {
-            entity.SpecialBuffHolders.OnInitiativeTrigger();
+            entity.TickerBuffHolders.OnInitiativeTrigger();
         }
 
         public void OnDoMoreActions(CombatingEntity entity)
         {
-            entity.SpecialBuffHolders.OnDoMoreActions();
+            entity.TickerBuffHolders.OnDoMoreActions();
         }
 
         public void OnFinisAllActions(CombatingEntity entity)
         {
-            entity.SpecialBuffHolders.OnFinisAllActions();
+            entity.TickerBuffHolders.OnFinisAllActions();
         }
 
         public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {
             foreach (CombatingEntity entity in allEntities)
             {
-                entity.SpecialBuffHolders.OnRoundCompleted();
+                entity.TickerBuffHolders.OnRoundCompleted();
             }
         }
     }

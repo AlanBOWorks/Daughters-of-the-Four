@@ -102,10 +102,19 @@ namespace _CombatSystem
         public CombatingTeam(int amountOfEntities = AmountOfArchetypes) : base(amountOfEntities)
         {
             Data = new TeamCombatData(this);
+            ControlHolder = EmptyTeamControllerHolder.EmptyTeamController;
         }
 
+        public CombatingTeam(ITeamCombatControlHolder controlHolder, int amountOfEntities = AmountOfArchetypes)
+            : base(amountOfEntities)
+        {
+            Data = new TeamCombatData(this);
+            ControlHolder = new CombatingTeamControlHolder(Data,controlHolder);
+        }
+
+
         public readonly TeamCombatData Data;
-        //TODO make an event to send every member a change State to the necessary Stance
+        public readonly ITeamCombatControlFull ControlHolder;
     }
 
 }

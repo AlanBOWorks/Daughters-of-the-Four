@@ -11,6 +11,7 @@ namespace Passives
         void DoPassiveFilter(
             ref EffectArguments arguments,
             ref float currentValue,
-            float originalValue);
+            float originalValue,
+            float effectValueModifier = 1);
     }
 }

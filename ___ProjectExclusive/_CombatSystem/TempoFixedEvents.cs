@@ -7,7 +7,6 @@ namespace _CombatSystem
     {
         public void OnInitiativeTrigger(CombatingEntity entity)
         {
-            entity.HarmonyBuffInvoker?.DoHarmonyCheck();
             entity.Events.OnInitiativeTrigger();
         }
 

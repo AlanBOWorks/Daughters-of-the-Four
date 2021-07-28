@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Skills
 {
     /// <summary>
-    /// A buff that depends of a certain ticker
+    /// Buffs that depends of a certain ticker/tempo ticks.
     /// </summary>
     public abstract class TickerBuff
     {
@@ -30,10 +30,14 @@ namespace Skills
     {
     }
 
-    public class CharacterBuffHolders : TempoTypeHandlerBase<TickerBuffHolder>
+    /// <summary>
+    /// Contains [<see cref="TickerBuff"/>]s as a [<seealso cref="TempoTypeHandlerBase{T}"/>]. <br></br>
+    /// (<inheritdoc cref="TickerBuff"/>)
+    /// </summary>
+    public class TickerBuffHolders : TempoTypeHandlerBase<TickerBuffHolder>
     {
         private readonly CombatingEntity _entity;
-        public CharacterBuffHolders(CombatingEntity entity)
+        public TickerBuffHolders(CombatingEntity entity)
         {
             _entity = entity;
             OnBeforeSequence = new TickerBuffHolder();
@@ -95,6 +99,10 @@ namespace Skills
         }
     }
 
+    /// <summary>
+    /// Contains [<see cref="TickerBuff"/>]s. <br></br>
+    /// (<inheritdoc cref="TickerBuff"/>)
+    /// </summary>
     public class TickerBuffHolder : List<TickerBuff> 
     {
         

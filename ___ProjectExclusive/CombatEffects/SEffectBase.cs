@@ -96,8 +96,11 @@ namespace CombatEffects
 
             if (canApplyEffect)
             {
-                DoPassiveVariation(user.PassivesHolder.ActionFilterPassives);
-                DoPassiveVariation(target.PassivesHolder.ReactionFilterPassives);
+                user.PassivesHolder.DoActionPassiveFilter(
+                    ref effectArguments,ref powerVariation,originalPowerVariation);
+                target.PassivesHolder.DoReActionPassiveFilter(
+                    ref effectArguments,ref powerVariation, originalPowerVariation);
+
                 effectPreset.DoEffect(user, target, powerVariation);
             }
             else
@@ -111,16 +114,6 @@ namespace CombatEffects
                 }
             }
 
-            void DoPassiveVariation(IEnumerable<SPassiveFilterPreset> passives)
-            {
-                foreach (SPassiveFilterPreset passive in passives)
-                {
-                    passive.DoPassiveFilter(
-                        ref effectArguments, 
-                        ref powerVariation, 
-                        originalPowerVariation);
-                }
-            }
         }
         public void DoDirectEffect(CombatingEntity target, float randomModifier)
         {

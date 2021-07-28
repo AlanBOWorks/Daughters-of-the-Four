@@ -20,11 +20,12 @@ namespace Passives
         public void DoPassiveFilter(
             ref EffectArguments arguments,
             ref float currentValue,
-            float originalValue)
+            float originalValue,
+            float effectValueModifier = 1)
         {
             foreach (PassiveParam passive in passives)
             {
-                passive.DoPassiveFilter(ref arguments,ref currentValue,originalValue);
+                passive.DoPassiveFilter(ref arguments,ref currentValue,originalValue, effectValueModifier);
             }
         }
 
@@ -50,12 +51,14 @@ namespace Passives
         [SerializeField, ShowIf("condition")]
         [SuffixLabel("00%"), Range(-10, 10)] private float conditionValue;
 
-        public void DoPassiveFilter(ref EffectArguments arguments, ref float currentValue, float originalValue)
+        public void DoPassiveFilter(ref EffectArguments arguments, ref float currentValue, 
+            float originalValue, float effectValueModifier = 1)
         {
             if (condition == null || condition.CanApply(ref arguments, conditionValue))
             {
                 if(passiveFilter.CanApplyPassive(arguments.Effect))
-                    passiveFilter.DoPassiveFilter(ref currentValue,originalValue, effectValue);
+                    passiveFilter.DoPassiveFilter(ref currentValue,originalValue, 
+                        effectValue * effectValueModifier);
             }
         }
     }

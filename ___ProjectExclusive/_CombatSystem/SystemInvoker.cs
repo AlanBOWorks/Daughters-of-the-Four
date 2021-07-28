@@ -74,6 +74,7 @@ namespace _CombatSystem
                 // This phase could be loaded asynchronously while the player is preparing the characters
                 CombatingTeam allEntities;
                 CharacterArchetypes.TeamPosition entityPosition;
+                Action onStartAction = StartPhase;
 
                 InitializationPhase();
                 InitializeCombatConditions();
@@ -84,7 +85,7 @@ namespace _CombatSystem
                 yield return Timing.WaitForSeconds(1f);
                 Debug.Log("x--- Starting Combat");
                 // TODO make an starting animation
-                StartPhase();
+                onStartAction.Invoke();
                 Debug.Log("x--- In Combat");
 
                 void InitializationPhase()
@@ -169,12 +170,6 @@ namespace _CombatSystem
                     {
                         listener.OnCombatStart();
                     }
-
-                    /*
-                    foreach (CombatingEntity entity in allEntities)
-                    {
-                        entity.PassivesHolder.DoOpeningPassives(entity);
-                    }*/
                 }
 
 
@@ -194,31 +189,39 @@ namespace _CombatSystem
                     // x----- Area
                     var characterAreaData = new CombatAreasData(entityPosition, variable.RangeType);
                     entity.AreasDataTracker = characterAreaData;
-
-
+                    
                     // x----- Skills
                     variable.GenerateCombatSkills(entity);
+
+                    // x----- Harmony Buffer
+                    var harmonyVariable = variable.GetHarmonyPassive();
+                    HarmonyBuffInvoker harmonyBuffer = null;
+                    if (harmonyVariable != null)
+                    {
+                        //TODO make a backup HarmonyBuff for empty by type (Archetype based)
+                        harmonyBuffer = new HarmonyBuffInvoker(entity, harmonyVariable);
+                        entity.Injection(harmonyBuffer);
+                    }
 
                     // x----- Passives
                     var passivesHolderVariable = variable.GetPassivesHolder();
                     var passiveHolder 
-                        = new CombatPassivesHolder(entity,passivesHolderVariable,variable.GetSharedFilterPassives());
+                        = new CombatPassivesHolder(entity,
+                            passivesHolderVariable,variable.GetSharedFilterPassives(),
+                            harmonyBuffer);
                     entity.Injection(passiveHolder);
                     
-                    // x----- Harmony Buffer
-                    var harmonyVariable = variable.GetHarmonyPassive();
-                    if (harmonyVariable != null)
-                    {
-                        //TODO make a backup HarmonyBuff for empty by type (Archetype based)
-                        var harmonyBuffer = new HarmonyBuffInvoker(entity, harmonyVariable);
-                        entity.Injection(harmonyBuffer);
-                    }
 
-                    var openingPassives = variable.GetOpeningPassives();
-                    openingPassives?.DoOpeningPassives(entity);
+                    onStartAction += OpeningPassivesInjection;
 
                     entityPosition++;
                     return entity;
+
+                    void OpeningPassivesInjection()
+                    {
+                        var openingPassives = variable.GetOpeningPassives();
+                        openingPassives?.DoOpeningPassives(entity);
+                    }
                 }
                 #endregion
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Characters;
+using Passives;
 using Skills;
 
 namespace _CombatSystem
@@ -56,6 +57,7 @@ namespace _CombatSystem
             }
         }
     }
+
 
     public interface IStanceArchetype<out T>
     {

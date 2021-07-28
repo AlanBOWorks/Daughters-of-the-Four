@@ -31,7 +31,7 @@ namespace Characters
             CharacterName = characterName;
             InstantiationPrefab = prefab;
             ReceivedStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
-            SpecialBuffHolders = new CharacterBuffHolders(this);
+            TickerBuffHolders = new TickerBuffHolders(this);
             Events = new CombatCharacterEvents(this);
         }
         
@@ -51,8 +51,11 @@ namespace Characters
         /// </summary>
         public readonly SerializedCombatStatsFull ReceivedStats;
 
+        /// <summary>
+        /// <inheritdoc cref="TickerBuffHolder"/>
+        /// </summary>
         [ShowInInspector]
-        public readonly CharacterBuffHolders SpecialBuffHolders;
+        public readonly TickerBuffHolders TickerBuffHolders;
         [ShowInInspector]
         public CombatPassivesHolder PassivesHolder { get; private set; }
 

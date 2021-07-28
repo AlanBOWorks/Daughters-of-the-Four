@@ -196,7 +196,6 @@ namespace _CombatSystem
 
         private void StartUsingActions(CombatingEntity entity)
         {
-            var stats = entity.CombatStats;
             OnInitiativeTrigger(entity);
         }
 
@@ -308,8 +307,11 @@ namespace _CombatSystem
 
             if(_loopHandle.IsRunning)
                 ResumeFromTempoTrigger();
+
+            // Do Harmony 
+            entity.HarmonyBuffInvoker?.InvokeBurstStats();
         }
-        
+
         public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {
             TriggerBasicHandler.OnRoundCompleted(allEntities,lastEntity);

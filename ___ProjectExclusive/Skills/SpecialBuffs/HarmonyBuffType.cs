@@ -34,7 +34,7 @@ namespace Skills
 
         public static void AddCriticalBuff(CombatingEntity entity)
         {
-            CharacterBuffHolders buffHolders = entity.SpecialBuffHolders;
+            TickerBuffHolders buffHolders = entity.TickerBuffHolders;
             Type type = typeof(CriticalActionBuff);
 
             if (buffHolders.HasStackableBuff(type))
