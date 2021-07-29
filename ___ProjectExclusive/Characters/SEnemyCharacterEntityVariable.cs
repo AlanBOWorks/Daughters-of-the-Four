@@ -15,7 +15,7 @@ namespace Characters
 
         public override CharacterCombatData GenerateCombatData()
         {
-            return UtilsStats.GenerateCombatData(presetStats);
+            return new CharacterCombatData(presetStats);
         }
     }
 }

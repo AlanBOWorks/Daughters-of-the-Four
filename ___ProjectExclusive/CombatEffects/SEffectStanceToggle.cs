@@ -1,8 +1,6 @@
-﻿using System;
-using _CombatSystem;
+﻿using _Team;
 using Characters;
 using Sirenix.OdinInspector;
-using UnityEditor;
 using UnityEngine;
 
 namespace CombatEffects

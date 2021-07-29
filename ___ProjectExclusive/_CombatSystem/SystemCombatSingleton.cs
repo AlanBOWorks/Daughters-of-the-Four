@@ -26,7 +26,6 @@ namespace _CombatSystem
             var combatControlDeclaration = new CombatControlDeclaration();
             var skillCooldown = new SkillCooldownHandler();
             var roundCheckHandler = new RoundCheckHandler();
-            var specialBuffHandler = new SpecialBuffHandler();
             var burstResetHandler = new BuffResetHandler();
 
             //---- Injections ----
@@ -43,9 +42,6 @@ namespace _CombatSystem
             TempoHandler.Subscribe(PerformSkillHandler);
             TempoHandler.Subscribe(skillCooldown);
 
-            TempoHandler.Subscribe((IRoundListener) specialBuffHandler);
-            TempoHandler.Subscribe((ITempoListener) specialBuffHandler);
-
             TempoHandler.Subscribe((ITempoListener) burstResetHandler);
             TempoHandler.Subscribe((ISkippedTempoListener)burstResetHandler);
 
@@ -57,7 +53,7 @@ namespace _CombatSystem
         [ShowInInspector]
         public static CombatCharactersHolder Characters;
         [ShowInInspector]
-        public static CombatTeamsHandler TeamsDataHandler;
+        public static CombatTeamControlsHandler TeamsDataHandler;
 
         [ShowInInspector] 
         public static CombatCharacterEventsBase CharacterChangesEvent;

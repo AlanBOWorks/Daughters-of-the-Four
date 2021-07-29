@@ -123,10 +123,7 @@ namespace Stats
             injection.SupportPower = copyFrom.SupportPower;
         }
 
-        public static CharacterCombatData GenerateCombatData(ICharacterFullStats stats)
-        {
-            return new CharacterCombatData(stats);
-        }
+        
         public static CharacterCombatData GenerateCombatData(IPlayerCharacterStats playerStats)
         {
             var copyStats = new PlayerCharacterCombatStats(playerStats);

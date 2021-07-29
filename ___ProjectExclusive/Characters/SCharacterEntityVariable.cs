@@ -28,6 +28,8 @@ namespace Characters
         private PassivesHolder filterPassivesHolder = new PassivesHolder();
         [SerializeField] 
         private SHarmonyPassive harmonyPassive = null;
+        [SerializeField] 
+        private SCriticalBuffPreset criticalBuff = null;
 
         [TitleGroup("Stats")] 
         public CharacterArchetypes.RangeType rangeType = CharacterArchetypes.RangeType.Melee;
@@ -54,6 +56,8 @@ namespace Characters
         public IPassivesFiltersHolder GetSharedFilterPassives() => sharedFilterPassives;
         public PassivesHolder GetPassivesHolder() => filterPassivesHolder;
         public SHarmonyPassive GetHarmonyPassive() => harmonyPassive;
+        public SCriticalBuffPreset GetCriticalBuff() => criticalBuff;
+
         public CharacterArchetypes.RangeType RangeType => rangeType;
     }
 
@@ -67,6 +71,7 @@ namespace Characters
         IPassivesFiltersHolder GetSharedFilterPassives();
         PassivesHolder GetPassivesHolder();
         SHarmonyPassive GetHarmonyPassive();
+        SCriticalBuffPreset GetCriticalBuff();
     }
 }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using _CombatSystem;
+using _Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

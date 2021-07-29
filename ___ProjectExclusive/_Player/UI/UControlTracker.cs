@@ -1,5 +1,6 @@
 ﻿using System;
 using _CombatSystem;
+using _Team;
 using Characters;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -77,9 +78,9 @@ namespace _Player
                 internal void DoPosition(float halfWith, float modifier)
                 {
                     Vector2 linePosition = Vector2.zero;
-                    linePosition.x = halfWith * CombatTeamsHandler.NeutralReturnModifier * modifier;
+                    linePosition.x = halfWith * CombatTeamControlsHandler.NeutralReturnModifier * modifier;
                     neutralReturnPoint.anchoredPosition = linePosition;
-                    linePosition.x = halfWith * CombatTeamsHandler.NeutralBreakModifier * modifier;
+                    linePosition.x = halfWith * CombatTeamControlsHandler.NeutralBreakModifier * modifier;
                     neutralBreakPoint.anchoredPosition = linePosition;
                 }
 

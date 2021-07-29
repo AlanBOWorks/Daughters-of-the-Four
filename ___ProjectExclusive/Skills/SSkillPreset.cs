@@ -73,17 +73,20 @@ namespace Skills
         /// Use this for doing the effect directly without animations nor waits
         /// </summary>
         public void DoDirectEffects(CombatingEntity user, CombatingEntity target)
+            => DoDirectEffects(user, target, 1);
+        public void DoDirectEffects(CombatingEntity user, CombatingEntity target, float modifier)
         {
             float randomValue = Random.value;
             bool isCritical =
                 UtilsCombatStats.IsCriticalPerformance(this, randomValue);
             UtilsCombatStats.UpdateRandomness(ref randomValue, isCritical);
+            float effectsModifier = randomValue * modifier;
             foreach (EffectParams effect in effects)
             {
                 var targets = UtilsTargets.GetEffectTargets(user, target, effect.GetEffectTarget());
                 foreach (CombatingEntity effectTarget in targets)
                 {
-                    effect.DoDirectEffect(effectTarget,randomValue);
+                    effect.DoDirectEffect(effectTarget,effectsModifier);
                 }
             }
         }
@@ -109,9 +112,10 @@ namespace Skills
             }
         }
 
+        private const string PresetPrefix = " - [SKILL Preset]";
         protected virtual string FullAssetName(IEffect mainEffect)
         {
-            return skillName + ValidationName(mainEffect) + " - [SKILL Preset]";
+            return skillName + ValidationName(mainEffect) + PresetPrefix;
         }
         protected virtual string ValidationName(IEffect mainEffect)
         {

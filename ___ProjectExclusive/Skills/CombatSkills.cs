@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using _CombatSystem;
+using _Team;
 using Characters;
-using JetBrains.Annotations;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace Skills
 {

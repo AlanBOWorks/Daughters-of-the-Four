@@ -49,5 +49,6 @@ namespace _Player
         public IPassivesFiltersHolder GetSharedFilterPassives() => Variable.GetSharedFilterPassives();
         public PassivesHolder GetPassivesHolder() => PassivesHolder;
         public SHarmonyPassive GetHarmonyPassive() => Variable.GetHarmonyPassive();
+        public SCriticalBuffPreset  GetCriticalBuff() => Variable.GetCriticalBuff();
     }
 }

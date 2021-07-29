@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using _CombatSystem;
+using _Team;
 using Characters;
 using CombatEffects;
 using MEC;
@@ -24,7 +25,10 @@ namespace Skills
             _currentSkillTargets = new SkillTargets(sizeAllocation); // it could be a whole targets
         }
 
-        public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
+        public void OnAfterPreparation(
+            CombatingTeam playerEntities, 
+            CombatingTeam enemyEntities, 
+            CharacterArchetypesList<CombatingEntity> allEntities)
         {
             
         }
@@ -89,7 +93,9 @@ namespace Skills
                 isCritical = true;
 
                 //ADD critical buff to the character
-               CriticalActionBuff.AddCriticalBuff(_currentUser);
+                var criticalBuff = _currentUser.CriticalBuff;
+                if(criticalBuff != null)
+                    _currentUser.DelayBuffHandler.EnqueueBuff(criticalBuff);
             }
             else
             {

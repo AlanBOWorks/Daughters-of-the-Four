@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using _Team;
 using Characters;
+using CombatEffects;
 using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
@@ -97,24 +99,5 @@ namespace _CombatSystem
         }
     }
 
-    public class CombatingTeam : CharacterArchetypesList<CombatingEntity>
-    {
-        public CombatingTeam(int amountOfEntities = AmountOfArchetypes) : base(amountOfEntities)
-        {
-            Data = new TeamCombatData(this);
-            ControlHolder = EmptyTeamControllerHolder.EmptyTeamController;
-        }
-
-        public CombatingTeam(ITeamCombatControlHolder controlHolder, int amountOfEntities = AmountOfArchetypes)
-            : base(amountOfEntities)
-        {
-            Data = new TeamCombatData(this);
-            ControlHolder = new CombatingTeamControlHolder(Data,controlHolder);
-        }
-
-
-        public readonly TeamCombatData Data;
-        public readonly ITeamCombatControlFull ControlHolder;
-    }
 
 }

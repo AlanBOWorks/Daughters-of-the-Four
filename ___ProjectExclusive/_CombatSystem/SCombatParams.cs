@@ -13,7 +13,13 @@ namespace _CombatSystem
     public class SCombatParams : ScriptableObject
     {
         [Title("Skills")]
-        [SerializeField] private Skills backupSkills = new Skills();
+        [SerializeField] 
+        private Skills backupSkills = new Skills();
+        [Title("Critical buffs")]
+        [SerializeField]
+        private CriticalBuff criticalBuff = new CriticalBuff();
+
+        [Title("Animator")]
         public SkipAnimationsType skipAnimationsType = SkipAnimationsType.None;
 
 
@@ -27,10 +33,18 @@ namespace _CombatSystem
         /// <summary>
         /// Used when a character doesn't have skills
         /// </summary>
-        public ICharacterArchetypesData<SCharacterSharedSkillsPreset> ArchetypesBackupSkills => backupSkills;
+        public ICharacterArchetypesData<SCharacterSharedSkillsPreset> ArchetypesBackupSkills 
+            => backupSkills;
+        public ICharacterArchetypesData<SCriticalBuffPreset> ArchetypesBackupCriticalBuffs
+            => criticalBuff;
+        
+        private void Awake()
+        {
+            CombatSystemSingleton.ParamsVariable = this;
+        }
 
         [Serializable]
-        internal class Skills : ICharacterArchetypesData<SCharacterSharedSkillsPreset>
+        private class Skills : ICharacterArchetypesData<SCharacterSharedSkillsPreset>
         {
             [SerializeField] private SCharacterSharedSkillsPreset vanguard;
             [SerializeField] private SCharacterSharedSkillsPreset attacker;
@@ -42,9 +56,18 @@ namespace _CombatSystem
             public SCharacterSharedSkillsPreset BackLiner => support;
         }
 
-        private void Awake()
+        [Serializable]
+        private class CriticalBuff : ICharacterArchetypesData<SCriticalBuffPreset>
         {
-            CombatSystemSingleton.ParamsVariable = this;
+            [SerializeField] private SCriticalBuffPreset frontLiner;
+            [SerializeField] private SCriticalBuffPreset midLiner;
+            [SerializeField] private SCriticalBuffPreset backLiner;
+
+            public SCriticalBuffPreset FrontLiner => frontLiner;
+
+            public SCriticalBuffPreset MidLiner => midLiner;
+
+            public SCriticalBuffPreset BackLiner => backLiner;
         }
     }
 }

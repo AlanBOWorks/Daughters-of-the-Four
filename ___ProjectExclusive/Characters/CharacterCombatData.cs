@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using _CombatSystem;
+using _Team;
 using Passives;
 using Sirenix.OdinInspector;
 using Skills;
@@ -31,7 +32,7 @@ namespace Characters
             CharacterName = characterName;
             InstantiationPrefab = prefab;
             ReceivedStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
-            TickerBuffHolders = new TickerBuffHolders(this);
+            DelayBuffHandler = new DelayBuffHandler(this);
             Events = new CombatCharacterEvents(this);
         }
         
@@ -52,10 +53,10 @@ namespace Characters
         public readonly SerializedCombatStatsFull ReceivedStats;
 
         /// <summary>
-        /// <inheritdoc cref="TickerBuffHolder"/>
+        /// <inheritdoc cref="DelayBuffHandler"/>
         /// </summary>
         [ShowInInspector]
-        public readonly TickerBuffHolders TickerBuffHolders;
+        public readonly DelayBuffHandler DelayBuffHandler;
         [ShowInInspector]
         public CombatPassivesHolder PassivesHolder { get; private set; }
 
@@ -67,6 +68,9 @@ namespace Characters
         public readonly CombatCharacterEvents Events;
         [ShowInInspector]
         public HarmonyBuffInvoker HarmonyBuffInvoker { get; private set; }
+
+        [ShowInInspector] 
+        public SDelayBuffPreset CriticalBuff { get; private set; }
 
         public IEquipSkill<CombatSkill> SharedSkills => CombatSkills.SharedSkills;
         public ISkillPositions<List<CombatSkill>> UniqueSkills => CombatSkills.UniqueSkills;
@@ -104,26 +108,16 @@ namespace Characters
         } 
         
 
-        public void Injection(CombatSkills combatSkills)
-        {
+        public void Injection(CombatSkills combatSkills) => 
             CombatSkills = combatSkills;
-        }
-        
-
-        public void Injection(CombatingTeam team)
-        {
+        public void Injection(CombatingTeam team) =>
             AreasDataTracker.Injection(team.Data);
-        }
-
-        public void Injection(CombatPassivesHolder passivesHolder)
-        {
+        public void Injection(CombatPassivesHolder passivesHolder) => 
             PassivesHolder = passivesHolder;
-        }
-
-        public void Injection(HarmonyBuffInvoker harmonyBuffInvoker)
-        {
+        public void Injection(HarmonyBuffInvoker harmonyBuffInvoker) => 
             HarmonyBuffInvoker = harmonyBuffInvoker;
-        }
+        public void Injection(SDelayBuffPreset criticalBuff) =>
+            CriticalBuff = criticalBuff;
 
         public ISkillShared<SkillPreset> GetBackUpSkillShared()
         {
@@ -150,6 +144,9 @@ namespace Characters
         [ShowInInspector]
         public SerializedCombatStatsFull BurstStats { get; protected set; }
 
+        [ShowInInspector, NonSerialized] 
+        public ICharacterFullStats TeamStats;
+
         public int ActionsLefts = 0;
 
         public void RefillInitiativeActions()
@@ -165,12 +162,13 @@ namespace Characters
 
             BaseStats.HealthPoints = BaseStats.MaxHealth;
             BaseStats.MortalityPoints = BaseStats.MaxMortalityPoints;
-        }
 
+            TeamStats = UtilsStats.ZeroValuesFull;
+        }
         public float AttackPower
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.AttackPower,
+                BaseStats.AttackPower + TeamStats.AttackPower,
                 BuffStats.AttackPower,
                 BurstStats.AttackPower);
             set => BuffStats.AttackPower = value;
@@ -178,7 +176,7 @@ namespace Characters
         public float DeBuffPower
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.DeBuffPower,
+                BaseStats.DeBuffPower + TeamStats.DeBuffPower,
                 BuffStats.DeBuffPower,
                 BurstStats.DeBuffPower);
             set => BuffStats.DeBuffPower = value;
@@ -186,7 +184,7 @@ namespace Characters
         public float HealPower
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.HealPower,
+                BaseStats.HealPower + TeamStats.HealPower,
                 BuffStats.HealPower,
                 BurstStats.HealPower);
             set => BuffStats.HealPower = value;
@@ -194,43 +192,43 @@ namespace Characters
         public float BuffPower
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.BuffPower,
+                BaseStats.BuffPower + TeamStats.BuffPower,
                 BuffStats.BuffPower,
                 BurstStats.BuffPower);
             set => BuffStats.BuffPower = value;
         }
         public float HealthPoints
         {
-            get => BaseStats.HealthPoints;
+            get => BaseStats.HealthPoints + TeamStats.HealthPoints;
             set => BaseStats.HealthPoints = value;
         }
         public float ShieldAmount
         {
-            get => BaseStats.ShieldAmount;
+            get => BaseStats.ShieldAmount + TeamStats.ShieldAmount;
             set => BaseStats.ShieldAmount = value;
         }
         public float MortalityPoints
         {
-            get => BaseStats.MortalityPoints;
+            get => BaseStats.MortalityPoints + TeamStats.MortalityPoints;
             set => BaseStats.MortalityPoints = value;
         }
         public float HarmonyAmount
         {
-            get => BaseStats.HarmonyAmount + BurstStats.HarmonyAmount;
+            get => BaseStats.HarmonyAmount + TeamStats.HarmonyAmount + BurstStats.HarmonyAmount;
             set => BaseStats.HarmonyAmount = value;
         }
 
         public float InitiativePercentage
         {
-            get => BaseStats.InitiativePercentage 
-                   + BuffStats.InitiativePercentage 
+            get => BaseStats.InitiativePercentage + TeamStats.InitiativePercentage
+                   + BuffStats.InitiativePercentage
                    + BurstStats.InitiativePercentage;
             set => BaseStats.InitiativePercentage = value;
         }
 
         public int ActionsPerInitiative
         {
-            get => BaseStats.ActionsPerInitiative 
+            get => BaseStats.ActionsPerInitiative + TeamStats.ActionsPerInitiative
                    + BuffStats.ActionsPerInitiative
                    + BurstStats.ActionsPerInitiative;
             set => BaseStats.ActionsPerInitiative = value;
@@ -239,7 +237,7 @@ namespace Characters
         public float Enlightenment
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.Enlightenment,
+                BaseStats.Enlightenment + TeamStats.Enlightenment,
                 BuffStats.Enlightenment,
                 BurstStats.Enlightenment);
             set => BuffStats.Enlightenment = value;
@@ -247,7 +245,7 @@ namespace Characters
         public float CriticalChance
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.CriticalChance,
+                BaseStats.CriticalChance + TeamStats.CriticalChance,
                 BuffStats.CriticalChance,
                 BurstStats.CriticalChance);
             set => BuffStats.CriticalChance = value;
@@ -256,7 +254,7 @@ namespace Characters
         public float SpeedAmount
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.SpeedAmount,
+                BaseStats.SpeedAmount + TeamStats.SpeedAmount,
                 BuffStats.SpeedAmount,
                 BurstStats.SpeedAmount);
             set => BuffStats.SpeedAmount = value;
@@ -264,18 +262,18 @@ namespace Characters
 
         public float MaxHealth
         {
-            get => BaseStats.MaxHealth;
+            get => BaseStats.MaxHealth + TeamStats.MaxHealth;
             set => BuffStats.MaxHealth = value;
         }
         public float MaxMortalityPoints
         {
-            get => BaseStats.MaxMortalityPoints;
+            get => BaseStats.MaxMortalityPoints + TeamStats.MaxMortalityPoints;
             set => BuffStats.MaxMortalityPoints = value;
         }
         public float DamageReduction
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.DamageReduction,
+                BaseStats.DamageReduction + TeamStats.DamageReduction,
                 BuffStats.DamageReduction,
                 BurstStats.DamageReduction);
             set => BuffStats.DamageReduction = value;
@@ -283,7 +281,7 @@ namespace Characters
         public float DeBuffReduction
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.DeBuffReduction,
+                BaseStats.DeBuffReduction + TeamStats.DeBuffReduction,
                 BuffStats.DeBuffReduction,
                 BurstStats.DeBuffReduction);
             set => BuffStats.DeBuffReduction = value;

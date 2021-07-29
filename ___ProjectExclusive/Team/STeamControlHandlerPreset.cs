@@ -6,7 +6,7 @@ using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
 
-namespace _CombatSystem
+namespace _Team
 {
     [CreateAssetMenu(fileName = "N - Team Control Passive [Preset]",
         menuName = "Combat/Team/Control Passive")]

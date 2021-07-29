@@ -15,16 +15,10 @@ namespace _CombatSystem
         [ShowInInspector]
         public List<ISkippedTempoListener> SkippedListeners { get; }
 
-        public readonly TempoFixedEvents FixedEvents;
 
         public TempoEvents()
         {
-            FixedEvents = new TempoFixedEvents();
-
-            TempoListeners = new List<ITempoListener>()
-            {
-                FixedEvents
-            };
+            TempoListeners = new List<ITempoListener>();
             RoundListeners = new List<IRoundListener>();
             SkippedListeners = new List<ISkippedTempoListener>();
         }
@@ -51,6 +45,8 @@ namespace _CombatSystem
 
         public void OnInitiativeTrigger(CombatingEntity entity)
         {
+            entity.DelayBuffHandler.OnInitiativeTrigger();
+            entity.Events.OnInitiativeTrigger();
             foreach (ITempoListener listener in TempoListeners)
             {
                 listener.OnInitiativeTrigger(entity);
@@ -63,6 +59,8 @@ namespace _CombatSystem
             {
                 listener.OnDoMoreActions(entity);
             }
+            entity.Events.OnDoMoreActions();
+            entity.DelayBuffHandler.OnDoMoreActions();
         }
 
         public void OnFinisAllActions(CombatingEntity entity)
@@ -71,12 +69,19 @@ namespace _CombatSystem
             {
                 listener.OnFinisAllActions(entity);
             }
+            entity.Events.OnFinisAllActions();
+            entity.DelayBuffHandler.OnFinisAllActions();
         }
         public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {
             foreach (IRoundListener listener in RoundListeners)
             {
                 listener.OnRoundCompleted(allEntities, lastEntity);
+            }
+
+            foreach (CombatingEntity entity in allEntities)
+            {
+                entity.DelayBuffHandler.OnRoundCompleted();
             }
         }
 
@@ -90,6 +95,8 @@ namespace _CombatSystem
             {
                 listener.OnSkippedEntity(entity);
             }
+            entity.Events.OnFinisAllActions();
+            entity.DelayBuffHandler.OnFinisAllActions();
         }
     }
 

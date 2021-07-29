@@ -1,24 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using _Team;
 using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace _CombatSystem
 {
-    
+    /// <summary>
+    /// This instance is mean to exit in the [<see cref="SystemInvoker"/>] while it creates
+    /// instances of [<see cref="CombatTeamControlsHandler"/>] on each combat iteration (the handlers are
+    /// volatiles).
+    /// </summary>
     public class CombatControlDeclaration : ICombatPreparationListener, ICombatStartListener
     {
-        private CombatTeamsHandler _combatTeamsHandler;
+        private CombatTeamControlsHandler _combatControlsHandler;
 
         public void OnBeforeStart(CombatingTeam playerEntities, CombatingTeam enemyEntities,
             CharacterArchetypesList<CombatingEntity> allEntities)
         {
             InitializeEntities(playerEntities);
             InitializeEntities(enemyEntities);
-            _combatTeamsHandler
-                = new CombatTeamsHandler(playerEntities, enemyEntities);
-            CombatSystemSingleton.TeamsDataHandler = _combatTeamsHandler;
+            _combatControlsHandler
+                = new CombatTeamControlsHandler(playerEntities, enemyEntities);
+            CombatSystemSingleton.TeamsDataHandler = _combatControlsHandler;
 
             void InitializeEntities(CombatingTeam entities)
             {
@@ -33,7 +38,7 @@ namespace _CombatSystem
 
         public void OnCombatStart()
         {
-            _combatTeamsHandler.OnCombatStart();
+            _combatControlsHandler.OnCombatStart();
         }
     }
 
@@ -42,9 +47,9 @@ namespace _CombatSystem
     /// of both [<seealso cref="ICharacterFaction{T}"/>]
     ///  groups and normalize the variations.
     /// </summary>
-    public class CombatTeamsHandler : ICharacterFaction<TeamCombatData>, ICombatStartListener
+    public class CombatTeamControlsHandler : ICharacterFaction<TeamCombatData>, ICombatStartListener
     {
-        public CombatTeamsHandler(CombatingTeam playerEntities, CombatingTeam enemyEntities)
+        public CombatTeamControlsHandler(CombatingTeam playerEntities, CombatingTeam enemyEntities)
         {
             PlayerFaction = playerEntities.Data;
             EnemyFaction = enemyEntities.Data;
@@ -118,8 +123,15 @@ namespace _CombatSystem
                     listener.OnPlayerControlVariation(control, stance);
                 }
             }
+        }
 
-            
+        private void ChangeBuffs(CombatingTeam team)
+        {
+            var currentStats = team.ControlHolder.GetCurrentStats();
+            foreach (CombatingEntity entity in team)
+            {
+                entity.CombatStats.TeamStats = currentStats;
+            }
         }
 
         private void HandleTeams(CombatingTeam team, out TeamCombatData actor, out TeamCombatData receiver)

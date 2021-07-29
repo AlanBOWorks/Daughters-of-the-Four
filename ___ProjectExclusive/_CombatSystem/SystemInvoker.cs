@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ___ProjectExclusive._Enemies;
 using Characters;
 using _Player;
+using _Team;
 using MEC;
 using Passives;
 using Sirenix.OdinInspector;
@@ -211,6 +212,9 @@ namespace _CombatSystem
                             harmonyBuffer);
                     entity.Injection(passiveHolder);
                     
+                    // X----- Critical Buff
+                    var criticalBuff = variable.GetCriticalBuff();
+                    entity.Injection(criticalBuff);
 
                     onStartAction += OpeningPassivesInjection;
 

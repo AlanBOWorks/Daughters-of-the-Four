@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _Team;
 using Characters;
 using UnityEngine;
 
@@ -45,10 +46,13 @@ namespace _CombatSystem
                 var lastEntity = this[0];
                 if(lastEntity != entity) return;
 
-                Debug.Log($"Last entity: {entity.CharacterName}");
                 var tempoHandler = CombatSystemSingleton.TempoHandler;
                 tempoHandler.OnRoundCompleted(_allEntities,lastEntity);
                 RefreshList();
+
+#if UNITY_EDITOR
+                Debug.Log($"Last entity: {entity.CharacterName}");
+#endif
             }
 
         }

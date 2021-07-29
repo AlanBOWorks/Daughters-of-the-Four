@@ -1,9 +1,8 @@
 ﻿using System;
 using Characters;
-using Passives;
 using Skills;
 
-namespace _CombatSystem
+namespace _Team
 {
     public class TeamCombatData
     {
@@ -91,4 +90,24 @@ namespace _CombatSystem
         }
     }
 
+
+    public class CombatingTeam : CharacterArchetypesList<CombatingEntity>
+    {
+        public CombatingTeam(int amountOfEntities = AmountOfArchetypes) : base(amountOfEntities)
+        {
+            Data = new TeamCombatData(this);
+            ControlHolder = EmptyTeamControllerHolder.EmptyTeamController;
+        }
+
+        public CombatingTeam(ITeamCombatControlHolder controlHolder, int amountOfEntities = AmountOfArchetypes)
+            : base(amountOfEntities)
+        {
+            Data = new TeamCombatData(this);
+            ControlHolder = new CombatingTeamControlHolder(Data, controlHolder);
+        }
+
+
+        public readonly TeamCombatData Data;
+        public readonly ITeamCombatControlFull ControlHolder;
+    }
 }
