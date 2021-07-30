@@ -88,12 +88,16 @@ namespace Skills
             float randomValue = Random.value;
             bool isCritical;
             float randomModifier;
-            if (UtilsCombatStats.IsCriticalPerformance(_currentUser.CombatStats,skill, randomValue))
+            var combatStats = _currentUser.CombatStats;
+            if (UtilsCombatStats.IsCriticalPerformance(combatStats,skill, randomValue))
             {
                 isCritical = true;
-
+                float defaultHarmonyAddition 
+                    = CombatSystemSingleton.ParamsVariable.criticalHarmonyAddition;
+                UtilsCombatStats.AddHarmony(combatStats, defaultHarmonyAddition);
                 //ADD critical buff to the character
                 var criticalBuff = _currentUser.CriticalBuff;
+                
                 if(criticalBuff != null)
                     _currentUser.DelayBuffHandler.EnqueueBuff(criticalBuff);
             }

@@ -1,5 +1,7 @@
 ﻿using System;
 using Characters;
+using Passives;
+using Sirenix.OdinInspector;
 using Skills;
 
 namespace _Team
@@ -91,23 +93,27 @@ namespace _Team
     }
 
 
-    public class CombatingTeam : CharacterArchetypesList<CombatingEntity>
+    public class CombatingTeam : CharacterArchetypesList<CombatingEntity>, ITeamCombatControlStats
     {
-        public CombatingTeam(int amountOfEntities = AmountOfArchetypes) : base(amountOfEntities)
-        {
-            Data = new TeamCombatData(this);
-            ControlHolder = EmptyTeamControllerHolder.EmptyTeamController;
-        }
-
-        public CombatingTeam(ITeamCombatControlHolder controlHolder, int amountOfEntities = AmountOfArchetypes)
+        public CombatingTeam(ITeamCombatControlHolder holder, int amountOfEntities = AmountOfArchetypes)
             : base(amountOfEntities)
         {
             Data = new TeamCombatData(this);
-            ControlHolder = new CombatingTeamControlHolder(Data, controlHolder);
+            if(holder != null)
+                StatsHolder = new TeamCombatStatsHolder(Data,holder,holder);
+            else
+                StatsHolder = new TeamCombatStatsHolder(Data);       
         }
 
-
+        [ShowInInspector]
         public readonly TeamCombatData Data;
-        public readonly ITeamCombatControlFull ControlHolder;
+        [ShowInInspector]
+        public readonly TeamCombatStatsHolder StatsHolder;
+
+        public ICharacterBasicStats GetCurrentStats()
+            => StatsHolder.GetCurrentStats();
+
+        public FilterPassivesHolder GetCurrentPassives()
+            => StatsHolder.GetCurrentPassives();
     }
 }

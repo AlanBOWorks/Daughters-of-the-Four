@@ -37,9 +37,9 @@ namespace Passives
             _harmonyPassive = harmonyBuffInvoker;
         }
 
-        private ITeamCombatControlHandler GetTeamControl()
+        private ITeamCombatControlStats GetTeamControl()
         {
-            return User.CharacterGroup.Team.ControlHolder;
+            return User.CharacterGroup.Team;
         }
 
         public List<SActionPassiveFilterPreset> ActionFilterPassives

@@ -64,8 +64,11 @@ namespace _CombatSystem
             var playerSelections 
                 = PlayerEntitySingleton.SelectedCharacters;
 
-            CombatingTeam playerEntities = new CombatingTeam();
-            CombatingTeam enemyEntities = new CombatingTeam();
+            CombatingTeam playerEntities = new CombatingTeam(enemyFightPreset.StatsPreset);
+            CombatingTeam enemyEntities = new CombatingTeam(PlayerEntitySingleton.TeamControlStats);
+
+            CombatSystemSingleton.PlayerTeam = playerEntities;
+            CombatSystemSingleton.EnemyTeam = enemyEntities;
 
             CombatHandle = Timing.RunCoroutine(_DoCombat());
 
@@ -73,7 +76,7 @@ namespace _CombatSystem
             {
                 #region <<< COMBAT REGION >>>>
                 // This phase could be loaded asynchronously while the player is preparing the characters
-                CombatingTeam allEntities;
+                CharacterArchetypesList<CombatingEntity> allEntities;
                 CharacterArchetypes.TeamPosition entityPosition;
                 Action onStartAction = StartPhase;
 
@@ -105,7 +108,7 @@ namespace _CombatSystem
                 void GenerateAllEntities()
                 {
                     int length = playerEntities.Count + enemyEntities.Count;
-                    allEntities = new CombatingTeam(length);
+                    allEntities = new CharacterArchetypesList<CombatingEntity>(length);
                     allEntities.AddRange(playerEntities);
                     allEntities.AddRange(enemyEntities);
                 }
@@ -214,6 +217,13 @@ namespace _CombatSystem
                     
                     // X----- Critical Buff
                     var criticalBuff = variable.GetCriticalBuff();
+                    if (criticalBuff == null)
+                    {
+                        var defaultCriticalBuffs 
+                            = CombatSystemSingleton.ParamsVariable.ArchetypesBackupCriticalBuffs;
+                        criticalBuff = CharacterArchetypes.GetElement(
+                            defaultCriticalBuffs, entityPosition);
+                    }
                     entity.Injection(criticalBuff);
 
                     onStartAction += OpeningPassivesInjection;
@@ -260,6 +270,8 @@ namespace _CombatSystem
                 listener.OnCombatFinish(lastEntity,isPlayerWin);
             }
 
+            CombatSystemSingleton.PlayerTeam = null;
+            CombatSystemSingleton.EnemyTeam = null;
         }
     }
 

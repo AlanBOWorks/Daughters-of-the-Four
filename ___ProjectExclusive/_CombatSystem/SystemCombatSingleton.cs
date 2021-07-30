@@ -1,5 +1,6 @@
 ﻿using System;
 using _Player;
+using _Team;
 using Characters;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -67,6 +68,13 @@ namespace _CombatSystem
         [ShowInInspector] 
         public static CombatConditionsChecker CombatConditionChecker;
 
+        [Title("Temporal")]
+        [ShowInInspector] 
+        public static CombatingTeam PlayerTeam;
+        [ShowInInspector] 
+        public static CombatingTeam EnemyTeam;
+
+        [Title("Global Variables")]
         [ShowInInspector]
         public static SCombatParams ParamsVariable = null;
     }

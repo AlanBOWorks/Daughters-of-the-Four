@@ -17,12 +17,18 @@ namespace Skills
         [SerializeField,TitleGroup("Stats"),Range(0,100)]
         private int maxStack = 1;
 
+        [SerializeField,TitleGroup("Effects"), Tooltip("This aren't affected by maxStack")]
+        private EffectParams[] maxLessEffects = new EffectParams[0];
+
         public TempoHandler.TickType GetTickType() => tickType;
         public int MaxStack => maxStack;
 
-        public void DoBuff(CombatingEntity user, float modifier)
+        public void DoBuff(CombatingEntity user, float stacks)
         {
-            DoDirectEffects(user,user,modifier);
+            float modifier = stacks;
+                if (modifier > maxStack) modifier = maxStack;
+            DoDirectEffects(user,user, modifier);
+            DoDirectEffects(user,user,stacks,maxLessEffects);
         }
 
 

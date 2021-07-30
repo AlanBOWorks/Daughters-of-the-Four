@@ -9,17 +9,14 @@ namespace CombatEffects
         menuName = "Combat/Effects/Buff/Action Modifier")]
     public class SEffectActionModifier : SEffectBuffBase
     {
-        private const float BuffStatLowerCap = 1f; 
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
-            float statAddition = user.CombatStats.BuffPower - BuffStatLowerCap;
-            if (statAddition < 0) statAddition = 0;
-            DoEffect(target,statAddition);
+            DoEffect(target,effectModifier);
         }
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {
-            UtilsCombatStats.AddActionAmount(target.CombatStats,Mathf.RoundToInt(effectModifier));
+            UtilsCombatStats.AddActionAmount(target.CombatStats,Mathf.RoundToInt(effectModifier +0.1f));
             target.Events.InvokeTemporalStatChange();
 
         }

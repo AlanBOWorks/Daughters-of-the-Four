@@ -12,8 +12,8 @@ namespace Characters
     { }
 
     public interface ICharacterBasicStats : IOffensiveStats,ISupportStats, 
-        IVitalityStats, ISpecialStats
-    {}
+        IVitalityStats, ISpecialStats, ICombatTemporalStatsBase
+    { }
 
 
 }

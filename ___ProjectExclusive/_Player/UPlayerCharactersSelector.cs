@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _Team;
 using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace _Player
         [SerializeField] private SPlayerCharacterEntityVariable _frontLiner;
         [SerializeField] private SPlayerCharacterEntityVariable _midLiner;
         [SerializeField] private SPlayerCharacterEntityVariable _backLiner;
+        [SerializeField] private STeamControlStatsPreset teamStats;
 
         public bool autoSelectionOnStart = true;
 
@@ -35,6 +37,7 @@ namespace _Player
             if (autoSelectionOnStart)
             {
                 DoSelectOfCurrent();
+                PlayerEntitySingleton.TeamControlStats = teamStats;
             }
         }
 

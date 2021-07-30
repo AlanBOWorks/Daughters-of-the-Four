@@ -1,5 +1,6 @@
 ﻿using _CombatSystem;
 using _Enemies;
+using _Team;
 using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,6 +13,12 @@ namespace ___ProjectExclusive._Enemies
         ICharacterArchetypesData<SEnemyCharacterEntityVariable>,
         ICombatConditionHolder
     {
+        [TitleGroup("Enemies")] 
+        [SerializeField]
+        private STeamControlStatsPreset statsPreset;
+        public STeamControlStatsPreset StatsPreset => statsPreset;
+
+
         [TitleGroup("Enemies")]
         [SerializeField] private SEnemyCharacterEntityVariable frontLiner;
         [SerializeField] private SEnemyCharacterEntityVariable midLiner;
@@ -24,6 +31,8 @@ namespace ___ProjectExclusive._Enemies
         [TitleGroup("Conditionals")] 
         [SerializeField] private SCombatConditions winCondition;
         [SerializeField] private SCombatConditions loseCondition;
+
+
 
         public SEnemyCharacterEntityVariable FrontLiner => frontLiner;
         public SEnemyCharacterEntityVariable MidLiner => midLiner;

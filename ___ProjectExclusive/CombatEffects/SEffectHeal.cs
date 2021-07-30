@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CombatEffects
 {
-    [CreateAssetMenu(fileName = "Heal Effect - N [Preset]",
+    [CreateAssetMenu(fileName = "Heal Effect [Effect]",
         menuName = "Combat/Effects/Heal")]
     public class SEffectHeal : SEffectBase
     {

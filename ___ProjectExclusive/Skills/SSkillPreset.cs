@@ -74,19 +74,24 @@ namespace Skills
         /// </summary>
         public void DoDirectEffects(CombatingEntity user, CombatingEntity target)
             => DoDirectEffects(user, target, 1);
+
         public void DoDirectEffects(CombatingEntity user, CombatingEntity target, float modifier)
+            => DoDirectEffects(user, target, modifier, effects);
+
+        protected void DoDirectEffects(CombatingEntity user, CombatingEntity target, float modifier,
+            EffectParams[] targetEffects)
         {
             float randomValue = Random.value;
             bool isCritical =
                 UtilsCombatStats.IsCriticalPerformance(this, randomValue);
             UtilsCombatStats.UpdateRandomness(ref randomValue, isCritical);
             float effectsModifier = randomValue * modifier;
-            foreach (EffectParams effect in effects)
+            foreach (EffectParams effect in targetEffects)
             {
                 var targets = UtilsTargets.GetEffectTargets(user, target, effect.GetEffectTarget());
                 foreach (CombatingEntity effectTarget in targets)
                 {
-                    effect.DoDirectEffect(effectTarget,effectsModifier);
+                    effect.DoDirectEffect(effectTarget, effectsModifier);
                 }
             }
         }

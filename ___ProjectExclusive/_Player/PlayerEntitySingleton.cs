@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using _CombatSystem;
+using _Team;
 using Characters;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -37,6 +38,9 @@ namespace _Player
         public static USkillButtonsHandler SkillButtonsHandler = null;
         [ShowInInspector]
         public static IPlayerArchetypesData<ICharacterCombatProvider> SelectedCharacters = null;
+
+        [ShowInInspector] 
+        public static ITeamCombatControlHolder TeamControlStats;
 
         public static void DoSubscriptionsToCombatSystem()
         {

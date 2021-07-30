@@ -13,7 +13,7 @@ namespace Skills
     public interface IDelayBuff
     {
         TempoHandler.TickType GetTickType();
-        void DoBuff(CombatingEntity user, float modifier);
+        void DoBuff(CombatingEntity user, float stacks);
         int MaxStack { get; }
     }
 

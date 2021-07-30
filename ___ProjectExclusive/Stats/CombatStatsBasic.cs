@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Stats
 {
@@ -34,7 +35,12 @@ namespace Stats
             Add(serializeThis.Enlightenment);
             Add(serializeThis.CriticalChance);
             Add(serializeThis.SpeedAmount);
+            Add(serializeThis.HarmonyAmount);
+            Add(serializeThis.InitiativePercentage);
+            ActionsPerInitiative = serializeThis.ActionsPerInitiative;
         }
+        public int ActionsPerInitiative { get; set; }
+
 
         public float AttackPower
         {
@@ -91,6 +97,17 @@ namespace Stats
             get => this[SpeedAmountIndex];
             set => this[SpeedAmountIndex] = value;
         }
+        public float HarmonyAmount
+        {
+            get => this[HarmonyAmountIndex];
+            set => this[HarmonyAmountIndex] = value;
+        }
+        public float InitiativePercentage
+        {
+            get => this[InitiativePercentageIndex];
+            set => this[InitiativePercentageIndex] = value;
+        }
+
 
         public const int AttackPowerIndex = 0;
         public const int DeBuffPowerIndex = AttackPowerIndex + 1;
@@ -103,7 +120,9 @@ namespace Stats
         public const int EnlightenmentIndex = DeBuffReductionIndex + 1;
         public const int CriticalChanceIndex = EnlightenmentIndex + 1;
         public const int SpeedAmountIndex = CriticalChanceIndex + 1;
-        public const int BasicStatsLength = SpeedAmountIndex + 1;
+        public const int HarmonyAmountIndex = SpeedAmountIndex + 1;
+        public const int InitiativePercentageIndex = HarmonyAmountIndex + 1;
+        public const int BasicStatsLength = InitiativePercentageIndex + 1;
 
         public virtual void ResetToZero()
         {
@@ -146,6 +165,13 @@ namespace Stats
         private float criticalChance = 0;
         [SerializeField, SuffixLabel("Units")]
         private float speedAmount = 100;
+
+        [SerializeField, SuffixLabel("%00")]
+        private float initiativePercentage;
+        [SerializeField, SuffixLabel("Units")]
+        private int actionsPerInitiative;
+        [SerializeField, SuffixLabel("%00")]
+        private float harmonyAmount;
 
         public float AttackPower
         {
@@ -213,6 +239,24 @@ namespace Stats
             set => speedAmount = value;
         }
 
+        public float InitiativePercentage
+        {
+            get => initiativePercentage;
+            set => initiativePercentage = value;
+        }
+
+        public int ActionsPerInitiative
+        {
+            get => actionsPerInitiative;
+            set => actionsPerInitiative = value;
+        }
+
+        public float HarmonyAmount
+        {
+            get => harmonyAmount;
+            set => harmonyAmount = value;
+        }
+
         public CharacterCombatStatsBasic()
         { }
 
@@ -232,6 +276,31 @@ namespace Stats
             Enlightenment = value;
             CriticalChance = value;
             SpeedAmount = value;
+
+            HarmonyAmount = value;
+            InitiativePercentage = value;
+            ActionsPerInitiative = overrideByDefault;
+        }
+
+        public virtual void OverrideAll(float value)
+        {
+            AttackPower = value;
+            DeBuffPower = value;
+
+            HealPower = value;
+            BuffPower = value;
+
+            MaxHealth = value;
+            MaxMortalityPoints = value;
+            DamageReduction = value;
+
+            Enlightenment = value;
+            CriticalChance = value;
+            SpeedAmount = value;
+
+            HarmonyAmount = value;
+            InitiativePercentage = value;
+            ActionsPerInitiative = (int)value;
         }
 
         public CharacterCombatStatsBasic(ICharacterBasicStats copyFrom)
@@ -239,6 +308,16 @@ namespace Stats
             UtilsStats.CopyStats(this, copyFrom);
         }
 
+
+        private const float MaxInitialInitiative = .8f;
+        private const float DefaultInitialInitiative = .6f;
+        public void AddInitialInitiative(float randomMax = DefaultInitialInitiative)
+        {
+            float initiativeAddition = Random.value * randomMax;
+            InitiativePercentage += initiativeAddition;
+            if (InitiativePercentage > MaxInitialInitiative)
+                InitiativePercentage = MaxInitialInitiative;
+        }
     }
 
 }

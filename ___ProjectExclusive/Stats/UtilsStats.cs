@@ -1,5 +1,6 @@
 ﻿using System;
 using _CombatSystem;
+using _Team;
 using Characters;
 using Skills;
 using SMaths;
@@ -219,12 +220,19 @@ namespace Stats
             SetActionAmount(stats, stats.ActionsLefts + addition);
         }
 
+        //TODO AddActionsPerSequence
+
         public static void AddHarmony(ICombatTemporalStats stats, float addition)
         {
             float targetHarmony = stats.HarmonyAmount + addition;
             stats.HarmonyAmount = Mathf.Clamp(
                 targetHarmony, 
                 StatsCap.MinHarmony, StatsCap.MaxHarmony);
+        }
+
+        public static void AddTeamControl(CombatingTeam team, float addition)
+        {
+            CombatSystemSingleton.TeamsDataHandler.DoVariation(team,addition);
         }
 
         public static bool IsCriticalPerformance(ICharacterBasicStats stats, CombatSkill skill, float criticalCheck)

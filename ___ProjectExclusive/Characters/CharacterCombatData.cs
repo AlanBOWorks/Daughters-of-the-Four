@@ -133,20 +133,22 @@ namespace Characters
 
     public class CharacterCombatData : ICharacterFullStats
     {
-        [ShowInInspector]
+        [Title("Combat Stats")]
+        [ShowInInspector, HorizontalGroup("Base Stats"),PropertyOrder(-2), GUIColor(.4f,.8f,.6f)]
         public CharacterCombatStatsFull BaseStats { get; protected set; }
         /// <summary>
         /// This remains active for the whole fight
         /// </summary>
-        [ShowInInspector]
+        [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.4f, .6f, .8f)]
         public CharacterCombatStatsFull BuffStats { get; protected set; }
 
-        [ShowInInspector]
-        public SerializedCombatStatsFull BurstStats { get; protected set; }
+        [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
+        public CharacterCombatStatsFull BurstStats { get; protected set; }
 
-        [ShowInInspector, NonSerialized] 
-        public ICharacterFullStats TeamStats;
+        [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)] 
+        public ICharacterBasicStats TeamStats;
 
+        [TitleGroup("Local stats"), PropertyOrder(10)]
         public int ActionsLefts = 0;
 
         public void RefillInitiativeActions()
@@ -158,7 +160,7 @@ namespace Characters
         {
             BaseStats = new CharacterCombatStatsFull(presetStats as ICharacterFullStats);
             BuffStats = new CharacterCombatStatsFull(0);
-            BurstStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
+            BurstStats = new CharacterCombatStatsFull(0);
 
             BaseStats.HealthPoints = BaseStats.MaxHealth;
             BaseStats.MortalityPoints = BaseStats.MaxMortalityPoints;
@@ -199,17 +201,17 @@ namespace Characters
         }
         public float HealthPoints
         {
-            get => BaseStats.HealthPoints + TeamStats.HealthPoints;
+            get => BaseStats.HealthPoints;
             set => BaseStats.HealthPoints = value;
         }
         public float ShieldAmount
         {
-            get => BaseStats.ShieldAmount + TeamStats.ShieldAmount;
+            get => BaseStats.ShieldAmount;
             set => BaseStats.ShieldAmount = value;
         }
         public float MortalityPoints
         {
-            get => BaseStats.MortalityPoints + TeamStats.MortalityPoints;
+            get => BaseStats.MortalityPoints;
             set => BaseStats.MortalityPoints = value;
         }
         public float HarmonyAmount

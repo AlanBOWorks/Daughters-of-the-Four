@@ -127,7 +127,7 @@ namespace _CombatSystem
 
         private void ChangeBuffs(CombatingTeam team)
         {
-            var currentStats = team.ControlHolder.GetCurrentStats();
+            var currentStats = team.GetCurrentStats();
             foreach (CombatingEntity entity in team)
             {
                 entity.CombatStats.TeamStats = currentStats;

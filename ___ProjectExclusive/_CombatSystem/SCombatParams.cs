@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using Characters;
-using _Player;
 using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
@@ -22,6 +20,8 @@ namespace _CombatSystem
         [Title("Animator")]
         public SkipAnimationsType skipAnimationsType = SkipAnimationsType.None;
 
+        [Title("Params")] 
+        [Range(-1,1)] public float criticalHarmonyAddition = 0.05f;
 
         public enum SkipAnimationsType
         {

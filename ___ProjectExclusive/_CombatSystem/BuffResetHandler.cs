@@ -16,12 +16,12 @@ namespace _CombatSystem
 
         public void OnFinisAllActions(CombatingEntity entity)
         {
-            entity.CombatStats.BurstStats.ResetToZero();
+            entity.CombatStats.BurstStats.OverrideAll(0); //Reset to zero
         }
 
         public void OnSkippedEntity(CombatingEntity entity)
         {
-            entity.CombatStats.BurstStats.ResetToZero();
+            entity.CombatStats.BurstStats.OverrideAll(0); //Reset to zero
         }
     }
 }

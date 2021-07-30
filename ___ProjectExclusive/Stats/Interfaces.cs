@@ -33,15 +33,28 @@ namespace Stats
     /// For variation, only the <seealso cref="CharacterCombatData.BaseStats"/>
     /// should be used
     /// </summary>
-    public interface ICombatTemporalStats
+    public interface ICombatTemporalStats : ICombatTemporalStatsBase
     {
         float HealthPoints { get; set; }
         float ShieldAmount { get; set; }
         float MortalityPoints { get; set; }
-        float HarmonyAmount { get; set; }
+        
+    }
+
+    public interface ICombatTemporalStatsBase : ICombatTempoStats, IHarmonyStats 
+    { }
+
+    public interface ICombatTempoStats
+    {
         float InitiativePercentage { get; set; }
         int ActionsPerInitiative { get; set; }
     }
+
+    public interface IHarmonyStats
+    {
+        float HarmonyAmount { get; set; }
+    }
+
 
     public interface ISpecialStats
     {
