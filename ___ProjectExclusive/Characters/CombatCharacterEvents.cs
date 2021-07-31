@@ -23,9 +23,9 @@ namespace Characters
     /// [<seealso cref="ITempoListener"/>]:
     /// is deterministic and will only be invoked in one specific Entity that was triggered.
     /// </summary>
-    public class CombatCharacterEventsBase : ITempoListenerVoid
+    public class CombatCharacterEventsBase : ITempoListenerVoid, IHealthZeroListener
     {
-        [ShowInInspector] 
+        [ShowInInspector]
         private readonly List<ITempoListenerVoid> _onTempoListeners;
         [ShowInInspector]
         private readonly List<IVitalityChangeListener> _onVitalityChange;
@@ -34,40 +34,33 @@ namespace Characters
         [ShowInInspector]
         private readonly List<IAreaStateChangeListener> _onAreaChange;
 
+        [ShowInInspector]
+        private readonly List<IHealthZeroListener> _onHealthZeroListeners;
+
         public CombatCharacterEventsBase()
         {
             _onTempoListeners = new List<ITempoListenerVoid>();
             _onVitalityChange = new List<IVitalityChangeListener>();
             _onTemporalStatsChange = new List<ITemporalStatsChangeListener>();
             _onAreaChange = new List<IAreaStateChangeListener>();
+            _onHealthZeroListeners = new List<IHealthZeroListener>();
         }
 
         public void Subscribe(ICharacterListener listener)
         {
-            if(listener is ITempoListenerVoid tempoListener)
+            if (listener is ITempoListenerVoid tempoListener)
                 _onTempoListeners.Add(tempoListener);
 
-            if(listener is IVitalityChangeListener vitalityListener)
-                _onVitalityChange.Add(vitalityListener);
-            if(listener is ITemporalStatsChangeListener temporalStatListener)
-                _onTemporalStatsChange.Add(temporalStatListener);
-            if(listener is IAreaStateChangeListener areaStateListener)
-                _onAreaChange.Add(areaStateListener);
-        }
-
-        public void RemoveListener(ICharacterListener listener)
-        {
-            if (listener is ITempoListenerVoid tempoListener)
-                _onTempoListeners.Remove(tempoListener);
-
             if (listener is IVitalityChangeListener vitalityListener)
-                _onVitalityChange.Remove(vitalityListener);
+                _onVitalityChange.Add(vitalityListener);
             if (listener is ITemporalStatsChangeListener temporalStatListener)
-                _onTemporalStatsChange.Remove(temporalStatListener);
+                _onTemporalStatsChange.Add(temporalStatListener);
             if (listener is IAreaStateChangeListener areaStateListener)
-                _onAreaChange.Remove(areaStateListener);
-        }
+                _onAreaChange.Add(areaStateListener);
 
+            if (listener is IHealthZeroListener healthCheckListener)
+                _onHealthZeroListeners.Add(healthCheckListener);
+        }
 
         public void InvokeVitalityChange(CombatingEntity entity)
         {
@@ -118,6 +111,22 @@ namespace Characters
                 listener.OnFinisAllActions();
             }
         }
+
+        public void OnHealthZero()
+        {
+            foreach (IHealthZeroListener listener in _onHealthZeroListeners)
+            {
+                listener.OnHealthZero();
+            }
+        }
+
+        public void OnMortalityZero()
+        {
+            foreach (IHealthZeroListener listener in _onHealthZeroListeners)
+            {
+                listener.OnMortalityZero();
+            }
+        }
     }
 
     public class CombatCharacterEvents : CombatCharacterEventsBase
@@ -166,5 +175,11 @@ namespace Characters
     public interface IAreaStateChangeListener : ICharacterListener
     {
         void OnAreaStateChange(CombatAreasData data);
+    }
+
+    public interface IHealthZeroListener : ICharacterListener
+    {
+        void OnHealthZero();
+        void OnMortalityZero();
     }
 }

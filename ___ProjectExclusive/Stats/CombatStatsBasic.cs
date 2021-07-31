@@ -163,7 +163,7 @@ namespace Stats
         private float enlightenment = 1; // before fight this could be modified
         [SerializeField, SuffixLabel("%00")]
         private float criticalChance = 0;
-        [SerializeField, SuffixLabel("Units")]
+        [SerializeField, SuffixLabel("Units"), Tooltip("[100] is the default value")]
         private float speedAmount = 100;
 
         [SerializeField, SuffixLabel("%00")]

@@ -147,7 +147,7 @@ namespace Stats
             CharacterCombatData attacker,
             ICharacterFullStats receiver, float damageModifier)
         {
-            float baseDamage = attacker.BaseStats.AttackPower;
+            float baseDamage = attacker.CalculateBaseAttackPower();
             float damageVariation = attacker.BuffStats.AttackPower
                                     + attacker.BurstStats.AttackPower
                                     - receiver.DamageReduction;
@@ -160,14 +160,42 @@ namespace Stats
         }
 
         /// <returns>The damage left</returns>
-        public static float DoDamageTo(ICharacterFullStats stats, float damage, bool canDamageMortality = false)
+        public static void DoDamageTo(CombatingEntity target, float damage, bool isInmortal = false)
         {
-            stats.ShieldAmount = CalculateDamageOnVitality(stats.ShieldAmount);
+            float originalDamage = damage;
+            ICharacterFullStats stats = target.CombatStats;
+            if (stats.ShieldAmount > 0)
+            {
+                stats.ShieldAmount = CalculateDamageOnVitality(stats.ShieldAmount);
+                SubmitDamageToEntity();
+                return; // Shield are the counter of 'Raw' damage > absorbs the rest of the damage
+            }
             stats.HealthPoints = CalculateDamageOnVitality(stats.HealthPoints);
-            if (canDamageMortality)
-                stats.MortalityPoints = CalculateDamageOnVitality(stats.MortalityPoints);
 
-            return damage;
+            if (stats.HealthPoints > 0)
+            {
+                target.Events.InvokeTemporalStatChange();
+                SubmitDamageToEntity();
+                return;
+            }
+
+
+            bool isInDanger = target.CharacterGroup.Team.IsInDangerState();
+            if (!isInmortal && isInDanger)
+            {
+                stats.MortalityPoints = CalculateDamageOnVitality(stats.MortalityPoints);
+                if(stats.MortalityPoints <= 0)
+                    target.Events.OnHealthZero();
+            }
+            else
+            {
+                target.Events.OnHealthZero();
+            }
+
+
+            target.Events.InvokeTemporalStatChange();
+            SubmitDamageToEntity();
+            return;
 
             float CalculateDamageOnVitality(float vitalityStat)
             {
@@ -181,15 +209,32 @@ namespace Stats
 
                 return vitalityStat;
             }
+
+            void SubmitDamageToEntity()
+            {
+                target.ReceivedStats.DamageReceived = originalDamage - damage;
+
+            }
         }
 
-        public static void DoHealTo(ICharacterFullStats stats, float heal)
+        public static void DoHealTo(CombatingEntity target, float heal)
         {
-            if (heal < 0) heal = 0;
+            if(!target.IsConscious() || heal < 0) return;
+            
+            ICharacterFullStats stats = target.CombatStats;
 
-            stats.HealthPoints += heal;
-            if (stats.HealthPoints > stats.MaxHealth)
+            float targetHealth = stats.HealthPoints + heal;
+            if (targetHealth > stats.MaxHealth)
+            {
+                target.ReceivedStats.HealReceived = stats.MaxHealth - stats.HealthPoints;
                 stats.HealthPoints = stats.MaxHealth;
+            }
+            else
+            {
+                stats.HealthPoints = targetHealth;
+                target.ReceivedStats.HealReceived += heal;
+            }
+            target.Events.InvokeTemporalStatChange();
         }
 
         public static void SetInitiative(ICombatTemporalStats stats, float targetValue = 0)

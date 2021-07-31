@@ -125,15 +125,6 @@ namespace _CombatSystem
             }
         }
 
-        private void ChangeBuffs(CombatingTeam team)
-        {
-            var currentStats = team.GetCurrentStats();
-            foreach (CombatingEntity entity in team)
-            {
-                entity.CombatStats.TeamStats = currentStats;
-            }
-        }
-
         private void HandleTeams(CombatingTeam team, out TeamCombatData actor, out TeamCombatData receiver)
         {
             if (IsPlayerGroup(team))

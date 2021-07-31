@@ -128,6 +128,11 @@ namespace CombatEffects
             if(HasEffects()) return;
             onFailEffects = new FailEffectParams[0];
         }
+
+        public bool CanApplyOnTarget(CombatingEntity entity)
+        {
+            return entity.IsConscious();
+        }
     }
 
     [Serializable]
@@ -149,6 +154,7 @@ namespace CombatEffects
     {
         SEffectBase.EffectTarget GetEffectTarget();
         bool CanPerformRandom();
+        bool CanApplyOnTarget(CombatingEntity entity);
     }
 
     public interface IEffectBase

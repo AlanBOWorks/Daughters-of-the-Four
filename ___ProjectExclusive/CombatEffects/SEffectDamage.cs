@@ -21,9 +21,7 @@ namespace CombatEffects
 
         public override void DoEffect(CombatingEntity target, float damage)
         {
-
-            UtilsCombatStats.DoDamageTo(target.CombatStats, damage);
-            target.Events.InvokeTemporalStatChange();
+            UtilsCombatStats.DoDamageTo(target, damage);
 
 #if UNITY_EDITOR
             Debug.Log($"Damage Effect: {target.CharacterName} => {damage}");

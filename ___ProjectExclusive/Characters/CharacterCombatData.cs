@@ -31,9 +31,10 @@ namespace Characters
         {
             CharacterName = characterName;
             InstantiationPrefab = prefab;
-            ReceivedStats = new SerializedCombatStatsFull(UtilsStats.ZeroValuesFull);
+            ReceivedStats = new SerializedTrackedStats(UtilsStats.ZeroValuesFull);
             DelayBuffHandler = new DelayBuffHandler(this);
             Events = new CombatCharacterEvents(this);
+            CharacterCriticalBuff = new CharacterCriticalActionHandler(this);
         }
         
 
@@ -50,7 +51,7 @@ namespace Characters
         /// <summary>
         /// Used to track the damage received, heals, etc.
         /// </summary>
-        public readonly SerializedCombatStatsFull ReceivedStats;
+        public readonly SerializedTrackedStats ReceivedStats;
 
         /// <summary>
         /// <inheritdoc cref="DelayBuffHandler"/>
@@ -70,7 +71,7 @@ namespace Characters
         public HarmonyBuffInvoker HarmonyBuffInvoker { get; private set; }
 
         [ShowInInspector] 
-        public SDelayBuffPreset CriticalBuff { get; private set; }
+        public CharacterCriticalActionHandler CharacterCriticalBuff { get; private set; }
 
         public IEquipSkill<CombatSkill> SharedSkills => CombatSkills.SharedSkills;
         public ISkillPositions<List<CombatSkill>> UniqueSkills => CombatSkills.UniqueSkills;
@@ -93,10 +94,19 @@ namespace Characters
         public bool CanAct()
         {
             // In order of [false] possibilities 
-            return IsConscious() && CombatStats.ActionsLefts > 0 && CanUseSkills();
+            return IsConscious() &&  HasActions() && CanUseSkills();
         }
         public bool IsAlive() => CombatStats.MortalityPoints > 0;
-        public bool IsConscious() => IsAlive(); //TODO change it to HP or Mortality based in combat state
+
+        public bool IsConscious()
+        {
+            if (CharacterGroup.Team.IsInDangerState())
+                return IsAlive();
+
+            return CombatStats.HealthPoints > 0;
+        }
+
+        public bool HasActions() => CombatStats.ActionsLefts > 0;
         public bool CanUseSkills() => UtilsSkill.CanUseSkills(this);
 
 
@@ -110,22 +120,17 @@ namespace Characters
 
         public void Injection(CombatSkills combatSkills) => 
             CombatSkills = combatSkills;
-        public void Injection(CombatingTeam team) =>
+        public void Injection(CombatingTeam team)
+        {
+            CombatStats.TeamData = team;
             AreasDataTracker.Injection(team.Data);
+        }
         public void Injection(CombatPassivesHolder passivesHolder) => 
             PassivesHolder = passivesHolder;
         public void Injection(HarmonyBuffInvoker harmonyBuffInvoker) => 
             HarmonyBuffInvoker = harmonyBuffInvoker;
         public void Injection(SDelayBuffPreset criticalBuff) =>
-            CriticalBuff = criticalBuff;
-
-        public ISkillShared<SkillPreset> GetBackUpSkillShared()
-        {
-            var archetype = this.AreasDataTracker.PositionInTeam;
-            var backUp
-                = CombatSystemSingleton.ParamsVariable.ArchetypesBackupSkills;
-            return CharacterArchetypes.GetElement(backUp, archetype);
-        }
+            CharacterCriticalBuff.CriticalBuff = criticalBuff;
 
     }
 
@@ -133,6 +138,7 @@ namespace Characters
 
     public class CharacterCombatData : ICharacterFullStats
     {
+
         [Title("Combat Stats")]
         [ShowInInspector, HorizontalGroup("Base Stats"),PropertyOrder(-2), GUIColor(.4f,.8f,.6f)]
         public CharacterCombatStatsFull BaseStats { get; protected set; }
@@ -145,8 +151,10 @@ namespace Characters
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
         public CharacterCombatStatsFull BurstStats { get; protected set; }
 
-        [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)] 
-        public ICharacterBasicStats TeamStats;
+        [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
+        private ICharacterBasicStats TeamStats => TeamData.GetCurrentStats();
+        public CombatingTeam TeamData { set; private get; }
+
 
         [TitleGroup("Local stats"), PropertyOrder(10)]
         public int ActionsLefts = 0;
@@ -164,15 +172,18 @@ namespace Characters
 
             BaseStats.HealthPoints = BaseStats.MaxHealth;
             BaseStats.MortalityPoints = BaseStats.MaxMortalityPoints;
+        }
 
-            TeamStats = UtilsStats.ZeroValuesFull;
+        public float CalculateBaseAttackPower()
+        {
+            return BaseStats.AttackPower + TeamStats.AttackPower;
         }
         public float AttackPower
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.AttackPower + TeamStats.AttackPower,
-                BuffStats.AttackPower,
-                BurstStats.AttackPower);
+                    CalculateBaseAttackPower(),
+                    BuffStats.AttackPower,
+                    BurstStats.AttackPower);
             set => BuffStats.AttackPower = value;
         }
         public float DeBuffPower

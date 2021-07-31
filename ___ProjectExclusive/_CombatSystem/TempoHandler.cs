@@ -142,6 +142,7 @@ namespace _CombatSystem
                     CharacterCombatData stats = entity.CombatStats;
 
                     //Increase Initiative
+                    if(entity.IsConscious())
                     {
                         stats.InitiativePercentage += deltaIncrement * stats.SpeedAmount * speedModifier;
 
@@ -157,7 +158,7 @@ namespace _CombatSystem
                     stats.InitiativePercentage = 0;
                     stats.RefillInitiativeActions();
 
-                    if (!entity.CanAct())
+                    if (!entity.CanUseSkills() || !entity.HasActions())
                     {
                         OnSkippedEntity(entity);
                         continue;
@@ -256,10 +257,11 @@ namespace _CombatSystem
             }
         }
         /// <summary>
-        /// Is just <see cref="OnDoMoreActions"/> but just for <seealso cref="Skills.PerformSkillHandler"/>
+        /// Is just [<see cref="OnDoMoreActions"/>] but just for
+        /// [<seealso cref="Skills.PerformSkillHandler"/>]
         /// (so it more clear who does the step to the next Action OR calls the finish implicitly)
         /// </summary>
-        public void OnSkillActionFinish(CombatingEntity entity)
+        public void DoSkillCheckFinish(CombatingEntity entity)
         {
             CombatConditionsChecker.FinishState finishCheck =
                 CombatConditionChecker.HandleFinish();

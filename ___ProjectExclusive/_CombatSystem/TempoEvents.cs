@@ -45,8 +45,11 @@ namespace _CombatSystem
 
         public void OnInitiativeTrigger(CombatingEntity entity)
         {
-            entity.DelayBuffHandler.OnInitiativeTrigger();
-            entity.Events.OnInitiativeTrigger();
+            //these are invoked here because eventHolder doesn't caches the [CombatEntity]
+            entity.DelayBuffHandler.OnInitiativeTrigger(); 
+            entity.CharacterCriticalBuff.OnInitiativeTrigger();
+            entity.Events.OnInitiativeTrigger(); 
+
             foreach (ITempoListener listener in TempoListeners)
             {
                 listener.OnInitiativeTrigger(entity);
@@ -69,8 +72,11 @@ namespace _CombatSystem
             {
                 listener.OnFinisAllActions(entity);
             }
+
             entity.Events.OnFinisAllActions();
+            entity.CharacterCriticalBuff.OnFinisAllActions();
             entity.DelayBuffHandler.OnFinisAllActions();
+            entity.CombatStats.RefillInitiativeActions();
         }
         public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {

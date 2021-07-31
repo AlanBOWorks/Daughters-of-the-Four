@@ -101,7 +101,7 @@ namespace Skills
                 {
                     foreach (CombatingEntity entity in targets)
                     {
-                        injectInList.Add(entity);
+                        AddIfConscious(entity);
                     }
                 }
                 void AddByEnemyTeam()
@@ -110,46 +110,26 @@ namespace Skills
                     var userAreaTracker = user.AreasDataTracker;
 
                     CombatingTeam enemyTeam = user.CharacterGroup.Enemies;
+                    AddAllIfConscious();
 
                     switch (userAreaTracker.RangeType)
                     {
                         case CharacterArchetypes.RangeType.Melee:
-                            AddMeleeType();
+                            RemoveFarTargets();
                             break;
                         case CharacterArchetypes.RangeType.Range:
-                            AddRangedType();
+                            RemoveCloseTargets();
                             break;
                         case CharacterArchetypes.RangeType.Hybrid:
-                            AddHybridType();
                             break;
                         default:
                             throw new NotImplementedException("Ranged type not implemented in targeting " +
                                                               $"{userAreaTracker.RangeType}");
                     }
 
-                    void AddRangedType()
-                    {
-                        for (var i = 0; i < enemyTeam.Count; i++)
-                        {
-                            CombatingEntity target = enemyTeam[i];
-                            //Vanguards are always added (i == 0 : Vanguard)
-                            if (i == 0 || !CharacterArchetypes.IsInCloseRange(user, target))
-                                AddIfConscious(target);
-                        }
-                    }
 
-                    void AddMeleeType()
-                    {
-                        for (var i = 0; i < enemyTeam.Count; i++)
-                        {
-                            CombatingEntity target = enemyTeam[i];
-                            //Vanguards are always added (i == 0 : Vanguard)
-                            if (i == 0 || CharacterArchetypes.IsInCloseRange(user, target))
-                                AddIfConscious(target);
-                        }
-                    }
 
-                    void AddHybridType()
+                    void AddAllIfConscious()
                     {
                         foreach (var target in enemyTeam)
                         {
@@ -157,11 +137,35 @@ namespace Skills
                         }
                     }
 
-                    void AddIfConscious(CombatingEntity entity)
+                    void RemoveCloseTargets()
                     {
-                        if(entity.IsConscious())
-                            injectInList.Add(entity);
+                        // (Inverse targets because backLine are the first to be removed)
+                        for (int i = injectInList.Count - 1; i >= 0 && injectInList.Count > 1; i--)
+                        {
+                            CombatingEntity target = enemyTeam[i];
+                            if (CharacterArchetypes.IsInCloseRange(user, target))
+                                injectInList.Remove(target);
+                        }
                     }
+
+                    void RemoveFarTargets()
+                    {
+                        
+                        for (int i = injectInList.Count - 1; i >= 0 && injectInList.Count > 1; i--)
+                        {
+                            CombatingEntity target = enemyTeam[i];
+                            if (!CharacterArchetypes.IsInCloseRange(user, target))
+                                injectInList.Remove(target);
+                        }
+
+                    }
+
+                }
+
+                void AddIfConscious(CombatingEntity entity)
+                {
+                    if (entity.IsConscious())
+                        injectInList.Add(entity);
                 }
             }
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _CombatSystem
 {
-    public class BuffResetHandler : ITempoListener, ISkippedTempoListener
+    public class CharacterCombatDataResetHandler : ITempoListener, ISkippedTempoListener
     {
         public void OnInitiativeTrigger(CombatingEntity entity)
         {
@@ -16,12 +16,14 @@ namespace _CombatSystem
 
         public void OnFinisAllActions(CombatingEntity entity)
         {
-            entity.CombatStats.BurstStats.OverrideAll(0); //Reset to zero
+            entity.CombatStats.BurstStats.OverrideAll(0);
+            entity.ReceivedStats.ResetToZero();
         }
 
         public void OnSkippedEntity(CombatingEntity entity)
         {
-            entity.CombatStats.BurstStats.OverrideAll(0); //Reset to zero
+            entity.CombatStats.BurstStats.OverrideAll(0);
+            entity.ReceivedStats.ResetToZero();
         }
     }
 }

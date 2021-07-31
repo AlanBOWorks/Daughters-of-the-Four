@@ -18,8 +18,7 @@ namespace CombatEffects
 
         public override void DoEffect(CombatingEntity target, float heal)
         {
-            UtilsCombatStats.DoHealTo(target.CombatStats, heal);
-            target.Events.InvokeTemporalStatChange();
+            UtilsCombatStats.DoHealTo(target, heal);
 #if UNITY_EDITOR
             Debug.Log($"Heal Effect: {target.CharacterName} => {heal}");
 #endif

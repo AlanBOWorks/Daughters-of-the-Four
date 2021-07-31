@@ -95,11 +95,9 @@ namespace Skills
                 float defaultHarmonyAddition 
                     = CombatSystemSingleton.ParamsVariable.criticalHarmonyAddition;
                 UtilsCombatStats.AddHarmony(combatStats, defaultHarmonyAddition);
-                //ADD critical buff to the character
-                var criticalBuff = _currentUser.CriticalBuff;
-                
-                if(criticalBuff != null)
-                    _currentUser.DelayBuffHandler.EnqueueBuff(criticalBuff);
+
+                var criticalBuff = _currentUser.CharacterCriticalBuff;
+                criticalBuff?.OnCriticalAction();
             }
             else
             {
@@ -123,7 +121,7 @@ namespace Skills
 
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
-            CombatSystemSingleton.TempoHandler.OnSkillActionFinish(_currentUser);
+            CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(_currentUser);
 
 
             //////////////////////

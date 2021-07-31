@@ -1,6 +1,7 @@
 using System;
 using Characters;
 using Passives;
+using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
 
@@ -11,11 +12,19 @@ namespace _Team
     {
         private readonly TeamCombatData _data;
 
+        public float LoseControlThreshold;
+
+        [ShowInInspector, HorizontalGroup("Attacking")]
         public CompositeStats AttackingStats { get; private set; }
-        public  CompositeStats NeutralStats { get; private set; }
+        [ShowInInspector, HorizontalGroup("Neutral")]
+        public CompositeStats NeutralStats { get; private set; }
+        [ShowInInspector, HorizontalGroup("Defending")]
         public CompositeStats DefendingStats { get; private set; }
+        [ShowInInspector, HorizontalGroup("Attacking")]
         public FilterPassivesHolder OnAttackPassives { get; private set; }
+        [ShowInInspector, HorizontalGroup("Neutral")]
         public FilterPassivesHolder OnNeutralPassives { get; private set; }
+        [ShowInInspector,HorizontalGroup("Defending")]
         public FilterPassivesHolder OnDefendingPassives { get; private set; }
 
         public TeamCombatStatsHolder(TeamCombatData data)
@@ -27,35 +36,40 @@ namespace _Team
             OnAttackPassives = new FilterPassivesHolder();
             OnNeutralPassives = new FilterPassivesHolder();
             OnDefendingPassives = new FilterPassivesHolder();
+
+            LoseControlThreshold = DefaultLoseThreshold;
+
         }
 
-        public TeamCombatStatsHolder(TeamCombatData data, IStanceArchetype<ICharacterBasicStats> stats)
+        private const float DefaultLoseThreshold = -.5f;
+        public TeamCombatStatsHolder(TeamCombatData data, ITeamCombatControlHolder stats)
         {
             _data = data;
-            InjectNewStats(stats);
+            InjectPreset(stats);
         }
 
-        public TeamCombatStatsHolder(TeamCombatData data, IStanceArchetype<ICharacterBasicStats> stats,
-            IStanceArchetype<FilterPassivesHolder> passives)
-        : this(data, stats)
-        {
-            InjectNewPassives(passives);
-        }
 
         public void InjectPreset(ITeamCombatControlHolder holder)
         {
             InjectNewStats(holder);
             InjectNewPassives(holder);
+            LoseControlThreshold = holder.GetLoseThreshold();
         }
 
-        public void InjectNewStats(IStanceArchetype<ICharacterBasicStats> stats)
+        private void InjectNewStats(IStanceArchetype<ICharacterBasicStats> stats)
         {
-            AttackingStats = new CompositeStats(stats.GetAttacking());
-            NeutralStats = new CompositeStats(stats.GetNeutral());
-            DefendingStats = new CompositeStats(stats.GetDefending());
+            var attackingStats = stats.GetAttacking();
+            var neutralStats = stats.GetNeutral();
+            var defendingStats = stats.GetDefending();
+            if(attackingStats == null)
+                throw new NullReferenceException(stats.GetType().ToString());
+
+            AttackingStats = new CompositeStats(attackingStats);
+            NeutralStats = new CompositeStats(neutralStats);
+            DefendingStats = new CompositeStats(defendingStats);
         }
 
-        public void InjectNewPassives(IStanceArchetype<FilterPassivesHolder> passives)
+        private void InjectNewPassives(IStanceArchetype<FilterPassivesHolder> passives)
         {
             OnAttackPassives = new FilterPassivesHolder(passives.GetAttacking());
             OnNeutralPassives = new FilterPassivesHolder(passives.GetNeutral());

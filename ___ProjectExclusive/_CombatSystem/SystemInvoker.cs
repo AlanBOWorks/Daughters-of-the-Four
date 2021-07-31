@@ -64,11 +64,11 @@ namespace _CombatSystem
             var playerSelections 
                 = PlayerEntitySingleton.SelectedCharacters;
 
-            CombatingTeam playerEntities = new CombatingTeam(enemyFightPreset.StatsPreset);
-            CombatingTeam enemyEntities = new CombatingTeam(PlayerEntitySingleton.TeamControlStats);
+            CombatingTeam playerEntities = new CombatingTeam(PlayerEntitySingleton.TeamControlStats);
+            CombatingTeam enemyEntities = new CombatingTeam(enemyFightPreset.StatsPreset);
 
-            CombatSystemSingleton.PlayerTeam = playerEntities;
-            CombatSystemSingleton.EnemyTeam = enemyEntities;
+            CombatSystemSingleton.PlayerTeam = playerEntities.Data;
+            CombatSystemSingleton.EnemyTeam = enemyEntities.Data;
 
             CombatHandle = Timing.RunCoroutine(_DoCombat());
 

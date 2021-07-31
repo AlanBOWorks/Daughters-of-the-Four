@@ -2,7 +2,6 @@
 using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Stats
 {
@@ -99,13 +98,44 @@ namespace Stats
             MortalityPoints = value;
         }
 
+        [Button("Reset to Zero")]
+        private void ResetToZero() => OverrideAll(0);
+
         public CharacterCombatStatsFull(ICharacterFullStats copyFrom)
         {
             UtilsStats.CopyStats(this, copyFrom);
         }
+    }
 
-        
+    public class SerializedTrackedStats : SerializedCombatStatsFull, ITrackingStats
+    {
+        public SerializedTrackedStats(ICharacterFullStats serializeThis) : base(serializeThis)
+        {
+            int countLoop = TrackedStatsLength - this.Count;
+            for (int i = 0; i < countLoop; i++)
+            {
+                Add(0);
+            }
+        }
+        public float DamageReceived
+        {
+            get => this[DamageReceivedIndex];
+            set => this[DamageReceivedIndex] = value;
+        }
+        public float HealReceived
+        {
+            get => this[HealReceivedIndex];
+            set => this[HealReceivedIndex] = value;
+        }
 
+        public const int DamageReceivedIndex = FullStatsLength;
+        public const int HealReceivedIndex = DamageReceivedIndex + 1;
+        public const int TrackedStatsLength = HealReceivedIndex + 1;
+    }
 
+    public interface ITrackingStats
+    {
+        float DamageReceived { set; get; }
+        float HealReceived { get; set; }
     }
 }

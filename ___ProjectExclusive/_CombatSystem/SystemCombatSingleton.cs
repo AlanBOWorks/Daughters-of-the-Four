@@ -27,7 +27,7 @@ namespace _CombatSystem
             var combatControlDeclaration = new CombatControlDeclaration();
             var skillCooldown = new SkillCooldownHandler();
             var roundCheckHandler = new RoundCheckHandler();
-            var burstResetHandler = new BuffResetHandler();
+            var burstResetHandler = new CharacterCombatDataResetHandler();
 
             //---- Injections ----
             Invoker.SubscribeListener(Characters);
@@ -70,9 +70,9 @@ namespace _CombatSystem
 
         [Title("Temporal")]
         [ShowInInspector] 
-        public static CombatingTeam PlayerTeam;
+        public static TeamCombatData PlayerTeam;
         [ShowInInspector] 
-        public static CombatingTeam EnemyTeam;
+        public static TeamCombatData EnemyTeam;
 
         [Title("Global Variables")]
         [ShowInInspector]

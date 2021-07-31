@@ -75,7 +75,8 @@ namespace ___ProjectExclusive
         {
             string assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
             var errorLog = AssetDatabase.RenameAsset(assetPath, asset.name);
-            Debug.Log(errorLog);
+            if(errorLog.Length > 0)
+                Debug.LogWarning("Name could be updated: " + errorLog);
 
         }
     }

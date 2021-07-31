@@ -14,29 +14,31 @@ namespace _Team
     {
         [Title("Tooltips")] [SerializeField] private string controlName = "NULL";
 
-        [HorizontalGroup("Stats")]
+        [Title("Control")]
+        [SerializeField, Range(-1, 0)] 
+        private float loseControlThreshold = -.6f;
+        [SerializeField] 
+        private TeamControlLoses controlLoses = new TeamControlLoses();
+
+        [Title("Stats")]
+        [HorizontalGroup("Attack")]
         [SerializeField] private CharacterCombatStatsFull onAttackStats;
-        [HorizontalGroup("Stats")]
+        [HorizontalGroup("Neutral")]
         [SerializeField] private CharacterCombatStatsFull onNeutralStats;
-        [HorizontalGroup("Stats")]
+        [HorizontalGroup("Defend")]
         [SerializeField] private CharacterCombatStatsFull onDefendingStats;
 
-        [HorizontalGroup("Passives")]
+        [HorizontalGroup("Attack")]
         [SerializeField] private FilterPassivesHolder onAttackPassives;
-        [HorizontalGroup("Passives")]
+        [HorizontalGroup("Neutral")]
         [SerializeField] private FilterPassivesHolder onNeutralPassives;
-        [HorizontalGroup("Passives")]
+        [HorizontalGroup("Defend")]
         [SerializeField] private FilterPassivesHolder onDefendingPassives;
         public string ControlName => controlName;
+        public float GetLoseThreshold() => loseControlThreshold;
+        public ICharacterArchetypesData<float> GetControlLosePoints() => controlLoses;
 
-        private const string ControlHandlerPrefix = " - Team Control Passives [Preset]";
 
-        [Button(ButtonSizes.Large)]
-        private void UpdateAssetName()
-        {
-            name = controlName + ControlHandlerPrefix;
-            UtilsGame.UpdateAssetName(this);
-        }
 
         ICharacterBasicStats IStanceArchetype<ICharacterBasicStats>.GetAttacking()
             => onAttackStats;
@@ -51,6 +53,29 @@ namespace _Team
             => onNeutralPassives;
         FilterPassivesHolder IStanceArchetype<FilterPassivesHolder>.GetDefending()
             => onDefendingPassives;
+
+
+
+
+        private const string ControlHandlerPrefix = " - Team Control Passives [Preset]";
+        [Button(ButtonSizes.Large)]
+        private void UpdateAssetName()
+        {
+            name = controlName + ControlHandlerPrefix;
+            UtilsGame.UpdateAssetName(this);
+        }
+    }
+
+    [Serializable]
+    public class TeamControlLoses : ICharacterArchetypesData<float>
+    {
+        [SerializeField, Range(0, 1)] private float frontLiner = .7f;
+        [SerializeField, Range(0, 1)] private float midLiner = .5f;
+        [SerializeField, Range(0, 1)] private float backLiner = .4f;
+
+        public float FrontLiner => frontLiner;
+        public float MidLiner => midLiner;
+        public float BackLiner => backLiner;
     }
 
     public interface ITeamCombatControlHolder : 
@@ -58,6 +83,8 @@ namespace _Team
 
     {
         string ControlName { get; }
+        float GetLoseThreshold();
+        ICharacterArchetypesData<float> GetControlLosePoints();
     }
 
     public interface ITeamCombatControlStats

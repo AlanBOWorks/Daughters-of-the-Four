@@ -1,4 +1,5 @@
 ﻿using System;
+using _Team;
 using Characters;
 using Sirenix.OdinInspector;
 using Skills;
@@ -10,6 +11,7 @@ namespace _CombatSystem
         menuName = "Combat/Combat Parameters")]
     public class SCombatParams : ScriptableObject
     {
+
         [Title("Skills")]
         [SerializeField] 
         private Skills backupSkills = new Skills();

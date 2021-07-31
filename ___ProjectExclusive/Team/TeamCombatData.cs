@@ -3,6 +3,7 @@ using Characters;
 using Passives;
 using Sirenix.OdinInspector;
 using Skills;
+using UnityEngine;
 
 namespace _Team
 {
@@ -16,8 +17,15 @@ namespace _Team
 
         public readonly CombatingTeam Team;
 
+        [ShowInInspector]
         public float ControlAmount;
+        [ShowInInspector]
         public Stance stance;
+
+        public bool IsInDanger()
+        {
+            return ControlAmount <= Team.StatsHolder.LoseControlThreshold;
+        }
 
         public enum Stance
         {
@@ -100,7 +108,9 @@ namespace _Team
         {
             Data = new TeamCombatData(this);
             if(holder != null)
-                StatsHolder = new TeamCombatStatsHolder(Data,holder,holder);
+            {
+                StatsHolder = new TeamCombatStatsHolder(Data, holder);
+            }
             else
                 StatsHolder = new TeamCombatStatsHolder(Data);       
         }
@@ -115,5 +125,8 @@ namespace _Team
 
         public FilterPassivesHolder GetCurrentPassives()
             => StatsHolder.GetCurrentPassives();
+
+        public bool IsInDangerState()
+            => Data.IsInDanger();
     }
 }
