@@ -65,10 +65,10 @@ namespace Skills
                 var skillPreset = skill.Preset;
                 var mainEffect = skillPreset.GetMainEffect();
 
-                SSkillPresetBase.SkillType skillType = skill.GetMainType();
+                SSkillPreset.SkillType skillType = skill.GetMainType();
 
 
-                if (skillType == SSkillPresetBase.SkillType.SelfOnly)
+                if (skillType == SSkillPreset.SkillType.SelfOnly)
                 {
                     injectInList.Add(user);
                     return;
@@ -82,7 +82,7 @@ namespace Skills
                 }
                 else
                 {
-                    if (skillType == SSkillPresetBase.SkillType.Support)
+                    if (skillType == SSkillPreset.SkillType.Support)
                     {
                         AddByPredefinedTargets(user.CharacterGroup.Team);
                     }

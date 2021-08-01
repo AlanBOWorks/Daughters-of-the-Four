@@ -116,7 +116,7 @@ namespace Skills
         public virtual SSkillPreset Preset => preset;
         public string SkillName => preset.SkillName; //could be modified by a special name in some cases
         public Sprite Icon => preset.Icon; // could be modified by another icon when upgraded or something
-        public SSkillPresetBase.SkillType GetMainType() => preset.GetSkillType();
+        public SSkillPreset.SkillType GetMainType() => preset.GetSkillType();
         public SEffectBase.EffectTarget GetMainTarget() => preset.GetMainEffect().GetEffectTarget();
     }
 }

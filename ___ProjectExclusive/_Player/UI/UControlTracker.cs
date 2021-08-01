@@ -15,15 +15,7 @@ namespace _Player
         [SerializeField] private TextMeshProUGUI stateTooltip;
         [SerializeField] private BreakPoints breakPoints = new BreakPoints();
         private float _lineWidthHalf;
-
-        private void Awake()
-        {
-            var rectTransform = (RectTransform) transform;
-            _lineWidthHalf = rectTransform.rect.width *.5f;
-
-            breakPoints.DoInitialPosition(_lineWidthHalf);
-        }
-
+        
         private void Start()
         {
             CombatSystemSingleton.Invoker.SubscribeListener(this);
@@ -31,16 +23,18 @@ namespace _Player
 
         public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
         {
-            CombatSystemSingleton.TeamsDataHandler.Subscribe(this);
+            var rectTransform = (RectTransform)transform;
+            _lineWidthHalf = rectTransform.rect.width * .5f; 
+            breakPoints.DoInitialPosition(_lineWidthHalf,playerEntities,enemyEntities);
+            breakPoints.Show(true);
+
+            CombatSystemSingleton.CombatTeamControlHandler.Subscribe(this);
         }
 
-        public void OnPlayerControlVariation(float controlPercentage, TeamCombatData.Stance stance)
+        public void OnPlayerControlVariation(float controlPercentage, TeamCombatState.Stance stance)
         {
             OnPlayerControlVariation(controlPercentage);
             stateTooltip.text = UtilsTeam.GetKeyword(stance);
-
-            bool showExtremes = stance == TeamCombatData.Stance.Neutral;
-            breakPoints.ShowExtreme(showExtremes);
         }
 
         public void OnPlayerControlVariation(float controlPercentage)
@@ -54,40 +48,41 @@ namespace _Player
         [Serializable]
         private class BreakPoints
         {
-            [SerializeField] private Points negatives;
-            [SerializeField] private Points positives;
+            [SerializeField] private Points enemyPoints;
+            [SerializeField] private Points playerPoints;
 
-            internal void DoInitialPosition(float halfWidth)
+            internal void DoInitialPosition(float halfWidth, CombatingTeam playerEntities, CombatingTeam enemyEntities)
             {
-                negatives.DoPosition(halfWidth,-1);
-                positives.DoPosition(halfWidth,1);
+                // Negative modifier because threshold is measured in negative values
+                // (and player goes to the left)
+
+                enemyPoints.DoPosition(halfWidth,
+                    -enemyEntities.StatsHolder.LoseControlThreshold);
+                playerPoints.DoPosition(halfWidth,
+                    playerEntities.StatsHolder.LoseControlThreshold); 
             }
 
-            internal void ShowExtreme(bool show)
+            internal void Show(bool show)
             {
-                negatives.ShowExtreme(show);
-                positives.ShowExtreme(show);
+                enemyPoints.Show(show);
+                playerPoints.Show(show);
             }
 
             [Serializable]
             struct Points
             {
-                [SerializeField] private RectTransform neutralReturnPoint;
-                [SerializeField] private RectTransform neutralBreakPoint;
+                [SerializeField] private RectTransform breakPoint;
 
                 internal void DoPosition(float halfWith, float modifier)
                 {
                     Vector2 linePosition = Vector2.zero;
-                    linePosition.x = halfWith * CombatTeamControlsHandler.NeutralReturnModifier * modifier;
-                    neutralReturnPoint.anchoredPosition = linePosition;
-                    linePosition.x = halfWith * CombatTeamControlsHandler.NeutralBreakModifier * modifier;
-                    neutralBreakPoint.anchoredPosition = linePosition;
+                    linePosition.x = halfWith * modifier;
+                    breakPoint.anchoredPosition = linePosition;
                 }
 
-                internal void ShowExtreme(bool show)
+                internal void Show(bool show)
                 {
-                    neutralReturnPoint.gameObject.SetActive(!show);
-                    neutralBreakPoint.gameObject.SetActive(show);
+                    breakPoint.gameObject.SetActive(show);
                 }
             }
         }

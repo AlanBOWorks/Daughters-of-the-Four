@@ -23,7 +23,7 @@ namespace _CombatSystem
             InitializeEntities(enemyEntities);
             _combatControlsHandler
                 = new CombatTeamControlsHandler(playerEntities, enemyEntities);
-            CombatSystemSingleton.TeamsDataHandler = _combatControlsHandler;
+            CombatSystemSingleton.CombatTeamControlHandler = _combatControlsHandler;
 
             void InitializeEntities(CombatingTeam entities)
             {
@@ -43,16 +43,16 @@ namespace _CombatSystem
     }
 
     /// <summary>
-    ///  Keeps track of the [<seealso cref="TeamCombatData.ControlAmount"/>]
+    ///  Keeps track of the [<seealso cref="TeamCombatState.ControlAmount"/>]
     /// of both [<seealso cref="ICharacterFaction{T}"/>]
     ///  groups and normalize the variations.
     /// </summary>
-    public class CombatTeamControlsHandler : ICharacterFaction<TeamCombatData>, ICombatStartListener
+    public class CombatTeamControlsHandler : ICharacterFaction<TeamCombatState>, ICombatStartListener
     {
         public CombatTeamControlsHandler(CombatingTeam playerEntities, CombatingTeam enemyEntities)
         {
-            PlayerFaction = playerEntities.Data;
-            EnemyFaction = enemyEntities.Data;
+            PlayerFaction = playerEntities.State;
+            EnemyFaction = enemyEntities.State;
             _listeners = new List<ITeamVariationListener>();
             _firstCall = true;
         }
@@ -60,7 +60,7 @@ namespace _CombatSystem
         [ShowInInspector]
         private readonly List<ITeamVariationListener> _listeners;
         [ShowInInspector]
-        private TeamCombatData.Stance _lastStance;
+        private TeamCombatState.Stance _lastPlayerStance;
 
         private bool _firstCall;
 
@@ -75,8 +75,8 @@ namespace _CombatSystem
         }
 
         [ShowInInspector]
-        public TeamCombatData PlayerFaction { get; }
-        public TeamCombatData EnemyFaction { get; }
+        public TeamCombatState PlayerFaction { get; }
+        public TeamCombatState EnemyFaction { get; }
 
         private bool IsPlayerGroup(CombatingTeam team)
         {
@@ -84,11 +84,9 @@ namespace _CombatSystem
         }
 
         [Button, HideInEditorMode]
-        public void DoVariationPlayer(float controlAddition) => 
+        private void DoVariationPlayer(float controlAddition) => 
             DoVariation(PlayerFaction.Team, controlAddition);
-        public void DoVariationPlayer(TeamCombatData.Stance targetStance) =>
-            DoVariation(PlayerFaction.Team, targetStance);
-
+       
         public void DoVariation(CombatingTeam team, float controlAddition)
         {
             HandleTeams(team, out var actor, out var receiver);
@@ -96,19 +94,11 @@ namespace _CombatSystem
             InvokeListeners();
         }
 
-        public void DoVariation(CombatingTeam team, TeamCombatData.Stance targetStance)
-        {
-            HandleTeams(team, out var actor, out var receiver);
-            DoVariation(actor, receiver, targetStance);
-            InvokeListeners();
-        }
-
-
         private void InvokeListeners()
         {
             float control = PlayerFaction.ControlAmount;
-            TeamCombatData.Stance stance = PlayerFaction.stance;
-            if (!_firstCall && stance == _lastStance)
+            TeamCombatState.Stance stance = PlayerFaction.stance;
+            if (!_firstCall && stance == _lastPlayerStance)
             {
                 foreach (ITeamVariationListener listener in _listeners)
                 {
@@ -117,7 +107,7 @@ namespace _CombatSystem
             }
             else
             {
-                _lastStance = stance;
+                _lastPlayerStance = stance;
                 foreach (ITeamVariationListener listener in _listeners)
                 {
                     listener.OnPlayerControlVariation(control, stance);
@@ -125,7 +115,7 @@ namespace _CombatSystem
             }
         }
 
-        private void HandleTeams(CombatingTeam team, out TeamCombatData actor, out TeamCombatData receiver)
+        private void HandleTeams(CombatingTeam team, out TeamCombatState actor, out TeamCombatState receiver)
         {
             if (IsPlayerGroup(team))
             {
@@ -138,11 +128,11 @@ namespace _CombatSystem
                 receiver = PlayerFaction;
             }
         }
-        private void DoVariation(TeamCombatData actor, TeamCombatData receiver, float controlGain)
+        private void DoVariation(TeamCombatState actingTeam, TeamCombatState receiver, float controlGain)
         {
-            DoVariation(ref actor.ControlAmount);
-            receiver.ControlAmount = -actor.ControlAmount;
-            DoVariationCheck(actor,receiver);
+            DoVariation(ref actingTeam.TeamControlAmount);
+            receiver.TeamControlAmount = -actingTeam.ControlAmount;
+            DoVariationCheck(actingTeam,receiver);
 
             void DoVariation(ref float controlValue)
             {
@@ -151,28 +141,23 @@ namespace _CombatSystem
             }
         }
 
-        public const float BreakStateThreshold = .25f;
-        public const float NeutralBreakModifier = .65f;
-        public const float NeutralReturnModifier = NeutralBreakModifier - BreakStateThreshold;
-        private void DoVariationCheck(TeamCombatData check, TeamCombatData reaction)
+        
+        private void DoVariationCheck(TeamCombatState check, TeamCombatState reaction)
         {
-            float neutralModifier = (_lastStance == TeamCombatData.Stance.Neutral) ? 0 : 1;
-            bool isAttacking = check.ControlAmount > NeutralBreakModifier - BreakStateThreshold 
-                * neutralModifier;
-            bool isDefending = check.ControlAmount < -NeutralBreakModifier + BreakStateThreshold 
-                * neutralModifier;
+            bool isAttacking = reaction.IsInDanger();
+            bool isDefending = check.IsInDanger();
 
-            switch (check.stance)
+            switch (_lastPlayerStance)
             {
-                case TeamCombatData.Stance.Attacking:
+                case TeamCombatState.Stance.Attacking:
                     CheckForDefending();
                     CheckForNeutral();
                     break;
-                case TeamCombatData.Stance.Neutral:
+                case TeamCombatState.Stance.Neutral:
                     CheckForAttacking();
                     CheckForDefending();
                     break;
-                case TeamCombatData.Stance.Defending:
+                case TeamCombatState.Stance.Defending:
                     CheckForNeutral();
                     CheckForAttacking();
                     break;
@@ -184,55 +169,63 @@ namespace _CombatSystem
             void CheckForAttacking()
             {
                 if (isAttacking)
-                    DoVariation(check, reaction, TeamCombatData.Stance.Attacking);
+                    DoVariation(check, reaction, TeamCombatState.Stance.Attacking);
             }
 
             void CheckForNeutral()
             {
                 if (isAttacking || isDefending) return;
                     
-                DoVariation(check, reaction, TeamCombatData.Stance.Neutral);
+                DoVariation(check, reaction, TeamCombatState.Stance.Neutral);
             }
 
             void CheckForDefending()
             {
                 if (isDefending)
-                    DoVariation(check, reaction, TeamCombatData.Stance.Defending);
+                    DoVariation(check, reaction, TeamCombatState.Stance.Defending);
             }
         }
 
 
 
-        private static void DoVariation(TeamCombatData actor, TeamCombatData receiver,
-            TeamCombatData.Stance targetStance)
+        private static void DoVariation(TeamCombatState actingTeam, TeamCombatState receiver,
+            TeamCombatState.Stance targetStance)
         {
-            TeamCombatData winner;
-            TeamCombatData loser;
+            TeamCombatState winner;
+            TeamCombatState loser;
             switch (targetStance)
             {
-                case TeamCombatData.Stance.Attacking:
-                    winner = actor;
+                case TeamCombatState.Stance.Attacking:
+                    winner = actingTeam;
                     loser = receiver;
                     HandleTeams();
                     break;
-                case TeamCombatData.Stance.Defending:
+                case TeamCombatState.Stance.Defending:
                     winner = receiver;
-                    loser = actor;
+                    loser = actingTeam;
                     HandleTeams();
                     break;
                 default:
-                    actor.stance = TeamCombatData.Stance.Neutral;
-                    receiver.stance = TeamCombatData.Stance.Neutral;
+                    actingTeam.stance = TeamCombatState.Stance.Neutral;
+                    receiver.stance = TeamCombatState.Stance.Neutral;
                     break;
             }
 
+            InvokeEvent(actingTeam);
+            InvokeEvent(receiver);
+
             void HandleTeams()
             {
-                winner.stance = TeamCombatData.Stance.Attacking;
-                loser.stance = TeamCombatData.Stance.Defending;
+                winner.stance = TeamCombatState.Stance.Attacking;
+                loser.stance = TeamCombatState.Stance.Defending;
             }
-
-
+            void InvokeEvent(TeamCombatState target)
+            {
+                foreach (CombatingEntity entity in target.Team)
+                {
+                    entity.Events.InvokeAreaChange();
+                }
+            }
         }
 
         public void OnCombatStart()

@@ -28,17 +28,18 @@ namespace _CombatSystem
             var skillCooldown = new SkillCooldownHandler();
             var roundCheckHandler = new RoundCheckHandler();
             var burstResetHandler = new CharacterCombatDataResetHandler();
+            var teamStateTicker = new TeamTempoTicker();
 
             //---- Injections ----
             Invoker.SubscribeListener(Characters);
             Invoker.SubscribeListener(TempoHandler);
             Invoker.SubscribeListener(combatControlDeclaration);
             Invoker.SubscribeListener(roundCheckHandler);
+            Invoker.SubscribeListener(teamStateTicker);
 
             // Round check first since is better to finish the combat before all other unnecessary task
             TempoHandler.Subscribe((ITempoListener)roundCheckHandler);
             TempoHandler.Subscribe((ISkippedTempoListener)roundCheckHandler);
-
 
             TempoHandler.Subscribe(PerformSkillHandler);
             TempoHandler.Subscribe(skillCooldown);
@@ -46,7 +47,7 @@ namespace _CombatSystem
             TempoHandler.Subscribe((ITempoListener) burstResetHandler);
             TempoHandler.Subscribe((ISkippedTempoListener)burstResetHandler);
 
-
+            TempoHandler.Subscribe(teamStateTicker);
         }
 
         [ShowInInspector]
@@ -54,7 +55,7 @@ namespace _CombatSystem
         [ShowInInspector]
         public static CombatCharactersHolder Characters;
         [ShowInInspector]
-        public static CombatTeamControlsHandler TeamsDataHandler;
+        public static CombatTeamControlsHandler CombatTeamControlHandler;
 
         [ShowInInspector] 
         public static CombatCharacterEventsBase CharacterChangesEvent;
@@ -67,12 +68,6 @@ namespace _CombatSystem
 
         [ShowInInspector] 
         public static CombatConditionsChecker CombatConditionChecker;
-
-        [Title("Temporal")]
-        [ShowInInspector] 
-        public static TeamCombatData PlayerTeam;
-        [ShowInInspector] 
-        public static TeamCombatData EnemyTeam;
 
         [Title("Global Variables")]
         [ShowInInspector]

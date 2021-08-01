@@ -67,8 +67,6 @@ namespace _CombatSystem
             CombatingTeam playerEntities = new CombatingTeam(PlayerEntitySingleton.TeamControlStats);
             CombatingTeam enemyEntities = new CombatingTeam(enemyFightPreset.StatsPreset);
 
-            CombatSystemSingleton.PlayerTeam = playerEntities.Data;
-            CombatSystemSingleton.EnemyTeam = enemyEntities.Data;
 
             CombatHandle = Timing.RunCoroutine(_DoCombat());
 
@@ -269,9 +267,6 @@ namespace _CombatSystem
             {
                 listener.OnCombatFinish(lastEntity,isPlayerWin);
             }
-
-            CombatSystemSingleton.PlayerTeam = null;
-            CombatSystemSingleton.EnemyTeam = null;
         }
     }
 

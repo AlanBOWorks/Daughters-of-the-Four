@@ -17,20 +17,7 @@ namespace Skills
     /// </summary>
     [CreateAssetMenu(fileName = "N (T) - SKILL L - [Preset]",
         menuName = "Combat/Skill/Skill Preset")]
-    public class SSkillPreset : SSkillPresetBase
-    {
-        [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
-        [SerializeField]
-        private int cooldownCost = 1;
-        public int CoolDownCost => cooldownCost;
-
-        protected override string ValidationName(IEffect mainEffect)
-        {
-            return " - [{ cooldownCost}] - " + base.ValidationName(mainEffect);
-        }
-    }
-
-    public abstract class SSkillPresetBase : SEffectSetPreset
+    public class SSkillPreset : SEffectSetPreset
     {
         [TitleGroup("Targeting")]
         [SerializeField] protected bool canTargetSelf = false;
@@ -44,7 +31,18 @@ namespace Skills
             Support,
             Other = SelfOnly
         }
+
+        [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
+        [SerializeField]
+        private int cooldownCost = 1;
+        public int CoolDownCost => cooldownCost;
+
+        protected override string ValidationName(IEffect mainEffect)
+        {
+            return $" - [{cooldownCost}] - " + base.ValidationName(mainEffect);
+        }
     }
+
 
     public abstract class SEffectSetPreset : ScriptableObject
     {

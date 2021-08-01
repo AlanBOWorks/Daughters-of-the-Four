@@ -20,17 +20,17 @@ namespace Characters
 
     public static class UtilsArea
     {
-        public static TeamCombatData.Stance ParseStance(float stanceEquivalent)
+        public static TeamCombatState.Stance ParseStance(float stanceEquivalent)
         {
-            TeamCombatData.Stance stance;
-            if (stanceEquivalent == 0) stance = TeamCombatData.Stance.Neutral;
-            else if (stanceEquivalent > 0) stance = TeamCombatData.Stance.Attacking;
-            else stance = TeamCombatData.Stance.Defending;
+            TeamCombatState.Stance stance;
+            if (stanceEquivalent == 0) stance = TeamCombatState.Stance.Neutral;
+            else if (stanceEquivalent > 0) stance = TeamCombatState.Stance.Attacking;
+            else stance = TeamCombatState.Stance.Defending;
 
             return stance;
         }
 
-        public static void ToggleStance(CombatingEntity entity, TeamCombatData.Stance targetStance)
+        public static void ToggleStance(CombatingEntity entity, TeamCombatState.Stance targetStance)
         {
             var areaData = entity.AreasDataTracker;
             if (areaData.IsForceStance)

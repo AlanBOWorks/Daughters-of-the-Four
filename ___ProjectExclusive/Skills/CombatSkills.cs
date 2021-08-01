@@ -27,7 +27,8 @@ namespace Skills
         public List<CombatSkill> GetNeutral() => NeutralSkills;
         public List<CombatSkill> GetDefending() => DefendingSkills;
 
-        public CombatSkills(CombatingEntity user,ISkillShared<SkillPreset> shared, ISkillPositions<List<SkillPreset>> uniqueSkills)
+        public CombatSkills(CombatingEntity user,
+            ISkillShared<SkillPreset> shared, ISkillPositions<List<SkillPreset>> uniqueSkills)
         {
             user.Injection(this);
             if (shared == null)

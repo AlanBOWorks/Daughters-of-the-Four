@@ -190,6 +190,7 @@ namespace Stats
             else
             {
                 target.Events.OnHealthZero();
+                target.CombatStats.TeamData.DeathHandler.Add(target);
             }
 
 
@@ -237,6 +238,13 @@ namespace Stats
             target.Events.InvokeTemporalStatChange();
         }
 
+        public static void HealToMax(CharacterCombatData stats)
+        {
+            if(!stats.IsAlive()) return;
+            if(stats.HealthPoints < stats.MaxHealth)
+                stats.HealthPoints = stats.MaxHealth;
+        }
+
         public static void SetInitiative(ICombatTemporalStats stats, float targetValue = 0)
         {
             const float lowerCap = 0;
@@ -265,19 +273,23 @@ namespace Stats
             SetActionAmount(stats, stats.ActionsLefts + addition);
         }
 
-        //TODO AddActionsPerSequence
 
-        public static void AddHarmony(ICombatTemporalStats stats, float addition)
+        public static void AddHarmony(CombatingEntity entity, ICombatTemporalStats stats, float addition)
         {
             float targetHarmony = stats.HarmonyAmount + addition;
             stats.HarmonyAmount = Mathf.Clamp(
                 targetHarmony, 
                 StatsCap.MinHarmony, StatsCap.MaxHarmony);
+
+            entity.Events.InvokeTemporalStatChange();
         }
+        public static void AddHarmony(CombatingEntity entity, float addition)
+            => AddHarmony(entity, entity.CombatStats, addition);
+
 
         public static void AddTeamControl(CombatingTeam team, float addition)
         {
-            CombatSystemSingleton.TeamsDataHandler.DoVariation(team,addition);
+            CombatSystemSingleton.CombatTeamControlHandler.DoVariation(team,addition);
         }
 
         public static bool IsCriticalPerformance(ICharacterBasicStats stats, CombatSkill skill, float criticalCheck)
@@ -314,6 +326,7 @@ namespace Stats
             randomValue = Random.value;
             return CalculateRandomModifier(randomValue);
         }
+
     }
 
     public static class UtilityBuffStats

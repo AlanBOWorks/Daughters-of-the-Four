@@ -80,7 +80,7 @@ namespace Characters
         /// </summary>
         public static bool IsInCloseRange(CombatingEntity user, CombatingEntity enemy)
         {
-            return IsInCloseRange(user.AreasDataTracker.combatFieldPosition, enemy.AreasDataTracker.combatFieldPosition);
+            return IsInCloseRange(user.AreasDataTracker.CombatFieldPosition, enemy.AreasDataTracker.CombatFieldPosition);
         }
 
         public static bool IsValid<T>(ICharacterArchetypesData<T> data) where T : class
@@ -160,6 +160,13 @@ namespace Characters
         {
             return GetElement(elements, (TeamPosition) index);
         }
+
+        public static T GetElement<T>(ICharacterArchetypesData<T> elements, RoleArchetype archetype)
+        {
+            return GetElement(elements, (TeamPosition) archetype);
+        }
+
+
         public static T GetElement<T>(ICharacterArchetypesData<T> elements, TeamPosition archetype)
         {
             switch (archetype)

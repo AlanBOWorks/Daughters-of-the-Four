@@ -28,7 +28,7 @@ namespace _Player
 
         public void OnAreaStateChange(CombatAreasData data)
         {
-            stanceTooltip.UpdateStance(data.PositionStance);
+            stanceTooltip.UpdateStance(data.GetCurrentPositionState());
         }
     }
 
@@ -40,10 +40,10 @@ namespace _Player
         private const string AttackingToolTip = "[ Attaking ]";
         private const string NeutralTooltip = "[ Neutral ]";
         private const string DefendingTooltip = "[ Defending ]";
-        public void UpdateStance(TeamCombatData.Stance targetStance)
+        public void UpdateStance(TeamCombatState.Stance targetStance)
         {
             var tooltip=
-                TeamCombatData.GetStance(this, targetStance);
+                TeamCombatState.GetStance(this, targetStance);
             stanceText.text = tooltip;
         }
 

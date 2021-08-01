@@ -20,7 +20,7 @@ namespace CombatEffects
 
         public override void DoEffect(CombatingEntity target, float harmonyAddition)
         {
-            UtilsCombatStats.AddHarmony(GetBuff(target), harmonyAddition);
+            UtilsCombatStats.AddHarmony(target,GetBuff(target), harmonyAddition);
             target.Events.InvokeTemporalStatChange();
         }
 

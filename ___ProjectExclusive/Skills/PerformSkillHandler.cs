@@ -94,7 +94,7 @@ namespace Skills
                 isCritical = true;
                 float defaultHarmonyAddition 
                     = CombatSystemSingleton.ParamsVariable.criticalHarmonyAddition;
-                UtilsCombatStats.AddHarmony(combatStats, defaultHarmonyAddition);
+                UtilsCombatStats.AddHarmony(target, defaultHarmonyAddition);
 
                 var criticalBuff = _currentUser.CharacterCriticalBuff;
                 criticalBuff?.OnCriticalAction();

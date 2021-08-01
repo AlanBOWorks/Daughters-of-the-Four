@@ -57,7 +57,7 @@ namespace Passives
 
     }
     
-    public class HarmonyBuffInvoker : IPassivesFilterHandler, ITemporalStatsChangeListener
+    public class HarmonyBuffInvoker : IPassivesFilterHandler
     {
         private readonly CombatingEntity _entity;
         public readonly SHarmonyPassive Passive;
@@ -70,8 +70,6 @@ namespace Passives
             _entity = user;
             OnPositivePassives = passive.OnPositivePassives;
             OnNegativePassives = passive.OnNegativePassives;
-
-            _entity.Events.Subscribe(this);
         }
 
         private HarmonyTiers _currentTier;
@@ -135,8 +133,9 @@ namespace Passives
             }
         }
 
-        public void OnTemporalStatsChange(ICombatTemporalStats currentStats)
+        public void OnTemporalStatsChange()
         {
+            ICombatTemporalStats currentStats = _entity.CombatStats;
             DoCheck();
             _currentTierModifier = (float)_currentTier;
 

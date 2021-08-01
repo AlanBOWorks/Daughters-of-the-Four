@@ -84,9 +84,10 @@ namespace Characters
         /// <summary>
         /// Keeps track of the entity's allies and enemies
         /// </summary>
-        [ShowInInspector]
-        public CharacterSelfGroup CharacterGroup { get; set; }
-        
+        [ShowInInspector] 
+        public CharacterSelfGroup CharacterGroup;
+
+
 
         /// <summary>
         /// If is Conscious, has actions left and at least can use any skill
@@ -96,7 +97,7 @@ namespace Characters
             // In order of [false] possibilities 
             return IsConscious() &&  HasActions() && CanUseSkills();
         }
-        public bool IsAlive() => CombatStats.MortalityPoints > 0;
+        public bool IsAlive() => CombatStats.IsAlive();
 
         public bool IsConscious()
         {
@@ -106,8 +107,9 @@ namespace Characters
             return CombatStats.HealthPoints > 0;
         }
 
-        public bool HasActions() => CombatStats.ActionsLefts > 0;
+        public bool HasActions() => CombatStats.HasActionLeft();
         public bool CanUseSkills() => UtilsSkill.CanUseSkills(this);
+        public CharacterArchetypes.RoleArchetype Role => AreasDataTracker.Role;
 
 
         public void Injection(CharacterCombatData combatStats)
@@ -123,7 +125,7 @@ namespace Characters
         public void Injection(CombatingTeam team)
         {
             CombatStats.TeamData = team;
-            AreasDataTracker.Injection(team.Data);
+            AreasDataTracker.Injection(team.State);
         }
         public void Injection(CombatPassivesHolder passivesHolder) => 
             PassivesHolder = passivesHolder;
@@ -153,16 +155,32 @@ namespace Characters
 
         [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
         private ICharacterBasicStats TeamStats => TeamData.GetCurrentStats();
-        public CombatingTeam TeamData { set; private get; }
+
+        public CombatingTeam TeamData;
 
 
         [TitleGroup("Local stats"), PropertyOrder(10)]
         public int ActionsLefts = 0;
 
+        public bool IsAlive() => MortalityPoints > 0;
+        public bool HasActionLeft() => ActionsLefts > 0;
+
+
         public void RefillInitiativeActions()
         {
             UtilsCombatStats.AddActionAmount(this, ActionsPerInitiative);
         }
+        public void ResetAdditionInitiativeAction()
+        {
+            ActionsLefts = 0;
+            RefillInitiativeActions();
+        }
+
+        public void Revive()
+        {
+            UtilsCombatStats.HealToMax(this);
+        }
+
 
         public CharacterCombatData(ICharacterFullStats presetStats)
         {

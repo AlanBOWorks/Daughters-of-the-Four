@@ -10,9 +10,10 @@ namespace _Team
     public class TeamCombatStatsHolder : ITeamCombatControlStats,
         IStanceArchetype<CompositeStats>
     {
-        private readonly TeamCombatData _data;
+        private readonly TeamCombatState _state;
 
-        public float LoseControlThreshold;
+        [ShowInInspector]
+        public ICharacterArchetypesData<float> ControlLoseOnDeath { get; private set; }
 
         [ShowInInspector, HorizontalGroup("Attacking")]
         public CompositeStats AttackingStats { get; private set; }
@@ -27,9 +28,12 @@ namespace _Team
         [ShowInInspector,HorizontalGroup("Defending")]
         public FilterPassivesHolder OnDefendingPassives { get; private set; }
 
-        public TeamCombatStatsHolder(TeamCombatData data)
+        public float LoseControlThreshold;
+        public float ReviveTime;
+
+        public TeamCombatStatsHolder(TeamCombatState state)
         {
-            _data = data;
+            _state = state;
             AttackingStats = new CompositeStats();
             NeutralStats = new CompositeStats();
             DefendingStats = new CompositeStats();
@@ -38,13 +42,15 @@ namespace _Team
             OnDefendingPassives = new FilterPassivesHolder();
 
             LoseControlThreshold = DefaultLoseThreshold;
-
+            ReviveTime = DefaultReviveTime;
+            ControlLoseOnDeath = TeamControlLoses.BackUpData;
         }
 
-        private const float DefaultLoseThreshold = -.5f;
-        public TeamCombatStatsHolder(TeamCombatData data, ITeamCombatControlHolder stats)
+        public const float DefaultLoseThreshold = -.6f;
+        public const float DefaultReviveTime = 2.5f;
+        public TeamCombatStatsHolder(TeamCombatState state, ITeamCombatControlHolder stats)
         {
-            _data = data;
+            _state = state;
             InjectPreset(stats);
         }
 
@@ -54,6 +60,8 @@ namespace _Team
             InjectNewStats(holder);
             InjectNewPassives(holder);
             LoseControlThreshold = holder.GetLoseThreshold();
+            ReviveTime = holder.GetReviveTime();
+            ControlLoseOnDeath = holder.GetControlLosePoints() ?? TeamControlLoses.BackUpData;
         }
 
         private void InjectNewStats(IStanceArchetype<ICharacterBasicStats> stats)
@@ -78,25 +86,25 @@ namespace _Team
 
         public ICharacterBasicStats GetCurrentStats()
         {
-            return _data.stance switch
+            return _state.stance switch
             {
-                TeamCombatData.Stance.Neutral => NeutralStats,
-                TeamCombatData.Stance.Attacking => AttackingStats,
-                TeamCombatData.Stance.Defending => DefendingStats,
+                TeamCombatState.Stance.Neutral => NeutralStats,
+                TeamCombatState.Stance.Attacking => AttackingStats,
+                TeamCombatState.Stance.Defending => DefendingStats,
                 _ => throw new ArgumentException("TeamControl seems to trying to access an invalid" +
-                                                 $"type of Team.State [{_data.stance}]")
+                                                 $"type of Team.State [{_state.stance}]")
             };
         }
 
         public FilterPassivesHolder GetCurrentPassives()
         {
-            return _data.stance switch
+            return _state.stance switch
             {
-                TeamCombatData.Stance.Neutral => OnNeutralPassives,
-                TeamCombatData.Stance.Attacking => OnAttackPassives,
-                TeamCombatData.Stance.Defending => OnDefendingPassives,
+                TeamCombatState.Stance.Neutral => OnNeutralPassives,
+                TeamCombatState.Stance.Attacking => OnAttackPassives,
+                TeamCombatState.Stance.Defending => OnDefendingPassives,
                 _ => throw new ArgumentException("TeamControl seems to trying to access an invalid" +
-                                                 $"type of Team.State [{_data.stance}]")
+                                                 $"type of Team.State [{_state.stance}]")
             };
         }
 

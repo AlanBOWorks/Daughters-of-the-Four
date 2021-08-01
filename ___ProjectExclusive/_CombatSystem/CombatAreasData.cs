@@ -8,71 +8,49 @@ namespace _CombatSystem
     public class CombatAreasData
     {
         public CharacterArchetypes.TeamPosition PositionInTeam;
-        public CharacterArchetypes.FieldPosition combatFieldPosition;
+        public CharacterArchetypes.RoleArchetype Role;
+        public CharacterArchetypes.FieldPosition CombatFieldPosition;
         public CharacterArchetypes.RangeType RangeType;
-        [ShowInInspector]
-        internal PositionState positionState;
-        private TeamCombatData _teamData;
+        private TeamCombatState _teamState;
 
+        private TeamCombatState.Stance _forcedTeamState;
+        public bool IsForceStance { get; private set; }
 
-        public TeamCombatData.Stance PositionStance
-        {
-            get => positionState.stance;
-            set => positionState.stance = value;
-        }
-
-        public bool IsForceStance
-        {
-            get => positionState.IsForcedState;
-            set => positionState.IsForcedState = value;
-        }
 
         public CombatAreasData(CharacterArchetypes.TeamPosition positionInTeam,
             CharacterArchetypes.RangeType rangeType,
             CharacterArchetypes.FieldPosition initialFieldPosition = CharacterArchetypes.FieldPosition.InTeam,
-            TeamCombatData.Stance initialStance = TeamCombatData.Stance.Neutral)
+            TeamCombatState.Stance initialStance = TeamCombatState.Stance.Neutral)
         {
             PositionInTeam = positionInTeam;
-            combatFieldPosition = initialFieldPosition;
+            Role = (CharacterArchetypes.RoleArchetype) positionInTeam;
+            CombatFieldPosition = initialFieldPosition;
             RangeType = rangeType;
-            positionState = new PositionState(initialStance,false);
+            _forcedTeamState = initialStance;
         }
 
-        public void Injection(TeamCombatData teamData)
+        public void Injection(TeamCombatState teamState)
         {
-            _teamData = teamData;
+            _teamState = teamState;
         }
 
-        public void ForceState(TeamCombatData.Stance targetStance)
+        public void ForceState(TeamCombatState.Stance targetStance)
         {
-            positionState.stance = targetStance;
-            positionState.IsForcedState = true;
+            _forcedTeamState = targetStance;
+            IsForceStance = true;
         }
 
         public void ForceStateFinish()
         {
-            positionState.IsForcedState = false;
-            positionState.stance = _teamData.stance;
+            IsForceStance = false;
         }
-
-        public TeamCombatData.Stance GetCurrentPositionState()
+        [ShowInInspector]
+        public TeamCombatState.Stance GetCurrentPositionState()
         {
-            if (positionState.IsForcedState || _teamData == null)
-                return positionState.stance;
-            return _teamData.stance;
+            if (IsForceStance || _teamState == null)
+                return _forcedTeamState;
+            return _teamState.stance;
         }
 
-        internal struct PositionState
-        {
-            public TeamCombatData.Stance stance;
-            public bool IsForcedState;
-
-            public PositionState(TeamCombatData.Stance target, bool isForcedState)
-            {
-                stance = target;
-                IsForcedState = isForcedState;
-            }
-
-        }
     }
 }

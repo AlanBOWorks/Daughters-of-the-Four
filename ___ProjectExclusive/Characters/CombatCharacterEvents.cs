@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using _CombatSystem;
-using Passives;
+using _Team;
 using Sirenix.OdinInspector;
-using Skills;
 using Stats;
 
 namespace Characters
@@ -26,20 +25,19 @@ namespace Characters
     public class CombatCharacterEventsBase : ITempoListenerVoid, IHealthZeroListener
     {
         [ShowInInspector]
-        private readonly List<ITempoListenerVoid> _onTempoListeners;
+        private List<ITempoListenerVoid> _onTempoListeners;
         [ShowInInspector]
-        private readonly List<IVitalityChangeListener> _onVitalityChange;
+        private List<IVitalityChangeListener> _onVitalityChange;
         [ShowInInspector]
-        private readonly List<ITemporalStatsChangeListener> _onTemporalStatsChange;
+        private List<ITemporalStatsChangeListener> _onTemporalStatsChange;
         [ShowInInspector]
-        private readonly List<IAreaStateChangeListener> _onAreaChange;
+        private List<IAreaStateChangeListener> _onAreaChange;
 
         [ShowInInspector]
-        private readonly List<IHealthZeroListener> _onHealthZeroListeners;
+        private List<IHealthZeroListener> _onHealthZeroListeners;
 
         public CombatCharacterEventsBase()
         {
-            _onTempoListeners = new List<ITempoListenerVoid>();
             _onVitalityChange = new List<IVitalityChangeListener>();
             _onTemporalStatsChange = new List<ITemporalStatsChangeListener>();
             _onAreaChange = new List<IAreaStateChangeListener>();
@@ -49,21 +47,55 @@ namespace Characters
         public void Subscribe(ICharacterListener listener)
         {
             if (listener is ITempoListenerVoid tempoListener)
-                _onTempoListeners.Add(tempoListener);
+                SubscribeTo(tempoListener);
 
             if (listener is IVitalityChangeListener vitalityListener)
-                _onVitalityChange.Add(vitalityListener);
+                SubscribeTo(vitalityListener);
             if (listener is ITemporalStatsChangeListener temporalStatListener)
-                _onTemporalStatsChange.Add(temporalStatListener);
+                SubscribeTo(temporalStatListener);
             if (listener is IAreaStateChangeListener areaStateListener)
-                _onAreaChange.Add(areaStateListener);
+                SubscribeTo(areaStateListener);
 
             if (listener is IHealthZeroListener healthCheckListener)
-                _onHealthZeroListeners.Add(healthCheckListener);
+                SubscribeTo(healthCheckListener);
         }
+
+        private void SubscribeTo(ITempoListenerVoid listener)
+        {
+            if(_onTempoListeners == null)
+                _onTempoListeners = new List<ITempoListenerVoid>();
+            _onTempoListeners.Add(listener);
+        }
+        private void SubscribeTo(IVitalityChangeListener listener)
+        {
+            if (_onVitalityChange == null)
+                _onVitalityChange = new List<IVitalityChangeListener>();
+            _onVitalityChange.Add(listener);
+        }
+        private void SubscribeTo(ITemporalStatsChangeListener listener)
+        {
+            if (_onTemporalStatsChange == null)
+                _onTemporalStatsChange = new List<ITemporalStatsChangeListener>();
+            _onTemporalStatsChange.Add(listener);
+        }
+        private void SubscribeTo(IAreaStateChangeListener listener)
+        {
+            if (_onAreaChange == null)
+                _onAreaChange = new List<IAreaStateChangeListener>();
+            _onAreaChange.Add(listener);
+        }
+        private void SubscribeTo(IHealthZeroListener listener)
+        {
+            if (_onHealthZeroListeners == null)
+                _onHealthZeroListeners = new List<IHealthZeroListener>();
+            _onHealthZeroListeners.Add(listener);
+        }
+
 
         public void InvokeVitalityChange(CombatingEntity entity)
         {
+            if(_onVitalityChange is null) return;
+
             IVitalityStats onStats = entity.CombatStats;
             foreach (IVitalityChangeListener listener in _onVitalityChange)
             {
@@ -73,6 +105,8 @@ namespace Characters
 
         public void InvokeTemporalStatChange(CombatingEntity entity)
         {
+            if(_onTemporalStatsChange is null) return;
+
             ICombatTemporalStats onStats = entity.CombatStats;
             foreach (ITemporalStatsChangeListener listener in _onTemporalStatsChange)
             {
@@ -81,6 +115,8 @@ namespace Characters
         }
         public void InvokeAreaChange(CombatingEntity entity)
         {
+            if(_onAreaChange is null) return;
+
             CombatAreasData areasData = entity.AreasDataTracker;
             foreach (IAreaStateChangeListener listener in _onAreaChange)
             {
@@ -90,6 +126,8 @@ namespace Characters
 
         public void OnInitiativeTrigger()
         {
+            if(_onTempoListeners is null) return;
+
             foreach (ITempoListenerVoid listener in _onTempoListeners)
             {
                 listener.OnInitiativeTrigger();
@@ -98,6 +136,8 @@ namespace Characters
 
         public void OnDoMoreActions()
         {
+            if(_onTempoListeners is null) return;
+
             foreach (ITempoListenerVoid listener in _onTempoListeners)
             {
                 listener.OnDoMoreActions();
@@ -106,6 +146,8 @@ namespace Characters
 
         public void OnFinisAllActions()
         {
+            if(_onTempoListeners is null) return;
+
             foreach (ITempoListenerVoid listener in _onTempoListeners)
             {
                 listener.OnFinisAllActions();
@@ -114,6 +156,8 @@ namespace Characters
 
         public void OnHealthZero()
         {
+            if(_onHealthZeroListeners is null) return;
+
             foreach (IHealthZeroListener listener in _onHealthZeroListeners)
             {
                 listener.OnHealthZero();
@@ -122,9 +166,31 @@ namespace Characters
 
         public void OnMortalityZero()
         {
+            if(_onHealthZeroListeners is null) return;
+
             foreach (IHealthZeroListener listener in _onHealthZeroListeners)
             {
                 listener.OnMortalityZero();
+            }
+        }
+
+        public void OnRevive()
+        {
+            if(_onHealthZeroListeners is null) return;
+
+            foreach (IHealthZeroListener listener in _onHealthZeroListeners)
+            {
+                listener.OnRevive();
+            }
+        }
+
+        public void OnTeamHealthZero(CombatingTeam losingTeam)
+        {
+            if (_onHealthZeroListeners is null) return;
+
+            foreach (IHealthZeroListener listener in _onHealthZeroListeners)
+            {
+                listener.OnTeamHealthZero(losingTeam);
             }
         }
     }
@@ -137,24 +203,31 @@ namespace Characters
             _user = user;
         }
 
+        private static CombatCharacterEventsBase GlobalEvents()
+        {
+            return CombatSystemSingleton.CharacterChangesEvent;
+        }
+
         public void InvokeVitalityChange()
         {
-            InvokeVitalityChange(_user);
-            CombatSystemSingleton.CharacterChangesEvent.InvokeVitalityChange(_user);
+            // This is to loop Global listeners (like unique UI than is not exclusive to each Entity)
+            GlobalEvents().InvokeVitalityChange(_user);
+            // This is to loop the listeners in the base (the UI over the character for example)
+            InvokeVitalityChange(_user); 
         }
 
         public void InvokeTemporalStatChange()
         {
+            _user.HarmonyBuffInvoker?.OnTemporalStatsChange();
+            GlobalEvents().InvokeTemporalStatChange(_user);
             InvokeTemporalStatChange(_user);
-            CombatSystemSingleton.CharacterChangesEvent.InvokeTemporalStatChange(_user);
         }
 
         public void InvokeAreaChange()
         {
+            GlobalEvents().InvokeAreaChange(_user);
             InvokeAreaChange(_user);
-            CombatSystemSingleton.CharacterChangesEvent.InvokeAreaChange(_user);
         }
-
     }
 
     /// <summary>
@@ -177,9 +250,12 @@ namespace Characters
         void OnAreaStateChange(CombatAreasData data);
     }
 
+
     public interface IHealthZeroListener : ICharacterListener
     {
         void OnHealthZero();
         void OnMortalityZero();
+        void OnRevive();
+        void OnTeamHealthZero(CombatingTeam losingTeam);
     }
 }

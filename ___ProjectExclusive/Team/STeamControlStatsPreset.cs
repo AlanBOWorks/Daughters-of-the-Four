@@ -15,10 +15,13 @@ namespace _Team
         [Title("Tooltips")] [SerializeField] private string controlName = "NULL";
 
         [Title("Control")]
-        [SerializeField, Range(-1, 0)] 
-        private float loseControlThreshold = -.6f;
+        [SerializeField, Range(-1, 0), SuffixLabel("%00")] 
+        private float loseControlThreshold = TeamCombatStatsHolder.DefaultLoseThreshold;
         [SerializeField] 
         private TeamControlLoses controlLoses = new TeamControlLoses();
+        [SerializeField,Range(0,100), SuffixLabel("tempoSec"), 
+         Tooltip("1 sec equals apr. 1 initiative at 100 Speed")] 
+        private float reviveTime = TeamCombatStatsHolder.DefaultReviveTime;
 
         [Title("Stats")]
         [HorizontalGroup("Attack")]
@@ -36,6 +39,8 @@ namespace _Team
         [SerializeField] private FilterPassivesHolder onDefendingPassives;
         public string ControlName => controlName;
         public float GetLoseThreshold() => loseControlThreshold;
+        public float GetReviveTime() => reviveTime;
+
         public ICharacterArchetypesData<float> GetControlLosePoints() => controlLoses;
 
 
@@ -69,9 +74,11 @@ namespace _Team
     [Serializable]
     public class TeamControlLoses : ICharacterArchetypesData<float>
     {
-        [SerializeField, Range(0, 1)] private float frontLiner = .7f;
-        [SerializeField, Range(0, 1)] private float midLiner = .5f;
-        [SerializeField, Range(0, 1)] private float backLiner = .4f;
+        public static TeamControlLoses BackUpData = new TeamControlLoses();
+
+        [SerializeField, Range(0, 1)] private float frontLiner = .4f;
+        [SerializeField, Range(0, 1)] private float midLiner = .3f;
+        [SerializeField, Range(0, 1)] private float backLiner = .25f;
 
         public float FrontLiner => frontLiner;
         public float MidLiner => midLiner;
@@ -84,6 +91,8 @@ namespace _Team
     {
         string ControlName { get; }
         float GetLoseThreshold();
+        float GetReviveTime();
+
         ICharacterArchetypesData<float> GetControlLosePoints();
     }
 

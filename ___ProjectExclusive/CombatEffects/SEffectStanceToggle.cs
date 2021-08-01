@@ -9,7 +9,7 @@ namespace CombatEffects
         menuName = "Combat/Effects/Stance Toggle")]
     public class SEffectStanceToggle : SEffectBase
     {
-        [SerializeField] private TeamCombatData.Stance targetStance = TeamCombatData.Stance.Neutral;
+        [SerializeField] private TeamCombatState.Stance targetStance = TeamCombatState.Stance.Neutral;
 
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float randomCheck = 1)
         {

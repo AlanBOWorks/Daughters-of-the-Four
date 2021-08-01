@@ -1,15 +1,13 @@
 ﻿using System;
-using Characters;
-using Passives;
 using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
 
 namespace _Team
 {
-    public class TeamCombatData
+    public class TeamCombatState
     {
-        public TeamCombatData(CombatingTeam team)
+        public TeamCombatState(CombatingTeam team)
         {
             Team = team;
             stance = Stance.Neutral;
@@ -17,14 +15,34 @@ namespace _Team
 
         public readonly CombatingTeam Team;
 
-        [ShowInInspector]
-        public float ControlAmount;
+        [ShowInInspector,Range(-1,1)] 
+        public float TeamControlAmount = 0;
+        [ShowInInspector,Range(-1,1)] 
+        public float BurstControlAmount = 0;
+
+        public float ControlAmount => TeamControlAmount + BurstControlAmount;
+
         [ShowInInspector]
         public Stance stance;
 
         public bool IsInDanger()
         {
             return ControlAmount <= Team.StatsHolder.LoseControlThreshold;
+        }
+
+        public void DoBurstControl(float targetBurst)
+        {
+            BurstControlAmount = targetBurst;
+        }
+
+        public void FinishBurstControl()
+        {
+            BurstControlAmount = 0;
+        }
+
+        public bool IsInBurstControl()
+        {
+            return BurstControlAmount > 0;
         }
 
         public enum Stance
@@ -82,18 +100,18 @@ namespace _Team
         public const string NeutralKeyword = "Neutral";
         public const string DefendingKeyword = "Defending";
 
-        public static string GetKeyword(TeamCombatData.Stance target)
+        public static string GetKeyword(TeamCombatState.Stance target)
         {
             switch (target)
             {
-                case TeamCombatData.Stance.Attacking:
+                case TeamCombatState.Stance.Attacking:
                     return AttackKeyword;
-                case TeamCombatData.Stance.Neutral:
+                case TeamCombatState.Stance.Neutral:
                     return NeutralKeyword;
-                case TeamCombatData.Stance.Defending:
+                case TeamCombatState.Stance.Defending:
                     return DefendingKeyword;
                 default:
-                    throw new ArgumentException($"Invalid {typeof(TeamCombatData.Stance)} target;",
+                    throw new ArgumentException($"Invalid {typeof(TeamCombatState.Stance)} target;",
                         new NotImplementedException("There's a state that wasn't implemented: " +
                                                     $"{target}"));
             }
@@ -101,32 +119,4 @@ namespace _Team
     }
 
 
-    public class CombatingTeam : CharacterArchetypesList<CombatingEntity>, ITeamCombatControlStats
-    {
-        public CombatingTeam(ITeamCombatControlHolder holder, int amountOfEntities = AmountOfArchetypes)
-            : base(amountOfEntities)
-        {
-            Data = new TeamCombatData(this);
-            if(holder != null)
-            {
-                StatsHolder = new TeamCombatStatsHolder(Data, holder);
-            }
-            else
-                StatsHolder = new TeamCombatStatsHolder(Data);       
-        }
-
-        [ShowInInspector]
-        public readonly TeamCombatData Data;
-        [ShowInInspector]
-        public readonly TeamCombatStatsHolder StatsHolder;
-
-        public ICharacterBasicStats GetCurrentStats()
-            => StatsHolder.GetCurrentStats();
-
-        public FilterPassivesHolder GetCurrentPassives()
-            => StatsHolder.GetCurrentPassives();
-
-        public bool IsInDangerState()
-            => Data.IsInDanger();
-    }
 }

@@ -75,8 +75,6 @@ namespace _CombatSystem
 
             entity.Events.OnFinisAllActions();
             entity.CharacterCriticalBuff.OnFinisAllActions();
-            entity.DelayBuffHandler.OnFinisAllActions();
-            entity.CombatStats.RefillInitiativeActions();
         }
         public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {
@@ -102,7 +100,6 @@ namespace _CombatSystem
                 listener.OnSkippedEntity(entity);
             }
             entity.Events.OnFinisAllActions();
-            entity.DelayBuffHandler.OnFinisAllActions();
         }
     }
 

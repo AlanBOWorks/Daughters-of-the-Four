@@ -36,6 +36,8 @@ namespace _CombatSystem
         public ICombatEnemyController EnemyController { get; private set; }
 
         public readonly Dictionary<CombatingEntity, ITempoFiller> EntitiesBar;
+        [ShowInInspector]
+        private readonly Queue<ITempoTicker> _tickers;
 
         /// <summary>
         /// A list of characters remaining of a Round to be completed; A round is considered
@@ -48,12 +50,19 @@ namespace _CombatSystem
         private bool _canControlAll;
         public TempoHandler()
         {
-            TriggerBasicHandler  = new TempoEvents();
             int memoryAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
-            EntitiesBar = new Dictionary<CombatingEntity, ITempoFiller>(
-                memoryAllocation);
-            _roundTracker = new List<CombatingEntity>(memoryAllocation);
-            CombatConditionChecker = new CombatConditionsChecker();
+
+            TriggerBasicHandler  
+                = new TempoEvents();
+            EntitiesBar 
+                = new Dictionary<CombatingEntity, ITempoFiller>(memoryAllocation);
+            CombatConditionChecker 
+                = new CombatConditionsChecker();
+            _roundTracker 
+                = new List<CombatingEntity>(memoryAllocation);
+            _tickers 
+                = new Queue<ITempoTicker>();
+
             CombatSystemSingleton.CombatConditionChecker = CombatConditionChecker;
         }
 
@@ -99,6 +108,11 @@ namespace _CombatSystem
                 return;
             }
             TriggerBasicHandler.SkippedListeners.Add(listener);
+        }
+
+        public void Subscribe(ITempoTicker ticker)
+        {
+            _tickers.Enqueue(ticker);
         }
 
 
@@ -187,6 +201,10 @@ namespace _CombatSystem
                     }
                 }
                 yield return Timing.WaitForSeconds(deltaIncrement);
+                foreach (ITempoTicker ticker in _tickers)
+                {
+                    ticker.TempoTick(deltaIncrement);
+                }
             }
         }
 
@@ -375,6 +393,11 @@ namespace _CombatSystem
         void OnInitiativeTrigger();
         void OnDoMoreActions();
         void OnFinisAllActions();
+    }
+
+    public interface ITempoTicker
+    {
+        void TempoTick(float deltaVariation);
     }
 
     public interface ITempoFiller
