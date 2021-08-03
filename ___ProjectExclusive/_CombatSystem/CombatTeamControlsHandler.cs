@@ -47,7 +47,8 @@ namespace _CombatSystem
     /// of both [<seealso cref="ICharacterFaction{T}"/>]
     ///  groups and normalize the variations.
     /// </summary>
-    public class CombatTeamControlsHandler : ICharacterFaction<TeamCombatState>, ICombatStartListener
+    public class CombatTeamControlsHandler : ICharacterFaction<TeamCombatState>, ICombatStartListener,
+        IRoundListenerVoid
     {
         public CombatTeamControlsHandler(CombatingTeam playerEntities, CombatingTeam enemyEntities)
         {
@@ -63,6 +64,8 @@ namespace _CombatSystem
         private TeamCombatState.Stance _lastPlayerStance;
 
         private bool _firstCall;
+        private int _burstRoundCount;
+        public bool IsBurstState() => _burstRoundCount > 0;
 
         public void Subscribe(ITeamVariationListener listener)
         {
@@ -89,15 +92,53 @@ namespace _CombatSystem
        
         public void DoVariation(CombatingTeam team, float controlAddition)
         {
-            HandleTeams(team, out var actor, out var receiver);
-            DoVariation(actor, receiver, controlAddition);
+            HandleTeams(team, out var actingTeam, out var receiver);
+            DoVariation(actingTeam, receiver, controlAddition);
             InvokeListeners();
         }
 
+        public void DoBurstControl(CombatingTeam team, float burstControl)
+        {
+            if (IsBurstState()) return;
+            HandleTeams(team, out var actingTeam, out var receiver);
+
+            actingTeam.IsBurstStance = true;
+            receiver.DoBurstControl(-burstControl); 
+            _burstRoundCount = team.StatsHolder.BurstCounterAmount;
+
+            DoVariationCheck(actingTeam, receiver);
+            InvokeListeners();
+        }
+        public void DoCounterBurstControl(CombatingTeam team, float counterBurst)
+        {
+            if (!IsBurstState()) return;
+            HandleTeams(team, out var actingTeam, out var receiver);
+            actingTeam.DoBurstVariation(counterBurst);
+
+            _burstRoundCount = team.StatsHolder.BurstCounterAmount;
+            _burstRoundCount -= _burstRoundCount;
+            if (_burstRoundCount <= 0)
+                FinishBurstControl();
+
+            DoVariationCheck(actingTeam,receiver);
+            InvokeListeners();
+        }
+
+        private void FinishBurstControl()
+        {
+            PlayerFaction.FinishBurstControl();
+            EnemyFaction.FinishBurstControl();
+            InvokeListeners();
+        }
+
+
         private void InvokeListeners()
         {
-            float control = PlayerFaction.ControlAmount;
-            TeamCombatState.Stance stance = PlayerFaction.stance;
+            float control = PlayerFaction.GetControlAmount()
+                - EnemyFaction.GetControlAmount();
+            control = Mathf.Clamp(control, -1, 1);
+
+                TeamCombatState.Stance stance = PlayerFaction.stance;
             if (!_firstCall && stance == _lastPlayerStance)
             {
                 foreach (ITeamVariationListener listener in _listeners)
@@ -131,7 +172,7 @@ namespace _CombatSystem
         private void DoVariation(TeamCombatState actingTeam, TeamCombatState receiver, float controlGain)
         {
             DoVariation(ref actingTeam.TeamControlAmount);
-            receiver.TeamControlAmount = -actingTeam.ControlAmount;
+            receiver.TeamControlAmount = -actingTeam.GetControlAmount();
             DoVariationCheck(actingTeam,receiver);
 
             void DoVariation(ref float controlValue)
@@ -141,7 +182,6 @@ namespace _CombatSystem
             }
         }
 
-        
         private void DoVariationCheck(TeamCombatState check, TeamCombatState reaction)
         {
             bool isAttacking = reaction.IsInDanger();
@@ -232,6 +272,15 @@ namespace _CombatSystem
         {
             InvokeListeners();
             _firstCall = false;
+        }
+
+        public void OnRoundCompleted()
+        {
+            if (!IsBurstState()) return;
+
+            _burstRoundCount--;
+            if(_burstRoundCount <= 0)
+                FinishBurstControl();
         }
     }
 

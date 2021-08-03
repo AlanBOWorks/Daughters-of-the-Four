@@ -10,9 +10,9 @@ namespace CombatEffects
     {
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
-            //TODO add stats (control power)
             DoEffect(target,effectModifier);
         }
+
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {

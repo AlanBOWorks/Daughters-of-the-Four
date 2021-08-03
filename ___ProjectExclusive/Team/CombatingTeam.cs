@@ -34,5 +34,10 @@ namespace _Team
 
         public bool IsInDangerState()
             => State.IsInDanger();
+
+        public void InjectAura(SAuraPassive aura)
+        {
+            StatsHolder.InjectAura(aura);
+        }
     }
 }

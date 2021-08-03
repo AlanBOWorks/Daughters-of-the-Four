@@ -59,7 +59,7 @@ namespace _Player
 
 
 
-                const int indexLimit = CharacterArchetypes.AmountOfArchetypes;
+                const int indexLimit = CharacterArchetypes.AmountOfArchetypesAmount;
                 int elementIndex = i;
                 Transform spawnElement;
                 if (i < indexLimit)

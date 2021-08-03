@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace CombatConditions
 {
-    public abstract class SCombatCondition : ScriptableObject, ICombatCondition
+    public abstract class SEffectCondition : ScriptableObject
     {
         public abstract bool CanApply(ref EffectArguments arguments, float conditionalCheck);
     }
@@ -17,19 +17,17 @@ namespace CombatConditions
     public struct ConditionParam
     {
         [SerializeField]
-        private SCombatCondition condition;
+        private SEffectCondition condition;
         [SuffixLabel("00%"),Range(-10,10),ShowIf("condition")]
         public float conditionalValue;
+        public bool inverseCondition;
 
         public bool HasCondition() => condition != null;
         public bool CanApplyCondition(ref EffectArguments arguments)
         {
-            return condition.CanApply(ref arguments, conditionalValue);
+            bool canBeApply = condition.CanApply(ref arguments, conditionalValue);
+            return canBeApply ^ inverseCondition;
         }
     }
 
-    public interface ICombatCondition
-    {
-        bool CanApply(ref EffectArguments arguments, float conditionalCheck);
-    }
 }

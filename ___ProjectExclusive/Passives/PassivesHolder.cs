@@ -191,9 +191,13 @@ namespace Passives
         [SerializeField]
         private List<SOpeningPassivesPreset> passives;
 
+        [SerializeField] 
+        private List<SAuraPassive> auras;
+
         public OpeningPassives(int size = 0)
         {
             passives = new List<SOpeningPassivesPreset>(size);
+            auras = new List<SAuraPassive>(size);
         }
 
         public void AddPassive(SOpeningPassivesPreset passive)
@@ -209,11 +213,16 @@ namespace Passives
 
         public void DoOpeningPassives(CombatingEntity user)
         {
-            if (passives.Count <= 0) return;
-            foreach (SOpeningPassivesPreset buffEffect in passives)
-            {
-                buffEffect.DoDirectEffects(user,user);
-            }
+            if (passives.Count > 0)
+                foreach (SOpeningPassivesPreset buffEffect in passives)
+                {
+                    buffEffect.DoDirectEffects(user, user);
+                }
+            if(auras.Count > 0)
+                foreach (SAuraPassive aura in auras)
+                {
+                    user.CharacterGroup.Team.InjectAura(aura);
+                }
         }
 
     }

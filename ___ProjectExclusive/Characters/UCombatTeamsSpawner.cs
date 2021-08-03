@@ -45,7 +45,7 @@ namespace Characters
             void AddEntities(CombatingTeam team, TeamTransforms transforms)
             {
 #if UNITY_EDITOR
-                if (team.Count != CharacterArchetypes.AmountOfArchetypes)
+                if (team.Count != CharacterArchetypes.AmountOfArchetypesAmount)
                 {
                     throw new NotImplementedException("Can't spawn all entities",
                         new IndexOutOfRangeException($"Not enough elements: {team.Count}"));

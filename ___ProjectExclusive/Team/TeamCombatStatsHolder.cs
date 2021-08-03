@@ -30,6 +30,8 @@ namespace _Team
 
         public float LoseControlThreshold;
         public float ReviveTime;
+        public int BurstControlLength;
+        public int BurstCounterAmount;
 
         public TeamCombatStatsHolder(TeamCombatState state)
         {
@@ -59,9 +61,13 @@ namespace _Team
         {
             InjectNewStats(holder);
             InjectNewPassives(holder);
+            
             LoseControlThreshold = holder.GetLoseThreshold();
             ReviveTime = holder.GetReviveTime();
             ControlLoseOnDeath = holder.GetControlLosePoints() ?? TeamControlLoses.BackUpData;
+
+            BurstControlLength = holder.GetBurstControlLength();
+            BurstCounterAmount = holder.GetBurstCounterAmount();
         }
 
         private void InjectNewStats(IStanceArchetype<ICharacterBasicStats> stats)
@@ -111,5 +117,32 @@ namespace _Team
         public CompositeStats GetAttacking() => AttackingStats;
         public CompositeStats GetNeutral() => NeutralStats;
         public CompositeStats GetDefending() => DefendingStats;
+
+        public void InjectAura(SAuraPassive aura)
+        {
+            var position = aura.InjectionPosition();
+            var stats = aura.GetStats();
+            switch (position)
+            {
+                case CharacterArchetypes.TeamPosition.FrontLine:
+                    AttackingStats.Add(stats);
+                    break;
+                case CharacterArchetypes.TeamPosition.MidLine:
+                    NeutralStats.Add(stats);
+                    break;
+                case CharacterArchetypes.TeamPosition.BackLine:
+                    DefendingStats.Add(stats);
+                    break;
+                case CharacterArchetypes.TeamPosition.All:
+                    AttackingStats.Add(stats);
+                    NeutralStats.Add(stats);
+                    DefendingStats.Add(stats);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"Target position [{position}] is not " +
+                                                          $"supported in Aura Injection.");
+            }
+
+        }
     }
 }

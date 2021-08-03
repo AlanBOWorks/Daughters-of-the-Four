@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Characters;
 using CombatEffects;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -57,7 +58,11 @@ namespace Skills
             return SkillState == State.Cooldown;
         }
 
-        //TODO give additional buff to skills if applied
+        public bool CanBeUse(CombatingEntity user)
+        {
+            return !IsInCooldown() && preset.CanBeUse(user);
+        }
+
 
 
         public void OnSkillUsage()
@@ -118,5 +123,6 @@ namespace Skills
         public Sprite Icon => preset.Icon; // could be modified by another icon when upgraded or something
         public SSkillPreset.SkillType GetMainType() => preset.GetSkillType();
         public SEffectBase.EffectTarget GetMainTarget() => preset.GetMainEffect().GetEffectTarget();
+
     }
 }

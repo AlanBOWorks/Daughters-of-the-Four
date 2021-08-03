@@ -77,7 +77,7 @@ namespace _Player
 
         public void UpdateCooldown()
         {
-            if (CurrentSkill.IsInCooldown())
+            if (!CurrentSkill.CanBeUse(CurrentEntity))
             {
                 cooldownHolder.transform.parent.gameObject.SetActive(true);
                 int cooldownAmount = CurrentSkill.CurrentCooldown;

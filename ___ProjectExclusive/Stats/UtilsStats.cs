@@ -292,6 +292,16 @@ namespace Stats
             CombatSystemSingleton.CombatTeamControlHandler.DoVariation(team,addition);
         }
 
+        public static void DoBurstControl(CombatingTeam team, float burstControl)
+        {
+            CombatSystemSingleton.CombatTeamControlHandler.DoBurstControl(team,burstControl);
+        }
+
+        public static void DoCounterBurstControl(CombatingTeam team, float counterBurst)
+        {
+            CombatSystemSingleton.CombatTeamControlHandler.DoCounterBurstControl(team,counterBurst);
+        }
+
         public static bool IsCriticalPerformance(ICharacterBasicStats stats, CombatSkill skill, float criticalCheck)
         {
             if (!skill.CanCrit) return false;

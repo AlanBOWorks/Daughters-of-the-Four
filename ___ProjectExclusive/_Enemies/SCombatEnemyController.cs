@@ -77,26 +77,27 @@ namespace _Enemies
 
     public static class UtilsEnemyController
     {
-        public static void DoInjectionOfSkills(List<CombatSkill> possibleSkills, CombatingEntity entity)
+        public static void DoInjectionOfSkills(List<CombatSkill> possibleSkills, CombatingEntity user)
         {
-            ISkillShared<CombatSkill> skillShared = entity.SharedSkills;
+            ISkillShared<CombatSkill> skillShared = user.SharedSkills;
             AddSharedType(skillShared.CommonSkillFirst);
             AddSharedType(skillShared.CommonSkillSecondary);
 
-            List<CombatSkill> uniqueSkills = UtilsSkill.GetUniqueByStance(entity);
+            List<CombatSkill> uniqueSkills = UtilsSkill.GetUniqueByStance(user);
             if (uniqueSkills == null) return;
 
             foreach (CombatSkill skill in uniqueSkills)
             {
-                if (skill.IsInCooldown()) continue;
+                if (!skill.CanBeUse(user)) return;
                 possibleSkills.Add(skill);
             }
 
             void AddSharedType(CombatSkill skill)
             {
-                if (skill == null || skill.IsInCooldown()) return;
+                if (!skill.CanBeUse(user)) return;
                 possibleSkills.Add(skill);
             }
+
         }
 
         public static void DoInjectionOfUltimate(List<CombatSkill> possibleSkills, CombatingEntity entity)

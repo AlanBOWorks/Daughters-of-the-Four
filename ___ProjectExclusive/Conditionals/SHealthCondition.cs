@@ -7,8 +7,8 @@ namespace CombatConditions
 {
 
     [CreateAssetMenu(fileName = "Health Condition - N [Preset]",
-        menuName = "Combat/Conditions/Health")]
-    public class SHealthCondition : SCombatCondition
+        menuName = "Combat/Conditions/Effect/Health")]
+    public class SHealthCondition : SEffectCondition
     {
         [SerializeField, Tooltip("If is the [user] or the [target] that needs to be check")] 
         private bool isUserCheck = true;
@@ -23,19 +23,8 @@ namespace CombatConditions
 
             float percentage = UtilsCombatStats.HealthPercentage(checkEntity);
 
-            if (isBiggerCheck)
-            {
-                return percentage >= healthCheck;
-            }
-            else
-            {
-                return percentage < healthCheck; 
-                // [<] because two conditions of opposite effect with [<=] && [>=] could trigger.
-                // [>=] has priority since it could be a
-                // (value >= 100% == MaxHealth) that is quite common
-                // while
-                // (value <= 0 == Dead) which is another special condition with special needs
-            }
+            bool isHealthLower = percentage < healthCheck;
+            return isHealthLower ^ isBiggerCheck;
         }
     }
 }

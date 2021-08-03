@@ -15,35 +15,51 @@ namespace _Team
 
         public readonly CombatingTeam Team;
 
-        [ShowInInspector,Range(-1,1)] 
+        [field: ShowInInspector]
+        [field: Range(-1,1)]
         public float TeamControlAmount = 0;
-        [ShowInInspector,Range(-1,1)] 
-        public float BurstControlAmount = 0;
 
-        public float ControlAmount => TeamControlAmount + BurstControlAmount;
+
+        [ShowInInspector] 
+        public float BurstControlAmount { get; private set; }
+
+
+        public float GetControlAmount()
+        {
+            float control = TeamControlAmount + BurstControlAmount;
+
+            return control;
+        } 
 
         [ShowInInspector]
         public Stance stance;
 
+        [ShowInInspector] 
+        public bool IsBurstStance;
+
         public bool IsInDanger()
         {
-            return ControlAmount <= Team.StatsHolder.LoseControlThreshold;
+            return GetControlAmount() <= 
+                   Team.StatsHolder.LoseControlThreshold;
         }
 
         public void DoBurstControl(float targetBurst)
         {
             BurstControlAmount = targetBurst;
+            IsBurstStance = true;
+        }
+
+        public void DoBurstVariation(float variation)
+        {
+            BurstControlAmount += variation;
         }
 
         public void FinishBurstControl()
         {
             BurstControlAmount = 0;
+            IsBurstStance = false;
         }
 
-        public bool IsInBurstControl()
-        {
-            return BurstControlAmount > 0;
-        }
 
         public enum Stance
         {

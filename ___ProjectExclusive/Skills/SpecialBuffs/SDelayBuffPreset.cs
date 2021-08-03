@@ -27,8 +27,8 @@ namespace Skills
         {
             float modifier = stacks;
                 if (modifier > maxStack) modifier = maxStack;
-            DoDirectEffects(user,user, modifier);
-            DoDirectEffects(user,user,stacks,maxLessEffects);
+            DoEffects(user,user, modifier);
+            DoEffects(user,user,stacks,maxLessEffects);
         }
 
 

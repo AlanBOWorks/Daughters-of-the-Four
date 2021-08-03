@@ -47,7 +47,7 @@ namespace Passives
         [SuffixLabel("00%"), Range(0, 10)] private float effectValue;
 
         [Title("Conditions")]
-        [SerializeField] private SCombatCondition condition;
+        [SerializeField] private SEffectCondition condition;
         [SerializeField, ShowIf("condition")]
         [SuffixLabel("00%"), Range(-10, 10)] private float conditionValue;
 

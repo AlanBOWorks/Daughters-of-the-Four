@@ -81,7 +81,7 @@ namespace _CombatSystem
         public const float InitiativeCheck = 1;
         public const float SpeedStatModifier = InitiativeCheck * 0.01f;
         public const int PredictedAmountOfCharacters = UtilsCharacter.PredictedAmountOfCharactersInBattle;
-        public const int PredictedAmountOfTeamCharacters = CharacterArchetypes.AmountOfArchetypes;
+        public const int PredictedAmountOfTeamCharacters = CharacterArchetypes.AmountOfArchetypesAmount;
         public const int ActionsPerInitiativeCap = 8;
         public const int ActionsLowerCap = -2;
     }

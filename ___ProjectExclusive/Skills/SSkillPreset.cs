@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using ___ProjectExclusive;
 using Characters;
 using CombatEffects;
 using Sirenix.OdinInspector;
 using Stats;
-using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -49,34 +47,49 @@ namespace Skills
         [TitleGroup("Details")]
         [SerializeField, Delayed]
         protected string skillName = "NULL";
-        public string SkillName => skillName;
 
         [TitleGroup("Details")]
         [SerializeField] private Sprite icon = null;
-        public Sprite Icon => icon;
 
         [TitleGroup("Stats")]
         public bool canCrit = true;
         [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
         public float criticalAddition = 0f;
 
+        [Title("MainCondition")] 
+        [SerializeField]
+        private ConditionalUse conditionalUse;
 
         [TitleGroup("Effects")]
         [SerializeField]
         private EffectParams[] effects = new EffectParams[1];
+
+
+        public string SkillName => skillName;
+        public Sprite Icon => icon;
         public EffectParams[] GetEffects => effects;
         public IEffect GetMainEffect() => effects[0];
+
+
+        public bool CanBeUse(CombatingEntity user)
+        {
+            return conditionalUse.CanBeUse(user);
+        }
 
         /// <summary>
         /// Use this for doing the effect directly without animations nor waits
         /// </summary>
         public void DoDirectEffects(CombatingEntity user, CombatingEntity target)
-            => DoDirectEffects(user, target, 1);
+        {
+            DoEffects(user, target, 1);
+        }
+        
+        public void DoEffects(CombatingEntity user, CombatingEntity target, float modifier)
+        {
+            DoEffects(user, target, modifier, effects);
+        }
 
-        public void DoDirectEffects(CombatingEntity user, CombatingEntity target, float modifier)
-            => DoDirectEffects(user, target, modifier, effects);
-
-        protected void DoDirectEffects(CombatingEntity user, CombatingEntity target, float modifier,
+        protected void DoEffects(CombatingEntity user, CombatingEntity target, float modifier,
             EffectParams[] targetEffects)
         {
             float randomValue = Random.value;
@@ -93,6 +106,10 @@ namespace Skills
                 }
             }
         }
+
+
+
+
 
 
         [Button(ButtonSizes.Large)]
@@ -123,6 +140,22 @@ namespace Skills
         protected virtual string ValidationName(IEffect mainEffect)
         {
             return "(" + mainEffect.GetEffectTarget().ToString().ToUpper() + ") ";
+        }
+
+        [Serializable]
+        private struct ConditionalUse
+        {
+            public SSkillUseConditionBase useCondition;
+            public float conditionCheck;
+            public bool inverseCondition;
+
+            public bool CanBeUse(CombatingEntity user)
+            {
+                if (useCondition == null) return true;
+
+                bool canBeUse = useCondition.CanUseSkill(user, conditionCheck);
+                return canBeUse ^ inverseCondition;
+            }
         }
     }
 }

@@ -11,13 +11,16 @@ namespace Characters
         public const int FrontLinerIndex = 0;
         public const int MidLinerIndex = FrontLinerIndex + 1;
         public const int BackLinerIndex = MidLinerIndex + 1;
-        public const int AmountOfArchetypes = BackLinerIndex + 1;
+        public const int AmountOfArchetypesAmount = BackLinerIndex + 1;
+        public const int AllPositionIndex = AmountOfArchetypesAmount;
+        public const int PositionsTypesAmount = AllPositionIndex + 1;
 
         public enum TeamPosition
         {
             FrontLine = FrontLinerIndex,
             MidLine = MidLinerIndex,
-            BackLine = BackLinerIndex
+            BackLine = BackLinerIndex,
+            All = AllPositionIndex
         }
         public enum RoleArchetype
         {
@@ -88,8 +91,8 @@ namespace Characters
             return data.BackLiner != null && data.MidLiner != null && data.FrontLiner != null;
         }
 
-        public static bool IsValid<T>(T[] elements) => elements.Length == AmountOfArchetypes;
-        public static bool IsValid<T>(List<T> elements) => elements.Count == AmountOfArchetypes;
+        public static bool IsValid<T>(T[] elements) => elements.Length == AmountOfArchetypesAmount;
+        public static bool IsValid<T>(List<T> elements) => elements.Count == AmountOfArchetypesAmount;
 
         public static void DoInjection<T, TParse>(
             ICharacterArchetypesData<T> original,
@@ -129,10 +132,10 @@ namespace Characters
                 parsingFunc(parsing.BackLiner)
             };
 
-            if (generated.Count != AmountOfArchetypes)
+            if (generated.Count != AmountOfArchetypesAmount)
                 throw new ArgumentException("Generated archetypes are invalid",
                     new IndexOutOfRangeException($"Amount of entities are ({generated.Count}) " +
-                                                 $"instead of ({AmountOfArchetypes})"));
+                                                 $"instead of ({AmountOfArchetypesAmount})"));
 
             return generated;
         }
@@ -246,7 +249,7 @@ namespace Characters
         public const int FrontLinerIndex = CharacterArchetypes.FrontLinerIndex;
         public const int MidLinerIndex = CharacterArchetypes.MidLinerIndex;
         public const int BackLinerIndex = CharacterArchetypes.BackLinerIndex;
-        public const int AmountOfArchetypes = CharacterArchetypes.AmountOfArchetypes;
+        public const int AmountOfArchetypes = CharacterArchetypes.AmountOfArchetypesAmount;
     }
 
     public class CharacterArchetypes<T> : ICharacterArchetypes<T>

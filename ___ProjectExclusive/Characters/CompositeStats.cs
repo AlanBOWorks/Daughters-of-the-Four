@@ -12,7 +12,7 @@ namespace Characters
         public readonly List<ISpecialStats> SpecialStats;
         public readonly List<ICombatTemporalStatsBase> TemporalStats;
 
-        public void Subscribe(ICharacterBasicStats stats)
+        public void Add(ICharacterBasicStats stats)
         {
             OffensiveStats.Add(stats);
             SupportStats.Add(stats);

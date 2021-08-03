@@ -282,6 +282,7 @@ namespace Stats
             ActionsPerInitiative = overrideByDefault;
         }
 
+        [Button]
         public virtual void OverrideAll(float value)
         {
             AttackPower = value;

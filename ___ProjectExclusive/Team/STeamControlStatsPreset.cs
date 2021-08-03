@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace _Team
 {
-    [CreateAssetMenu(fileName = "N - Team Control Passive [Preset]",
-        menuName = "Combat/Team/Control Passive")]
+    [CreateAssetMenu(fileName = "N"+ ControlHandlerPrefix,
+        menuName = "Combat/Team/Tean Control Stats")]
     public class STeamControlStatsPreset : ScriptableObject, ITeamCombatControlHolder
     {
         [Title("Tooltips")] [SerializeField] private string controlName = "NULL";
@@ -22,6 +22,10 @@ namespace _Team
         [SerializeField,Range(0,100), SuffixLabel("tempoSec"), 
          Tooltip("1 sec equals apr. 1 initiative at 100 Speed")] 
         private float reviveTime = TeamCombatStatsHolder.DefaultReviveTime;
+
+        [SerializeField, Range(0, 10), SuffixLabel("Rounds")] private int controlBurstLength = 4;
+        [SerializeField, Range(0, 10), SuffixLabel("Rounds")] private int counterBurstAmount = 2;
+
 
         [Title("Stats")]
         [HorizontalGroup("Attack")]
@@ -40,6 +44,8 @@ namespace _Team
         public string ControlName => controlName;
         public float GetLoseThreshold() => loseControlThreshold;
         public float GetReviveTime() => reviveTime;
+        public int GetBurstControlLength() => controlBurstLength;
+        public int GetBurstCounterAmount() => counterBurstAmount;
 
         public ICharacterArchetypesData<float> GetControlLosePoints() => controlLoses;
 
@@ -62,7 +68,7 @@ namespace _Team
 
 
 
-        private const string ControlHandlerPrefix = " - Team Control Passives [Preset]";
+        private const string ControlHandlerPrefix = " - Team Control Stats [Preset]";
         [Button(ButtonSizes.Large)]
         private void UpdateAssetName()
         {
@@ -92,6 +98,16 @@ namespace _Team
         string ControlName { get; }
         float GetLoseThreshold();
         float GetReviveTime();
+        /// <summary>
+        /// How many rounds a BurstControl a team can hold
+        /// </summary>
+        /// <returns></returns>
+        int GetBurstControlLength();
+        /// <summary>
+        /// How much a CounterBurst a team can reduce
+        /// </summary>
+        /// <returns></returns>
+        int GetBurstCounterAmount();
 
         ICharacterArchetypesData<float> GetControlLosePoints();
     }
