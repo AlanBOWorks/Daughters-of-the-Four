@@ -7,7 +7,7 @@ namespace Passives
     // This is made for organizational purposes and have a clear object type for 'opening passives'
     [CreateAssetMenu(fileName = "N [PASSIVE Opening Preset]",
         menuName = "Combat/Passive/Preset/Opening Passive Preset")]
-    public class SOpeningPassivesPreset : SEffectSetPreset
+    public class SOpeningPassivesPreset : SSkillPreset
     {
         protected override string FullAssetName(IEffect mainEffect)
         {

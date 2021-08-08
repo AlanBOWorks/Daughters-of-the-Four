@@ -32,7 +32,7 @@ namespace StylizedAnimator
             {
                 AnimancerLayer layer = Animancer.Layers[i];
                 var state = layer.CurrentState;
-                state.Time += deltaVariation;
+                state.Time += deltaVariation * state.Speed;
             }
 
         }

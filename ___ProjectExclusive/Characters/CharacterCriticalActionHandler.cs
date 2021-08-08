@@ -29,8 +29,8 @@ namespace Characters
             }
             _isFirstCritical = true;
 
-            if(CriticalBuff != null)
-                _user.DelayBuffHandler.EnqueueBuff(CriticalBuff);
+            if (CriticalBuff != null)
+                _user.DelayBuffHandler.EnqueueBuff(CriticalBuff,_user);
         }
 
         public void OnCriticalAction()

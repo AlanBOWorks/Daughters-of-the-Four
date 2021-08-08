@@ -7,8 +7,9 @@ namespace ___ProjectExclusive.Animators
 {
     public class UHairAdditionAnimator : MonoBehaviour
     {
-        [SerializeField] private Parameters parameters = new Parameters();
+        [SerializeField,HideInPlayMode] private Parameters parameters = new Parameters();
 
+        [ShowInInspector,HideInEditorMode]
         public MixerState.Transition2D HairState { get; private set; }
         private void Start()
         {
@@ -17,7 +18,7 @@ namespace ___ProjectExclusive.Animators
         }
 
         [Serializable]
-        private class Parameters
+        internal class Parameters
         {
             [SerializeField] private AnimancerComponent hairAnimancer;
             [SerializeField] private MixerTransition2D windAdditions;
@@ -28,9 +29,9 @@ namespace ___ProjectExclusive.Animators
             public MixerState.Transition2D StartAnimations()
             {
                 var animationLayer = hairAnimancer.Layers[targetLayer];
+                animationLayer.Play(windAdditions);
                 animationLayer.IsAdditive = true;
-                animationLayer.GetOrCreateState(windAdditions);
-
+                animationLayer.SetWeight(1);
                 return windAdditions.Transition;
             }
         }

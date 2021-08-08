@@ -421,12 +421,12 @@ namespace Stats
             return criticalCheck < stats.CriticalChance + skill.CriticalAddition;
         }
 
-        public static bool IsCriticalPerformance(ICharacterBasicStats stats, SEffectSetPreset preset, float criticalCheck)
+        public static bool IsCriticalPerformance(ICharacterBasicStats stats, SSkillPreset preset, float criticalCheck)
         {
             if (!preset.canCrit) return false;
             return criticalCheck < stats.CriticalChance + preset.criticalAddition;
         }
-        public static bool IsCriticalPerformance(SEffectSetPreset preset, float criticalCheck)
+        public static bool IsCriticalPerformance(SSkillPreset preset, float criticalCheck)
         {
             if (!preset.canCrit) return false;
             return criticalCheck < preset.criticalAddition;

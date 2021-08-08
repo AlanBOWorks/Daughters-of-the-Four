@@ -13,7 +13,7 @@ namespace Skills
     public interface IDelayBuff
     {
         TempoHandler.TickType GetTickType();
-        void DoBuff(CombatingEntity user, float stacks);
+        void DoBuff(CombatingEntity user, CombatingEntity target, float stacks);
         int MaxStack { get; }
     }
 
@@ -40,20 +40,10 @@ namespace Skills
         [ShowInInspector] protected override StackableBuffPool OnSequence { get; }
         [ShowInInspector] protected override StackableBuffPool OnRound { get; }
 
-        public void EnqueueBuff(IDelayBuff buff)
+        public void EnqueueBuff(IDelayBuff buff, CombatingEntity buffer)
         {
             var handler = GetHandler(buff.GetTickType());
-            if (handler.ContainsKey(buff))
-            {
-                float stackAmount = handler[buff];
-                stackAmount++;
-                if (stackAmount <= buff.MaxStack)
-                    handler[buff] = stackAmount;
-            }
-            else
-            {
-                handler.Add(buff,1);
-            }
+            handler.Add(buff,buffer);
 
         }
 
@@ -61,21 +51,48 @@ namespace Skills
         {
             if (holder.Count <= 0) return;
 
-            foreach (KeyValuePair<IDelayBuff, float> pair in holder)
+            for (int i = holder.Count - 1; i >= 0; i--)
             {
-                pair.Key.DoBuff(_entity,pair.Value);
+                var values = holder[i];
+                values.Buff.DoBuff(values.Buffer,_entity,values.StackAmount);
+                holder.RemoveAt(i);
             }
-            holder.Clear();
         }
     }
 
     /// <summary>
     /// <see cref="float"/> is stack amount
     /// </summary>
-    public class StackableBuffPool : Dictionary<IDelayBuff,float> 
-    { }
+    public class StackableBuffPool : List<StackableBuffValues>
+    {
+        public void Add(IDelayBuff buff,CombatingEntity buffer)
+        {
+            for (var i = 0; i < this.Count; i++)
+            {
+                StackableBuffValues buffValues = this[i];
+                if (buff != buffValues.Buff || buffer != buffValues.Buffer) continue;
 
-    
+                this[i] = new StackableBuffValues(buff, buffer, buffValues.StackAmount+1);
+                return;
+            }
+            Add(new StackableBuffValues(buff,buffer,1));
+        }
+    }
+
+    public struct StackableBuffValues
+    {
+        public readonly IDelayBuff Buff;
+        public readonly CombatingEntity Buffer;
+        public readonly float StackAmount;
+
+        public StackableBuffValues(IDelayBuff buff, CombatingEntity buffer, float stackAmount)
+        {
+            Buff = buff;
+            Buffer = buffer;
+            StackAmount = stackAmount;
+        }
+    }
+
 
     /// <summary>
     /// For buff that have a special condition for need to be removed;

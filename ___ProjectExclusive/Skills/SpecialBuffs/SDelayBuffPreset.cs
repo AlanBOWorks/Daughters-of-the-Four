@@ -8,7 +8,7 @@ namespace Skills
 {
     [CreateAssetMenu(fileName = "N (T) - [Delay BUFF Skill Preset]",
         menuName = "Combat/Buffs/Delay Buff")]
-    public class SDelayBuffPreset : SEffectSetPreset, IDelayBuff
+    public class SDelayBuffPreset : SSkillPreset, IDelayBuff
     {
         [SerializeField,TitleGroup("Stats")] 
         protected TempoHandler.TickType tickType 
@@ -23,12 +23,26 @@ namespace Skills
         public TempoHandler.TickType GetTickType() => tickType;
         public int MaxStack => maxStack;
 
-        public void DoBuff(CombatingEntity user, float stacks)
+        protected override void DoEffect(ref DoSkillArguments arguments, int effectIndex)
+        {
+            //Just to avoid repetition of EnqueueBuff (since the effectIndex depends of effects.Length)
+            if (effectIndex > 0) return;
+            var user = arguments.User;
+            var target = arguments.Target;
+            target.DelayBuffHandler.EnqueueBuff(this, user);
+        }
+
+        public override void DoDirectEffects(CombatingEntity user, CombatingEntity target)
+        {
+            target.DelayBuffHandler.EnqueueBuff(this,user);
+        }
+
+        public void DoBuff(CombatingEntity user,CombatingEntity target, float stacks)
         {
             float modifier = stacks;
                 if (modifier > maxStack) modifier = maxStack;
-            DoEffects(user,user, modifier);
-            DoEffects(user,user,stacks,maxLessEffects);
+            base.DoEffects(user,target, modifier);
+            base.DoEffects(user,target,stacks,maxLessEffects);
         }
 
 

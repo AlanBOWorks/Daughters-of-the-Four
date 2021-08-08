@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ___ProjectExclusive;
 using Characters;
 using CombatEffects;
@@ -15,7 +16,7 @@ namespace Skills
     /// </summary>
     [CreateAssetMenu(fileName = "N (T) - SKILL L - [Preset]",
         menuName = "Combat/Skill/Skill Preset", order = -100)]
-    public class SSkillPreset : SEffectSetPreset
+    public class SSkillPreset : ScriptableObject
     {
         [TitleGroup("Targeting")]
         [SerializeField] protected bool canTargetSelf = false;
@@ -34,16 +35,11 @@ namespace Skills
         [SerializeField]
         private int cooldownCost = 1;
         public int CoolDownCost => cooldownCost;
+        [TitleGroup("Stats")]
+        public bool canCrit = true;
+        [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
+        public float criticalAddition = 0f;
 
-        protected override string ValidationName(IEffect mainEffect)
-        {
-            return $" - [{cooldownCost}] - " + base.ValidationName(mainEffect);
-        }
-    }
-
-
-    public abstract class SEffectSetPreset : ScriptableObject
-    {
         [TitleGroup("Details")]
         [SerializeField, Delayed]
         protected string skillName = "NULL";
@@ -51,12 +47,8 @@ namespace Skills
         [TitleGroup("Details")]
         [SerializeField] private Sprite icon = null;
 
-        [TitleGroup("Stats")]
-        public bool canCrit = true;
-        [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
-        public float criticalAddition = 0f;
 
-        [Title("MainCondition"),PropertyOrder(90)] 
+        [Title("Main Condition"),PropertyOrder(90)] 
         [SerializeField]
         private ConditionalUse conditionalUse;
 
@@ -67,8 +59,56 @@ namespace Skills
 
         public string SkillName => skillName;
         public Sprite Icon => icon;
-        public EffectParams[] GetEffects => effects;
         public IEffect GetMainEffect() => effects[0];
+
+        public List<CombatingEntity> GetMainEffectTargets(CombatingEntity user,CombatingEntity target)
+        {
+            return UtilsTargets.GetEffectTargets(user, target, effects[0].GetEffectTarget());
+        }
+
+        protected virtual void DoEffect(ref DoSkillArguments arguments, int effectIndex)
+        {
+            var user = arguments.User;
+            var target = arguments.Target;
+            var isCritical = arguments.IsCritical;
+
+            var effect = effects[effectIndex];
+            var effectTargets = UtilsTargets.GetEffectTargets(user, target, effect.GetEffectTarget());
+            float randomModifier;
+            UpdateRandomness();
+            foreach (CombatingEntity effectTarget in effectTargets)
+            {
+                if (effect.CanPerformRandom())
+                    UpdateRandomness();
+                else
+                    randomModifier = 1;
+
+                effect.DoEffect(user, effectTarget, randomModifier);
+            }
+
+
+            void UpdateRandomness()
+            {
+                if (isCritical)
+                {
+                    randomModifier = UtilsCombatStats.RandomHigh;
+                    return;
+                }
+                randomModifier = UtilsCombatStats.CalculateRandomModifier(Random.value);
+            }
+        }
+
+        
+
+        public void DoMainEffect(ref DoSkillArguments arguments)
+            => DoEffect(ref arguments,0);
+        public void DoSecondaryEffects(ref DoSkillArguments arguments)
+        {
+            for (int i = 1; i < effects.Length; i++)
+            {
+                DoEffect(ref arguments, i);
+            }
+        }
 
 
         public bool CanBeUse(CombatingEntity user)
@@ -79,17 +119,17 @@ namespace Skills
         /// <summary>
         /// Use this for doing the effect directly without animations nor waits
         /// </summary>
-        public void DoDirectEffects(CombatingEntity user, CombatingEntity target)
+        public virtual void DoDirectEffects(CombatingEntity user, CombatingEntity target)
         {
             DoEffects(user, target, 1);
         }
         
-        public void DoEffects(CombatingEntity user, CombatingEntity target, float modifier)
+        public virtual void DoEffects(CombatingEntity user, CombatingEntity target, float modifier)
         {
             DoEffects(user, target, modifier, effects);
         }
 
-        protected void DoEffects(CombatingEntity user, CombatingEntity target, float modifier,
+        protected virtual void DoEffects(CombatingEntity user, CombatingEntity target, float modifier,
             EffectParams[] targetEffects)
         {
             float randomValue = Random.value;
@@ -106,11 +146,6 @@ namespace Skills
                 }
             }
         }
-
-
-
-
-
 
         [Button(ButtonSizes.Large)]
         protected virtual void UpdateAssetName()
@@ -139,7 +174,7 @@ namespace Skills
         }
         protected virtual string ValidationName(IEffect mainEffect)
         {
-            return "(" + mainEffect.GetEffectTarget().ToString().ToUpper() + ") ";
+            return $" - [{cooldownCost}] - (" + mainEffect.GetEffectTarget().ToString().ToUpper() + ") ";
         }
 
         [Serializable]
@@ -156,6 +191,20 @@ namespace Skills
                 bool canBeUse = useCondition.CanUseSkill(user, conditionCheck);
                 return canBeUse ^ inverseCondition;
             }
+        }
+    }
+
+    public struct DoSkillArguments
+    {
+        public readonly CombatingEntity User;
+        public readonly CombatingEntity Target;
+        public bool IsCritical;
+
+        public DoSkillArguments(CombatingEntity user, CombatingEntity target, bool isCritical)
+        {
+            User = user;
+            Target = target;
+            IsCritical = isCritical;
         }
     }
 }

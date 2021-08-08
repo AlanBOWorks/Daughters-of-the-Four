@@ -47,18 +47,17 @@ namespace Skills
             return applyEffectOn;
         }
 
-        public static List<CombatingEntity> GetPossibleTargets(CombatSkill skill,
+        public static void InjectPossibleTargets(CombatSkill skill,
             CombatingEntity user, SkillTargets injectInList)
         {
             injectInList.UsingSkill = skill;
-            return GetPossibleTargets(skill, user, injectInList as List<CombatingEntity>);
+            InjectPossibleTargets(skill, user, injectInList as List<CombatingEntity>);
         }
-        public static List<CombatingEntity> GetPossibleTargets(SkillBase skill, 
+        public static void InjectPossibleTargets(SkillBase skill, 
             CombatingEntity user, List<CombatingEntity> injectInList)
         {
             injectInList.Clear();
             PrepareTargets();
-            return injectInList;
 
             void PrepareTargets()
             {

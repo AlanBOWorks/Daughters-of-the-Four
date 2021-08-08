@@ -12,7 +12,7 @@ using Random = UnityEngine.Random;
 
 namespace Skills
 {
-    public class PerformSkillHandler : ICombatAfterPreparationListener, ITempoListener
+    public class PerformSkillHandler : ICombatAfterPreparationListener, ITempoListener, ISkippedTempoListener
     {
         [ShowInInspector]
         private CombatingEntity _currentUser;
@@ -37,6 +37,8 @@ namespace Skills
         public void OnInitiativeTrigger(CombatingEntity entity)
         {
             _currentUser = entity;
+            _currentSkillTargets.UsingSkill = null;
+            _currentSkillTargets.Clear();
         }
 
         public void OnDoMoreActions(CombatingEntity entity)
@@ -48,6 +50,11 @@ namespace Skills
             _currentUser = null;
             _currentSkillTargets.UsingSkill = null;
             _currentSkillTargets.Clear();
+        }
+
+        public void OnSkippedEntity(CombatingEntity entity)
+        {
+            OnFinisAllActions(entity);
         }
 
         private CoroutineHandle _doSkillHandle;
@@ -70,24 +77,10 @@ namespace Skills
                 throw new NullReferenceException("DoSkills() was invoked before preparation");
             }
 
-            skill.OnSkillUsage();
-            var effects = skillPreset.GetEffects;
-            var mainEffect = effects[0];
-
-
-            if (effects.Length <= 0)
-            {
-#if UNITY_EDITOR
-                Debug.LogError("Skill doesn't have an effect");
-#endif                
-                yield break;
-            }
-
 
             //>>>>>>>>>>>>>>>>>>> DO Randomness
             float randomValue = Random.value;
             bool isCritical;
-            float randomModifier;
             var combatStats = _currentUser.CombatStats;
             if (UtilsCombatStats.IsCriticalPerformance(combatStats,skill, randomValue))
             {
@@ -103,60 +96,26 @@ namespace Skills
             {
                 isCritical = false;
             }
+            DoSkillArguments skillArguments = new DoSkillArguments(_currentUser,target,isCritical);
 
             //>>>>>>>>>>>>>>>>>>> DO Main Effect
-            List<CombatingEntity> effectTargets;
-            DoEffectOnTargets(mainEffect);
-            yield return Timing.WaitUntilDone(_currentUser.CombatAnimator
-                ._DoAnimation(_currentUser, effectTargets, _currentSkillTargets.UsingSkill));
+            List<CombatingEntity> effectTargets = skillPreset.GetMainEffectTargets(_currentUser, target);
 
-
-
-            //>>>>>>>>>>>>>>>>>>> DO Secondary Effects
-            // 1 since the main Effect is skillEffects[0]
-            for (int i = 1; i < effects.Length; i++)
-            {
-                DoEffectOnTargets(effects[i]);
-            }
-
+            skillPreset.DoMainEffect(ref skillArguments);
+            yield return Timing.WaitUntilDone(
+                    _currentUser.CombatAnimator._DoAnimation(_currentUser, effectTargets, _currentSkillTargets.UsingSkill));
+            skillPreset.DoSecondaryEffects(ref skillArguments);
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
+            skill.OnSkillUsage();
             CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(_currentUser);
 
-
-            //////////////////////
-            void DoEffectOnTargets(IEffect effect)
-            {
-                effectTargets 
-                    = UtilsTargets.GetEffectTargets(_currentUser, target,effect.GetEffectTarget());
-                foreach (CombatingEntity effectTarget in effectTargets)
-                {
-                    if (effect.CanPerformRandom())
-                        UpdateRandomness();
-                    else
-                        randomModifier = 1;   
-
-                    effect.DoEffect(_currentUser, effectTarget,randomModifier);
-                }
-            }
-
-            void UpdateRandomness()
-            {
-                if (isCritical)
-                {
-                    randomModifier = UtilsCombatStats.RandomHigh;
-                    return;
-                }
-
-                randomValue = Random.value;
-                randomModifier = UtilsCombatStats.CalculateRandomModifier(randomValue);
-
-            }
         }
 
         public List<CombatingEntity> HandlePossibleTargets(CombatSkill skill)
         {
-            return UtilsTargets.GetPossibleTargets(skill, _currentUser, _currentSkillTargets);
+            UtilsTargets.InjectPossibleTargets(skill, _currentUser, _currentSkillTargets);
+            return _currentSkillTargets;
         }
 
         public static List<CombatingEntity> SendHandlePossibleTargets(CombatSkill skill)

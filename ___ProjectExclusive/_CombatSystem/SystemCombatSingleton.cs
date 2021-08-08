@@ -41,7 +41,8 @@ namespace _CombatSystem
             Invoker.SubscribeListener(teamStateTicker);
 
             // Round check first since is better to finish the combat before all other unnecessary task
-            TempoHandler.Subscribe(PerformSkillHandler);
+            TempoHandler.Subscribe((ITempoListener)PerformSkillHandler);
+            TempoHandler.Subscribe((ISkippedTempoListener)PerformSkillHandler);
             TempoHandler.Subscribe(skillCooldown);
 
             TempoHandler.Subscribe(staticDamageHandler);
