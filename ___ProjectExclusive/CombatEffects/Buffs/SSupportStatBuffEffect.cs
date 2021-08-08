@@ -16,14 +16,15 @@ namespace CombatEffects
 
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
-            effectModifier *= user.CombatStats.BuffPower;
+            UtilsCombatStats.VariateBuffUser(user.CombatStats,ref effectModifier);
             DoEffect(target, effectModifier);
         }
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {
+            UtilsCombatStats.VariateBuffTarget(target.CombatStats,ref effectModifier);
             DoBuff(GetBuff(target), effectModifier);
-
+            UtilsStats.InvokeSupportStatsEvents(target);
         }
 
         protected void DoBuff(ICharacterBasicStats buffStats, float effectModifier)
@@ -35,6 +36,9 @@ namespace CombatEffects
                     break;
                 case EnumStats.Support.Buff:
                     buffStats.BuffPower += effectModifier;
+                    break;
+                case EnumStats.Support.ReceiveBuffIndex:
+                    buffStats.BuffReceivePower += effectModifier;
                     break;
                 default:
                     throw new ArgumentException($"The buff type [{buffType}] is not valid.",

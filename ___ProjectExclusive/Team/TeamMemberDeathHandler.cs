@@ -81,7 +81,7 @@ namespace _Team
         private static void CallRevive(CombatingEntity entity)
         {
             entity.CombatStats.Revive();
-            entity.Events.OnRevive();
+            entity.Events.OnRevive(entity);
         }
 
         private const float HarmonyAddition = .5f;

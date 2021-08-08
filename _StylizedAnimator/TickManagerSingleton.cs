@@ -9,19 +9,14 @@ namespace StylizedAnimator
     public sealed class TickManagerSingleton 
     {
         static TickManagerSingleton() { }
-        private TickManagerSingleton() { }
+
+        private TickManagerSingleton()
+        {
+            TickManager = new StylizedTickManager();
+        }
         public static TickManagerSingleton Instance { get; } = new TickManagerSingleton();
 
-        [SerializeField, HideInEditorMode, HideInPlayMode, HideInInlineEditors, HideDuplicateReferenceBox]
-        public TickerManagerEntity Entity = new TickerManagerEntity();
-
-        public static StylizedTickManager GetTickManager() => Instance.Entity.MainManager;
+        public static StylizedTickManager TickManager;
     }
 
-    [Serializable]
-    public class TickerManagerEntity
-    {
-        [ShowInInspector,DisableInEditorMode]
-        public StylizedTickManager MainManager = null;
-    }
 }

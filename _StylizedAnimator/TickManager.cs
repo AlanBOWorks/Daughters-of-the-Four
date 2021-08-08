@@ -13,9 +13,13 @@ namespace StylizedAnimator
         public readonly UnityEngine.Object ManagerContainer;
 
         [ShowInInspector]
-        private List<IStylizedTicker>[] _tickInvokers;
+        private TickersHolder[] _tickInvokers;
         private Dictionary<IStylizedTicker, int> _searchDictionary;
         private const int DefaultAmountOfTicksPerTier = 16;
+
+
+        public StylizedTickManager()
+        {}
 
         public StylizedTickManager(TickManagerParameters parameters, UnityEngine.Object managerContainer)
         {
@@ -25,18 +29,18 @@ namespace StylizedAnimator
             this.ManagerContainer = managerContainer;
         }
 
+        private class TickersHolder : List<IStylizedTicker>
+        {}
+
         private void InitializeCollections(int tickersAmount)
         {
-
-            _tickInvokers = new List<IStylizedTicker>[tickersAmount];
+            _tickInvokers = new TickersHolder[tickersAmount];
             for (int i = 0; i < _tickInvokers.Length; i++)
             {
-                _tickInvokers[i] = new List<IStylizedTicker>(DefaultAmountOfTicksPerTier);
+                _tickInvokers[i] = new TickersHolder();
             }
             _searchDictionary = new Dictionary<IStylizedTicker, int>(DefaultAmountOfTicksPerTier);
         }
-
-
         public void OnEnable()
         {
             Timing.ResumeCoroutines(_tickingHandle);
@@ -144,7 +148,7 @@ namespace StylizedAnimator
 
         private IEnumerator<float> _CallTicks(int index, int frameRate)
         {
-            List<IStylizedTicker> tickers = _tickInvokers[index];
+            TickersHolder tickers = _tickInvokers[index];
             float deltaVariation  = frameRate * Timing.DeltaTime;
 
             while (ManagerContainer)

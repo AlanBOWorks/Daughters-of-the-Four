@@ -14,10 +14,14 @@ namespace _CombatSystem
 
         [Title("Skills")]
         [SerializeField] 
-        private Skills backupSkills = new Skills();
+        private Skills onNullSkills = new Skills();
+        [Title("BackUp Skills")]
+        [SerializeField] private SBackUpSkills backUpSkills;
+
         [Title("Critical buffs")]
         [SerializeField]
-        private CriticalBuff criticalBuff = new CriticalBuff();
+        private CriticalBuff onNullCriticalBuff = new CriticalBuff();
+
 
         [Title("Animator")]
         public SkipAnimationsType skipAnimationsType = SkipAnimationsType.None;
@@ -35,10 +39,11 @@ namespace _CombatSystem
         /// <summary>
         /// Used when a character doesn't have skills
         /// </summary>
-        public ICharacterArchetypesData<SCharacterSharedSkillsPreset> ArchetypesBackupSkills 
-            => backupSkills;
-        public ICharacterArchetypesData<SCriticalBuffPreset> ArchetypesBackupCriticalBuffs
-            => criticalBuff;
+        public ICharacterArchetypesData<SCharacterSharedSkillsPreset> ArchetypesOnNullSkills 
+            => onNullSkills;
+        public ICharacterArchetypesData<SCriticalBuffPreset> ArchetypesBackupOnNullCriticalBuffs
+            => onNullCriticalBuff;
+        public ISkillBackUp<SkillPreset[]> BackUpSkills => backUpSkills;
         
         private void Awake()
         {

@@ -20,29 +20,71 @@ namespace Characters
 
     public static class UtilsArea
     {
-        public static TeamCombatState.Stance ParseStance(float stanceEquivalent)
+        public static void InvokeAreaChange(CombatingEntity entity)
         {
-            TeamCombatState.Stance stance;
-            if (stanceEquivalent == 0) stance = TeamCombatState.Stance.Neutral;
-            else if (stanceEquivalent > 0) stance = TeamCombatState.Stance.Attacking;
-            else stance = TeamCombatState.Stance.Defending;
+            entity.Events.InvokeAreaChange();
+            CombatSystemSingleton.CharacterChangesEvent.InvokeTemporalStatChange(entity);
+        }
+
+        public static TeamCombatState.Stances ParseStance(float stanceEquivalent)
+        {
+            TeamCombatState.Stances stance;
+            if (stanceEquivalent == 0) stance = TeamCombatState.Stances.Neutral;
+            else if (stanceEquivalent > 0) stance = TeamCombatState.Stances.Attacking;
+            else stance = TeamCombatState.Stances.Defending;
 
             return stance;
         }
 
-        public static void ToggleStance(CombatingEntity entity, TeamCombatState.Stance targetStance)
+        public static void ToggleStance(CombatingEntity entity, TeamCombatState.Stances targetStance)
         {
             var areaData = entity.AreasDataTracker;
             if (areaData.IsForceStance)
             {
-                Debug.Log("Restore stance");
                 areaData.ForceStateFinish();
             }
             else
             {
-                Debug.Log($"{entity.CharacterName} >> Change stance: {targetStance}");
                 areaData.ForceState(targetStance);
             }
+
+            InvokeAreaChange(entity);
+        }
+
+        public static void TeamToggleStance(CombatingEntity teamHolder, TeamCombatState.Stances targetStance)
+        {
+            var team = teamHolder.CharacterGroup.Team;
+            var teamData = team.State;
+            if (teamData.IsForcedStance)
+            {
+                teamData.FinishForceStance();
+            }
+            else
+            {
+                teamData.DoForceStance(targetStance);
+            }
+
+            foreach (CombatingEntity entity in team)
+            {
+                entity.Events.InvokeAreaChange();
+            }
+            CombatSystemSingleton.CharacterChangesEvent.InvokeTemporalStatChange(teamHolder);
+
+        }
+
+        public static void TogglePosition(CombatingEntity entity, CharacterArchetypes.FieldPosition targetPosition)
+        {
+            var areaTracker = entity.AreasDataTracker;
+            var currentPosition = areaTracker.CombatFieldPosition;
+            var finalPosition 
+                = currentPosition != CharacterArchetypes.FieldPosition.InTeam 
+                ? CharacterArchetypes.FieldPosition.InTeam 
+                : targetPosition;
+
+
+            areaTracker.CombatFieldPosition = finalPosition;
+
+            InvokeAreaChange(entity);
         }
     }
 }

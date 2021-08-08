@@ -65,7 +65,7 @@ namespace StylizedAnimator
 
         public void InjectInManager(int startInIndex = 0)
         {
-            TickManagerSingleton.Instance.Entity.MainManager.AddTicker(this, startInIndex);
+            TickManagerSingleton.TickManager.AddTicker(this, startInIndex);
         }
 
         public void InjectInManager(StylizedTickManager.HigherFrameRate higherFrameRate)

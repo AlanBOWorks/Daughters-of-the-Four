@@ -1,13 +1,14 @@
-﻿using _Team;
+using _Team;
 using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatEffects
 {
-    [CreateAssetMenu(fileName = "Stance Toggle - N [Preset]",
-        menuName = "Combat/Effects/Stance Toggle")]
-    public class SEffectStanceToggle : SEffectBase
+
+    [CreateAssetMenu(fileName = "TEAM Stance Toggle - N [Preset]",
+        menuName = "Combat/Effects/Team/Team Stance Toggle")]
+    public class SEffectTeamStance : SEffectBase
     {
         [SerializeField] private TeamCombatState.Stances targetStance = TeamCombatState.Stances.Neutral;
 
@@ -20,14 +21,13 @@ namespace CombatEffects
         {
             if (FailRandom(randomCheck)) return;
 
-            UtilsArea.ToggleStance(target, targetStance);
-            target.Events.InvokeAreaChange();
+            UtilsArea.TeamToggleStance(target, targetStance);
         }
 
         [Button(ButtonSizes.Large)]
         private void UpdateAssetName()
         {
-            name = $"Stance Toggle - {targetStance.ToString().ToUpper()} [Preset]";
+            name = $"_TEAM Stance Toggle - {targetStance.ToString().ToUpper()} [Preset]";
             RenameAsset();
         }
     }

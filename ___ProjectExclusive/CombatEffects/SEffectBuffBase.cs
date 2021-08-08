@@ -14,7 +14,7 @@ namespace CombatEffects
         {
             ICharacterFullStats stats =
                 isBurstType
-                    ? (ICharacterFullStats) target.CombatStats.BurstStats
+                    ? target.CombatStats.BurstStats
                     : target.CombatStats.BuffStats;
             return stats;
         }
@@ -23,7 +23,7 @@ namespace CombatEffects
         {
             ICharacterFullStats stats =
                 isBurstType
-                    ? (ICharacterFullStats)target.CombatStats.BurstStats
+                    ? target.CombatStats.BurstStats
                     : target.CombatStats.BaseStats;
             return stats;
         }

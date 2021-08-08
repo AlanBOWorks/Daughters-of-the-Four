@@ -52,6 +52,13 @@ namespace Stats
             get => this[DeBuffPowerIndex];
             set => this[DeBuffPowerIndex] = value;
         }
+
+        public float StaticDamagePower
+        {
+            get => this[StaticDamagePowerIndex];
+            set => this[StaticDamagePowerIndex] = value;
+        }
+
         public float HealPower
         {
             get => this[HealPowerIndex];
@@ -62,6 +69,13 @@ namespace Stats
             get => this[BuffPowerIndex];
             set => this[BuffPowerIndex] = value;
         }
+
+        public float BuffReceivePower
+        {
+            get => this[BuffReceivePowerIndex];
+            set => this[BuffReceivePowerIndex] = value;
+        }
+
         public float MaxHealth
         {
             get => this[MaxHealthIndex];
@@ -111,9 +125,11 @@ namespace Stats
 
         public const int AttackPowerIndex = 0;
         public const int DeBuffPowerIndex = AttackPowerIndex + 1;
-        public const int HealPowerIndex = DeBuffPowerIndex + 1;
+        public const int StaticDamagePowerIndex = DeBuffPowerIndex + 1;
+        public const int HealPowerIndex = StaticDamagePowerIndex + 1;
         public const int BuffPowerIndex = HealPowerIndex + 1;
-        public const int MaxHealthIndex = BuffPowerIndex + 1;
+        public const int BuffReceivePowerIndex = BuffPowerIndex + 1;
+        public const int MaxHealthIndex = BuffReceivePowerIndex + 1;
         public const int MaxMortalityPointsIndex = MaxHealthIndex + 1;
         public const int DamageReductionIndex = MaxMortalityPointsIndex + 1;
         public const int DeBuffReductionIndex = DamageReductionIndex + 1;
@@ -141,18 +157,27 @@ namespace Stats
         private float attackPower = 10;
         [SerializeField, SuffixLabel("%00")]
         private float deBuffPower = 0.1f;
+        
+        [SerializeField, SuffixLabel("Units")]
+        private float staticDamagePower = 10;
+
+
         [Title("Support")]
         [SerializeField, SuffixLabel("Units")]
         private float healPower = 10;
         [SerializeField, SuffixLabel("%00")]
         private float buffPower = 1;
+
+        [SerializeField, SuffixLabel("%00(Add)")]
+        private float buffReceivePower = 0;
+
         [Title("Vitality")]
         [SerializeField, SuffixLabel("Units")]
         private float maxHealth = 100;
         [SerializeField, SuffixLabel("Units")]
         private float maxMortalityPoints = 1000;
 
-        [SerializeField, SuffixLabel("%00")]
+        [SerializeField, SuffixLabel("Units|%00")]
         private float damageReduction = 0;
         [SerializeField, SuffixLabel("%00"), Tooltip("Counters DeBuffPower")]
         private float deBuffReduction = 0;
@@ -173,6 +198,8 @@ namespace Stats
         [SerializeField, SuffixLabel("%00")]
         private float harmonyAmount;
 
+
+
         public float AttackPower
         {
             get => attackPower;
@@ -185,6 +212,12 @@ namespace Stats
             set => deBuffPower = value;
         }
 
+        public float StaticDamagePower
+        {
+            get => staticDamagePower;
+            set => staticDamagePower = value;
+        }
+
         public float HealPower
         {
             get => healPower;
@@ -195,6 +228,12 @@ namespace Stats
         {
             get => buffPower;
             set => buffPower = value;
+        }
+
+        public float BuffReceivePower
+        {
+            get => buffReceivePower;
+            set => buffReceivePower = value;
         }
 
         public float MaxHealth
@@ -260,36 +299,21 @@ namespace Stats
         public CharacterCombatStatsBasic()
         { }
 
-        public CharacterCombatStatsBasic(int overrideByDefault)
+        public CharacterCombatStatsBasic(float value)
         {
-            float value = overrideByDefault;
-            AttackPower = value;
-            DeBuffPower = value;
-
-            HealPower = value;
-            BuffPower = value;
-
-            MaxHealth = value;
-            MaxMortalityPoints = value;
-            DamageReduction = value;
-
-            Enlightenment = value;
-            CriticalChance = value;
-            SpeedAmount = value;
-
-            HarmonyAmount = value;
-            InitiativePercentage = value;
-            ActionsPerInitiative = overrideByDefault;
+           OverrideAll(value);
         }
 
         [Button]
-        public virtual void OverrideAll(float value)
+        public void OverrideAll(float value)
         {
             AttackPower = value;
             DeBuffPower = value;
+            StaticDamagePower = value;
 
             HealPower = value;
             BuffPower = value;
+            buffReceivePower = value;
 
             MaxHealth = value;
             MaxMortalityPoints = value;
@@ -301,7 +325,7 @@ namespace Stats
 
             HarmonyAmount = value;
             InitiativePercentage = value;
-            ActionsPerInitiative = (int)value;
+            ActionsPerInitiative = (int) value;
         }
 
         public CharacterCombatStatsBasic(ICharacterBasicStats copyFrom)

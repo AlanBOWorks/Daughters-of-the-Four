@@ -20,6 +20,7 @@ namespace ___ProjectExclusive.Animators
         private Action _returnToIdle;
         private AnimancerTicker _stylizedAnimancerTicker;
 
+
         public void Awake()
         {
             _isAnimationFinish = IsStateFinish;
@@ -98,6 +99,15 @@ namespace ___ProjectExclusive.Animators
         public abstract AnimancerState GetReceiveSupport();
         public abstract AnimancerState GetReceiveOffensive();
         public abstract void Injection(AnimancerComponent animancer);
+
+
+        public enum AnimationType
+        {
+            Offensive,
+            Support,
+            ReceiveOffensive,
+            ReceiveSupport
+        }
     }
 
     public interface CombatAnimationsBasic<out T>
@@ -109,5 +119,10 @@ namespace ___ProjectExclusive.Animators
         T GetReceiveOffensive();
 
         void Injection(AnimancerComponent animancer);
+    }
+
+    public interface ICombatAnimationListener
+    {
+        void OnAnimationPlay(SCombatAnimationsStates.AnimationType type);
     }
 }

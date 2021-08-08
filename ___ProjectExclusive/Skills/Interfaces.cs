@@ -19,6 +19,11 @@ namespace Skills
         T WaitSkill { get; }
     }
 
+    public interface ISkillBackUp<out T>
+    {
+        ICharacterArchetypesData<T> OnDeathSkill();
+    }
+
     public interface IEquipSkill<T> : ISkillShared<T>
     {
         List<T> AllSkills { get; }

@@ -30,8 +30,7 @@ namespace StylizedAnimator
         {
             _rotationDebug = new RotationDebugStylizedTicker[_rotationTransforms.Length];
 
-            TickerManagerEntity entity = TickManagerSingleton.Instance.Entity;
-            StylizedTickManager manager = entity.MainManager;
+            StylizedTickManager manager = TickManagerSingleton.TickManager;
             for (int i = 0; i < _rotationTransforms.Length; i++)
             {
                 Transform rotation = _rotationTransforms[i];
@@ -50,8 +49,7 @@ namespace StylizedAnimator
         {
             if(_rotationDebug is null) return;
 
-            TickerManagerEntity entity = TickManagerSingleton.Instance.Entity;
-            StylizedTickManager manager = entity.MainManager;
+            StylizedTickManager manager = TickManagerSingleton.TickManager;
             foreach (RotationDebugStylizedTicker debugStylizedTicker in _rotationDebug)
             {
                 manager.RemoveTicker(debugStylizedTicker);

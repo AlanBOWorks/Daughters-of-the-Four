@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Skills
 {
     [CreateAssetMenu(fileName = "N - Character Skills [Preset]",
-        menuName = "Combat/Skill/Character Skills Preset")]
+        menuName = "Combat/Skill/[Set] Character Skills Preset")]
     public class SCharacterSkillsPreset : ScriptableObject, ISkillPositions<List<SkillPreset>>
     {
         [SerializeField] private SSkillSetPreset attackingSkills;

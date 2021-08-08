@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Skills
 {
     [CreateAssetMenu(fileName = "N (T) - SKILL set [Preset]",
-        menuName = "Combat/Skill/Skills Set Preset")]
+        menuName = "Combat/Skill/[Set] Skills Set Preset")]
     public class SSkillSetPreset : ScriptableObject
     {
         [Title("Params")]

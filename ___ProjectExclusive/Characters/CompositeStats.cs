@@ -85,6 +85,21 @@ namespace Characters
             set { }
         }
 
+        public float StaticDamagePower
+        {
+            get
+            {
+                float calculation = 0;
+                foreach (IOffensiveStats offensiveStat in OffensiveStats)
+                {
+                    calculation += offensiveStat.StaticDamagePower;
+                }
+
+                return calculation;
+            }
+            set { }
+        }
+
         public float HealPower
         {
             get
@@ -107,6 +122,21 @@ namespace Characters
                 foreach (ISupportStats supportStats in SupportStats)
                 {
                     calculation += supportStats.BuffPower;
+                }
+
+                return calculation;
+            }
+            set { }
+        }
+
+        public float BuffReceivePower
+        {
+            get
+            {
+                float calculation = 0;
+                foreach (ISupportStats supportStats in SupportStats)
+                {
+                    calculation += supportStats.BuffReceivePower;
                 }
 
                 return calculation;

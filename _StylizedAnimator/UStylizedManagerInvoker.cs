@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using MEC;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace StylizedAnimator
@@ -10,37 +12,36 @@ namespace StylizedAnimator
         [SerializeField]
         private TickManagerParameters _parameters
             = new TickManagerParameters();
-        private StylizedTickManager _manager;
+        [NonSerialized,ShowInInspector]
+        private StylizedTickManager _tickerManager;
 
-        public TickerManagerEntity Entity = TickManagerSingleton.Instance.Entity;
 
         private void Awake()
         {
-            _manager = new StylizedTickManager(_parameters,this);
-            Entity.MainManager = _manager;
+            _tickerManager = new StylizedTickManager(_parameters,this);
+            TickManagerSingleton.TickManager = _tickerManager;
 
         }
 
         private void Start()
         {
-            _manager = TickManagerSingleton.GetTickManager();
-            _manager.StartTicks();
+            _tickerManager.StartTicks();
         }
 
 
         private void OnEnable()
         {
-            _manager?.OnEnable();
+            _tickerManager?.OnEnable();
         }
 
         private void OnDisable()
         {
-            _manager?.OnDisable();
+            _tickerManager?.OnDisable();
         }
 
         public StylizedTickManager GetManager()
         {
-            return _manager;
+            return _tickerManager;
         }
 
     }

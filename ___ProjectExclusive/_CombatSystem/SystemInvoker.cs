@@ -189,7 +189,7 @@ namespace _CombatSystem
                     entity.Injection(combatData);
 
                     // x----- Area
-                    var characterAreaData = new CombatAreasData(entityPosition, variable.RangeType);
+                    var characterAreaData = new CharacterCombatAreasData(entityPosition, variable.RangeType);
                     entity.AreasDataTracker = characterAreaData;
                     
                     // x----- Skills
@@ -218,7 +218,7 @@ namespace _CombatSystem
                     if (criticalBuff == null)
                     {
                         var defaultCriticalBuffs 
-                            = CombatSystemSingleton.ParamsVariable.ArchetypesBackupCriticalBuffs;
+                            = CombatSystemSingleton.ParamsVariable.ArchetypesBackupOnNullCriticalBuffs;
                         criticalBuff = CharacterArchetypes.GetElement(
                             defaultCriticalBuffs, entityPosition);
                     }

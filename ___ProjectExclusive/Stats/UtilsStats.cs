@@ -19,18 +19,22 @@ namespace Stats
     {
         public const int AttackIndex = 0;
         public const int DeBuffIndex = AttackIndex + 1;
+        public const int StaticDamageIndex = DeBuffIndex + 1;
         public enum Offensive
         {
             Attack = AttackIndex,
-            DeBuff = DeBuffIndex
+            DeBuff = DeBuffIndex,
+            StaticPower = StaticDamageIndex
         }
 
         public const int HealIndex = 10;
-        public const int BuffIndex = HealIndex + 1; 
+        public const int BuffIndex = HealIndex + 1;
+        public const int ReceiveBuffIndex = BuffIndex+1;
         public enum Support
         {
             Heal = HealIndex,
-            Buff = BuffIndex
+            Buff = BuffIndex,
+            ReceiveBuffIndex = EnumStats.ReceiveBuffIndex
         }
 
         public const int MaxHealthIndex = 100;
@@ -57,7 +61,8 @@ namespace Stats
 
         public const int HealthIndex = 10000;
         public const int ShieldIndex = HealthIndex + 1;
-        public const int MortalityIndex = ShieldIndex + 1;
+        public const int AccumulatedStaticIndex = ShieldIndex + 1; 
+        public const int MortalityIndex = AccumulatedStaticIndex + 1;
         public const int HarmonyIndex = MortalityIndex + 1;
         public const int InitiativeIndex = HarmonyIndex + 1;
         public const int ActionsIndex = InitiativeIndex + 1;
@@ -65,6 +70,7 @@ namespace Stats
         {
             Health = HealthIndex,
             Shield = ShieldIndex,
+            AccumulatedStatic = AccumulatedStaticIndex,
             Mortality = MortalityIndex,
             Harmony = HarmonyIndex,
             Initiative = InitiativeIndex,
@@ -92,9 +98,12 @@ namespace Stats
         {
             injection.AttackPower = copyFrom.AttackPower;
             injection.DeBuffPower = copyFrom.DeBuffPower;
-            injection.HealPower = copyFrom.HealPower;
+            injection.StaticDamagePower = copyFrom.StaticDamagePower;
 
+            injection.HealPower = copyFrom.HealPower;
             injection.BuffPower = copyFrom.BuffPower;
+            injection.BuffReceivePower = copyFrom.BuffReceivePower;
+
             injection.MaxHealth = copyFrom.MaxHealth;
             injection.MaxMortalityPoints = copyFrom.MaxMortalityPoints;
             injection.DamageReduction = copyFrom.DamageReduction;
@@ -130,6 +139,35 @@ namespace Stats
             var copyStats = new PlayerCharacterCombatStats(playerStats);
             return new CharacterCombatData(copyStats);
         }
+
+        public static void InvokeOffensiveStatsEvents(CombatingEntity target)
+        {
+            //TODO
+        }
+
+        public static void InvokeSupportStatsEvents(CombatingEntity target)
+        {
+            //TODO
+        }
+
+        public static void InvokeTemporalStatsEvents(CombatingEntity target)
+        {
+            target.Events.InvokeTemporalStatChange();
+            CombatSystemSingleton.CharacterChangesEvent.InvokeTemporalStatChange(target);
+        }
+
+        public static void InvokeHealthZeroStatsEvent(CombatingEntity target)
+        {
+            target.Events.OnHealthZero(target);
+            CombatSystemSingleton.CharacterChangesEvent.OnHealthZero(target);
+
+        }
+
+        public static void InvokeMortalityZeroEvent(CombatingEntity target)
+        {
+            target.Events.OnMortalityZero(target);
+            CombatSystemSingleton.CharacterChangesEvent.OnMortalityZero(target);
+        }
     }
 
     public static class UtilsCombatStats
@@ -145,18 +183,52 @@ namespace Stats
 
         public static float CalculateFinalDamage(
             CharacterCombatData attacker,
-            ICharacterFullStats receiver, float damageModifier)
+            CharacterCombatData receiver, float damageModifier)
         {
-            float baseDamage = attacker.CalculateBaseAttackPower();
+            float baseDamage = attacker.CalculateBaseAttackPower() 
+                               - receiver.CalculateDamageReduction();
+
             float damageVariation = attacker.BuffStats.AttackPower
                                     + attacker.BurstStats.AttackPower
-                                    - receiver.DamageReduction;
-            baseDamage += baseDamage * damageVariation;
+                                    - receiver.BuffStats.DamageReduction
+                                    - receiver.BurstStats.DamageReduction;
 
+            baseDamage += baseDamage * damageVariation;
             float total = baseDamage * damageModifier;
             if (total < 0) total = 0;
 
             return total;
+        }
+
+        public static float CalculateFinalStaticDamage(
+            CharacterCombatData attacker,
+            CharacterCombatData receiver, float damageModifier)
+        {
+            float baseDamage = attacker.CalculateBaseStaticDamagePower()
+                               - receiver.CalculateDamageReduction();
+            float damageVariation = attacker.BuffStats.StaticDamagePower
+                                    + attacker.BurstStats.StaticDamagePower
+                                    - receiver.BuffStats.DamageReduction
+                                    - receiver.BurstStats.DamageReduction;
+
+            baseDamage += baseDamage * damageVariation;
+            float total = baseDamage * damageModifier;
+            if (total < 0) total = 0;
+
+            return total;
+        }
+
+        public static void DoDamageToShield(CombatingEntity target, float damage)
+        {
+            ICharacterFullStats stats = target.CombatStats;
+
+            float shields = stats.ShieldAmount;
+            if(shields <= 0) return;
+            shields -= damage;
+            if (shields < 0) shields = 0;
+            stats.ShieldAmount = shields;
+
+            UtilsStats.InvokeTemporalStatsEvents(target);
         }
 
         /// <returns>The damage left</returns>
@@ -164,39 +236,50 @@ namespace Stats
         {
             float originalDamage = damage;
             ICharacterFullStats stats = target.CombatStats;
+
+
+            #region <<<<<<<<<<<< SHIELD Calculations >>>>>>>>>>>>>
             if (stats.ShieldAmount > 0)
             {
                 stats.ShieldAmount = CalculateDamageOnVitality(stats.ShieldAmount);
+                UtilsStats.InvokeTemporalStatsEvents(target);
                 SubmitDamageToEntity();
+
                 return; // Shield are the counter of 'Raw' damage > absorbs the rest of the damage
             }
+            #endregion
+            #region <<<<<<<<<<<< HEALTH Calculations >>>>>>>>>>>>>
             stats.HealthPoints = CalculateDamageOnVitality(stats.HealthPoints);
 
             if (stats.HealthPoints > 0)
             {
-                target.Events.InvokeTemporalStatChange();
+                UtilsStats.InvokeTemporalStatsEvents(target);
                 SubmitDamageToEntity();
+
                 return;
             }
-
-
+            #endregion
+            #region <<<<<<<<<<<< DEATH Calculations >>>>>>>>>>>>>
             bool isInDanger = target.CharacterGroup.Team.IsInDangerState();
             if (!isInmortal && isInDanger)
             {
                 stats.MortalityPoints = CalculateDamageOnVitality(stats.MortalityPoints);
-                if(stats.MortalityPoints <= 0)
-                    target.Events.OnHealthZero();
+                if (!target.IsAlive())
+                {
+                    UtilsStats.InvokeMortalityZeroEvent(target);
+                }
             }
             else
             {
-                target.Events.OnHealthZero();
                 target.CombatStats.TeamData.DeathHandler.Add(target);
+                UtilsStats.InvokeHealthZeroStatsEvent(target);
             }
 
 
-            target.Events.InvokeTemporalStatChange();
+            UtilsStats.InvokeTemporalStatsEvents(target);
             SubmitDamageToEntity();
-            return;
+            #endregion
+
 
             float CalculateDamageOnVitality(float vitalityStat)
             {
@@ -210,19 +293,26 @@ namespace Stats
 
                 return vitalityStat;
             }
-
             void SubmitDamageToEntity()
             {
                 target.ReceivedStats.DamageReceived = originalDamage - damage;
-
             }
         }
+
+        public static void DoStaticDamage(CombatingEntity target, float damage)
+        {
+            DoDamageToShield(target,damage); //By design StaticDamage counters 'Shields'
+            target.CombatStats.AccumulatedStaticDamage += damage;
+            UtilsStats.InvokeTemporalStatsEvents(target);
+        }
+
+
 
         public static void DoHealTo(CombatingEntity target, float heal)
         {
             if(!target.IsConscious() || heal < 0) return;
             
-            ICharacterFullStats stats = target.CombatStats;
+            var stats = target.CombatStats;
 
             float targetHealth = stats.HealthPoints + heal;
             if (targetHealth > stats.MaxHealth)
@@ -235,7 +325,14 @@ namespace Stats
                 stats.HealthPoints = targetHealth;
                 target.ReceivedStats.HealReceived += heal;
             }
-            target.Events.InvokeTemporalStatChange();
+            ResetAccumulatedStaticDamage();
+
+            UtilsStats.InvokeTemporalStatsEvents(target);
+
+            void ResetAccumulatedStaticDamage()
+            {
+                stats.AccumulatedStaticDamage = 0; //By design Heals counts 'StaticDamage'
+            }
         }
 
         public static void HealToMax(CharacterCombatData stats)
@@ -276,16 +373,32 @@ namespace Stats
 
         public static void AddHarmony(CombatingEntity entity, ICombatTemporalStats stats, float addition)
         {
+            float userEnlightenment = entity.CombatStats.Enlightenment; //Generally value = 1;
+            addition *= userEnlightenment;
+
             float targetHarmony = stats.HarmonyAmount + addition;
             stats.HarmonyAmount = Mathf.Clamp(
                 targetHarmony, 
                 StatsCap.MinHarmony, StatsCap.MaxHarmony);
 
-            entity.Events.InvokeTemporalStatChange();
+            UtilsStats.InvokeTemporalStatsEvents(entity);
         }
         public static void AddHarmony(CombatingEntity entity, float addition)
             => AddHarmony(entity, entity.CombatStats, addition);
+        public static void RemoveHarmony(CombatingEntity user, CombatingEntity target, float reduction)
+        {
+            var userStats = user.CombatStats;
+            var targetStats = target.CombatStats;
+            float userEnlightenment = userStats.Enlightenment; //Generally value = 1;
+            float targetEnlightenment = targetStats.Enlightenment;
+            float harmonyVariation = userEnlightenment - targetEnlightenment;
+            reduction += reduction * harmonyVariation;
 
+            float targetHarmony = targetStats.HarmonyAmount;
+            targetHarmony -= reduction;
+            if (targetHarmony < 0) targetHarmony = 0;
+            targetStats.HarmonyAmount = targetHarmony;
+        }
 
         public static void AddTeamControl(CombatingTeam team, float addition)
         {
@@ -335,6 +448,18 @@ namespace Stats
 
             randomValue = Random.value;
             return CalculateRandomModifier(randomValue);
+        }
+
+
+        public static void VariateBuffUser(ICharacterBasicStats user, ref float buffValue)
+        {
+            var userBuffPower = user.BuffPower; //Generally value == 1;
+            buffValue *= userBuffPower;
+        }
+        public static void VariateBuffTarget(ICharacterBasicStats target, ref float buffValue)
+        {
+            var targetReceiveBuffPower = target.BuffReceivePower; //Generally value == 0;
+            buffValue += buffValue * targetReceiveBuffPower;
         }
 
     }

@@ -8,13 +8,13 @@ namespace Skills
         menuName = "Combat/Conditions/Skill/Team Stance")]
     public class SSkillConditionOnTeamStance : SSkillUseConditionBase
     {
-        [SerializeField] private TeamCombatState.Stance checkStance =
-            TeamCombatState.Stance.Neutral;
+        [SerializeField] private TeamCombatState.Stances checkStance =
+            TeamCombatState.Stances.Neutral;
 
         public override bool CanUseSkill(CombatingEntity user, float conditionalCheck)
         {
             var userTeam = user.CharacterGroup.Team;
-            return userTeam.State.stance == checkStance;
+            return userTeam.State.CurrentStance == checkStance;
         }
 
         protected override string GenerateAssetName()

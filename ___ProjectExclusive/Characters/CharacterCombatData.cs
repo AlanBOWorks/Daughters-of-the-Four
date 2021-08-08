@@ -63,7 +63,7 @@ namespace Characters
 
 
         [ShowInInspector, NonSerialized] 
-        public CombatAreasData AreasDataTracker;
+        public CharacterCombatAreasData AreasDataTracker;
 
         [ShowInInspector, NonSerialized] 
         public readonly CombatCharacterEvents Events;
@@ -160,7 +160,9 @@ namespace Characters
 
 
         [TitleGroup("Local stats"), PropertyOrder(10)]
-        public int ActionsLefts = 0;
+        public int ActionsLefts;
+        [TitleGroup("Local stats")] 
+        public float AccumulatedStaticDamage;
 
         public bool IsAlive() => MortalityPoints > 0;
         public bool HasActionLeft() => ActionsLefts > 0;
@@ -184,7 +186,7 @@ namespace Characters
 
         public CharacterCombatData(ICharacterFullStats presetStats)
         {
-            BaseStats = new CharacterCombatStatsFull(presetStats as ICharacterFullStats);
+            BaseStats = new CharacterCombatStatsFull(presetStats);
             BuffStats = new CharacterCombatStatsFull(0);
             BurstStats = new CharacterCombatStatsFull(0);
 
@@ -212,6 +214,20 @@ namespace Characters
                 BurstStats.DeBuffPower);
             set => BuffStats.DeBuffPower = value;
         }
+
+        public float CalculateBaseStaticDamagePower()
+        {
+            return BaseStats.StaticDamagePower + TeamStats.StaticDamagePower;
+        }
+        public float StaticDamagePower
+        {
+            get => UtilsStats.StatsFormula(
+                CalculateBaseStaticDamagePower(),
+                BuffStats.StaticDamagePower,
+                BurstStats.StaticDamagePower);
+            set => BuffStats.StaticDamagePower = value;
+        }
+
         public float HealPower
         {
             get => UtilsStats.StatsFormula(
@@ -228,6 +244,15 @@ namespace Characters
                 BurstStats.BuffPower);
             set => BuffStats.BuffPower = value;
         }
+        public float BuffReceivePower
+        {
+            get => UtilsStats.StatsFormula(
+                BaseStats.BuffReceivePower + TeamStats.BuffReceivePower,
+                BuffStats.BuffReceivePower,
+                BurstStats.BuffReceivePower);
+            set => BuffStats.BuffReceivePower = value;
+        }
+
         public float HealthPoints
         {
             get => BaseStats.HealthPoints;
@@ -301,10 +326,15 @@ namespace Characters
             get => BaseStats.MaxMortalityPoints + TeamStats.MaxMortalityPoints;
             set => BuffStats.MaxMortalityPoints = value;
         }
+
+        public float CalculateDamageReduction()
+        {
+            return BaseStats.DamageReduction + TeamStats.DamageReduction;
+        }
         public float DamageReduction
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.DamageReduction + TeamStats.DamageReduction,
+                CalculateDamageReduction(),
                 BuffStats.DamageReduction,
                 BurstStats.DamageReduction);
             set => BuffStats.DamageReduction = value;
@@ -331,39 +361,12 @@ namespace Characters
         public PlayerCharacterCombatStats()
         {}
 
-        public PlayerCharacterCombatStats(int overrideByDefault) : base(overrideByDefault)
+        public PlayerCharacterCombatStats(float overrideByDefault) : base(overrideByDefault)
         {}
 
         public PlayerCharacterCombatStats(PlayerCharacterCombatStats copyFrom)
-        {
-            AttackPower = copyFrom.AttackPower;
-            DeBuffPower = copyFrom.DeBuffPower;
-
-
-            HealPower = copyFrom.HealPower;
-            BuffPower = copyFrom.BuffPower;
-
-
-            MaxHealth = copyFrom.MaxHealth;
-            MaxMortalityPoints = copyFrom.MaxMortalityPoints;
-            DamageReduction = copyFrom.DamageReduction;
-            DeBuffReduction = copyFrom.DeBuffReduction;
-
-
-
-            Enlightenment = copyFrom.Enlightenment;
-            CriticalChance = copyFrom.CriticalChance;
-            SpeedAmount = copyFrom.SpeedAmount;
-
-
-            HealthPoints = copyFrom.HealthPoints;
-            ShieldAmount = copyFrom.ShieldAmount;
-            MortalityPoints = copyFrom.MortalityPoints;
-            HarmonyAmount = copyFrom.HarmonyAmount;
-            InitiativePercentage = copyFrom.InitiativePercentage;
-
-            ActionsPerInitiative = copyFrom.ActionsPerInitiative;
-        }
+        : base(copyFrom)
+        {}
 
         public PlayerCharacterCombatStats(IPlayerCharacterStats playerCharacterStats)
         : this(playerCharacterStats.InitialStats,playerCharacterStats.GrowStats,playerCharacterStats.UpgradedStats)
@@ -377,12 +380,20 @@ namespace Characters
             DeBuffPower = UtilsStats.GrowFormula(
                 initialStats.DeBuffPower, growStats.DeBuffPower,
                 currentUpgrades.OffensivePower);
+            StaticDamagePower = UtilsStats.GrowFormula(
+                initialStats.StaticDamagePower, growStats.StaticDamagePower,
+                currentUpgrades.OffensivePower
+            );
+
 
             HealPower = UtilsStats.GrowFormula(
                 initialStats.HealPower, growStats.HealPower,
                 currentUpgrades.SupportPower);
             BuffPower = UtilsStats.GrowFormula(
                 initialStats.BuffPower, growStats.BuffPower,
+                currentUpgrades.SupportPower);
+            BuffReceivePower = UtilsStats.GrowFormula(
+                initialStats.BuffReceivePower, growStats.BuffReceivePower,
                 currentUpgrades.SupportPower);
 
             MaxHealth = UtilsStats.GrowFormula(

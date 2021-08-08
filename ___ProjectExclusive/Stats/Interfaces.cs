@@ -8,12 +8,14 @@ namespace Stats
     {
         float AttackPower { get; set; }
         float DeBuffPower { get; set; }
+        float StaticDamagePower { get; set; }
     }
 
     public interface ISupportStats
     {
         float HealPower { get; set; }
         float BuffPower { get; set; }
+        float BuffReceivePower { get; set; }
     }
 
 

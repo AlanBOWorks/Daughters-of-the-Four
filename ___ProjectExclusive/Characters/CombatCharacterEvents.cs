@@ -117,7 +117,7 @@ namespace Characters
         {
             if(_onAreaChange is null) return;
 
-            CombatAreasData areasData = entity.AreasDataTracker;
+            CharacterCombatAreasData areasData = entity.AreasDataTracker;
             foreach (IAreaStateChangeListener listener in _onAreaChange)
             {
                 listener.OnAreaStateChange(areasData);
@@ -154,33 +154,33 @@ namespace Characters
             }
         }
 
-        public void OnHealthZero()
+        public void OnHealthZero(CombatingEntity entity)
         {
             if(_onHealthZeroListeners is null) return;
 
             foreach (IHealthZeroListener listener in _onHealthZeroListeners)
             {
-                listener.OnHealthZero();
+                listener.OnHealthZero(entity);
             }
         }
 
-        public void OnMortalityZero()
+        public void OnMortalityZero(CombatingEntity entity)
         {
             if(_onHealthZeroListeners is null) return;
 
             foreach (IHealthZeroListener listener in _onHealthZeroListeners)
             {
-                listener.OnMortalityZero();
+                listener.OnMortalityZero(entity);
             }
         }
 
-        public void OnRevive()
+        public void OnRevive(CombatingEntity entity)
         {
             if(_onHealthZeroListeners is null) return;
 
             foreach (IHealthZeroListener listener in _onHealthZeroListeners)
             {
-                listener.OnRevive();
+                listener.OnRevive(entity);
             }
         }
 
@@ -247,15 +247,15 @@ namespace Characters
 
     public interface IAreaStateChangeListener : ICharacterListener
     {
-        void OnAreaStateChange(CombatAreasData data);
+        void OnAreaStateChange(CharacterCombatAreasData data);
     }
 
 
     public interface IHealthZeroListener : ICharacterListener
     {
-        void OnHealthZero();
-        void OnMortalityZero();
-        void OnRevive();
+        void OnHealthZero(CombatingEntity entity);
+        void OnMortalityZero(CombatingEntity entity);
+        void OnRevive(CombatingEntity entity);
         void OnTeamHealthZero(CombatingTeam losingTeam);
     }
 }

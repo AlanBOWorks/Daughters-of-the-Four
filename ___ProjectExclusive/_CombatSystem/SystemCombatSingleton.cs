@@ -5,6 +5,7 @@ using Characters;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using Skills;
+using Stats;
 using UnityEditor;
 
 namespace _CombatSystem
@@ -26,9 +27,11 @@ namespace _CombatSystem
             // Locals declarations that wont be used further than durante the CombatInvoker
             var combatControlDeclaration = new CombatControlDeclaration();
             var skillCooldown = new SkillCooldownHandler();
+            var staticDamageHandler = new StaticDamageHandler();
             var roundCheckHandler = new RoundCheckHandler();
             var burstResetHandler = new CharacterCombatDataResetHandler();
             var teamStateTicker = new TeamTempoTicker();
+            var onDeathBackUpSkillInjector = new OnDeathSkillInjector();
 
             //---- Injections ----
             Invoker.SubscribeListener(Characters);
@@ -38,16 +41,21 @@ namespace _CombatSystem
             Invoker.SubscribeListener(teamStateTicker);
 
             // Round check first since is better to finish the combat before all other unnecessary task
-            TempoHandler.Subscribe((ITempoListener)roundCheckHandler);
-            TempoHandler.Subscribe((ISkippedTempoListener)roundCheckHandler);
-
             TempoHandler.Subscribe(PerformSkillHandler);
             TempoHandler.Subscribe(skillCooldown);
 
+            TempoHandler.Subscribe(staticDamageHandler);
+            
             TempoHandler.Subscribe((ITempoListener) burstResetHandler);
             TempoHandler.Subscribe((ISkippedTempoListener)burstResetHandler);
 
             TempoHandler.Subscribe(teamStateTicker);
+
+            TempoHandler.Subscribe((ITempoListener)roundCheckHandler);
+            TempoHandler.Subscribe((ISkippedTempoListener)roundCheckHandler);
+
+            //---- Events
+            CharacterChangesEvent.Subscribe(onDeathBackUpSkillInjector);
         }
 
         [ShowInInspector]

@@ -8,6 +8,7 @@ namespace _CombatSystem
 {
     public class RoundCheckHandler : List<CombatingEntity>, ICombatPreparationListener, ITempoListener, ISkippedTempoListener
     {
+        //This is just to add all entities to the check list (this.Add)
         private CharacterArchetypesList<CombatingEntity> _allEntities;
       
 

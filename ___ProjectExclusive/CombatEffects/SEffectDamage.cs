@@ -5,8 +5,8 @@ using UnityEngine;
 namespace CombatEffects
 {
 
-    [CreateAssetMenu(fileName = "Damage Effect [Preset]",
-        menuName = "Combat/Effects/Damage")]
+    [CreateAssetMenu(fileName = "DAMAGE Direct [OFFENSIVE Effect]",
+        menuName = "Combat/Effects/DAMAGE Direct")]
     public class SEffectDamage : SEffectBase
     {
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)

@@ -27,9 +27,14 @@ namespace StylizedAnimator
 
         public override void DoTick(float deltaVariation)
         {
-            AnimancerState state = Animancer.States.Current;
-            if(!_enabled || state is null) return;
-            state.Time += deltaVariation;
+            if(!_enabled) return;
+            for (var i = 0; i < Animancer.Layers.Count; i++)
+            {
+                AnimancerLayer layer = Animancer.Layers[i];
+                var state = layer.CurrentState;
+                state.Time += deltaVariation;
+            }
+
         }
     }
 }

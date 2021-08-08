@@ -10,7 +10,7 @@ namespace Skills
     /// of the Character
     /// </summary>
     [CreateAssetMenu(fileName = "Skills Shared - N [Preset]",
-        menuName = "Combat/Skill/Skills Shared Preset")]
+        menuName = "Combat/Skill/[Global] Skills Shared Preset", order = 100)]
     public class SCharacterSharedSkillsPreset : ScriptableObject, ISkillShared<SkillPreset>
     {
         [SerializeField] private SkillPreset ultimateSkill;

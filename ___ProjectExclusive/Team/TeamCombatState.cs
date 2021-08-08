@@ -10,7 +10,7 @@ namespace _Team
         public TeamCombatState(CombatingTeam team)
         {
             Team = team;
-            stance = Stance.Neutral;
+            _normalStance = Stances.Neutral;
         }
 
         public readonly CombatingTeam Team;
@@ -29,10 +29,17 @@ namespace _Team
             float control = TeamControlAmount + BurstControlAmount;
 
             return control;
-        } 
+        }
+
+        public Stances CurrentStance => IsForcedStance ? ForceStance : _normalStance;
+        [ShowInInspector]
+        public Stances ForceStance { get; private set; }
 
         [ShowInInspector]
-        public Stance stance;
+        private Stances _normalStance;
+
+        [ShowInInspector] 
+        public bool IsForcedStance;
 
         [ShowInInspector] 
         public bool IsBurstStance;
@@ -41,6 +48,22 @@ namespace _Team
         {
             return GetControlAmount() <= 
                    Team.StatsHolder.LoseControlThreshold;
+        }
+
+        public void VariateStance(Stances target)
+        {
+            _normalStance = target;
+        }
+
+        public void DoForceStance(Stances target)
+        {
+            IsForcedStance = true;
+            ForceStance = target;
+        }
+
+        public void FinishForceStance()
+        {
+            IsForcedStance = false;
         }
 
         public void DoBurstControl(float targetBurst)
@@ -61,22 +84,23 @@ namespace _Team
         }
 
 
-        public enum Stance
+
+        public enum Stances
         {
             Attacking = 1, //These values are to convert to percentage in Control from (-1,1) values if needed
             Neutral = 0,
             Defending = -1
         }
 
-        public static T GetStance<T>(IStanceArchetype<T> archetype, Stance stance)
+        public static T GetStance<T>(IStanceArchetype<T> archetype, Stances stance)
         {
             switch (stance)
             {
-                case Stance.Attacking:
+                case Stances.Attacking:
                     return archetype.GetAttacking();
-                case Stance.Neutral:
+                case Stances.Neutral:
                     return archetype.GetNeutral();
-                case Stance.Defending:
+                case Stances.Defending:
                     return archetype.GetDefending();
                 default:
                     throw new ArgumentException("Can't get Stance from the passed arguments",
@@ -84,15 +108,15 @@ namespace _Team
             }
         }
 
-        public static T GetStance<T>(ISkillPositions<T> skills, Stance stance) where T : class 
+        public static T GetStance<T>(ISkillPositions<T> skills, Stances stance) where T : class 
         {
             switch (stance)
             {
-                case Stance.Attacking:
+                case Stances.Attacking:
                     return skills.AttackingSkills;
-                case Stance.Neutral:
+                case Stances.Neutral:
                     return skills.NeutralSkills;
-                case Stance.Defending:
+                case Stances.Defending:
                     return skills.DefendingSkills;
                 default:
                     throw new ArgumentException("Can't get Stance from the passed arguments",
@@ -116,18 +140,18 @@ namespace _Team
         public const string NeutralKeyword = "Neutral";
         public const string DefendingKeyword = "Defending";
 
-        public static string GetKeyword(TeamCombatState.Stance target)
+        public static string GetKeyword(TeamCombatState.Stances target)
         {
             switch (target)
             {
-                case TeamCombatState.Stance.Attacking:
+                case TeamCombatState.Stances.Attacking:
                     return AttackKeyword;
-                case TeamCombatState.Stance.Neutral:
+                case TeamCombatState.Stances.Neutral:
                     return NeutralKeyword;
-                case TeamCombatState.Stance.Defending:
+                case TeamCombatState.Stances.Defending:
                     return DefendingKeyword;
                 default:
-                    throw new ArgumentException($"Invalid {typeof(TeamCombatState.Stance)} target;",
+                    throw new ArgumentException($"Invalid {typeof(TeamCombatState.Stances)} target;",
                         new NotImplementedException("There's a state that wasn't implemented: " +
                                                     $"{target}"));
             }

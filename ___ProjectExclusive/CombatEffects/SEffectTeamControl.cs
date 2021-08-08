@@ -5,7 +5,7 @@ using UnityEngine;
 namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "Team Control [Effect]",
-        menuName = "Combat/Effects/Team Control")]
+        menuName = "Combat/Effects/Team/Team Control")]
     public class SEffectTeamControl : SEffectBase
     {
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)

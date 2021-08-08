@@ -14,7 +14,7 @@ namespace Skills
     /// <seealso cref="Skill"/> are the specific skills for individual <seealso cref="SCharacterSkillsPreset"/>
     /// </summary>
     [CreateAssetMenu(fileName = "N (T) - SKILL L - [Preset]",
-        menuName = "Combat/Skill/Skill Preset")]
+        menuName = "Combat/Skill/Skill Preset", order = -100)]
     public class SSkillPreset : SEffectSetPreset
     {
         [TitleGroup("Targeting")]
@@ -56,11 +56,11 @@ namespace Skills
         [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
         public float criticalAddition = 0f;
 
-        [Title("MainCondition")] 
+        [Title("MainCondition"),PropertyOrder(90)] 
         [SerializeField]
         private ConditionalUse conditionalUse;
 
-        [TitleGroup("Effects")]
+        [TitleGroup("Effects"),PropertyOrder(100)]
         [SerializeField]
         private EffectParams[] effects = new EffectParams[1];
 

@@ -1,42 +1,41 @@
 ﻿using _Team;
-using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace _CombatSystem
+namespace Characters
 {
-    public class CombatAreasData
+    public class CharacterCombatAreasData
     {
         public CharacterArchetypes.TeamPosition PositionInTeam;
         public CharacterArchetypes.RoleArchetype Role;
         public CharacterArchetypes.FieldPosition CombatFieldPosition;
         public CharacterArchetypes.RangeType RangeType;
-        private TeamCombatState _teamState;
+        private TeamCombatState _teamStateData;
 
-        private TeamCombatState.Stance _forcedTeamState;
+        private TeamCombatState.Stances _forcedState;
         public bool IsForceStance { get; private set; }
 
 
-        public CombatAreasData(CharacterArchetypes.TeamPosition positionInTeam,
+        public CharacterCombatAreasData(CharacterArchetypes.TeamPosition positionInTeam,
             CharacterArchetypes.RangeType rangeType,
             CharacterArchetypes.FieldPosition initialFieldPosition = CharacterArchetypes.FieldPosition.InTeam,
-            TeamCombatState.Stance initialStance = TeamCombatState.Stance.Neutral)
+            TeamCombatState.Stances initialStance = TeamCombatState.Stances.Neutral)
         {
             PositionInTeam = positionInTeam;
             Role = (CharacterArchetypes.RoleArchetype) positionInTeam;
             CombatFieldPosition = initialFieldPosition;
             RangeType = rangeType;
-            _forcedTeamState = initialStance;
+            _forcedState = initialStance;
         }
 
         public void Injection(TeamCombatState teamState)
         {
-            _teamState = teamState;
+            _teamStateData = teamState;
         }
 
-        public void ForceState(TeamCombatState.Stance targetStance)
+        public void ForceState(TeamCombatState.Stances targetStance)
         {
-            _forcedTeamState = targetStance;
+            _forcedState = targetStance;
             IsForceStance = true;
         }
 
@@ -45,11 +44,11 @@ namespace _CombatSystem
             IsForceStance = false;
         }
         [ShowInInspector]
-        public TeamCombatState.Stance GetCurrentPositionState()
+        public TeamCombatState.Stances GetCurrentPositionState()
         {
-            if (IsForceStance || _teamState == null)
-                return _forcedTeamState;
-            return _teamState.stance;
+            if (IsForceStance || _teamStateData == null)
+                return _forcedState;
+            return _teamStateData.CurrentStance;
         }
 
     }

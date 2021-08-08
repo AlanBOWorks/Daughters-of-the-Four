@@ -81,16 +81,14 @@ namespace Stats
         public CharacterCombatStatsFull() : base()
         { }
 
-        public CharacterCombatStatsFull(int overrideByDefault) : base(overrideByDefault)
+        public CharacterCombatStatsFull(float value) : base(value)
         {
-            float value = overrideByDefault;
             HealthPoints = value;
             ShieldAmount = value;
             MortalityPoints = value;
-            
         }
 
-        public override void OverrideAll(float value)
+        public new void OverrideAll(float value)
         {
             base.OverrideAll(value);
             HealthPoints = value;
@@ -98,8 +96,7 @@ namespace Stats
             MortalityPoints = value;
         }
 
-        [Button("Reset to Zero")]
-        private void ResetToZero() => OverrideAll(0);
+        public void ResetToZero() => OverrideAll(0);
 
         public CharacterCombatStatsFull(ICharacterFullStats copyFrom)
         {

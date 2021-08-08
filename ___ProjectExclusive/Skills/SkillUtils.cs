@@ -41,10 +41,10 @@ namespace Skills
             return false;
         }
 
-        public static SCharacterSharedSkillsPreset GetBackUpSkills(CharacterArchetypes.TeamPosition position)
+        public static SCharacterSharedSkillsPreset GetOnNullSkills(CharacterArchetypes.TeamPosition position)
         {
             var backUpElements 
-                = CombatSystemSingleton.ParamsVariable.ArchetypesBackupSkills;
+                = CombatSystemSingleton.ParamsVariable.ArchetypesOnNullSkills;
             return CharacterArchetypes.GetElement(backUpElements, position);
         }
 
@@ -72,9 +72,9 @@ namespace Skills
             var state = entity.AreasDataTracker.GetCurrentPositionState();
             return state switch
             {
-                TeamCombatState.Stance.Attacking => elements.AttackingSkills,
-                TeamCombatState.Stance.Neutral => elements.NeutralSkills,
-                TeamCombatState.Stance.Defending => elements.DefendingSkills,
+                TeamCombatState.Stances.Attacking => elements.AttackingSkills,
+                TeamCombatState.Stances.Neutral => elements.NeutralSkills,
+                TeamCombatState.Stances.Defending => elements.DefendingSkills,
                 _ => throw new NotImplementedException("Not implemented stance was invoked" +
                                                        $"in the GetElement for [{typeof(T)}]")
             };
@@ -108,6 +108,20 @@ namespace Skills
             action(skills.CommonSkillFirst);
             action(skills.CommonSkillSecondary);
             action(skills.WaitSkill);
+        }
+
+        public static void DoSafeParse<T>(ISkillShared<T> skills, Action<T> action)
+        {
+            DoAction(skills.UltimateSkill);
+            DoAction(skills.CommonSkillFirst);
+            DoAction(skills.CommonSkillSecondary);
+            DoAction(skills.WaitSkill);
+
+            void DoAction(T element)
+            {
+                if (element == null) return;
+                action(element);
+            }
         }
 
 

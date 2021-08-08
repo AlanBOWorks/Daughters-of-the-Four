@@ -92,25 +92,25 @@ namespace _Team
 
         public ICharacterBasicStats GetCurrentStats()
         {
-            return _state.stance switch
+            return _state.CurrentStance switch
             {
-                TeamCombatState.Stance.Neutral => NeutralStats,
-                TeamCombatState.Stance.Attacking => AttackingStats,
-                TeamCombatState.Stance.Defending => DefendingStats,
+                TeamCombatState.Stances.Neutral => NeutralStats,
+                TeamCombatState.Stances.Attacking => AttackingStats,
+                TeamCombatState.Stances.Defending => DefendingStats,
                 _ => throw new ArgumentException("TeamControl seems to trying to access an invalid" +
-                                                 $"type of Team.State [{_state.stance}]")
+                                                 $"type of Team.State [{_state.CurrentStance}]")
             };
         }
 
         public FilterPassivesHolder GetCurrentPassives()
         {
-            return _state.stance switch
+            return _state.CurrentStance switch
             {
-                TeamCombatState.Stance.Neutral => OnNeutralPassives,
-                TeamCombatState.Stance.Attacking => OnAttackPassives,
-                TeamCombatState.Stance.Defending => OnDefendingPassives,
+                TeamCombatState.Stances.Neutral => OnNeutralPassives,
+                TeamCombatState.Stances.Attacking => OnAttackPassives,
+                TeamCombatState.Stances.Defending => OnDefendingPassives,
                 _ => throw new ArgumentException("TeamControl seems to trying to access an invalid" +
-                                                 $"type of Team.State [{_state.stance}]")
+                                                 $"type of Team.State [{_state.CurrentStance}]")
             };
         }
 

@@ -22,7 +22,6 @@ namespace Skills
         [ShowInInspector]
         public List<CombatSkill> DefendingSkills { get; }
 
-
         public List<CombatSkill> GetAttacking() => AttackingSkills;
         public List<CombatSkill> GetNeutral() => NeutralSkills;
         public List<CombatSkill> GetDefending() => DefendingSkills;
@@ -33,7 +32,7 @@ namespace Skills
             user.Injection(this);
             if (shared == null)
             {
-                shared = UtilsSkill.GetBackUpSkills(user.AreasDataTracker.PositionInTeam);
+                shared = UtilsSkill.GetOnNullSkills(user.AreasDataTracker.PositionInTeam);
             }
 
             int attackingCount;
@@ -57,7 +56,7 @@ namespace Skills
             
 
             int allCount = attackingCount + neutralCount + defendingCount;
-            UtilsSkill.DoParse(shared,SumBySkill);
+            UtilsSkill.DoSafeParse(shared,SumBySkill);
 
             AllSkills = new List<CombatSkill>(allCount);
             AttackingSkills = new List<CombatSkill>(attackingCount);
@@ -75,7 +74,7 @@ namespace Skills
 
             void SumBySkill(SkillPreset check)
             {
-                if (check != null && check.Preset != null)
+                if(check.Preset != null)
                     allCount++;
             }
         }
@@ -87,19 +86,54 @@ namespace Skills
                 throw new ArgumentException("Shared skills are null; BackUp skills weren't invoked still");
             SharedSkills = new SharedCombatSkills(shared);
 
-            UtilsSkill.DoParse(shared, DoInjection);
-            void DoInjection(SkillPreset skill)
-            {
-                if (skill == null || skill.Preset == null) return;
-                var combatSkill = new CombatSkill(skill);
-                AllSkills.Add(combatSkill);
-            }
+            UtilsSkill.DoSafeParse(shared, AddShared);
         }
 
         private void AddUniqueSkills(ISkillPositions<List<SkillPreset>> uniqueSkills)
         {
             UtilsSkill.DoParse(uniqueSkills, this, InjectStanceSkills);
+        }
 
+        private void AddShared(SkillPreset skill)
+        {
+            if (skill == null)
+                return;
+            if (skill.Preset == null)
+                return;
+            var combatSkill = new CombatSkill(skill);
+            AllSkills.Add(combatSkill);
+        }
+
+        public void AddSingle(SkillPreset skill)
+        {
+            if (skill == null)
+                throw new NullReferenceException("Skill preset is Null (Value wasn't Serialized)");
+            if(skill.Preset == null) 
+                throw new NullReferenceException("Skill Preset is  null (Forgotten Serialized reference)");
+            AddSkill(skill);
+        }
+
+        /// <summary>
+        /// Search if the [<seealso cref="skill"/>] is wasn't added and if so Adds it to the
+        /// <see cref="AllSkills"/>; Else ignores it.
+        /// </summary>
+        /// <param name="skill"></param>
+        public void AddNotRepeat(SkillPreset skill)
+        {
+            bool canAdd = true;
+            foreach (CombatSkill combatSkill in AllSkills)
+            {
+                if (combatSkill.Preset != skill.Preset) continue;
+                canAdd = false;
+                break;
+            }
+            if(canAdd) AddSkill(skill);
+        }
+
+        private void AddSkill(SkillPreset skill)
+        {
+            var combatSkill = new CombatSkill(skill);
+            AllSkills.Add(combatSkill);
         }
 
         private void InjectStanceSkills(List<SkillPreset> injectedSkills, List<CombatSkill> onPositionCombatSkills)
@@ -112,6 +146,7 @@ namespace Skills
                 AllSkills.Add(combatSkill);
             }
         }
+
 
     }
 }

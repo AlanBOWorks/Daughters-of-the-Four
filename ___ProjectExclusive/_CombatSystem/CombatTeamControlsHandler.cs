@@ -61,7 +61,7 @@ namespace _CombatSystem
         [ShowInInspector]
         private readonly List<ITeamVariationListener> _listeners;
         [ShowInInspector]
-        private TeamCombatState.Stance _lastPlayerStance;
+        private TeamCombatState.Stances _lastPlayerStance;
 
         private bool _firstCall;
         private int _burstRoundCount;
@@ -103,7 +103,7 @@ namespace _CombatSystem
             HandleTeams(team, out var actingTeam, out var receiver);
 
             actingTeam.IsBurstStance = true;
-            receiver.DoBurstControl(-burstControl); 
+            receiver.DoBurstControl(-burstControl); // Is negative because the Control is checked in negatives
             _burstRoundCount = team.StatsHolder.BurstCounterAmount;
 
             DoVariationCheck(actingTeam, receiver);
@@ -138,7 +138,7 @@ namespace _CombatSystem
                 - EnemyFaction.GetControlAmount();
             control = Mathf.Clamp(control, -1, 1);
 
-                TeamCombatState.Stance stance = PlayerFaction.stance;
+                TeamCombatState.Stances stance = PlayerFaction.CurrentStance;
             if (!_firstCall && stance == _lastPlayerStance)
             {
                 foreach (ITeamVariationListener listener in _listeners)
@@ -189,65 +189,65 @@ namespace _CombatSystem
 
             switch (_lastPlayerStance)
             {
-                case TeamCombatState.Stance.Attacking:
+                case TeamCombatState.Stances.Attacking:
                     CheckForDefending();
                     CheckForNeutral();
                     break;
-                case TeamCombatState.Stance.Neutral:
+                case TeamCombatState.Stances.Neutral:
                     CheckForAttacking();
                     CheckForDefending();
                     break;
-                case TeamCombatState.Stance.Defending:
+                case TeamCombatState.Stances.Defending:
                     CheckForNeutral();
                     CheckForAttacking();
                     break;
                 default:
-                    throw new NotImplementedException($"Team state not supported: {check.stance}");
+                    throw new NotImplementedException($"Team state not supported: {check.CurrentStance}");
             }
 
 
             void CheckForAttacking()
             {
                 if (isAttacking)
-                    DoVariation(check, reaction, TeamCombatState.Stance.Attacking);
+                    DoVariation(check, reaction, TeamCombatState.Stances.Attacking);
             }
 
             void CheckForNeutral()
             {
                 if (isAttacking || isDefending) return;
                     
-                DoVariation(check, reaction, TeamCombatState.Stance.Neutral);
+                DoVariation(check, reaction, TeamCombatState.Stances.Neutral);
             }
 
             void CheckForDefending()
             {
                 if (isDefending)
-                    DoVariation(check, reaction, TeamCombatState.Stance.Defending);
+                    DoVariation(check, reaction, TeamCombatState.Stances.Defending);
             }
         }
 
 
 
         private static void DoVariation(TeamCombatState actingTeam, TeamCombatState receiver,
-            TeamCombatState.Stance targetStance)
+            TeamCombatState.Stances targetStance)
         {
             TeamCombatState winner;
             TeamCombatState loser;
             switch (targetStance)
             {
-                case TeamCombatState.Stance.Attacking:
+                case TeamCombatState.Stances.Attacking:
                     winner = actingTeam;
                     loser = receiver;
                     HandleTeams();
                     break;
-                case TeamCombatState.Stance.Defending:
+                case TeamCombatState.Stances.Defending:
                     winner = receiver;
                     loser = actingTeam;
                     HandleTeams();
                     break;
                 default:
-                    actingTeam.stance = TeamCombatState.Stance.Neutral;
-                    receiver.stance = TeamCombatState.Stance.Neutral;
+                    actingTeam.DoForceStance(TeamCombatState.Stances.Neutral);
+                    receiver.DoForceStance(TeamCombatState.Stances.Neutral);
                     break;
             }
 
@@ -256,8 +256,8 @@ namespace _CombatSystem
 
             void HandleTeams()
             {
-                winner.stance = TeamCombatState.Stance.Attacking;
-                loser.stance = TeamCombatState.Stance.Defending;
+                winner.DoForceStance(TeamCombatState.Stances.Attacking);
+                loser.DoForceStance(TeamCombatState.Stances.Defending);
             }
             void InvokeEvent(TeamCombatState target)
             {
