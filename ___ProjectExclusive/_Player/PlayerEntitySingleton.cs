@@ -34,6 +34,9 @@ namespace _Player
         [ShowInInspector]
         public static PlayerCombatElementsPools CombatElementsPools;
 
+        [ShowInInspector] 
+        public static PredefinedUIHolderDictionary PredefinedUIDictionary;
+
         [ShowInInspector]
         public static USkillButtonsHandler SkillButtonsHandler = null;
         [ShowInInspector]

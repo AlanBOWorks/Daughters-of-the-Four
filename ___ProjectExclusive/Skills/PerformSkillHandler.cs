@@ -103,7 +103,7 @@ namespace Skills
 
             skillPreset.DoMainEffect(ref skillArguments);
             yield return Timing.WaitUntilDone(
-                    _currentUser.CombatAnimator._DoAnimation(_currentUser, effectTargets, _currentSkillTargets.UsingSkill));
+                    _currentUser.CombatAnimator.DoAnimation(_currentUser, effectTargets, _currentSkillTargets.UsingSkill));
             skillPreset.DoSecondaryEffects(ref skillArguments);
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL

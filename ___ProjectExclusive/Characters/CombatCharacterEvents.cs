@@ -47,44 +47,48 @@ namespace Characters
         public void Subscribe(ICharacterListener listener)
         {
             if (listener is ITempoListenerVoid tempoListener)
-                SubscribeTo(tempoListener);
+                CheckAndSubscribe(tempoListener);
 
             if (listener is IVitalityChangeListener vitalityListener)
-                SubscribeTo(vitalityListener);
+                CheckAndSubscribe(vitalityListener);
             if (listener is ITemporalStatsChangeListener temporalStatListener)
-                SubscribeTo(temporalStatListener);
+                CheckAndSubscribe(temporalStatListener);
             if (listener is IAreaStateChangeListener areaStateListener)
-                SubscribeTo(areaStateListener);
+                CheckAndSubscribe(areaStateListener);
 
             if (listener is IHealthZeroListener healthCheckListener)
-                SubscribeTo(healthCheckListener);
+                CheckAndSubscribe(healthCheckListener);
         }
 
-        private void SubscribeTo(ITempoListenerVoid listener)
+        protected void CheckAndSubscribe(ITempoListenerVoid listener)
         {
             if(_onTempoListeners == null)
                 _onTempoListeners = new List<ITempoListenerVoid>();
             _onTempoListeners.Add(listener);
         }
-        private void SubscribeTo(IVitalityChangeListener listener)
+
+        protected void CheckAndSubscribe(IVitalityChangeListener listener)
         {
             if (_onVitalityChange == null)
                 _onVitalityChange = new List<IVitalityChangeListener>();
             _onVitalityChange.Add(listener);
         }
-        private void SubscribeTo(ITemporalStatsChangeListener listener)
+
+        protected void CheckAndSubscribe(ITemporalStatsChangeListener listener)
         {
             if (_onTemporalStatsChange == null)
                 _onTemporalStatsChange = new List<ITemporalStatsChangeListener>();
             _onTemporalStatsChange.Add(listener);
         }
-        private void SubscribeTo(IAreaStateChangeListener listener)
+
+        protected void CheckAndSubscribe(IAreaStateChangeListener listener)
         {
             if (_onAreaChange == null)
                 _onAreaChange = new List<IAreaStateChangeListener>();
             _onAreaChange.Add(listener);
         }
-        private void SubscribeTo(IHealthZeroListener listener)
+
+        protected void CheckAndSubscribe(IHealthZeroListener listener)
         {
             if (_onHealthZeroListeners == null)
                 _onHealthZeroListeners = new List<IHealthZeroListener>();
@@ -195,12 +199,15 @@ namespace Characters
         }
     }
 
-    public class CombatCharacterEvents : CombatCharacterEventsBase
+    public class CombatCharacterEvents : CombatCharacterEventsBase, IHitEventHandler
     {
         private readonly CombatingEntity _user;
+        public readonly InHitEventHandler OnHitEvent;
         public CombatCharacterEvents(CombatingEntity user)
         {
             _user = user;
+            OnHitEvent = new InHitEventHandler(user);
+            CheckAndSubscribe(OnHitEvent);
         }
 
         private static CombatCharacterEventsBase GlobalEvents()
@@ -228,6 +235,14 @@ namespace Characters
             GlobalEvents().InvokeAreaChange(_user);
             InvokeAreaChange(_user);
         }
+
+        public void SubscribeListener(ICombatHitListener listener)
+            => OnHitEvent.SubscribeListener(listener);
+
+
+        public void UnSubscribeListener(ICombatHitListener listener)
+            => OnHitEvent.UnSubscribeListener(listener);
+       
     }
 
     /// <summary>

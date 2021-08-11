@@ -17,6 +17,7 @@ namespace CombatEffects
                 effectModifier);
 
             DoEffect(target,damage);
+            target.Events.OnHitEvent.OnHit(damage);
         }
 
         public override void DoEffect(CombatingEntity target, float damage)

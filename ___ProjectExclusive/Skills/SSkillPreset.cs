@@ -40,7 +40,7 @@ namespace Skills
         [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
         public float criticalAddition = 0f;
 
-        [TitleGroup("Details")]
+        [TitleGroup("Details"),PropertyOrder(-100)]
         [SerializeField, Delayed]
         protected string skillName = "NULL";
 
@@ -124,12 +124,12 @@ namespace Skills
             DoEffects(user, target, 1);
         }
         
-        public virtual void DoEffects(CombatingEntity user, CombatingEntity target, float modifier)
+        public void DoEffects(CombatingEntity user, CombatingEntity target, float modifier)
         {
             DoEffects(user, target, modifier, effects);
         }
 
-        protected virtual void DoEffects(CombatingEntity user, CombatingEntity target, float modifier,
+        protected void DoEffects(CombatingEntity user, CombatingEntity target, float modifier,
             EffectParams[] targetEffects)
         {
             float randomValue = Random.value;

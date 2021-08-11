@@ -9,25 +9,7 @@ namespace Characters
 
     public class CharacterAnimatorHandler 
     {
-        public static void DoReactAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill)
-        {
-            foreach (CombatingEntity target in targets)
-            {
-                DoReaction(target);
-            }
-
-
-            void DoReaction(CombatingEntity target)
-            {
-                if (target == user) return;
-                if (skill.GetMainType() != SSkillPreset.SkillType.Offensive)
-                {
-                    target.CombatAnimator.ReceiveSupport(user, target, skill);
-                }
-                else
-                    target.CombatAnimator.ReceiveAttack(user, target, skill);
-            }
-        }
+       
     }
 
     /// <summary>
@@ -45,23 +27,51 @@ namespace Characters
             
         }
 
-        public IEnumerator<float> _DoAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill)
-        {
-            ProvisionalAnimation();
-            CharacterAnimatorHandler.DoReactAnimation(user,targets,skill);
-            yield return Timing.WaitForSeconds(2);
+        private CoroutineHandle _currentAnimationHandle;
 
-            void ProvisionalAnimation()
+        
+        public CoroutineHandle DoAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill)
+        {
+            Timing.KillCoroutines(_currentAnimationHandle);
+            _currentAnimationHandle = Timing.RunCoroutine(_DoProvisionalAction());
+
+            return _currentAnimationHandle;
+
+            IEnumerator<float> _DoProvisionalAction()
             {
-                user.Holder.transform.DOPunchPosition(Vector3.up, 1,3);
+                user.Holder.transform.DOPunchPosition(Vector3.up, 1, 3);
+                yield return Timing.WaitForSeconds(2);
             }
         }
 
-        public void ReceiveSupport(CombatingEntity actor, CombatingEntity target, CombatSkill skill)
+        public CoroutineHandle ReceiveAction(CombatingEntity actor, CombatingEntity receiver, bool isSupport)
+        {
+            Timing.KillCoroutines(_currentAnimationHandle);
+            _currentAnimationHandle = Timing.RunCoroutine(_DoProvisionalAnimation());
+
+            return _currentAnimationHandle;
+
+            IEnumerator<float> _DoProvisionalAnimation()
+            {
+                if (isSupport)
+                {
+                    ReceiveSupport(receiver);
+                }
+                else
+                {
+                    ReceiveAttack(receiver);
+                }
+
+                yield return Timing.WaitForSeconds(ReceiveActionDuration);
+            }
+        }
+
+        private const float ReceiveActionDuration = 1.4f;
+        public void ReceiveSupport(CombatingEntity target)
         {
             target.Holder.transform.DOPunchPosition(Vector3.right , 1.4f);
         }
-        public void ReceiveAttack(CombatingEntity actor, CombatingEntity target, CombatSkill skill)
+        public void ReceiveAttack( CombatingEntity target)
         {
             target.Holder.transform.DOPunchPosition(Vector3.forward, 1.4f);
         }
@@ -70,8 +80,7 @@ namespace Characters
     public interface ICharacterCombatAnimator
     {
         void DoInitialAnimation();
-        IEnumerator<float> _DoAnimation(CombatingEntity user, List<CombatingEntity> targets,CombatSkill skill);
-        void ReceiveSupport(CombatingEntity actor, CombatingEntity receiver, CombatSkill skill);
-        void ReceiveAttack(CombatingEntity actor, CombatingEntity receiver, CombatSkill skill);
+        CoroutineHandle DoAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill);
+        CoroutineHandle ReceiveAction(CombatingEntity actor, CombatingEntity receiver, bool isSupport);
     }
 }

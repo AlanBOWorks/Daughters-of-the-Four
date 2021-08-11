@@ -30,10 +30,10 @@ namespace ___ProjectExclusive.Animators
             AnimancerEvent onAnimationEnd = new AnimancerEvent(.9f, _returnToIdle);
 
 
-            InjectEvent(animations.GetOffensive());
-            InjectEvent(animations.GetSupport());
-            InjectEvent(animations.GetReceiveOffensive());
-            InjectEvent(animations.GetReceiveSupport());
+            InjectEvent(animations.OffensiveAnimation);
+            InjectEvent(animations.SupportAnimation);
+            InjectEvent(animations.ReceiveOffensiveAnimation);
+            InjectEvent(animations.ReceiveSupportAnimation);
             animancer.Layers[0].Weight = 1;
 
 
@@ -58,46 +58,81 @@ namespace ___ProjectExclusive.Animators
 
         private void ReturnToIdle()
         {
-            animancer.Play(animations.GetIdle());
+            animancer.Play(animations.IdleAnimation);
         }
 
-        public IEnumerator<float> _DoAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill)
+
+        private CoroutineHandle _currentAnimationHandle;
+        public CoroutineHandle DoAnimation(CombatingEntity user, List<CombatingEntity> targets, CombatSkill skill)
         {
-            if (UtilsSkill.GetType(skill) == SSkillPreset.SkillType.Offensive)
+            Timing.KillCoroutines(_currentAnimationHandle);
+            _currentAnimationHandle = Timing.RunCoroutine(_DoAnimation());
+
+            return _currentAnimationHandle;
+
+            IEnumerator<float> _DoAnimation()
             {
-                _currentState = animancer.Play(animations.GetOffensive());
+                if (UtilsSkill.GetType(skill) == SSkillPreset.SkillType.Offensive)
+                {
+                    _currentState = animancer.Play(animations.OffensiveAnimation);
+                }
+                else
+                {
+                    _currentState = animancer.Play(animations.SupportAnimation);
+                }
+
+                yield return Timing.WaitUntilTrue(_isAnimationFinish);
+                animancer.Play(animations.IdleAnimation);
+                _currentState = null;
             }
-            else
+        }
+
+        public CoroutineHandle ReceiveAction(CombatingEntity actor, CombatingEntity receiver, bool isSupport)
+        {
+            Timing.KillCoroutines(_currentAnimationHandle);
+            _currentAnimationHandle = Timing.RunCoroutine(_DoProvisionalAnimation());
+
+            return _currentAnimationHandle;
+
+            IEnumerator<float> _DoProvisionalAnimation()
             {
-                _currentState = animancer.Play(animations.GetSupport());
+                float targetDuration;
+                if (isSupport)
+                {
+                    targetDuration = DoReceiveAction(animations.ReceiveSupportAnimation);
+                }
+                else
+                {
+                    targetDuration = DoReceiveAction(animations.ReceiveOffensiveAnimation);
+                }
+
+                yield return Timing.WaitForSeconds(targetDuration);
             }
-
-            CharacterAnimatorHandler.DoReactAnimation(user,targets,skill);
-            yield return Timing.WaitUntilTrue(_isAnimationFinish);
-            animancer.Play(animations.GetIdle());
-            _currentState = null;
         }
 
-        public void ReceiveSupport(CombatingEntity actor, CombatingEntity receiver, CombatSkill skill)
+        private float DoReceiveAction(AnimancerState target)
         {
-            animancer.Play(animations.GetReceiveSupport());
+            animancer.Play(target);
             _currentState = null;
+            return target.Duration;
         }
 
-        public void ReceiveAttack(CombatingEntity actor, CombatingEntity receiver, CombatSkill skill)
-        {
-            animancer.Play(animations.GetReceiveOffensive());
-            _currentState = null;
-        }
     }
 
-    public  abstract class SCombatAnimationsStates : ScriptableObject, CombatAnimationsBasic<AnimancerState>
+    public abstract class SCombatAnimationsTransitionsBase : ScriptableObject,
+        ICombatAnimationsHandler<ITransition>
     {
-        public abstract AnimancerState GetIdle();
-        public abstract AnimancerState GetOffensive();
-        public abstract AnimancerState GetSupport();
-        public abstract AnimancerState GetReceiveSupport();
-        public abstract AnimancerState GetReceiveOffensive();
+        public abstract ITransition IdleAnimation { get; }
+        public abstract ITransition SelfSupportAnimation { get; }
+        public abstract ITransition OffensiveAnimation { get; }
+        public abstract ITransition SupportAnimation { get; }
+        public abstract ITransition ReceiveSupportAnimation { get; }
+        public abstract ITransition ReceiveOffensiveAnimation { get; }
+        public abstract ITransition GetActionAnimationElement(CombatSkill skill);
+    }
+
+    public  abstract class SCombatAnimationsStates : ScriptableObject, ICombatAnimationsPreparation<AnimancerState>
+    {
         public abstract void Injection(AnimancerComponent animancer);
 
 
@@ -108,18 +143,47 @@ namespace ___ProjectExclusive.Animators
             ReceiveOffensive,
             ReceiveSupport
         }
+
+        public abstract AnimancerState IdleAnimation { get; }
+        public abstract AnimancerState SelfSupportAnimation { get; }
+        public abstract AnimancerState OffensiveAnimation { get; }
+        public abstract AnimancerState SupportAnimation { get; }
+        public abstract AnimancerState ReceiveSupportAnimation { get; }
+        public abstract AnimancerState ReceiveOffensiveAnimation { get; }
     }
 
-    public interface CombatAnimationsBasic<out T>
+    public interface ICombatAnimationsPreparation<out T> : ICombatAnimationsBasic<T>
     {
-        T GetIdle();
-        T GetOffensive();
-        T GetSupport();
-        T GetReceiveSupport();
-        T GetReceiveOffensive();
-
         void Injection(AnimancerComponent animancer);
     }
+
+    public interface ICombatAnimationsHandler<out T> : ICombatAnimationsBasic<T>
+    {
+        T GetActionAnimationElement(CombatSkill skill);
+    }
+
+    public interface ICombatAnimationsBasic<out T> : ICombatAnimationsIdle<T>, ICombatAnimationsActions<T>,
+        ICombatAnimationsReceive<T>
+    {}
+
+    public interface ICombatAnimationsIdle<out T>
+    {
+        T IdleAnimation { get; }
+    }
+
+    public interface ICombatAnimationsActions<out T>
+    {
+        T SelfSupportAnimation { get; }
+        T OffensiveAnimation { get; }
+        T SupportAnimation { get; }
+    }
+
+    public interface ICombatAnimationsReceive<out T>
+    {
+        T ReceiveSupportAnimation { get; }
+        T ReceiveOffensiveAnimation { get; }
+    }
+
 
     public interface ICombatAnimationListener
     {

@@ -17,8 +17,12 @@ namespace Skills
         [SerializeField,TitleGroup("Stats"),Range(0,100)]
         private int maxStack = 1;
 
-        [SerializeField,TitleGroup("Effects"), Tooltip("This aren't affected by maxStack")]
+        /*
+        // Remove for simplicity; But could be re-implemented
+
+         [SerializeField,TitleGroup("Effects"), Tooltip("This aren't affected by maxStack")]
         private EffectParams[] maxLessEffects = new EffectParams[0];
+        */
 
         public TempoHandler.TickType GetTickType() => tickType;
         public int MaxStack => maxStack;
@@ -42,7 +46,9 @@ namespace Skills
             float modifier = stacks;
                 if (modifier > maxStack) modifier = maxStack;
             base.DoEffects(user,target, modifier);
-            base.DoEffects(user,target,stacks,maxLessEffects);
+
+            // Remove for simplicity; But could be re-implemented
+            // base.DoEffects(user,target,stacks,maxLessEffects);
         }
 
 

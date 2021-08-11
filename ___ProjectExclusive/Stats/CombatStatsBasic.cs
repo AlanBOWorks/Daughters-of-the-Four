@@ -153,7 +153,7 @@ namespace Stats
     public class CharacterCombatStatsBasic : ICharacterBasicStats
     {
         [Title("Offensive")]
-        [SerializeField, SuffixLabel("Units")]
+        [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
         private float attackPower = 10;
         [SerializeField, SuffixLabel("%00")]
         private float deBuffPower = 0.1f;
@@ -163,7 +163,7 @@ namespace Stats
 
 
         [Title("Support")]
-        [SerializeField, SuffixLabel("Units")]
+        [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
         private float healPower = 10;
         [SerializeField, SuffixLabel("%00")]
         private float buffPower = 1;
@@ -177,7 +177,7 @@ namespace Stats
         [SerializeField, SuffixLabel("Units")]
         private float maxMortalityPoints = 1000;
 
-        [SerializeField, SuffixLabel("Units|%00")]
+        [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
         private float damageReduction = 0;
         [SerializeField, SuffixLabel("%00"), Tooltip("Counters DeBuffPower")]
         private float deBuffReduction = 0;
@@ -188,7 +188,7 @@ namespace Stats
         private float enlightenment = 1; // before fight this could be modified
         [SerializeField, SuffixLabel("%00")]
         private float criticalChance = 0;
-        [SerializeField, SuffixLabel("Units"), Tooltip("[100] is the default value")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("[100] is the default value")]
         private float speedAmount = 100;
 
         [SerializeField, SuffixLabel("%00")]

@@ -51,11 +51,11 @@ namespace Stats
     {
 
         [Title("Temporal Stats")]
-        [SerializeField, SuffixLabel("units")]
+        [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
         private float healthPoints; // before fight this could be reduced
-        [SerializeField, SuffixLabel("units")]
+        [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
         private float shieldAmount; // before fight this could be increased
-        [SerializeField, SuffixLabel("units")]
+        [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
         private float mortalityPoints; // after fight this could be reduced
 
 

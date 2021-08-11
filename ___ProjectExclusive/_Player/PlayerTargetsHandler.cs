@@ -16,9 +16,12 @@ namespace _Player
 
             var playerElements
                 = PlayerEntitySingleton.CombatDictionary;
+            var predefinedUIElements 
+                = PlayerEntitySingleton.PredefinedUIDictionary;
             foreach (CombatingEntity entity in possibleTargets)
             {
                 playerElements[entity].GetTargetButton().Show();
+                predefinedUIElements[entity].ShowTargetButton();
             }
         }
 
@@ -26,9 +29,14 @@ namespace _Player
         {
             var playerElements 
                 = PlayerEntitySingleton.CombatDictionary;
+            var predefinedUIElements
+                = PlayerEntitySingleton.PredefinedUIDictionary;
             foreach (KeyValuePair<CombatingEntity, PlayerCombatElement> playerElement in playerElements)
             {
+                var entity = playerElement.Key;
                 playerElement.Value.GetTargetButton().Hide();
+                predefinedUIElements[entity].HideTargetButton();
+
             }
         }
 

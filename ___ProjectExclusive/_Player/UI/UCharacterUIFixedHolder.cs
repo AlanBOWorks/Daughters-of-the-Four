@@ -15,12 +15,18 @@ namespace _Player
         [SerializeField] private TextMeshProUGUI characterName = null;
         //TODO give Injection
         [SerializeField] private TempoFillerTooltip tempoFiller = new TempoFillerTooltip();
+        [SerializeField] private UTargetButton buttonHandler;
         public override void Injection(CombatingEntity entity)
         {
             characterName.text = entity.CharacterName;
             base.Injection(entity);
             tempoFiller.Injection(entity);
+            buttonHandler.Injection(entity);
         }
+
+        public void ShowTargetButton() => buttonHandler.Show();
+        public void HideTargetButton() => buttonHandler.Hide();
+
     }
 
     public abstract class UCharacterUIHolderBase : MonoBehaviour

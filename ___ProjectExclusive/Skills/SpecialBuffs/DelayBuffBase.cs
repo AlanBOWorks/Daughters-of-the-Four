@@ -49,14 +49,7 @@ namespace Skills
 
         protected override void DoActionOn(StackableBuffPool holder)
         {
-            if (holder.Count <= 0) return;
-
-            for (int i = holder.Count - 1; i >= 0; i--)
-            {
-                var values = holder[i];
-                values.Buff.DoBuff(values.Buffer,_entity,values.StackAmount);
-                holder.RemoveAt(i);
-            }
+            holder.InvokeAndClear(_entity);
         }
     }
 
@@ -72,10 +65,37 @@ namespace Skills
                 StackableBuffValues buffValues = this[i];
                 if (buff != buffValues.Buff || buffer != buffValues.Buffer) continue;
 
-                this[i] = new StackableBuffValues(buff, buffer, buffValues.StackAmount+1);
+                this[i] = new StackableBuffValues(buffValues);
                 return;
             }
-            Add(new StackableBuffValues(buff,buffer,1));
+            Add(new StackableBuffValues(buff,buffer));
+        }
+
+        public void Add(ref StackableBuffValues values)
+        {
+            for (var i = 0; i < Count; i++)
+            {
+                StackableBuffValues buff = this[i];
+                if (buff.Buff != values.Buff || buff.Buffer != values.Buffer) continue;
+
+                this[i] = new StackableBuffValues(buff);
+                return;
+            }
+
+            Add(values);
+        }
+
+        public void InvokeAndClear(CombatingEntity target)
+        {
+            if (Count <= 0) return;
+
+            for (int i = Count - 1; i >= 0; i--)
+            {
+                var buff = this[i];
+                RemoveAt(i);
+                buff.Buff.DoBuff(buff.Buffer, target,  buff.StackAmount);
+
+            }
         }
     }
 
@@ -91,15 +111,16 @@ namespace Skills
             Buffer = buffer;
             StackAmount = stackAmount;
         }
-    }
 
+        public StackableBuffValues(IDelayBuff buff, CombatingEntity buffer)
+        : this(buff,buffer,1)
+        {}
 
-    /// <summary>
-    /// For buff that have a special condition for need to be removed;
-    /// (<example>It could have a count down or a float to check for the buff be removed)</example>
-    /// </summary>
-    public interface IPersistentBuff
-    {
-        bool BuffHasEnded();
+        public StackableBuffValues(StackableBuffValues copyFrom, float stackAddition = 1)
+        {
+            Buff = copyFrom.Buff;
+            Buffer = copyFrom.Buffer;
+            StackAmount = copyFrom.StackAmount + stackAddition;
+        }
     }
 }

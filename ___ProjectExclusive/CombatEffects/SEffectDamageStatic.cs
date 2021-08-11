@@ -16,6 +16,8 @@ namespace CombatEffects
                 effectModifier);
 
             DoEffect(target, staticDamage);
+            target.Events.OnHitEvent.OnHit(staticDamage);
+
         }
 
         public override void DoEffect(CombatingEntity target, float damage)

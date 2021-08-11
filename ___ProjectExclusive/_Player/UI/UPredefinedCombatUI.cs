@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using _CombatSystem;
 using _Team;
 using Characters;
@@ -9,16 +10,27 @@ namespace _Player
     public class UPredefinedCombatUI : MonoBehaviour, ICombatAfterPreparationListener
     {
         [SerializeField] FactionsFixedUI FixedUi = new FactionsFixedUI();
-        public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
-        {
-            FixedUi.OnBeforeStart(playerEntities,enemyEntities,allEntities);
-        }
-
+        private PredefinedUIHolderDictionary _characterFixedHolders;
         private void Awake()
         {
             CombatSystemSingleton.Invoker.SubscribeListener(this);
+            _characterFixedHolders = new PredefinedUIHolderDictionary();
+            PlayerEntitySingleton.PredefinedUIDictionary = _characterFixedHolders;
         }
+
+
+        public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
+        {
+            _characterFixedHolders.Clear();
+
+            FixedUi.Injection(playerEntities, enemyEntities, _characterFixedHolders);
+        }
+
     }
+
+    public class PredefinedUIHolderDictionary : Dictionary<CombatingEntity, UCharacterUIFixedHolder>
+    {}
+
     [Serializable]
     internal class FactionsFixedUI : ICharacterFaction<TeamCombatFixedUI>
     {
@@ -27,17 +39,18 @@ namespace _Player
 
         public TeamCombatFixedUI PlayerFaction => playerFaction;
         public TeamCombatFixedUI EnemyFaction => enemyFaction;
-        public void OnBeforeStart(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
+        public void Injection(CombatingTeam playerEntities, CombatingTeam enemyEntities,
+            PredefinedUIHolderDictionary holders)
         {
-            playerFaction.DoInjection(playerEntities);
-            enemyFaction.DoInjection(enemyEntities);
+            playerFaction.DoInjection(playerEntities,holders);
+            enemyFaction.DoInjection(enemyEntities,holders);
         }
     }
 
     [Serializable]
     internal class TeamCombatFixedUI : SerializablePlayerArchetypes<UCharacterUIFixedHolder>
     {
-        public void DoInjection(CombatingTeam team)
+        public void DoInjection(CombatingTeam team, PredefinedUIHolderDictionary dictionary)
         {
 #if UNITY_EDITOR
             if (team.Count != 3)
@@ -45,10 +58,15 @@ namespace _Player
                 throw new NotImplementedException("UI elements can't support != 3 elements");
             }
 #endif
+            DoInjection(team.FrontLiner,FrontLiner);
+            DoInjection(team.MidLiner,MidLiner);
+            DoInjection(team.BackLiner,BackLiner);
 
-            FrontLiner.Injection(team.FrontLiner);
-            MidLiner.Injection(team.MidLiner);
-            BackLiner.Injection(team.BackLiner);
+            void DoInjection(CombatingEntity entity, UCharacterUIFixedHolder holder)
+            {
+                holder.Injection(entity);
+                dictionary.Add(entity,holder);
+            }
         }
     }
 }

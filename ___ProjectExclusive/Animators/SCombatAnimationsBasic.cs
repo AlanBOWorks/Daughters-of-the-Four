@@ -13,29 +13,34 @@ namespace ___ProjectExclusive.Animators
     public class SCombatAnimationsBasic : SCombatAnimationsStates
     {
         [SerializeField] private AnimationClip combatIdleClip;
+        [SerializeField] private AnimationClip selfSupportClip;
         [SerializeField] private AnimationClip offensiveClip;
         [SerializeField] private AnimationClip supportClip;
         [SerializeField] private AnimationClip receiveSupportClip;
         [SerializeField] private AnimationClip receivingOffensiveClip;
 
         private AnimancerState _idleState;
-        public override AnimancerState GetIdle() => _idleState;
+        public override AnimancerState IdleAnimation => _idleState;
+
+        private AnimancerState _selfSupportState;
+        public override AnimancerState SelfSupportAnimation => _selfSupportState;
 
         private AnimancerState _offensiveState;
-        public override AnimancerState GetOffensive() => _offensiveState;
+        public override AnimancerState OffensiveAnimation => _offensiveState;
 
         private AnimancerState _supportState;
-        public override AnimancerState GetSupport() => _supportState;
+        public override AnimancerState SupportAnimation => _supportState;
 
         private AnimancerState _receiveSupportState;
-        public override AnimancerState GetReceiveSupport() => _receiveSupportState;
+        public override AnimancerState ReceiveSupportAnimation => _receiveSupportState;
 
         private AnimancerState _receiveOffensiveState;
-        public override AnimancerState GetReceiveOffensive() => _receiveOffensiveState;
+        public override AnimancerState ReceiveOffensiveAnimation => _receiveOffensiveState;
 
         public override void Injection(AnimancerComponent animancer)
         {
             _idleState = GenerateState(combatIdleClip);
+            _selfSupportState = GenerateState(selfSupportClip);
             _offensiveState = GenerateState(offensiveClip);
             _supportState = GenerateState(supportClip);
             _receiveSupportState = GenerateState(receiveSupportClip);
@@ -43,6 +48,7 @@ namespace ___ProjectExclusive.Animators
 
             AnimancerState GenerateState(AnimationClip clip)
             {
+                if (clip == null) return null;
                 return animancer.States.Create(clip);
             }
         }
