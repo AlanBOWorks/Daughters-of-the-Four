@@ -27,11 +27,11 @@ namespace ___ProjectExclusive.Animators
             var animationType = UtilsSkill.GetType(skill);
             switch (animationType)
             {
-                case SSkillPreset.SkillType.SelfOnly:
+                case EnumSkills.TargetingType.SelfOnly:
                     return selfSupportAnimation;
-                case SSkillPreset.SkillType.Offensive:
+                case EnumSkills.TargetingType.Offensive:
                     return offensiveAnimation;
-                case SSkillPreset.SkillType.Support:
+                case EnumSkills.TargetingType.Support:
                     return SupportAnimation;
                 default:
                     throw new ArgumentOutOfRangeException(

@@ -1,5 +1,6 @@
 ﻿using System;
 using Sirenix.OdinInspector;
+using Skills;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,6 +29,7 @@ namespace ___ProjectExclusive
     {
         public TextColors textColors = new TextColors();
         public PlayerColors playerColors = new PlayerColors();
+        public CombatTargetColors targetColors = new CombatTargetColors();
     }
 
 
@@ -47,6 +49,10 @@ namespace ___ProjectExclusive
         public Color enemyColor = new Color(.9f, .2f, .4f);
         public Color neutralColor = new Color(.4f,.4f,.4f);
     }
+
+    [Serializable]
+    public class CombatTargetColors : SerializableTargetDrivenData<Color>
+    {}
 
     public static class UtilsGameTheme
     {

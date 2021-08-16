@@ -31,6 +31,23 @@ namespace ___ProjectExclusive
 
             _wasPaused = !_wasPaused;
         }
+
+        [Button]
+        private void TestEditorAction(SSkillPreset testSkill, EnumSkills.StatDriven statsDriven)
+        {
+            EnumSkills.TargetingType type = testSkill.GetSkillType();
+            EnumSkills.Archetype targetArchetype = (EnumSkills.Archetype) ((int) type | (int) statsDriven);
+
+            Debug.Log($"Selected: {type} + {statsDriven} \n" +
+                      $"{(int)type} + {(int)statsDriven} => " +
+                      $"Result: {(int) targetArchetype} || {targetArchetype}");
+        }
+
+        [Button]
+        void TestEnum(EnumSkills.Archetype archetype)
+        {
+            Debug.Log(archetype + " => " +(int)archetype);
+        }
 #endif
     }
 }

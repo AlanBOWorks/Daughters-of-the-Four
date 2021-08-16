@@ -1,5 +1,6 @@
 using Characters;
 using Sirenix.OdinInspector;
+using Skills;
 using UnityEngine;
 
 namespace CombatEffects
@@ -13,6 +14,9 @@ namespace CombatEffects
         {
             DoEffect(target,effectModifier);
         }
+
+
+        public override EnumSkills.StatDriven GetEffectStatDriven() => EnumSkills.StatDriven.Area;
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {

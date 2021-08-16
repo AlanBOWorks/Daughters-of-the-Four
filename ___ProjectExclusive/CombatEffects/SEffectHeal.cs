@@ -1,4 +1,5 @@
 ﻿using Characters;
+using Skills;
 using Stats;
 using UnityEngine;
 
@@ -15,6 +16,9 @@ namespace CombatEffects
 
             DoEffect(target,heal);
         }
+
+        public override EnumSkills.StatDriven GetEffectStatDriven()
+            => EnumSkills.StatDriven.Health;
 
         public override void DoEffect(CombatingEntity target, float heal)
         {

@@ -15,6 +15,7 @@ namespace CombatEffects
     public abstract class SEffectBase : ScriptableObject, IEffectBase
     {
         public abstract void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1);
+        public abstract EnumSkills.StatDriven GetEffectStatDriven();
         public abstract void DoEffect(CombatingEntity target, float effectModifier);
 
 
@@ -81,6 +82,7 @@ namespace CombatEffects
 
         protected bool HasEffects() => effectPreset != null;
         protected bool HasCondition() => effectCondition.HasCondition();
+        public EnumSkills.StatDriven GetEffectStatDriven() => effectPreset.GetEffectStatDriven();
 
         public void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier)
         {
@@ -115,6 +117,8 @@ namespace CombatEffects
             }
 
         }
+
+
         public void DoDirectEffect(CombatingEntity target, float randomModifier)
         {
             float powerVariation = power;
@@ -153,6 +157,7 @@ namespace CombatEffects
     public interface IEffect : IEffectBase
     {
         SEffectBase.EffectTarget GetEffectTarget();
+
         bool CanPerformRandom();
         bool CanApplyOnTarget(CombatingEntity entity);
     }
@@ -160,6 +165,7 @@ namespace CombatEffects
     public interface IEffectBase
     { 
         void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier);
+        EnumSkills.StatDriven GetEffectStatDriven();
     }
 
 

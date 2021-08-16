@@ -1,4 +1,5 @@
 ﻿using Characters;
+using Skills;
 using UnityEngine;
 
 namespace CombatEffects
@@ -11,6 +12,9 @@ namespace CombatEffects
         {
             DoEffect(target, randomCheck);
         }
+
+        public override EnumSkills.StatDriven GetEffectStatDriven()
+            => EnumSkills.StatDriven.Stance;
 
         public override void DoEffect(CombatingEntity target, float randomCheck)
         {

@@ -64,10 +64,10 @@ namespace Skills
                 var skillPreset = skill.Preset;
                 var mainEffect = skillPreset.GetMainEffect();
 
-                SSkillPreset.SkillType skillType = skill.GetMainType();
+                EnumSkills.TargetingType skillType = skill.GetMainType();
 
 
-                if (skillType == SSkillPreset.SkillType.SelfOnly)
+                if (skillType == EnumSkills.TargetingType.SelfOnly)
                 {
                     injectInList.Add(user);
                     return;
@@ -81,7 +81,7 @@ namespace Skills
                 }
                 else
                 {
-                    if (skillType == SSkillPreset.SkillType.Support)
+                    if (skillType == EnumSkills.TargetingType.Support)
                     {
                         AddByPredefinedTargets(user.CharacterGroup.Team);
                     }

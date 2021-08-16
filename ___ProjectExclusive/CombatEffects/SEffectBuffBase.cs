@@ -1,5 +1,6 @@
 ﻿using Characters;
 using Sirenix.OdinInspector;
+using Skills;
 using Stats;
 using UnityEngine;
 
@@ -28,6 +29,8 @@ namespace CombatEffects
             return stats;
         }
 
+        public override EnumSkills.StatDriven GetEffectStatDriven()
+            => EnumSkills.StatDriven.Buff;
 
         [Button(ButtonSizes.Large)]
         private void UpdateAssetName()

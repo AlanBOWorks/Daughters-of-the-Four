@@ -1,5 +1,6 @@
 ﻿using _CombatSystem;
 using Characters;
+using Skills;
 using Stats;
 using UnityEngine;
 
@@ -17,6 +18,9 @@ namespace CombatEffects
             float initiativeAddition = effectModifier * ( user.CombatStats.BuffPower);
             DoEffect(target,initiativeAddition);
         }
+
+        public override EnumSkills.StatDriven GetEffectStatDriven()
+            => EnumSkills.StatDriven.Tempo;
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {

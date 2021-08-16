@@ -18,48 +18,46 @@ namespace Skills
         menuName = "Combat/Skill/Skill Preset", order = -100)]
     public class SSkillPreset : ScriptableObject
     {
-        [TitleGroup("Targeting")]
-        [SerializeField] protected bool canTargetSelf = false;
-        public bool CanTargetSelf() => canTargetSelf;
-        [SerializeField] protected SkillType skillType = SkillType.Support;
-        public SkillType GetSkillType() => skillType;
-        public enum SkillType
-        {
-            SelfOnly,
-            Offensive,
-            Support,
-            Other = SelfOnly
-        }
+        [TitleGroup("Details"), PropertyOrder(-100)]
+        [SerializeField, Delayed]
+        protected string skillName = "NULL";
+        [TitleGroup("Details"), PreviewField, GUIColor(.4f, .4f, .4f)]
+        [SerializeField] private Sprite icon = null;
 
         [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
         [SerializeField]
         private int cooldownCost = 1;
-        public int CoolDownCost => cooldownCost;
         [TitleGroup("Stats")]
         public bool canCrit = true;
         [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
         public float criticalAddition = 0f;
 
-        [TitleGroup("Details"),PropertyOrder(-100)]
-        [SerializeField, Delayed]
-        protected string skillName = "NULL";
-
-        [TitleGroup("Details")]
-        [SerializeField] private Sprite icon = null;
-
+        [TitleGroup("Targeting")]
+        [SerializeField]
+        protected bool canTargetSelf = false;
+        [SerializeField]
+        protected EnumSkills.TargetingType skillType = EnumSkills.TargetingType.Support;
 
         [Title("Main Condition"),PropertyOrder(90)] 
         [SerializeField]
         private ConditionalUse conditionalUse;
-
         [TitleGroup("Effects"),PropertyOrder(100)]
         [SerializeField]
         private EffectParams[] effects = new EffectParams[1];
 
 
+
+
         public string SkillName => skillName;
         public Sprite Icon => icon;
+        public bool CanTargetSelf() => canTargetSelf;
+        public EnumSkills.TargetingType GetSkillType() => skillType;
+        public int CoolDownCost => cooldownCost;
         public IEffect GetMainEffect() => effects[0];
+
+
+
+
 
         public List<CombatingEntity> GetMainEffectTargets(CombatingEntity user,CombatingEntity target)
         {

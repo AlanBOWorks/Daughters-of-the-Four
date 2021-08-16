@@ -72,7 +72,7 @@ namespace ___ProjectExclusive.Animators
 
             IEnumerator<float> _DoAnimation()
             {
-                if (UtilsSkill.GetType(skill) == SSkillPreset.SkillType.Offensive)
+                if (UtilsSkill.GetType(skill) == EnumSkills.TargetingType.Offensive)
                 {
                     _currentState = animancer.Play(animations.OffensiveAnimation);
                 }

@@ -342,6 +342,16 @@ namespace Stats
                 stats.HealthPoints = stats.MaxHealth;
         }
 
+        public static void DoGiveShieldsTo(CombatingEntity target, float shieldsAmount)
+        {
+            if(!target.IsConscious() || shieldsAmount < 0) return;
+
+            var stats = target.CombatStats;
+            stats.ShieldAmount += shieldsAmount;
+
+            UtilsStats.InvokeTemporalStatsEvents(target);
+        }
+
         public static void SetInitiative(ICombatTemporalStats stats, float targetValue = 0)
         {
             const float lowerCap = 0;

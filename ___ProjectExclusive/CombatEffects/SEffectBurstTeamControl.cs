@@ -1,4 +1,5 @@
 using Characters;
+using Skills;
 using Stats;
 using UnityEngine;
 
@@ -12,6 +13,9 @@ namespace CombatEffects
         {
             DoEffect(target, burstAmount);
         }
+
+        public override EnumSkills.StatDriven GetEffectStatDriven()
+            => EnumSkills.StatDriven.Control;
 
         public override void DoEffect(CombatingEntity target, float burstAmount)
         {
