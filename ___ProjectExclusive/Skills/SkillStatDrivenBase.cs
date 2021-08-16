@@ -12,6 +12,7 @@ namespace Skills
     {
 
         T Health { get; }
+        T Static { get; }
         T Buff { get; }
         T Harmony { get; }
         T Tempo { get; }
@@ -23,6 +24,7 @@ namespace Skills
     {
 
         T Health { set; }
+        T Static { set; }
         T Buff { set; }
         T Harmony { set; }
         T Tempo { set; }
@@ -39,6 +41,7 @@ namespace Skills
         public StatDrivenData(IStatDrivenData<T> copyFrom)
         {
             Health = copyFrom.Health;
+            Static = copyFrom.Static;
             Buff = copyFrom.Buff;
             Harmony = copyFrom.Harmony;
             Tempo = copyFrom.Tempo;
@@ -48,6 +51,7 @@ namespace Skills
         }
 
         public T Health { get; set; }
+        public T Static { get; set; }
         public T Buff { get; set; }
         public T Harmony { get; set; }
         public T Tempo { get; set; }
@@ -64,6 +68,7 @@ namespace Skills
     public class SerializableStatDrivenData<T> : IStatDriven<T>
     {
         [SerializeField] protected T health;
+        [SerializeField] protected T _static;
         [SerializeField] protected T buff;
         [SerializeField] protected T harmony;
         [SerializeField] protected T tempo;
@@ -76,6 +81,13 @@ namespace Skills
             get => health;
             set => health = value;
         }
+
+        public T Static
+        {
+            get => _static;
+            set => _static = value;
+        }
+
         public T Buff
         {
             get => buff;

@@ -120,7 +120,7 @@ namespace Skills
         public bool CanCrit => preset.canCrit;
         public virtual SSkillPreset Preset => preset;
         public string SkillName => preset.SkillName; //could be modified by a special name in some cases
-        public Sprite Icon => preset.Icon; // could be modified by another icon when upgraded or something
+        public Sprite Icon => preset.SpecialIcon; // could be modified by another icon when upgraded or something
         public EnumSkills.TargetingType GetMainType() => preset.GetSkillType();
         public SEffectBase.EffectTarget GetMainTarget() => preset.GetMainEffect().GetEffectTarget();
 

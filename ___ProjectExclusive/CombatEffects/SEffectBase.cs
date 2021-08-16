@@ -165,7 +165,6 @@ namespace CombatEffects
     public interface IEffectBase
     { 
         void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier);
-        EnumSkills.StatDriven GetEffectStatDriven();
     }
 
 

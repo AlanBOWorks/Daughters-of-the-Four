@@ -22,7 +22,8 @@ namespace Skills
         [SerializeField, Delayed]
         protected string skillName = "NULL";
         [TitleGroup("Details"), PreviewField, GUIColor(.4f, .4f, .4f)]
-        [SerializeField] private Sprite icon = null;
+        [SerializeField, Tooltip("This will be used instead of the generic one")] 
+        private Sprite specialIcon = null;
 
         [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
         [SerializeField]
@@ -34,9 +35,12 @@ namespace Skills
 
         [TitleGroup("Targeting")]
         [SerializeField]
-        protected bool canTargetSelf = false;
-        [SerializeField]
         protected EnumSkills.TargetingType skillType = EnumSkills.TargetingType.Support;
+        [SerializeField]
+        protected bool canTargetSelf = false;
+        [SerializeField, Tooltip("The main stat this skill interact/represent"),
+         EnumToggleButtons] 
+        private EnumSkills.StatDriven mainStat = EnumSkills.StatDriven.Health;
 
         [Title("Main Condition"),PropertyOrder(90)] 
         [SerializeField]
@@ -49,7 +53,7 @@ namespace Skills
 
 
         public string SkillName => skillName;
-        public Sprite Icon => icon;
+        public Sprite SpecialIcon => specialIcon;
         public bool CanTargetSelf() => canTargetSelf;
         public EnumSkills.TargetingType GetSkillType() => skillType;
         public int CoolDownCost => cooldownCost;

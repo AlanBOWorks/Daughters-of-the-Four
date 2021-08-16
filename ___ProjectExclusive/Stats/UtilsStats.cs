@@ -85,7 +85,7 @@ namespace Stats
 
         public static float StatsFormula(float baseStat, float buffStat, float burstStat)
         {
-            return baseStat + baseStat * (buffStat + burstStat);
+            return baseStat * (1 + buffStat) * (1 + burstStat); //Exponential grow for buff * Burst
         }
 
         public static float GrowFormula(float baseStat, float growStat, float upgradeAmount)
@@ -140,15 +140,11 @@ namespace Stats
             return new CharacterCombatData(copyStats);
         }
 
-        public static void InvokeOffensiveStatsEvents(CombatingEntity target)
+        public static void InvokeStatsBuff(CombatingEntity target)
         {
             //TODO
         }
 
-        public static void InvokeSupportStatsEvents(CombatingEntity target)
-        {
-            //TODO
-        }
 
         public static void InvokeTemporalStatsEvents(CombatingEntity target)
         {
@@ -185,16 +181,15 @@ namespace Stats
             CharacterCombatData attacker,
             CharacterCombatData receiver, float damageModifier)
         {
-            float baseDamage = attacker.CalculateBaseAttackPower() 
+            float baseDamage = attacker.CalculateBaseAttackPower() * damageModifier
                                - receiver.CalculateDamageReduction();
 
-            float damageVariation = attacker.BuffStats.AttackPower
-                                    + attacker.BurstStats.AttackPower
-                                    - receiver.BuffStats.DamageReduction
-                                    - receiver.BurstStats.DamageReduction;
+            float buffVariation = attacker.BuffStats.AttackPower 
+                                  - receiver.BuffStats.DamageReduction;
+            float burstVariation = attacker.BurstStats.AttackPower
+                                   - receiver.BurstStats.DamageReduction;
 
-            baseDamage += baseDamage * damageVariation;
-            float total = baseDamage * damageModifier;
+            float total = UtilsStats.StatsFormula(baseDamage, buffVariation, burstVariation);
             if (total < 0) total = 0;
 
             return total;
@@ -204,15 +199,15 @@ namespace Stats
             CharacterCombatData attacker,
             CharacterCombatData receiver, float damageModifier)
         {
-            float baseDamage = attacker.CalculateBaseStaticDamagePower()
+            float baseDamage = attacker.CalculateBaseStaticDamagePower() * damageModifier
                                - receiver.CalculateDamageReduction();
-            float damageVariation = attacker.BuffStats.StaticDamagePower
-                                    + attacker.BurstStats.StaticDamagePower
-                                    - receiver.BuffStats.DamageReduction
-                                    - receiver.BurstStats.DamageReduction;
 
-            baseDamage += baseDamage * damageVariation;
-            float total = baseDamage * damageModifier;
+            float buffVariation = attacker.BuffStats.StaticDamagePower
+                                  - receiver.BuffStats.DamageReduction;
+            float burstVariation = attacker.BurstStats.StaticDamagePower
+                                   - receiver.BurstStats.DamageReduction;
+
+            float total = UtilsStats.StatsFormula(baseDamage, buffVariation, burstVariation);
             if (total < 0) total = 0;
 
             return total;

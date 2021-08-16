@@ -22,7 +22,7 @@ namespace CombatEffects
         {
             UtilsCombatStats.VariateBuffTarget(target.CombatStats,ref effectModifier);
             DoBuff(GetBuff(target), effectModifier);
-            UtilsStats.InvokeOffensiveStatsEvents(target);
+            UtilsStats.InvokeStatsBuff(target);
         }
 
         protected void DoBuff(ICharacterBasicStats buffStats, float effectModifier)
