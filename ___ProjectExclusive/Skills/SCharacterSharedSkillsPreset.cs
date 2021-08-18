@@ -36,8 +36,7 @@ namespace Skills
 
         public CombatSkill WaitSkill { get; }
 
-        private int _amount;
-        public int GetSharedAmount() => _amount;
+        
 
         public SharedCombatSkills(ISkillShared<SkillPreset> skills)
         {
@@ -53,10 +52,9 @@ namespace Skills
 
         private CombatSkill GenerateSkill(SkillPreset skill, bool isInCooldown)
         {
-            if (skill is null)
+            if (skill == null || skill.Preset == null)
                 return null;
 
-            _amount++;
             var generatedSkill = new CombatSkill(skill, isInCooldown);
             Add(generatedSkill);
             return generatedSkill;

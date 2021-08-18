@@ -370,7 +370,8 @@ namespace Stats
             UtilsStats.InvokeTemporalStatsEvents(target);
         }
 
-        public static void SetInitiative(ICombatTemporalStats stats, float targetValue = 0)
+
+        public static void SetInitiative(ICharacterFullStats stats, float targetValue)
         {
             const float lowerCap = 0;
             const float maxCap = GlobalCombatParams.InitiativeCheck;
@@ -378,10 +379,32 @@ namespace Stats
             targetValue = Mathf.Clamp(targetValue, lowerCap, maxCap);
             stats.InitiativePercentage = targetValue;
         }
-
-        public static void AddInitiative(ICombatTemporalStats stats, float addition)
+        public static void SetInitiative(CombatingEntity entity, float targetValue, bool isBurstType)
         {
+            ICharacterFullStats stats = isBurstType
+                ? entity.CombatStats.BurstStats
+                : entity.CombatStats.BaseStats;
+            SetInitiative(stats, targetValue);
+
+            entity.Events.InvokeTemporalStatChange();
+            var tempoHandler = CombatSystemSingleton.TempoHandler;
+
+            tempoHandler.CallUpdateOnInitiativeBar(entity);
+            tempoHandler.CheckAndInjectEntityInitiative(entity);
+        }
+        public static void AddInitiative(CombatingEntity entity, float addition, bool isBurstType)
+        {
+            ICharacterFullStats stats = isBurstType 
+                ? entity.CombatStats.BurstStats 
+                : entity.CombatStats.BaseStats;
             SetInitiative(stats, stats.InitiativePercentage + addition);
+
+
+            entity.Events.InvokeTemporalStatChange();
+            var tempoHandler = CombatSystemSingleton.TempoHandler;
+
+            tempoHandler.CallUpdateOnInitiativeBar(entity);
+            tempoHandler.CheckAndInjectEntityInitiative(entity);
         }
 
         public static void SetActionAmount(CharacterCombatData stats, int targetValue = 0)

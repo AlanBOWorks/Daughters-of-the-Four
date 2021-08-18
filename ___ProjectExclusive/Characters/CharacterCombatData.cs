@@ -48,7 +48,7 @@ namespace Characters
         [ShowInInspector, NonSerialized] 
         public UCharacterHolder Holder;
 
-        [ShowInInspector]
+        [ShowInInspector, GUIColor(.4f,.8f,.7f)]
         public CharacterCombatData CombatStats { get; private set; }
 
         /// <summary>

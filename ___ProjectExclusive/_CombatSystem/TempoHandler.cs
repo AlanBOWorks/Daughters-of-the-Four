@@ -171,7 +171,6 @@ namespace _CombatSystem
         private const float InitiativeCheck = GlobalCombatParams.InitiativeCheck;
         private const float VelocityModifier = GlobalCombatParams.TempoVelocityModifier;
         private CoroutineHandle _loopHandle;
-        //TODO make this in a Loop 
         private IEnumerator<float> _Tick()
         {
             // >>>> PREPARATIONS
@@ -187,7 +186,11 @@ namespace _CombatSystem
 
                 InvokeListeners();
                 DoInitiativeTick();
-                if(HasActingEntities()) DoActingQueue();
+                if (HasActingEntities())
+                {
+                    DequeueInvokeNextActor();
+                    Timing.PauseCoroutines(_loopHandle);
+                }
 
 
                 void InvokeListeners()
@@ -222,45 +225,43 @@ namespace _CombatSystem
                         _fillingEntities.RemoveAt(i);
                     }
                 }
-                void DoActingQueue()
-                {
-                    CombatingEntity lastActor = null;
-                    while (HasActingEntities())
-                    {
-                        var entity = _actingQueue.Dequeue();
-                        _fillingEntities.Add(entity);
-                        lastActor = entity;
-                        CharacterCombatData stats = entity.CombatStats;
-
-                        stats.InitiativePercentage = 0;
-                        stats.RefillInitiativeActions();
-
-                        if (!entity.CanUseSkills() || !entity.HasActions())
-                        {
-                            OnSkippedEntity(entity);
-                            continue;
-                        }
-
-                        StartUsingActions(entity);
-                        Timing.PauseCoroutines(_loopHandle);
-                        Debug.Log("Acting done");
-                    }
-                    DoCheckIfRoundPassed(lastActor);
-                }
                 
-                void DoCheckIfRoundPassed(CombatingEntity entity)
-                {
-                    if (!_roundTracker.Contains(entity)) return;
-                    if (_roundTracker.Count <= 1) //this means is the last one
-                    {
-                        RefillRoundTracker();
-                        TriggerBasicHandler.OnRoundCompleted(_characters, entity);
-                    }
-                    else
-                    {
-                        _roundTracker.Remove(entity);
-                    }
-                }
+                
+                
+            }
+        }
+
+
+        private void DequeueInvokeNextActor()
+        {
+
+            var entity = _actingQueue.Dequeue();
+            _fillingEntities.Add(entity);
+            CharacterCombatData stats = entity.CombatStats;
+
+            stats.BaseStats.InitiativePercentage = 0;
+            stats.BurstStats.InitiativePercentage = 0;
+            stats.RefillInitiativeActions();
+            CallUpdateOnInitiativeBar(entity);
+
+
+            if (!entity.CanUseSkills() || !entity.HasActions())
+                OnSkippedEntity(entity);
+            else
+                StartUsingActions(entity);
+        }
+
+        private void DoCheckIfRoundPassed(CombatingEntity entity)
+        {
+            if (!_roundTracker.Contains(entity)) return;
+            if (_roundTracker.Count <= 1) //this means is the last one
+            {
+                RefillRoundTracker();
+                TriggerBasicHandler.OnRoundCompleted(_characters, entity);
+            }
+            else
+            {
+                _roundTracker.Remove(entity);
             }
         }
 
@@ -393,10 +394,13 @@ namespace _CombatSystem
                 PlayerTempoHandler.OnFinisAllActions(entity);
 
             if(_loopHandle.IsRunning)
-                ResumeFromTempoTrigger();
+                StepNextActingEntity();
 
             // Do Harmony 
             entity.HarmonyBuffInvoker?.InvokeBurstStats();
+
+            // End round?
+            DoCheckIfRoundPassed(entity);
         }
 
         public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
@@ -416,10 +420,18 @@ namespace _CombatSystem
         /// Used to resume [<see cref="_Tick"/>] (which was paused by an [<seealso cref="CombatingEntity"/>] when
         /// it reaches its top [<seealso cref="ICombatTemporalStats.InitiativePercentage"/>])
         /// </summary>
-        private void ResumeFromTempoTrigger()
+        private void StepNextActingEntity()
         {
-            ForcedBarUpdate();
-            Timing.ResumeCoroutines(_loopHandle);
+            if (HasActingEntities())
+            {
+                DequeueInvokeNextActor();
+            }
+            else
+            {
+                ForcedBarUpdate();
+                Timing.ResumeCoroutines(_loopHandle);
+            }
+            
         }
     }
 

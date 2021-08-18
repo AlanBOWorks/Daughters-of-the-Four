@@ -19,12 +19,8 @@ namespace CombatEffects
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {
-            UtilsCombatStats.AddInitiative(GetBuff(target), effectModifier);
-            target.Events.InvokeTemporalStatChange();
-            var tempoHandler = CombatSystemSingleton.TempoHandler;
-
-            tempoHandler.CallUpdateOnInitiativeBar(target);
-            tempoHandler.CheckAndInjectEntityInitiative(target);
+            UtilsCombatStats.AddInitiative(target, effectModifier, isBurstType);
+            
         }
 
         private const string TemporalStatsPrefix = " Temporal Stat - INITIATIVE Modifier";
