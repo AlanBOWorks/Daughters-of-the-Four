@@ -177,11 +177,6 @@ namespace Characters
         {
             UtilsCombatStats.AddActionAmount(this, ActionsPerInitiative);
         }
-        public void ResetAdditionInitiativeAction()
-        {
-            ActionsLefts = 0;
-            RefillInitiativeActions();
-        }
 
         public void Revive()
         {

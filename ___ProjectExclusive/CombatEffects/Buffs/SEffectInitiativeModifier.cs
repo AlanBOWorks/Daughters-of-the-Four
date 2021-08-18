@@ -10,9 +10,6 @@ namespace CombatEffects
         menuName = "Combat/Effects/Buff/Initiative Modifier")]
     public class SEffectInitiativeModifier : SEffectBuffBase
     {
-        protected override ICharacterFullStats GetBuff(CombatingEntity target)
-            => GetBurstOrBase(target);
-
         public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
         {
             float initiativeAddition = effectModifier * ( user.CombatStats.BuffPower);
@@ -22,9 +19,12 @@ namespace CombatEffects
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {
-            UtilsCombatStats.AddInitiative(target.CombatStats, effectModifier);
-            TempoHandler.CallUpdateOnInitiativeBar(target);
+            UtilsCombatStats.AddInitiative(GetBuff(target), effectModifier);
             target.Events.InvokeTemporalStatChange();
+            var tempoHandler = CombatSystemSingleton.TempoHandler;
+
+            tempoHandler.CallUpdateOnInitiativeBar(target);
+            tempoHandler.CheckAndInjectEntityInitiative(target);
         }
 
         private const string TemporalStatsPrefix = " Temporal Stat - INITIATIVE Modifier";
