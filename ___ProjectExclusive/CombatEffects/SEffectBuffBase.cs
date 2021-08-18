@@ -29,9 +29,6 @@ namespace CombatEffects
             return stats;
         }
 
-        public override EnumSkills.StatDriven GetEffectStatDriven()
-            => EnumSkills.StatDriven.Buff;
-
         [Button(ButtonSizes.Large)]
         private void UpdateAssetName()
         {

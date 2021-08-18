@@ -40,7 +40,7 @@ namespace Skills
         protected bool canTargetSelf = false;
         [SerializeField, Tooltip("The main stat this skill interact/represent"),
          EnumToggleButtons] 
-        private EnumSkills.StatDriven mainStat = EnumSkills.StatDriven.Health;
+        private EnumSkills.StatDriven statRepresentation = EnumSkills.StatDriven.Health;
 
         [Title("Main Condition"),PropertyOrder(90)] 
         [SerializeField]
@@ -56,6 +56,7 @@ namespace Skills
         public Sprite SpecialIcon => specialIcon;
         public bool CanTargetSelf() => canTargetSelf;
         public EnumSkills.TargetingType GetSkillType() => skillType;
+        public EnumSkills.StatDriven GetStatDriven() => statRepresentation;
         public int CoolDownCost => cooldownCost;
         public IEffect GetMainEffect() => effects[0];
 
@@ -74,21 +75,27 @@ namespace Skills
             var target = arguments.Target;
             var isCritical = arguments.IsCritical;
 
+
             var effect = effects[effectIndex];
             var effectTargets = UtilsTargets.GetEffectTargets(user, target, effect.GetEffectTarget());
             float randomModifier;
             UpdateRandomness();
-            foreach (CombatingEntity effectTarget in effectTargets)
+            DoEffectOnTargets();
+
+
+            void DoEffectOnTargets()
             {
-                if (effect.CanPerformRandom())
-                    UpdateRandomness();
-                else
-                    randomModifier = 1;
+                for (var i = 0; i < effectTargets.Count; i++)
+                {
+                    CombatingEntity effectTarget = effectTargets[i];
+                    if (effect.CanPerformRandom())
+                        UpdateRandomness();
+                    else
+                        randomModifier = 1;
 
-                effect.DoEffect(user, effectTarget, randomModifier);
+                    effect.DoEffect(user, effectTarget, randomModifier);
+                }
             }
-
-
             void UpdateRandomness()
             {
                 if (isCritical)
@@ -149,16 +156,31 @@ namespace Skills
             }
         }
 
-        [Button(ButtonSizes.Large)]
+        [Button(ButtonSizes.Large), GUIColor(.3f,.6f,1f)]
         protected virtual void UpdateAssetName()
         {
             ValidateEffects();
             var mainEffect = GetMainEffect();
             if (mainEffect != null)
             {
-                name = FullAssetName(mainEffect);
+                name = SkillType() + FullAssetName(mainEffect);
             }
             UtilsGame.UpdateAssetName(this);
+
+            string SkillType()
+            {
+                switch (skillType)
+                {
+                    case EnumSkills.TargetingType.SelfOnly:
+                        return "SELF - ";
+                    case EnumSkills.TargetingType.Offensive:
+                        return "OFFE - ";
+                    case EnumSkills.TargetingType.Support:
+                        return "SUPP - ";
+                    default:
+                        throw new ArgumentOutOfRangeException("Type is not supported in name Update");
+                }
+            }
         }
 
         protected void ValidateEffects()

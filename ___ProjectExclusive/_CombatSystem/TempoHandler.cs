@@ -24,15 +24,16 @@ namespace _CombatSystem
 
         private CharacterArchetypesList<CombatingEntity> _characters;
         [Range(0,10),SuffixLabel("deltas")]
-        public float TempoModifier = 1f;
+        public float TempoStepModifier = 1f;
 
         [HideInEditorMode,HideInPlayMode]
         public readonly CombatConditionsChecker CombatConditionChecker;
 
-        [ShowInInspector, DisableInPlayMode] 
+        [ShowInInspector, DisableInEditorMode] 
         public readonly TempoEvents TriggerBasicHandler;
-        [ShowInInspector, DisableInPlayMode] 
+        [ShowInInspector, DisableInEditorMode] 
         public ITempoTriggerHandler PlayerTempoHandler { get; private set; }
+        [ShowInInspector, DisableInEditorMode] 
         public ICombatEnemyController EnemyController { get; private set; }
 
         public readonly Dictionary<CombatingEntity, ITempoFiller> EntitiesBar;
@@ -124,6 +125,8 @@ namespace _CombatSystem
             CombatConditionChecker.OnAfterPreparation(playerEntities,enemyEntities,allEntities);
             _characters = allEntities;
             RefillRoundTracker();
+
+            TempoStepModifier = CombatSystemSingleton.ParamsVariable.TempoVelocityModifier;
         }
 
 
@@ -138,19 +141,19 @@ namespace _CombatSystem
         }
 
         private CoroutineHandle _loopHandle;
+        //TODO make it UpdateLoop
         private IEnumerator<float> _Tick()
         {
             // >>>> PREPARATIONS
             yield return Timing.WaitForOneFrame; //To ensure that everything is initialized
             const float initiativeCheck = GlobalCombatParams.InitiativeCheck;
-            const float speedModifier = GlobalCombatParams.SpeedStatModifier;
             _isEntityPause = false;
             ForcedBarUpdate();
 
             // >>>> COMBAT LOOP
             while (_characters != null)
             {
-                float deltaIncrement = Time.deltaTime * TempoModifier;
+                float deltaIncrement = Time.deltaTime * TempoStepModifier;
                 foreach (CombatingEntity entity in _characters)
                 {
                     CharacterCombatData stats = entity.CombatStats;
@@ -158,7 +161,7 @@ namespace _CombatSystem
                     //Increase Initiative
                     if(entity.IsConscious())
                     {
-                        stats.InitiativePercentage += deltaIncrement * stats.SpeedAmount * speedModifier;
+                        stats.InitiativePercentage += deltaIncrement * stats.SpeedAmount;
 
                         float initiativePercentage = SRange.Percentage(
                             stats.InitiativePercentage,
@@ -232,7 +235,7 @@ namespace _CombatSystem
         public void OnCombatStart()
         {
             Timing.KillCoroutines(_loopHandle);
-            _loopHandle = Timing.RunCoroutine(_Tick());
+            _loopHandle = Timing.RunCoroutine(_Tick(),Segment.LateUpdate);
         }
 
         public void OnCombatFinish(CombatingEntity lastEntity, bool isPlayerWin)

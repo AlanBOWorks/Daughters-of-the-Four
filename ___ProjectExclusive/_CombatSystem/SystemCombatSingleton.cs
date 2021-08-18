@@ -87,8 +87,7 @@ namespace _CombatSystem
     public static class GlobalCombatParams
     {
 
-        public const float InitiativeCheck = 1;
-        public const float SpeedStatModifier = InitiativeCheck * 0.01f;
+        public const float InitiativeCheck = 100f;
         public const int PredictedAmountOfCharacters = UtilsCharacter.PredictedAmountOfCharactersInBattle;
         public const int PredictedAmountOfTeamCharacters = CharacterArchetypes.AmountOfArchetypesAmount;
         public const int ActionsPerInitiativeCap = 8;

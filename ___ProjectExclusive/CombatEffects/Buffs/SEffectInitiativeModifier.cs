@@ -19,8 +19,6 @@ namespace CombatEffects
             DoEffect(target,initiativeAddition);
         }
 
-        public override EnumSkills.StatDriven GetEffectStatDriven()
-            => EnumSkills.StatDriven.Tempo;
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {

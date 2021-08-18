@@ -13,28 +13,38 @@ namespace Stats
         private readonly CombatingEntity _user;
         [ShowInInspector]
         private readonly StackableBuffPool _onHitInvoke;
+
         [ShowInInspector]
-        private readonly StackableBuffPool _onNoHitInvoke;
+        private readonly StackableBuffPool _onHitIncrease;
+        [ShowInInspector]
+        private readonly StackableBuffPool _onHitRemove;
         private List<ICombatHitListener> _onHitListeners;
 
         public InHitEventHandler(CombatingEntity user)
         {
             _user = user;
             _onHitInvoke = new StackableBuffPool();
-            _onNoHitInvoke = new StackableBuffPool();
+            _onHitIncrease = new StackableBuffPool();
+            _onHitRemove = new StackableBuffPool();
             _onHitListeners = new List<ICombatHitListener>();
         }
 
-        public void AddBuff(IDelayBuff buff, CombatingEntity actor,bool isOnHit)
+        public void AddBuff(IDelayBuff buff, CombatingEntity actor,EnumSkills.HitType hitType)
         {
             var buffValues = new StackableBuffValues(buff,actor);
-            if (isOnHit)
+            switch (hitType)
             {
-                _onHitInvoke.Add(buffValues);
-            }
-            else
-            {
-                _onNoHitInvoke.Add(buffValues);
+                case EnumSkills.HitType.DirectHit:
+                    _onHitInvoke.Add(buffValues);
+                    break;
+                case EnumSkills.HitType.OnHitIncrease:
+                    _onHitIncrease.Add(buffValues);
+                    break;
+                case EnumSkills.HitType.OnHitCancel:
+                    _onHitRemove.Add(buffValues);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"Hit type [{hitType}] is not implemented");
             }
         }
 
@@ -45,8 +55,9 @@ namespace Stats
             {
                 listener.OnHit(damage);
             }
-            _onHitInvoke.InvokeAndClear(_user);
-            _onNoHitInvoke.Clear();
+            _onHitInvoke.Invoke(_user);
+            _onHitIncrease.IncreaseStacks();
+            _onHitRemove.Clear();
         }
 
         public void OnNotBeingHitSequence()
@@ -55,12 +66,13 @@ namespace Stats
             {
                 listener.OnNotBeingHitSequence();
             }
-            _onNoHitInvoke.InvokeAndClear(_user);
+            _onHitRemove.InvokeAndClear(_user);
+            _onHitIncrease.InvokeAndClear(_user);
             _onHitInvoke.Clear();
         }
 
 
-        public void SubscribeListener(ICombatHitListener listener)
+        public void Subscribe(ICombatHitListener listener)
         {
             if (_onHitListeners == null)
             {
@@ -71,14 +83,17 @@ namespace Stats
                 _onHitListeners.Add(listener);
             }
         }
-        public void UnSubscribeListener(ICombatHitListener listener)
+        public void UnSubscribe(ICombatHitListener listener)
         {
             _onHitListeners.Remove(listener);
         }
 
         public void OnInitiativeTrigger()
-            => OnNotBeingHitSequence();
-        
+        {
+            OnNotBeingHitSequence();
+
+        }
+
         public void OnDoMoreActions()
         { }
 
@@ -89,7 +104,7 @@ namespace Stats
 #if UNITY_EDITOR
         private class DebuggHit : IDelayBuff
         {
-            private string _messange;
+            private readonly string _messange;
             public DebuggHit(bool isHit)
             {
                 if (isHit)
@@ -116,8 +131,8 @@ namespace Stats
 
     public interface IHitEventHandler
     {
-        void SubscribeListener(ICombatHitListener listener);
-        void UnSubscribeListener(ICombatHitListener listener);
+        void Subscribe(ICombatHitListener listener);
+        void UnSubscribe(ICombatHitListener listener);
 
     }
 

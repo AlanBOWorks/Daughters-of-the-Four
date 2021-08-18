@@ -236,12 +236,12 @@ namespace Characters
             InvokeAreaChange(_user);
         }
 
-        public void SubscribeListener(ICombatHitListener listener)
-            => OnHitEvent.SubscribeListener(listener);
+        public void Subscribe(ICombatHitListener listener)
+            => OnHitEvent.Subscribe(listener);
 
 
-        public void UnSubscribeListener(ICombatHitListener listener)
-            => OnHitEvent.UnSubscribeListener(listener);
+        public void UnSubscribe(ICombatHitListener listener)
+            => OnHitEvent.UnSubscribe(listener);
        
     }
 

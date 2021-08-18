@@ -206,10 +206,8 @@ namespace Skills
         public enum Archetype
         {
             Undefined = -1,
-            /// <summary>
-            /// Damages, Static damage
-            /// </summary>
             OffensiveHealth = TargetingType.Offensive | StatDriven.Health,
+            OffensiveStatic = TargetingType.Offensive | StatDriven.Static,
             /// <summary>
             /// DeBuff, Mutes
             /// </summary>
@@ -233,9 +231,10 @@ namespace Skills
             OffensiveArea = TargetingType.Offensive | StatDriven.Area,
 
             /// <summary>
-            /// Health, Shields (and Mortality)
+            /// Health (and Mortality)
             /// </summary>
             SupportHealth = TargetingType.Support | StatDriven.Health,
+            SupportStatic = TargetingType.Support | StatDriven.Static,
             SupportBuff = TargetingType.Support | StatDriven.Buff,
             SupportHarmony = TargetingType.Support | StatDriven.Harmony,
             SupportTempo = TargetingType.Support | StatDriven.Tempo,
@@ -247,6 +246,7 @@ namespace Skills
         public enum StatDriven
         {
             Health = HealthIndex,
+            Static = StaticIndex,
             Buff = BuffIndex,
             Harmony = HarmonyIndex,
             Tempo = TempoIndex,
@@ -257,11 +257,12 @@ namespace Skills
 
 
         private const int HealthIndex = 0;
-        private const int BuffIndex = HealthIndex+1;
+        private const int StaticIndex = HealthIndex +1;
+        private const int BuffIndex = StaticIndex + 1;
         private const int HarmonyIndex = BuffIndex + 1;
-        private const int TempoIndex = HarmonyIndex+1;
-        private const int ControlIndex = TempoIndex+1;
-        private const int StanceIndex = ControlIndex+1;
+        private const int TempoIndex = HarmonyIndex + 1;
+        private const int ControlIndex = TempoIndex + 1;
+        private const int StanceIndex = ControlIndex + 1;
         private const int AreaIndex = StanceIndex + 1;
 
         /// <summary>
@@ -278,5 +279,21 @@ namespace Skills
         private const int SelfOnlyIndex = 1000;
         private const int OffensiveIndex = SelfOnlyIndex *2;
         private const int SupportIndex = OffensiveIndex *3;
+
+        public enum HitType
+        {
+            /// <summary>
+            /// Invoke the event directly on hit
+            /// </summary>
+            DirectHit,
+            /// <summary>
+            /// Each hit will increase the effect; Once on StartSequence all counts will be invoke
+            /// </summary>
+            OnHitIncrease,
+            /// <summary>
+            /// Remove the effect if received hit, else on StartSequence invoke
+            /// </summary>
+            OnHitCancel
+        }
     }
 }

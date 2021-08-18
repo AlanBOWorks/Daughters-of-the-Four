@@ -5,14 +5,14 @@ using UnityEngine;
 namespace Passives
 {
     [CreateAssetMenu(fileName = "N - REACTION Type - Combat Passive [Preset]",
-        menuName = "Combat/Passive/Preset/Reaction Passive Preset")]
+        menuName = "Combat/Passive/Preset/Reaction Passive",order = -100)]
     public class SReactionPassiveFilterPreset : SPassiveFilterPreset
     {
-        private const string ActionPassivePrefix = " - REACTION Type ";
+        private const string ActionPassivePrefix = "REACTION Type - ";
         [Button(ButtonSizes.Large)]
         protected override void UpdateAssetName()
         {
-            name = PassiveName.ToUpper() + ActionPassivePrefix + InjectionNamePrefix;
+            name = ActionPassivePrefix + PassiveName.ToUpper() + InjectionNamePrefix;
             UtilsGame.UpdateAssetName(this);
         }
     }

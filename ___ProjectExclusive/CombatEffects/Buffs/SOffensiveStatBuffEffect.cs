@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatEffects
 {
-    [CreateAssetMenu(fileName = "Offensive Buff - N [Preset]",
+    [CreateAssetMenu(fileName = "Offensive Buff - N [ Buff Effect ]",
         menuName = "Combat/Effects/Buff/Offensive Buff")]
     public class SOffensiveStatBuffEffect : SEffectBuffBase
     {

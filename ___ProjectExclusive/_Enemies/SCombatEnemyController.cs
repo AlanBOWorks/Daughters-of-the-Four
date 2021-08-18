@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using _CombatSystem;
 using Characters;
+using Sirenix.OdinInspector;
 using Skills;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -17,6 +18,7 @@ namespace _Enemies
     {
         public static CombatEnemyControllerRandom GenericEnemyController = new CombatEnemyControllerRandom();
 
+        [ShowInInspector]
         private readonly List<CombatSkill> _possibleSkills;
 
         public CombatEnemyControllerRandom()
@@ -69,6 +71,11 @@ namespace _Enemies
 
         private void DoRandomSelection()
         {
+            if (_possibleSkills.Count <= 0)
+            {
+                throw new IndexOutOfRangeException($"Skills aren't updated correctly: {_possibleSkills.Count} Length");
+            }
+
             int randomSelection = Random.Range(0, _possibleSkills.Count);
             CombatSkill selectedSkill = _possibleSkills[randomSelection];
             DoSkill(selectedSkill);

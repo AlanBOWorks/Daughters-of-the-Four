@@ -14,10 +14,7 @@ namespace CombatEffects
         {
             DoEffect(target,effectModifier);
         }
-
-        public override EnumSkills.StatDriven GetEffectStatDriven()
-            => EnumSkills.StatDriven.Tempo;
-
+        
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {
             UtilsCombatStats.AddActionAmount(target.CombatStats,Mathf.RoundToInt(effectModifier +0.1f));

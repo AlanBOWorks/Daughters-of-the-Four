@@ -18,7 +18,6 @@ namespace CombatEffects
             DoEffect(target, randomCheck);
         }
 
-        public override EnumSkills.StatDriven GetEffectStatDriven() => EnumSkills.StatDriven.Stance;
 
         public override void DoEffect(CombatingEntity target, float randomCheck)
         {

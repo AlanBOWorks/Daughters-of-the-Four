@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Skills
 {
     [CreateAssetMenu(fileName = "N (T) - [Delay BUFF Skill Preset]",
-        menuName = "Combat/Buffs/Delay Buff")]
+        menuName = "Combat/Buffs/Delay Buff", order = 100)]
     public class SDelayBuffPreset : SSkillPreset, IDelayBuff
     {
         [SerializeField,TitleGroup("Stats")] 

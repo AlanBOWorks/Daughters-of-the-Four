@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatEffects
 {
-    [CreateAssetMenu(fileName = "Heal Effect [Effect]",
+    [CreateAssetMenu(fileName = "Heal [Effect]",
         menuName = "Combat/Effects/Heal")]
     public class SEffectHeal : SEffectBase
     {
@@ -16,9 +16,6 @@ namespace CombatEffects
 
             DoEffect(target,heal);
         }
-
-        public override EnumSkills.StatDriven GetEffectStatDriven()
-            => EnumSkills.StatDriven.Health;
 
         public override void DoEffect(CombatingEntity target, float heal)
         {

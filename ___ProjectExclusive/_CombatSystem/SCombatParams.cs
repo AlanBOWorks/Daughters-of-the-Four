@@ -25,6 +25,9 @@ namespace _CombatSystem
 
         [Title("Animator")]
         public SkipAnimationsType skipAnimationsType = SkipAnimationsType.None;
+        [SerializeField,Range(.2f,5f)] 
+        private float tempoVelocityModifier = 1;
+
 
         [Title("Params")] 
         [Range(-1,1)] public float criticalHarmonyAddition = 0.05f;
@@ -44,7 +47,19 @@ namespace _CombatSystem
         public ICharacterArchetypesData<SCriticalBuffPreset> ArchetypesBackupOnNullCriticalBuffs
             => onNullCriticalBuff;
         public ISkillBackUp<SkillPreset[]> BackUpSkills => backUpSkills;
-        
+
+        public float TempoVelocityModifier
+        {
+            get => tempoVelocityModifier;
+            set
+            {
+                tempoVelocityModifier = value;
+
+                var currentTempoHandler = CombatSystemSingleton.TempoHandler;
+                if (currentTempoHandler != null) currentTempoHandler.TempoStepModifier = value;
+            }
+        }
+
         private void Awake()
         {
             CombatSystemSingleton.ParamsVariable = this;

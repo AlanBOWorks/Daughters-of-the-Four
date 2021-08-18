@@ -15,7 +15,6 @@ namespace CombatEffects
     public abstract class SEffectBase : ScriptableObject, IEffectBase
     {
         public abstract void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1);
-        public abstract EnumSkills.StatDriven GetEffectStatDriven();
         public abstract void DoEffect(CombatingEntity target, float effectModifier);
 
 
@@ -82,7 +81,6 @@ namespace CombatEffects
 
         protected bool HasEffects() => effectPreset != null;
         protected bool HasCondition() => effectCondition.HasCondition();
-        public EnumSkills.StatDriven GetEffectStatDriven() => effectPreset.GetEffectStatDriven();
 
         public void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier)
         {

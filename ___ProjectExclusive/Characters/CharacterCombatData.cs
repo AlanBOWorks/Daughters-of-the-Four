@@ -35,6 +35,9 @@ namespace Characters
             DelayBuffHandler = new DelayBuffHandler(this);
             Events = new CombatCharacterEvents(this);
             CharacterCriticalBuff = new CharacterCriticalActionHandler(this);
+            Guarding = new CharacterGuarding(this);
+
+            Events.Subscribe(Guarding);
         }
         
 
@@ -87,6 +90,8 @@ namespace Characters
         [ShowInInspector] 
         public CharacterSelfGroup CharacterGroup;
 
+        [ShowInInspector] 
+        public readonly CharacterGuarding Guarding;
 
 
         /// <summary>

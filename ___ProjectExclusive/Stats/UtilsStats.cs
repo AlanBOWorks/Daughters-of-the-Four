@@ -94,6 +94,7 @@ namespace Stats
         }
 
 
+
         public static void CopyStats(ICharacterBasicStats injection, ICharacterBasicStats copyFrom)
         {
             injection.AttackPower = copyFrom.AttackPower;
@@ -330,6 +331,28 @@ namespace Stats
             }
         }
 
+        public static void DoOverHealTo(CombatingEntity target,float overHeal)
+        {
+            var stats = target.CombatStats;
+            float currentHealth = stats.HealthPoints;
+            float maxHealth = stats.MaxHealth;
+            float currentOverHeal = currentHealth - maxHealth;
+
+            // Is inValid?
+            if (!target.IsConscious() || overHeal < 0) return;
+
+            // Is not at max HP nor overHealed?
+            if(currentOverHeal < 0) return;
+
+            // Is new overHeal lower?
+            if(overHeal < currentOverHeal) return;
+
+            stats.HealthPoints = maxHealth + overHeal;
+
+            UtilsStats.InvokeTemporalStatsEvents(target);
+        }
+
+
         public static void HealToMax(CharacterCombatData stats)
         {
             if(!stats.IsAlive()) return;
@@ -456,6 +479,14 @@ namespace Stats
         }
 
 
+        public static float CalculateShieldsPower(ICharacterFullStats user)
+        {
+            float shields = user.HealPower + user.BuffPower;
+            shields *= .5f; //The average of Heal && buffPower is the Shields power
+
+            return shields;
+        }
+
         public static void VariateBuffUser(ICharacterBasicStats user, ref float buffValue)
         {
             var userBuffPower = user.BuffPower; //Generally value == 1;
@@ -466,7 +497,6 @@ namespace Stats
             var targetReceiveBuffPower = target.BuffReceivePower; //Generally value == 0;
             buffValue += buffValue * targetReceiveBuffPower;
         }
-
     }
 
     public static class UtilityBuffStats

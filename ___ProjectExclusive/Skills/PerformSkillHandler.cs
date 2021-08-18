@@ -77,6 +77,12 @@ namespace Skills
                 throw new NullReferenceException("DoSkills() was invoked before preparation");
             }
 
+            bool isOffensiveSkill = skillPreset.GetSkillType() == EnumSkills.TargetingType.Offensive;
+            var targetGuarding = target.Guarding;
+            if (isOffensiveSkill && targetGuarding.HasProtector())
+            {
+                targetGuarding.VariateTarget(ref target);
+            }
 
             //>>>>>>>>>>>>>>>>>>> DO Randomness
             float randomValue = Random.value;

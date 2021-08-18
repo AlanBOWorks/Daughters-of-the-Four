@@ -85,6 +85,15 @@ namespace Skills
             Add(values);
         }
 
+        public void Invoke(CombatingEntity target)
+        {
+            for (int i = Count - 1; i >= 0; i--)
+            {
+                var buff = this[i];
+                buff.Buff.DoBuff(buff.Buffer, target, buff.StackAmount);
+            }
+        }
+
         public void InvokeAndClear(CombatingEntity target)
         {
             if (Count <= 0) return;
@@ -97,13 +106,22 @@ namespace Skills
 
             }
         }
+
+        public void IncreaseStacks()
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                this[i].IncreaseStacks();
+            }
+            
+        }
     }
 
     public struct StackableBuffValues
     {
         public readonly IDelayBuff Buff;
         public readonly CombatingEntity Buffer;
-        public readonly float StackAmount;
+        public float StackAmount;
 
         public StackableBuffValues(IDelayBuff buff, CombatingEntity buffer, float stackAmount)
         {
@@ -121,6 +139,11 @@ namespace Skills
             Buff = copyFrom.Buff;
             Buffer = copyFrom.Buffer;
             StackAmount = copyFrom.StackAmount + stackAddition;
+        }
+
+        public void IncreaseStacks()
+        {
+            StackAmount++;
         }
     }
 }

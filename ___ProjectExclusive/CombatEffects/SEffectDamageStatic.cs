@@ -21,8 +21,6 @@ namespace CombatEffects
 
         }
 
-        public override EnumSkills.StatDriven GetEffectStatDriven()
-            => EnumSkills.StatDriven.Health;
 
         public override void DoEffect(CombatingEntity target, float damage)
         {

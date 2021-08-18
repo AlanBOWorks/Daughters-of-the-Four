@@ -18,10 +18,7 @@ namespace CombatEffects
             float harmonyModifier = user.CombatStats.Enlightenment * harmonyAddition;
             DoEffect(target,harmonyModifier);
         }
-
-        public override EnumSkills.StatDriven GetEffectStatDriven()
-            => EnumSkills.StatDriven.Harmony;
-
+        
         public override void DoEffect(CombatingEntity target, float harmonyAddition)
         {
             UtilsCombatStats.AddHarmony(target,GetBuff(target), harmonyAddition);
