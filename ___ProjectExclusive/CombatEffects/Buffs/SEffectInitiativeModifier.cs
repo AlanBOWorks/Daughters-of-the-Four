@@ -10,14 +10,10 @@ namespace CombatEffects
         menuName = "Combat/Effects/Buff/Initiative Modifier")]
     public class SEffectInitiativeModifier : SEffectBuffBase
     {
-<<<<<<< Updated upstream
         protected override ICharacterFullStats GetBuff(CombatingEntity target)
             => GetBurstOrBase(target);
 
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
-=======
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
->>>>>>> Stashed changes
         {
             var buffPower = arguments.UserStats.BuffPower;
             float initiativeAddition = effectModifier * ( buffPower);

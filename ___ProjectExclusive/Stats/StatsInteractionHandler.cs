@@ -87,7 +87,6 @@ namespace Stats
 
             skillPreset.DoMainEffect(_skillArguments);
             skillPreset.DoSecondaryEffects(_skillArguments);
-
         }
 
         private class ReflectionStats : ICharacterFullStats
