@@ -1,5 +1,6 @@
 using Characters;
 using Sirenix.OdinInspector;
+using Skills;
 using Stats;
 using UnityEngine;
 
@@ -11,9 +12,9 @@ namespace CombatEffects
     {
         [SerializeField] private SEffectBuffBase defuffMirror;
 
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float debuffModifier = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float debuffModifier = 1)
         {
-            float userDebuffChance = user.CombatStats.DeBuffPower * Random.value;
+            float userDebuffChance = arguments.UserStats.DeBuffPower * Random.value;
             float targetDebuffChance = target.CombatStats.DeBuffReduction * Random.value;
 
             if(targetDebuffChance > userDebuffChance) return;

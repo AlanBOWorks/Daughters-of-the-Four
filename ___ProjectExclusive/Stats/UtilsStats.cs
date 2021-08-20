@@ -93,37 +93,111 @@ namespace Stats
             return baseStat + growStat * upgradeAmount;
         }
 
+        public static void OverrideStats(IOffensiveStats stats, float value = 0)
+        {
+            stats.AttackPower = value;
+            stats.DeBuffPower = value;
+            stats.StaticDamagePower = value;
+        }
 
+        public static void OverrideStats(ISupportStats stats, float value = 0)
+        {
+            stats.HealPower = value;
+            stats.BuffPower = value;
+            stats.BuffReceivePower = value;
+        }
 
-        public static void CopyStats(ICharacterBasicStats injection, ICharacterBasicStats copyFrom)
+        public static void OverrideStats(IVitalityStats stats, float value = 0)
+        {
+            stats.MaxHealth = value;
+            stats.MaxMortalityPoints = value;
+            stats.DeBuffReduction = value;
+            stats.DamageReduction = value;
+        }
+
+        public static void OverrideStats(ISpecialStats stats, float value = 0)
+        {
+            stats.Enlightenment = value;
+            stats.CriticalChance = value;
+            stats.SpeedAmount = value;
+        }
+
+        public static void OverrideStats(ICharacterBasicStats stats, float value = 0)
+        {
+            OverrideStats(stats as IOffensiveStats, value);
+            OverrideStats(stats as ISupportStats, value);
+            OverrideStats(stats as IVitalityStats, value);
+            OverrideStats(stats as ISpecialStats, value);
+        }
+
+        public static void OverrideStats(ICombatTemporalStatsBase stats, float value = 0)
+        {
+            stats.InitiativePercentage = value;
+            stats.HarmonyAmount = value;
+            stats.ActionsPerInitiative = Mathf.RoundToInt(value);
+        }
+
+        public static void OverrideStats(ICharacterFullStats stats, float value)
+        {
+            OverrideStats(stats as ICharacterBasicStats,value);
+            OverrideStats(stats as ICombatTemporalStatsBase,value);
+        }
+
+        public static void CopyStats(IOffensiveStats injection, IOffensiveStats copyFrom)
         {
             injection.AttackPower = copyFrom.AttackPower;
             injection.DeBuffPower = copyFrom.DeBuffPower;
             injection.StaticDamagePower = copyFrom.StaticDamagePower;
+        }
 
+        public static void CopyStats(ISupportStats injection, ISupportStats copyFrom)
+        {
             injection.HealPower = copyFrom.HealPower;
             injection.BuffPower = copyFrom.BuffPower;
             injection.BuffReceivePower = copyFrom.BuffReceivePower;
+        }
 
+        public static void CopyStats(IVitalityStats injection, IVitalityStats copyFrom)
+        {
             injection.MaxHealth = copyFrom.MaxHealth;
             injection.MaxMortalityPoints = copyFrom.MaxMortalityPoints;
             injection.DamageReduction = copyFrom.DamageReduction;
+            injection.DeBuffReduction = copyFrom.DeBuffReduction;
+        }
 
+        public static void CopyStats(ISpecialStats injection, ISpecialStats copyFrom)
+        {
             injection.Enlightenment = copyFrom.Enlightenment;
             injection.CriticalChance = copyFrom.CriticalChance;
             injection.SpeedAmount = copyFrom.SpeedAmount;
         }
 
-        public static void CopyStats(ICharacterFullStats injection, ICharacterFullStats copyFrom)
+
+        public static void CopyStats(ICharacterBasicStats injection, ICharacterBasicStats copyFrom)
         {
-            CopyStats(injection as ICharacterBasicStats, copyFrom);
+            CopyStats(injection as IOffensiveStats, copyFrom);
+            CopyStats(injection as ISupportStats, copyFrom);
+            CopyStats(injection as IVitalityStats, copyFrom);
+            CopyStats(injection as ISpecialStats, copyFrom);
+        }
+
+        public static void CopyStats(ICombatTemporalStats injection, ICombatTemporalStats copyFrom)
+        {
             injection.HealthPoints = copyFrom.HealthPoints;
             injection.ShieldAmount = copyFrom.ShieldAmount;
-
             injection.MortalityPoints = copyFrom.MortalityPoints;
+
             injection.HarmonyAmount = copyFrom.HarmonyAmount;
             injection.InitiativePercentage = copyFrom.InitiativePercentage;
             injection.ActionsPerInitiative = copyFrom.ActionsPerInitiative;
+        }
+
+
+        public static void CopyStats(ICharacterFullStats injection, ICharacterFullStats copyFrom)
+        {
+            CopyStats(injection as ICharacterBasicStats, copyFrom);
+            CopyStats(injection as ICombatTemporalStats, copyFrom);
+            
         }
 
         public static void CopyStats(IStatsUpgradable injection, IStatsUpgradable copyFrom)

@@ -9,7 +9,7 @@ namespace CombatEffects
         menuName = "Combat/Effects/Team/Team Control")]
     public class SEffectTeamControl : SEffectBase
     {
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
             DoEffect(target,effectModifier);
         }

@@ -37,9 +37,12 @@ namespace _Enemies
                 DoSkill(ultimate);
                 return;
             }
+
+            var waitSkill = skillShared.WaitSkill;
+
             if (Random.value < UseWaitChance)
             {
-                DoSkill(skillShared.WaitSkill);
+                DoSkill(waitSkill);
                 return;
             }
 
@@ -47,7 +50,7 @@ namespace _Enemies
             _possibleSkills.Clear();
             UtilsEnemyController.DoInjectionOfSkills(_possibleSkills,entity);
 
-            DoRandomSelection();
+            DoRandomSelection(waitSkill);
         }
 
 
@@ -69,11 +72,12 @@ namespace _Enemies
             PerformSkillHandler.SendDoSkill(selection);
         }
 
-        private void DoRandomSelection()
+        private void DoRandomSelection(CombatSkill backupSkillOnZero)
         {
             if (_possibleSkills.Count <= 0)
             {
-                throw new IndexOutOfRangeException($"Skills aren't updated correctly: {_possibleSkills.Count} Length");
+                DoSkill(backupSkillOnZero);
+                return;
             }
 
             int randomSelection = Random.Range(0, _possibleSkills.Count);
@@ -84,7 +88,7 @@ namespace _Enemies
 
     public static class UtilsEnemyController
     {
-        public static void DoInjectionOfSkills(List<CombatSkill> possibleSkills, CombatingEntity user)
+        public static void DoInjectionOfSkills(List<CombatSkill> injectInto, CombatingEntity user)
         {
             ISkillShared<CombatSkill> skillShared = user.SharedSkills;
             AddSharedType(skillShared.CommonSkillFirst);
@@ -96,13 +100,13 @@ namespace _Enemies
             foreach (CombatSkill skill in uniqueSkills)
             {
                 if (!skill.CanBeUse(user)) return;
-                possibleSkills.Add(skill);
+                injectInto.Add(skill);
             }
 
             void AddSharedType(CombatSkill skill)
             {
                 if (!skill.CanBeUse(user)) return;
-                possibleSkills.Add(skill);
+                injectInto.Add(skill);
             }
 
         }

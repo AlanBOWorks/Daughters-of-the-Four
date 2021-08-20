@@ -9,9 +9,9 @@ namespace CombatEffects
         menuName = "Combat/Effects/Heal")]
     public class SEffectHeal : SEffectBase
     {
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
-            float heal = user.CombatStats.HealPower;
+            float heal = arguments.UserStats.HealPower;
             heal *= effectModifier;
 
             DoEffect(target,heal);

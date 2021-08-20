@@ -9,7 +9,7 @@ namespace CombatEffects
         menuName = "Combat/Effects/Team/Counter Burst Team Control")]
     public class SEffectCounterBurstTeamControl : SEffectBase
     {
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float counterBurstAmount = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float counterBurstAmount = 1)
         {
             DoEffect(target, counterBurstAmount);
         }

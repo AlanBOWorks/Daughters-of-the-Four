@@ -27,12 +27,12 @@ namespace Skills
         public TempoHandler.TickType GetTickType() => tickType;
         public int MaxStack => maxStack;
 
-        protected override void DoEffect(ref DoSkillArguments arguments, int effectIndex)
+        protected override void DoEffect(SkillArguments arguments, int effectIndex)
         {
             //Just to avoid repetition of EnqueueBuff (since the effectIndex depends of effects.Length)
             if (effectIndex > 0) return;
             var user = arguments.User;
-            var target = arguments.Target;
+            var target = arguments.InitialTarget;
             target.DelayBuffHandler.EnqueueBuff(this, user);
         }
 

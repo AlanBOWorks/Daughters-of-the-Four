@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -7,148 +6,6 @@ using Random = UnityEngine.Random;
 
 namespace Stats
 {
-
-    public class SerializedCombatStatsBasic : List<float>, ICharacterBasicStats
-    {
-        public SerializedCombatStatsBasic(int memoryAllocation) : base(memoryAllocation)
-        { }
-
-        public SerializedCombatStatsBasic(ICharacterBasicStats serializeThis) : base(BasicStatsLength)
-        {
-            InjectValues(serializeThis);
-        }
-
-        public SerializedCombatStatsBasic(SerializedCombatStatsBasic serializeThis) : base(serializeThis)
-        {
-        }
-
-        protected void InjectValues(ICharacterBasicStats serializeThis)
-        {
-            Add(serializeThis.AttackPower);
-            Add(serializeThis.DeBuffPower);
-            Add(serializeThis.HealPower);
-            Add(serializeThis.BuffPower);
-            Add(serializeThis.MaxHealth);
-            Add(serializeThis.MaxMortalityPoints);
-            Add(serializeThis.DamageReduction);
-            Add(serializeThis.DeBuffReduction);
-            Add(serializeThis.Enlightenment);
-            Add(serializeThis.CriticalChance);
-            Add(serializeThis.SpeedAmount);
-            Add(serializeThis.HarmonyAmount);
-            Add(serializeThis.InitiativePercentage);
-            ActionsPerInitiative = serializeThis.ActionsPerInitiative;
-        }
-        public int ActionsPerInitiative { get; set; }
-
-
-        public float AttackPower
-        {
-            get => this[AttackPowerIndex];
-            set => this[AttackPowerIndex] = value;
-        }
-        public float DeBuffPower
-        {
-            get => this[DeBuffPowerIndex];
-            set => this[DeBuffPowerIndex] = value;
-        }
-
-        public float StaticDamagePower
-        {
-            get => this[StaticDamagePowerIndex];
-            set => this[StaticDamagePowerIndex] = value;
-        }
-
-        public float HealPower
-        {
-            get => this[HealPowerIndex];
-            set => this[HealPowerIndex] = value;
-        }
-        public float BuffPower
-        {
-            get => this[BuffPowerIndex];
-            set => this[BuffPowerIndex] = value;
-        }
-
-        public float BuffReceivePower
-        {
-            get => this[BuffReceivePowerIndex];
-            set => this[BuffReceivePowerIndex] = value;
-        }
-
-        public float MaxHealth
-        {
-            get => this[MaxHealthIndex];
-            set => this[MaxHealthIndex] = value;
-        }
-        public float MaxMortalityPoints
-        {
-            get => this[MaxMortalityPointsIndex];
-            set => this[MaxMortalityPointsIndex] = value;
-        }
-        public float DamageReduction
-        {
-            get => this[DamageReductionIndex];
-            set => this[DamageReductionIndex] = value;
-        }
-        public float DeBuffReduction
-        {
-            get => this[DeBuffReductionIndex];
-            set => this[DeBuffReductionIndex] = value;
-        }
-        public float Enlightenment
-        {
-            get => this[EnlightenmentIndex];
-            set => this[EnlightenmentIndex] = value;
-        }
-        public float CriticalChance
-        {
-            get => this[CriticalChanceIndex];
-            set => this[CriticalChanceIndex] = value;
-        }
-        public float SpeedAmount
-        {
-            get => this[SpeedAmountIndex];
-            set => this[SpeedAmountIndex] = value;
-        }
-        public float HarmonyAmount
-        {
-            get => this[HarmonyAmountIndex];
-            set => this[HarmonyAmountIndex] = value;
-        }
-        public float InitiativePercentage
-        {
-            get => this[InitiativePercentageIndex];
-            set => this[InitiativePercentageIndex] = value;
-        }
-
-
-        public const int AttackPowerIndex = 0;
-        public const int DeBuffPowerIndex = AttackPowerIndex + 1;
-        public const int StaticDamagePowerIndex = DeBuffPowerIndex + 1;
-        public const int HealPowerIndex = StaticDamagePowerIndex + 1;
-        public const int BuffPowerIndex = HealPowerIndex + 1;
-        public const int BuffReceivePowerIndex = BuffPowerIndex + 1;
-        public const int MaxHealthIndex = BuffReceivePowerIndex + 1;
-        public const int MaxMortalityPointsIndex = MaxHealthIndex + 1;
-        public const int DamageReductionIndex = MaxMortalityPointsIndex + 1;
-        public const int DeBuffReductionIndex = DamageReductionIndex + 1;
-        public const int EnlightenmentIndex = DeBuffReductionIndex + 1;
-        public const int CriticalChanceIndex = EnlightenmentIndex + 1;
-        public const int SpeedAmountIndex = CriticalChanceIndex + 1;
-        public const int HarmonyAmountIndex = SpeedAmountIndex + 1;
-        public const int InitiativePercentageIndex = HarmonyAmountIndex + 1;
-        public const int BasicStatsLength = InitiativePercentageIndex + 1;
-
-        public virtual void ResetToZero()
-        {
-            for (int i = 0; i < Count; i++)
-            {
-                this[i] = 0;
-            }
-        }
-    }
-
     [Serializable]
     public class CharacterCombatStatsBasic : ICharacterBasicStats
     {
@@ -301,32 +158,12 @@ namespace Stats
 
         public CharacterCombatStatsBasic(float value)
         {
-           OverrideAll(value);
+            UtilsStats.OverrideStats(this, value);
         }
 
         [Button]
-        public void OverrideAll(float value)
-        {
-            AttackPower = value;
-            DeBuffPower = value;
-            StaticDamagePower = value;
-
-            HealPower = value;
-            BuffPower = value;
-            buffReceivePower = value;
-
-            MaxHealth = value;
-            MaxMortalityPoints = value;
-            DamageReduction = value;
-
-            Enlightenment = value;
-            CriticalChance = value;
-            SpeedAmount = value;
-
-            HarmonyAmount = value;
-            InitiativePercentage = value;
-            ActionsPerInitiative = (int) value;
-        }
+        public virtual void OverrideAll(float value) => UtilsStats.OverrideStats(this, value);
+        public virtual void ResetToZero() => UtilsStats.OverrideStats(this);
 
         public CharacterCombatStatsBasic(ICharacterBasicStats copyFrom)
         {
@@ -343,6 +180,7 @@ namespace Stats
             if (InitiativePercentage > MaxInitialInitiative)
                 InitiativePercentage = MaxInitialInitiative;
         }
+
     }
 
 }

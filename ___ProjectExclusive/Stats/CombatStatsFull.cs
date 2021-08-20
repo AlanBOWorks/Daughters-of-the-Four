@@ -5,47 +5,6 @@ using UnityEngine;
 
 namespace Stats
 {
-    public class SerializedCombatStatsFull : SerializedCombatStatsBasic, ICharacterFullStats
-    {
-        public SerializedCombatStatsFull(ICharacterFullStats serializeThis) : base(FullStatsLength)
-        {
-            InjectValues(serializeThis);
-            Add(serializeThis.HealthPoints);
-            Add(serializeThis.ShieldAmount);
-            Add(serializeThis.MortalityPoints);
-            
-        }
-
-
-        public float HealthPoints
-        {
-            get => this[HealthPointsIndex];
-            set => this[HealthPointsIndex] = value;
-        }
-        public float ShieldAmount
-        {
-            get => this[ShieldAmountIndex];
-            set => this[ShieldAmountIndex] = value;
-        }
-        public float MortalityPoints
-        {
-            get => this[MortalityPointsIndex];
-            set => this[MortalityPointsIndex] = value;
-        }
-        
-
-        public const int HealthPointsIndex = BasicStatsLength;
-        public const int ShieldAmountIndex = HealthPointsIndex + 1;
-        public const int MortalityPointsIndex = ShieldAmountIndex + 1;
-        public const int FullStatsLength = MortalityPointsIndex + 1;
-
-        public override void ResetToZero()
-        {
-            base.ResetToZero();
-            ActionsPerInitiative = 0;
-        }
-    }
-
     [Serializable]
     public class CharacterCombatStatsFull : CharacterCombatStatsBasic, ICharacterFullStats
     {
@@ -87,47 +46,21 @@ namespace Stats
             ShieldAmount = value;
             MortalityPoints = value;
         }
-
-        public new void OverrideAll(float value)
-        {
-            base.OverrideAll(value);
-            HealthPoints = value;
-            ShieldAmount = value;
-            MortalityPoints = value;
-        }
-
-        public void ResetToZero() => OverrideAll(0);
-
         public CharacterCombatStatsFull(ICharacterFullStats copyFrom)
         {
             UtilsStats.CopyStats(this, copyFrom);
         }
+
+        public override void ResetToZero() => UtilsStats.OverrideStats(this, 0);
+
     }
 
-    public class SerializedTrackedStats : SerializedCombatStatsFull, ITrackingStats
+    public class SerializedTrackedStats : CharacterCombatStatsFull, ITrackingStats
     {
         public SerializedTrackedStats(ICharacterFullStats serializeThis) : base(serializeThis)
-        {
-            int countLoop = TrackedStatsLength - this.Count;
-            for (int i = 0; i < countLoop; i++)
-            {
-                Add(0);
-            }
-        }
-        public float DamageReceived
-        {
-            get => this[DamageReceivedIndex];
-            set => this[DamageReceivedIndex] = value;
-        }
-        public float HealReceived
-        {
-            get => this[HealReceivedIndex];
-            set => this[HealReceivedIndex] = value;
-        }
-
-        public const int DamageReceivedIndex = FullStatsLength;
-        public const int HealReceivedIndex = DamageReceivedIndex + 1;
-        public const int TrackedStatsLength = HealReceivedIndex + 1;
+        {}
+        public float DamageReceived { get; set; }
+        public float HealReceived { get; set; }
     }
 
     public interface ITrackingStats

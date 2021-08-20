@@ -21,12 +21,12 @@ namespace Skills
         public TempoHandler.TickType GetTickType() => TempoHandler.TickType.OnBeforeSequence;
         public int MaxStack => maxStack;
 
-        protected override void DoEffect(ref DoSkillArguments arguments, int effectIndex)
+        protected override void DoEffect(SkillArguments arguments, int effectIndex)
         {
             if(effectIndex > 0) return;
 
             var actor = arguments.User;
-            var target = arguments.Target;
+            var target = arguments.InitialTarget;
             target.Events.OnHitEvent.AddBuff(this,actor,hitType);
         }
 

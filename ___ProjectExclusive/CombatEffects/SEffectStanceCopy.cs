@@ -9,9 +9,10 @@ namespace CombatEffects
         menuName = "Combat/Effects/Stance Copy")]
     public class SEffectStanceCopy : SEffectBase
     {
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float randomCheck = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float randomCheck = 1)
         {
             if(FailRandom(randomCheck)) return;
+            var user = arguments.User;
             var targetStance = target.AreasDataTracker.GetCurrentPositionState();
             UtilsArea.ToggleStance(user,targetStance);
 

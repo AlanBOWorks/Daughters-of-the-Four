@@ -43,7 +43,7 @@ namespace Passives
             if(passives.Length < 1) return;
             foreach (EffectParams passive in passives)
             {
-                passive.DoEffect(user,target,modifier);
+                //passive.DoEffect(user,target,modifier);
             }
         }
 

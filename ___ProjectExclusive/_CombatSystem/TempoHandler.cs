@@ -33,6 +33,9 @@ namespace _CombatSystem
         public readonly TempoEvents TriggerBasicHandler;
         [ShowInInspector, DisableInEditorMode] 
         public ITempoTriggerHandler PlayerTempoHandler { get; private set; }
+
+        // I know this could be in another class container, but from what
+        // was tried it's just a lot easier and direct having this here
         [ShowInInspector, DisableInEditorMode] 
         public ICombatEnemyController EnemyController { get; private set; }
 
@@ -77,9 +80,7 @@ namespace _CombatSystem
             if (enemyController == null)
                 EnemyController = CombatEnemyControllerRandom.GenericEnemyController;
             else
-            {
                 EnemyController = enemyController;
-            }
         }
         public void Subscribe(ITempoListener listener)
         {
@@ -265,9 +266,8 @@ namespace _CombatSystem
             return _canControlAll || UtilsCharacter.IsAPlayerEntity(entity);
         }
 
-        public void OnInitiativeTrigger(CombatingEntity entity)
+        private void CallForControl(CombatingEntity entity)
         {
-            TriggerBasicHandler.OnInitiativeTrigger(entity);
             if (IsForPlayer(entity))
             {
                 PlayerTempoHandler.OnInitiativeTrigger(entity);
@@ -276,6 +276,12 @@ namespace _CombatSystem
             {
                 EnemyController.DoControlOn(entity);
             }
+        }
+
+        public void OnInitiativeTrigger(CombatingEntity entity)
+        {
+            TriggerBasicHandler.OnInitiativeTrigger(entity);
+            CallForControl(entity);
         }
         /// <summary>
         /// Is just [<see cref="OnDoMoreActions"/>] but just for
@@ -310,12 +316,7 @@ namespace _CombatSystem
             if (entity.CanAct())
             {
                 TriggerBasicHandler.OnDoMoreActions(entity);
-                if (IsForPlayer(entity))
-                    PlayerTempoHandler.OnDoMoreActions(entity);
-                else
-                {
-                    EnemyController.DoControlOn(entity);
-                }
+                CallForControl(entity);
             }
             else
             {

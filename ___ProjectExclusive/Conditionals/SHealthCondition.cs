@@ -18,8 +18,8 @@ namespace CombatConditions
         public override bool CanApply(ref EffectArguments arguments,float healthCheck)
         {
             var checkEntity = isUserCheck
-                ? arguments.User
-                : arguments.Target;
+                ? arguments.Arguments.User
+                : arguments.Arguments.InitialTarget;
 
             float percentage = UtilsCombatStats.HealthPercentage(checkEntity);
 

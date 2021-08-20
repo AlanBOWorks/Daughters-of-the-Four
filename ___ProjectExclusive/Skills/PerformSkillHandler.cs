@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using _CombatSystem;
 using _Team;
 using Characters;
-using CombatEffects;
 using MEC;
 using Sirenix.OdinInspector;
 using Stats;
-using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Skills
 {
+    /// <summary>
+    /// Perform the skill with all event calls in a sequence that syncs with Animations and such
+    /// </summary>
     public class PerformSkillHandler : ICombatAfterPreparationListener, ITempoListener, ISkippedTempoListener
     {
         [ShowInInspector]
@@ -19,10 +18,14 @@ namespace Skills
         [ShowInInspector]
         private readonly SkillTargets _currentSkillTargets;
 
+        [ShowInInspector]
+        private readonly StatsInteractionHandler _statsInteractionHandler;
+
         public PerformSkillHandler()
         {
             int sizeAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
             _currentSkillTargets = new SkillTargets(sizeAllocation); // it could be a whole targets
+            _statsInteractionHandler = new StatsInteractionHandler();
         }
 
         public void OnAfterPreparation(
@@ -70,52 +73,18 @@ namespace Skills
 
         private IEnumerator<float> _DoSkill(CombatingEntity target)
         {
-            CombatSkill skill = _currentSkillTargets.UsingSkill;
+            var skill = _currentSkillTargets.UsingSkill;
             var skillPreset = skill.Preset;
-            if (skill is null)
-            {
-                throw new NullReferenceException("DoSkills() was invoked before preparation");
-            }
+            var effectTargets = skillPreset.GetMainEffectTargets(_currentUser, target);
 
-            bool isOffensiveSkill = skillPreset.GetSkillType() == EnumSkills.TargetingType.Offensive;
-            var targetGuarding = target.Guarding;
-            if (isOffensiveSkill && targetGuarding.HasProtector())
-            {
-                targetGuarding.VariateTarget(ref target);
-            }
-
-            //>>>>>>>>>>>>>>>>>>> DO Randomness
-            float randomValue = Random.value;
-            bool isCritical;
-            var combatStats = _currentUser.CombatStats;
-            if (UtilsCombatStats.IsCriticalPerformance(combatStats,skill, randomValue))
-            {
-                isCritical = true;
-                float defaultHarmonyAddition 
-                    = CombatSystemSingleton.ParamsVariable.criticalHarmonyAddition;
-                UtilsCombatStats.AddHarmony(target, defaultHarmonyAddition);
-
-                var criticalBuff = _currentUser.CharacterCriticalBuff;
-                criticalBuff?.OnCriticalAction();
-            }
-            else
-            {
-                isCritical = false;
-            }
-            DoSkillArguments skillArguments = new DoSkillArguments(_currentUser,target,isCritical);
-
-            //>>>>>>>>>>>>>>>>>>> DO Main Effect
-            List<CombatingEntity> effectTargets = skillPreset.GetMainEffectTargets(_currentUser, target);
-
-            skillPreset.DoMainEffect(ref skillArguments);
+            // TODO make a waitUntil(Animation call for Skill)
             yield return Timing.WaitUntilDone(
                     _currentUser.CombatAnimator.DoAnimation(_currentUser, effectTargets, _currentSkillTargets.UsingSkill));
-            skillPreset.DoSecondaryEffects(ref skillArguments);
+            _statsInteractionHandler.DoSkill(skill, _currentUser, target);
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
-            skill.OnSkillUsage();
             CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(_currentUser);
-
+            skill.OnSkillUsage();
         }
 
         public List<CombatingEntity> HandlePossibleTargets(CombatSkill skill)

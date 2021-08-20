@@ -13,7 +13,7 @@ namespace CombatEffects
     {
         [SerializeField] private TeamCombatState.Stances targetStance = TeamCombatState.Stances.Neutral;
 
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float randomCheck = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float randomCheck = 1)
         {
             DoEffect(target, randomCheck);
         }

@@ -9,10 +9,10 @@ namespace CombatEffects
         menuName = "Combat/Effects/DAMAGE Static")]
     public class SEffectDamageStatic : SEffectBase
     {
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
             float staticDamage = UtilsCombatStats.CalculateFinalStaticDamage(
-                user.CombatStats,
+                arguments.User.CombatStats,
                 target.CombatStats,
                 effectModifier);
 

@@ -10,7 +10,7 @@ namespace CombatEffects
         menuName = "Combat/Effects/Buff/Action Modifier")]
     public class SEffectActionModifier : SEffectBuffBase
     {
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
             DoEffect(target,effectModifier);
         }
@@ -18,8 +18,6 @@ namespace CombatEffects
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {
             UtilsCombatStats.AddActionAmount(target.CombatStats,Mathf.RoundToInt(effectModifier +0.1f));
-            target.Events.InvokeTemporalStatChange();
-
         }
 
         private const string TemporalStatsPrefix = " Temporal Stat - ACTION Modifier";

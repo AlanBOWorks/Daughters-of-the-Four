@@ -1,5 +1,6 @@
 using System;
 using Characters;
+using Skills;
 using UnityEngine;
 
 namespace CombatEffects
@@ -11,9 +12,9 @@ namespace CombatEffects
         [SerializeField, Tooltip("If is requesting a guarding from target instead of giving guard")] 
         private bool isProtectMe = false;
 
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
-            var userGuarding = user.Guarding;
+            var userGuarding = arguments.User.Guarding;
             if (isProtectMe)
             {
                 userGuarding.ProtectMe(target,effectModifier);

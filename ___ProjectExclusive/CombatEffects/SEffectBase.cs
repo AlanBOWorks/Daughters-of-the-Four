@@ -14,7 +14,7 @@ namespace CombatEffects
 
     public abstract class SEffectBase : ScriptableObject, IEffectBase
     {
-        public abstract void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1);
+        public abstract void DoEffect(SkillArguments arguments,CombatingEntity target, float effectModifier = 1);
         public abstract void DoEffect(CombatingEntity target, float effectModifier);
 
 
@@ -82,13 +82,14 @@ namespace CombatEffects
         protected bool HasEffects() => effectPreset != null;
         protected bool HasCondition() => effectCondition.HasCondition();
 
-        public void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier)
+        public void DoEffect(SkillArguments arguments,CombatingEntity target, float randomModifier)
         {
+            var user = arguments.User;
             bool canApplyEffect = true;
             float powerVariation = power * randomModifier;
             float originalPowerVariation = powerVariation;
             EffectArguments effectArguments
-                = new EffectArguments(user, target, effectPreset);
+                = new EffectArguments(arguments, effectPreset);
             if (effectCondition.HasCondition())
             {
                 canApplyEffect = effectCondition.CanApplyCondition(ref effectArguments);
@@ -101,7 +102,7 @@ namespace CombatEffects
                 target.PassivesHolder.DoReActionPassiveFilter(
                     ref effectArguments,ref powerVariation, originalPowerVariation);
 
-                effectPreset.DoEffect(user, target, powerVariation);
+                effectPreset.DoEffect(arguments, target, powerVariation);
             }
             else
             {
@@ -110,7 +111,7 @@ namespace CombatEffects
                 var failEffects = onFailEffects;
                 foreach (var failEffect in failEffects)
                 {
-                    failEffect.DoEffect(user, target, randomModifier);
+                    failEffect.DoEffect(arguments, target, randomModifier);
                 }
             }
 
@@ -141,12 +142,13 @@ namespace CombatEffects
     public class FailEffectParams : EffectParamsBase
     {
 
-        public void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier)
+        public void DoEffect(SkillArguments arguments, CombatingEntity target, float randomModifier)
         {
+            var user = arguments.User;
             var targets = UtilsTargets.GetEffectTargets(user, target, effectTarget);
             foreach (CombatingEntity failTarget in targets)
             {
-                effectPreset.DoEffect(user,failTarget,randomModifier);
+                effectPreset.DoEffect(arguments,failTarget,randomModifier);
             }
         }
 
@@ -162,20 +164,18 @@ namespace CombatEffects
 
     public interface IEffectBase
     { 
-        void DoEffect(CombatingEntity user, CombatingEntity target, float randomModifier);
+        void DoEffect(SkillArguments arguments, CombatingEntity target, float randomModifier);
     }
 
 
     public struct EffectArguments
     {
-        public readonly CombatingEntity User;
-        public readonly CombatingEntity Target;
+        public readonly SkillArguments Arguments;
         public readonly SEffectBase Effect;
 
-        public EffectArguments(CombatingEntity user, CombatingEntity target, SEffectBase effect)
+        public EffectArguments(SkillArguments arguments, SEffectBase effect)
         {
-            User = user;
-            Target = target;
+            Arguments = arguments;
             Effect = effect;
         }
     }

@@ -69,10 +69,10 @@ namespace Skills
             return UtilsTargets.GetEffectTargets(user, target, effects[0].GetEffectTarget());
         }
 
-        protected virtual void DoEffect(ref DoSkillArguments arguments, int effectIndex)
+        protected virtual void DoEffect(SkillArguments arguments, int effectIndex)
         {
             var user = arguments.User;
-            var target = arguments.Target;
+            var target = arguments.InitialTarget;
             var isCritical = arguments.IsCritical;
 
 
@@ -93,7 +93,7 @@ namespace Skills
                     else
                         randomModifier = 1;
 
-                    effect.DoEffect(user, effectTarget, randomModifier);
+                    effect.DoEffect(arguments, effectTarget, randomModifier);
                 }
             }
             void UpdateRandomness()
@@ -109,13 +109,13 @@ namespace Skills
 
         
 
-        public void DoMainEffect(ref DoSkillArguments arguments)
-            => DoEffect(ref arguments,0);
-        public void DoSecondaryEffects(ref DoSkillArguments arguments)
+        public void DoMainEffect(SkillArguments arguments)
+            => DoEffect(arguments,0);
+        public void DoSecondaryEffects(SkillArguments arguments)
         {
             for (int i = 1; i < effects.Length; i++)
             {
-                DoEffect(ref arguments, i);
+                DoEffect(arguments, i);
             }
         }
 
@@ -218,17 +218,11 @@ namespace Skills
         }
     }
 
-    public struct DoSkillArguments
+    public class SkillArguments
     {
-        public readonly CombatingEntity User;
-        public readonly CombatingEntity Target;
+        public CombatingEntity User;
+        public ICharacterFullStats UserStats;
+        public CombatingEntity InitialTarget;
         public bool IsCritical;
-
-        public DoSkillArguments(CombatingEntity user, CombatingEntity target, bool isCritical)
-        {
-            User = user;
-            Target = target;
-            IsCritical = isCritical;
-        }
     }
 }

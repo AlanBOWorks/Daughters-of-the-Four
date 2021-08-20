@@ -10,10 +10,10 @@ namespace CombatEffects
         menuName = "Combat/Effects/DAMAGE Direct")]
     public class SEffectDamage : SEffectBase
     {
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
             float damage = UtilsCombatStats.CalculateFinalDamage(
-                user.CombatStats, 
+                arguments.User.CombatStats, 
                 target.CombatStats,
                 effectModifier);
 

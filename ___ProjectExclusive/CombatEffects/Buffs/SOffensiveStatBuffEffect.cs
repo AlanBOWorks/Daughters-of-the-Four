@@ -1,5 +1,6 @@
 ﻿using System;
 using Characters;
+using Skills;
 using Stats;
 using UnityEngine;
 
@@ -12,9 +13,9 @@ namespace CombatEffects
         [SerializeField] private EnumStats.Offensive buffType 
             = EnumStats.Offensive.Attack;
 
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float effectModifier = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
-            UtilsCombatStats.VariateBuffUser(user.CombatStats,ref effectModifier);
+            UtilsCombatStats.VariateBuffUser(arguments.UserStats,ref effectModifier);
             DoEffect(target,effectModifier);
         }
 

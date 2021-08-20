@@ -13,9 +13,10 @@ namespace CombatEffects
             => GetBurstOrBase(target);
 
         
-        public override void DoEffect(CombatingEntity user, CombatingEntity target, float harmonyAddition = 1)
+        public override void DoEffect(SkillArguments arguments, CombatingEntity target, float harmonyAddition = 1)
         {
-            float harmonyModifier = user.CombatStats.Enlightenment * harmonyAddition;
+            float enlightenmentAmount = arguments.UserStats.Enlightenment;
+            float harmonyModifier = enlightenmentAmount * harmonyAddition;
             DoEffect(target,harmonyModifier);
         }
         
