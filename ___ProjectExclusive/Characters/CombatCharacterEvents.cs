@@ -3,6 +3,7 @@ using _CombatSystem;
 using _Team;
 using Sirenix.OdinInspector;
 using Stats;
+using UnityEngine;
 
 namespace Characters
 {
@@ -212,7 +213,7 @@ namespace Characters
 
         private static CombatCharacterEventsBase GlobalEvents()
         {
-            return CombatSystemSingleton.CharacterChangesEvent;
+            return CombatSystemSingleton.GlobalCharacterChangesEvent;
         }
 
         public void InvokeVitalityChange()
@@ -243,6 +244,48 @@ namespace Characters
         public void UnSubscribe(ICombatHitListener listener)
             => OnHitEvent.UnSubscribe(listener);
        
+    }
+
+
+    public class CharacterEventsTracker
+    {
+        [ShowInInspector]
+        public readonly Queue<CombatingEntity> InvokeTemporalChanges;
+
+        public CharacterEventsTracker()
+        {
+            InvokeTemporalChanges = new Queue<CombatingEntity>();
+        }
+
+        public void EnqueueTemporalChangeListener(CombatingEntity entity)
+        {
+            if (InvokeTemporalChanges.Contains(entity)) return;
+            InvokeTemporalChanges.Enqueue(entity);
+        }
+
+        public void Invoke()
+        {
+            while (InvokeTemporalChanges.Count > 0)
+            {
+                var entity = InvokeTemporalChanges.Dequeue();
+                entity.Events.InvokeTemporalStatChange();
+                CombatSystemSingleton.GlobalCharacterChangesEvent.InvokeTemporalStatChange(entity);
+            }
+        }
+
+
+        public static void InvokeHealthZeroStatsEvent(CombatingEntity target)
+        {
+            target.Events.OnHealthZero(target);
+            CombatSystemSingleton.GlobalCharacterChangesEvent.OnHealthZero(target);
+
+        }
+
+        public static void InvokeMortalityZeroEvent(CombatingEntity target)
+        {
+            target.Events.OnMortalityZero(target);
+            CombatSystemSingleton.GlobalCharacterChangesEvent.OnMortalityZero(target);
+        }
     }
 
     /// <summary>

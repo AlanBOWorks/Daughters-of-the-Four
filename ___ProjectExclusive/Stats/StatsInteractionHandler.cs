@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using _CombatSystem;
 using Characters;
 using MEC;
+using Sirenix.OdinInspector;
 using Skills;
 using Random = UnityEngine.Random;
 
@@ -26,7 +27,9 @@ namespace Stats
             _skillArguments = new SkillArguments();
         }
 
+        [ShowInInspector]
         private readonly ReflectionStats _stats;
+        [ShowInInspector]
         private readonly SkillArguments _skillArguments;
 
         public ICharacterFullStats CurrentStats => _stats;
@@ -197,5 +200,7 @@ namespace Stats
                 set => _statsReference.MortalityPoints = value;
             }
         }
+
+
     }
 }

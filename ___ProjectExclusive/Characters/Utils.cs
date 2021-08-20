@@ -23,7 +23,7 @@ namespace Characters
         public static void InvokeAreaChange(CombatingEntity entity)
         {
             entity.Events.InvokeAreaChange();
-            CombatSystemSingleton.CharacterChangesEvent.InvokeTemporalStatChange(entity);
+            CombatSystemSingleton.GlobalCharacterChangesEvent.InvokeTemporalStatChange(entity);
         }
 
         public static TeamCombatState.Stances ParseStance(float stanceEquivalent)
@@ -68,7 +68,7 @@ namespace Characters
             {
                 entity.Events.InvokeAreaChange();
             }
-            CombatSystemSingleton.CharacterChangesEvent.InvokeTemporalStatChange(teamHolder);
+            CombatSystemSingleton.GlobalCharacterChangesEvent.InvokeTemporalStatChange(teamHolder);
 
         }
 

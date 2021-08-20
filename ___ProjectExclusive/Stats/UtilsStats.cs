@@ -215,29 +215,23 @@ namespace Stats
             return new CharacterCombatData(copyStats);
         }
 
-        public static void InvokeStatsBuff(CombatingEntity target)
+        public static void EnqueueStatsBuffEvent(CombatingEntity target)
+        {
+            //TODO
+        }
+        public static void EnqueueTemporalStatsEvent(CombatingEntity target)
+        {
+            CombatSystemSingleton.CharacterEventsTracker.EnqueueTemporalChangeListener(target);
+        }
+
+        public static void EnqueueHealthZeroStatsEvent(CombatingEntity target)
         {
             //TODO
         }
 
-
-        public static void InvokeTemporalStatsEvents(CombatingEntity target)
+        public static void EnqueueMortalityZeroEvent(CombatingEntity target)
         {
-            target.Events.InvokeTemporalStatChange();
-            CombatSystemSingleton.CharacterChangesEvent.InvokeTemporalStatChange(target);
-        }
-
-        public static void InvokeHealthZeroStatsEvent(CombatingEntity target)
-        {
-            target.Events.OnHealthZero(target);
-            CombatSystemSingleton.CharacterChangesEvent.OnHealthZero(target);
-
-        }
-
-        public static void InvokeMortalityZeroEvent(CombatingEntity target)
-        {
-            target.Events.OnMortalityZero(target);
-            CombatSystemSingleton.CharacterChangesEvent.OnMortalityZero(target);
+            //TODO
         }
     }
 
@@ -298,7 +292,7 @@ namespace Stats
             if (shields < 0) shields = 0;
             stats.ShieldAmount = shields;
 
-            UtilsStats.InvokeTemporalStatsEvents(target);
+            UtilsStats.EnqueueTemporalStatsEvent(target);
         }
 
         /// <returns>The damage left</returns>
@@ -312,7 +306,7 @@ namespace Stats
             if (stats.ShieldAmount > 0)
             {
                 stats.ShieldAmount = CalculateDamageOnVitality(stats.ShieldAmount);
-                UtilsStats.InvokeTemporalStatsEvents(target);
+                UtilsStats.EnqueueTemporalStatsEvent(target);
                 SubmitDamageToEntity();
 
                 return; // Shield are the counter of 'Raw' damage > absorbs the rest of the damage
@@ -323,7 +317,7 @@ namespace Stats
 
             if (stats.HealthPoints > 0)
             {
-                UtilsStats.InvokeTemporalStatsEvents(target);
+                UtilsStats.EnqueueTemporalStatsEvent(target);
                 SubmitDamageToEntity();
 
                 return;
@@ -336,17 +330,17 @@ namespace Stats
                 stats.MortalityPoints = CalculateDamageOnVitality(stats.MortalityPoints);
                 if (!target.IsAlive())
                 {
-                    UtilsStats.InvokeMortalityZeroEvent(target);
+                    UtilsStats.EnqueueMortalityZeroEvent(target);
                 }
             }
             else
             {
                 target.CombatStats.TeamData.DeathHandler.Add(target);
-                UtilsStats.InvokeHealthZeroStatsEvent(target);
+                UtilsStats.EnqueueHealthZeroStatsEvent(target);
             }
 
 
-            UtilsStats.InvokeTemporalStatsEvents(target);
+            UtilsStats.EnqueueTemporalStatsEvent(target);
             SubmitDamageToEntity();
             #endregion
 
@@ -373,7 +367,7 @@ namespace Stats
         {
             DoDamageToShield(target,damage); //By design StaticDamage counters 'Shields'
             target.CombatStats.AccumulatedStaticDamage += damage;
-            UtilsStats.InvokeTemporalStatsEvents(target);
+            UtilsStats.EnqueueTemporalStatsEvent(target);
         }
 
 
@@ -397,7 +391,7 @@ namespace Stats
             }
             ResetAccumulatedStaticDamage();
 
-            UtilsStats.InvokeTemporalStatsEvents(target);
+            UtilsStats.EnqueueTemporalStatsEvent(target);
 
             void ResetAccumulatedStaticDamage()
             {
@@ -423,7 +417,7 @@ namespace Stats
 
             stats.HealthPoints = maxHealth + overHeal;
 
-            UtilsStats.InvokeTemporalStatsEvents(target);
+            UtilsStats.EnqueueTemporalStatsEvent(target);
         }
 
 
@@ -441,7 +435,7 @@ namespace Stats
             var stats = target.CombatStats;
             stats.ShieldAmount += shieldsAmount;
 
-            UtilsStats.InvokeTemporalStatsEvents(target);
+            UtilsStats.EnqueueTemporalStatsEvent(target);
         }
 
         public static void SetInitiative(ICombatTemporalStats stats, float targetValue = 0)
@@ -483,7 +477,7 @@ namespace Stats
                 targetHarmony, 
                 StatsCap.MinHarmony, StatsCap.MaxHarmony);
 
-            UtilsStats.InvokeTemporalStatsEvents(entity);
+            UtilsStats.EnqueueTemporalStatsEvent(entity);
         }
         public static void AddHarmony(CombatingEntity entity, float addition)
             => AddHarmony(entity, entity.CombatStats, addition);

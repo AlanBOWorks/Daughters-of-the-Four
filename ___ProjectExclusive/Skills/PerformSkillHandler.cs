@@ -18,14 +18,11 @@ namespace Skills
         [ShowInInspector]
         private readonly SkillTargets _currentSkillTargets;
 
-        [ShowInInspector]
-        private readonly StatsInteractionHandler _statsInteractionHandler;
 
         public PerformSkillHandler()
         {
             int sizeAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
             _currentSkillTargets = new SkillTargets(sizeAllocation); // it could be a whole targets
-            _statsInteractionHandler = new StatsInteractionHandler();
         }
 
         public void OnAfterPreparation(
@@ -78,13 +75,15 @@ namespace Skills
             var effectTargets = skillPreset.GetMainEffectTargets(_currentUser, target);
 
             // TODO make a waitUntil(Animation call for Skill)
-            yield return Timing.WaitUntilDone(
-                    _currentUser.CombatAnimator.DoAnimation(_currentUser, effectTargets, _currentSkillTargets.UsingSkill));
-            _statsInteractionHandler.DoSkill(skill, _currentUser, target);
+            yield return Timing.WaitUntilDone(_currentUser.CombatAnimator.DoAnimation(
+                        _currentUser, effectTargets,
+                        _currentSkillTargets.UsingSkill));
+            CombatSystemSingleton.StatsInteractionHandler.DoSkill(skill, _currentUser, target);
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
-            CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(_currentUser);
             skill.OnSkillUsage();
+            CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(_currentUser);
+            CombatSystemSingleton.CharacterEventsTracker.Invoke();
         }
 
         public List<CombatingEntity> HandlePossibleTargets(CombatSkill skill)

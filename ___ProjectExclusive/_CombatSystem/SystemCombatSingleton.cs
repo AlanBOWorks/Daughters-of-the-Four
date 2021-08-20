@@ -22,7 +22,9 @@ namespace _CombatSystem
             Characters = new CombatCharactersHolder();
             TempoHandler = new TempoHandler();
             PerformSkillHandler = new PerformSkillHandler();
-            CharacterChangesEvent = new CombatCharacterEventsBase();
+            StatsInteractionHandler = new StatsInteractionHandler();
+            GlobalCharacterChangesEvent = new CombatCharacterEventsBase();
+            CharacterEventsTracker = new CharacterEventsTracker();
 
             // Locals declarations that wont be used further than durante the CombatInvoker
             var combatControlDeclaration = new CombatControlDeclaration();
@@ -56,18 +58,23 @@ namespace _CombatSystem
             TempoHandler.Subscribe((ISkippedTempoListener)roundCheckHandler);
 
             //---- Events
-            CharacterChangesEvent.Subscribe(onDeathBackUpSkillInjector);
+            GlobalCharacterChangesEvent.Subscribe(onDeathBackUpSkillInjector);
         }
 
         [ShowInInspector]
         public static PerformSkillHandler PerformSkillHandler;
+        [ShowInInspector]
+        public static StatsInteractionHandler StatsInteractionHandler;
+        [ShowInInspector] 
+        public static CharacterEventsTracker CharacterEventsTracker;
+
         [ShowInInspector]
         public static CombatCharactersHolder Characters;
         [ShowInInspector]
         public static CombatTeamControlsHandler CombatTeamControlHandler;
 
         [ShowInInspector] 
-        public static CombatCharacterEventsBase CharacterChangesEvent;
+        public static CombatCharacterEventsBase GlobalCharacterChangesEvent;
 
         // This are not invoked that usually
         [ShowInInspector]

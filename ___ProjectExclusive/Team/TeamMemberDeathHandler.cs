@@ -104,7 +104,7 @@ namespace _Team
                 UtilsCombatStats.AddActionAmount(entity.CombatStats,ActionsAddition);
             }
 
-            CombatSystemSingleton.CharacterChangesEvent.OnTeamHealthZero(_team);
+            CombatSystemSingleton.GlobalCharacterChangesEvent.OnTeamHealthZero(_team);
         }
 
         public bool Contains(CombatingEntity entity)
