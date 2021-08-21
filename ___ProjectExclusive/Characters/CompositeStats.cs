@@ -54,7 +54,14 @@ namespace Characters
             };
         }
 
-
+        public void ResetToZero()
+        {
+            OffensiveStats.Clear();
+            SupportStats.Clear();
+            VitalityStats.Clear();
+            SpecialStats.Clear();
+            TemporalStats.Clear();
+        }
 
         public float AttackPower
         {

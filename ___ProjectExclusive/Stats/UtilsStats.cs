@@ -423,7 +423,7 @@ namespace Stats
         }
 
 
-        public static void SetInitiative(ICharacterFullStats stats, float targetValue)
+        public static void SetInitiative(ICharacterBasicStats stats, float targetValue)
         {
             const float lowerCap = 0;
             const float maxCap = GlobalCombatParams.InitiativeCheck;
@@ -433,9 +433,9 @@ namespace Stats
         }
         public static void SetInitiative(CombatingEntity entity, float targetValue, bool isBurstType)
         {
-            ICharacterFullStats stats = isBurstType
-                ? entity.CombatStats.BurstStats
-                : entity.CombatStats.BaseStats;
+            var stats = isBurstType
+                ?  entity.CombatStats.BurstStats
+                : (ICharacterBasicStats) entity.CombatStats.BaseStats;
             SetInitiative(stats, targetValue);
 
             entity.Events.InvokeTemporalStatChange();
@@ -446,9 +446,9 @@ namespace Stats
         }
         public static void AddInitiative(CombatingEntity entity, float addition, bool isBurstType)
         {
-            ICharacterFullStats stats = isBurstType 
+            var stats = isBurstType 
                 ? entity.CombatStats.BurstStats 
-                : entity.CombatStats.BaseStats;
+                : (ICharacterBasicStats) entity.CombatStats.BaseStats;
             SetInitiative(stats, stats.InitiativePercentage + addition);
 
 
@@ -474,7 +474,7 @@ namespace Stats
         }
 
 
-        public static void AddHarmony(CombatingEntity entity, ICombatTemporalStats stats, float addition)
+        public static void AddHarmony(CombatingEntity entity, ICombatTemporalStatsBase stats, float addition)
         {
             float userEnlightenment = entity.CombatStats.Enlightenment; //Generally value = 1;
             addition *= userEnlightenment;

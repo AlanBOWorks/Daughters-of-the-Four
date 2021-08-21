@@ -10,9 +10,6 @@ namespace CombatEffects
         menuName = "Combat/Effects/Buff/Initiative Modifier")]
     public class SEffectInitiativeModifier : SEffectBuffBase
     {
-        protected override ICharacterFullStats GetBuff(CombatingEntity target)
-            => GetBurstOrBase(target);
-
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
             var buffPower = arguments.UserStats.BuffPower;

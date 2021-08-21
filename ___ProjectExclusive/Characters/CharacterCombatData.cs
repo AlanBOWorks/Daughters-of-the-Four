@@ -156,10 +156,10 @@ namespace Characters
         /// This remains active for the whole fight
         /// </summary>
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.4f, .6f, .8f)]
-        public CharacterCombatStatsFull BuffStats { get; protected set; }
+        public CompositeStats BuffStats { get; protected set; }
 
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
-        public CharacterCombatStatsFull BurstStats { get; protected set; }
+        public CompositeStats BurstStats { get; protected set; }
 
         [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
         private ICharacterBasicStats TeamStats => TeamData.GetCurrentStats();
@@ -190,8 +190,8 @@ namespace Characters
         public CharacterCombatData(ICharacterFullStats presetStats)
         {
             BaseStats = new CharacterCombatStatsFull(presetStats);
-            BuffStats = new CharacterCombatStatsFull(0);
-            BurstStats = new CharacterCombatStatsFull(0);
+            BuffStats = new CompositeStats();
+            BurstStats = new CompositeStats();
 
             BaseStats.HealthPoints = BaseStats.MaxHealth;
             BaseStats.MortalityPoints = BaseStats.MaxMortalityPoints;
