@@ -80,7 +80,7 @@ namespace _CombatSystem
             CombatSystemSingleton.CombatConditionChecker = CombatConditionChecker;
         }
 
-        public void Inject(ITempoTriggerHandler playerTriggerHandler)
+        public void InjectPlayerEvents(ITempoTriggerHandler playerTriggerHandler)
         {
             PlayerTempoHandler = playerTriggerHandler;
         }
@@ -235,7 +235,6 @@ namespace _CombatSystem
 
         private void DequeueInvokeNextActor()
         {
-
             var entity = _actingQueue.Dequeue();
             _fillingEntities.Add(entity);
             CharacterCombatData stats = entity.CombatStats;
@@ -333,7 +332,7 @@ namespace _CombatSystem
         {
             if (IsForPlayer(entity))
             {
-                PlayerTempoHandler.OnInitiativeTrigger(entity);
+                PlayerTempoHandler.OnDoMoreActions(entity);
             }
             else
             {

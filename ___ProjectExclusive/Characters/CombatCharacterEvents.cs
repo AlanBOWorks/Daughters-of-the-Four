@@ -364,6 +364,7 @@ namespace Characters
 
         private static void InvokeOnDamageAction(CombatingEntity entity, float totalDamage)
         {
+            Debug.Log("Invoking");
             entity.Events.OnHitEvent.OnDamage(totalDamage);
         }
 
@@ -381,6 +382,7 @@ namespace Characters
 
         private class EntityValuesQueue 
         {
+            [ShowInInspector]
             private readonly List<QueueValues> _elements;
 
             public EntityValuesQueue()

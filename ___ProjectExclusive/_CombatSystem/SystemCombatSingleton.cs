@@ -99,7 +99,7 @@ namespace _CombatSystem
         public const float TempoVelocityModifier = .01f;
 
 
-        public const float InitiativeCheck = 100f;
+        public const float InitiativeCheck = 1f;
         public const int ActionsPerInitiativeCap = 8;
         public const int ActionsLowerCap = -2;
 

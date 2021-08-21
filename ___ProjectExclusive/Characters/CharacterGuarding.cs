@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using _CombatSystem;
 using Sirenix.OdinInspector;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Characters
@@ -74,6 +75,7 @@ namespace Characters
                 _guardingEntities[i].Guarding.RemoveProtection();
                 _guardingEntities.RemoveAt(i);
             }
+            Debug.Log("Removed");
         }
         /// <summary>
         /// Removes the [<seealso cref="CombatingEntity"/>] that is being protected by this

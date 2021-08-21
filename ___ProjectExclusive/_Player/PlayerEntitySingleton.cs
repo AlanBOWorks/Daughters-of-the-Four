@@ -51,7 +51,7 @@ namespace _Player
             invoker.SubscribeListener(CombatElementsPools);
 
             var tempoHandler = CombatSystemSingleton.TempoHandler;
-            tempoHandler.Inject(PlayerCombatEvents);
+            tempoHandler.InjectPlayerEvents(PlayerCombatEvents);
         }
     }
 
