@@ -165,7 +165,7 @@ namespace Stats
         public virtual void OverrideAll(float value) => UtilsStats.OverrideStats(this, value);
         public virtual void ResetToZero() => UtilsStats.OverrideStats(this);
 
-        public CharacterCombatStatsBasic(ICharacterBasicStats copyFrom)
+        public CharacterCombatStatsBasic(ICharacterBasicStatsData copyFrom)
         {
             UtilsStats.CopyStats(this, copyFrom);
         }

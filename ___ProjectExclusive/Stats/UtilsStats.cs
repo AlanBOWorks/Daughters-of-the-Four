@@ -244,7 +244,7 @@ namespace Stats
         public static float HealthPercentage(CombatingEntity entity)
         {
             var stats = entity.CombatStats;
-            return SRange.Percentage(stats.HealthPoints, 0, stats.MaxHealth);
+            return SRange.Percentage(stats.HealthPoints, 0, stats.GetMaxHealth());
         }
 
         public static float CalculateFinalDamage(
@@ -368,10 +368,11 @@ namespace Stats
             var stats = target.CombatStats;
 
             float targetHealth = stats.HealthPoints + heal;
-            if (targetHealth > stats.MaxHealth)
+            float maxHealth = stats.GetMaxHealth();
+            if (targetHealth > maxHealth)
             {
-                target.ReceivedStats.HealReceived = stats.MaxHealth - stats.HealthPoints;
-                stats.HealthPoints = stats.MaxHealth;
+                target.ReceivedStats.HealReceived = maxHealth - stats.HealthPoints;
+                stats.HealthPoints = maxHealth;
             }
             else
             {
@@ -392,7 +393,7 @@ namespace Stats
         {
             var stats = target.CombatStats;
             float currentHealth = stats.HealthPoints;
-            float maxHealth = stats.MaxHealth;
+            float maxHealth = stats.GetMaxHealth();
             float currentOverHeal = currentHealth - maxHealth;
 
             // Is inValid?
@@ -413,8 +414,9 @@ namespace Stats
         public static void HealToMax(CharacterCombatData stats)
         {
             if(!stats.IsAlive()) return;
-            if(stats.HealthPoints < stats.MaxHealth)
-                stats.HealthPoints = stats.MaxHealth;
+            float maxHealth = stats.GetMaxHealth();
+            if(stats.HealthPoints < maxHealth) // This is because the target could have overHeal state
+                stats.HealthPoints = maxHealth;
         }
 
         public static void DoGiveShieldsTo(CombatingEntity target, float shieldsAmount)
@@ -481,7 +483,7 @@ namespace Stats
 
         public static void AddHarmony(CombatingEntity entity, ICombatTemporalStatsBase stats, float addition)
         {
-            float userEnlightenment = entity.CombatStats.Enlightenment; //Generally value = 1;
+            float userEnlightenment = entity.CombatStats.GetEnlightenment(); //Generally value = 1;
             addition *= userEnlightenment;
 
             float targetHarmony = stats.GetHarmonyAmount() + addition;
@@ -498,8 +500,8 @@ namespace Stats
         {
             var userStats = user.CombatStats;
             var targetStats = target.CombatStats;
-            float userEnlightenment = userStats.Enlightenment; //Generally value = 1;
-            float targetEnlightenment = targetStats.Enlightenment;
+            float userEnlightenment = userStats.GetEnlightenment(); //Generally value = 1;
+            float targetEnlightenment = targetStats.GetEnlightenment();
             float harmonyVariation = userEnlightenment - targetEnlightenment;
             reduction += reduction * harmonyVariation;
 

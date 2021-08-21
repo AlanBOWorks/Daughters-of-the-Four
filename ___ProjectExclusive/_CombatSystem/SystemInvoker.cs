@@ -98,8 +98,8 @@ namespace _CombatSystem
                     entityPosition = CharacterArchetypes.TeamPosition.FrontLine;
                     enemyEntities.InjectParse(enemyFightPreset, GenerateEntity);
 
-                    DoInjectionTeams(playerEntities);
-                    DoInjectionTeams(enemyEntities);
+                    DoInitializations(playerEntities);
+                    DoInitializations(enemyEntities);
 
                     GenerateAllEntities();
                 }
@@ -110,11 +110,12 @@ namespace _CombatSystem
                     allEntities.AddRange(playerEntities);
                     allEntities.AddRange(enemyEntities);
                 }
-                void DoInjectionTeams(CombatingTeam team)
+                void DoInitializations(CombatingTeam team)
                 {
                     foreach (CombatingEntity entity in team)
                     {
                         entity.Injection(team);
+                        entity.CombatStats.Initialization();
                     }
                 }
 

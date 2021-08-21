@@ -148,8 +148,16 @@ namespace Characters
 
     public class CharacterCombatData : ICharacterFullStatsData
     {
+        public CharacterCombatData(ICharacterFullStats presetStats)
+        {
+            BaseStats = new CharacterCombatStatsFull(presetStats);
+            BuffStats = new CharacterCombatStatsFull();
+            BurstStats = new CharacterCombatStatsFull();
+            CalculatedStats = new CharacterCombatStatsBasic();
 
-        [Title("Combat Stats")]
+            _formulatedStats = new FormulatedStats(this);
+        }
+
         [ShowInInspector, HorizontalGroup("Base Stats"),PropertyOrder(-2), GUIColor(.4f,.8f,.6f)]
         public CharacterCombatStatsFull BaseStats { get; protected set; }
         /// <summary>
@@ -161,16 +169,34 @@ namespace Characters
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
         public CharacterCombatStatsFull BurstStats { get; protected set; }
 
-        [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
         private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStats();
 
-        public CombatingTeam TeamData;
+        public CombatingTeam TeamData
+        {
+            get => _formulatedStats.TeamData;
+            set => _formulatedStats.TeamData = value;
+        }
+
+        private readonly FormulatedStats _formulatedStats;
+        /// <summary>
+        /// For using <see cref="CombatSkill"/>
+        /// </summary>
+        [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2)]
+        public CharacterCombatStatsBasic CalculatedStats { get; protected set; }
 
 
-        [TitleGroup("Local stats"), PropertyOrder(10)]
+        [TitleGroup("Local stats"), PropertyOrder(-10)]
         public int ActionsLefts;
         [TitleGroup("Local stats")] 
         public float AccumulatedStaticDamage;
+
+
+        public void Initialization()
+        {
+            UpdateCalculatedStats();
+            BaseStats.HealthPoints = BaseStats.MaxHealth;
+            BaseStats.MortalityPoints = BaseStats.MaxMortalityPoints;
+        }
 
         public bool IsAlive() => MortalityPoints > 0;
         public bool HasActionLeft() => ActionsLefts > 0;
@@ -178,82 +204,29 @@ namespace Characters
 
         public void RefillInitiativeActions()
         {
-            UtilsCombatStats.AddActionAmount(this, ActionsPerInitiative);
+            UtilsCombatStats.AddActionAmount(this, _formulatedStats.GetActionsPerInitiative());
         }
-
         public void Revive()
         {
             UtilsCombatStats.HealToMax(this);
         }
 
-
-        public CharacterCombatData(ICharacterFullStats presetStats)
+        public void UpdateCalculatedStats()
         {
-            BaseStats = new CharacterCombatStatsFull(presetStats);
-            BuffStats = new CharacterCombatStatsFull();
-            BurstStats = new CharacterCombatStatsFull();
-
-            BaseStats.HealthPoints = BaseStats.MaxHealth;
-            BaseStats.MortalityPoints = BaseStats.MaxMortalityPoints;
+            UtilsStats.CopyStats(CalculatedStats, _formulatedStats);
         }
 
         public float CalculateBaseAttackPower()
         {
             return BaseStats.AttackPower + TeamStats.GetAttackPower();
         }
-        public float AttackPower
-        {
-            get => UtilsStats.StatsFormula(
-                    CalculateBaseAttackPower(),
-                    BuffStats.AttackPower,
-                    BurstStats.AttackPower);
-            set => BuffStats.AttackPower = value;
-        }
-        public float DeBuffPower
-        {
-            get => UtilsStats.StatsFormula(
-                BaseStats.DeBuffPower + TeamStats.GetDeBuffPower(),
-                BuffStats.DeBuffPower,
-                BurstStats.DeBuffPower);
-            set => BuffStats.DeBuffPower = value;
-        }
-
         public float CalculateBaseStaticDamagePower()
         {
             return BaseStats.StaticDamagePower + TeamStats.GetStaticDamagePower();
         }
-        public float StaticDamagePower
+        public float CalculateDamageReduction()
         {
-            get => UtilsStats.StatsFormula(
-                CalculateBaseStaticDamagePower(),
-                BuffStats.StaticDamagePower,
-                BurstStats.StaticDamagePower);
-            set => BuffStats.StaticDamagePower = value;
-        }
-
-        public float HealPower
-        {
-            get => UtilsStats.StatsFormula(
-                BaseStats.HealPower + TeamStats.GetHealPower(),
-                BuffStats.HealPower,
-                BurstStats.HealPower);
-            set => BuffStats.HealPower = value;
-        }
-        public float BuffPower
-        {
-            get => UtilsStats.StatsFormula(
-                BaseStats.BuffPower + TeamStats.GetBuffPower(),
-                BuffStats.BuffPower,
-                BurstStats.BuffPower);
-            set => BuffStats.BuffPower = value;
-        }
-        public float BuffReceivePower
-        {
-            get => UtilsStats.StatsFormula(
-                BaseStats.BuffReceivePower + TeamStats.GetBuffReceivePower(),
-                BuffStats.BuffReceivePower,
-                BurstStats.BuffReceivePower);
-            set => BuffStats.BuffReceivePower = value;
+            return BaseStats.DamageReduction + TeamStats.GetDamageReduction();
         }
 
         public float HealthPoints
@@ -280,124 +253,196 @@ namespace Characters
         public float InitiativePercentage
         {
             get => BaseStats.InitiativePercentage + TeamStats.GetInitiativePercentage()
-                   + BuffStats.InitiativePercentage
-                   + BurstStats.InitiativePercentage;
+                                                  + BuffStats.InitiativePercentage
+                                                  + BurstStats.InitiativePercentage;
             set => BaseStats.InitiativePercentage = value;
         }
 
         public int ActionsPerInitiative
         {
             get => BaseStats.ActionsPerInitiative + TeamStats.GetActionsPerInitiative()
-                   + BuffStats.ActionsPerInitiative
-                   + BurstStats.ActionsPerInitiative;
+                                                  + BuffStats.ActionsPerInitiative
+                                                  + BurstStats.ActionsPerInitiative;
             set => BaseStats.ActionsPerInitiative = value;
         }
 
-        public float Enlightenment
+        
+
+        public float GetAttackPower() => CalculatedStats.AttackPower;
+        public float GetDeBuffPower() => CalculatedStats.DeBuffPower;
+        public float GetStaticDamagePower() => CalculatedStats.StaticDamagePower;
+        public float GetHealPower() => CalculatedStats.HealPower;
+        public float GetBuffPower() => CalculatedStats.BuffPower;
+        public float GetBuffReceivePower() => CalculatedStats.BuffReceivePower;
+        public float GetMaxHealth() => CalculatedStats.MaxHealth;
+        public float GetMaxMortalityPoints() => CalculatedStats.MaxMortalityPoints;
+        public float GetDamageReduction() => CalculatedStats.DamageReduction;
+        public float GetDeBuffReduction() => CalculatedStats.DeBuffReduction;
+        public float GetEnlightenment() => CalculatedStats.Enlightenment;
+        public float GetCriticalChance() => CalculatedStats.CriticalChance;
+        public float GetSpeedAmount() => CalculatedStats.SpeedAmount;
+        public float GetInitiativePercentage() => _formulatedStats.GetInitiativePercentage(); //This are tempo related
+        public int GetActionsPerInitiative() => CalculatedStats.ActionsPerInitiative;
+        public float GetHarmonyAmount() => CalculatedStats.HarmonyAmount;
+
+
+        private class FormulatedStats : ICharacterBasicStatsData
         {
-            get => UtilsStats.StatsFormula(
-                BaseStats.Enlightenment + TeamStats.GetEnlightenment(),
-                BuffStats.Enlightenment,
-                BurstStats.Enlightenment);
-            set => BuffStats.Enlightenment = value;
+            [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
+            public CharacterCombatStatsFull BaseStats { get; protected set; }
+            /// <summary>
+            /// This remains active for the whole fight
+            /// </summary>
+            [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.4f, .6f, .8f)]
+            public CharacterCombatStatsFull BuffStats { get; protected set; }
+
+            [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
+            public CharacterCombatStatsFull BurstStats { get; protected set; }
+
+            [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
+            private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStats();
+
+            public CombatingTeam TeamData;
+
+            public FormulatedStats(CharacterCombatData data)
+            {
+                BaseStats = data.BaseStats;
+                BuffStats = data.BuffStats;
+                BurstStats = data.BurstStats;
+            }
+
+            public FormulatedStats(CharacterCombatData data, CombatingTeam teamData) : this(data)
+            {
+                TeamData = teamData;
+            }
+
+
+
+
+            public float CalculateBaseAttackPower()
+            {
+                return BaseStats.AttackPower + TeamStats.GetAttackPower();
+            }
+            public float CalculateBaseStaticDamagePower()
+            {
+                return BaseStats.StaticDamagePower + TeamStats.GetStaticDamagePower();
+            }
+
+            public float GetAttackPower()
+            {
+                return UtilsStats.StatsFormula(
+                        CalculateBaseAttackPower(),
+                        BuffStats.AttackPower,
+                        BurstStats.AttackPower);
+            }
+            public float GetDeBuffPower()
+            {
+                return UtilsStats.StatsFormula(
+                    BaseStats.DeBuffPower + TeamStats.GetDeBuffPower(),
+                    BuffStats.DeBuffPower,
+                    BurstStats.DeBuffPower);
+            }
+
+            
+            public float GetStaticDamagePower()
+            {
+                return UtilsStats.StatsFormula(
+                    CalculateBaseStaticDamagePower(),
+                    BuffStats.StaticDamagePower,
+                    BurstStats.StaticDamagePower);
+            }
+
+            public float GetHealPower()
+            {
+                return UtilsStats.StatsFormula(
+                    BaseStats.HealPower + TeamStats.GetHealPower(),
+                    BuffStats.HealPower,
+                    BurstStats.HealPower);
+            }
+            public float GetBuffPower()
+            {
+                return UtilsStats.StatsFormula(
+                    BaseStats.BuffPower + TeamStats.GetBuffPower(),
+                    BuffStats.BuffPower,
+                    BurstStats.BuffPower);
+            }
+            public float GetBuffReceivePower()
+            {
+                return UtilsStats.StatsFormula(
+                    BaseStats.BuffReceivePower + TeamStats.GetBuffReceivePower(),
+                    BuffStats.BuffReceivePower,
+                    BurstStats.BuffReceivePower);
+            }
+            public float GetHarmonyAmount()
+            {
+                return BaseStats.HarmonyAmount + TeamStats.GetHarmonyAmount() + BurstStats.HarmonyAmount;
+            }
+
+            public float GetInitiativePercentage()
+            {
+                return BaseStats.InitiativePercentage + TeamStats.GetInitiativePercentage()
+                       + BuffStats.InitiativePercentage
+                       + BurstStats.InitiativePercentage;
+            }
+
+            public int GetActionsPerInitiative()
+            {
+                return BaseStats.ActionsPerInitiative + TeamStats.GetActionsPerInitiative()
+                       + BuffStats.ActionsPerInitiative
+                       + BurstStats.ActionsPerInitiative;
+            }
+
+            public float GetEnlightenment()
+            {
+                return UtilsStats.StatsFormula(
+                    BaseStats.Enlightenment + TeamStats.GetEnlightenment(),
+                    BuffStats.Enlightenment,
+                    BurstStats.Enlightenment);
+            }
+            public float GetCriticalChance()
+            {
+                return UtilsStats.StatsFormula(
+                    BaseStats.CriticalChance + TeamStats.GetCriticalChance(),
+                    BuffStats.CriticalChance,
+                    BurstStats.CriticalChance);
+            }
+
+            public float GetSpeedAmount()
+            {
+                return UtilsStats.StatsFormula(
+                    BaseStats.SpeedAmount + TeamStats.GetSpeedAmount(),
+                    BuffStats.SpeedAmount,
+                    BurstStats.SpeedAmount);
+            }
+
+            public float GetMaxHealth()
+            {
+                return BaseStats.MaxHealth + TeamStats.GetMaxHealth();
+            }
+            public float GetMaxMortalityPoints()
+            {
+                return BaseStats.MaxMortalityPoints + TeamStats.GetMaxMortalityPoints();
+            }
+
+            public float CalculateDamageReduction()
+            {
+                return BaseStats.DamageReduction + TeamStats.GetDamageReduction();
+            }
+            public float GetDamageReduction()
+            {
+                return UtilsStats.StatsFormula(
+                    CalculateDamageReduction(),
+                    BuffStats.DamageReduction,
+                    BurstStats.DamageReduction);
+            }
+            public float GetDeBuffReduction()
+            {
+                return UtilsStats.StatsFormula(
+                    BaseStats.DeBuffReduction + TeamStats.GetDeBuffReduction(),
+                    BuffStats.DeBuffReduction,
+                    BurstStats.DeBuffReduction);
+            }
         }
-        public float CriticalChance
-        {
-            get => UtilsStats.StatsFormula(
-                BaseStats.CriticalChance + TeamStats.GetCriticalChance(),
-                BuffStats.CriticalChance,
-                BurstStats.CriticalChance);
-            set => BuffStats.CriticalChance = value;
-        }
-
-        public float SpeedAmount
-        {
-            get => UtilsStats.StatsFormula(
-                BaseStats.SpeedAmount + TeamStats.GetSpeedAmount(),
-                BuffStats.SpeedAmount,
-                BurstStats.SpeedAmount);
-            set => BuffStats.SpeedAmount = value;
-        }
-
-        public float MaxHealth
-        {
-            get => BaseStats.MaxHealth + TeamStats.GetMaxHealth();
-            set => BuffStats.MaxHealth = value;
-        }
-        public float MaxMortalityPoints
-        {
-            get => BaseStats.MaxMortalityPoints + TeamStats.GetMaxMortalityPoints();
-            set => BuffStats.MaxMortalityPoints = value;
-        }
-
-        public float CalculateDamageReduction()
-        {
-            return BaseStats.DamageReduction + TeamStats.GetDamageReduction();
-        }
-        public float DamageReduction
-        {
-            get => UtilsStats.StatsFormula(
-                CalculateDamageReduction(),
-                BuffStats.DamageReduction,
-                BurstStats.DamageReduction);
-            set => BuffStats.DamageReduction = value;
-        }
-        public float DeBuffReduction
-        {
-            get => UtilsStats.StatsFormula(
-                BaseStats.DeBuffReduction + TeamStats.GetDeBuffReduction(),
-                BuffStats.DeBuffReduction,
-                BurstStats.DeBuffReduction);
-            set => BuffStats.DeBuffReduction = value;
-        }
-
-        public void SetInitiativePercentage(float value)
-        {
-            BaseStats.InitiativePercentage = value;
-        }
-
-        public void SetActionsPerInitiative(int value)
-        {
-            BaseStats.ActionsPerInitiative = value;
-
-        }
-
-        public void SetHarmonyAmount(float value)
-        {
-            BaseStats.HarmonyAmount = value;
-        }
-
-        public float GetAttackPower() => AttackPower;
-
-        public float GetDeBuffPower() => DeBuffPower;
-
-        public float GetStaticDamagePower() => StaticDamagePower;
-
-        public float GetHealPower() => HealPower;
-
-        public float GetBuffPower() => BuffPower;
-
-        public float GetBuffReceivePower() => BuffReceivePower;
-
-        public float GetMaxHealth() => MaxHealth;
-
-        public float GetMaxMortalityPoints() => MaxMortalityPoints;
-
-        public float GetDamageReduction() => DamageReduction;
-
-        public float GetDeBuffReduction() => DeBuffReduction;
-
-        public float GetEnlightenment() => Enlightenment;
-
-        public float GetCriticalChance() => CriticalChance;
-
-        public float GetSpeedAmount() => SpeedAmount;
-
-        public float GetInitiativePercentage() => InitiativePercentage;
-
-        public int GetActionsPerInitiative() => ActionsPerInitiative;
-
-        public float GetHarmonyAmount() => HarmonyAmount;
     }
 
     

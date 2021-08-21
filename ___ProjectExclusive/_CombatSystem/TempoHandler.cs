@@ -330,6 +330,7 @@ namespace _CombatSystem
 
         private void CallForControl(CombatingEntity entity)
         {
+            UpdateEntitiesStats();
             if (IsForPlayer(entity))
             {
                 PlayerTempoHandler.OnDoMoreActions(entity);
@@ -337,6 +338,14 @@ namespace _CombatSystem
             else
             {
                 EnemyController.DoControlOn(entity);
+            }
+
+            void UpdateEntitiesStats()
+            {
+                foreach (CombatingEntity combatingEntity in _characters)
+                {
+                    combatingEntity.CombatStats.UpdateCalculatedStats();
+                }
             }
         }
 

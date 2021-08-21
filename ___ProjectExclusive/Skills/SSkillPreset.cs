@@ -49,7 +49,7 @@ namespace Skills
         [SerializeField]
         private EffectParams[] effects = new EffectParams[1];
 
-
+        public EffectParams[] Effects => effects;
 
 
         public string SkillName => skillName;
@@ -108,7 +108,13 @@ namespace Skills
         }
 
         
-
+        public void DoEffects(SkillArguments arguments)
+        {
+            for (int i = 0; i < effects.Length; i++)
+            {
+                DoEffect(arguments, i);
+            }
+        }
         public void DoMainEffect(SkillArguments arguments)
             => DoEffect(arguments,0);
         public void DoSecondaryEffects(SkillArguments arguments)
