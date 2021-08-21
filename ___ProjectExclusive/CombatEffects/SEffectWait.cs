@@ -17,7 +17,7 @@ namespace CombatEffects
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {
-            UtilsCombatStats.SetInitiative(target.CombatStats, effectModifier);
+            UtilsCombatStats.SetInitiative(target, effectModifier, false);
             UtilsCombatStats.SetActionAmount(target.CombatStats);
         }
     }

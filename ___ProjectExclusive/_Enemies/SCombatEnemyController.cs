@@ -32,7 +32,7 @@ namespace _Enemies
             ISkillShared<CombatSkill> skillShared = entity.SharedSkills;
             
             var ultimate = skillShared.UltimateSkill;
-            if (ultimate.Preset != null && !ultimate.IsInCooldown())
+            if (ultimate != null && ultimate.Preset != null && !ultimate.IsInCooldown())
             {
                 DoSkill(ultimate);
                 return;

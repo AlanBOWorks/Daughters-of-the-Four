@@ -14,9 +14,13 @@ namespace Skills
     {
         public CombatSkill(SkillPreset injection, bool isInCooldown = false)
         {
+#if UNITY_EDITOR
+            if(injection.Preset == null)
+                throw new NullReferenceException($"Preset is null on [{injection.SkillName}]");
+#endif
+
             this.preset = injection.Preset;
-            if(preset != null)
-                CooldownCost = preset.CoolDownCost + injection.coolDownVariation;
+            CooldownCost = preset.CoolDownCost + injection.coolDownVariation;
             SkillState = isInCooldown 
                 ? State.Cooldown 
                 : State.Idle;

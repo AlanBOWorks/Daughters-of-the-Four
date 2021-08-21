@@ -93,8 +93,13 @@ namespace _CombatSystem
 
     public static class GlobalCombatParams
     {
+        /// <summary>
+        /// A modifier that alters how much the velocity affects each Tempo Tick
+        /// </summary>
+        public const float TempoVelocityModifier = .01f;
 
-        public const float InitiativeCheck = 100f;
+        public const float InitiativeCheck = 1;
+
         public const int PredictedAmountOfCharacters = UtilsCharacter.PredictedAmountOfCharactersInBattle;
         public const int PredictedAmountOfTeamCharacters = CharacterArchetypes.AmountOfArchetypesAmount;
         public const int ActionsPerInitiativeCap = 8;
