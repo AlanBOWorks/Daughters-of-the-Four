@@ -15,7 +15,7 @@ namespace CombatEffects
 
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
-            float userDebuff = arguments.UserStats.DeBuffPower * effectModifier;
+            float userDebuff = arguments.UserStats.GetDeBuffPower() * effectModifier;
             float targetDebuffResist = target.CombatStats.DeBuffReduction;
 
             float finalModifier = userDebuff - targetDebuffResist;

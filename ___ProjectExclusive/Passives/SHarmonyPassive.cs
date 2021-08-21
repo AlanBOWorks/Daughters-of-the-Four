@@ -141,7 +141,7 @@ namespace Passives
 
             void DoCheck()
             {
-                float currentHarmony = currentStats.HarmonyAmount;
+                float currentHarmony = currentStats.GetHarmonyAmount();
                 if (currentHarmony > 0)
                 {
                 }

@@ -114,7 +114,7 @@ namespace _Team
 
     public interface ITeamCombatControlStats
     {
-        ICharacterBasicStats GetCurrentStats();
+        ICharacterBasicStatsData GetCurrentStats();
         FilterPassivesHolder GetCurrentPassives();
     }
 }

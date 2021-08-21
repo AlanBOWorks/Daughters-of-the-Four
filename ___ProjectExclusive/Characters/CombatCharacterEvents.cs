@@ -102,7 +102,7 @@ namespace Characters
         {
             if(_onVitalityChange is null) return;
 
-            IVitalityStats onStats = entity.CombatStats;
+            IVitalityStatsData onStats = entity.CombatStats;
             foreach (IVitalityChangeListener listener in _onVitalityChange)
             {
                 listener.OnVitalityChange(onStats);
@@ -364,7 +364,6 @@ namespace Characters
 
         private static void InvokeOnDamageAction(CombatingEntity entity, float totalDamage)
         {
-            Debug.Log("Invoking");
             entity.Events.OnHitEvent.OnDamage(totalDamage);
         }
 
@@ -457,7 +456,7 @@ namespace Characters
 
     public interface IVitalityChangeListener : ICharacterListener
     {
-        void OnVitalityChange(IVitalityStats currentStats);
+        void OnVitalityChange(IVitalityStatsData currentStats);
     }
 
     public interface ITemporalStatsChangeListener : ICharacterListener

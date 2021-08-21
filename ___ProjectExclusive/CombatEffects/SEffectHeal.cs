@@ -11,7 +11,7 @@ namespace CombatEffects
     {
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
-            float heal = arguments.UserStats.HealPower;
+            float heal = arguments.UserStats.GetHealPower();
             heal *= effectModifier;
 
             DoEffect(target,heal);

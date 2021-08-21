@@ -4,29 +4,57 @@ using UnityEngine;
 namespace Stats
 {
 
-    public interface IOffensiveStats
+    public interface IOffensiveStats : IOffensiveStatsData, IOffensiveStatsInjection
+    { }
+    public interface IOffensiveStatsData
     {
-        float AttackPower { get; set; }
-        float DeBuffPower { get; set; }
-        float StaticDamagePower { get; set; }
+        float GetAttackPower();
+        float GetDeBuffPower();
+        float GetStaticDamagePower();
     }
 
-    public interface ISupportStats
+    public interface IOffensiveStatsInjection
     {
-        float HealPower { get; set; }
-        float BuffPower { get; set; }
-        float BuffReceivePower { get; set; }
+        float AttackPower { set; }
+        float DeBuffPower { set; }
+        float StaticDamagePower { set; }
     }
 
+    public interface ISupportStats : ISupportStatsData, ISupportStatsInjection
+    { }
 
-    public interface IVitalityStats
+    public interface ISupportStatsData
     {
-        float MaxHealth { get; set; }
-        float MaxMortalityPoints { set; get; }
+        float GetHealPower();
+        float GetBuffPower();
+        float GetBuffReceivePower();
+    }
+    public interface ISupportStatsInjection
+    {
+        float HealPower { set; }
+        float BuffPower { set; }
+        float BuffReceivePower { set; }
+    }
 
-        float DamageReduction { set; get; }
-        float DeBuffReduction { set; get; }
+    public interface IVitalityStats : IVitalityStatsData, IVitalityStatsInjection
+    { }
+    public interface IVitalityStatsData
+    {
+        float GetMaxHealth();
+        float GetMaxMortalityPoints();
+        float GetDamageReduction();
+        float GetDeBuffReduction();
+
         //Static reduction is determined by deBuffReduction (+ damage?)
+    }
+
+    public interface IVitalityStatsInjection
+    {
+        float MaxHealth { set; }
+        float MaxMortalityPoints { set; }
+
+        float DamageReduction { set; }
+        float DeBuffReduction { set; }
     }
 
 
@@ -40,34 +68,57 @@ namespace Stats
         float HealthPoints { get; set; }
         float ShieldAmount { get; set; }
         float MortalityPoints { get; set; }
-        
+
     }
 
-    public interface ICombatTemporalStatsBase : ICombatTempoStats, IHarmonyStats 
+    public interface ICombatTemporalStatsBase : ICombatTemporalStatsBaseData, ICombatTemporalStatsBaseInjection
     { }
 
-    public interface ICombatTempoStats
+    public interface ICombatTemporalStatsBaseData : ICombatTempoStatsData, IHarmonyStatsData
+    { }
+    public interface ICombatTemporalStatsBaseInjection : ICombatTempoStatsInjection, IHarmonyStatsInjection
+    { }
+
+    public interface ICombatTempoStatsData
     {
-        float InitiativePercentage { get; set; }
-        int ActionsPerInitiative { get; set; }
+        float GetInitiativePercentage();
+        int GetActionsPerInitiative();
+    }
+    public interface ICombatTempoStatsInjection
+    {
+        float InitiativePercentage { set; }
+        int ActionsPerInitiative { set; }
+    }
+    public interface IHarmonyStatsData
+    {
+        float GetHarmonyAmount();
     }
 
-    public interface IHarmonyStats
+    public interface IHarmonyStatsInjection
     {
-        float HarmonyAmount { get; set; }
+        float HarmonyAmount { set; }
     }
 
 
-    public interface ISpecialStats
+    public interface ISpecialStats : ISpecialStatsData, ISpecialStatsInjection
+    { }
+
+    public interface ISpecialStatsData
     {
         /// <summary>
         /// Affects Harmony
         /// </summary>
-        float Enlightenment { get; set; }
-        float CriticalChance { get; set; }
-        float SpeedAmount { get; set; }
+        float GetEnlightenment();
+        float GetCriticalChance();
+        float GetSpeedAmount();
     }
 
+    public interface ISpecialStatsInjection
+    {
+        float Enlightenment { set; }
+        float CriticalChance { set; }
+        float SpeedAmount { set; }
+    }
 
     public interface IStatsUpgradable
     {

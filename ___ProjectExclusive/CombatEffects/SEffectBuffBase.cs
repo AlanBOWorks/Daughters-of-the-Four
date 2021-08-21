@@ -11,7 +11,7 @@ namespace CombatEffects
         [InfoBox("$FalseBurstTooltip")]
         [SerializeField] protected bool isBurstType = false;
 
-        protected virtual ICharacterBasicStats GetBuff(CombatingEntity target)
+        protected virtual ICharacterFullStats GetBuff(CombatingEntity target)
         {
             var stats =
                 isBurstType
@@ -20,12 +20,12 @@ namespace CombatEffects
             return stats;
         }
 
-        protected ICharacterBasicStats GetBurstOrBase(CombatingEntity target)
+        protected ICharacterFullStats GetBurstOrBase(CombatingEntity target)
         {
-            ICharacterBasicStats stats =
+            var stats =
                 isBurstType
                     ? target.CombatStats.BurstStats
-                    : (ICharacterBasicStats)target.CombatStats.BaseStats;
+                    : (ICharacterFullStats) target.CombatStats.BaseStats;
             return stats;
         }
 

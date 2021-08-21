@@ -51,7 +51,7 @@ namespace Stats
             UtilsStats.CopyStats(this, copyFrom);
         }
 
-        public override void ResetToZero() => UtilsStats.OverrideStats(this, 0);
+        public override void ResetToZero() => UtilsStats.OverrideStats(this as ICharacterFullStats, 0);
 
     }
 

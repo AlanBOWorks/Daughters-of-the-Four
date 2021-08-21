@@ -10,43 +10,43 @@ namespace Stats
     public class CharacterCombatStatsBasic : ICharacterBasicStats
     {
         [Title("Offensive")]
-        [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
-        private float attackPower = 10;
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        private float attackPower;
         [SerializeField, SuffixLabel("%00")]
-        private float deBuffPower = 0.1f;
-        
+        private float deBuffPower;
+
         [SerializeField, SuffixLabel("Units")]
-        private float staticDamagePower = 10;
+        private float staticDamagePower;
 
 
         [Title("Support")]
-        [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
-        private float healPower = 10;
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        private float healPower;
         [SerializeField, SuffixLabel("%00")]
-        private float buffPower = 1;
+        private float buffPower;
 
         [SerializeField, SuffixLabel("%00(Add)")]
-        private float buffReceivePower = 0;
+        private float buffReceivePower;
 
         [Title("Vitality")]
         [SerializeField, SuffixLabel("Units")]
-        private float maxHealth = 100;
+        private float maxHealth;
         [SerializeField, SuffixLabel("Units")]
-        private float maxMortalityPoints = 1000;
+        private float maxMortalityPoints;
 
-        [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
-        private float damageReduction = 0;
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        private float damageReduction;
         [SerializeField, SuffixLabel("%00"), Tooltip("Counters DeBuffPower")]
-        private float deBuffReduction = 0;
+        private float deBuffReduction;
 
 
         [Title("Enlightenment")]
         [SerializeField, SuffixLabel("%00"), Tooltip("Affects Harmony gain")]
-        private float enlightenment = 1; // before fight this could be modified
+        private float enlightenment; // before fight this could be modified
         [SerializeField, SuffixLabel("%00")]
-        private float criticalChance = 0;
+        private float criticalChance;
         [SerializeField, SuffixLabel("u|%%"), Tooltip("[100] is the default value")]
-        private float speedAmount = 100;
+        private float speedAmount;
 
         [SerializeField, SuffixLabel("%00")]
         private float initiativePercentage;
@@ -181,6 +181,116 @@ namespace Stats
                 InitiativePercentage = MaxInitialInitiative;
         }
 
+        public void SetAttackPower(float value)
+        {
+            attackPower = value;
+        }
+
+        public void SetDeBuffPower(float value)
+        {
+            deBuffPower = value;
+        }
+
+        public void SetStaticDamagePower(float value)
+        {
+            staticDamagePower = value;
+        }
+
+        public void SetHealPower(float value)
+        {
+            healPower = value;
+        }
+
+        public void SetBuffPower(float value)
+        {
+            buffPower = value;
+        }
+
+        public void SetBuffReceivePower(float value)
+        {
+            buffReceivePower = value;
+        }
+
+        public void SetMaxHealth(float value)
+        {
+            MaxHealth = value;
+        }
+
+        public void SetMaxMortalityPoints(float value)
+        {
+            MaxMortalityPoints = value;
+        }
+
+        public void SetDamageReduction(float value)
+        {
+            damageReduction = value;
+        }
+
+        public void SetDeBuffReduction(float value)
+        {
+            deBuffReduction = value;
+        }
+
+        public void SetEnlightenment(float value)
+        {
+            enlightenment = value;
+        }
+
+        public void SetCriticalChance(float value)
+        {
+            criticalChance = value;
+        }
+
+        public void SetSpeedAmount(float value)
+        {
+            speedAmount = value;
+        }
+
+        public void SetInitiativePercentage(float value)
+        {
+            initiativePercentage = value;
+        }
+
+        public void SetActionsPerInitiative(int value)
+        {
+            actionsPerInitiative = value;
+        }
+
+        public void SetHarmonyAmount(float value)
+        {
+            harmonyAmount = value;
+        }
+        public float GetAttackPower() => AttackPower;
+
+        public float GetDeBuffPower() => DeBuffPower;
+
+        public float GetStaticDamagePower() => StaticDamagePower;
+
+        public float GetHealPower() => HealPower;
+
+        public float GetBuffPower() => BuffPower;
+
+        public float GetBuffReceivePower() => BuffReceivePower;
+
+        public float GetMaxHealth() => MaxHealth;
+
+        public float GetMaxMortalityPoints() => MaxMortalityPoints;
+
+        public float GetDamageReduction() => DamageReduction;
+
+        public float GetDeBuffReduction() => DeBuffReduction;
+
+        public float GetEnlightenment() => Enlightenment;
+
+        public float GetCriticalChance() => CriticalChance;
+
+        public float GetSpeedAmount() => SpeedAmount;
+
+        public float GetInitiativePercentage() => InitiativePercentage;
+
+        public int GetActionsPerInitiative() => ActionsPerInitiative;
+
+        public float GetHarmonyAmount() => HarmonyAmount;
     }
 
 }

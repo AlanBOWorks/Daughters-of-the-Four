@@ -26,7 +26,7 @@ namespace _Team
         [ShowInInspector] public readonly TeamCombatStatsHolder StatsHolder;
         [ShowInInspector] public MemberKnockOutHandler knockOutHandler;
 
-        public ICharacterBasicStats GetCurrentStats()
+        public ICharacterBasicStatsData GetCurrentStats()
             => StatsHolder.GetCurrentStats();
 
         public FilterPassivesHolder GetCurrentPassives()

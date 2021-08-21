@@ -42,7 +42,7 @@ namespace Characters
 
         [ShowInInspector,DisableInEditorMode]
         public CombatingEntity Entity { get; private set; }
-        public ICharacterFullStats BaseStats { get; private set; }
+        public ICharacterFullStatsData BaseStats { get; private set; }
 
 
     }

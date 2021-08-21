@@ -31,13 +31,13 @@ namespace CombatEffects
             switch (buffType)
             {
                 case EnumStats.Offensive.Attack:
-                    buffStats.AttackPower += effectModifier;
+                    buffStats.AttackPower = buffStats.GetAttackPower() + effectModifier;
                     break;
                 case EnumStats.Offensive.DeBuff:
-                    buffStats.DeBuffPower += effectModifier;
+                    buffStats.DeBuffPower = buffStats.GetDeBuffPower() + effectModifier;
                     break;
                 case EnumStats.Offensive.StaticPower:
-                    buffStats.StaticDamagePower += effectModifier;
+                    buffStats.StaticDamagePower = buffStats.GetStaticDamagePower() + effectModifier;
                     break;
                 default:
                     throw new ArgumentException($"The buff type [{buffType}] is not valid.",

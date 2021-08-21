@@ -9,13 +9,13 @@ namespace CombatEffects
         menuName = "Combat/Effects/Buff/Harmony Modifier")]
     public class SHarmonyBuffEffect : SEffectBuffBase
     {
-        protected override ICharacterBasicStats GetBuff(CombatingEntity target)
+        protected override ICharacterFullStats GetBuff(CombatingEntity target)
             => GetBurstOrBase(target);
 
         
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float harmonyAddition = 1)
         {
-            float enlightenmentAmount = arguments.UserStats.Enlightenment;
+            float enlightenmentAmount = arguments.UserStats.GetEnlightenment();
             float harmonyModifier = enlightenmentAmount * harmonyAddition;
             DoEffect(target,harmonyModifier);
         }

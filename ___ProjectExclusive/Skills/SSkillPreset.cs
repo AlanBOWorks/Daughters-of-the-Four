@@ -221,7 +221,7 @@ namespace Skills
     public class SkillArguments
     {
         public CombatingEntity User;
-        public ICharacterFullStats UserStats;
+        public ICharacterFullStatsData UserStats;
         public CombatingEntity InitialTarget;
         public bool IsCritical;
     }

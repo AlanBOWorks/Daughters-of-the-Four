@@ -32,7 +32,7 @@ namespace Stats
         [ShowInInspector]
         private readonly SkillArguments _skillArguments;
 
-        public ICharacterFullStats CurrentStats => _stats;
+        public ICharacterFullStatsData CurrentStats => _stats;
 
         private void Injection(CombatingEntity user, CombatingEntity target)
         {
@@ -92,102 +92,70 @@ namespace Stats
             skillPreset.DoSecondaryEffects(_skillArguments);
         }
 
-        private class ReflectionStats : ICharacterFullStats
+        private class ReflectionStats : ICharacterFullStatsData
         {
-            private ICharacterFullStats _statsReference;
-            private readonly CharacterCombatStatsBasic _calculatedStats;
+            private ICharacterFullStatsData _statsReference;
+            private readonly CharacterCombatStatsFull _calculatedStats;
 
             public ReflectionStats()
             {
-                _calculatedStats = new CharacterCombatStatsBasic();
+                _calculatedStats = new CharacterCombatStatsFull();
             }
 
-            public void Injection(ICharacterFullStats statsReference)
+            public void Injection(ICharacterFullStatsData statsReference)
             {
                 _statsReference = statsReference;
-                UtilsStats.CopyStats(_calculatedStats,statsReference);
+                UtilsStats.CopyStats(_calculatedStats as ICharacterBasicStatsInjection, statsReference);
             }
 
-            public float AttackPower
-            {
-                get => _calculatedStats.AttackPower;
-                set => _statsReference.AttackPower = value;
-            }
-            public float DeBuffPower
-            {
-                get => _calculatedStats.DeBuffPower;
-                set => _statsReference.DeBuffPower = value;
-            }
-            public float StaticDamagePower
-            {
-                get => _calculatedStats.StaticDamagePower;
-                set => _statsReference.StaticDamagePower = value;
-            }
-            public float HealPower
-            {
-                get => _calculatedStats.HealPower;
-                set => _statsReference.HealPower = value;
-            }
-            public float BuffPower
-            {
-                get => _calculatedStats.BuffPower;
-                set => _statsReference.BuffPower = value;
-            }
-            public float BuffReceivePower
-            {
-                get => _calculatedStats.BuffReceivePower;
-                set => _statsReference.BuffReceivePower = value;
-            }
-            public float MaxHealth
-            {
-                get => _calculatedStats.MaxHealth;
-                set => _statsReference.MaxHealth = value;
-            }
-            public float MaxMortalityPoints
-            {
-                get => _calculatedStats.MaxMortalityPoints;
-                set => _statsReference.MaxMortalityPoints = value;
-            }
-            public float DamageReduction
-            {
-                get => _calculatedStats.DamageReduction;
-                set => _statsReference.DamageReduction = value;
-            }
-            public float DeBuffReduction
-            {
-                get => _calculatedStats.DeBuffReduction;
-                set => _statsReference.DeBuffReduction = value;
-            }
-            public float Enlightenment
-            {
-                get => _calculatedStats.Enlightenment;
-                set => _statsReference.Enlightenment = value;
-            }
-            public float CriticalChance
-            {
-                get => _calculatedStats.CriticalChance;
-                set => _statsReference.CriticalChance = value;
-            }
-            public float SpeedAmount
-            {
-                get => _calculatedStats.SpeedAmount;
-                set => _statsReference.SpeedAmount = value;
-            }
+            public float AttackPower => _calculatedStats.AttackPower;
+
+            public float DeBuffPower => _calculatedStats.DeBuffPower;
+
+            public float StaticDamagePower => _calculatedStats.StaticDamagePower;
+
+            public float HealPower => _calculatedStats.HealPower;
+
+            public float BuffPower => _calculatedStats.BuffPower;
+
+            public float BuffReceivePower => _calculatedStats.BuffReceivePower;
+
+            public float MaxHealth => _calculatedStats.MaxHealth;
+
+            public float MaxMortalityPoints => _calculatedStats.MaxMortalityPoints;
+
+            public float DamageReduction => _calculatedStats.DamageReduction;
+
+            public float DeBuffReduction => _calculatedStats.DeBuffReduction;
+
+            public float Enlightenment => _calculatedStats.Enlightenment;
+
+            public float CriticalChance => _calculatedStats.CriticalChance;
+
+            public float SpeedAmount => _calculatedStats.SpeedAmount;
+
             public float InitiativePercentage
             {
                 get => _calculatedStats.InitiativePercentage;
-                set => _statsReference.InitiativePercentage = value;
+                set => _calculatedStats.InitiativePercentage = value;
             }
-            public int ActionsPerInitiative { get; set; }
+
+            public int ActionsPerInitiative
+            {
+                get => _calculatedStats.ActionsPerInitiative;
+                set => _calculatedStats.ActionsPerInitiative = value;
+            }
+
             public float HarmonyAmount
             {
                 get => _calculatedStats.HarmonyAmount;
-                set => _statsReference.HarmonyAmount = value;
+                set => _calculatedStats.HarmonyAmount = value;
             }
+
             public float HealthPoints
             {
                 get => _statsReference.HealthPoints;
-                set => _statsReference.HealthPoints = value;
+                set => _calculatedStats.HealthPoints = value;
             }
             public float ShieldAmount
             {
@@ -199,6 +167,53 @@ namespace Stats
                 get => _statsReference.MortalityPoints;
                 set => _statsReference.MortalityPoints = value;
             }
+
+            public void SetInitiativePercentage(float value)
+            {
+                _calculatedStats.InitiativePercentage = value;
+            }
+
+            public void SetActionsPerInitiative(int value)
+            {
+                _calculatedStats.ActionsPerInitiative = value;
+            }
+
+            public void SetHarmonyAmount(float value)
+            {
+                _calculatedStats.HarmonyAmount = value;
+            }
+
+            public float GetAttackPower() => AttackPower;
+
+            public float GetDeBuffPower() => DeBuffPower;
+
+            public float GetStaticDamagePower() => StaticDamagePower;
+
+            public float GetHealPower() => HealPower;
+
+            public float GetBuffPower() => BuffPower;
+
+            public float GetBuffReceivePower() => BuffReceivePower;
+
+            public float GetMaxHealth() => MaxHealth;
+
+            public float GetMaxMortalityPoints() => MaxMortalityPoints;
+
+            public float GetDamageReduction() => DamageReduction;
+
+            public float GetDeBuffReduction() => DeBuffReduction;
+
+            public float GetEnlightenment() => Enlightenment;
+
+            public float GetCriticalChance() => CriticalChance;
+
+            public float GetSpeedAmount() => SpeedAmount;
+
+            public float GetInitiativePercentage() => InitiativePercentage;
+
+            public int GetActionsPerInitiative() => ActionsPerInitiative;
+
+            public float GetHarmonyAmount() => HarmonyAmount;
         }
 
 

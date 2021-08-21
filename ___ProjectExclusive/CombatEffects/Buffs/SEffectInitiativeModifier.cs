@@ -12,7 +12,7 @@ namespace CombatEffects
     {
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
-            var buffPower = arguments.UserStats.BuffPower;
+            var buffPower = arguments.UserStats.GetBuffPower();
             float initiativeAddition = effectModifier * ( buffPower);
             DoEffect(target,initiativeAddition);
         }

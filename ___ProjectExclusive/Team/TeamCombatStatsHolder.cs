@@ -90,7 +90,7 @@ namespace _Team
             OnDefendingPassives = new FilterPassivesHolder(passives.GetDefending());
         }
 
-        public ICharacterBasicStats GetCurrentStats()
+        public ICharacterBasicStatsData GetCurrentStats()
         {
             return _state.CurrentStance switch
             {

@@ -146,7 +146,7 @@ namespace Characters
 
 
 
-    public class CharacterCombatData : ICharacterFullStats
+    public class CharacterCombatData : ICharacterFullStatsData
     {
 
         [Title("Combat Stats")]
@@ -156,13 +156,13 @@ namespace Characters
         /// This remains active for the whole fight
         /// </summary>
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.4f, .6f, .8f)]
-        public CompositeStats BuffStats { get; protected set; }
+        public CharacterCombatStatsFull BuffStats { get; protected set; }
 
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
-        public CompositeStats BurstStats { get; protected set; }
+        public CharacterCombatStatsFull BurstStats { get; protected set; }
 
         [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
-        private ICharacterBasicStats TeamStats => TeamData.GetCurrentStats();
+        private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStats();
 
         public CombatingTeam TeamData;
 
@@ -190,8 +190,8 @@ namespace Characters
         public CharacterCombatData(ICharacterFullStats presetStats)
         {
             BaseStats = new CharacterCombatStatsFull(presetStats);
-            BuffStats = new CompositeStats();
-            BurstStats = new CompositeStats();
+            BuffStats = new CharacterCombatStatsFull();
+            BurstStats = new CharacterCombatStatsFull();
 
             BaseStats.HealthPoints = BaseStats.MaxHealth;
             BaseStats.MortalityPoints = BaseStats.MaxMortalityPoints;
@@ -199,7 +199,7 @@ namespace Characters
 
         public float CalculateBaseAttackPower()
         {
-            return BaseStats.AttackPower + TeamStats.AttackPower;
+            return BaseStats.AttackPower + TeamStats.GetAttackPower();
         }
         public float AttackPower
         {
@@ -212,7 +212,7 @@ namespace Characters
         public float DeBuffPower
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.DeBuffPower + TeamStats.DeBuffPower,
+                BaseStats.DeBuffPower + TeamStats.GetDeBuffPower(),
                 BuffStats.DeBuffPower,
                 BurstStats.DeBuffPower);
             set => BuffStats.DeBuffPower = value;
@@ -220,7 +220,7 @@ namespace Characters
 
         public float CalculateBaseStaticDamagePower()
         {
-            return BaseStats.StaticDamagePower + TeamStats.StaticDamagePower;
+            return BaseStats.StaticDamagePower + TeamStats.GetStaticDamagePower();
         }
         public float StaticDamagePower
         {
@@ -234,7 +234,7 @@ namespace Characters
         public float HealPower
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.HealPower + TeamStats.HealPower,
+                BaseStats.HealPower + TeamStats.GetHealPower(),
                 BuffStats.HealPower,
                 BurstStats.HealPower);
             set => BuffStats.HealPower = value;
@@ -242,7 +242,7 @@ namespace Characters
         public float BuffPower
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.BuffPower + TeamStats.BuffPower,
+                BaseStats.BuffPower + TeamStats.GetBuffPower(),
                 BuffStats.BuffPower,
                 BurstStats.BuffPower);
             set => BuffStats.BuffPower = value;
@@ -250,7 +250,7 @@ namespace Characters
         public float BuffReceivePower
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.BuffReceivePower + TeamStats.BuffReceivePower,
+                BaseStats.BuffReceivePower + TeamStats.GetBuffReceivePower(),
                 BuffStats.BuffReceivePower,
                 BurstStats.BuffReceivePower);
             set => BuffStats.BuffReceivePower = value;
@@ -273,13 +273,13 @@ namespace Characters
         }
         public float HarmonyAmount
         {
-            get => BaseStats.HarmonyAmount + TeamStats.HarmonyAmount + BurstStats.HarmonyAmount;
+            get => BaseStats.HarmonyAmount + TeamStats.GetHarmonyAmount() + BurstStats.HarmonyAmount;
             set => BaseStats.HarmonyAmount = value;
         }
 
         public float InitiativePercentage
         {
-            get => BaseStats.InitiativePercentage + TeamStats.InitiativePercentage
+            get => BaseStats.InitiativePercentage + TeamStats.GetInitiativePercentage()
                    + BuffStats.InitiativePercentage
                    + BurstStats.InitiativePercentage;
             set => BaseStats.InitiativePercentage = value;
@@ -287,7 +287,7 @@ namespace Characters
 
         public int ActionsPerInitiative
         {
-            get => BaseStats.ActionsPerInitiative + TeamStats.ActionsPerInitiative
+            get => BaseStats.ActionsPerInitiative + TeamStats.GetActionsPerInitiative()
                    + BuffStats.ActionsPerInitiative
                    + BurstStats.ActionsPerInitiative;
             set => BaseStats.ActionsPerInitiative = value;
@@ -296,7 +296,7 @@ namespace Characters
         public float Enlightenment
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.Enlightenment + TeamStats.Enlightenment,
+                BaseStats.Enlightenment + TeamStats.GetEnlightenment(),
                 BuffStats.Enlightenment,
                 BurstStats.Enlightenment);
             set => BuffStats.Enlightenment = value;
@@ -304,7 +304,7 @@ namespace Characters
         public float CriticalChance
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.CriticalChance + TeamStats.CriticalChance,
+                BaseStats.CriticalChance + TeamStats.GetCriticalChance(),
                 BuffStats.CriticalChance,
                 BurstStats.CriticalChance);
             set => BuffStats.CriticalChance = value;
@@ -313,7 +313,7 @@ namespace Characters
         public float SpeedAmount
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.SpeedAmount + TeamStats.SpeedAmount,
+                BaseStats.SpeedAmount + TeamStats.GetSpeedAmount(),
                 BuffStats.SpeedAmount,
                 BurstStats.SpeedAmount);
             set => BuffStats.SpeedAmount = value;
@@ -321,18 +321,18 @@ namespace Characters
 
         public float MaxHealth
         {
-            get => BaseStats.MaxHealth + TeamStats.MaxHealth;
+            get => BaseStats.MaxHealth + TeamStats.GetMaxHealth();
             set => BuffStats.MaxHealth = value;
         }
         public float MaxMortalityPoints
         {
-            get => BaseStats.MaxMortalityPoints + TeamStats.MaxMortalityPoints;
+            get => BaseStats.MaxMortalityPoints + TeamStats.GetMaxMortalityPoints();
             set => BuffStats.MaxMortalityPoints = value;
         }
 
         public float CalculateDamageReduction()
         {
-            return BaseStats.DamageReduction + TeamStats.DamageReduction;
+            return BaseStats.DamageReduction + TeamStats.GetDamageReduction();
         }
         public float DamageReduction
         {
@@ -345,11 +345,59 @@ namespace Characters
         public float DeBuffReduction
         {
             get => UtilsStats.StatsFormula(
-                BaseStats.DeBuffReduction + TeamStats.DeBuffReduction,
+                BaseStats.DeBuffReduction + TeamStats.GetDeBuffReduction(),
                 BuffStats.DeBuffReduction,
                 BurstStats.DeBuffReduction);
             set => BuffStats.DeBuffReduction = value;
         }
+
+        public void SetInitiativePercentage(float value)
+        {
+            BaseStats.InitiativePercentage = value;
+        }
+
+        public void SetActionsPerInitiative(int value)
+        {
+            BaseStats.ActionsPerInitiative = value;
+
+        }
+
+        public void SetHarmonyAmount(float value)
+        {
+            BaseStats.HarmonyAmount = value;
+        }
+
+        public float GetAttackPower() => AttackPower;
+
+        public float GetDeBuffPower() => DeBuffPower;
+
+        public float GetStaticDamagePower() => StaticDamagePower;
+
+        public float GetHealPower() => HealPower;
+
+        public float GetBuffPower() => BuffPower;
+
+        public float GetBuffReceivePower() => BuffReceivePower;
+
+        public float GetMaxHealth() => MaxHealth;
+
+        public float GetMaxMortalityPoints() => MaxMortalityPoints;
+
+        public float GetDamageReduction() => DamageReduction;
+
+        public float GetDeBuffReduction() => DeBuffReduction;
+
+        public float GetEnlightenment() => Enlightenment;
+
+        public float GetCriticalChance() => CriticalChance;
+
+        public float GetSpeedAmount() => SpeedAmount;
+
+        public float GetInitiativePercentage() => InitiativePercentage;
+
+        public int GetActionsPerInitiative() => ActionsPerInitiative;
+
+        public float GetHarmonyAmount() => HarmonyAmount;
     }
 
     
@@ -375,63 +423,65 @@ namespace Characters
         : this(playerCharacterStats.InitialStats,playerCharacterStats.GrowStats,playerCharacterStats.UpgradedStats)
         { }
 
-        public PlayerCharacterCombatStats(ICharacterFullStats initialStats,ICharacterFullStats growStats, IStatsUpgradable currentUpgrades)
+        public PlayerCharacterCombatStats(
+            ICharacterFullStatsData initialStats, 
+            ICharacterFullStatsData growStats, IStatsUpgradable currentUpgrades)
         {
             AttackPower = UtilsStats.GrowFormula(
-                initialStats.AttackPower, growStats.AttackPower,
+                initialStats.GetAttackPower(), growStats.GetAttackPower(),
                 currentUpgrades.OffensivePower);
             DeBuffPower = UtilsStats.GrowFormula(
-                initialStats.DeBuffPower, growStats.DeBuffPower,
+                initialStats.GetDeBuffPower(), growStats.GetDeBuffPower(),
                 currentUpgrades.OffensivePower);
             StaticDamagePower = UtilsStats.GrowFormula(
-                initialStats.StaticDamagePower, growStats.StaticDamagePower,
+                initialStats.GetStaticDamagePower(), growStats.GetStaticDamagePower(),
                 currentUpgrades.OffensivePower
             );
 
 
             HealPower = UtilsStats.GrowFormula(
-                initialStats.HealPower, growStats.HealPower,
+                initialStats.GetHealPower(), growStats.GetHealPower(),
                 currentUpgrades.SupportPower);
             BuffPower = UtilsStats.GrowFormula(
-                initialStats.BuffPower, growStats.BuffPower,
+                initialStats.GetBuffPower(), growStats.GetBuffPower(),
                 currentUpgrades.SupportPower);
             BuffReceivePower = UtilsStats.GrowFormula(
-                initialStats.BuffReceivePower, growStats.BuffReceivePower,
+                initialStats.GetBuffReceivePower(), growStats.GetBuffReceivePower(),
                 currentUpgrades.SupportPower);
 
             MaxHealth = UtilsStats.GrowFormula(
-                initialStats.MaxHealth, growStats.MaxHealth,
+                initialStats.GetMaxHealth(), growStats.GetMaxHealth(),
                 currentUpgrades.VitalityAmount);
             MaxMortalityPoints = UtilsStats.GrowFormula(
-                initialStats.MaxMortalityPoints, growStats.MaxMortalityPoints,
+                initialStats.GetMaxMortalityPoints(), growStats.GetMaxMortalityPoints(),
                 currentUpgrades.VitalityAmount);
             DamageReduction = UtilsStats.GrowFormula(
-                initialStats.DamageReduction, growStats.DamageReduction,
+                initialStats.GetDamageReduction(), growStats.GetDamageReduction(),
                 currentUpgrades.VitalityAmount);
             DeBuffReduction = UtilsStats.GrowFormula(
-                initialStats.DeBuffReduction, growStats.DeBuffReduction,
+                initialStats.GetDeBuffReduction(), growStats.GetDeBuffReduction(),
                 currentUpgrades.VitalityAmount);
 
 
             Enlightenment = UtilsStats.GrowFormula(
-                initialStats.Enlightenment, growStats.Enlightenment,
+                initialStats.GetEnlightenment(), growStats.GetEnlightenment(),
                 currentUpgrades.Enlightenment);
             CriticalChance = UtilsStats.GrowFormula(
-                initialStats.CriticalChance, growStats.CriticalChance,
+                initialStats.GetCriticalChance(), growStats.GetCriticalChance(),
                 currentUpgrades.Enlightenment);
             SpeedAmount = UtilsStats.GrowFormula(
-                initialStats.SpeedAmount, growStats.SpeedAmount,
+                initialStats.GetSpeedAmount(), growStats.GetSpeedAmount(),
                 currentUpgrades.Enlightenment);
 
 
             HealthPoints = initialStats.HealthPoints + growStats.HealthPoints;
             ShieldAmount = initialStats.ShieldAmount + growStats.ShieldAmount;
             MortalityPoints = initialStats.MortalityPoints + growStats.MortalityPoints;
-            HarmonyAmount = initialStats.HarmonyAmount + growStats.HarmonyAmount;
-            InitiativePercentage = initialStats.InitiativePercentage + growStats.InitiativePercentage;
+            HarmonyAmount = initialStats.GetHarmonyAmount() + growStats.GetHarmonyAmount();
+            InitiativePercentage = initialStats.GetInitiativePercentage() + growStats.GetInitiativePercentage();
 
-            ActionsPerInitiative = initialStats.ActionsPerInitiative +
-                                   (int) (growStats.ActionsPerInitiative * currentUpgrades.Enlightenment * GrowActionsModifier);
+            ActionsPerInitiative = initialStats.GetActionsPerInitiative() +
+                                   (int)(growStats.GetActionsPerInitiative() * currentUpgrades.Enlightenment * GrowActionsModifier);
         }
 
         private const float GrowActionsModifier = .2f; //Each 5 upgrades

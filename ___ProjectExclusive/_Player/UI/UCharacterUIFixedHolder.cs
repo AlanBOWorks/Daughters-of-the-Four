@@ -56,10 +56,10 @@ namespace _Player
         }
 
 
-        public void OnVitalityChange(IVitalityStats currentStats)
+        public void OnVitalityChange(IVitalityStatsData currentStats)
         {
 
-            maxHealth.text = UtilsGameTheme.GetNumericalPrint(currentStats.MaxHealth);
+            maxHealth.text = UtilsGameTheme.GetNumericalPrint(currentStats.GetMaxHealth());
         }
 
         public void OnTemporalStatsChange(ICombatTemporalStats currentStats)

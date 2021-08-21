@@ -159,8 +159,8 @@ namespace _CombatSystem
 
         public void CheckAndInjectEntityInitiative(CombatingEntity entity)
         {
-            ICharacterFullStats stats = entity.CombatStats;
-            float initiative = stats.InitiativePercentage;
+            ICharacterFullStatsData stats = entity.CombatStats;
+            float initiative = stats.GetInitiativePercentage();
 
             if (initiative < InitiativeCheck) return;
 
@@ -210,9 +210,9 @@ namespace _CombatSystem
                         if(!entity.IsConscious()) continue;
 
                         // Increment
-                        ICharacterFullStats stats = entity.CombatStats;
-                        float initiative = stats.InitiativePercentage;
-                        initiative += deltaIncrement * stats.SpeedAmount * VelocityModifier;
+                        ICharacterFullStatsData stats = entity.CombatStats;
+                        float initiative = stats.GetInitiativePercentage();
+                        initiative += deltaIncrement * stats.GetSpeedAmount() * VelocityModifier;
                         stats.InitiativePercentage = initiative;
 
                         // Percentage
@@ -271,9 +271,9 @@ namespace _CombatSystem
             CallUpdateOnInitiativeBar(entity,stats);
         }
 
-        private void CallUpdateOnInitiativeBar(CombatingEntity entity, ICombatTempoStats stats)
+        private void CallUpdateOnInitiativeBar(CombatingEntity entity, ICombatTempoStatsData stats)
         {
-            float initiativePercentage = stats.InitiativePercentage;
+            float initiativePercentage = stats.GetInitiativePercentage();
             EntitiesBar[entity].FillBar(initiativePercentage);
         }
 
