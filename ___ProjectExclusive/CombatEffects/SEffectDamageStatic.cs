@@ -17,8 +17,6 @@ namespace CombatEffects
                 effectModifier);
 
             DoEffect(target, staticDamage);
-            target.Events.OnHitEvent.OnHit(staticDamage);
-
         }
 
 

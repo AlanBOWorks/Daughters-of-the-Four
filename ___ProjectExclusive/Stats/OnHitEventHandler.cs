@@ -8,23 +8,23 @@ using UnityEngine;
 
 namespace Stats
 {
-    public class InHitEventHandler : ICombatHitListener, IHitEventHandler, ITempoListenerVoid
+    public class OnHitEventHandler : ICombatHitListener, IHitEventHandler, ITempoListenerVoid
     {
         private readonly CombatingEntity _user;
         [ShowInInspector]
-        private readonly StackableBuffPool _onHitInvoke;
+        private readonly StackableBuffPool _onDamageInvoke;
 
         [ShowInInspector]
-        private readonly StackableBuffPool _onHitIncrease;
+        private readonly StackableBuffPool _onDamageIncrease;
         [ShowInInspector]
         private readonly StackableBuffPool _onHitRemove;
         private List<ICombatHitListener> _onHitListeners;
 
-        public InHitEventHandler(CombatingEntity user)
+        public OnHitEventHandler(CombatingEntity user)
         {
             _user = user;
-            _onHitInvoke = new StackableBuffPool();
-            _onHitIncrease = new StackableBuffPool();
+            _onDamageInvoke = new StackableBuffPool();
+            _onDamageIncrease = new StackableBuffPool();
             _onHitRemove = new StackableBuffPool();
             _onHitListeners = new List<ICombatHitListener>();
         }
@@ -35,10 +35,10 @@ namespace Stats
             switch (hitType)
             {
                 case EnumSkills.HitType.DirectHit:
-                    _onHitInvoke.Add(buffValues);
+                    _onDamageInvoke.Add(buffValues);
                     break;
                 case EnumSkills.HitType.OnHitIncrease:
-                    _onHitIncrease.Add(buffValues);
+                    _onDamageIncrease.Add(buffValues);
                     break;
                 case EnumSkills.HitType.OnHitCancel:
                     _onHitRemove.Add(buffValues);
@@ -49,14 +49,14 @@ namespace Stats
         }
 
 
-        public void OnHit(float damage)
+        public void OnDamage(float damage)
         {
             foreach (ICombatHitListener listener in _onHitListeners)
             {
-                listener.OnHit(damage);
+                listener.OnDamage(damage);
             }
-            _onHitInvoke.Invoke(_user);
-            _onHitIncrease.IncreaseStacks();
+            _onDamageInvoke.Invoke(_user);
+            _onDamageIncrease.IncreaseStacks();
             _onHitRemove.Clear();
         }
 
@@ -67,8 +67,8 @@ namespace Stats
                 listener.OnNotBeingHitSequence();
             }
             _onHitRemove.InvokeAndClear(_user);
-            _onHitIncrease.InvokeAndClear(_user);
-            _onHitInvoke.Clear();
+            _onDamageIncrease.InvokeAndClear(_user);
+            _onDamageInvoke.Clear();
         }
 
 
@@ -138,7 +138,7 @@ namespace Stats
 
     public interface ICombatHitListener
     {
-        void OnHit(float damage);
+        void OnDamage(float damage);
         void OnNotBeingHitSequence();
     }
 }

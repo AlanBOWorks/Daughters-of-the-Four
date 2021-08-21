@@ -102,11 +102,14 @@ namespace Characters
             // In order of [false] possibilities 
             return IsConscious() &&  HasActions() && CanUseSkills();
         }
+
+        public bool IsInDanger() => CharacterGroup.Team.IsInDangerState();
+
         public bool IsAlive() => CombatStats.IsAlive();
 
         public bool IsConscious()
         {
-            if (CharacterGroup.Team.IsInDangerState())
+            if (IsInDanger())
                 return IsAlive();
 
             return CombatStats.HealthPoints > 0;

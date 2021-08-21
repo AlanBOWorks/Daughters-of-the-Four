@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using _CombatSystem;
 using _Team;
 using Sirenix.OdinInspector;
@@ -203,11 +204,11 @@ namespace Characters
     public class CombatCharacterEvents : CombatCharacterEventsBase, IHitEventHandler
     {
         private readonly CombatingEntity _user;
-        public readonly InHitEventHandler OnHitEvent;
+        public readonly OnHitEventHandler OnHitEvent;
         public CombatCharacterEvents(CombatingEntity user)
         {
             _user = user;
-            OnHitEvent = new InHitEventHandler(user);
+            OnHitEvent = new OnHitEventHandler(user);
             CheckAndSubscribe(OnHitEvent);
         }
 
@@ -249,42 +250,201 @@ namespace Characters
 
     public class CharacterEventsTracker
     {
+        private readonly Queue<CombatingEntity> _temporalStatsEvents;
         [ShowInInspector]
-        public readonly Queue<CombatingEntity> InvokeTemporalChanges;
+        private readonly EntityValuesQueue _onDamageEvents;
+        private readonly Queue<CombatingEntity> _healthZeroEvents;
+        private readonly Queue<CombatingEntity> _mortalityZeroEvents;
+        private readonly Queue<CombatingTeam> _groupZeroHealthEvents;
 
         public CharacterEventsTracker()
         {
-            InvokeTemporalChanges = new Queue<CombatingEntity>();
+            const int amountOfCharacterPerTeam = GlobalCombatParams.PredictedAmountOfTeamCharacters;
+            const int amountOfTeams = GlobalCombatParams.PredictedAmountOfTeams;
+            _temporalStatsEvents = new Queue<CombatingEntity>(amountOfCharacterPerTeam);
+            _healthZeroEvents = new Queue<CombatingEntity>(amountOfCharacterPerTeam);
+            _onDamageEvents = new EntityValuesQueue(amountOfCharacterPerTeam);
+
+            _mortalityZeroEvents = new Queue<CombatingEntity>(); // MortalityZero happens less frequently
+            _groupZeroHealthEvents = new Queue<CombatingTeam>(amountOfTeams);
         }
 
         public void EnqueueTemporalChangeListener(CombatingEntity entity)
+            => EnqueueListener(entity, _temporalStatsEvents);
+
+        public void EnqueueOnDamageListener(CombatingEntity entity, float damage)
+            => EnqueueListener(entity, _onDamageEvents, damage);
+
+        public void EnqueueZeroHealthListener(CombatingEntity entity)
         {
-            if (InvokeTemporalChanges.Contains(entity)) return;
-            InvokeTemporalChanges.Enqueue(entity);
+            EnqueueListener(entity,_healthZeroEvents);
+            EnqueueTeamParticipants(entity.CharacterGroup.Team);
         }
 
+        public void EnqueueZeroMortalityListener(CombatingEntity entity)
+            => EnqueueListener(entity, _mortalityZeroEvents);
+
+        private static void EnqueueListener(CombatingEntity entity, Queue<CombatingEntity> onQueue)
+        {
+            if(onQueue.Contains(entity)) return;
+            onQueue.Enqueue(entity);
+        }
+
+        private static void EnqueueListener(CombatingEntity entity, EntityValuesQueue onQueue, float value)
+        {
+            onQueue.EnQueue(entity,value);
+        }
+
+        private void EnqueueTeamParticipants(CombatingTeam team)
+        {
+            if(_groupZeroHealthEvents.Contains(team)) return;
+
+            _groupZeroHealthEvents.Enqueue(team);
+        }
+
+        // This avoids GC alloc
+        private Action<CombatingEntity> _queueAction;
         public void Invoke()
         {
-            while (InvokeTemporalChanges.Count > 0)
+            _queueAction = InvokeTemporalStatsAction;
+            InvokeQueue(_temporalStatsEvents);
+
+            _queueAction = InvokeZeroHealthAction;
+            InvokeQueue(_healthZeroEvents);
+
+            _queueAction = InvokeMortalityZeroAction;
+            InvokeQueue(_mortalityZeroEvents);
+
+            InvokeDamageQueue();
+
+            InvokeTeamQueue(_groupZeroHealthEvents);
+
+            _queueAction = null;
+
+            ////////////////////
+            void InvokeQueue(Queue<CombatingEntity> queue)
             {
-                var entity = InvokeTemporalChanges.Dequeue();
-                entity.Events.InvokeTemporalStatChange();
-                CombatSystemSingleton.GlobalCharacterChangesEvent.InvokeTemporalStatChange(entity);
+                while (queue.Count > 0)
+                {
+                    var entity = queue.Dequeue();
+                    _queueAction(entity);
+                }
+            }
+
+            // this can be transformed into a generic Invoke
+            void InvokeDamageQueue()
+            {
+                var queue = _onDamageEvents;
+                while (queue.Count > 0)
+                {
+                    var element = queue.DeQueue();
+                    var entity = element.Entity;
+                    var damage = element.Value;
+                    InvokeOnDamageAction(entity,damage);
+                }
+            }
+
+            void InvokeTeamQueue(Queue<CombatingTeam> teamQueue)
+            {
+                while (teamQueue.Count > 0)
+                {
+                    var team = teamQueue.Dequeue();
+                    // TODO
+                }
             }
         }
 
 
-        public static void InvokeHealthZeroStatsEvent(CombatingEntity target)
-        {
-            target.Events.OnHealthZero(target);
-            CombatSystemSingleton.GlobalCharacterChangesEvent.OnHealthZero(target);
 
+        private static void InvokeTemporalStatsAction(CombatingEntity entity)
+        {
+            entity.Events.InvokeTemporalStatChange();
+            CombatSystemSingleton.GlobalCharacterChangesEvent.InvokeTemporalStatChange(entity);
         }
 
-        public static void InvokeMortalityZeroEvent(CombatingEntity target)
+        private static void InvokeOnDamageAction(CombatingEntity entity, float totalDamage)
         {
-            target.Events.OnMortalityZero(target);
-            CombatSystemSingleton.GlobalCharacterChangesEvent.OnMortalityZero(target);
+            entity.Events.OnHitEvent.OnDamage(totalDamage);
+        }
+
+        private static void InvokeZeroHealthAction(CombatingEntity entity)
+        {
+            entity.Events.OnHealthZero(entity);
+            CombatSystemSingleton.GlobalCharacterChangesEvent.OnHealthZero(entity);
+        }
+
+        private static void InvokeMortalityZeroAction(CombatingEntity entity)
+        {
+            entity.Events.OnMortalityZero(entity);
+            CombatSystemSingleton.GlobalCharacterChangesEvent.OnMortalityZero(entity);
+        }
+
+        private class EntityValuesQueue 
+        {
+            private readonly List<QueueValues> _elements;
+
+            public EntityValuesQueue()
+            {
+                _elements = new List<QueueValues>();
+            }
+
+            public EntityValuesQueue(int collectionSize) 
+            {
+                _elements = new List<QueueValues>(collectionSize);
+            }
+
+            public int Count => _elements.Count;
+
+            private int IndexOf(CombatingEntity entity)
+            {
+                int indexOf = -1;
+                for (int i = 0; i < _elements.Count; i++)
+                {
+                    var elementEntity = _elements[i].Entity;
+                    if (elementEntity == entity)
+                        return i;
+                }
+                return indexOf;
+            }
+            public void EnQueue(CombatingEntity entity, float value)
+            {
+                int index = IndexOf(entity);
+
+                if (index < 0)
+                {
+                    QueueValues values = new QueueValues(entity,value);
+                    _elements.Add(values);
+                    return;
+                }
+
+                _elements[index].Increment(value);
+            }
+
+            public QueueValues DeQueue()
+            {
+                int index = _elements.Count - 1;
+                QueueValues element = _elements[index];
+                _elements.RemoveAt(index);
+
+                return element;
+            }
+        }
+
+        private struct QueueValues
+        {
+            public readonly CombatingEntity Entity;
+            public float Value;
+
+            public QueueValues(CombatingEntity entity, float value)
+            {
+                Entity = entity;
+                Value = value;
+            }
+
+            public void Increment(float addition)
+            {
+                Value += addition;
+            }
         }
     }
 

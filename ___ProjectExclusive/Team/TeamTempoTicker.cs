@@ -7,20 +7,20 @@ namespace _Team
     public class TeamTempoTicker : ICombatPreparationListener, ITempoTicker
     {
         [ShowInInspector]
-        private TeamMemberDeathHandler _playerDeathHandler;
+        private MemberKnockOutHandler _playerKnockOutHandler;
         [ShowInInspector]
-        private TeamMemberDeathHandler _enemyDeathHandler;
+        private MemberKnockOutHandler _enemyKnockOutHandler;
 
         public void OnBeforeStart(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
         {
-            _playerDeathHandler = playerEntities.DeathHandler;
-            _enemyDeathHandler = enemyEntities.DeathHandler;
+            _playerKnockOutHandler = playerEntities.knockOutHandler;
+            _enemyKnockOutHandler = enemyEntities.knockOutHandler;
         }
 
         public void TempoTick(float deltaVariation)
         {
-            _playerDeathHandler.TempoTick(deltaVariation);
-            _enemyDeathHandler.TempoTick(deltaVariation);
+            _playerKnockOutHandler.TempoTick(deltaVariation);
+            _enemyKnockOutHandler.TempoTick(deltaVariation);
         }
     }
 }

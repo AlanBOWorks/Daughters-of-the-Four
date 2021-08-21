@@ -7,14 +7,14 @@ using UnityEngine;
 
 namespace _Team
 {
-    public class TeamMemberDeathHandler : ITempoTicker
+    public class MemberKnockOutHandler : ITempoTicker
     {
         private readonly CombatingTeam _team;
         private readonly List<CombatingEntity> _standByEntities;
         [ShowInInspector]
         private readonly List<float> _timerCheck;
 
-        public TeamMemberDeathHandler(CombatingTeam team)
+        public MemberKnockOutHandler(CombatingTeam team)
         {
             _team = team;
             int listsLength = team.Count;

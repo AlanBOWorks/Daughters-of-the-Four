@@ -18,7 +18,6 @@ namespace CombatEffects
                 effectModifier);
 
             DoEffect(target,damage);
-            target.Events.OnHitEvent.OnHit(damage);
         }
 
 

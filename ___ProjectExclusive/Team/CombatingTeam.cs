@@ -19,12 +19,12 @@ namespace _Team
             else
                 StatsHolder = new TeamCombatStatsHolder(State);
 
-            DeathHandler = new TeamMemberDeathHandler(this);
+            knockOutHandler = new MemberKnockOutHandler(this);
         }
 
         [ShowInInspector] public readonly TeamCombatState State;
         [ShowInInspector] public readonly TeamCombatStatsHolder StatsHolder;
-        [ShowInInspector] public TeamMemberDeathHandler DeathHandler;
+        [ShowInInspector] public MemberKnockOutHandler knockOutHandler;
 
         public ICharacterBasicStats GetCurrentStats()
             => StatsHolder.GetCurrentStats();

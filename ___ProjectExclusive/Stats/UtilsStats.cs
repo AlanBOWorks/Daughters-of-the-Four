@@ -219,20 +219,16 @@ namespace Stats
         {
             //TODO
         }
+
+        private static CharacterEventsTracker GetStatsEvents() => CombatSystemSingleton.CharacterEventsTracker;
         public static void EnqueueTemporalStatsEvent(CombatingEntity target)
-        {
-            CombatSystemSingleton.CharacterEventsTracker.EnqueueTemporalChangeListener(target);
-        }
-
+            => GetStatsEvents().EnqueueTemporalChangeListener(target);
+        public static void EnqueueDamageEvent(CombatingEntity target, float damage)
+            => GetStatsEvents().EnqueueOnDamageListener(target, damage);
         public static void EnqueueHealthZeroStatsEvent(CombatingEntity target)
-        {
-            //TODO
-        }
-
+            => GetStatsEvents().EnqueueZeroHealthListener(target);
         public static void EnqueueMortalityZeroEvent(CombatingEntity target)
-        {
-            //TODO
-        }
+            => GetStatsEvents().EnqueueZeroMortalityListener(target);
     }
 
     public static class UtilsCombatStats
@@ -285,64 +281,53 @@ namespace Stats
         public static void DoDamageToShield(CombatingEntity target, float damage)
         {
             ICharacterFullStats stats = target.CombatStats;
-
             float shields = stats.ShieldAmount;
-            if(shields <= 0) return;
+
+            if (shields <= 0 || damage <= 0) return;
+
+            UtilsStats.EnqueueTemporalStatsEvent(target);
+            UtilsStats.EnqueueDamageEvent(target, damage);
+
             shields -= damage;
             if (shields < 0) shields = 0;
             stats.ShieldAmount = shields;
-
-            UtilsStats.EnqueueTemporalStatsEvent(target);
         }
 
         /// <returns>The damage left</returns>
-        public static void DoDamageTo(CombatingEntity target, float damage, bool isInmortal = false)
+        public static void DoDamageTo(CombatingEntity target, float damage)
         {
-            float originalDamage = damage;
+            if(damage <= 0) return;
+
             ICharacterFullStats stats = target.CombatStats;
 
+            UtilsStats.EnqueueTemporalStatsEvent(target);
+            UtilsStats.EnqueueDamageEvent(target,damage);
+            SubmitDamageToEntity();
 
-            #region <<<<<<<<<<<< SHIELD Calculations >>>>>>>>>>>>>
             if (stats.ShieldAmount > 0)
             {
                 stats.ShieldAmount = CalculateDamageOnVitality(stats.ShieldAmount);
-                UtilsStats.EnqueueTemporalStatsEvent(target);
-                SubmitDamageToEntity();
 
                 return; // Shield are the counter of 'Raw' damage > absorbs the rest of the damage
             }
-            #endregion
-            #region <<<<<<<<<<<< HEALTH Calculations >>>>>>>>>>>>>
             stats.HealthPoints = CalculateDamageOnVitality(stats.HealthPoints);
+            if(stats.HealthPoints > 0) return;
 
-            if (stats.HealthPoints > 0)
-            {
-                UtilsStats.EnqueueTemporalStatsEvent(target);
-                SubmitDamageToEntity();
 
-                return;
-            }
-            #endregion
-            #region <<<<<<<<<<<< DEATH Calculations >>>>>>>>>>>>>
-            bool isInDanger = target.CharacterGroup.Team.IsInDangerState();
-            if (!isInmortal && isInDanger)
+
+            bool teamIsInDanger = target.CharacterGroup.Team.IsInDangerState();
+            if (teamIsInDanger)
             {
+                // When in danger, characters receive permanent damage (a.k.a. Mortality damage)
                 stats.MortalityPoints = CalculateDamageOnVitality(stats.MortalityPoints);
-                if (!target.IsAlive())
-                {
-                    UtilsStats.EnqueueMortalityZeroEvent(target);
-                }
+                UtilsStats.EnqueueMortalityZeroEvent(target);
             }
             else
             {
-                target.CombatStats.TeamData.DeathHandler.Add(target);
+                // If not, just make them KO
+                target.CombatStats.TeamData.knockOutHandler.Add(target);
                 UtilsStats.EnqueueHealthZeroStatsEvent(target);
             }
-
-
-            UtilsStats.EnqueueTemporalStatsEvent(target);
-            SubmitDamageToEntity();
-            #endregion
 
 
             float CalculateDamageOnVitality(float vitalityStat)
@@ -359,15 +344,14 @@ namespace Stats
             }
             void SubmitDamageToEntity()
             {
-                target.ReceivedStats.DamageReceived = originalDamage - damage;
+                target.ReceivedStats.DamageReceived = damage;
             }
         }
 
         public static void DoStaticDamage(CombatingEntity target, float damage)
         {
-            DoDamageToShield(target,damage); //By design StaticDamage counters 'Shields'
+            DoDamageToShield(target,damage); //By design StaticDamage counters 'Shields' by dealing damage additionally
             target.CombatStats.AccumulatedStaticDamage += damage;
-            UtilsStats.EnqueueTemporalStatsEvent(target);
         }
 
 
