@@ -13,8 +13,10 @@ namespace Skills
 
         public static bool CanUseSkills(CombatingEntity entity)
         {
-            var sharedSkills = entity.SharedSkills;
-            if (!sharedSkills.WaitSkill.IsInCooldown())
+            var skills = entity.CombatSkills;
+            var sharedSkills = skills.GetCurrentSharedSkills();
+
+            if (!skills.WaitSkill.IsInCooldown())
             {
                 return true;
             }
@@ -34,7 +36,7 @@ namespace Skills
                     return true;
             }
 
-            if (sharedSkills.UltimateSkill != null && !sharedSkills.UltimateSkill.IsInCooldown())
+            if (skills.UltimateSkill != null && !skills.UltimateSkill.IsInCooldown())
             {
                 return true;
             }
@@ -52,7 +54,7 @@ namespace Skills
         public static List<CombatSkill> GetUniqueByStance(CombatingEntity entity)
         {
             var state = entity.AreasDataTracker.GetCurrentPositionState();
-            var skills = entity.UniqueSkills;
+            var skills = entity.CombatSkills.UniqueSkills;
 
             return skills == null 
                 ? null 
@@ -149,6 +151,18 @@ namespace Skills
             action(skills.NeutralSkills);
             action(skills.DefendingSkills);
         }
+        public static void DoParse<T>(ISharedSkills<T> skills, Action<T> action)
+        {
+            action(skills.CommonSkillFirst);
+            action(skills.CommonSkillSecondary);
+        }
+        public static void DoParse<T>(ISharedSkillsInPosition<T> sharedSkillsPositions, Action<T> action)
+        {
+            DoParse(sharedSkillsPositions.AttackingSkills, action);
+            DoParse(sharedSkillsPositions.NeutralSkills, action);
+            DoParse(sharedSkillsPositions.DefendingSkills, action);
+        }
+
 
         public static void DoParse<T, TParse>(ISkillPositions<T> skills, ISkillPositions<TParse> parsing,
             Action<T, TParse> action)
@@ -158,38 +172,57 @@ namespace Skills
             action(skills.DefendingSkills, parsing.DefendingSkills);
         }
 
-
-
-        public static void DoParse<T>(ISkillShared<T> skills, Action<T> action)
+        public static void DoParse<T, TParse>(ISharedSkills<T> skills, ISharedSkills<TParse> parsing,
+            Action<T, TParse> action)
         {
-            action(skills.UltimateSkill);
-            action(skills.CommonSkillFirst);
-            action(skills.CommonSkillSecondary);
-            action(skills.WaitSkill);
+            action(skills.CommonSkillFirst, parsing.CommonSkillFirst);
+            action(skills.CommonSkillSecondary, parsing.CommonSkillSecondary);
         }
 
-        public static void DoSafeParse<T>(ISkillShared<T> skills, Action<T> action)
+        public static void DoParse<T, TParse>(ISharedSkillsInPosition<T> sharedSkillsPositions,
+            ISharedSkillsInPosition<TParse> parsing, Action<T, TParse> action)
+        {
+            DoParse(sharedSkillsPositions.AttackingSkills,parsing.AttackingSkills,action);
+            DoParse(sharedSkillsPositions.NeutralSkills,parsing.NeutralSkills,action);
+            DoParse(sharedSkillsPositions.DefendingSkills,parsing.DefendingSkills,action);
+        }
+
+        public static void DoParse<T>(ISharedSkillsSet<T> skills, Action<T> action)
+        {
+            action(skills.UltimateSkill);
+            action(skills.WaitSkill);
+            DoParse(skills as ISharedSkillsInPosition<T>, action);
+        }
+
+        public static void DoSafeParse<T>(ISharedSkillsSet<T> skills, Action<T> action)
         {
             DoAction(skills.UltimateSkill);
-            DoAction(skills.CommonSkillFirst);
-            DoAction(skills.CommonSkillSecondary);
             DoAction(skills.WaitSkill);
+
+            DoActions(skills.AttackingSkills);
+            DoActions(skills.NeutralSkills);
+            DoActions(skills.DefendingSkills);
 
             void DoAction(T element)
             {
                 if (element == null) return;
                 action(element);
             }
+
+            void DoActions(ISharedSkills<T> elements)
+            {
+                DoAction(elements.CommonSkillFirst);
+                DoAction(elements.CommonSkillSecondary);
+            }
         }
 
-
-        public static void DoParse<T,TParse>(ISkillShared<T> skills, ISkillShared<TParse> parsing,
+        public static void DoParse<T,TParse>(ISharedSkillsSet<T> skills, ISharedSkillsSet<TParse> parsing,
             Action<T, TParse> action)
         {
             action(skills.UltimateSkill, parsing.UltimateSkill);
-            action(skills.CommonSkillFirst, parsing.CommonSkillFirst);
-            action(skills.CommonSkillSecondary, parsing.CommonSkillSecondary);
             action(skills.WaitSkill, parsing.WaitSkill);
+
+            DoParse(skills as ISharedSkillsInPosition<T>,parsing,action);
         }
 
 

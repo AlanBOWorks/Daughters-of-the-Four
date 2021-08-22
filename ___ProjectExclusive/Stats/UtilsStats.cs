@@ -66,7 +66,7 @@ namespace Stats
         public const int HarmonyIndex = MortalityIndex + 1;
         public const int InitiativeIndex = HarmonyIndex + 1;
         public const int ActionsIndex = InitiativeIndex + 1;
-        public enum Combat
+        public enum TemporalCombatStats
         {
             Health = HealthIndex,
             Shield = ShieldIndex,
@@ -75,6 +75,77 @@ namespace Stats
             Harmony = HarmonyIndex,
             Initiative = InitiativeIndex,
             Actions = ActionsIndex
+        }
+    }
+
+    public static class UtilsEnumStats
+    {
+        public static float GetStat(IOffensiveStatsData stats, EnumStats.Offensive type)
+        {
+            return type switch
+            {
+                EnumStats.Offensive.Attack => stats.GetAttackPower(),
+                EnumStats.Offensive.DeBuff => stats.GetDeBuffPower(),
+                EnumStats.Offensive.StaticPower => stats.GetStaticDamagePower(),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
+        public static float GetStat(ISupportStatsData stats, EnumStats.Support type)
+        {
+            return type switch
+            {
+                EnumStats.Support.Heal => stats.GetHealPower(),
+                EnumStats.Support.Buff => stats.GetBuffPower(),
+                EnumStats.Support.ReceiveBuffIndex => stats.GetBuffReceivePower(),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
+        public static float GetStat(IVitalityStatsData stats, EnumStats.Vitality type)
+        {
+            return type switch
+            {
+                EnumStats.Vitality.MaxHealth => stats.GetMaxHealth(),
+                EnumStats.Vitality.MaxMortality => stats.GetMaxMortalityPoints(),
+                EnumStats.Vitality.DamageReduction => stats.GetDamageReduction(),
+                EnumStats.Vitality.DeDuffReduction => stats.GetDeBuffReduction(),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
+        public static float GetStat(ISpecialStatsData stats, EnumStats.Special type)
+        {
+            return type switch
+            {
+                EnumStats.Special.Enlightenment => stats.GetEnlightenment(),
+                EnumStats.Special.Critical => stats.GetCriticalChance(),
+                EnumStats.Special.Speed => stats.GetSpeedAmount(),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
+        public static float GetStat(ICombatTemporalStats stats, EnumStats.TemporalCombatStats type)
+        {
+            switch (type)
+            {
+                case EnumStats.TemporalCombatStats.Health:
+                    return stats.HealthPoints;
+                case EnumStats.TemporalCombatStats.Shield:
+                    return stats.ShieldAmount;
+                case EnumStats.TemporalCombatStats.AccumulatedStatic:
+                    return stats.AccumulatedStatic;
+                case EnumStats.TemporalCombatStats.Mortality:
+                    return stats.MortalityPoints;
+                case EnumStats.TemporalCombatStats.Harmony:
+                    return stats.GetHarmonyAmount();
+                case EnumStats.TemporalCombatStats.Initiative:
+                    return stats.GetInitiativePercentage();
+                case EnumStats.TemporalCombatStats.Actions:
+                    return stats.GetActionsPerInitiative();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
         }
     }
 
@@ -91,6 +162,48 @@ namespace Stats
         public static float GrowFormula(float baseStat, float growStat, float upgradeAmount)
         {
             return baseStat + growStat * upgradeAmount;
+        }
+
+        public static void Add(ICharacterBasicStats injection, IOffensiveStatsData stats)
+        {
+            injection.AttackPower = injection.GetAttackPower() + stats.GetAttackPower();
+            injection.DeBuffPower = injection.GetDeBuffPower() + stats.GetDeBuffPower();
+            injection.StaticDamagePower = injection.GetStaticDamagePower() + stats.GetStaticDamagePower();
+        }
+        public static void Add(ICharacterBasicStats injection, ISupportStatsData stats)
+        {
+            injection.HealPower = injection.GetHealPower() + stats.GetHealPower();
+            injection.BuffPower = injection.GetBuffPower() + stats.GetBuffPower();
+            injection.BuffReceivePower = injection.GetBuffReceivePower() + stats.GetBuffReceivePower();
+        }
+        public static void Add(ICharacterBasicStats injection, IVitalityStatsData stats)
+        {
+            injection.MaxHealth = injection.GetMaxHealth() + stats.GetMaxHealth();
+            injection.MaxMortalityPoints = injection.GetMaxMortalityPoints() + stats.GetMaxMortalityPoints();
+            injection.DeBuffReduction = injection.GetDeBuffReduction() + stats.GetDeBuffReduction();
+            injection.DamageReduction = injection.GetDamageReduction() + stats.GetDamageReduction();
+        }
+
+        public static void Add(ICharacterBasicStats injection, ISpecialStatsData stats)
+        {
+            injection.SpeedAmount = injection.GetSpeedAmount() + stats.GetSpeedAmount();
+            injection.CriticalChance = injection.GetCriticalChance() + stats.GetCriticalChance();
+            injection.Enlightenment = injection.GetEnlightenment() + stats.GetEnlightenment();
+        }
+
+        public static void Add(ICharacterBasicStats injection, ICombatTempoStatsData stats)
+        {
+            injection.InitiativePercentage = injection.GetInitiativePercentage() + stats.GetInitiativePercentage();
+            injection.ActionsPerInitiative = injection.GetActionsPerInitiative() + stats.GetActionsPerInitiative();
+        }
+
+        public static void Add(ICharacterBasicStats injection, ICharacterBasicStatsData stats)
+        {
+            Add(injection, stats as IOffensiveStatsData);
+            Add(injection, stats as ISupportStatsData);
+            Add(injection, stats as IVitalityStatsData);
+            Add(injection, stats as ISpecialStatsData);
+            Add(injection, stats as ICombatTempoStatsData);
         }
 
         public static void OverrideStats(IOffensiveStatsInjection stats, float value = 0)
@@ -247,6 +360,13 @@ namespace Stats
             return SRange.Percentage(stats.HealthPoints, 0, stats.GetMaxHealth());
         }
 
+        public static float MortalityPercent(CombatingEntity entity)
+        {
+            var stats = entity.CombatStats;
+            return SRange.Percentage(stats.MortalityPoints, 0, stats.GetMaxMortalityPoints());
+        }
+
+
         public static float CalculateFinalDamage(
             CharacterCombatData attacker,
             CharacterCombatData receiver, float damageModifier)
@@ -356,7 +476,7 @@ namespace Stats
         public static void DoStaticDamage(CombatingEntity target, float damage)
         {
             DoDamageToShield(target,damage); //By design StaticDamage counters 'Shields' by dealing damage additionally
-            target.CombatStats.AccumulatedStaticDamage += damage;
+            target.CombatStats.AccumulatedStatic += damage;
         }
 
 
@@ -385,7 +505,7 @@ namespace Stats
 
             void ResetAccumulatedStaticDamage()
             {
-                stats.AccumulatedStaticDamage = 0; //By design Heals counts 'StaticDamage'
+                stats.AccumulatedStatic = 0; //By design Heals counts 'StaticDamage'
             }
         }
 

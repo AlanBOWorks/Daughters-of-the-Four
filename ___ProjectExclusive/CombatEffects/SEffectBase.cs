@@ -92,7 +92,7 @@ namespace CombatEffects
                 = new EffectArguments(arguments, effectPreset);
             if (effectCondition.HasCondition())
             {
-                canApplyEffect = effectCondition.CanApplyCondition(ref effectArguments);
+                canApplyEffect = effectCondition.CanApply(user,target);
             }
 
             if (canApplyEffect)

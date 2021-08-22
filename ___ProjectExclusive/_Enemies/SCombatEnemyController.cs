@@ -29,16 +29,16 @@ namespace _Enemies
         private const float UseWaitChance = .1f;
         public void DoControlOn(CombatingEntity entity)
         {
-            ISkillShared<CombatSkill> skillShared = entity.SharedSkills;
+            var skills = entity.CombatSkills;
             
-            var ultimate = skillShared.UltimateSkill;
+            var ultimate = skills.UltimateSkill;
             if (ultimate != null && ultimate.Preset != null && !ultimate.IsInCooldown())
             {
                 DoSkill(ultimate);
                 return;
             }
 
-            var waitSkill = skillShared.WaitSkill;
+            var waitSkill = skills.WaitSkill;
 
             if (Random.value < UseWaitChance)
             {
@@ -90,7 +90,7 @@ namespace _Enemies
     {
         public static void DoInjectionOfSkills(List<CombatSkill> injectInto, CombatingEntity user)
         {
-            ISkillShared<CombatSkill> skillShared = user.SharedSkills;
+            var skillShared = user.CombatSkills.GetCurrentSharedSkills();
             AddSharedType(skillShared.CommonSkillFirst);
             AddSharedType(skillShared.CommonSkillSecondary);
 
@@ -113,8 +113,7 @@ namespace _Enemies
 
         public static void DoInjectionOfUltimate(List<CombatSkill> possibleSkills, CombatingEntity entity)
         {
-            ISkillShared<CombatSkill> skillShared = entity.SharedSkills;
-            var ultimate = skillShared.UltimateSkill;
+            var ultimate = entity.CombatSkills.UltimateSkill;
             if (ultimate != null && !ultimate.IsInCooldown())
             {
                 possibleSkills.Add(ultimate);
@@ -123,8 +122,8 @@ namespace _Enemies
 
         public static void DoInjectionOfWait(List<CombatSkill> possibleSkills, CombatingEntity entity)
         {
-            ISkillShared<CombatSkill> skillShared = entity.SharedSkills;
-            possibleSkills.Add(skillShared.WaitSkill);
+            var skill = entity.CombatSkills.WaitSkill;
+            possibleSkills.Add(skill);
         }
     }
 

@@ -77,6 +77,9 @@ namespace ___ProjectExclusive
 
     public static class UtilsGame
     {
+
+        public const string IconsPath = "Assets/ART/Icons/Dayed/";
+
         public static void UpdateAssetName(ScriptableObject asset)
         {
             string assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ___ProjectExclusive;
 using Characters;
+using CombatConditions;
 using CombatEffects;
 using Sirenix.OdinInspector;
 using Stats;
@@ -22,8 +23,11 @@ namespace Skills
         [SerializeField, Delayed]
         protected string skillName = "NULL";
         [TitleGroup("Details"), PreviewField, GUIColor(.4f, .4f, .4f)]
-        [SerializeField, Tooltip("This will be used instead of the generic one")] 
+        [SerializeField, Tooltip("This will be used instead of the generic one"),
+        AssetSelector(Paths = UtilsGame.IconsPath,FlattenTreeView = true,DropdownWidth = 500)] 
         private Sprite specialIcon = null;
+
+        
 
         [TitleGroup("Stats"), Range(0, 100), SuffixLabel("actions")]
         [SerializeField]
@@ -32,19 +36,26 @@ namespace Skills
         public bool canCrit = true;
         [TitleGroup("Stats"), Range(-10, 10), SuffixLabel("00%"), ShowIf("canCrit")]
         public float criticalAddition = 0f;
+        
 
         [TitleGroup("Targeting")]
         [SerializeField]
         protected EnumSkills.TargetingType skillType = EnumSkills.TargetingType.Support;
         [SerializeField]
         protected bool canTargetSelf = false;
+
+        [TitleGroup("Categorization")]
+        [SerializeField, Tooltip("Used to determinate the limitation of equipment; Hybrid can be used by any range")]
+        private CharacterArchetypes.RangeType rangeType = CharacterArchetypes.RangeType.Hybrid;
+
+        [TitleGroup("Categorization")]
         [SerializeField, Tooltip("The main stat this skill interact/represent"),
          EnumToggleButtons] 
-        private EnumSkills.StatDriven statRepresentation = EnumSkills.StatDriven.Health;
+        private EnumSkills.Archetype skillArchetype = EnumSkills.Archetype.OffensiveHealth;
 
         [Title("Main Condition"),PropertyOrder(90)] 
         [SerializeField]
-        private ConditionalUse conditionalUse;
+        private ConditionUserParams conditionalUse;
         [TitleGroup("Effects"),PropertyOrder(100)]
         [SerializeField]
         private EffectParams[] effects = new EffectParams[1];
@@ -55,8 +66,9 @@ namespace Skills
         public string SkillName => skillName;
         public Sprite SpecialIcon => specialIcon;
         public bool CanTargetSelf() => canTargetSelf;
+        public CharacterArchetypes.RangeType GetRangeType() => rangeType;
         public EnumSkills.TargetingType GetSkillType() => skillType;
-        public EnumSkills.StatDriven GetStatDriven() => statRepresentation;
+        public EnumSkills.Archetype GetArchetype() => skillArchetype;
         public int CoolDownCost => cooldownCost;
         public IEffect GetMainEffect() => effects[0];
 
@@ -207,21 +219,6 @@ namespace Skills
             return $" - [{cooldownCost}] - (" + mainEffect.GetEffectTarget().ToString().ToUpper() + ") ";
         }
 
-        [Serializable]
-        private struct ConditionalUse
-        {
-            public SSkillUseConditionBase useCondition;
-            public float conditionCheck;
-            public bool inverseCondition;
-
-            public bool CanBeUse(CombatingEntity user)
-            {
-                if (useCondition == null) return true;
-
-                bool canBeUse = useCondition.CanUseSkill(user, conditionCheck);
-                return canBeUse ^ inverseCondition;
-            }
-        }
     }
 
     public class SkillArguments

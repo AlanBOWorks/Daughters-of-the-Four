@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace _Player
 {
-    public class USkillButtonsHandler : MonoBehaviour, IEquipSkill<USkillButton>, 
+    public class USkillButtonsHandler : MonoBehaviour, IIndividualSkillsSet<USkillButton>, 
         IPlayerTempoListener, IPlayerButtonListener
     {
         [TitleGroup("Params")] 
@@ -117,7 +117,7 @@ namespace _Player
             if (_sharedParsingAction == null) 
                 _sharedParsingAction = DoParsingInjection;
 
-            ISkillShared<CombatSkill> skillShared = entity.SharedSkills;
+            ISharedSkills<CombatSkill> skillShared = entity.CombatSkills.GetCurrentSharedSkills();
             UtilsSkill.DoParse(skillShared,this, _sharedParsingAction);
 
             void DoParsingInjection(CombatSkill skill, USkillButton button)

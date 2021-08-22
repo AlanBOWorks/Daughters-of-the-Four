@@ -24,9 +24,9 @@ namespace Characters
         }
         public enum RoleArchetype
         {
-            Vanguard = FrontLinerIndex,
-            Attacker = MidLinerIndex,
-            Support = BackLinerIndex
+            Vanguard = TeamPosition.FrontLine,
+            Attacker = TeamPosition.MidLine,
+            Support = TeamPosition.BackLine
         }
 
 

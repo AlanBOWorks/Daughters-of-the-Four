@@ -68,7 +68,7 @@ namespace Stats
         float HealthPoints { get; set; }
         float ShieldAmount { get; set; }
         float MortalityPoints { get; set; }
-
+        float AccumulatedStatic { get; set; }
     }
 
     public interface ICombatTemporalStatsBase : ICombatTemporalStatsBaseData, ICombatTemporalStatsBaseInjection

@@ -73,6 +73,7 @@ namespace Skills
             var skill = _currentSkillTargets.UsingSkill;
             var skillPreset = skill.Preset;
             var effectTargets = skillPreset.GetMainEffectTargets(_currentUser, target);
+            UpdateEntitiesStats();
 
             // TODO make a waitUntil(Animation call for Skill)
             yield return Timing.WaitUntilDone(_currentUser.CombatAnimator.DoAnimation(
@@ -84,6 +85,21 @@ namespace Skills
             skill.OnSkillUsage();
             CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(_currentUser);
             CombatSystemSingleton.CharacterEventsTracker.Invoke();
+
+
+            void UpdateEntitiesStats()
+            {
+                UpdateEntityStats(_currentUser);
+                foreach (CombatingEntity entity in effectTargets)
+                {
+                    UpdateEntityStats(entity);
+                }
+            }
+
+            void UpdateEntityStats(CombatingEntity entity)
+            {
+                entity.CombatStats.UpdateCalculatedStats();
+            }
         }
 
         public List<CombatingEntity> HandlePossibleTargets(CombatSkill skill)

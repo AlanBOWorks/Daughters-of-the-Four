@@ -9,7 +9,7 @@ using UnityEngine;
 namespace _Team
 {
     [CreateAssetMenu(fileName = "N"+ ControlHandlerPrefix,
-        menuName = "Combat/Team/Tean Control Stats")]
+        menuName = "Combat/Team/Team Control Stats")]
     public class STeamControlStatsPreset : ScriptableObject, ITeamCombatControlHolder
     {
         [Title("Tooltips")] [SerializeField] private string controlName = "NULL";

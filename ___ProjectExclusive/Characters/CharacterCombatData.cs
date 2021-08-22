@@ -76,9 +76,6 @@ namespace Characters
         [ShowInInspector] 
         public CharacterCriticalActionHandler CharacterCriticalBuff { get; private set; }
 
-        public IEquipSkill<CombatSkill> SharedSkills => CombatSkills.SharedSkills;
-        public ISkillPositions<List<CombatSkill>> UniqueSkills => CombatSkills.UniqueSkills;
-
         [ShowInInspector]
         public CombatSkills CombatSkills { get; private set; }
 
@@ -183,12 +180,9 @@ namespace Characters
         /// </summary>
         [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2)]
         public CharacterCombatStatsBasic CalculatedStats { get; protected set; }
-
-
+        
         [TitleGroup("Local stats"), PropertyOrder(-10)]
         public int ActionsLefts;
-        [TitleGroup("Local stats")] 
-        public float AccumulatedStaticDamage;
 
 
         public void Initialization()
@@ -244,6 +238,13 @@ namespace Characters
             get => BaseStats.MortalityPoints;
             set => BaseStats.MortalityPoints = value;
         }
+
+        public float AccumulatedStatic
+        {
+            get => BaseStats.AccumulatedStatic;
+            set => BaseStats.AccumulatedStatic = value;
+        }
+
         public float HarmonyAmount
         {
             get => BaseStats.HarmonyAmount + TeamStats.GetHarmonyAmount() + BurstStats.HarmonyAmount;

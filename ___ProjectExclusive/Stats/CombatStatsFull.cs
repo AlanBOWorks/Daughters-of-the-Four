@@ -16,7 +16,8 @@ namespace Stats
         private float shieldAmount; // before fight this could be increased
         [SerializeField, SuffixLabel("u|%%"),Tooltip("Base is Unit; Buff is percent")]
         private float mortalityPoints; // after fight this could be reduced
-
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        private float accumulatedStatic;
 
         public float HealthPoints
         {
@@ -34,6 +35,12 @@ namespace Stats
         {
             get => mortalityPoints;
             set => mortalityPoints = value;
+        }
+
+        public float AccumulatedStatic
+        {
+            get => accumulatedStatic;
+            set => accumulatedStatic = value;
         }
 
 

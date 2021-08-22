@@ -8,12 +8,14 @@ namespace Skills
 {
 
     public class CombatSkills : ISkillPositions<List<CombatSkill>>,
-        IStanceArchetype<List<CombatSkill>>
+        IStanceArchetype<List<CombatSkill>>, ISpecialSkills<CombatSkill>
     {
+        private readonly CombatingEntity _user;
+
         [ShowInInspector]
         public List<CombatSkill> AllSkills { get; private set; }
         [ShowInInspector]
-        public IEquipSkill<CombatSkill> SharedSkills { get; private set; }
+        public ISharedSkillsSet<CombatSkill> SharedSkills { get; private set; }
         public ISkillPositions<List<CombatSkill>> UniqueSkills => this;
         [ShowInInspector]
         public List<CombatSkill> AttackingSkills { get; }
@@ -26,9 +28,18 @@ namespace Skills
         public List<CombatSkill> GetNeutral() => NeutralSkills;
         public List<CombatSkill> GetDefending() => DefendingSkills;
 
+
+        public CombatSkill UltimateSkill => SharedSkills.UltimateSkill;
+        public CombatSkill WaitSkill => SharedSkills.WaitSkill;
+
+        public ISharedSkills<CombatSkill> GetCurrentSharedSkills()
+            => UtilsSkill.GetElement(SharedSkills, _user);
+
+
         public CombatSkills(CombatingEntity user,
-            ISkillShared<SkillPreset> shared, ISkillPositions<List<SkillPreset>> uniqueSkills)
+            ISharedSkillsSet<SkillPreset> shared, ISkillPositions<List<SkillPreset>> uniqueSkills)
         {
+            _user = user;
             user.Injection(this);
             if (shared == null)
             {
@@ -80,7 +91,7 @@ namespace Skills
         }
 
 
-        private void AddSharedSkills(ISkillShared<SkillPreset> shared)
+        private void AddSharedSkills(ISharedSkillsSet<SkillPreset> shared)
         {
             if(shared == null)
                 throw new ArgumentException("Shared skills are null; BackUp skills weren't invoked still");
@@ -146,7 +157,5 @@ namespace Skills
                 AllSkills.Add(combatSkill);
             }
         }
-
-
     }
 }

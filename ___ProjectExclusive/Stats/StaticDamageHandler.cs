@@ -16,7 +16,7 @@ namespace Stats
 
         public void OnFinisAllActions(CombatingEntity entity)
         {
-            float damage = entity.CombatStats.AccumulatedStaticDamage;
+            float damage = entity.CombatStats.AccumulatedStatic;
             if(damage <= 0) return;
 
             UtilsCombatStats.DoDamageTo(entity,damage);

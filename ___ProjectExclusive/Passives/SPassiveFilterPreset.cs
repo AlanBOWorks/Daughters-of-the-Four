@@ -47,14 +47,13 @@ namespace Passives
         [SuffixLabel("00%"), Range(0, 10)] private float effectValue;
 
         [Title("Conditions")]
-        [SerializeField] private SEffectCondition condition;
-        [SerializeField, ShowIf("condition")]
-        [SuffixLabel("00%"), Range(-10, 10)] private float conditionValue;
+        [SerializeField] private ConditionParam condition;
 
         public void DoPassiveFilter(ref EffectArguments arguments, ref float currentValue, 
             float originalValue, float effectValueModifier = 1)
         {
-            if (condition == null || condition.CanApply(ref arguments, conditionValue))
+            var skillArguments = arguments.Arguments;
+            if (condition.CanApply(skillArguments.User))
             {
                 if(passiveFilter.CanApplyPassive(arguments.Effect))
                     passiveFilter.DoPassiveFilter(ref currentValue,originalValue, 
