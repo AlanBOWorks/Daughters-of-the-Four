@@ -105,8 +105,10 @@ namespace Skills
                 var firstSkill = presets.CommonSkillFirst;
                 var secondary = presets.CommonSkillSecondary;
 
-                CommonSkillFirst = new CombatSkill(presets.CommonSkillFirst);
-                CommonSkillSecondary = new CombatSkill(presets.CommonSkillSecondary);
+                if(firstSkill != null && firstSkill.Preset != null)
+                    CommonSkillFirst = new CombatSkill(firstSkill);
+                if(secondary != null && secondary.Preset != null)
+                    CommonSkillSecondary = new CombatSkill(secondary);
             }
 
             public CombatSkill CommonSkillFirst { get; }

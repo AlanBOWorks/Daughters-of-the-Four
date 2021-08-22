@@ -24,42 +24,44 @@ namespace Characters
 
         public void Add(IOffensiveStatsData stats)
         {
-            if(offensiveStats == null)
-                offensiveStats = new List<IOffensiveStatsData>();
             offensiveStats.Add(stats);
         }
         public void Add(ISupportStatsData stats)
         {
-            if (supportStats == null)
-                supportStats = new List<ISupportStatsData>();
             supportStats.Add(stats);
         }
         public void Add(IVitalityStatsData stats)
         {
-            if (vitalityStats == null)
-                vitalityStats = new List<IVitalityStatsData>();
             vitalityStats.Add(stats);
         }
         public void Add(ISpecialStatsData stats)
         {
-            if (specialStats == null)
-                specialStats = new List<ISpecialStatsData>();
             specialStats.Add(stats);
         }
         public void Add(ICombatTemporalStatsBaseData stats)
         {
-            if (temporalStats == null)
-                temporalStats = new List<ICombatTemporalStatsBaseData>();
             temporalStats.Add(stats);
         }
 
         public CompositeStats()
         {
             BaseStats = new CharacterCombatStatsBasic();
+            Initialize();
+
         }
         public CompositeStats(ICharacterBasicStats stats)
         {
             BaseStats = new CharacterCombatStatsBasic(stats);
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            offensiveStats = new List<IOffensiveStatsData>();
+            supportStats = new List<ISupportStatsData>();
+            vitalityStats = new List<IVitalityStatsData>();
+            temporalStats = new List<ICombatTemporalStatsBaseData>();
+            specialStats = new List<ISpecialStatsData>();
         }
 
         public void ResetToZero()
