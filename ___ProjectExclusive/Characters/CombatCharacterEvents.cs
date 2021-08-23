@@ -227,7 +227,7 @@ namespace Characters
 
         public void InvokeTemporalStatChange()
         {
-            _user.HarmonyBuffInvoker?.OnTemporalStatsChange();
+            //TODO _user.HarmonyBuffInvoker?.OnTemporalStatsChange();
             GlobalEvents().InvokeTemporalStatChange(_user);
             InvokeTemporalStatChange(_user);
         }

@@ -61,7 +61,7 @@ namespace _CombatSystem
         [ShowInInspector]
         private readonly List<ITeamVariationListener> _listeners;
         [ShowInInspector]
-        private TeamCombatState.Stances _lastPlayerStance;
+        private EnumTeam.Stances _lastPlayerStance;
 
         private bool _firstCall;
         private int _burstRoundCount;
@@ -138,7 +138,7 @@ namespace _CombatSystem
                 - EnemyFaction.GetControlAmount();
             control = Mathf.Clamp(control, -1, 1);
 
-                TeamCombatState.Stances stance = PlayerFaction.CurrentStance;
+                EnumTeam.Stances stance = PlayerFaction.CurrentStance;
             if (!_firstCall && stance == _lastPlayerStance)
             {
                 foreach (ITeamVariationListener listener in _listeners)
@@ -189,15 +189,15 @@ namespace _CombatSystem
 
             switch (_lastPlayerStance)
             {
-                case TeamCombatState.Stances.Attacking:
+                case EnumTeam.Stances.Attacking:
                     CheckForDefending();
                     CheckForNeutral();
                     break;
-                case TeamCombatState.Stances.Neutral:
+                case EnumTeam.Stances.Neutral:
                     CheckForAttacking();
                     CheckForDefending();
                     break;
-                case TeamCombatState.Stances.Defending:
+                case EnumTeam.Stances.Defending:
                     CheckForNeutral();
                     CheckForAttacking();
                     break;
@@ -209,45 +209,45 @@ namespace _CombatSystem
             void CheckForAttacking()
             {
                 if (isAttacking)
-                    DoVariation(check, reaction, TeamCombatState.Stances.Attacking);
+                    DoVariation(check, reaction, EnumTeam.Stances.Attacking);
             }
 
             void CheckForNeutral()
             {
                 if (isAttacking || isDefending) return;
                     
-                DoVariation(check, reaction, TeamCombatState.Stances.Neutral);
+                DoVariation(check, reaction, EnumTeam.Stances.Neutral);
             }
 
             void CheckForDefending()
             {
                 if (isDefending)
-                    DoVariation(check, reaction, TeamCombatState.Stances.Defending);
+                    DoVariation(check, reaction, EnumTeam.Stances.Defending);
             }
         }
 
 
 
         private static void DoVariation(TeamCombatState actingTeam, TeamCombatState receiver,
-            TeamCombatState.Stances targetStance)
+            EnumTeam.Stances targetStance)
         {
             TeamCombatState winner;
             TeamCombatState loser;
             switch (targetStance)
             {
-                case TeamCombatState.Stances.Attacking:
+                case EnumTeam.Stances.Attacking:
                     winner = actingTeam;
                     loser = receiver;
                     HandleTeams();
                     break;
-                case TeamCombatState.Stances.Defending:
+                case EnumTeam.Stances.Defending:
                     winner = receiver;
                     loser = actingTeam;
                     HandleTeams();
                     break;
                 default:
-                    actingTeam.DoForceStance(TeamCombatState.Stances.Neutral);
-                    receiver.DoForceStance(TeamCombatState.Stances.Neutral);
+                    actingTeam.DoForceStance(EnumTeam.Stances.Neutral);
+                    receiver.DoForceStance(EnumTeam.Stances.Neutral);
                     break;
             }
 
@@ -256,8 +256,8 @@ namespace _CombatSystem
 
             void HandleTeams()
             {
-                winner.DoForceStance(TeamCombatState.Stances.Attacking);
-                loser.DoForceStance(TeamCombatState.Stances.Defending);
+                winner.DoForceStance(EnumTeam.Stances.Attacking);
+                loser.DoForceStance(EnumTeam.Stances.Defending);
             }
             void InvokeEvent(TeamCombatState target)
             {

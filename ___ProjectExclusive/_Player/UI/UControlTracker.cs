@@ -31,7 +31,7 @@ namespace _Player
             CombatSystemSingleton.CombatTeamControlHandler.Subscribe(this);
         }
 
-        public void OnPlayerControlVariation(float controlPercentage, TeamCombatState.Stances stance)
+        public void OnPlayerControlVariation(float controlPercentage, EnumTeam.Stances stance)
         {
             OnPlayerControlVariation(controlPercentage);
             stateTooltip.text = UtilsTeam.GetKeyword(stance);

@@ -20,11 +20,11 @@ namespace Characters
     { }
 
     public interface ICharacterBasicStatsData : IOffensiveStatsData, ISupportStatsData,
-        IVitalityStatsData, ISpecialStatsData, ICombatTemporalStatsBaseData
+        IVitalityStatsData, IConcentrationStatsData, ICombatTemporalStatsBaseData
     { }
 
     public interface ICharacterBasicStatsInjection : IOffensiveStatsInjection, ISupportStatsInjection,
-        IVitalityStatsInjection, ISpecialStatsInjection, ICombatTemporalStatsBaseInjection
+        IVitalityStatsInjection, IConcentrationStatsInjection, ICombatTemporalStatsBaseInjection
     { }
 
     public interface ICharacterBasicStatsData<out T>

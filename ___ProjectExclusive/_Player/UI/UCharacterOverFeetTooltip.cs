@@ -33,25 +33,25 @@ namespace _Player
     }
 
     [Serializable]
-    internal class CharacterStanceTooltip : IStanceArchetype<string>
+    internal class CharacterStanceTooltip : IStanceData<string>
     {
         [SerializeField] private TextMeshProUGUI stanceText;
 
         private const string AttackingToolTip = "[ Attaking ]";
         private const string NeutralTooltip = "[ Neutral ]";
         private const string DefendingTooltip = "[ Defending ]";
-        public void UpdateStance(TeamCombatState.Stances targetStance)
+        public void UpdateStance(EnumTeam.Stances targetStance)
         {
             var tooltip=
-                TeamCombatState.GetStance(this, targetStance);
+                UtilsTeam.GetElement(this, targetStance);
             stanceText.text = tooltip;
         }
 
-        public string GetAttacking() => AttackingToolTip;
+        public string AttackingStance => AttackingToolTip;
 
-        public string GetNeutral() => NeutralTooltip;
+        public string NeutralStance => NeutralTooltip;
 
-        public string GetDefending() => DefendingTooltip;
+        public string DefendingStance => DefendingTooltip;
     }
 
 }

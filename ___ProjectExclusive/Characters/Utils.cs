@@ -26,17 +26,17 @@ namespace Characters
             CombatSystemSingleton.GlobalCharacterChangesEvent.InvokeTemporalStatChange(entity);
         }
 
-        public static TeamCombatState.Stances ParseStance(float stanceEquivalent)
+        public static EnumTeam.Stances ParseStance(float stanceEquivalent)
         {
-            TeamCombatState.Stances stance;
-            if (stanceEquivalent == 0) stance = TeamCombatState.Stances.Neutral;
-            else if (stanceEquivalent > 0) stance = TeamCombatState.Stances.Attacking;
-            else stance = TeamCombatState.Stances.Defending;
+            EnumTeam.Stances stance;
+            if (stanceEquivalent == 0) stance = EnumTeam.Stances.Neutral;
+            else if (stanceEquivalent > 0) stance = EnumTeam.Stances.Attacking;
+            else stance = EnumTeam.Stances.Defending;
 
             return stance;
         }
 
-        public static void ToggleStance(CombatingEntity entity, TeamCombatState.Stances targetStance)
+        public static void ToggleStance(CombatingEntity entity, EnumTeam.Stances targetStance)
         {
             var areaData = entity.AreasDataTracker;
             if (areaData.IsForceStance)
@@ -51,7 +51,7 @@ namespace Characters
             InvokeAreaChange(entity);
         }
 
-        public static void TeamToggleStance(CombatingEntity teamHolder, TeamCombatState.Stances targetStance)
+        public static void TeamToggleStance(CombatingEntity teamHolder, EnumTeam.Stances targetStance)
         {
             var team = teamHolder.CharacterGroup.Team;
             var teamData = team.State;

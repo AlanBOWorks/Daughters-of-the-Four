@@ -8,7 +8,7 @@ namespace Skills
 {
 
     public class CombatSkills : ISkillPositions<List<CombatSkill>>,
-        IStanceArchetype<List<CombatSkill>>, ISpecialSkills<CombatSkill>
+        IStanceData<List<CombatSkill>>, ISpecialSkills<CombatSkill>
     {
         private readonly CombatingEntity _user;
 
@@ -24,9 +24,9 @@ namespace Skills
         [ShowInInspector]
         public List<CombatSkill> DefendingSkills { get; }
 
-        public List<CombatSkill> GetAttacking() => AttackingSkills;
-        public List<CombatSkill> GetNeutral() => NeutralSkills;
-        public List<CombatSkill> GetDefending() => DefendingSkills;
+        public List<CombatSkill> AttackingStance => AttackingSkills;
+        public List<CombatSkill> NeutralStance => NeutralSkills;
+        public List<CombatSkill> DefendingStance => DefendingSkills;
 
 
         public CombatSkill UltimateSkill => SharedSkills.UltimateSkill;

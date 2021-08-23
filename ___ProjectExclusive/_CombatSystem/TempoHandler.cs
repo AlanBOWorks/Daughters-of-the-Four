@@ -398,7 +398,7 @@ namespace _CombatSystem
                 StepNextActingEntity();
 
             // Do Harmony 
-            entity.HarmonyBuffInvoker?.InvokeBurstStats();
+            // TODO entity.HarmonyBuffInvoker?.InvokeBurstStats();
 
             // End round?
             DoCheckIfRoundPassed(entity);

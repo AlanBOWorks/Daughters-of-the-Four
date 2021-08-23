@@ -142,12 +142,12 @@ namespace Stats
 
 
 
-    public interface ISpecialStats : ISpecialStatsData, ISpecialStatsInjection
+    public interface IConcentrationStats : IConcentrationStatsData, IConcentrationStatsInjection
     { }
 
-    public interface ISpecialStatsData : ISpecialStatsData<float>
+    public interface IConcentrationStatsData : IConcentrationStatsData<float>
     {}
-    public interface ISpecialStatsData<out T>
+    public interface IConcentrationStatsData<out T>
     {
         /// <summary>
         /// Affects Harmony
@@ -157,9 +157,9 @@ namespace Stats
         T GetSpeedAmount();
     }
 
-    public interface ISpecialStatsInjection : ISpecialStatsInjection<float>
+    public interface IConcentrationStatsInjection : IConcentrationStatsInjection<float>
     {}
-    public interface ISpecialStatsInjection<in T>
+    public interface IConcentrationStatsInjection<in T>
     {
         T Enlightenment { set; }
         T CriticalChance { set; }

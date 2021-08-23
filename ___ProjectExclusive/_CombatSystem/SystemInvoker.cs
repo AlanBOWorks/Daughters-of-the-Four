@@ -197,22 +197,8 @@ namespace _CombatSystem
                     variable.GenerateCombatSkills(entity);
 
                     // x----- Harmony Buffer
-                    var harmonyVariable = variable.GetHarmonyPassive();
-                    HarmonyBuffInvoker harmonyBuffer = null;
-                    if (harmonyVariable != null)
-                    {
-                        //TODO make a backup HarmonyBuff for empty by type (Archetype based)
-                        harmonyBuffer = new HarmonyBuffInvoker(entity, harmonyVariable);
-                        entity.Injection(harmonyBuffer);
-                    }
 
                     // x----- Passives
-                    var passivesHolderVariable = variable.GetPassivesHolder();
-                    var passiveHolder 
-                        = new CombatPassivesHolder(entity,
-                            passivesHolderVariable,variable.GetSharedFilterPassives(),
-                            harmonyBuffer);
-                    entity.Injection(passiveHolder);
                     
                     // X----- Critical Buff
                     var criticalBuff = variable.GetCriticalBuff();
@@ -225,16 +211,11 @@ namespace _CombatSystem
                     }
                     entity.Injection(criticalBuff);
 
-                    onStartAction += OpeningPassivesInjection;
+                    //TODO onStartAction += OpeningPassivesInjection;
 
                     entityPosition++;
                     return entity;
 
-                    void OpeningPassivesInjection()
-                    {
-                        var openingPassives = variable.GetOpeningPassives();
-                        openingPassives?.DoOpeningPassives(entity);
-                    }
                 }
                 #endregion
 

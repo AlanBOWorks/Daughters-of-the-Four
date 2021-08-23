@@ -17,13 +17,12 @@ namespace _Player
         public CharacterUpgradeStats UpgradedStats { get; }
         public PlayerCharacterCombatStats InitialStats => Variable.InitialStats;
         public PlayerCharacterCombatStats GrowStats => Variable.GrowStats;
-        public readonly PassivesHolder PassivesHolder;
+      
 
         public PlayableCharacter(SPlayerCharacterEntityVariable variable)
         {
             Variable = variable;
             UpgradedStats = new CharacterUpgradeStats(variable.UpgradedStats);
-            PassivesHolder = new PassivesHolder(variable.GetPassivesHolder());
         }
         // TODO make an constructor or injector for the SaveFile.JSON
 
@@ -45,10 +44,6 @@ namespace _Player
             return Variable.GenerateCombatSkills(injection);
         }
 
-        public OpeningPassives GetOpeningPassives() => Variable.GetOpeningPassives();
-        public IPassivesFiltersHolder GetSharedFilterPassives() => Variable.GetSharedFilterPassives();
-        public PassivesHolder GetPassivesHolder() => PassivesHolder;
-        public SHarmonyPassive GetHarmonyPassive() => Variable.GetHarmonyPassive();
         public SCriticalBuffPreset  GetCriticalBuff() => Variable.GetCriticalBuff();
     }
 }

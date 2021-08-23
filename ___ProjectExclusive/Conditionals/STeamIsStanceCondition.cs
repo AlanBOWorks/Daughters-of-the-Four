@@ -11,8 +11,8 @@ namespace Skills
         menuName = "Combat/Conditions/Team Is Stance")]
     public class STeamIsStanceCondition : SCondition
     {
-        [SerializeField] private TeamCombatState.Stances checkStance =
-            TeamCombatState.Stances.Neutral;
+        [SerializeField] private EnumTeam.Stances checkStance =
+            EnumTeam.Stances.Neutral;
 
         public override bool CanApply(CombatingEntity target, float checkValue)
         {

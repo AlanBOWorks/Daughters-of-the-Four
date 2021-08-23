@@ -87,7 +87,6 @@ namespace CombatEffects
             var user = arguments.User;
             bool canApplyEffect = true;
             float powerVariation = power * randomModifier;
-            float originalPowerVariation = powerVariation;
             EffectArguments effectArguments
                 = new EffectArguments(arguments, effectPreset);
             if (effectCondition.HasCondition())
@@ -97,10 +96,12 @@ namespace CombatEffects
 
             if (canApplyEffect)
             {
-                user.PassivesHolder.DoActionPassiveFilter(
-                    ref effectArguments,ref powerVariation,originalPowerVariation);
+                /* TODO
+                 user.PassivesHolder.DoActionPassiveFilter(
+                    ref effectArguments,ref powerVariation);
                 target.PassivesHolder.DoReActionPassiveFilter(
-                    ref effectArguments,ref powerVariation, originalPowerVariation);
+                    ref effectArguments,ref powerVariation);
+                */
 
                 effectPreset.DoEffect(arguments, target, powerVariation);
             }

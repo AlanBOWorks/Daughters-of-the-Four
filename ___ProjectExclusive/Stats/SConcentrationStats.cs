@@ -3,9 +3,9 @@ using UnityEngine;
 namespace Stats
 {
 
-    [CreateAssetMenu(fileName = "SPECIAL - N [Stats]",
+    [CreateAssetMenu(fileName = "CONCENTRATION - N [Stats]",
         menuName = "Combat/Stats/Concentration")]
-    public class SSpecialStats : ScriptableObject, ISpecialStats
+    public class SConcentrationStats : ScriptableObject, IConcentrationStats
     {
         [SerializeField] private float enlightenment;
         [SerializeField] private float criticalChance;

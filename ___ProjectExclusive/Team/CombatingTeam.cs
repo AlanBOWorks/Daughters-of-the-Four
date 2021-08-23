@@ -26,18 +26,12 @@ namespace _Team
         [ShowInInspector] public readonly TeamCombatStatsHolder StatsHolder;
         [ShowInInspector] public MemberKnockOutHandler knockOutHandler;
 
-        public ICharacterBasicStatsData GetCurrentStats()
-            => StatsHolder.GetCurrentStats();
 
-        public FilterPassivesHolder GetCurrentPassives()
-            => StatsHolder.GetCurrentPassives();
 
         public bool IsInDangerState()
             => State.IsInDanger();
+        public ICharacterBasicStatsData GetCurrentStanceValue() 
+            => StatsHolder.GetCurrentStanceValue();
 
-        public void InjectAura(SAuraPassive aura)
-        {
-            StatsHolder.InjectAura(aura);
-        }
     }
 }

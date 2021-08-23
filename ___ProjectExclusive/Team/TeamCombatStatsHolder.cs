@@ -3,30 +3,21 @@ using Characters;
 using Passives;
 using Sirenix.OdinInspector;
 using Skills;
+using Stats;
 using UnityEngine;
 
 namespace _Team
 {
-    public class TeamCombatStatsHolder : ITeamCombatControlStats,
-        IStanceArchetype<CompositeStats>
+    public class TeamCombatStatsHolder : ITeamCombatControlStats, 
+        IStanceData<ICharacterBasicStatsData>
     {
         private readonly TeamCombatState _state;
 
         [ShowInInspector]
         public ICharacterArchetypesData<float> ControlLoseOnDeath { get; private set; }
-
-        [ShowInInspector, HorizontalGroup("Attacking")]
-        public CompositeStats AttackingStats { get; private set; }
-        [ShowInInspector, HorizontalGroup("Neutral")]
-        public CompositeStats NeutralStats { get; private set; }
-        [ShowInInspector, HorizontalGroup("Defending")]
-        public CompositeStats DefendingStats { get; private set; }
-        [ShowInInspector, HorizontalGroup("Attacking")]
-        public FilterPassivesHolder OnAttackPassives { get; private set; }
-        [ShowInInspector, HorizontalGroup("Neutral")]
-        public FilterPassivesHolder OnNeutralPassives { get; private set; }
-        [ShowInInspector,HorizontalGroup("Defending")]
-        public FilterPassivesHolder OnDefendingPassives { get; private set; }
+        [ShowInInspector]
+        public readonly PositionalStats PositionalStats;
+       
 
         public float LoseControlThreshold;
         public float ReviveTime;
@@ -36,12 +27,7 @@ namespace _Team
         public TeamCombatStatsHolder(TeamCombatState state)
         {
             _state = state;
-            AttackingStats = new CompositeStats();
-            NeutralStats = new CompositeStats();
-            DefendingStats = new CompositeStats();
-            OnAttackPassives = new FilterPassivesHolder();
-            OnNeutralPassives = new FilterPassivesHolder();
-            OnDefendingPassives = new FilterPassivesHolder();
+            PositionalStats = PositionalStats.GenerateStats(state);
 
             LoseControlThreshold = DefaultLoseThreshold;
             ReviveTime = DefaultReviveTime;
@@ -53,6 +39,8 @@ namespace _Team
         public TeamCombatStatsHolder(TeamCombatState state, ITeamCombatControlHolder stats)
         {
             _state = state;
+            PositionalStats = PositionalStats.GenerateStats(state);
+
             InjectPreset(stats);
         }
 
@@ -60,8 +48,7 @@ namespace _Team
         public void InjectPreset(ITeamCombatControlHolder holder)
         {
             InjectNewStats(holder);
-            InjectNewPassives(holder);
-            
+       
             LoseControlThreshold = holder.GetLoseThreshold();
             ReviveTime = holder.GetReviveTime();
             ControlLoseOnDeath = holder.GetControlLosePoints() ?? TeamControlLoses.BackUpData;
@@ -70,79 +57,26 @@ namespace _Team
             BurstCounterAmount = holder.GetBurstCounterAmount();
         }
 
-        private void InjectNewStats(IStanceArchetype<ICharacterBasicStats> stats)
+        private void InjectNewStats(IStanceData<ICharacterBasicStats> stats)
         {
-            var attackingStats = stats.GetAttacking();
-            var neutralStats = stats.GetNeutral();
-            var defendingStats = stats.GetDefending();
-            if(attackingStats == null)
-                throw new NullReferenceException(stats.GetType().ToString());
-
-            AttackingStats = new CompositeStats(attackingStats);
-            NeutralStats = new CompositeStats(neutralStats);
-            DefendingStats = new CompositeStats(defendingStats);
+            var attackingStats = stats.AttackingStance;
+            var neutralStats = stats.NeutralStance;
+            var defendingStats = stats.DefendingStance;
+            
+            if(attackingStats != null)
+                UtilsStats.Add(PositionalStats.AttackingStance, attackingStats);
+            if (neutralStats != null)
+                UtilsStats.Add(PositionalStats.NeutralStance, neutralStats);
+            if (defendingStats != null)
+                UtilsStats.Add(PositionalStats.DefendingStance, defendingStats);
         }
 
-        private void InjectNewPassives(IStanceArchetype<FilterPassivesHolder> passives)
-        {
-            OnAttackPassives = new FilterPassivesHolder(passives.GetAttacking());
-            OnNeutralPassives = new FilterPassivesHolder(passives.GetNeutral());
-            OnDefendingPassives = new FilterPassivesHolder(passives.GetDefending());
-        }
 
-        public ICharacterBasicStatsData GetCurrentStats()
-        {
-            return _state.CurrentStance switch
-            {
-                TeamCombatState.Stances.Neutral => NeutralStats,
-                TeamCombatState.Stances.Attacking => AttackingStats,
-                TeamCombatState.Stances.Defending => DefendingStats,
-                _ => throw new ArgumentException("TeamControl seems to trying to access an invalid" +
-                                                 $"type of Team.State [{_state.CurrentStance}]")
-            };
-        }
+        public ICharacterBasicStatsData AttackingStance => PositionalStats.AttackingStance;
+        public ICharacterBasicStatsData NeutralStance => PositionalStats.NeutralStance;
+        public ICharacterBasicStatsData DefendingStance => PositionalStats.DefendingStance;
 
-        public FilterPassivesHolder GetCurrentPassives()
-        {
-            return _state.CurrentStance switch
-            {
-                TeamCombatState.Stances.Neutral => OnNeutralPassives,
-                TeamCombatState.Stances.Attacking => OnAttackPassives,
-                TeamCombatState.Stances.Defending => OnDefendingPassives,
-                _ => throw new ArgumentException("TeamControl seems to trying to access an invalid" +
-                                                 $"type of Team.State [{_state.CurrentStance}]")
-            };
-        }
-
-        public CompositeStats GetAttacking() => AttackingStats;
-        public CompositeStats GetNeutral() => NeutralStats;
-        public CompositeStats GetDefending() => DefendingStats;
-
-        public void InjectAura(SAuraPassive aura)
-        {
-            var position = aura.InjectionPosition();
-            var stats = aura.GetStats();
-            switch (position)
-            {
-                case CharacterArchetypes.TeamPosition.FrontLine:
-                    AttackingStats.Add(stats);
-                    break;
-                case CharacterArchetypes.TeamPosition.MidLine:
-                    NeutralStats.Add(stats);
-                    break;
-                case CharacterArchetypes.TeamPosition.BackLine:
-                    DefendingStats.Add(stats);
-                    break;
-                case CharacterArchetypes.TeamPosition.All:
-                    AttackingStats.Add(stats);
-                    NeutralStats.Add(stats);
-                    DefendingStats.Add(stats);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException($"Target position [{position}] is not " +
-                                                          $"supported in Aura Injection.");
-            }
-
-        }
+        public ICharacterBasicStatsData GetCurrentStanceValue() 
+            => PositionalStats.GetCurrentStanceValue();
     }
 }

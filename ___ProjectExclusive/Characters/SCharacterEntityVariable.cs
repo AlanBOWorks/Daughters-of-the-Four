@@ -21,14 +21,6 @@ namespace Characters
 
         [TitleGroup("Passives")]
         [SerializeField] 
-        private OpeningPassives openingPassives = new OpeningPassives();
-        [SerializeField]
-        private FilterPassivesHolder sharedFilterPassives = new FilterPassivesHolder();
-        [SerializeField] 
-        private PassivesHolder filterPassivesHolder = new PassivesHolder();
-        [SerializeField] 
-        private SHarmonyPassive harmonyPassive = null;
-        [SerializeField] 
         private SCriticalBuffPreset criticalBuff = null;
 
         [TitleGroup("Stats")] 
@@ -52,10 +44,7 @@ namespace Characters
         public GameObject CharacterPrefab => characterPrefab;
         public SCharacterSkillsPreset UniqueSkillsPreset => skillsPreset;
         public SCharacterSharedSkillsPreset SharedSkillsPreset => sharedSkillsPreset;
-        public OpeningPassives GetOpeningPassives() => openingPassives;
-        public IPassivesFiltersHolder GetSharedFilterPassives() => sharedFilterPassives;
-        public PassivesHolder GetPassivesHolder() => filterPassivesHolder;
-        public SHarmonyPassive GetHarmonyPassive() => harmonyPassive;
+     
         public SCriticalBuffPreset GetCriticalBuff() => criticalBuff;
 
         public CharacterArchetypes.RangeType RangeType => rangeType;
@@ -67,10 +56,6 @@ namespace Characters
         CharacterArchetypes.RangeType RangeType { get; }
         CharacterCombatData GenerateCombatData();
         CombatSkills GenerateCombatSkills(CombatingEntity injection);
-        OpeningPassives GetOpeningPassives();
-        IPassivesFiltersHolder GetSharedFilterPassives();
-        PassivesHolder GetPassivesHolder();
-        SHarmonyPassive GetHarmonyPassive();
         SCriticalBuffPreset GetCriticalBuff();
     }
 }

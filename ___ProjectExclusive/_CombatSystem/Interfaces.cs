@@ -22,7 +22,7 @@ namespace _CombatSystem
     {
         
         /// <param name="controlPercentage">Goes (-1,1)</param>
-        void OnPlayerControlVariation(float controlPercentage, TeamCombatState.Stances targetStance);
+        void OnPlayerControlVariation(float controlPercentage, EnumTeam.Stances targetStance);
         void OnPlayerControlVariation(float controlPercentage);
     }
 }

@@ -140,7 +140,7 @@ namespace Stats
             };
         }
 
-        public static T GetStat<T>(ISpecialStatsData<T> stats, EnumStats.Concentration type)
+        public static T GetStat<T>(IConcentrationStatsData<T> stats, EnumStats.Concentration type)
         {
             return type switch
             {
@@ -212,7 +212,7 @@ namespace Stats
             injection.DamageReduction = injection.GetDamageReduction() + stats.GetDamageReduction();
         }
 
-        public static void Add(ICharacterBasicStats injection, ISpecialStatsData stats)
+        public static void Add(ICharacterBasicStats injection, IConcentrationStatsData stats)
         {
             injection.SpeedAmount = injection.GetSpeedAmount() + stats.GetSpeedAmount();
             injection.CriticalChance = injection.GetCriticalChance() + stats.GetCriticalChance();
@@ -230,7 +230,7 @@ namespace Stats
             Add(injection, stats as IOffensiveStatsData);
             Add(injection, stats as ISupportStatsData);
             Add(injection, stats as IVitalityStatsData);
-            Add(injection, stats as ISpecialStatsData);
+            Add(injection, stats as IConcentrationStatsData);
             Add(injection, stats as ICombatTempoStatsData);
         }
 
@@ -256,7 +256,7 @@ namespace Stats
             stats.DamageReduction = value;
         }
 
-        public static void OverrideStats(ISpecialStatsInjection stats, float value = 0)
+        public static void OverrideStats(IConcentrationStatsInjection stats, float value = 0)
         {
             stats.Enlightenment = value;
             stats.CriticalChance = value;
@@ -268,7 +268,7 @@ namespace Stats
             OverrideStats(stats as IOffensiveStatsInjection, value);
             OverrideStats(stats as ISupportStatsInjection, value);
             OverrideStats(stats as IVitalityStatsInjection, value);
-            OverrideStats(stats as ISpecialStatsInjection, value);
+            OverrideStats(stats as IConcentrationStatsInjection, value);
         }
 
         public static void OverrideStats(ICombatTemporalStatsBaseInjection stats, float value = 0)
@@ -306,7 +306,7 @@ namespace Stats
             injection.DeBuffReduction = copyFrom.GetDeBuffReduction();
         }
 
-        public static void CopyStats(ISpecialStatsInjection injection, ISpecialStatsData copyFrom)
+        public static void CopyStats(IConcentrationStatsInjection injection, IConcentrationStatsData copyFrom)
         {
             injection.Enlightenment = copyFrom.GetEnlightenment();
             injection.CriticalChance = copyFrom.GetCriticalChance();
@@ -319,7 +319,7 @@ namespace Stats
             CopyStats(injection as IOffensiveStatsInjection, copyFrom);
             CopyStats(injection as ISupportStatsInjection, copyFrom);
             CopyStats(injection as IVitalityStatsInjection, copyFrom);
-            CopyStats(injection as ISpecialStatsInjection, copyFrom);
+            CopyStats(injection as IConcentrationStatsInjection, copyFrom);
             CopyStats(injection as ICombatTemporalStatsBaseInjection, copyFrom);
         }
 

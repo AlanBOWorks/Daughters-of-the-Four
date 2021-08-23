@@ -61,17 +61,12 @@ namespace Characters
         /// </summary>
         [ShowInInspector]
         public readonly DelayBuffHandler DelayBuffHandler;
-        [ShowInInspector]
-        public CombatPassivesHolder PassivesHolder { get; private set; }
-
 
         [ShowInInspector, NonSerialized] 
         public CharacterCombatAreasData AreasDataTracker;
 
         [ShowInInspector, NonSerialized] 
         public readonly CombatCharacterEvents Events;
-        [ShowInInspector]
-        public HarmonyBuffInvoker HarmonyBuffInvoker { get; private set; }
 
         [ShowInInspector] 
         public CharacterCriticalActionHandler CharacterCriticalBuff { get; private set; }
@@ -132,10 +127,6 @@ namespace Characters
             CombatStats.TeamData = team;
             AreasDataTracker.Injection(team.State);
         }
-        public void Injection(CombatPassivesHolder passivesHolder) => 
-            PassivesHolder = passivesHolder;
-        public void Injection(HarmonyBuffInvoker harmonyBuffInvoker) => 
-            HarmonyBuffInvoker = harmonyBuffInvoker;
         public void Injection(SDelayBuffPreset criticalBuff) =>
             CharacterCriticalBuff.CriticalBuff = criticalBuff;
 
@@ -173,7 +164,7 @@ namespace Characters
         // Eg: increasing the Heal power instead the Support)
         private readonly MultiplierStats _multiplierStats;
 
-        private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStats();
+        private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStanceValue();
         public IStatsPrimordial GetMultiplierStats() => _multiplierStats;
 
         public CombatingTeam TeamData
@@ -305,7 +296,7 @@ namespace Characters
             public CharacterCombatStatsFull BurstStats { get; protected set; }
 
             [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
-            private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStats();
+            private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStanceValue();
 
             public CombatingTeam TeamData;
 

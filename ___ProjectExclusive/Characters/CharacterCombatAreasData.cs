@@ -12,14 +12,14 @@ namespace Characters
         public CharacterArchetypes.RangeType RangeType;
         private TeamCombatState _teamStateData;
 
-        private TeamCombatState.Stances _forcedState;
+        private EnumTeam.Stances _forcedState;
         public bool IsForceStance { get; private set; }
 
 
         public CharacterCombatAreasData(CharacterArchetypes.TeamPosition positionInTeam,
             CharacterArchetypes.RangeType rangeType,
             CharacterArchetypes.FieldPosition initialFieldPosition = CharacterArchetypes.FieldPosition.InTeam,
-            TeamCombatState.Stances initialStance = TeamCombatState.Stances.Neutral)
+            EnumTeam.Stances initialStance = EnumTeam.Stances.Neutral)
         {
             PositionInTeam = positionInTeam;
             Role = (CharacterArchetypes.RoleArchetype) positionInTeam;
@@ -33,7 +33,7 @@ namespace Characters
             _teamStateData = teamState;
         }
 
-        public void ForceState(TeamCombatState.Stances targetStance)
+        public void ForceState(EnumTeam.Stances targetStance)
         {
             _forcedState = targetStance;
             IsForceStance = true;
@@ -44,7 +44,7 @@ namespace Characters
             IsForceStance = false;
         }
         [ShowInInspector]
-        public TeamCombatState.Stances GetCurrentPositionState()
+        public EnumTeam.Stances GetCurrentPositionState()
         {
             if (IsForceStance || _teamStateData == null)
                 return _forcedState;

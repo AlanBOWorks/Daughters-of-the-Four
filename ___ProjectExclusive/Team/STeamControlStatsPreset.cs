@@ -35,12 +35,6 @@ namespace _Team
         [HorizontalGroup("Defend")]
         [SerializeField] private CharacterCombatStatsFull onDefendingStats;
 
-        [HorizontalGroup("Attack")]
-        [SerializeField] private FilterPassivesHolder onAttackPassives;
-        [HorizontalGroup("Neutral")]
-        [SerializeField] private FilterPassivesHolder onNeutralPassives;
-        [HorizontalGroup("Defend")]
-        [SerializeField] private FilterPassivesHolder onDefendingPassives;
         public string ControlName => controlName;
         public float GetLoseThreshold() => loseControlThreshold;
         public float GetReviveTime() => reviveTime;
@@ -50,21 +44,12 @@ namespace _Team
         public ICharacterArchetypesData<float> GetControlLosePoints() => controlLoses;
 
 
-
-        ICharacterBasicStats IStanceArchetype<ICharacterBasicStats>.GetAttacking()
+        ICharacterBasicStats IStanceData<ICharacterBasicStats>.AttackingStance
             => onAttackStats;
-        ICharacterBasicStats IStanceArchetype<ICharacterBasicStats>.GetNeutral()
+        ICharacterBasicStats IStanceData<ICharacterBasicStats>.NeutralStance
             => onNeutralStats;
-        ICharacterBasicStats IStanceArchetype<ICharacterBasicStats>.GetDefending()
+        ICharacterBasicStats IStanceData<ICharacterBasicStats>.DefendingStance
             => onDefendingStats;
-
-        FilterPassivesHolder IStanceArchetype<FilterPassivesHolder>.GetAttacking()
-            => onAttackPassives;
-        FilterPassivesHolder IStanceArchetype<FilterPassivesHolder>.GetNeutral()
-            => onNeutralPassives;
-        FilterPassivesHolder IStanceArchetype<FilterPassivesHolder>.GetDefending()
-            => onDefendingPassives;
-
 
 
 
@@ -92,7 +77,7 @@ namespace _Team
     }
 
     public interface ITeamCombatControlHolder : 
-        IStanceArchetype<ICharacterBasicStats>, IStanceArchetype<FilterPassivesHolder>
+        IStanceData<ICharacterBasicStats>
 
     {
         string ControlName { get; }
@@ -112,9 +97,6 @@ namespace _Team
         ICharacterArchetypesData<float> GetControlLosePoints();
     }
 
-    public interface ITeamCombatControlStats
-    {
-        ICharacterBasicStatsData GetCurrentStats();
-        FilterPassivesHolder GetCurrentPassives();
-    }
+    public interface ITeamCombatControlStats : IStanceElement<ICharacterBasicStatsData>
+    { }
 }

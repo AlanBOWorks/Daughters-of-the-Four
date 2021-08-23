@@ -58,7 +58,7 @@ namespace Skills
 
             return skills == null 
                 ? null 
-                : TeamCombatState.GetStance(skills, state);
+                : UtilsSkill.GetElement(skills, state);
         }
         public static List<CombatSkill> GetSkillsByStance(CombatingEntity entity)
         {
@@ -67,17 +67,20 @@ namespace Skills
 
             return skills == null
                 ? null
-                : TeamCombatState.GetStance((IStanceArchetype<List<CombatSkill>>)skills, state);
+                : UtilsTeam.GetElement(skills, state);
         }
-
         public static T GetElement<T>(ISkillPositions<T> elements, CombatingEntity entity)
         {
             var state = entity.AreasDataTracker.GetCurrentPositionState();
+            return GetElement(elements, state);
+        }
+        public static T GetElement<T>(ISkillPositions<T> elements, EnumTeam.Stances state)
+        {
             return state switch
             {
-                TeamCombatState.Stances.Attacking => elements.AttackingSkills,
-                TeamCombatState.Stances.Neutral => elements.NeutralSkills,
-                TeamCombatState.Stances.Defending => elements.DefendingSkills,
+                EnumTeam.Stances.Attacking => elements.AttackingSkills,
+                EnumTeam.Stances.Neutral => elements.NeutralSkills,
+                EnumTeam.Stances.Defending => elements.DefendingSkills,
                 _ => throw new NotImplementedException("Not implemented [Stance] was invoked" +
                                                        $"in the GetElement for [{typeof(T)}]")
             };

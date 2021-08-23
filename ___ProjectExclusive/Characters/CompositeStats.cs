@@ -10,7 +10,7 @@ namespace Characters
         protected List<IOffensiveStatsData> offensiveStats;
         protected List<ISupportStatsData> supportStats;
         protected List<IVitalityStatsData> vitalityStats;
-        protected List<ISpecialStatsData> specialStats;
+        protected List<IConcentrationStatsData> specialStats;
         protected List<ICombatTemporalStatsBaseData> temporalStats;
 
         public void Add(ICharacterBasicStats stats)
@@ -18,7 +18,7 @@ namespace Characters
             Add(stats as IOffensiveStatsData);
             Add(stats as ISupportStatsData);
             Add(stats as IVitalityStatsData);
-            Add(stats as ISpecialStatsData);
+            Add(stats as IConcentrationStatsData);
             Add(stats as ICombatTemporalStatsBaseData);
         }
 
@@ -34,7 +34,7 @@ namespace Characters
         {
             vitalityStats.Add(stats);
         }
-        public void Add(ISpecialStatsData stats)
+        public void Add(IConcentrationStatsData stats)
         {
             specialStats.Add(stats);
         }
@@ -61,7 +61,7 @@ namespace Characters
             supportStats = new List<ISupportStatsData>();
             vitalityStats = new List<IVitalityStatsData>();
             temporalStats = new List<ICombatTemporalStatsBaseData>();
-            specialStats = new List<ISpecialStatsData>();
+            specialStats = new List<IConcentrationStatsData>();
         }
 
         public void ResetToZero()
@@ -224,7 +224,7 @@ namespace Characters
             get
             {
                 float calculation = BaseStats.Enlightenment;
-                foreach (ISpecialStatsData specialStat in specialStats)
+                foreach (IConcentrationStatsData specialStat in specialStats)
                 {
                     calculation += specialStat.GetEnlightenment();
                 }
@@ -238,7 +238,7 @@ namespace Characters
             get
             {
                 float calculation = BaseStats.CriticalChance;
-                foreach (ISpecialStatsData specialStat in specialStats)
+                foreach (IConcentrationStatsData specialStat in specialStats)
                 {
                     calculation += specialStat.GetCriticalChance();
                 }
@@ -252,7 +252,7 @@ namespace Characters
             get
             {
                 float calculation = BaseStats.SpeedAmount;
-                foreach (ISpecialStatsData specialStat in specialStats)
+                foreach (IConcentrationStatsData specialStat in specialStats)
                 {
                     calculation += specialStat.GetSpeedAmount();
                 }

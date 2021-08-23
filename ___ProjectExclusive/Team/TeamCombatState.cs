@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace _Team
 {
-    public class TeamCombatState
+    public class TeamCombatState : IStanceProvider
     {
         public TeamCombatState(CombatingTeam team)
         {
             Team = team;
-            _normalStance = Stances.Neutral;
+            _normalStance = EnumTeam.Stances.Neutral;
         }
 
         public readonly CombatingTeam Team;
@@ -31,12 +31,12 @@ namespace _Team
             return control;
         }
 
-        public Stances CurrentStance => IsForcedStance ? ForceStance : _normalStance;
+        public EnumTeam.Stances CurrentStance => IsForcedStance ? ForceStance : _normalStance;
         [ShowInInspector]
-        public Stances ForceStance { get; private set; }
+        public EnumTeam.Stances ForceStance { get; private set; }
 
         [ShowInInspector]
-        private Stances _normalStance;
+        private EnumTeam.Stances _normalStance;
 
         [ShowInInspector] 
         public bool IsForcedStance;
@@ -50,12 +50,12 @@ namespace _Team
                    Team.StatsHolder.LoseControlThreshold;
         }
 
-        public void VariateStance(Stances target)
+        public void VariateStance(EnumTeam.Stances target)
         {
             _normalStance = target;
         }
 
-        public void DoForceStance(Stances target)
+        public void DoForceStance(EnumTeam.Stances target)
         {
             IsForcedStance = true;
             ForceStance = target;
@@ -82,55 +82,16 @@ namespace _Team
             BurstControlAmount = 0;
             IsBurstStance = false;
         }
+    }
 
-
-
+    public static class EnumTeam
+    {
         public enum Stances
         {
             Attacking = 1, //These values are to convert to percentage in Control from (-1,1) values if needed
             Neutral = 0,
             Defending = -1
         }
-
-        public static T GetStance<T>(IStanceArchetype<T> archetype, Stances stance)
-        {
-            switch (stance)
-            {
-                case Stances.Attacking:
-                    return archetype.GetAttacking();
-                case Stances.Neutral:
-                    return archetype.GetNeutral();
-                case Stances.Defending:
-                    return archetype.GetDefending();
-                default:
-                    throw new ArgumentException("Can't get Stance from the passed arguments",
-                        new NotImplementedException($"Target stance is not implemented: {stance}"));
-            }
-        }
-
-        public static T GetStance<T>(ISkillPositions<T> skills, Stances stance) where T : class 
-        {
-            switch (stance)
-            {
-                case Stances.Attacking:
-                    return skills.AttackingSkills;
-                case Stances.Neutral:
-                    return skills.NeutralSkills;
-                case Stances.Defending:
-                    return skills.DefendingSkills;
-                default:
-                    throw new ArgumentException("Can't get Stance from the passed arguments",
-                        new NotImplementedException($"Target stance is not implemented: {stance}"));
-            }
-        }
-    }
-
-
-    public interface IStanceArchetype<out T>
-    {
-        T GetAttacking();
-        T GetNeutral();
-        T GetDefending();
     }
 
     public static class UtilsTeam
@@ -140,23 +101,36 @@ namespace _Team
         public const string NeutralKeyword = "Neutral";
         public const string DefendingKeyword = "Defending";
 
-        public static string GetKeyword(TeamCombatState.Stances target)
+        public static string GetKeyword(EnumTeam.Stances target)
         {
             switch (target)
             {
-                case TeamCombatState.Stances.Attacking:
+                case EnumTeam.Stances.Attacking:
                     return AttackKeyword;
-                case TeamCombatState.Stances.Neutral:
+                case EnumTeam.Stances.Neutral:
                     return NeutralKeyword;
-                case TeamCombatState.Stances.Defending:
+                case EnumTeam.Stances.Defending:
                     return DefendingKeyword;
                 default:
-                    throw new ArgumentException($"Invalid {typeof(TeamCombatState.Stances)} target;",
+                    throw new ArgumentException($"Invalid {typeof(EnumTeam.Stances)} target;",
                         new NotImplementedException("There's a state that wasn't implemented: " +
                                                     $"{target}"));
             }
         }
+
+        public static T GetElement<T>(IStanceData<T> stances, EnumTeam.Stances target)
+        {
+            switch (target)
+            {
+                case EnumTeam.Stances.Attacking:
+                    return stances.AttackingStance;
+                case EnumTeam.Stances.Neutral:
+                    return stances.NeutralStance;
+                case EnumTeam.Stances.Defending:
+                    return stances.DefendingStance;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(target), target, null);
+            }
+        }
     }
-
-
 }
