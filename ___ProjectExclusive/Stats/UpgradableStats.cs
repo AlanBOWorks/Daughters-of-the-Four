@@ -39,7 +39,7 @@ namespace Stats
             set => vitalityAmount = value;
         }
 
-        public float Enlightenment
+        public float ConcentrationAmount
         {
             get => enlightenment;
             set => enlightenment = value;

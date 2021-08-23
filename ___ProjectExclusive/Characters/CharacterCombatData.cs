@@ -150,9 +150,9 @@ namespace Characters
             BaseStats = new CharacterCombatStatsFull(presetStats);
             BuffStats = new CharacterCombatStatsFull();
             BurstStats = new CharacterCombatStatsFull();
-            CalculatedStats = new CharacterCombatStatsBasic();
 
             _formulatedStats = new FormulatedStats(this);
+            _multiplierStats = new MultiplierStats();
         }
 
         [ShowInInspector, HorizontalGroup("Base Stats"),PropertyOrder(-2), GUIColor(.4f,.8f,.6f)]
@@ -166,7 +166,15 @@ namespace Characters
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
         public CharacterCombatStatsFull BurstStats { get; protected set; }
 
+        // By design multiplier are consistent / Burst are temporary and specific;
+        // making multipliers Burst type could be confusing.
+        // Some buff could increase multiplier and/or a specific stat
+        //
+        // Eg: increasing the Heal power instead the Support)
+        private readonly MultiplierStats _multiplierStats;
+
         private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStats();
+        public IStatsPrimordial GetMultiplierStats() => _multiplierStats;
 
         public CombatingTeam TeamData
         {
@@ -175,19 +183,12 @@ namespace Characters
         }
 
         private readonly FormulatedStats _formulatedStats;
-        /// <summary>
-        /// For using <see cref="CombatSkill"/>
-        /// </summary>
-        [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2)]
-        public CharacterCombatStatsBasic CalculatedStats { get; protected set; }
-        
         [TitleGroup("Local stats"), PropertyOrder(-10)]
         public int ActionsLefts;
 
 
         public void Initialization()
         {
-            UpdateCalculatedStats();
             BaseStats.HealthPoints = BaseStats.MaxHealth;
             BaseStats.MortalityPoints = BaseStats.MaxMortalityPoints;
         }
@@ -205,10 +206,6 @@ namespace Characters
             UtilsCombatStats.HealToMax(this);
         }
 
-        public void UpdateCalculatedStats()
-        {
-            UtilsStats.CopyStats(CalculatedStats, _formulatedStats);
-        }
 
         public float CalculateBaseAttackPower()
         {
@@ -267,25 +264,32 @@ namespace Characters
             set => BaseStats.ActionsPerInitiative = value;
         }
 
-        
 
-        public float GetAttackPower() => CalculatedStats.AttackPower;
-        public float GetDeBuffPower() => CalculatedStats.DeBuffPower;
-        public float GetStaticDamagePower() => CalculatedStats.StaticDamagePower;
-        public float GetHealPower() => CalculatedStats.HealPower;
-        public float GetBuffPower() => CalculatedStats.BuffPower;
-        public float GetBuffReceivePower() => CalculatedStats.BuffReceivePower;
-        public float GetMaxHealth() => CalculatedStats.MaxHealth;
-        public float GetMaxMortalityPoints() => CalculatedStats.MaxMortalityPoints;
-        public float GetDamageReduction() => CalculatedStats.DamageReduction;
-        public float GetDeBuffReduction() => CalculatedStats.DeBuffReduction;
-        public float GetEnlightenment() => CalculatedStats.Enlightenment;
-        public float GetCriticalChance() => CalculatedStats.CriticalChance;
-        public float GetSpeedAmount() => CalculatedStats.SpeedAmount;
-        public float GetInitiativePercentage() => _formulatedStats.GetInitiativePercentage(); //This are tempo related
-        public int GetActionsPerInitiative() => CalculatedStats.ActionsPerInitiative;
-        public float GetHarmonyAmount() => CalculatedStats.HarmonyAmount;
 
+        public float GetAttackPower() => _multiplierStats.OffensivePower * _formulatedStats.GetAttackPower();
+        public float GetDeBuffPower() => _multiplierStats.OffensivePower * _formulatedStats.GetDeBuffPower();
+        public float GetStaticDamagePower() => _multiplierStats.OffensivePower * _formulatedStats.GetStaticDamagePower();
+        public float GetHealPower() => _multiplierStats.SupportPower * _formulatedStats.GetHealPower();
+        public float GetBuffPower() => _multiplierStats.SupportPower * _formulatedStats.GetBuffPower();
+        public float GetBuffReceivePower() => _multiplierStats.SupportPower * _formulatedStats.GetBuffReceivePower();
+        public float GetMaxHealth() => _multiplierStats.VitalityAmount * _formulatedStats.GetMaxHealth();
+        public float GetMaxMortalityPoints() => _multiplierStats.VitalityAmount * _formulatedStats.GetMaxMortalityPoints();
+        public float GetDamageReduction() => _multiplierStats.VitalityAmount * _formulatedStats.GetDamageReduction();
+        public float GetDeBuffReduction() => _multiplierStats.VitalityAmount * _formulatedStats.GetDeBuffReduction();
+        public float GetEnlightenment() => _multiplierStats.ConcentrationAmount * _formulatedStats.GetEnlightenment();
+        public float GetCriticalChance() => _multiplierStats.ConcentrationAmount * _formulatedStats.GetCriticalChance();
+        public float GetSpeedAmount() => _multiplierStats.ConcentrationAmount * _formulatedStats.GetSpeedAmount();
+        public float GetInitiativePercentage() => InitiativePercentage;
+        public int GetActionsPerInitiative() => ActionsPerInitiative;
+        public float GetHarmonyAmount() => HarmonyAmount;
+
+        private class MultiplierStats : IStatsPrimordial
+        {
+            public float OffensivePower { get; set; } = 1;
+            public float SupportPower { get; set; } = 1;
+            public float VitalityAmount { get; set; } = 1;
+            public float ConcentrationAmount { get; set; } = 1;
+        }
 
         private class FormulatedStats : ICharacterBasicStatsData
         {
@@ -511,13 +515,13 @@ namespace Characters
 
             Enlightenment = UtilsStats.GrowFormula(
                 initialStats.GetEnlightenment(), growStats.GetEnlightenment(),
-                currentUpgrades.Enlightenment);
+                currentUpgrades.ConcentrationAmount);
             CriticalChance = UtilsStats.GrowFormula(
                 initialStats.GetCriticalChance(), growStats.GetCriticalChance(),
-                currentUpgrades.Enlightenment);
+                currentUpgrades.ConcentrationAmount);
             SpeedAmount = UtilsStats.GrowFormula(
                 initialStats.GetSpeedAmount(), growStats.GetSpeedAmount(),
-                currentUpgrades.Enlightenment);
+                currentUpgrades.ConcentrationAmount);
 
 
             HealthPoints = initialStats.HealthPoints + growStats.HealthPoints;
@@ -527,7 +531,7 @@ namespace Characters
             InitiativePercentage = initialStats.GetInitiativePercentage() + growStats.GetInitiativePercentage();
 
             ActionsPerInitiative = initialStats.GetActionsPerInitiative() +
-                                   (int)(growStats.GetActionsPerInitiative() * currentUpgrades.Enlightenment * GrowActionsModifier);
+                                   (int)(growStats.GetActionsPerInitiative() * currentUpgrades.ConcentrationAmount * GrowActionsModifier);
         }
 
         private const float GrowActionsModifier = .2f; //Each 5 upgrades

@@ -4,7 +4,7 @@ namespace Stats
 {
 
     [CreateAssetMenu(fileName = "SPECIAL - N [Stats]",
-        menuName = "Combat/Stats/Special")]
+        menuName = "Combat/Stats/Concentration")]
     public class SSpecialStats : ScriptableObject, ISpecialStats
     {
         [SerializeField] private float enlightenment;

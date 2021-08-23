@@ -44,13 +44,11 @@ namespace CombatEffects
                         new NotImplementedException($"Could be the type [{buffType}] is not implemented"));
             }
         }
-        
 
 
-        private const string OffensivePrefix = " Offensive Stat - ";
         protected override string GetPrefix()
         {
-            return OffensivePrefix + buffType.ToString().ToUpper();
+            return " Offensive Stat - " + buffType.ToString().ToUpper();
         }
     }
 }

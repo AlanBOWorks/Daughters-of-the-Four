@@ -17,6 +17,19 @@ namespace Stats
 
     public static class EnumStats
     {
+        /// <summary>
+        /// Wrappers of the subStats: <br></br>
+        /// <see cref="Offensive"/>,<see cref="Support"/>,<see cref="Vitality"/>, <see cref="Concentration"/>,
+        /// <see cref="TemporalCombatStats"/>)
+        /// </summary>
+        public enum Primordial
+        {
+            Offensive,
+            Support,
+            Vitality,
+            Concentration,
+        }
+
         public const int AttackIndex = 0;
         public const int DeBuffIndex = AttackIndex + 1;
         public const int StaticDamageIndex = DeBuffIndex + 1;
@@ -46,13 +59,13 @@ namespace Stats
             MaxHealth = MaxHealthIndex,
             MaxMortality = MaxMortalityIndex,
             DamageReduction = DamageReductionIndex,
-            DeDuffReduction = DeBuffReductionIndex
+            DeBuffReduction = DeBuffReductionIndex
         }
 
         public const int EnlightenmentIndex = 1000;
         public const int CriticalIndex = EnlightenmentIndex + 1;
         public const int SpeedIndex = CriticalIndex + 1;
-        public enum Special
+        public enum Concentration
         {
             Enlightenment = EnlightenmentIndex,
             Critical = CriticalIndex,
@@ -80,7 +93,20 @@ namespace Stats
 
     public static class UtilsEnumStats
     {
-        public static float GetStat(IOffensiveStatsData stats, EnumStats.Offensive type)
+
+        public static T GetStat<T>(IStatsPrimordial<T> stats, EnumStats.Primordial type)
+        {
+            return type switch
+            {
+                EnumStats.Primordial.Offensive => stats.OffensivePower,
+                EnumStats.Primordial.Support => stats.SupportPower,
+                EnumStats.Primordial.Vitality => stats.VitalityAmount,
+                EnumStats.Primordial.Concentration => stats.ConcentrationAmount,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
+        public static T GetStat<T>(IOffensiveStatsData<T> stats, EnumStats.Offensive type)
         {
             return type switch
             {
@@ -91,7 +117,7 @@ namespace Stats
             };
         }
 
-        public static float GetStat(ISupportStatsData stats, EnumStats.Support type)
+        public static T GetStat<T>(ISupportStatsData<T> stats, EnumStats.Support type)
         {
             return type switch
             {
@@ -102,25 +128,25 @@ namespace Stats
             };
         }
 
-        public static float GetStat(IVitalityStatsData stats, EnumStats.Vitality type)
+        public static T GetStat<T>(IVitalityStatsData<T> stats, EnumStats.Vitality type)
         {
             return type switch
             {
                 EnumStats.Vitality.MaxHealth => stats.GetMaxHealth(),
                 EnumStats.Vitality.MaxMortality => stats.GetMaxMortalityPoints(),
                 EnumStats.Vitality.DamageReduction => stats.GetDamageReduction(),
-                EnumStats.Vitality.DeDuffReduction => stats.GetDeBuffReduction(),
+                EnumStats.Vitality.DeBuffReduction => stats.GetDeBuffReduction(),
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
 
-        public static float GetStat(ISpecialStatsData stats, EnumStats.Special type)
+        public static T GetStat<T>(ISpecialStatsData<T> stats, EnumStats.Concentration type)
         {
             return type switch
             {
-                EnumStats.Special.Enlightenment => stats.GetEnlightenment(),
-                EnumStats.Special.Critical => stats.GetCriticalChance(),
-                EnumStats.Special.Speed => stats.GetSpeedAmount(),
+                EnumStats.Concentration.Enlightenment => stats.GetEnlightenment(),
+                EnumStats.Concentration.Critical => stats.GetCriticalChance(),
+                EnumStats.Concentration.Speed => stats.GetSpeedAmount(),
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
@@ -147,6 +173,8 @@ namespace Stats
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
+
+
     }
 
     public static class UtilsStats
@@ -321,7 +349,7 @@ namespace Stats
         public static void CopyStats(IStatsUpgradable injection, IStatsUpgradable copyFrom)
         {
             injection.VitalityAmount = copyFrom.VitalityAmount;
-            injection.Enlightenment = copyFrom.Enlightenment;
+            injection.ConcentrationAmount = copyFrom.ConcentrationAmount;
             injection.OffensivePower = copyFrom.OffensivePower;
             injection.SupportPower = copyFrom.SupportPower;
         }
@@ -700,6 +728,8 @@ namespace Stats
             var targetReceiveBuffPower = target.GetBuffReceivePower(); //Generally value == 0;
             buffValue += buffValue * targetReceiveBuffPower;
         }
+
+
     }
 
     public static class UtilityBuffStats

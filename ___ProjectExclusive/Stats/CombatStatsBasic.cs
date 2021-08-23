@@ -40,7 +40,7 @@ namespace Stats
         private float deBuffReduction;
 
 
-        [Title("Enlightenment")]
+        [Title("Concentration")]
         [SerializeField, SuffixLabel("%00"), Tooltip("Affects Harmony gain")]
         private float enlightenment; // before fight this could be modified
         [SerializeField, SuffixLabel("%00")]
