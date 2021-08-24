@@ -89,6 +89,13 @@ namespace Stats
             Initiative = InitiativeIndex,
             Actions = ActionsIndex
         }
+
+        public enum StatsType
+        {
+            Base,
+            Buff,
+            Burst
+        }
     }
 
     public static class UtilsEnumStats
@@ -179,8 +186,8 @@ namespace Stats
 
     public static class UtilsStats
     {
-        public static CharacterCombatStatsBasic ZeroValuesBasic = new CharacterCombatStatsBasic(0);
-        public static CharacterCombatStatsFull ZeroValuesFull = new CharacterCombatStatsFull(0);
+        public static CombatStatsBasic ZeroValuesBasic = new CombatStatsBasic(0);
+        public static CombatStatsFull ZeroValuesFull = new CombatStatsFull(0);
 
         public static float StatsFormula(float baseStat, float buffStat, float burstStat)
         {
@@ -192,19 +199,19 @@ namespace Stats
             return baseStat + growStat * upgradeAmount;
         }
 
-        public static void Add(ICharacterBasicStats injection, IOffensiveStatsData stats)
+        public static void Add(IBasicStats injection, IOffensiveStatsData stats)
         {
             injection.AttackPower = injection.GetAttackPower() + stats.GetAttackPower();
             injection.DeBuffPower = injection.GetDeBuffPower() + stats.GetDeBuffPower();
             injection.StaticDamagePower = injection.GetStaticDamagePower() + stats.GetStaticDamagePower();
         }
-        public static void Add(ICharacterBasicStats injection, ISupportStatsData stats)
+        public static void Add(IBasicStats injection, ISupportStatsData stats)
         {
             injection.HealPower = injection.GetHealPower() + stats.GetHealPower();
             injection.BuffPower = injection.GetBuffPower() + stats.GetBuffPower();
             injection.BuffReceivePower = injection.GetBuffReceivePower() + stats.GetBuffReceivePower();
         }
-        public static void Add(ICharacterBasicStats injection, IVitalityStatsData stats)
+        public static void Add(IBasicStats injection, IVitalityStatsData stats)
         {
             injection.MaxHealth = injection.GetMaxHealth() + stats.GetMaxHealth();
             injection.MaxMortalityPoints = injection.GetMaxMortalityPoints() + stats.GetMaxMortalityPoints();
@@ -212,20 +219,20 @@ namespace Stats
             injection.DamageReduction = injection.GetDamageReduction() + stats.GetDamageReduction();
         }
 
-        public static void Add(ICharacterBasicStats injection, IConcentrationStatsData stats)
+        public static void Add(IBasicStats injection, IConcentrationStatsData stats)
         {
             injection.SpeedAmount = injection.GetSpeedAmount() + stats.GetSpeedAmount();
             injection.CriticalChance = injection.GetCriticalChance() + stats.GetCriticalChance();
             injection.Enlightenment = injection.GetEnlightenment() + stats.GetEnlightenment();
         }
 
-        public static void Add(ICharacterBasicStats injection, ICombatTempoStatsData stats)
+        public static void Add(IBasicStats injection, ICombatTempoStatsData stats)
         {
             injection.InitiativePercentage = injection.GetInitiativePercentage() + stats.GetInitiativePercentage();
             injection.ActionsPerInitiative = injection.GetActionsPerInitiative() + stats.GetActionsPerInitiative();
         }
 
-        public static void Add(ICharacterBasicStats injection, ICharacterBasicStatsData stats)
+        public static void Add(IBasicStats injection, IBasicStatsData stats)
         {
             Add(injection, stats as IOffensiveStatsData);
             Add(injection, stats as ISupportStatsData);
@@ -263,7 +270,7 @@ namespace Stats
             stats.SpeedAmount = value;
         }
 
-        public static void OverrideStats(ICharacterBasicStats stats, float value = 0)
+        public static void OverrideStats(IBasicStatsInjection stats, float value = 0)
         {
             OverrideStats(stats as IOffensiveStatsInjection, value);
             OverrideStats(stats as ISupportStatsInjection, value);
@@ -278,9 +285,9 @@ namespace Stats
             stats.ActionsPerInitiative = Mathf.RoundToInt(value);
         }
 
-        public static void OverrideStats(ICharacterFullStats stats, float value)
+        public static void OverrideStats(IFullStatsInjection stats, float value)
         {
-            OverrideStats(stats as ICharacterBasicStats, value);
+            OverrideStats(stats as IBasicStats, value);
             OverrideStats(stats as ICombatTemporalStatsBaseInjection, value);
         }
 
@@ -314,7 +321,7 @@ namespace Stats
         }
 
 
-        public static void CopyStats(ICharacterBasicStatsInjection injection, ICharacterBasicStatsData copyFrom)
+        public static void CopyStats(IBasicStatsInjection injection, IBasicStatsData copyFrom)
         {
             CopyStats(injection as IOffensiveStatsInjection, copyFrom);
             CopyStats(injection as ISupportStatsInjection, copyFrom);
@@ -339,9 +346,9 @@ namespace Stats
         }
 
 
-        public static void CopyStats(ICharacterFullStats injection, ICharacterFullStats copyFrom)
+        public static void CopyStats(IFullStatsInjection injection, IFullStatsData copyFrom)
         {
-            CopyStats(injection as ICharacterBasicStatsInjection, copyFrom);
+            CopyStats(injection as IBasicStatsInjection, copyFrom);
             CopyStats(injection as ICombatTemporalStats, copyFrom);
             
         }
@@ -355,10 +362,10 @@ namespace Stats
         }
 
         
-        public static CharacterCombatData GenerateCombatData(IPlayerCharacterStats playerStats)
+        public static CombatStatsHolder GenerateCombatData(IPlayerCharacterStats playerStats)
         {
-            var copyStats = new PlayerCharacterCombatStats(playerStats);
-            return new CharacterCombatData(copyStats);
+            var copyStats = new PlayerCombatStats(playerStats);
+            return new CombatStatsHolder(copyStats);
         }
 
         public static void EnqueueStatsBuffEvent(CombatingEntity target)
@@ -396,8 +403,8 @@ namespace Stats
 
 
         public static float CalculateFinalDamage(
-            CharacterCombatData attacker,
-            CharacterCombatData receiver, float damageModifier)
+            CombatStatsHolder attacker,
+            CombatStatsHolder receiver, float damageModifier)
         {
             float baseDamage = attacker.CalculateBaseAttackPower() * damageModifier
                                - receiver.CalculateDamageReduction();
@@ -414,8 +421,8 @@ namespace Stats
         }
 
         public static float CalculateFinalStaticDamage(
-            CharacterCombatData attacker,
-            CharacterCombatData receiver, float damageModifier)
+            CombatStatsHolder attacker,
+            CombatStatsHolder receiver, float damageModifier)
         {
             float baseDamage = attacker.CalculateBaseStaticDamagePower() * damageModifier
                                - receiver.CalculateDamageReduction();
@@ -433,7 +440,7 @@ namespace Stats
 
         public static void DoDamageToShield(CombatingEntity target, float damage)
         {
-            ICharacterFullStatsData stats = target.CombatStats;
+            IFullStatsData stats = target.CombatStats;
             float shields = stats.ShieldAmount;
 
             if (shields <= 0 || damage <= 0) return;
@@ -559,7 +566,7 @@ namespace Stats
         }
 
 
-        public static void HealToMax(CharacterCombatData stats)
+        public static void HealToMax(CombatStatsHolder stats)
         {
             if(!stats.IsAlive()) return;
             float maxHealth = stats.GetMaxHealth();
@@ -578,7 +585,7 @@ namespace Stats
         }
 
 
-        public static void SetInitiative(ICharacterBasicStats stats, float targetValue)
+        public static void SetInitiative(IBasicStats stats, float targetValue)
         {
             const float lowerCap = 0;
             const float maxCap = GlobalCombatParams.InitiativeCheck;
@@ -588,7 +595,7 @@ namespace Stats
         }
         public static void SetInitiative(CombatingEntity entity, float targetValue, bool isBurstType)
         {
-            ICharacterBasicStats stats = isBurstType
+            IBasicStats stats = isBurstType
                 ? entity.CombatStats.BurstStats
                 : entity.CombatStats.BaseStats;
             SetInitiative(stats, targetValue);
@@ -603,7 +610,7 @@ namespace Stats
         {
             var stats = isBurstType 
                 ? entity.CombatStats.BurstStats 
-                : (ICharacterBasicStats) entity.CombatStats.BaseStats;
+                : (IBasicStats) entity.CombatStats.BaseStats;
             SetInitiative(stats, stats.GetInitiativePercentage() + addition);
 
 
@@ -614,7 +621,7 @@ namespace Stats
             tempoHandler.CheckAndInjectEntityInitiative(entity);
         }
 
-        public static void SetActionAmount(CharacterCombatData stats, int targetValue = 0)
+        public static void SetActionAmount(CombatStatsHolder stats, int targetValue = 0)
         {
             const int lowerCap = GlobalCombatParams.ActionsLowerCap;
             const int maxCap = GlobalCombatParams.ActionsPerInitiativeCap;
@@ -623,7 +630,7 @@ namespace Stats
             stats.ActionsLefts = targetValue;
         }
 
-        public static void AddActionAmount(CharacterCombatData stats, int addition = 1)
+        public static void AddActionAmount(CombatStatsHolder stats, int addition = 1)
         {
             SetActionAmount(stats, stats.ActionsLefts + addition);
         }
@@ -674,13 +681,13 @@ namespace Stats
             CombatSystemSingleton.CombatTeamControlHandler.DoCounterBurstControl(team,counterBurst);
         }
 
-        public static bool IsCriticalPerformance(ICharacterBasicStatsData stats, CombatSkill skill, float criticalCheck)
+        public static bool IsCriticalPerformance(IBasicStatsData stats, CombatSkill skill, float criticalCheck)
         {
             if (!skill.CanCrit) return false;
             return criticalCheck < stats.GetCriticalChance() + skill.CriticalAddition;
         }
 
-        public static bool IsCriticalPerformance(ICharacterBasicStats stats, SSkillPreset preset, float criticalCheck)
+        public static bool IsCriticalPerformance(IBasicStats stats, SSkillPreset preset, float criticalCheck)
         {
             if (!preset.canCrit) return false;
             return criticalCheck < stats.GetCriticalChance() + preset.criticalAddition;
@@ -710,7 +717,7 @@ namespace Stats
         }
 
 
-        public static float CalculateShieldsPower(ICharacterFullStatsData user)
+        public static float CalculateShieldsPower(IFullStatsData user)
         {
             float shields = user.GetHealPower() + user.GetBuffPower();
             shields *= .5f; //The average of Heal && buffPower is the Shields power
@@ -718,12 +725,12 @@ namespace Stats
             return shields;
         }
 
-        public static void VariateBuffUser(ICharacterBasicStatsData user, ref float buffValue)
+        public static void VariateBuffUser(IBasicStatsData user, ref float buffValue)
         {
             var userBuffPower = user.GetBuffPower(); //Generally value == 1;
             buffValue *= userBuffPower;
         }
-        public static void VariateBuffTarget(ICharacterBasicStatsData target, ref float buffValue)
+        public static void VariateBuffTarget(IBasicStatsData target, ref float buffValue)
         {
             var targetReceiveBuffPower = target.GetBuffReceivePower(); //Generally value == 0;
             buffValue += buffValue * targetReceiveBuffPower;

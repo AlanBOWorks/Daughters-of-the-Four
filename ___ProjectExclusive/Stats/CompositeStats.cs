@@ -1,19 +1,31 @@
 using System.Collections.Generic;
+using Characters;
 using Stats;
 using UnityEngine;
 
-namespace Characters
+namespace Stats
 {
-    public class CompositeStats : ICharacterBasicStatsData
+    public class CompositeStats : IBasicStatsData
     {
-        protected readonly CharacterCombatStatsBasic BaseStats;
+        public CompositeStats()
+        {
+            baseCombatStats = new CombatStatsBasic();
+            Initialize();
+        }
+        public CompositeStats(IBasicStats stats)
+        {
+            baseCombatStats = new CombatStatsBasic(stats);
+            Initialize();
+        }
+
+        protected readonly CombatStatsBasic baseCombatStats;
         protected List<IOffensiveStatsData> offensiveStats;
         protected List<ISupportStatsData> supportStats;
         protected List<IVitalityStatsData> vitalityStats;
         protected List<IConcentrationStatsData> specialStats;
         protected List<ICombatTemporalStatsBaseData> temporalStats;
 
-        public void Add(ICharacterBasicStats stats)
+        public void Add(IBasicStats stats)
         {
             Add(stats as IOffensiveStatsData);
             Add(stats as ISupportStatsData);
@@ -43,18 +55,6 @@ namespace Characters
             temporalStats.Add(stats);
         }
 
-        public CompositeStats()
-        {
-            BaseStats = new CharacterCombatStatsBasic();
-            Initialize();
-
-        }
-        public CompositeStats(ICharacterBasicStats stats)
-        {
-            BaseStats = new CharacterCombatStatsBasic(stats);
-            Initialize();
-        }
-
         private void Initialize()
         {
             offensiveStats = new List<IOffensiveStatsData>();
@@ -77,7 +77,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.AttackPower;
+                float calculation = baseCombatStats.AttackPower;
                 foreach (IOffensiveStatsData offensiveStat in offensiveStats)
                 {
                     calculation += offensiveStat.GetAttackPower();
@@ -91,7 +91,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.DeBuffPower;
+                float calculation = baseCombatStats.DeBuffPower;
                 foreach (IOffensiveStatsData offensiveStat in offensiveStats)
                 {
                     calculation += offensiveStat.GetDeBuffPower();
@@ -106,7 +106,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.StaticDamagePower;
+                float calculation = baseCombatStats.StaticDamagePower;
                 foreach (IOffensiveStatsData offensiveStat in offensiveStats)
                 {
                     calculation += offensiveStat.GetStaticDamagePower();
@@ -121,7 +121,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.HealPower;
+                float calculation = baseCombatStats.HealPower;
                 foreach (ISupportStatsData supportStat in supportStats)
                 {
                     calculation += supportStat.GetHealPower();
@@ -135,7 +135,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.BuffPower;
+                float calculation = baseCombatStats.BuffPower;
                 foreach (ISupportStatsData supportStat in supportStats)
                 {
                     calculation += supportStat.GetBuffPower();
@@ -150,7 +150,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.BuffReceivePower;
+                float calculation = baseCombatStats.BuffReceivePower;
                 foreach (ISupportStatsData supportStat in supportStats)
                 {
                     calculation += supportStat.GetBuffReceivePower();
@@ -165,7 +165,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.MaxHealth;
+                float calculation = baseCombatStats.MaxHealth;
                 foreach (IVitalityStatsData vitalityStat in vitalityStats)
                 {
                     calculation += vitalityStat.GetMaxHealth();
@@ -179,7 +179,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.MaxMortalityPoints;
+                float calculation = baseCombatStats.MaxMortalityPoints;
                 foreach (IVitalityStatsData vitalityStat in vitalityStats)
                 {
                     calculation += vitalityStat.GetMaxMortalityPoints();
@@ -193,7 +193,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.DamageReduction;
+                float calculation = baseCombatStats.DamageReduction;
                 foreach (IVitalityStatsData vitalityStat in vitalityStats)
                 {
                     calculation += vitalityStat.GetDamageReduction();
@@ -207,7 +207,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.DeBuffReduction;
+                float calculation = baseCombatStats.DeBuffReduction;
                 foreach (IVitalityStatsData vitalityStat in vitalityStats)
                 {
                     calculation += vitalityStat.GetDeBuffReduction();
@@ -223,7 +223,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.Enlightenment;
+                float calculation = baseCombatStats.Enlightenment;
                 foreach (IConcentrationStatsData specialStat in specialStats)
                 {
                     calculation += specialStat.GetEnlightenment();
@@ -237,7 +237,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.CriticalChance;
+                float calculation = baseCombatStats.CriticalChance;
                 foreach (IConcentrationStatsData specialStat in specialStats)
                 {
                     calculation += specialStat.GetCriticalChance();
@@ -251,7 +251,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.SpeedAmount;
+                float calculation = baseCombatStats.SpeedAmount;
                 foreach (IConcentrationStatsData specialStat in specialStats)
                 {
                     calculation += specialStat.GetSpeedAmount();
@@ -265,7 +265,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.InitiativePercentage;
+                float calculation = baseCombatStats.InitiativePercentage;
                 foreach (ICombatTemporalStatsBaseData specialStat in temporalStats)
                 {
                     calculation += specialStat.GetInitiativePercentage();
@@ -279,7 +279,7 @@ namespace Characters
         {
             get
             {
-                int calculation = BaseStats.ActionsPerInitiative;
+                int calculation = baseCombatStats.ActionsPerInitiative;
                 foreach (ICombatTemporalStatsBaseData specialStat in temporalStats)
                 {
                     calculation += specialStat.GetActionsPerInitiative();
@@ -293,7 +293,7 @@ namespace Characters
         {
             get
             {
-                float calculation = BaseStats.HarmonyAmount;
+                float calculation = baseCombatStats.HarmonyAmount;
                 foreach (ICombatTemporalStatsBaseData specialStat in temporalStats)
                 {
                     calculation += specialStat.GetHarmonyAmount();

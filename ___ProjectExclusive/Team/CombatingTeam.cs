@@ -2,6 +2,7 @@ using _CombatSystem;
 using Characters;
 using Passives;
 using Sirenix.OdinInspector;
+using Stats;
 
 
 namespace _Team
@@ -30,7 +31,7 @@ namespace _Team
 
         public bool IsInDangerState()
             => State.IsInDanger();
-        public ICharacterBasicStatsData GetCurrentStanceValue() 
+        public IBasicStatsData GetCurrentStanceValue() 
             => StatsHolder.GetCurrentStanceValue();
 
     }

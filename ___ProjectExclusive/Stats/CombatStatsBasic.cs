@@ -7,8 +7,25 @@ using Random = UnityEngine.Random;
 namespace Stats
 {
     [Serializable]
-    public class CharacterCombatStatsBasic : ICharacterBasicStats
+    public class CombatStatsBasic : IBasicStats
     {
+        public CombatStatsBasic()
+        { }
+
+        public CombatStatsBasic(float value)
+        {
+            UtilsStats.OverrideStats(this, value);
+        }
+
+        [Button]
+        public virtual void OverrideAll(float value) => UtilsStats.OverrideStats(this, value);
+        public virtual void ResetToZero() => UtilsStats.OverrideStats(this);
+
+        public CombatStatsBasic(IBasicStatsData copyFrom)
+        {
+            UtilsStats.CopyStats(this, copyFrom);
+        }
+
         [Title("Offensive")]
         [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
         private float attackPower;
@@ -153,22 +170,6 @@ namespace Stats
             set => harmonyAmount = value;
         }
 
-        public CharacterCombatStatsBasic()
-        { }
-
-        public CharacterCombatStatsBasic(float value)
-        {
-            UtilsStats.OverrideStats(this, value);
-        }
-
-        [Button]
-        public virtual void OverrideAll(float value) => UtilsStats.OverrideStats(this, value);
-        public virtual void ResetToZero() => UtilsStats.OverrideStats(this);
-
-        public CharacterCombatStatsBasic(ICharacterBasicStatsData copyFrom)
-        {
-            UtilsStats.CopyStats(this, copyFrom);
-        }
 
 
         private const float MaxInitialInitiative = .8f;

@@ -2,6 +2,7 @@
 using Passives;
 using Sirenix.OdinInspector;
 using Skills;
+using Stats;
 using UnityEngine;
 
 namespace Characters
@@ -33,7 +34,7 @@ namespace Characters
                 : (CharacterHolderReference = Instantiate(characterPrefab,position,rotation).transform);
         }
 
-        public abstract CharacterCombatData GenerateCombatData();
+        public abstract CombatStatsHolder GenerateCombatData();
         public CombatSkills GenerateCombatSkills(CombatingEntity injection)
         {
             return new CombatSkills(injection,sharedSkillsPreset, skillsPreset);
@@ -54,7 +55,7 @@ namespace Characters
     {
         GameObject CharacterPrefab { get; }
         CharacterArchetypes.RangeType RangeType { get; }
-        CharacterCombatData GenerateCombatData();
+        CombatStatsHolder GenerateCombatData();
         CombatSkills GenerateCombatSkills(CombatingEntity injection);
         SCriticalBuffPreset GetCriticalBuff();
     }

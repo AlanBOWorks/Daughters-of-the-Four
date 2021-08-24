@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Stats
 {
     [Serializable]
-    public class CharacterCombatStatsFull : CharacterCombatStatsBasic, ICharacterFullStats
+    public class CombatStatsFull : CombatStatsBasic, IFullStats
     {
 
         [Title("Temporal Stats")]
@@ -44,33 +44,35 @@ namespace Stats
         }
 
 
-        public CharacterCombatStatsFull() : base()
+        public CombatStatsFull() : base()
         { }
 
-        public CharacterCombatStatsFull(float value) : base(value)
+        public CombatStatsFull(float value) : base(value)
         {
             HealthPoints = value;
             ShieldAmount = value;
             MortalityPoints = value;
         }
-        public CharacterCombatStatsFull(ICharacterFullStats copyFrom)
+        public CombatStatsFull(IFullStatsData copyFrom)
         {
             UtilsStats.CopyStats(this, copyFrom);
         }
 
-        public override void ResetToZero() => UtilsStats.OverrideStats(this as ICharacterFullStats, 0);
+        public override void ResetToZero() => UtilsStats.OverrideStats(this as IFullStatsData, 0);
 
     }
 
-    public class SerializedTrackedStats : CharacterCombatStatsFull, ITrackingStats
+    public class TrackingStats : CombatStatsFull, ITrackingStats
     {
-        public SerializedTrackedStats(ICharacterFullStats serializeThis) : base(serializeThis)
-        {}
+        public TrackingStats() : base()
+        { }
+        public TrackingStats(IFullStatsData serializeThis) : base(serializeThis)
+        { }
         public float DamageReceived { get; set; }
         public float HealReceived { get; set; }
     }
 
-    public interface ITrackingStats
+    public interface ITrackingStats 
     {
         float DamageReceived { set; get; }
         float HealReceived { get; set; }

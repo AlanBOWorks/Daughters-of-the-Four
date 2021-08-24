@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Characters
 {
-    public class CharacterCombatAreasData
+    public class CharacterCombatAreasData : IStanceProvider
     {
         public CharacterArchetypes.TeamPosition PositionInTeam;
         public CharacterArchetypes.RoleArchetype Role;
@@ -51,5 +51,6 @@ namespace Characters
             return _teamStateData.CurrentStance;
         }
 
+        public EnumTeam.Stances CurrentStance => GetCurrentPositionState();
     }
 }

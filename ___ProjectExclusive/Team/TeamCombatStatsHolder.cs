@@ -9,7 +9,7 @@ using UnityEngine;
 namespace _Team
 {
     public class TeamCombatStatsHolder : ITeamCombatControlStats, 
-        IStanceData<ICharacterBasicStatsData>
+        IStanceData<IBasicStatsData>
     {
         private readonly TeamCombatState _state;
 
@@ -27,7 +27,7 @@ namespace _Team
         public TeamCombatStatsHolder(TeamCombatState state)
         {
             _state = state;
-            PositionalStats = PositionalStats.GenerateStats(state);
+            PositionalStats = new PositionalStats(state);
 
             LoseControlThreshold = DefaultLoseThreshold;
             ReviveTime = DefaultReviveTime;
@@ -39,7 +39,7 @@ namespace _Team
         public TeamCombatStatsHolder(TeamCombatState state, ITeamCombatControlHolder stats)
         {
             _state = state;
-            PositionalStats = PositionalStats.GenerateStats(state);
+            PositionalStats = new PositionalStats(state);
 
             InjectPreset(stats);
         }
@@ -57,7 +57,7 @@ namespace _Team
             BurstCounterAmount = holder.GetBurstCounterAmount();
         }
 
-        private void InjectNewStats(IStanceData<ICharacterBasicStats> stats)
+        private void InjectNewStats(IStanceData<IBasicStats> stats)
         {
             var attackingStats = stats.AttackingStance;
             var neutralStats = stats.NeutralStance;
@@ -72,11 +72,11 @@ namespace _Team
         }
 
 
-        public ICharacterBasicStatsData AttackingStance => PositionalStats.AttackingStance;
-        public ICharacterBasicStatsData NeutralStance => PositionalStats.NeutralStance;
-        public ICharacterBasicStatsData DefendingStance => PositionalStats.DefendingStance;
+        public IBasicStatsData AttackingStance => PositionalStats.AttackingStance;
+        public IBasicStatsData NeutralStance => PositionalStats.NeutralStance;
+        public IBasicStatsData DefendingStance => PositionalStats.DefendingStance;
 
-        public ICharacterBasicStatsData GetCurrentStanceValue() 
+        public IBasicStatsData GetCurrentStanceValue() 
             => PositionalStats.GetCurrentStanceValue();
     }
 }

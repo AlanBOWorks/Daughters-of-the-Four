@@ -16,13 +16,13 @@ namespace Characters
 
         [HorizontalGroup("Combat Stats")]
         [SerializeField,Tooltip("Initial stats from level 0 (this values are constant)")]
-        private PlayerCharacterCombatStats initialStats = new PlayerCharacterCombatStats();
-        public PlayerCharacterCombatStats InitialStats => initialStats;
+        private PlayerCombatStats initialStats = new PlayerCombatStats();
+        public PlayerCombatStats InitialStats => initialStats;
 
         [HorizontalGroup("Combat Stats"),Tooltip("Additional stats that grows the character's power per level")]
         [SerializeField, GUIColor(.5f, .9f, .8f)]
-        private PlayerCharacterCombatStats growStats = new PlayerCharacterCombatStats(0);
-        public PlayerCharacterCombatStats GrowStats => growStats;
+        private PlayerCombatStats growCombatStats = new PlayerCombatStats(0);
+        public PlayerCombatStats GrowStats => growCombatStats;
 
 
         [Button("Inject in DataBase")]
@@ -39,7 +39,7 @@ namespace Characters
                 RemoveVariable(this);
         }
 
-        public override CharacterCombatData GenerateCombatData()
+        public override CombatStatsHolder GenerateCombatData()
         {
             return UtilsStats.GenerateCombatData(this);
         }
@@ -48,7 +48,7 @@ namespace Characters
     public interface IPlayerCharacterStats
     {
         CharacterUpgradeStats UpgradedStats { get; }
-        PlayerCharacterCombatStats InitialStats { get; }
-        PlayerCharacterCombatStats GrowStats { get; }
+        PlayerCombatStats InitialStats { get; }
+        PlayerCombatStats GrowStats { get; }
     }
 }

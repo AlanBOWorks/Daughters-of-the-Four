@@ -191,7 +191,7 @@ namespace _CombatSystem
 
                     // x----- Area
                     var characterAreaData = new CharacterCombatAreasData(entityPosition, variable.RangeType);
-                    entity.AreasDataTracker = characterAreaData;
+                    entity.Injection(characterAreaData);
                     
                     // x----- Skills
                     variable.GenerateCombatSkills(entity);

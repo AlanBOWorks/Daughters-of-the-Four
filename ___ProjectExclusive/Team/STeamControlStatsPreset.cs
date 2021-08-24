@@ -29,11 +29,11 @@ namespace _Team
 
         [Title("Stats")]
         [HorizontalGroup("Attack")]
-        [SerializeField] private CharacterCombatStatsFull onAttackStats;
+        [SerializeField] private CombatStatsFull onAttackStats;
         [HorizontalGroup("Neutral")]
-        [SerializeField] private CharacterCombatStatsFull onNeutralStats;
+        [SerializeField] private CombatStatsFull onNeutralStats;
         [HorizontalGroup("Defend")]
-        [SerializeField] private CharacterCombatStatsFull onDefendingStats;
+        [SerializeField] private CombatStatsFull onDefendingStats;
 
         public string ControlName => controlName;
         public float GetLoseThreshold() => loseControlThreshold;
@@ -44,11 +44,11 @@ namespace _Team
         public ICharacterArchetypesData<float> GetControlLosePoints() => controlLoses;
 
 
-        ICharacterBasicStats IStanceData<ICharacterBasicStats>.AttackingStance
+        IBasicStats IStanceData<IBasicStats>.AttackingStance
             => onAttackStats;
-        ICharacterBasicStats IStanceData<ICharacterBasicStats>.NeutralStance
+        IBasicStats IStanceData<IBasicStats>.NeutralStance
             => onNeutralStats;
-        ICharacterBasicStats IStanceData<ICharacterBasicStats>.DefendingStance
+        IBasicStats IStanceData<IBasicStats>.DefendingStance
             => onDefendingStats;
 
 
@@ -77,7 +77,7 @@ namespace _Team
     }
 
     public interface ITeamCombatControlHolder : 
-        IStanceData<ICharacterBasicStats>
+        IStanceData<IBasicStats>
 
     {
         string ControlName { get; }
@@ -97,6 +97,6 @@ namespace _Team
         ICharacterArchetypesData<float> GetControlLosePoints();
     }
 
-    public interface ITeamCombatControlStats : IStanceElement<ICharacterBasicStatsData>
+    public interface ITeamCombatControlStats : IStanceElement<IBasicStatsData>
     { }
 }

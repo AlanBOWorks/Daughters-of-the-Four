@@ -1,161 +1,37 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using _CombatSystem;
+using System;
 using _Team;
-using Passives;
+using Characters;
 using Sirenix.OdinInspector;
-using Skills;
-using Stats;
 using UnityEngine;
 
-namespace Characters
+namespace Stats
 {
-    /// <summary>
-    /// Used in combat only: In every fight objects of this type should be cleaned
-    /// and re-instantiated (since player's one, or others, could being modified).<br></br>
-    /// Conceptually it's different from a [<seealso cref="CharacterCombatData"/>] since a character is
-    /// something that is permanent in the game while a <see cref="CombatingEntity"/>
-    /// exits as long there's a 'Combat'. In other words, 'Character' is a general concept
-    /// while <see cref="CombatingEntity"/> is hyper specific to the Combat and their existence
-    /// are bond to the Combat.<br></br>
-    /// _____ <br></br>
-    /// TL;DR:<br></br>
-    /// [<see cref="CharacterCombatData"/>]:
-    /// persist as an entity of the Game.<br></br>
-    /// [<see cref="CombatingEntity"/>]:
-    /// exists while there's a Combat and contains the core data for the combating part
-    /// </summary>
-    public class CombatingEntity
-    { public CombatingEntity(string characterName, GameObject prefab)
-        {
-            CharacterName = characterName;
-            InstantiationPrefab = prefab;
-            ReceivedStats = new SerializedTrackedStats(UtilsStats.ZeroValuesFull);
-            DelayBuffHandler = new DelayBuffHandler(this);
-            Events = new CombatCharacterEvents(this);
-            CharacterCriticalBuff = new CharacterCriticalActionHandler(this);
-            Guarding = new CharacterGuarding(this);
 
-            Events.Subscribe(Guarding);
-        }
-        
-
-        [ShowInInspector,GUIColor(.3f,.5f,1)]
-        public readonly string CharacterName;
-
-        public readonly GameObject InstantiationPrefab;
-        [ShowInInspector, NonSerialized] 
-        public UCharacterHolder Holder;
-
-        [ShowInInspector, GUIColor(.4f,.8f,.7f)]
-        public CharacterCombatData CombatStats { get; private set; }
-
-        /// <summary>
-        /// Used to track the damage received, heals, etc.
-        /// </summary>
-        public readonly SerializedTrackedStats ReceivedStats;
-
-        /// <summary>
-        /// <inheritdoc cref="DelayBuffHandler"/>
-        /// </summary>
-        [ShowInInspector]
-        public readonly DelayBuffHandler DelayBuffHandler;
-
-        [ShowInInspector, NonSerialized] 
-        public CharacterCombatAreasData AreasDataTracker;
-
-        [ShowInInspector, NonSerialized] 
-        public readonly CombatCharacterEvents Events;
-
-        [ShowInInspector] 
-        public CharacterCriticalActionHandler CharacterCriticalBuff { get; private set; }
-
-        [ShowInInspector]
-        public CombatSkills CombatSkills { get; private set; }
-
-        public ICharacterCombatAnimator CombatAnimator;
-
-        /// <summary>
-        /// Keeps track of the entity's allies and enemies
-        /// </summary>
-        [ShowInInspector] 
-        public CharacterSelfGroup CharacterGroup;
-
-        [ShowInInspector] 
-        public readonly CharacterGuarding Guarding;
-
-
-        /// <summary>
-        /// If is Conscious, has actions left and at least can use any skill
-        /// </summary>
-        public bool CanAct()
-        {
-            // In order of [false] possibilities 
-            return IsConscious() &&  HasActions() && CanUseSkills();
-        }
-
-        public bool IsInDanger() => CharacterGroup.Team.IsInDangerState();
-
-        public bool IsAlive() => CombatStats.IsAlive();
-
-        public bool IsConscious()
-        {
-            if (IsInDanger())
-                return IsAlive();
-
-            return CombatStats.HealthPoints > 0;
-        }
-
-        public bool HasActions() => CombatStats.HasActionLeft();
-        public bool CanUseSkills() => UtilsSkill.CanUseSkills(this);
-        public CharacterArchetypes.RoleArchetype Role => AreasDataTracker.Role;
-
-
-        public void Injection(CharacterCombatData combatStats)
-        {
-            if(CombatStats != null)
-                throw new ArgumentException("Can't inject stats when the Entity already has its Stats");
-            CombatStats = combatStats;
-        } 
-        
-
-        public void Injection(CombatSkills combatSkills) => 
-            CombatSkills = combatSkills;
-        public void Injection(CombatingTeam team)
-        {
-            CombatStats.TeamData = team;
-            AreasDataTracker.Injection(team.State);
-        }
-        public void Injection(SDelayBuffPreset criticalBuff) =>
-            CharacterCriticalBuff.CriticalBuff = criticalBuff;
-
-    }
-
-
-
-    public class CharacterCombatData : ICharacterFullStatsData
+    public class CombatStatsHolder : IFullStatsData
     {
-        public CharacterCombatData(ICharacterFullStats presetStats)
+        public CombatStatsHolder(IFullStatsData presetStats)
         {
-            BaseStats = new CharacterCombatStatsFull(presetStats);
-            BuffStats = new CharacterCombatStatsFull();
-            BurstStats = new CharacterCombatStatsFull();
+            BaseStats = new CombatStatsFull(presetStats);
+            BuffStats = new CombatStatsFull();
+            BurstStats = new CombatStatsFull();
 
+            PositionalStats = PositionalStats.GenerateProvisionalBasics();
             _formulatedStats = new FormulatedStats(this);
             _multiplierStats = new MultiplierStats();
         }
 
-        [ShowInInspector, HorizontalGroup("Base Stats"),PropertyOrder(-2), GUIColor(.4f,.8f,.6f)]
-        public CharacterCombatStatsFull BaseStats { get; protected set; }
+        [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
+        public CombatStatsFull BaseStats { get; protected set; }
         /// <summary>
         /// This remains active for the whole fight
         /// </summary>
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.4f, .6f, .8f)]
-        public CharacterCombatStatsFull BuffStats { get; protected set; }
+        public CombatStatsFull BuffStats { get; protected set; }
 
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
-        public CharacterCombatStatsFull BurstStats { get; protected set; }
+        public CombatStatsFull BurstStats { get; protected set; }
+
+        public PositionalStats PositionalStats { get; protected set; }
 
         // By design multiplier are consistent / Burst are temporary and specific;
         // making multipliers Burst type could be confusing.
@@ -164,7 +40,12 @@ namespace Characters
         // Eg: increasing the Heal power instead the Support)
         private readonly MultiplierStats _multiplierStats;
 
-        private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStanceValue();
+        private readonly FormulatedStats _formulatedStats;
+        [TitleGroup("Local stats"), PropertyOrder(-10)]
+        public int ActionsLefts;
+
+
+        private IBasicStatsData TeamStats => TeamData.GetCurrentStanceValue();
         public IStatsPrimordial GetMultiplierStats() => _multiplierStats;
 
         public CombatingTeam TeamData
@@ -173,9 +54,10 @@ namespace Characters
             set => _formulatedStats.TeamData = value;
         }
 
-        private readonly FormulatedStats _formulatedStats;
-        [TitleGroup("Local stats"), PropertyOrder(-10)]
-        public int ActionsLefts;
+        public void Injection(IStanceProvider positionStatsStanceProvider)
+        {
+            PositionalStats.Injection(positionStatsStanceProvider);
+        }
 
 
         public void Initialization()
@@ -282,32 +164,32 @@ namespace Characters
             public float ConcentrationAmount { get; set; } = 1;
         }
 
-        private class FormulatedStats : ICharacterBasicStatsData
+        private class FormulatedStats : IBasicStatsData
         {
             [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
-            public CharacterCombatStatsFull BaseStats { get; protected set; }
+            public CombatStatsFull BaseStats { get; protected set; }
             /// <summary>
             /// This remains active for the whole fight
             /// </summary>
             [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.4f, .6f, .8f)]
-            public CharacterCombatStatsFull BuffStats { get; protected set; }
+            public CombatStatsFull BuffStats { get; protected set; }
 
             [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
-            public CharacterCombatStatsFull BurstStats { get; protected set; }
+            public CombatStatsFull BurstStats { get; protected set; }
 
             [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
-            private ICharacterBasicStatsData TeamStats => TeamData.GetCurrentStanceValue();
+            private IBasicStatsData TeamStats => TeamData.GetCurrentStanceValue();
 
             public CombatingTeam TeamData;
 
-            public FormulatedStats(CharacterCombatData data)
+            public FormulatedStats(CombatStatsHolder stats)
             {
-                BaseStats = data.BaseStats;
-                BuffStats = data.BuffStats;
-                BurstStats = data.BurstStats;
+                BaseStats = stats.BaseStats;
+                BuffStats = stats.BuffStats;
+                BurstStats = stats.BurstStats;
             }
 
-            public FormulatedStats(CharacterCombatData data, CombatingTeam teamData) : this(data)
+            public FormulatedStats(CombatStatsHolder stats, CombatingTeam teamData) : this(stats)
             {
                 TeamData = teamData;
             }
@@ -339,7 +221,7 @@ namespace Characters
                     BurstStats.DeBuffPower);
             }
 
-            
+
             public float GetStaticDamagePower()
             {
                 return UtilsStats.StatsFormula(
@@ -441,32 +323,32 @@ namespace Characters
         }
     }
 
-    
+
 
     /// <summary>
-    /// It's the same than <see cref="CharacterCombatStatsFull"/> but its constructor
+    /// It's the same than <see cref="CombatStatsFull"/> but its constructor
     /// allows to inject <seealso cref="IStatsUpgradable"/>
     /// </summary>
     [Serializable]
-    public class PlayerCharacterCombatStats : CharacterCombatStatsFull
+    public class PlayerCombatStats : CombatStatsFull
     {
-        public PlayerCharacterCombatStats()
-        {}
-
-        public PlayerCharacterCombatStats(float overrideByDefault) : base(overrideByDefault)
-        {}
-
-        public PlayerCharacterCombatStats(PlayerCharacterCombatStats copyFrom)
-        : base(copyFrom)
-        {}
-
-        public PlayerCharacterCombatStats(IPlayerCharacterStats playerCharacterStats)
-        : this(playerCharacterStats.InitialStats,playerCharacterStats.GrowStats,playerCharacterStats.UpgradedStats)
+        public PlayerCombatStats()
         { }
 
-        public PlayerCharacterCombatStats(
-            ICharacterFullStatsData initialStats, 
-            ICharacterFullStatsData growStats, IStatsUpgradable currentUpgrades)
+        public PlayerCombatStats(float overrideByDefault) : base(overrideByDefault)
+        { }
+
+        public PlayerCombatStats(PlayerCombatStats copyFrom)
+        : base(copyFrom)
+        { }
+
+        public PlayerCombatStats(IPlayerCharacterStats playerCharacterStats)
+        : this(playerCharacterStats.InitialStats, playerCharacterStats.GrowStats, playerCharacterStats.UpgradedStats)
+        { }
+
+        public PlayerCombatStats(
+            IFullStatsData initialStats,
+            IFullStatsData growStats, IStatsUpgradable currentUpgrades)
         {
             AttackPower = UtilsStats.GrowFormula(
                 initialStats.GetAttackPower(), growStats.GetAttackPower(),
@@ -527,6 +409,4 @@ namespace Characters
 
         private const float GrowActionsModifier = .2f; //Each 5 upgrades
     }
-
-
 }

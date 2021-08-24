@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 namespace Stats
 {
     /// <summary>
-    /// Its job is to keep track the <see cref="CharacterCombatStatsFull"/> of all participants in one calculation
+    /// Its job is to keep track the <see cref="CombatStatsFull"/> of all participants in one calculation
     /// and then execute the requested Skills/actions in a one go.<br></br>
     /// <br></br>
     /// This exits because some effects could have conditions and it could trigger false positives 

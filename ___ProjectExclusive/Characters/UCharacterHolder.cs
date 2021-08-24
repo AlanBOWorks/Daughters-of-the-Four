@@ -1,6 +1,7 @@
 ﻿using System;
 using _CombatSystem;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 
 namespace Characters
@@ -42,7 +43,7 @@ namespace Characters
 
         [ShowInInspector,DisableInEditorMode]
         public CombatingEntity Entity { get; private set; }
-        public ICharacterFullStatsData BaseStats { get; private set; }
+        public IFullStatsData BaseStats { get; private set; }
 
 
     }

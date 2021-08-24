@@ -9,7 +9,7 @@ namespace CombatEffects
         menuName = "Combat/Effects/Buff/Harmony Modifier")]
     public class SHarmonyBuffEffect : SEffectBuffBase
     {
-        protected override ICharacterFullStats GetBuff(CombatingEntity target)
+        protected override IFullStats GetBuff(CombatingEntity target)
             => GetBurstOrBase(target);
 
         

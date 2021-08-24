@@ -15,8 +15,8 @@ namespace _Player
     {
         public readonly SPlayerCharacterEntityVariable Variable;
         public CharacterUpgradeStats UpgradedStats { get; }
-        public PlayerCharacterCombatStats InitialStats => Variable.InitialStats;
-        public PlayerCharacterCombatStats GrowStats => Variable.GrowStats;
+        public PlayerCombatStats InitialStats => Variable.InitialStats;
+        public PlayerCombatStats GrowStats => Variable.GrowStats;
       
 
         public PlayableCharacter(SPlayerCharacterEntityVariable variable)
@@ -29,7 +29,7 @@ namespace _Player
         public string CharacterName => Variable.CharacterName;
         public GameObject CharacterPrefab => Variable.CharacterPrefab;
         public CharacterArchetypes.RangeType RangeType => Variable.RangeType;
-        public CharacterCombatData GenerateCombatData()
+        public CombatStatsHolder GenerateCombatData()
         {
             return UtilsStats.GenerateCombatData(this);
         }

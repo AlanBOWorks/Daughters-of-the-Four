@@ -91,7 +91,7 @@ namespace Stats
     { }
     /// <summary>
     /// Used only during the fights. <br></br>
-    /// For variation, only the <seealso cref="CharacterCombatData.BaseStats"/>
+    /// For variation, only the <seealso cref="CombatStatsHolder.BaseStats"/>
     /// should be used
     /// </summary>
     public interface ICombatTemporalStats<T> : ICombatTemporalStatsBase
@@ -166,5 +166,27 @@ namespace Stats
         T SpeedAmount { set; }
     }
 
-    
+
+
+
+
+
+    public interface IFullStats : IBasicStats, IFullStatsData, IFullStatsInjection
+    { }
+
+    public interface IFullStatsInjection : IBasicStatsInjection, ICombatTemporalStats
+    { }
+    public interface IFullStatsData : IBasicStatsData, ICombatTemporalStats
+    { }
+
+    public interface IBasicStats : IBasicStatsData, IBasicStatsInjection
+    { }
+
+    public interface IBasicStatsData : IOffensiveStatsData, ISupportStatsData,
+        IVitalityStatsData, IConcentrationStatsData, ICombatTemporalStatsBaseData
+    { }
+
+    public interface IBasicStatsInjection : IOffensiveStatsInjection, ISupportStatsInjection,
+        IVitalityStatsInjection, IConcentrationStatsInjection, ICombatTemporalStatsBaseInjection
+    { }
 }

@@ -81,17 +81,17 @@ namespace ___ProjectExclusive
         {
             public SPlayerCharacterEntityVariable variable;
             [HorizontalGroup("Stats")]
-            public PlayerCharacterCombatStats initialStats;
+            public PlayerCombatStats initialStats;
             [HorizontalGroup("Stats")]
             [GUIColor(.5f,.9f, .8f)]
-            public PlayerCharacterCombatStats growStats;
+            public PlayerCombatStats growCombatStats;
             public CharacterUpgradeStats upgradedStats;
 
             public CharacterData(SPlayerCharacterEntityVariable variable)
             {
                 this.variable = variable;
                 initialStats = variable.InitialStats;
-                growStats = variable.GrowStats;
+                growCombatStats = variable.GrowStats;
                 upgradedStats = variable.UpgradedStats;
             }
         }

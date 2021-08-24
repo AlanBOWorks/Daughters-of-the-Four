@@ -11,11 +11,11 @@ namespace Characters
     {
         [TitleGroup("Stats")]
         [SerializeField]
-        private CharacterCombatStatsFull presetStats = new CharacterCombatStatsFull();
+        private CombatStatsFull presetStats = new CombatStatsFull();
 
-        public override CharacterCombatData GenerateCombatData()
+        public override CombatStatsHolder GenerateCombatData()
         {
-            return new CharacterCombatData(presetStats);
+            return new CombatStatsHolder(presetStats);
         }
     }
 }
