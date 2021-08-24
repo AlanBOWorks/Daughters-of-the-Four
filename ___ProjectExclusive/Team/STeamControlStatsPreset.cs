@@ -71,9 +71,9 @@ namespace _Team
         [SerializeField, Range(0, 1)] private float midLiner = .3f;
         [SerializeField, Range(0, 1)] private float backLiner = .25f;
 
-        public float FrontLiner => frontLiner;
-        public float MidLiner => midLiner;
-        public float BackLiner => backLiner;
+        public float Vanguard => frontLiner;
+        public float Attacker => midLiner;
+        public float Support => backLiner;
     }
 
     public interface ITeamCombatControlHolder : 

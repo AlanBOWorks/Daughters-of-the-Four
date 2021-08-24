@@ -75,7 +75,7 @@ namespace _CombatSystem
                 #region <<< COMBAT REGION >>>>
                 // This phase could be loaded asynchronously while the player is preparing the characters
                 CharacterArchetypesList<CombatingEntity> allEntities;
-                CharacterArchetypes.TeamPosition entityPosition;
+                EnumTeam.GroupPositioning entityPosition;
                 Action onStartAction = StartPhase;
 
                 InitializationPhase();
@@ -92,10 +92,10 @@ namespace _CombatSystem
 
                 void InitializationPhase()
                 {
-                    entityPosition = CharacterArchetypes.TeamPosition.FrontLine;
+                    entityPosition = EnumTeam.GroupPositioning.FrontLine;
                     playerEntities.InjectParse(playerSelections, GenerateEntity);
 
-                    entityPosition = CharacterArchetypes.TeamPosition.FrontLine;
+                    entityPosition = EnumTeam.GroupPositioning.FrontLine;
                     enemyEntities.InjectParse(enemyFightPreset, GenerateEntity);
 
                     DoInitializations(playerEntities);

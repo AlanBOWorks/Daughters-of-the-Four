@@ -6,23 +6,23 @@ namespace Characters
 {
     public class CharacterCombatAreasData : IStanceProvider
     {
-        public CharacterArchetypes.TeamPosition PositionInTeam;
-        public CharacterArchetypes.RoleArchetype Role;
-        public CharacterArchetypes.FieldPosition CombatFieldPosition;
-        public CharacterArchetypes.RangeType RangeType;
+        public EnumTeam.GroupPositioning PositionInTeam;
+        public EnumCharacter.RoleArchetype Role;
+        public EnumCharacter.FieldPosition CombatFieldPosition;
+        public EnumCharacter.RangeType RangeType;
         private TeamCombatState _teamStateData;
 
         private EnumTeam.Stances _forcedState;
         public bool IsForceStance { get; private set; }
 
 
-        public CharacterCombatAreasData(CharacterArchetypes.TeamPosition positionInTeam,
-            CharacterArchetypes.RangeType rangeType,
-            CharacterArchetypes.FieldPosition initialFieldPosition = CharacterArchetypes.FieldPosition.InTeam,
+        public CharacterCombatAreasData(EnumTeam.GroupPositioning positionInTeam,
+            EnumCharacter.RangeType rangeType,
+            EnumCharacter.FieldPosition initialFieldPosition = EnumCharacter.FieldPosition.InTeam,
             EnumTeam.Stances initialStance = EnumTeam.Stances.Neutral)
         {
             PositionInTeam = positionInTeam;
-            Role = (CharacterArchetypes.RoleArchetype) positionInTeam;
+            Role = (EnumCharacter.RoleArchetype) positionInTeam;
             CombatFieldPosition = initialFieldPosition;
             RangeType = rangeType;
             _forcedState = initialStance;
@@ -53,4 +53,5 @@ namespace Characters
 
         public EnumTeam.Stances CurrentStance => GetCurrentPositionState();
     }
+
 }

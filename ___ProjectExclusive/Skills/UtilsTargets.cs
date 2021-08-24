@@ -113,13 +113,13 @@ namespace Skills
 
                     switch (userAreaTracker.RangeType)
                     {
-                        case CharacterArchetypes.RangeType.Melee:
+                        case EnumCharacter.RangeType.Melee:
                             RemoveFarTargets();
                             break;
-                        case CharacterArchetypes.RangeType.Range:
+                        case EnumCharacter.RangeType.Range:
                             RemoveCloseTargets();
                             break;
-                        case CharacterArchetypes.RangeType.Hybrid:
+                        case EnumCharacter.RangeType.HybridRange:
                             break;
                         default:
                             throw new NotImplementedException("Ranged type not implemented in targeting " +

@@ -12,11 +12,14 @@ namespace _CombatSystem
     public class SCombatParams : ScriptableObject
     {
 
-        [Title("Skills")]
+        [Title("Skills")] 
         [SerializeField] 
-        private Skills onNullSkills = new Skills();
-        [Title("BackUp Skills")]
-        [SerializeField] private SBackUpSkills backUpSkills;
+        private SharedSkillsSet sharedSkillsSets = new SharedSkillsSet();
+        [SerializeField] 
+        private NullSkills onNullSkills = new NullSkills();
+        [SerializeField] 
+        private SBackUpSkills backUpSkills;
+
 
         [Title("Critical buffs")]
         [SerializeField]
@@ -39,6 +42,16 @@ namespace _CombatSystem
             All
         }
 
+
+        public SSharedSkillsSet GetSkillPreset(
+            EnumCharacter.RoleArchetype role,
+            EnumCharacter.RangeType range)
+        {
+            var roleSkills = UtilsCharacter.GetElement(sharedSkillsSets, role);
+
+            return UtilsCharacter.GetElement(roleSkills, range);
+
+        }
         /// <summary>
         /// Used when a character doesn't have skills
         /// </summary>
@@ -66,16 +79,34 @@ namespace _CombatSystem
         }
 
         [Serializable]
-        private class Skills : ICharacterArchetypesData<SCharacterSharedSkillsPreset>
+        private class NullSkills : ICharacterArchetypesData<SCharacterSharedSkillsPreset>
         {
             [SerializeField] private SCharacterSharedSkillsPreset vanguard;
             [SerializeField] private SCharacterSharedSkillsPreset attacker;
             [SerializeField] private SCharacterSharedSkillsPreset support;
 
             [TitleGroup("Characters")]
-            public SCharacterSharedSkillsPreset FrontLiner => vanguard;
-            public SCharacterSharedSkillsPreset MidLiner => attacker;
-            public SCharacterSharedSkillsPreset BackLiner => support;
+            public SCharacterSharedSkillsPreset Vanguard => vanguard;
+            public SCharacterSharedSkillsPreset Attacker => attacker;
+            public SCharacterSharedSkillsPreset Support => support;
+        }
+
+        [Serializable]
+        private class SharedSkillsSet : ICharacterArchetypesData<ICharacterRangesData<SSharedSkillsSet>>
+        {
+            [SerializeField] private RangesSkills frontLiner;
+            [SerializeField] private RangesSkills midLiner;
+            [SerializeField] private RangesSkills backLiner;
+
+            public ICharacterRangesData<SSharedSkillsSet> Vanguard => frontLiner;
+
+            public ICharacterRangesData<SSharedSkillsSet> Attacker => midLiner;
+
+            public ICharacterRangesData<SSharedSkillsSet> Support => backLiner;
+
+            [Serializable]
+            private class RangesSkills : RangesSkills<SSharedSkillsSet>
+            {}
         }
 
         [Serializable]
@@ -85,11 +116,11 @@ namespace _CombatSystem
             [SerializeField] private SCriticalBuffPreset midLiner;
             [SerializeField] private SCriticalBuffPreset backLiner;
 
-            public SCriticalBuffPreset FrontLiner => frontLiner;
+            public SCriticalBuffPreset Vanguard => frontLiner;
 
-            public SCriticalBuffPreset MidLiner => midLiner;
+            public SCriticalBuffPreset Attacker => midLiner;
 
-            public SCriticalBuffPreset BackLiner => backLiner;
+            public SCriticalBuffPreset Support => backLiner;
         }
     }
 }

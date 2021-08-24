@@ -16,13 +16,13 @@ namespace Skills
         private string skillGroupName = "NULL";
         public string GetSkillGroupName() => skillGroupName;
 
-        [SerializeField] private CharacterArchetypes.RoleArchetype archetype 
-            = CharacterArchetypes.RoleArchetype.Attacker;
-        public CharacterArchetypes.RoleArchetype GetTargetArchetype() => archetype;
+        [SerializeField] private EnumCharacter.RoleArchetype archetype 
+            = EnumCharacter.RoleArchetype.Attacker;
+        public EnumCharacter.RoleArchetype GetTargetArchetype() => archetype;
 
-        [SerializeField] private CharacterArchetypes.RangeType rangeType
-            = CharacterArchetypes.RangeType.Hybrid;
-        public CharacterArchetypes.RangeType GetRangeType() 
+        [SerializeField] private EnumCharacter.RangeType rangeType
+            = EnumCharacter.RangeType.HybridRange;
+        public EnumCharacter.RangeType GetRangeType() 
             => rangeType;
 
         [Title("Skills")]

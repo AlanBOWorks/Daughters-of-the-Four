@@ -9,7 +9,7 @@ namespace CombatEffects
         menuName = "Combat/Effects/Position Toggle")]
     public class SEffectPositionToggle : SEffectBase
     {
-        [SerializeField] private CharacterArchetypes.FieldPosition targetPosition;
+        [SerializeField] private EnumCharacter.FieldPosition targetPosition;
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float effectModifier = 1)
         {
             DoEffect(target,effectModifier);

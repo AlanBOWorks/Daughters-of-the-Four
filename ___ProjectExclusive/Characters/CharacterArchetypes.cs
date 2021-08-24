@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using _CombatSystem;
+using _Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -8,78 +9,42 @@ namespace Characters
 {
     public static class CharacterArchetypes
     {
-        public const int FrontLinerIndex = 0;
+        public const int FrontLinerIndex = EnumTeam.FrontLinerIndex;
         public const int MidLinerIndex = FrontLinerIndex + 1;
         public const int BackLinerIndex = MidLinerIndex + 1;
         public const int AmountOfArchetypesAmount = BackLinerIndex + 1;
         public const int AllPositionIndex = AmountOfArchetypesAmount;
         public const int PositionsTypesAmount = AllPositionIndex + 1;
 
-        public enum TeamPosition
+        public static EnumTeam.GroupPositioning GetTeamPosition(int indexEquivalent)
         {
-            FrontLine = FrontLinerIndex,
-            MidLine = MidLinerIndex,
-            BackLine = BackLinerIndex,
-            All = AllPositionIndex
-        }
-        public enum RoleArchetype
-        {
-            Vanguard = TeamPosition.FrontLine,
-            Attacker = TeamPosition.MidLine,
-            Support = TeamPosition.BackLine
+            return (EnumTeam.GroupPositioning) indexEquivalent;
         }
 
-
-        public static TeamPosition GetTeamPosition(int indexEquivalent)
+        public static EnumCharacter.FieldPosition GetPosition(int index)
         {
-            return (TeamPosition) indexEquivalent;
+            return (EnumCharacter.FieldPosition)index;
         }
-
-
-        public enum FieldPosition
-        {
-            InTeam,
-            InEnemyTeam,
-            OutFormation
-        }
-        public static FieldPosition GetPosition(int index)
-        {
-            return (FieldPosition)index;
-        }
-        public enum RangeType
-        {
-            /// <summary>
-            /// Can only target closeRange foes
-            /// </summary>
-            Melee,
-            /// <summary>
-            /// Can only target ranged foes
-            /// </summary>
-            Range,
-            /// <summary>
-            /// Are the combination of <see cref="Melee"/> and <see cref="Range"/>
-            /// </summary>
-            Hybrid
-        }
+        
 
         /// <summary>
-        /// Used for determinate if a <see cref="RangeType.Range"/> is in close position towards an enemy
+        /// Used for determinate if a <see cref="EnumCharacter.RangeType.Range"/> is in close position towards an enemy
         /// </summary>
-        public static bool IsInCloseRange(FieldPosition user, FieldPosition enemy)
+        public static bool IsInCloseRange(EnumCharacter.FieldPosition user, EnumCharacter.FieldPosition enemy)
         {
             switch (user)
             {
-                case FieldPosition.InTeam:
-                    return enemy == FieldPosition.InEnemyTeam;
-                case FieldPosition.InEnemyTeam:
-                    return enemy == FieldPosition.InTeam;
-                case FieldPosition.OutFormation:
+                case EnumCharacter.FieldPosition.InTeam:
+                    return enemy == EnumCharacter.FieldPosition.InEnemyTeam;
+                case EnumCharacter.FieldPosition.InEnemyTeam:
+                    return enemy == EnumCharacter.FieldPosition.InTeam;
+                case EnumCharacter.FieldPosition.OutFormation:
                 default:
                     throw new NotImplementedException("Position is not implemented for CloseRange");
             }
         }
         /// <summary>
-        /// <inheritdoc cref="IsInCloseRange(FieldPosition,FieldPosition)"/>
+        /// <inheritdoc cref="IsInCloseRange(EnumCharacter.FieldPosition,EnumCharacter.FieldPosition)"/>
         /// </summary>
         public static bool IsInCloseRange(CombatingEntity user, CombatingEntity enemy)
         {
@@ -88,7 +53,7 @@ namespace Characters
 
         public static bool IsValid<T>(ICharacterArchetypesData<T> data) where T : class
         {
-            return data.BackLiner != null && data.MidLiner != null && data.FrontLiner != null;
+            return data.Support != null && data.Attacker != null && data.Vanguard != null;
         }
 
         public static bool IsValid<T>(T[] elements) => elements.Length == AmountOfArchetypesAmount;
@@ -99,27 +64,27 @@ namespace Characters
             ICharacterArchetypesInjection<TParse> injectIn,
             Func<T, TParse> parseFunc)
         {
-            injectIn.FrontLiner = parseFunc(original.FrontLiner);
-            injectIn.MidLiner = parseFunc(original.MidLiner);
-            injectIn.BackLiner = parseFunc(original.BackLiner);
+            injectIn.Vanguard = parseFunc(original.Vanguard);
+            injectIn.Attacker = parseFunc(original.Attacker);
+            injectIn.Support = parseFunc(original.Support);
         }
 
         public static void DoAction<T>(
             ICharacterArchetypesData<T> elements,
             Action<T> action)
         {
-            action(elements.FrontLiner);
-            action(elements.MidLiner);
-            action(elements.BackLiner);
+            action(elements.Vanguard);
+            action(elements.Attacker);
+            action(elements.Support);
         }
         public static void DoParse<T, TParse>(
             ICharacterArchetypesData<T> elements,
             ICharacterArchetypesData<TParse> parsing,
             Action<T, TParse> action)
         {
-            action(elements.FrontLiner, parsing.FrontLiner);
-            action(elements.MidLiner, parsing.MidLiner);
-            action(elements.BackLiner, parsing.BackLiner);
+            action(elements.Vanguard, parsing.Vanguard);
+            action(elements.Attacker, parsing.Attacker);
+            action(elements.Support, parsing.Support);
         }
 
         public static CharacterArchetypesList<T> ParseToList<T,TParse>
@@ -127,9 +92,9 @@ namespace Characters
         {
             CharacterArchetypesList<T> generated = new CharacterArchetypesList<T>
             {
-                parsingFunc(parsing.FrontLiner), 
-                parsingFunc(parsing.MidLiner), 
-                parsingFunc(parsing.BackLiner)
+                parsingFunc(parsing.Vanguard), 
+                parsingFunc(parsing.Attacker), 
+                parsingFunc(parsing.Support)
             };
 
             if (generated.Count != AmountOfArchetypesAmount)
@@ -144,63 +109,62 @@ namespace Characters
         {
             List<T> generation = new List<T>()
             {
-                fromData.FrontLiner,
-                fromData.MidLiner,
-                fromData.BackLiner
+                fromData.Vanguard,
+                fromData.Attacker,
+                fromData.Support
             };
             return generation;
         }
 
         public static void AddToList<T>(ICharacterArchetypesData<T> injection, List<T> onList)
         {
-            onList.Add(injection.FrontLiner);
-            onList.Add(injection.MidLiner);
-            onList.Add(injection.BackLiner);
+            onList.Add(injection.Vanguard);
+            onList.Add(injection.Attacker);
+            onList.Add(injection.Support);
         }
 
 
         public static T GetElement<T>(ICharacterArchetypesData<T> elements, int index)
         {
-            return GetElement(elements, (TeamPosition) index);
+            return GetElement(elements, (EnumTeam.GroupPositioning) index);
         }
 
-        public static T GetElement<T>(ICharacterArchetypesData<T> elements, RoleArchetype archetype)
+        public static T GetElement<T>(ICharacterArchetypesData<T> elements, EnumCharacter.RoleArchetype archetype)
         {
-            return GetElement(elements, (TeamPosition) archetype);
+            return GetElement(elements, (EnumTeam.GroupPositioning) archetype);
         }
 
 
-        public static T GetElement<T>(ICharacterArchetypesData<T> elements, TeamPosition archetype)
+        public static T GetElement<T>(ICharacterArchetypesData<T> elements, EnumTeam.GroupPositioning archetype)
         {
             switch (archetype)
             {
-                case TeamPosition.FrontLine:
-                    return elements.FrontLiner;
-                case TeamPosition.MidLine:
-                    return elements.MidLiner;
-                case TeamPosition.BackLine:
-                    return elements.BackLiner;
+                case EnumTeam.GroupPositioning.FrontLine:
+                    return elements.Vanguard;
+                case EnumTeam.GroupPositioning.MidLine:
+                    return elements.Attacker;
+                case EnumTeam.GroupPositioning.BackLine:
+                    return elements.Support;
                 default:
                     throw new NotImplementedException("Invalid archetype", 
                         new NotImplementedException($"Index of {archetype}"));
             }
         }
-
     }
 
     public class CharacterArchetypesList<T> : List<T>, ICharacterArchetypes<T>
     {
-        public T FrontLiner
+        public T Vanguard
         {
             get => this[FrontLinerIndex];
             set => this[FrontLinerIndex] = value;
         }
-        public T MidLiner
+        public T Attacker
         {
             get => this[MidLinerIndex];
             set => this[MidLinerIndex] = value;
         }
-        public T BackLiner
+        public T Support
         {
             get => this[BackLinerIndex];
             set => this[BackLinerIndex] = value;
@@ -213,23 +177,23 @@ namespace Characters
 
         public CharacterArchetypesList(ICharacterArchetypesData<T> references) : this()
         {
-            Add(references.FrontLiner);
-            Add(references.MidLiner);
-            Add(references.BackLiner);
+            Add(references.Vanguard);
+            Add(references.Attacker);
+            Add(references.Support);
         }
 
         public void InjectParse<TParse>(
             ICharacterArchetypesData<TParse> references,
             Func<TParse,T> parsingFunc)
         {
-            T frontLiner = parsingFunc(references.FrontLiner);
-            T midLiner = parsingFunc(references.MidLiner);
-            T backLiner = parsingFunc(references.BackLiner);
+            T frontLiner = parsingFunc(references.Vanguard);
+            T midLiner = parsingFunc(references.Attacker);
+            T backLiner = parsingFunc(references.Support);
             if (Count >= AmountOfArchetypes)
             {
-                FrontLiner = frontLiner;
-                MidLiner = midLiner;
-                BackLiner = backLiner;
+                Vanguard = frontLiner;
+                Attacker = midLiner;
+                Support = backLiner;
             }
             else
             {
@@ -255,19 +219,19 @@ namespace Characters
     public class CharacterArchetypes<T> : ICharacterArchetypes<T>
     {
         [ShowInInspector]
-        public T FrontLiner { get; set; }
+        public T Vanguard { get; set; }
         [ShowInInspector]
-        public T MidLiner { get; set; }
+        public T Attacker { get; set; }
         [ShowInInspector]
-        public T BackLiner { get; set; }
+        public T Support { get; set; }
 
         public CharacterArchetypes()
         { }
         public CharacterArchetypes(ICharacterArchetypesData<T> data)
         {
-            FrontLiner = data.FrontLiner;
-            MidLiner = data.MidLiner;
-            BackLiner = data.BackLiner;
+            Vanguard = data.Vanguard;
+            Attacker = data.Attacker;
+            Support = data.Support;
         }
     }
 
@@ -278,17 +242,17 @@ namespace Characters
         [SerializeField] private T _backLiner;
 
 
-        public T FrontLiner
+        public T Vanguard
         {
             get => _frontLiner;
             set => _frontLiner = value;
         }
-        public T MidLiner
+        public T Attacker
         {
             get => _midLiner;
             set => _midLiner = value;
         }
-        public T BackLiner
+        public T Support
         {
             get => _backLiner;
             set => _backLiner = value;
@@ -301,15 +265,15 @@ namespace Characters
 
     public interface ICharacterArchetypesData<out T>
     {
-        T FrontLiner { get; }
-        T MidLiner { get; }
-        T BackLiner { get; }
+        T Vanguard { get; }
+        T Attacker { get; }
+        T Support { get; }
     }
 
     public interface ICharacterArchetypesInjection<in T>
     {
-        T FrontLiner { set; }
-        T MidLiner { set; }
-        T BackLiner { set; }
+        T Vanguard { set; }
+        T Attacker { set; }
+        T Support { set; }
     }
 }

@@ -46,7 +46,7 @@ namespace Skills
 
         [TitleGroup("Categorization")]
         [SerializeField, Tooltip("Used to determinate the limitation of equipment; Hybrid can be used by any range")]
-        private CharacterArchetypes.RangeType rangeType = CharacterArchetypes.RangeType.Hybrid;
+        private EnumCharacter.RangeType rangeType = EnumCharacter.RangeType.HybridRange;
 
         [TitleGroup("Categorization")]
         [SerializeField, Tooltip("The main stat this skill interact/represent"),
@@ -66,7 +66,7 @@ namespace Skills
         public string SkillName => skillName;
         public Sprite SpecialIcon => specialIcon;
         public bool CanTargetSelf() => canTargetSelf;
-        public CharacterArchetypes.RangeType GetRangeType() => rangeType;
+        public EnumCharacter.RangeType GetRangeType() => rangeType;
         public EnumSkills.TargetingType GetSkillType() => skillType;
         public EnumSkills.Archetype GetArchetype() => skillArchetype;
         public int CoolDownCost => cooldownCost;

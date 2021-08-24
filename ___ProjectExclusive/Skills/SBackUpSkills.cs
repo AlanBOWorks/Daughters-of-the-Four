@@ -26,9 +26,9 @@ namespace Skills
             [SerializeField] private SkillPreset[] midLiner;
             [SerializeField] private SkillPreset[] backLiner;
 
-            public SkillPreset[] FrontLiner => frontLiner;
-            public SkillPreset[] MidLiner => midLiner;
-            public SkillPreset[] BackLiner => backLiner;
+            public SkillPreset[] Vanguard => frontLiner;
+            public SkillPreset[] Attacker => midLiner;
+            public SkillPreset[] Support => backLiner;
         }
     }
 

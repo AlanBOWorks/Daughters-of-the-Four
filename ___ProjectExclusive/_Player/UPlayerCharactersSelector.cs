@@ -41,19 +41,19 @@ namespace _Player
             }
         }
 
-        public SPlayerCharacterEntityVariable FrontLiner
+        public SPlayerCharacterEntityVariable Vanguard
         {
             get => _frontLiner;
             set => _frontLiner = value;
         }
 
-        public SPlayerCharacterEntityVariable MidLiner
+        public SPlayerCharacterEntityVariable Attacker
         {
             get => _midLiner;
             set => _midLiner = value;
         }
 
-        public SPlayerCharacterEntityVariable BackLiner
+        public SPlayerCharacterEntityVariable Support
         {
             get => _backLiner;
             set => _backLiner = value;
@@ -69,15 +69,15 @@ namespace _Player
     {
         public PlayableCharactersSelected(ICharacterArchetypesData<SPlayerCharacterEntityVariable> variable)
         {
-            FrontLiner = new PlayableCharacter(variable.FrontLiner);
-            MidLiner = new PlayableCharacter(variable.MidLiner);
-            BackLiner = new PlayableCharacter(variable.BackLiner);
+            Vanguard = new PlayableCharacter(variable.Vanguard);
+            Attacker = new PlayableCharacter(variable.Attacker);
+            Support = new PlayableCharacter(variable.Support);
         }
         [ShowInInspector]
-        public PlayableCharacter FrontLiner { get; set; }
+        public PlayableCharacter Vanguard { get; set; }
         [ShowInInspector]
-        public PlayableCharacter MidLiner { get; set; }
+        public PlayableCharacter Attacker { get; set; }
         [ShowInInspector]
-        public PlayableCharacter BackLiner { get; set; }
+        public PlayableCharacter Support { get; set; }
     }
 }

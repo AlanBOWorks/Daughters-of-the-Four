@@ -34,9 +34,9 @@ namespace ___ProjectExclusive._Enemies
 
 
 
-        public SEnemyCharacterEntityVariable FrontLiner => frontLiner;
-        public SEnemyCharacterEntityVariable MidLiner => midLiner;
-        public SEnemyCharacterEntityVariable BackLiner => backLiner;
+        public SEnemyCharacterEntityVariable Vanguard => frontLiner;
+        public SEnemyCharacterEntityVariable Attacker => midLiner;
+        public SEnemyCharacterEntityVariable Support => backLiner;
 
 
         public bool GetWinCondition() => winCondition.GetTriggerCondition();

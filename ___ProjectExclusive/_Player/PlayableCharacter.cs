@@ -28,7 +28,7 @@ namespace _Player
 
         public string CharacterName => Variable.CharacterName;
         public GameObject CharacterPrefab => Variable.CharacterPrefab;
-        public CharacterArchetypes.RangeType RangeType => Variable.RangeType;
+        public EnumCharacter.RangeType RangeType => Variable.RangeType;
         public CombatStatsHolder GenerateCombatData()
         {
             return UtilsStats.GenerateCombatData(this);

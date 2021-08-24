@@ -58,9 +58,9 @@ namespace _Player
                 throw new NotImplementedException("UI elements can't support != 3 elements");
             }
 #endif
-            DoInjection(team.FrontLiner,FrontLiner);
-            DoInjection(team.MidLiner,MidLiner);
-            DoInjection(team.BackLiner,BackLiner);
+            DoInjection(team.Vanguard,Vanguard);
+            DoInjection(team.Attacker,Attacker);
+            DoInjection(team.Support,Support);
 
             void DoInjection(CombatingEntity entity, UCharacterUIFixedHolder holder)
             {

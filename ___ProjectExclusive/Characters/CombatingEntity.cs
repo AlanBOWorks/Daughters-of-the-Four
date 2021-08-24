@@ -109,7 +109,7 @@ namespace Characters
 
         public bool HasActions() => CombatStats.HasActionLeft();
         public bool CanUseSkills() => UtilsSkill.CanUseSkills(this);
-        public CharacterArchetypes.RoleArchetype Role => AreasDataTracker.Role;
+        public EnumCharacter.RoleArchetype Role => AreasDataTracker.Role;
 
 
         public void Injection(CombatStatsHolder combatStats)

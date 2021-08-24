@@ -25,7 +25,7 @@ namespace Characters
         private SCriticalBuffPreset criticalBuff = null;
 
         [TitleGroup("Stats")] 
-        public CharacterArchetypes.RangeType rangeType = CharacterArchetypes.RangeType.Melee;
+        public EnumCharacter.RangeType rangeType = EnumCharacter.RangeType.Melee;
 
         public Transform SceneInstantiateCharacter(Vector3 position, Quaternion rotation)
         {
@@ -48,13 +48,13 @@ namespace Characters
      
         public SCriticalBuffPreset GetCriticalBuff() => criticalBuff;
 
-        public CharacterArchetypes.RangeType RangeType => rangeType;
+        public EnumCharacter.RangeType RangeType => rangeType;
     }
 
     public interface ICharacterCombatProvider : ICharacterLore
     {
         GameObject CharacterPrefab { get; }
-        CharacterArchetypes.RangeType RangeType { get; }
+        EnumCharacter.RangeType RangeType { get; }
         CombatStatsHolder GenerateCombatData();
         CombatSkills GenerateCombatSkills(CombatingEntity injection);
         SCriticalBuffPreset GetCriticalBuff();

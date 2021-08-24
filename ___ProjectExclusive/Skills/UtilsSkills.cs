@@ -44,7 +44,7 @@ namespace Skills
             return false;
         }
 
-        public static SCharacterSharedSkillsPreset GetOnNullSkills(CharacterArchetypes.TeamPosition position)
+        public static SCharacterSharedSkillsPreset GetOnNullSkills(EnumTeam.GroupPositioning position)
         {
             var backUpElements 
                 = CombatSystemSingleton.ParamsVariable.ArchetypesOnNullSkills;
