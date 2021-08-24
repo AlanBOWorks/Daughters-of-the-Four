@@ -18,7 +18,6 @@ namespace Characters
         private GameObject characterPrefab = null;
 
         public SCharacterSkillsPreset skillsPreset = null;
-        public SCharacterSharedSkillsPreset sharedSkillsPreset = null;
 
         [TitleGroup("Passives")]
         [SerializeField] 
@@ -37,14 +36,13 @@ namespace Characters
         public abstract CombatStatsHolder GenerateCombatData();
         public CombatSkills GenerateCombatSkills(CombatingEntity injection)
         {
-            return new CombatSkills(injection,sharedSkillsPreset, skillsPreset);
+            return new CombatSkills(injection, skillsPreset);
         }
 
         public string CharacterName => characterName;
         public Transform CharacterHolderReference { get; private set; }
         public GameObject CharacterPrefab => characterPrefab;
         public SCharacterSkillsPreset UniqueSkillsPreset => skillsPreset;
-        public SCharacterSharedSkillsPreset SharedSkillsPreset => sharedSkillsPreset;
      
         public SCriticalBuffPreset GetCriticalBuff() => criticalBuff;
 

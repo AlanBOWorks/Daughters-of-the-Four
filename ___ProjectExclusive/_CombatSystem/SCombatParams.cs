@@ -14,27 +14,22 @@ namespace _CombatSystem
 
         [Title("Skills")] 
         [SerializeField] 
-        private SharedSkillsSet sharedSkillsSets = new SharedSkillsSet();
+        private SkillPreset waitSkill;
         [SerializeField] 
-        private NullSkills onNullSkills = new NullSkills();
+        private SharedSkillsSet sharedSkillsSets = new SharedSkillsSet();
         [SerializeField] 
         private SBackUpSkills backUpSkills;
 
 
         [Title("Critical buffs")]
+        [Range(-1,1)] public float criticalHarmonyAddition = 0.05f;
         [SerializeField]
         private CriticalBuff onNullCriticalBuff = new CriticalBuff();
 
-
         [Title("Animator")]
-        public SkipAnimationsType skipAnimationsType = SkipAnimationsType.None;
-        [SerializeField,Range(.2f,5f)] 
+        [SerializeField, Range(.2f, 5f)]
         private float tempoVelocityModifier = 1;
-
-
-        [Title("Params")] 
-        [Range(-1,1)] public float criticalHarmonyAddition = 0.05f;
-
+        public SkipAnimationsType skipAnimationsType = SkipAnimationsType.None;
         public enum SkipAnimationsType
         {
             None,
@@ -43,7 +38,8 @@ namespace _CombatSystem
         }
 
 
-        public SSharedSkillsSet GetSkillPreset(
+        public SkillPreset GetWaitSkillPreset() => waitSkill;
+        public ISharedSkillsInPosition<SkillPreset> GetSkillPreset(
             EnumCharacter.RoleArchetype role,
             EnumCharacter.RangeType range)
         {
@@ -52,11 +48,7 @@ namespace _CombatSystem
             return UtilsCharacter.GetElement(roleSkills, range);
 
         }
-        /// <summary>
-        /// Used when a character doesn't have skills
-        /// </summary>
-        public ICharacterArchetypesData<SCharacterSharedSkillsPreset> ArchetypesOnNullSkills 
-            => onNullSkills;
+       
         public ICharacterArchetypesData<SCriticalBuffPreset> ArchetypesBackupOnNullCriticalBuffs
             => onNullCriticalBuff;
         public ISkillBackUp<SkillPreset[]> BackUpSkills => backUpSkills;
@@ -78,18 +70,7 @@ namespace _CombatSystem
             CombatSystemSingleton.ParamsVariable = this;
         }
 
-        [Serializable]
-        private class NullSkills : ICharacterArchetypesData<SCharacterSharedSkillsPreset>
-        {
-            [SerializeField] private SCharacterSharedSkillsPreset vanguard;
-            [SerializeField] private SCharacterSharedSkillsPreset attacker;
-            [SerializeField] private SCharacterSharedSkillsPreset support;
-
-            [TitleGroup("Characters")]
-            public SCharacterSharedSkillsPreset Vanguard => vanguard;
-            public SCharacterSharedSkillsPreset Attacker => attacker;
-            public SCharacterSharedSkillsPreset Support => support;
-        }
+       
 
         [Serializable]
         private class SharedSkillsSet : ICharacterArchetypesData<ICharacterRangesData<SSharedSkillsSet>>

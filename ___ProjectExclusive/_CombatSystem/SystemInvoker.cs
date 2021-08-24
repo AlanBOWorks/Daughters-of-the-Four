@@ -116,6 +116,7 @@ namespace _CombatSystem
                     {
                         entity.Injection(team);
                         entity.CombatStats.Initialization();
+                        entity.CombatSkills.Initialization();
                     }
                 }
 

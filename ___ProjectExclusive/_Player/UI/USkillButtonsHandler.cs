@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace _Player
 {
-    public class USkillButtonsHandler : MonoBehaviour, IIndividualSkillsSet<USkillButton>, 
+    public class USkillButtonsHandler : MonoBehaviour, ISharedSpecialSkills<USkillButton>, 
         IPlayerTempoListener, IPlayerButtonListener
     {
         [TitleGroup("Params")] 
@@ -131,6 +131,21 @@ namespace _Player
             }
         }
 
+        private void InjectSpecialSkills(CombatingEntity entity)
+        {
+            ISpecialSkills<CombatSkill> skills = entity.CombatSkills;
+            InjectSkillOnButton(entity,skills.WaitSkill,waitButton);
+
+            var ultimateSkill = skills.UltimateSkill;
+            if(ultimateSkill != null)
+                InjectSkillOnButton(entity,ultimateSkill,ultimateButton);
+            else
+            {
+                ultimateButton.Hide();
+            }
+
+        }
+
         private void UpdateSkills()
         {
             foreach (KeyValuePair<CombatSkill, USkillButton> pair in _skillButtons)
@@ -173,6 +188,7 @@ namespace _Player
             _skillButtons.Clear();
             InjectUniqueSkills(entity);
             InjectSharedSkills(entity);
+            InjectSpecialSkills(entity);
             ShowButtons();
         }
 

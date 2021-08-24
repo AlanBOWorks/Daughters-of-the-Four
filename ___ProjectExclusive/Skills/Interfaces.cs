@@ -17,13 +17,20 @@ namespace Skills
         T DefendingSkills { get; }
     }
 
-    public interface IIndividualSkillsSet<out T> : ISpecialSkills<T>, ISharedSkills<T>
+    public interface ISharedSpecialSkills<out T> : ISpecialSkills<T>, ISharedSkills<T> 
+    { }
+    
+    public interface ISpecialSkills<out T> : IUltimateSkill<T>, IWaitSkill<T>
     { }
 
-    public interface ISpecialSkills<out T>
+    public interface IUltimateSkill<out T>
     {
         T UltimateSkill { get; }
+    }
+    public interface IWaitSkill<out T>
+    {
         T WaitSkill { get; }
+
     }
 
     public interface ISharedSkills<out T>

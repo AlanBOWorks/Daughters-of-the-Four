@@ -44,11 +44,10 @@ namespace Skills
             return false;
         }
 
-        public static SCharacterSharedSkillsPreset GetOnNullSkills(EnumTeam.GroupPositioning position)
+        public static ISharedSkillsInPosition<SkillPreset> GetSharedSkillPreset(
+            EnumCharacter.RoleArchetype role, EnumCharacter.RangeType rangeType)
         {
-            var backUpElements 
-                = CombatSystemSingleton.ParamsVariable.ArchetypesOnNullSkills;
-            return CharacterArchetypes.GetElement(backUpElements, position);
+            return CombatSystemSingleton.ParamsVariable.GetSkillPreset(role, rangeType);
         }
 
         public static List<CombatSkill> GetUniqueByStance(CombatingEntity entity)
@@ -228,7 +227,18 @@ namespace Skills
             DoParse(skills as ISharedSkillsInPosition<T>,parsing,action);
         }
 
+        public static void AddTo(ISharedSkills<CombatSkill> skills, List<CombatSkill> addTo)
+        {
+            addTo.Add(skills.CommonSkillFirst);
+            addTo.Add(skills.CommonSkillSecondary);
+        }
 
+        public static void AddTo(ISharedSkillsSet<CombatSkill> skills, List<CombatSkill> addTo)
+        {
+            AddTo(skills.AttackingSkills, addTo);
+            AddTo(skills.NeutralSkills, addTo);
+            AddTo(skills.DefendingSkills, addTo);
+        }
     }
 
     public static class EnumSkills

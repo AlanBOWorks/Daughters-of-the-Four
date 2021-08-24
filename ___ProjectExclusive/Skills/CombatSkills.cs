@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _CombatSystem;
 using _Team;
 using Characters;
 using Sirenix.OdinInspector;
@@ -14,8 +15,10 @@ namespace Skills
 
         [ShowInInspector]
         public List<CombatSkill> AllSkills { get; private set; }
-        [ShowInInspector]
-        public ISharedSkillsSet<CombatSkill> SharedSkills { get; private set; }
+
+        [ShowInInspector] 
+        private readonly CombatSharedSkills _sharedSkills;
+        public ISharedSkillsSet<CombatSkill> SharedSkills => _sharedSkills;
         public ISkillPositions<List<CombatSkill>> UniqueSkills => this;
         [ShowInInspector]
         public List<CombatSkill> AttackingSkills { get; }
@@ -36,15 +39,11 @@ namespace Skills
             => UtilsSkill.GetElement(SharedSkills, _user);
 
 
-        public CombatSkills(CombatingEntity user,
-            ISharedSkillsSet<SkillPreset> shared, ISkillPositions<List<SkillPreset>> uniqueSkills)
+        public CombatSkills(CombatingEntity user, ISkillPositions<List<SkillPreset>> uniqueSkills)
         {
             _user = user;
             user.Injection(this);
-            if (shared == null)
-            {
-                shared = UtilsSkill.GetOnNullSkills(user.AreasDataTracker.PositionInTeam);
-            }
+            
 
             int attackingCount;
             int neutralCount;
@@ -67,52 +66,57 @@ namespace Skills
             
 
             int allCount = attackingCount + neutralCount + defendingCount;
-            UtilsSkill.DoSafeParse(shared,SumBySkill);
 
             AllSkills = new List<CombatSkill>(allCount);
             AttackingSkills = new List<CombatSkill>(attackingCount);
             NeutralSkills = new List<CombatSkill>(neutralCount);
             DefendingSkills = new List<CombatSkill>(defendingCount);
+            _sharedSkills = new CombatSharedSkills();
 
-            AddSharedSkills(shared);
             if(!isUniqueNull)
                 AddUniqueSkills(uniqueSkills);
+
+            AddWait();
+
 
             int GetSkillsCount(List<SkillPreset> skills)
             {
                 return skills?.Count ?? 0;
             }
 
-            void SumBySkill(SkillPreset check)
+            void AddWait()
             {
-                if(check.Preset != null)
-                    allCount++;
+                SkillPreset waitPreset = CombatSystemSingleton.ParamsVariable.GetWaitSkillPreset();
+                CombatSkill waitSkill = new CombatSkill(waitPreset);
+                AllSkills.Add(waitSkill);
+                _sharedSkills.WaitSkill = waitSkill;
             }
         }
 
+        public void Initialization()
+        {
+            EnumCharacter.RoleArchetype entityRole = _user.Role;
+            EnumCharacter.RangeType entityRange = _user.AreasDataTracker.RangeType;
 
-        private void AddSharedSkills(ISharedSkillsSet<SkillPreset> shared)
+            var sharedSkills = UtilsSkill.GetSharedSkillPreset(entityRole, entityRange);
+            InjectGenerateSharedSkills(sharedSkills);
+        }
+
+        private void InjectGenerateSharedSkills(ISharedSkillsInPosition<SkillPreset> shared)
         {
             if(shared == null)
                 throw new ArgumentException("Shared skills are null; BackUp skills weren't invoked still");
-            SharedSkills = new SharedCombatSkills(shared);
-
-            UtilsSkill.DoSafeParse(shared, AddShared);
+            _sharedSkills.GenerateShared(shared,AllSkills);
+        }
+        public void AddGenerateUltimate(SkillPreset ultimate)
+        {
+            var ultimateSkill = new CombatSkill(ultimate,true);
+            AllSkills.Add(ultimateSkill);
         }
 
         private void AddUniqueSkills(ISkillPositions<List<SkillPreset>> uniqueSkills)
         {
             UtilsSkill.DoParse(uniqueSkills, this, InjectStanceSkills);
-        }
-
-        private void AddShared(SkillPreset skill)
-        {
-            if (skill == null)
-                return;
-            if (skill.Preset == null)
-                return;
-            var combatSkill = new CombatSkill(skill);
-            AllSkills.Add(combatSkill);
         }
 
         public void AddSingle(SkillPreset skill)
@@ -155,6 +159,36 @@ namespace Skills
                 var combatSkill = new CombatSkill(skill);
                 onPositionCombatSkills.Add(combatSkill);
                 AllSkills.Add(combatSkill);
+            }
+        }
+
+        private class CombatSharedSkills : ISharedSkillsSet<CombatSkill>
+        {
+            public ISharedSkills<CombatSkill> AttackingSkills { get; private set; }
+            public ISharedSkills<CombatSkill> NeutralSkills { get; private set; }
+            public ISharedSkills<CombatSkill> DefendingSkills { get; private set; }
+            public CombatSkill UltimateSkill { get; set; } = null;
+            public CombatSkill WaitSkill { get; set; } = null;
+
+            public void GenerateShared(ISharedSkillsInPosition<SkillPreset> sharedSkills, List<CombatSkill> addTo)
+            {
+                AttackingSkills = new SharedCombatSkills(sharedSkills.AttackingSkills);
+                NeutralSkills = new SharedCombatSkills(sharedSkills.NeutralSkills);
+                DefendingSkills = new SharedCombatSkills(sharedSkills.DefendingSkills);
+
+                UtilsSkill.AddTo(this,addTo);
+            }
+
+            private class SharedCombatSkills : ISharedSkills<CombatSkill>
+            {
+                public SharedCombatSkills(ISharedSkills<SkillPreset> preset)
+                {
+                    CommonSkillFirst = new CombatSkill(preset.CommonSkillFirst);
+                    CommonSkillSecondary = new CombatSkill(preset.CommonSkillSecondary);
+                }
+
+                public CombatSkill CommonSkillFirst { get; }
+                public CombatSkill CommonSkillSecondary { get; }
             }
         }
     }
