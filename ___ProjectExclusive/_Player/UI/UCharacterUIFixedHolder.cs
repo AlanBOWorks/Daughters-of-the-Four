@@ -59,7 +59,7 @@ namespace _Player
         public void OnVitalityChange(IVitalityStatsData currentStats)
         {
 
-            maxHealth.text = UtilsGameTheme.GetNumericalPrint(currentStats.GetMaxHealth());
+            maxHealth.text = UtilsGameTheme.GetNumericalPrint(currentStats.MaxHealth);
         }
 
         public void OnTemporalStatsChange(ICombatTemporalStats currentStats)

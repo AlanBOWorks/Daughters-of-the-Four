@@ -80,7 +80,7 @@ namespace Stats
                 float calculation = baseCombatStats.AttackPower;
                 foreach (IOffensiveStatsData offensiveStat in offensiveStats)
                 {
-                    calculation += offensiveStat.GetAttackPower();
+                    calculation += offensiveStat.AttackPower;
                 }
 
                 return calculation;
@@ -94,7 +94,7 @@ namespace Stats
                 float calculation = baseCombatStats.DeBuffPower;
                 foreach (IOffensiveStatsData offensiveStat in offensiveStats)
                 {
-                    calculation += offensiveStat.GetDeBuffPower();
+                    calculation += offensiveStat.DeBuffPower;
                 }
 
                 return calculation;
@@ -109,7 +109,7 @@ namespace Stats
                 float calculation = baseCombatStats.StaticDamagePower;
                 foreach (IOffensiveStatsData offensiveStat in offensiveStats)
                 {
-                    calculation += offensiveStat.GetStaticDamagePower();
+                    calculation += offensiveStat.StaticDamagePower;
                 }
 
                 return calculation;
@@ -124,7 +124,7 @@ namespace Stats
                 float calculation = baseCombatStats.HealPower;
                 foreach (ISupportStatsData supportStat in supportStats)
                 {
-                    calculation += supportStat.GetHealPower();
+                    calculation += supportStat.HealPower;
                 }
 
                 return calculation;
@@ -138,7 +138,7 @@ namespace Stats
                 float calculation = baseCombatStats.BuffPower;
                 foreach (ISupportStatsData supportStat in supportStats)
                 {
-                    calculation += supportStat.GetBuffPower();
+                    calculation += supportStat.BuffPower;
                 }
 
                 return calculation;
@@ -153,7 +153,7 @@ namespace Stats
                 float calculation = baseCombatStats.BuffReceivePower;
                 foreach (ISupportStatsData supportStat in supportStats)
                 {
-                    calculation += supportStat.GetBuffReceivePower();
+                    calculation += supportStat.BuffReceivePower;
                 }
 
                 return calculation;
@@ -168,7 +168,7 @@ namespace Stats
                 float calculation = baseCombatStats.MaxHealth;
                 foreach (IVitalityStatsData vitalityStat in vitalityStats)
                 {
-                    calculation += vitalityStat.GetMaxHealth();
+                    calculation += vitalityStat.MaxHealth;
                 }
 
                 return calculation;
@@ -182,7 +182,7 @@ namespace Stats
                 float calculation = baseCombatStats.MaxMortalityPoints;
                 foreach (IVitalityStatsData vitalityStat in vitalityStats)
                 {
-                    calculation += vitalityStat.GetMaxMortalityPoints();
+                    calculation += vitalityStat.MaxMortalityPoints;
                 }
 
                 return calculation;
@@ -196,7 +196,7 @@ namespace Stats
                 float calculation = baseCombatStats.DamageReduction;
                 foreach (IVitalityStatsData vitalityStat in vitalityStats)
                 {
-                    calculation += vitalityStat.GetDamageReduction();
+                    calculation += vitalityStat.DamageReduction;
                 }
 
                 return calculation;
@@ -210,7 +210,7 @@ namespace Stats
                 float calculation = baseCombatStats.DeBuffReduction;
                 foreach (IVitalityStatsData vitalityStat in vitalityStats)
                 {
-                    calculation += vitalityStat.GetDeBuffReduction();
+                    calculation += vitalityStat.DeBuffReduction;
                 }
 
                 return calculation;
@@ -226,7 +226,7 @@ namespace Stats
                 float calculation = baseCombatStats.Enlightenment;
                 foreach (IConcentrationStatsData specialStat in specialStats)
                 {
-                    calculation += specialStat.GetEnlightenment();
+                    calculation += specialStat.Enlightenment;
                 }
 
                 return calculation;
@@ -240,7 +240,7 @@ namespace Stats
                 float calculation = baseCombatStats.CriticalChance;
                 foreach (IConcentrationStatsData specialStat in specialStats)
                 {
-                    calculation += specialStat.GetCriticalChance();
+                    calculation += specialStat.CriticalChance;
                 }
 
                 return calculation;
@@ -254,7 +254,7 @@ namespace Stats
                 float calculation = baseCombatStats.SpeedAmount;
                 foreach (IConcentrationStatsData specialStat in specialStats)
                 {
-                    calculation += specialStat.GetSpeedAmount();
+                    calculation += specialStat.SpeedAmount;
                 }
 
                 return calculation;
@@ -268,7 +268,7 @@ namespace Stats
                 float calculation = baseCombatStats.InitiativePercentage;
                 foreach (ICombatTemporalStatsBaseData specialStat in temporalStats)
                 {
-                    calculation += specialStat.GetInitiativePercentage();
+                    calculation += specialStat.InitiativePercentage;
                 }
 
                 return calculation;
@@ -282,7 +282,7 @@ namespace Stats
                 int calculation = baseCombatStats.ActionsPerInitiative;
                 foreach (ICombatTemporalStatsBaseData specialStat in temporalStats)
                 {
-                    calculation += specialStat.GetActionsPerInitiative();
+                    calculation += specialStat.ActionsPerInitiative;
                 }
 
                 return calculation;
@@ -296,43 +296,12 @@ namespace Stats
                 float calculation = baseCombatStats.HarmonyAmount;
                 foreach (ICombatTemporalStatsBaseData specialStat in temporalStats)
                 {
-                    calculation += specialStat.GetHarmonyAmount();
+                    calculation += specialStat.HarmonyAmount;
                 }
 
                 return calculation;
             }
-
         }
-        public float GetAttackPower() => AttackPower;
 
-        public float GetDeBuffPower() => DeBuffPower;
-
-        public float GetStaticDamagePower() => StaticDamagePower;
-
-        public float GetHealPower() => HealPower;
-
-        public float GetBuffPower() => BuffPower;
-
-        public float GetBuffReceivePower() => BuffReceivePower;
-
-        public float GetMaxHealth() => MaxHealth;
-
-        public float GetMaxMortalityPoints() => MaxMortalityPoints;
-
-        public float GetDamageReduction() => DamageReduction;
-
-        public float GetDeBuffReduction() => DeBuffReduction;
-
-        public float GetEnlightenment() => Enlightenment;
-
-        public float GetCriticalChance() => CriticalChance;
-
-        public float GetSpeedAmount() => SpeedAmount;
-
-        public float GetInitiativePercentage() => InitiativePercentage;
-
-        public int GetActionsPerInitiative() => ActionsPerInitiative;
-
-        public float GetHarmonyAmount() => HarmonyAmount;
     }
 }

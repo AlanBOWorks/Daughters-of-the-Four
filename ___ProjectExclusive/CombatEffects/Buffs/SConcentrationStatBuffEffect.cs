@@ -32,13 +32,13 @@ namespace CombatEffects
             switch (buffType)
             {
                 case EnumStats.Concentration.Enlightenment:
-                    buffStats.Enlightenment = buffStats.GetEnlightenment() + effectAmount;
+                    buffStats.Enlightenment = buffStats.Enlightenment + effectAmount;
                     break;
                 case EnumStats.Concentration.Critical:
-                    buffStats.CriticalChance = buffStats.GetCriticalChance() + effectAmount;
+                    buffStats.CriticalChance = buffStats.CriticalChance + effectAmount;
                     break;
                 case EnumStats.Concentration.Speed:
-                    buffStats.SpeedAmount = buffStats.GetSpeedAmount() + effectAmount;
+                    buffStats.SpeedAmount = buffStats.SpeedAmount + effectAmount;
                     break;
                 default:
                     throw new ArgumentException($"The buff type [{buffType}] is not valid.",

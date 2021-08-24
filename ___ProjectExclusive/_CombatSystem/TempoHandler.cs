@@ -160,7 +160,7 @@ namespace _CombatSystem
         public void CheckAndInjectEntityInitiative(CombatingEntity entity)
         {
             IFullStatsData stats = entity.CombatStats;
-            float initiative = stats.GetInitiativePercentage();
+            float initiative = stats.InitiativePercentage;
 
             if (initiative < InitiativeCheck) return;
 
@@ -211,8 +211,8 @@ namespace _CombatSystem
 
                         // Increment
                         IFullStatsData stats = entity.CombatStats;
-                        float initiative = stats.GetInitiativePercentage();
-                        initiative += deltaIncrement * stats.GetSpeedAmount() * VelocityModifier;
+                        float initiative = stats.InitiativePercentage;
+                        initiative += deltaIncrement * stats.SpeedAmount * VelocityModifier;
                         stats.InitiativePercentage = initiative;
 
                         // Percentage
@@ -273,7 +273,7 @@ namespace _CombatSystem
 
         private void CallUpdateOnInitiativeBar(CombatingEntity entity, ICombatTempoStatsData stats)
         {
-            float initiativePercentage = stats.GetInitiativePercentage();
+            float initiativePercentage = stats.InitiativePercentage;
             EntitiesBar[entity].FillBar(initiativePercentage);
         }
 

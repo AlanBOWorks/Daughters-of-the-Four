@@ -33,13 +33,13 @@ namespace CombatEffects
             switch (buffType)
             {
                 case EnumStats.Support.Heal:
-                    buffStats.HealPower = buffStats.GetHealPower() + effectModifier;
+                    buffStats.HealPower = buffStats.HealPower + effectModifier;
                     break;
                 case EnumStats.Support.Buff:
-                    buffStats.BuffPower = buffStats.GetBuffPower() + effectModifier;
+                    buffStats.BuffPower = buffStats.BuffPower + effectModifier;
                     break;
                 case EnumStats.Support.ReceiveBuffIndex:
-                    buffStats.BuffReceivePower = buffStats.GetBuffReceivePower() + effectModifier;
+                    buffStats.BuffReceivePower = buffStats.BuffReceivePower + effectModifier;
                     break;
                 default:
                     throw new ArgumentException($"The buff type [{buffType}] is not valid.",

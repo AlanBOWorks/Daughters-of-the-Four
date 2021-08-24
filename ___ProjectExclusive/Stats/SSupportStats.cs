@@ -10,11 +10,6 @@ namespace Stats
         [SerializeField] private float buffPower;
         [SerializeField] private float buffReceivePower;
 
-        public float GetHealPower() => healPower;
-
-        public float GetBuffPower() => buffPower;
-
-        public float GetBuffReceivePower() => BuffReceivePower;
 
         public float HealPower
         {

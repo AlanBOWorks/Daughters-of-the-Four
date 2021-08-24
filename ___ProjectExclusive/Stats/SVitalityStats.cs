@@ -12,13 +12,6 @@ namespace Stats
         [SerializeField] private float damageReduction;
         [SerializeField] private float deBuffReduction;
 
-        public float GetMaxHealth() => maxHealth;
-
-        public float GetMaxMortalityPoints() => maxMortalityPoints;
-
-        public float GetDamageReduction() => DamageReduction;
-
-        public float GetDeBuffReduction() => deBuffReduction;
 
         public float MaxHealth
         {

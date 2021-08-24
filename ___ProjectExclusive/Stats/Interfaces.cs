@@ -19,18 +19,23 @@ namespace Stats
         //TODO UpgradeLevel?
     }
 
-    public interface IOffensiveStats : IOffensiveStatsData, IOffensiveStatsInjection
+    public interface IOffensiveStats : IOffensiveStats<float>, IOffensiveStatsData, IOffensiveStatsInjection
     { }
+
     public interface IOffensiveStatsData : IOffensiveStatsData<float>
     { }
 
     public interface IOffensiveStatsInjection : IOffensiveStatsInjection<float>
     { }
+
+    public interface IOffensiveStats<T> : IOffensiveStatsData<T>, IOffensiveStatsInjection<T>
+    { }
+
     public interface IOffensiveStatsData<out T>
     {
-        T GetAttackPower();
-        T GetDeBuffPower();
-        T GetStaticDamagePower();
+        T AttackPower { get; }
+        T DeBuffPower { get; }
+        T StaticDamagePower { get; }
     }
     public interface IOffensiveStatsInjection<in T>
     {
@@ -47,9 +52,9 @@ namespace Stats
     { }
     public interface ISupportStatsData<out T>
     {
-        T GetHealPower();
-        T GetBuffPower();
-        T GetBuffReceivePower();
+        T HealPower { get; }
+        T BuffPower { get; }
+        T BuffReceivePower { get; }
     }
     public interface ISupportStatsInjection<in T>
     {
@@ -64,10 +69,10 @@ namespace Stats
     {}
     public interface IVitalityStatsData<out T>
     {
-        T GetMaxHealth();
-        T GetMaxMortalityPoints();
-        T GetDamageReduction();
-        T GetDeBuffReduction();
+        T MaxHealth { get; }
+        T MaxMortalityPoints { get; }
+        T DamageReduction { get; }
+        T DeBuffReduction { get; }
 
         //Static reduction is determined by deBuffReduction (+ damage?)
     }
@@ -103,7 +108,12 @@ namespace Stats
     }
 
     public interface ICombatTemporalStatsBase : ICombatTemporalStatsBaseData, ICombatTemporalStatsBaseInjection
-    { }
+    {
+        new float InitiativePercentage { get; set; }
+        new int ActionsPerInitiative { get; set; }
+        new float HarmonyAmount { get; set; }
+
+    }
 
     public interface ICombatTemporalStatsBaseData : ICombatTempoStatsData, IHarmonyStatsData
     { }
@@ -118,12 +128,12 @@ namespace Stats
     {}
 
     public interface IHarmonyStatsInjection : IHarmonyStatsInjection<float>
-    {}
+    { }
 
     public interface ICombatTempoStatsData<out T>
     {
-        T GetInitiativePercentage();
-        int GetActionsPerInitiative();
+        T InitiativePercentage { get; }
+        int ActionsPerInitiative { get; }
     }
     public interface ICombatTempoStatsInjection<in T>
     {
@@ -132,7 +142,7 @@ namespace Stats
     }
     public interface IHarmonyStatsData<out T>
     {
-        T GetHarmonyAmount();
+        T HarmonyAmount { get; }
     }
 
     public interface IHarmonyStatsInjection<in T>
@@ -143,7 +153,11 @@ namespace Stats
 
 
     public interface IConcentrationStats : IConcentrationStatsData, IConcentrationStatsInjection
-    { }
+    {
+        new float Enlightenment { get; set; }
+        new float CriticalChance { get; set; }
+        new float SpeedAmount { get; set; }
+    }
 
     public interface IConcentrationStatsData : IConcentrationStatsData<float>
     {}
@@ -152,9 +166,10 @@ namespace Stats
         /// <summary>
         /// Affects Harmony
         /// </summary>
-        T GetEnlightenment();
-        T GetCriticalChance();
-        T GetSpeedAmount();
+        T Enlightenment { get; }
+
+        T CriticalChance { get; }
+        T SpeedAmount { get; }
     }
 
     public interface IConcentrationStatsInjection : IConcentrationStatsInjection<float>
@@ -180,7 +195,25 @@ namespace Stats
     { }
 
     public interface IBasicStats : IBasicStatsData, IBasicStatsInjection
-    { }
+    {
+        new float AttackPower { get; set; }
+        new float DeBuffPower { get; set; }
+        new float StaticDamagePower { get; set; }
+        new float HealPower { get; set; }
+        new float BuffPower { get; set; }
+        new float BuffReceivePower { get; set; }
+        new float MaxHealth { get; set; }
+        new float MaxMortalityPoints { get; set; }
+        new float DamageReduction { get; set; }
+        new float DeBuffReduction { get; set; }
+        new float InitiativePercentage { get; set; }
+        new int ActionsPerInitiative { get; set; }
+        new float HarmonyAmount { get; set; }
+        new float Enlightenment { get; set; }
+        new float CriticalChance { get; set; }
+        new float SpeedAmount { get; set; }
+
+    }
 
     public interface IBasicStatsData : IOffensiveStatsData, ISupportStatsData,
         IVitalityStatsData, IConcentrationStatsData, ICombatTemporalStatsBaseData

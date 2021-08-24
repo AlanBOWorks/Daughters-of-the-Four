@@ -14,8 +14,8 @@ namespace CombatEffects
 
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float debuffModifier = 1)
         {
-            float userDebuffChance = arguments.UserStats.GetDeBuffPower() * Random.value;
-            float targetDebuffChance = target.CombatStats.GetDeBuffReduction() * Random.value;
+            float userDebuffChance = arguments.UserStats.DeBuffPower * Random.value;
+            float targetDebuffChance = target.CombatStats.DeBuffReduction * Random.value;
 
             if(targetDebuffChance > userDebuffChance) return;
             DoEffect(target,debuffModifier);

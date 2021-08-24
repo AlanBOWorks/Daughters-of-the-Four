@@ -32,16 +32,16 @@ namespace CombatEffects
             switch (buffType)
             {
                 case EnumStats.Vitality.MaxHealth:
-                    buffStats.MaxHealth = buffStats.GetMaxHealth() + effectAmount;
+                    buffStats.MaxHealth = buffStats.MaxHealth + effectAmount;
                     break;
                 case EnumStats.Vitality.MaxMortality:
-                    buffStats.MaxMortalityPoints = buffStats.GetMaxMortalityPoints() + effectAmount;
+                    buffStats.MaxMortalityPoints = buffStats.MaxMortalityPoints + effectAmount;
                     break;
                 case EnumStats.Vitality.DamageReduction:
-                    buffStats.DamageReduction = buffStats.GetDamageReduction() + effectAmount;
+                    buffStats.DamageReduction = buffStats.DamageReduction + effectAmount;
                     break;
                 case EnumStats.Vitality.DeBuffReduction:
-                    buffStats.DeBuffReduction = buffStats.GetDeBuffReduction() + effectAmount;
+                    buffStats.DeBuffReduction = buffStats.DeBuffReduction + effectAmount;
                     break;
                 default:
                     throw new ArgumentException($"The buff type [{buffType}] is not valid.",

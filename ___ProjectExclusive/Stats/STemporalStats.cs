@@ -9,11 +9,6 @@ namespace Stats
         [SerializeField] private float initiativePercentage;
         [SerializeField] private int actionsPerInitiative;
         [SerializeField] private float harmonyAmount;
-
-        public float GetInitiativePercentage() => initiativePercentage;
-        public int GetActionsPerInitiative() => actionsPerInitiative;
-        public float GetHarmonyAmount() => harmonyAmount;
-
         public float InitiativePercentage
         {
             get => initiativePercentage;

@@ -9,11 +9,7 @@ namespace Stats
         [SerializeField] private float attackPower;
         [SerializeField] private float deBuffPower;
         [SerializeField] private float staticDamagePower;
-
-
-        public float GetAttackPower() => attackPower;
-        public float GetDeBuffPower() => deBuffPower;
-        public float GetStaticDamagePower() => staticDamagePower;
+        
 
         public float AttackPower
         {

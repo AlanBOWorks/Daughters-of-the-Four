@@ -15,7 +15,7 @@ namespace CombatEffects
         
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float harmonyAddition = 1)
         {
-            float enlightenmentAmount = arguments.UserStats.GetEnlightenment();
+            float enlightenmentAmount = arguments.UserStats.Enlightenment;
             float harmonyModifier = enlightenmentAmount * harmonyAddition;
             DoEffect(target,harmonyModifier);
         }

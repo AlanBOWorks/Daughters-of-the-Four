@@ -8,4 +8,21 @@ namespace Characters
         string CharacterName { get; }
     }
 
+    public interface ICharacterRanges<T> : ICharacterRangesData<T>, ICharacterRangesInjection<T>
+    {
+        new T MeleeRange { get; set; }
+        new T RangedRange { get; set; }
+    }
+
+    public interface ICharacterRangesData<out T>
+    {
+        T MeleeRange { get; }
+        T RangedRange { get; }
+    }
+
+    public interface ICharacterRangesInjection<in T>
+    {
+        T MeleeRange { set; }
+        T RangedRange { set; }
+    }
 }

@@ -261,37 +261,7 @@ namespace Stats
         {
             harmonyAmount = value;
         }
-        public float GetAttackPower() => AttackPower;
 
-        public float GetDeBuffPower() => DeBuffPower;
-
-        public float GetStaticDamagePower() => StaticDamagePower;
-
-        public float GetHealPower() => HealPower;
-
-        public float GetBuffPower() => BuffPower;
-
-        public float GetBuffReceivePower() => BuffReceivePower;
-
-        public float GetMaxHealth() => MaxHealth;
-
-        public float GetMaxMortalityPoints() => MaxMortalityPoints;
-
-        public float GetDamageReduction() => DamageReduction;
-
-        public float GetDeBuffReduction() => DeBuffReduction;
-
-        public float GetEnlightenment() => Enlightenment;
-
-        public float GetCriticalChance() => CriticalChance;
-
-        public float GetSpeedAmount() => SpeedAmount;
-
-        public float GetInitiativePercentage() => InitiativePercentage;
-
-        public int GetActionsPerInitiative() => ActionsPerInitiative;
-
-        public float GetHarmonyAmount() => HarmonyAmount;
     }
 
 }

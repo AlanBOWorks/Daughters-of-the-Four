@@ -11,11 +11,6 @@ namespace Stats
         [SerializeField] private float criticalChance;
         [SerializeField] private float speedAmount;
 
-        public float GetEnlightenment() => enlightenment;
-
-        public float GetCriticalChance() => criticalChance;
-
-        public float GetSpeedAmount() => speedAmount;
 
         public float Enlightenment
         {

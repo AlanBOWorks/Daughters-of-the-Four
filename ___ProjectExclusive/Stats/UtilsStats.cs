@@ -117,9 +117,9 @@ namespace Stats
         {
             return type switch
             {
-                EnumStats.Offensive.Attack => stats.GetAttackPower(),
-                EnumStats.Offensive.DeBuff => stats.GetDeBuffPower(),
-                EnumStats.Offensive.StaticPower => stats.GetStaticDamagePower(),
+                EnumStats.Offensive.Attack => stats.AttackPower,
+                EnumStats.Offensive.DeBuff => stats.DeBuffPower,
+                EnumStats.Offensive.StaticPower => stats.StaticDamagePower,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
@@ -128,9 +128,9 @@ namespace Stats
         {
             return type switch
             {
-                EnumStats.Support.Heal => stats.GetHealPower(),
-                EnumStats.Support.Buff => stats.GetBuffPower(),
-                EnumStats.Support.ReceiveBuffIndex => stats.GetBuffReceivePower(),
+                EnumStats.Support.Heal => stats.HealPower,
+                EnumStats.Support.Buff => stats.BuffPower,
+                EnumStats.Support.ReceiveBuffIndex => stats.BuffReceivePower,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
@@ -139,10 +139,10 @@ namespace Stats
         {
             return type switch
             {
-                EnumStats.Vitality.MaxHealth => stats.GetMaxHealth(),
-                EnumStats.Vitality.MaxMortality => stats.GetMaxMortalityPoints(),
-                EnumStats.Vitality.DamageReduction => stats.GetDamageReduction(),
-                EnumStats.Vitality.DeBuffReduction => stats.GetDeBuffReduction(),
+                EnumStats.Vitality.MaxHealth => stats.MaxHealth,
+                EnumStats.Vitality.MaxMortality => stats.MaxMortalityPoints,
+                EnumStats.Vitality.DamageReduction => stats.DamageReduction,
+                EnumStats.Vitality.DeBuffReduction => stats.DeBuffReduction,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
@@ -151,9 +151,9 @@ namespace Stats
         {
             return type switch
             {
-                EnumStats.Concentration.Enlightenment => stats.GetEnlightenment(),
-                EnumStats.Concentration.Critical => stats.GetCriticalChance(),
-                EnumStats.Concentration.Speed => stats.GetSpeedAmount(),
+                EnumStats.Concentration.Enlightenment => stats.Enlightenment,
+                EnumStats.Concentration.Critical => stats.CriticalChance,
+                EnumStats.Concentration.Speed => stats.SpeedAmount,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
@@ -171,11 +171,11 @@ namespace Stats
                 case EnumStats.TemporalCombatStats.Mortality:
                     return stats.MortalityPoints;
                 case EnumStats.TemporalCombatStats.Harmony:
-                    return stats.GetHarmonyAmount();
+                    return stats.HarmonyAmount;
                 case EnumStats.TemporalCombatStats.Initiative:
-                    return stats.GetInitiativePercentage();
+                    return stats.InitiativePercentage;
                 case EnumStats.TemporalCombatStats.Actions:
-                    return stats.GetActionsPerInitiative();
+                    return stats.ActionsPerInitiative;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
@@ -201,35 +201,35 @@ namespace Stats
 
         public static void Add(IBasicStats injection, IOffensiveStatsData stats)
         {
-            injection.AttackPower = injection.GetAttackPower() + stats.GetAttackPower();
-            injection.DeBuffPower = injection.GetDeBuffPower() + stats.GetDeBuffPower();
-            injection.StaticDamagePower = injection.GetStaticDamagePower() + stats.GetStaticDamagePower();
+            injection.AttackPower += stats.AttackPower;
+            injection.DeBuffPower += stats.DeBuffPower;
+            injection.StaticDamagePower += stats.StaticDamagePower;
         }
         public static void Add(IBasicStats injection, ISupportStatsData stats)
         {
-            injection.HealPower = injection.GetHealPower() + stats.GetHealPower();
-            injection.BuffPower = injection.GetBuffPower() + stats.GetBuffPower();
-            injection.BuffReceivePower = injection.GetBuffReceivePower() + stats.GetBuffReceivePower();
+            injection.HealPower = injection.HealPower + stats.HealPower;
+            injection.BuffPower = injection.BuffPower + stats.BuffPower;
+            injection.BuffReceivePower = injection.BuffReceivePower + stats.BuffReceivePower;
         }
         public static void Add(IBasicStats injection, IVitalityStatsData stats)
         {
-            injection.MaxHealth = injection.GetMaxHealth() + stats.GetMaxHealth();
-            injection.MaxMortalityPoints = injection.GetMaxMortalityPoints() + stats.GetMaxMortalityPoints();
-            injection.DeBuffReduction = injection.GetDeBuffReduction() + stats.GetDeBuffReduction();
-            injection.DamageReduction = injection.GetDamageReduction() + stats.GetDamageReduction();
+            injection.MaxHealth = injection.MaxHealth + stats.MaxHealth;
+            injection.MaxMortalityPoints = injection.MaxMortalityPoints + stats.MaxMortalityPoints;
+            injection.DeBuffReduction = injection.DeBuffReduction + stats.DeBuffReduction;
+            injection.DamageReduction = injection.DamageReduction + stats.DamageReduction;
         }
 
         public static void Add(IBasicStats injection, IConcentrationStatsData stats)
         {
-            injection.SpeedAmount = injection.GetSpeedAmount() + stats.GetSpeedAmount();
-            injection.CriticalChance = injection.GetCriticalChance() + stats.GetCriticalChance();
-            injection.Enlightenment = injection.GetEnlightenment() + stats.GetEnlightenment();
+            injection.SpeedAmount = injection.SpeedAmount + stats.SpeedAmount;
+            injection.CriticalChance = injection.CriticalChance + stats.CriticalChance;
+            injection.Enlightenment = injection.Enlightenment + stats.Enlightenment;
         }
 
         public static void Add(IBasicStats injection, ICombatTempoStatsData stats)
         {
-            injection.InitiativePercentage = injection.GetInitiativePercentage() + stats.GetInitiativePercentage();
-            injection.ActionsPerInitiative = injection.GetActionsPerInitiative() + stats.GetActionsPerInitiative();
+            injection.InitiativePercentage = injection.InitiativePercentage + stats.InitiativePercentage;
+            injection.ActionsPerInitiative = injection.ActionsPerInitiative + stats.ActionsPerInitiative;
         }
 
         public static void Add(IBasicStats injection, IBasicStatsData stats)
@@ -293,31 +293,31 @@ namespace Stats
 
         public static void CopyStats(IOffensiveStatsInjection injection, IOffensiveStatsData copyFrom)
         {
-            injection.AttackPower = copyFrom.GetAttackPower();
-            injection.DeBuffPower = copyFrom.GetDeBuffPower();
-            injection.StaticDamagePower = copyFrom.GetStaticDamagePower();
+            injection.AttackPower = copyFrom.AttackPower;
+            injection.DeBuffPower = copyFrom.DeBuffPower;
+            injection.StaticDamagePower = copyFrom.StaticDamagePower;
         }
 
         public static void CopyStats(ISupportStatsInjection injection, ISupportStatsData copyFrom)
         {
-            injection.HealPower = copyFrom.GetHealPower();
-            injection.BuffPower = copyFrom.GetBuffPower();
-            injection.BuffReceivePower = copyFrom.GetBuffReceivePower();
+            injection.HealPower = copyFrom.HealPower;
+            injection.BuffPower = copyFrom.BuffPower;
+            injection.BuffReceivePower = copyFrom.BuffReceivePower;
         }
 
         public static void CopyStats(IVitalityStatsInjection injection, IVitalityStatsData copyFrom)
         {
-            injection.MaxHealth = copyFrom.GetMaxHealth();
-            injection.MaxMortalityPoints = copyFrom.GetMaxMortalityPoints();
-            injection.DamageReduction = copyFrom.GetDamageReduction();
-            injection.DeBuffReduction = copyFrom.GetDeBuffReduction();
+            injection.MaxHealth = copyFrom.MaxHealth;
+            injection.MaxMortalityPoints = copyFrom.MaxMortalityPoints;
+            injection.DamageReduction = copyFrom.DamageReduction;
+            injection.DeBuffReduction = copyFrom.DeBuffReduction;
         }
 
         public static void CopyStats(IConcentrationStatsInjection injection, IConcentrationStatsData copyFrom)
         {
-            injection.Enlightenment = copyFrom.GetEnlightenment();
-            injection.CriticalChance = copyFrom.GetCriticalChance();
-            injection.SpeedAmount = copyFrom.GetSpeedAmount();
+            injection.Enlightenment = copyFrom.Enlightenment;
+            injection.CriticalChance = copyFrom.CriticalChance;
+            injection.SpeedAmount = copyFrom.SpeedAmount;
         }
 
 
@@ -332,9 +332,9 @@ namespace Stats
 
         public static void CopyStats(ICombatTemporalStatsBaseInjection injection, ICombatTemporalStatsBaseData copyFrom)
         {
-            injection.HarmonyAmount = copyFrom.GetHarmonyAmount();
-            injection.InitiativePercentage = copyFrom.GetInitiativePercentage();
-            injection.ActionsPerInitiative = copyFrom.GetActionsPerInitiative();
+            injection.HarmonyAmount = copyFrom.HarmonyAmount;
+            injection.InitiativePercentage = copyFrom.InitiativePercentage;
+            injection.ActionsPerInitiative = copyFrom.ActionsPerInitiative;
         }
 
         public static void CopyStats(ICombatTemporalStats injection, ICombatTemporalStats copyFrom)
@@ -392,13 +392,13 @@ namespace Stats
         public static float HealthPercentage(CombatingEntity entity)
         {
             var stats = entity.CombatStats;
-            return SRange.Percentage(stats.HealthPoints, 0, stats.GetMaxHealth());
+            return SRange.Percentage(stats.HealthPoints, 0, stats.MaxHealth);
         }
 
         public static float MortalityPercent(CombatingEntity entity)
         {
             var stats = entity.CombatStats;
-            return SRange.Percentage(stats.MortalityPoints, 0, stats.GetMaxMortalityPoints());
+            return SRange.Percentage(stats.MortalityPoints, 0, stats.MaxMortalityPoints);
         }
 
 
@@ -523,7 +523,7 @@ namespace Stats
             var stats = target.CombatStats;
 
             float targetHealth = stats.HealthPoints + heal;
-            float maxHealth = stats.GetMaxHealth();
+            float maxHealth = stats.MaxHealth;
             if (targetHealth > maxHealth)
             {
                 target.ReceivedStats.HealReceived = maxHealth - stats.HealthPoints;
@@ -548,7 +548,7 @@ namespace Stats
         {
             var stats = target.CombatStats;
             float currentHealth = stats.HealthPoints;
-            float maxHealth = stats.GetMaxHealth();
+            float maxHealth = stats.MaxHealth;
             float currentOverHeal = currentHealth - maxHealth;
 
             // Is inValid?
@@ -569,7 +569,7 @@ namespace Stats
         public static void HealToMax(CombatStatsHolder stats)
         {
             if(!stats.IsAlive()) return;
-            float maxHealth = stats.GetMaxHealth();
+            float maxHealth = stats.MaxHealth;
             if(stats.HealthPoints < maxHealth) // This is because the target could have overHeal state
                 stats.HealthPoints = maxHealth;
         }
@@ -611,7 +611,7 @@ namespace Stats
             var stats = isBurstType 
                 ? entity.CombatStats.BurstStats 
                 : (IBasicStats) entity.CombatStats.BaseStats;
-            SetInitiative(stats, stats.GetInitiativePercentage() + addition);
+            SetInitiative(stats, stats.InitiativePercentage + addition);
 
 
             entity.Events.InvokeTemporalStatChange();
@@ -638,10 +638,10 @@ namespace Stats
 
         public static void AddHarmony(CombatingEntity entity, ICombatTemporalStatsBase stats, float addition)
         {
-            float userEnlightenment = entity.CombatStats.GetEnlightenment(); //Generally value = 1;
+            float userEnlightenment = entity.CombatStats.Enlightenment; //Generally value = 1;
             addition *= userEnlightenment;
 
-            float targetHarmony = stats.GetHarmonyAmount() + addition;
+            float targetHarmony = stats.HarmonyAmount + addition;
             targetHarmony = Mathf.Clamp(
                 targetHarmony, 
                 StatsCap.MinHarmony, StatsCap.MaxHarmony);
@@ -655,8 +655,8 @@ namespace Stats
         {
             var userStats = user.CombatStats;
             var targetStats = target.CombatStats;
-            float userEnlightenment = userStats.GetEnlightenment(); //Generally value = 1;
-            float targetEnlightenment = targetStats.GetEnlightenment();
+            float userEnlightenment = userStats.Enlightenment; //Generally value = 1;
+            float targetEnlightenment = targetStats.Enlightenment;
             float harmonyVariation = userEnlightenment - targetEnlightenment;
             reduction += reduction * harmonyVariation;
 
@@ -684,13 +684,13 @@ namespace Stats
         public static bool IsCriticalPerformance(IBasicStatsData stats, CombatSkill skill, float criticalCheck)
         {
             if (!skill.CanCrit) return false;
-            return criticalCheck < stats.GetCriticalChance() + skill.CriticalAddition;
+            return criticalCheck < stats.CriticalChance + skill.CriticalAddition;
         }
 
         public static bool IsCriticalPerformance(IBasicStats stats, SSkillPreset preset, float criticalCheck)
         {
             if (!preset.canCrit) return false;
-            return criticalCheck < stats.GetCriticalChance() + preset.criticalAddition;
+            return criticalCheck < stats.CriticalChance + preset.criticalAddition;
         }
         public static bool IsCriticalPerformance(SSkillPreset preset, float criticalCheck)
         {
@@ -719,7 +719,7 @@ namespace Stats
 
         public static float CalculateShieldsPower(IFullStatsData user)
         {
-            float shields = user.GetHealPower() + user.GetBuffPower();
+            float shields = user.HealPower + user.BuffPower;
             shields *= .5f; //The average of Heal && buffPower is the Shields power
 
             return shields;
@@ -727,12 +727,12 @@ namespace Stats
 
         public static void VariateBuffUser(IBasicStatsData user, ref float buffValue)
         {
-            var userBuffPower = user.GetBuffPower(); //Generally value == 1;
+            var userBuffPower = user.BuffPower; //Generally value == 1;
             buffValue *= userBuffPower;
         }
         public static void VariateBuffTarget(IBasicStatsData target, ref float buffValue)
         {
-            var targetReceiveBuffPower = target.GetBuffReceivePower(); //Generally value == 0;
+            var targetReceiveBuffPower = target.BuffReceivePower; //Generally value == 0;
             buffValue += buffValue * targetReceiveBuffPower;
         }
 
