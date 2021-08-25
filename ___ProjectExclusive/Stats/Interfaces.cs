@@ -3,9 +3,15 @@ using UnityEngine;
 
 namespace Stats
 {
+    /// <summary>
+    /// Used just to know if the interface is a Stat type  
+    /// </summary>
+    public interface IStatsData 
+    { }
+
     public interface IStatsPrimordial : IStatsPrimordial<float>
     { }
-    public interface IStatsPrimordial<T>
+    public interface IStatsPrimordial<T> : IStatsData
     {
         T OffensivePower { get; set; }
         T SupportPower { get; set; }
@@ -31,7 +37,7 @@ namespace Stats
     public interface IOffensiveStats<T> : IOffensiveStatsData<T>, IOffensiveStatsInjection<T>
     { }
 
-    public interface IOffensiveStatsData<out T>
+    public interface IOffensiveStatsData<out T> : IStatsData
     {
         T AttackPower { get; }
         T DeBuffPower { get; }
@@ -50,7 +56,7 @@ namespace Stats
     { }
     public interface ISupportStatsInjection : ISupportStatsInjection<float>
     { }
-    public interface ISupportStatsData<out T>
+    public interface ISupportStatsData<out T> : IStatsData
     {
         T HealPower { get; }
         T BuffPower { get; }
@@ -67,7 +73,7 @@ namespace Stats
     { }
     public interface IVitalityStatsData : IVitalityStatsData<float>
     {}
-    public interface IVitalityStatsData<out T>
+    public interface IVitalityStatsData<out T> : IStatsData
     {
         T MaxHealth { get; }
         T MaxMortalityPoints { get; }
@@ -130,7 +136,7 @@ namespace Stats
     public interface IHarmonyStatsInjection : IHarmonyStatsInjection<float>
     { }
 
-    public interface ICombatTempoStatsData<out T>
+    public interface ICombatTempoStatsData<out T> : IStatsData
     {
         T InitiativePercentage { get; }
         int ActionsPerInitiative { get; }
@@ -140,7 +146,7 @@ namespace Stats
         T InitiativePercentage { set; }
         int ActionsPerInitiative { set; }
     }
-    public interface IHarmonyStatsData<out T>
+    public interface IHarmonyStatsData<out T> : IStatsData
     {
         T HarmonyAmount { get; }
     }
@@ -161,7 +167,7 @@ namespace Stats
 
     public interface IConcentrationStatsData : IConcentrationStatsData<float>
     {}
-    public interface IConcentrationStatsData<out T>
+    public interface IConcentrationStatsData<out T> : IStatsData
     {
         /// <summary>
         /// Affects Harmony

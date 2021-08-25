@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Stats
 {
 
-    public class CombatStatsHolder : IFullStatsData
+    public class CombatStatsHolder : IFullStatsData, IStanceAllData<IBasicStatsData>
     {
         public CombatStatsHolder(IFullStatsData presetStats)
         {
@@ -15,7 +15,7 @@ namespace Stats
             BuffStats = new CombatStatsFull();
             BurstStats = new CombatStatsFull();
 
-            PositionalStats = PositionalStats.GenerateProvisionalBasics();
+            _positionalStats = PositionalStats.GenerateProvisionalBasics();
             _formulatedStats = new FormulatedStats(this);
             _multiplierStats = new MultiplierStats();
         }
@@ -31,7 +31,7 @@ namespace Stats
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
         public CombatStatsFull BurstStats { get; protected set; }
 
-        public PositionalStats PositionalStats { get; protected set; }
+        private readonly PositionalStats _positionalStats;
 
         // By design multiplier are consistent / Burst are temporary and specific;
         // making multipliers Burst type could be confusing.
@@ -47,6 +47,7 @@ namespace Stats
 
         private IBasicStatsData TeamStats => TeamData.GetCurrentStanceValue();
         public IStatsPrimordial GetMultiplierStats() => _multiplierStats;
+        public IStanceData<IBasicStats> GetPositionalStats() => _positionalStats;
 
         public CombatingTeam TeamData
         {
@@ -56,7 +57,7 @@ namespace Stats
 
         public void Injection(IStanceProvider positionStatsStanceProvider)
         {
-            PositionalStats.Injection(positionStatsStanceProvider);
+            _positionalStats.Injection(positionStatsStanceProvider);
         }
 
 
@@ -203,168 +204,99 @@ namespace Stats
                 return BaseStats.StaticDamagePower + TeamStats.StaticDamagePower;
             }
 
-            public float AttackPower
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        CalculateBaseAttackPower(),
-                        BuffStats.AttackPower,
-                        BurstStats.AttackPower);
-                }
-            }
+            public float AttackPower =>
+                UtilsStats.StatsFormula(
+                    CalculateBaseAttackPower(),
+                    BuffStats.AttackPower,
+                    BurstStats.AttackPower);
 
-            public float DeBuffPower
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        BaseStats.DeBuffPower + TeamStats.DeBuffPower,
-                        BuffStats.DeBuffPower,
-                        BurstStats.DeBuffPower);
-                }
-            }
+            public float DeBuffPower =>
+                UtilsStats.StatsFormula(
+                    BaseStats.DeBuffPower + TeamStats.DeBuffPower,
+                    BuffStats.DeBuffPower,
+                    BurstStats.DeBuffPower);
 
 
-            public float StaticDamagePower
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        CalculateBaseStaticDamagePower(),
-                        BuffStats.StaticDamagePower,
-                        BurstStats.StaticDamagePower);
-                }
-            }
+            public float StaticDamagePower =>
+                UtilsStats.StatsFormula(
+                    CalculateBaseStaticDamagePower(),
+                    BuffStats.StaticDamagePower,
+                    BurstStats.StaticDamagePower);
 
-            public float HealPower
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        BaseStats.HealPower + TeamStats.HealPower,
-                        BuffStats.HealPower,
-                        BurstStats.HealPower);
-                }
-            }
+            public float HealPower =>
+                UtilsStats.StatsFormula(
+                    BaseStats.HealPower + TeamStats.HealPower,
+                    BuffStats.HealPower,
+                    BurstStats.HealPower);
 
-            public float BuffPower
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        BaseStats.BuffPower + TeamStats.BuffPower,
-                        BuffStats.BuffPower,
-                        BurstStats.BuffPower);
-                }
-            }
+            public float BuffPower =>
+                UtilsStats.StatsFormula(
+                    BaseStats.BuffPower + TeamStats.BuffPower,
+                    BuffStats.BuffPower,
+                    BurstStats.BuffPower);
 
-            public float BuffReceivePower
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        BaseStats.BuffReceivePower + TeamStats.BuffReceivePower,
-                        BuffStats.BuffReceivePower,
-                        BurstStats.BuffReceivePower);
-                }
-            }
+            public float BuffReceivePower =>
+                UtilsStats.StatsFormula(
+                    BaseStats.BuffReceivePower + TeamStats.BuffReceivePower,
+                    BuffStats.BuffReceivePower,
+                    BurstStats.BuffReceivePower);
 
-            public float HarmonyAmount
-            {
-                get { return BaseStats.HarmonyAmount + TeamStats.HarmonyAmount + BurstStats.HarmonyAmount; }
-            }
+            public float HarmonyAmount => BaseStats.HarmonyAmount + TeamStats.HarmonyAmount + BurstStats.HarmonyAmount;
 
-            public float InitiativePercentage
-            {
-                get
-                {
-                    return BaseStats.InitiativePercentage + TeamStats.InitiativePercentage
-                                                          + BuffStats.InitiativePercentage
-                                                          + BurstStats.InitiativePercentage;
-                }
-            }
+            public float InitiativePercentage =>
+                BaseStats.InitiativePercentage + TeamStats.InitiativePercentage
+                                               + BuffStats.InitiativePercentage
+                                               + BurstStats.InitiativePercentage;
 
-            public int ActionsPerInitiative
-            {
-                get
-                {
-                    return BaseStats.ActionsPerInitiative + TeamStats.ActionsPerInitiative
-                                                          + BuffStats.ActionsPerInitiative
-                                                          + BurstStats.ActionsPerInitiative;
-                }
-            }
+            public int ActionsPerInitiative =>
+                BaseStats.ActionsPerInitiative + TeamStats.ActionsPerInitiative
+                                               + BuffStats.ActionsPerInitiative
+                                               + BurstStats.ActionsPerInitiative;
 
-            public float Enlightenment
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        BaseStats.Enlightenment + TeamStats.Enlightenment,
-                        BuffStats.Enlightenment,
-                        BurstStats.Enlightenment);
-                }
-            }
+            public float Enlightenment =>
+                UtilsStats.StatsFormula(
+                    BaseStats.Enlightenment + TeamStats.Enlightenment,
+                    BuffStats.Enlightenment,
+                    BurstStats.Enlightenment);
 
-            public float CriticalChance
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        BaseStats.CriticalChance + TeamStats.CriticalChance,
-                        BuffStats.CriticalChance,
-                        BurstStats.CriticalChance);
-                }
-            }
+            public float CriticalChance =>
+                UtilsStats.StatsFormula(
+                    BaseStats.CriticalChance + TeamStats.CriticalChance,
+                    BuffStats.CriticalChance,
+                    BurstStats.CriticalChance);
 
-            public float SpeedAmount
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        BaseStats.SpeedAmount + TeamStats.SpeedAmount,
-                        BuffStats.SpeedAmount,
-                        BurstStats.SpeedAmount);
-                }
-            }
+            public float SpeedAmount =>
+                UtilsStats.StatsFormula(
+                    BaseStats.SpeedAmount + TeamStats.SpeedAmount,
+                    BuffStats.SpeedAmount,
+                    BurstStats.SpeedAmount);
 
-            public float MaxHealth
-            {
-                get { return BaseStats.MaxHealth + TeamStats.MaxHealth; }
-            }
+            public float MaxHealth => BaseStats.MaxHealth + TeamStats.MaxHealth;
 
-            public float MaxMortalityPoints
-            {
-                get { return BaseStats.MaxMortalityPoints + TeamStats.MaxMortalityPoints; }
-            }
+            public float MaxMortalityPoints => BaseStats.MaxMortalityPoints + TeamStats.MaxMortalityPoints;
 
             public float CalculateDamageReduction()
             {
                 return BaseStats.DamageReduction + TeamStats.DamageReduction;
             }
 
-            public float DamageReduction
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        CalculateDamageReduction(),
-                        BuffStats.DamageReduction,
-                        BurstStats.DamageReduction);
-                }
-            }
+            public float DamageReduction =>
+                UtilsStats.StatsFormula(
+                    CalculateDamageReduction(),
+                    BuffStats.DamageReduction,
+                    BurstStats.DamageReduction);
 
-            public float DeBuffReduction
-            {
-                get
-                {
-                    return UtilsStats.StatsFormula(
-                        BaseStats.DeBuffReduction + TeamStats.DeBuffReduction,
-                        BuffStats.DeBuffReduction,
-                        BurstStats.DeBuffReduction);
-                }
-            }
+            public float DeBuffReduction =>
+                UtilsStats.StatsFormula(
+                    BaseStats.DeBuffReduction + TeamStats.DeBuffReduction,
+                    BuffStats.DeBuffReduction,
+                    BurstStats.DeBuffReduction);
         }
+
+        public IBasicStatsData AttackingStance => _positionalStats.AttackingStance;
+        public IBasicStatsData NeutralStance => _positionalStats.NeutralStance;
+        public IBasicStatsData DefendingStance => _positionalStats.DefendingStance;
+        public IBasicStatsData InAllStances => _formulatedStats;
     }
 
 

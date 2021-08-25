@@ -5,7 +5,7 @@ namespace Stats
 
     [CreateAssetMenu(fileName = "CONCENTRATION - N [Stats]",
         menuName = "Combat/Stats/Concentration")]
-    public class SConcentrationStats : ScriptableObject, IConcentrationStats
+    public class SConcentrationStats : SStatsBase, IConcentrationStats
     {
         [SerializeField] private float enlightenment;
         [SerializeField] private float criticalChance;

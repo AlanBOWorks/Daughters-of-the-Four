@@ -264,4 +264,10 @@ namespace Stats
 
     }
 
+    /// <summary>
+    /// Mean to be used for [<see cref="SerializeField"/>] in [<seealso cref="UnityEngine.Object"/>]'s serialization
+    /// as a Base. It doesn't have any functionality beside that
+    /// </summary>
+    public abstract class SStatsBase : ScriptableObject, IStatsData 
+    { }
 }

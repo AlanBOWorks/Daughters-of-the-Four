@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using _CombatSystem;
 using _Team;
+using CombatEffects;
 using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
@@ -247,7 +248,10 @@ namespace Characters
        
     }
 
-
+    /// <summary>
+    /// Tracks all events than need to ve invoked and rises them all in one go.
+    /// This avoid clusters of events
+    /// </summary>
     public class CharacterEventsTracker
     {
         private readonly Queue<CombatingEntity> _temporalStatsEvents;
@@ -476,5 +480,15 @@ namespace Characters
         void OnMortalityZero(CombatingEntity entity);
         void OnRevive(CombatingEntity entity);
         void OnTeamHealthZero(CombatingTeam losingTeam);
+    }
+
+    public interface IBuffDoneListener : ICharacterListener
+    {
+        void OnBuffDone(CombatingEntity entity);
+    }
+
+    public interface ICriticalActionListener : ICharacterListener
+    {
+        void OnCriticalAction(CombatingEntity entity); 
     }
 }

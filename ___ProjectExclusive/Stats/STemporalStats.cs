@@ -4,7 +4,7 @@ namespace Stats
 {
     [CreateAssetMenu(fileName = "TEMPORAL(base) - N [Stats]",
         menuName = "Combat/Stats/Temporal(Base)")]
-    public class STemporalStats : ScriptableObject, ICombatTemporalStatsBase
+    public class STemporalStats : SStatsBase, ICombatTemporalStatsBase
     {
         [SerializeField] private float initiativePercentage;
         [SerializeField] private int actionsPerInitiative;

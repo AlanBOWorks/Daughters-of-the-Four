@@ -4,7 +4,7 @@ namespace Stats
 {
     [CreateAssetMenu(fileName = "OFFENSIVE - N [Stats]", 
         menuName = "Combat/Stats/Offensive")]
-    public class SOffensiveStats : ScriptableObject, IOffensiveStats
+    public class SOffensiveStats : SStatsBase, IOffensiveStats
     {
         [SerializeField] private float attackPower;
         [SerializeField] private float deBuffPower;

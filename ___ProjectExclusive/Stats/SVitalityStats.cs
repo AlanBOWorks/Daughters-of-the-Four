@@ -5,7 +5,7 @@ namespace Stats
 
     [CreateAssetMenu(fileName = "VITALITY - N [Stats]",
         menuName = "Combat/Stats/Vitality")]
-    public class SVitalityStats : ScriptableObject, IVitalityStats
+    public class SVitalityStats : SStatsBase, IVitalityStats
     {
         [SerializeField] private float maxHealth;
         [SerializeField] private float maxMortalityPoints;

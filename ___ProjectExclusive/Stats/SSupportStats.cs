@@ -4,7 +4,7 @@ namespace Stats
 {
     [CreateAssetMenu(fileName = "SUPPORT - N [Stats]",
         menuName = "Combat/Stats/Support")]
-    public class SSupportStats : ScriptableObject, ISupportStats
+    public class SSupportStats : SStatsBase, ISupportStats
     {
         [SerializeField] private float healPower;
         [SerializeField] private float buffPower;
