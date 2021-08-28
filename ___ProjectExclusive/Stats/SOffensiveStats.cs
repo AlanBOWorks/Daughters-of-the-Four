@@ -4,7 +4,7 @@ namespace Stats
 {
     [CreateAssetMenu(fileName = "OFFENSIVE - N [Stats]", 
         menuName = "Combat/Stats/Offensive")]
-    public class SOffensiveStats : SStatsBase, IOffensiveStats
+    public class SOffensiveStats : SStatsBase, IOffensiveStats<float>
     {
         [SerializeField] private float attackPower;
         [SerializeField] private float deBuffPower;
@@ -27,6 +27,11 @@ namespace Stats
         {
             get => staticDamagePower;
             set => staticDamagePower = value;
+        }
+
+        public override void DoInjection(IBasicStats<float> stats)
+        {
+            UtilsStats.Add(stats,this);
         }
     }
 }

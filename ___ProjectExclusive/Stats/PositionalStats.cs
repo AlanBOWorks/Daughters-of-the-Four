@@ -9,7 +9,7 @@ namespace Stats
     /// [<see cref="ICombatStatsBasic"/>] based by the [<seealso cref="EnumTeam.Stances"/>]<br></br>
     /// Get mainly by [<see cref="PositionalStats{T}.GetCurrentStanceValue"/>]
     /// </summary>
-    public class PositionalStats : PositionalStructureBase<IBasicStats>
+    public class PositionalStats : PositionalStructureBase<IBasicStats<float>>
     {
        
         /// <summary>
@@ -21,9 +21,9 @@ namespace Stats
         { }
 
         public PositionalStats(IStanceProvider stanceProvider,
-            IBasicStats attackingStance, 
-            IBasicStats neutralStance, 
-            IBasicStats defendingStance) 
+            IBasicStats<float> attackingStance, 
+            IBasicStats<float> neutralStance, 
+            IBasicStats<float> defendingStance) 
             : base(stanceProvider, attackingStance, neutralStance, defendingStance)
         {}
 

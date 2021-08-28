@@ -4,7 +4,7 @@ namespace Stats
 {
     [CreateAssetMenu(fileName = "SUPPORT - N [Stats]",
         menuName = "Combat/Stats/Support")]
-    public class SSupportStats : SStatsBase, ISupportStats
+    public class SSupportStats : SStatsBase, ISupportStats<float>
     {
         [SerializeField] private float healPower;
         [SerializeField] private float buffPower;
@@ -27,6 +27,11 @@ namespace Stats
         {
             get => buffReceivePower;
             set => buffReceivePower = value;
+        }
+
+        public override void DoInjection(IBasicStats<float> stats)
+        {
+            UtilsStats.Add(stats, this);
         }
     }
 }

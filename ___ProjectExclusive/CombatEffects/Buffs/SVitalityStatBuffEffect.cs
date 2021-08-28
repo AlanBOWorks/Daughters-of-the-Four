@@ -27,7 +27,7 @@ namespace CombatEffects
             UtilsStats.EnqueueStatsBuffEvent(target);
         }
 
-        private void DoBuff(IBasicStats buffStats, float effectAmount)
+        private void DoBuff(IBasicStats<float> buffStats, float effectAmount)
         {
             switch (buffType)
             {

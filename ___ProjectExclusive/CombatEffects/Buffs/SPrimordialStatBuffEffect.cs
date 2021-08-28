@@ -29,7 +29,7 @@ namespace CombatEffects
             UtilsStats.EnqueueStatsBuffEvent(target);
         }
 
-        private void DoBuff(IStatsPrimordial multiplierStats, float effectModifier)
+        private void DoBuff(IMasterStats<float> multiplierStats, float effectModifier)
         {
             switch (buffStat)
             {

@@ -9,33 +9,41 @@ namespace Stats
     public interface IStatsData 
     { }
 
-    public interface IStatsPrimordial : IStatsPrimordial<float>
-    { }
-    public interface IStatsPrimordial<T> : IStatsData
-    {
-        T OffensivePower { get; set; }
-        T SupportPower { get; set; }
-        T VitalityAmount { get; set; }
-        T ConcentrationAmount { get; set; }
-    }
-
-
-    public interface IStatsUpgradable : IStatsPrimordial
+    // it's is float because upgrades could be increased in half
+    public interface IStatsUpgradable : IMasterStats<float>
     {
         //TODO UpgradeLevel?
     }
+    public interface IMasterStats<T> : IMasterStatsData<T>, IMasterStatsInjection<T> ,IStatsData
+    {
+        new T OffensivePower { get; set; }
+        new T SupportPower { get; set; }
+        new T VitalityAmount { get; set; }
+        new T ConcentrationAmount { get; set; }
+    }
 
-    public interface IOffensiveStats : IOffensiveStats<float>, IOffensiveStatsData, IOffensiveStatsInjection
-    { }
+    public interface IMasterStatsData<out T>
+    {
+        T OffensivePower { get; }
+        T SupportPower { get; }
+        T VitalityAmount { get; }
+        T ConcentrationAmount { get; }
+    }
 
-    public interface IOffensiveStatsData : IOffensiveStatsData<float>
-    { }
-
-    public interface IOffensiveStatsInjection : IOffensiveStatsInjection<float>
-    { }
-
+    public interface IMasterStatsInjection<in T>
+    {
+        T OffensivePower { set; }
+        T SupportPower { set; }
+        T VitalityAmount { set; }
+        T ConcentrationAmount { set; }
+    }
+    
     public interface IOffensiveStats<T> : IOffensiveStatsData<T>, IOffensiveStatsInjection<T>
-    { }
+    {
+        new T AttackPower { get; set; }
+        new T DeBuffPower { get; set; }
+        new T StaticDamagePower { get; set; }
+    }
 
     public interface IOffensiveStatsData<out T> : IStatsData
     {
@@ -49,13 +57,13 @@ namespace Stats
         T DeBuffPower { set; }
         T StaticDamagePower { set; }
     }
-
-    public interface ISupportStats : ISupportStatsData, ISupportStatsInjection
-    { }
-    public interface ISupportStatsData : ISupportStatsData<float>
-    { }
-    public interface ISupportStatsInjection : ISupportStatsInjection<float>
-    { }
+    public interface ISupportStats<T> : ISupportStatsData<T>, ISupportStatsInjection<T>
+    {
+        new T HealPower { get; set; }
+        new T BuffPower { get; set; }
+        new T BuffReceivePower { get; set; }
+    }
+   
     public interface ISupportStatsData<out T> : IStatsData
     {
         T HealPower { get; }
@@ -69,10 +77,14 @@ namespace Stats
         T BuffReceivePower { set; }
     }
 
-    public interface IVitalityStats : IVitalityStatsData, IVitalityStatsInjection
-    { }
-    public interface IVitalityStatsData : IVitalityStatsData<float>
-    {}
+    public interface IVitalityStats<T> : IVitalityStatsData<T>, IVitalityStatsInjection<T>
+    {
+        new T MaxHealth { get; set; }
+        new T MaxMortalityPoints { get; set; }
+        new T DamageReduction { get; set; }
+        new T DeBuffReduction { get; set; }
+    }
+
     public interface IVitalityStatsData<out T> : IStatsData
     {
         T MaxHealth { get; }
@@ -82,9 +94,6 @@ namespace Stats
 
         //Static reduction is determined by deBuffReduction (+ damage?)
     }
-
-    public interface IVitalityStatsInjection : IVitalityStatsInjection<float>
-    {}
     public interface IVitalityStatsInjection<in T>
     {
         T MaxHealth { set; }
@@ -93,80 +102,65 @@ namespace Stats
         T DamageReduction { set; }
         T DeBuffReduction { set; }
     }
-
-
-    ///  /// <summary>
-    /// <inheritdoc cref="ICombatTemporalStats{T}"/>
-    /// </summary>
-    public interface ICombatTemporalStats : ICombatTemporalStats<float>
-    { }
+    
     /// <summary>
     /// Used only during the fights. <br></br>
     /// For variation, only the <seealso cref="CombatStatsHolder.BaseStats"/>
     /// should be used
     /// </summary>
-    public interface ICombatTemporalStats<T> : ICombatTemporalStatsBase
+    public interface ICombatHealthStats<T> : ICombatHealthStatsData<T>,ICombatHealthStatsInjector<T>
     {
-        T HealthPoints { get; set; }
-        T ShieldAmount { get; set; }
-        T MortalityPoints { get; set; }
-        T AccumulatedStatic { get; set; }
+        new T HealthPoints { get; set; }
+        new T ShieldAmount { get; set; }
+        new T MortalityPoints { get; set; }
+        new T AccumulatedStatic { get; set; }
+    }
+    public interface ICombatHealthStatsData<out T>
+    {
+        T HealthPoints { get; }
+        T ShieldAmount { get; }
+        T MortalityPoints { get; }
+        T AccumulatedStatic { get; }
+    }
+    public interface ICombatHealthStatsInjector<in T>
+    {
+        T HealthPoints { set; }
+        T ShieldAmount { set; }
+        T MortalityPoints { set; }
+        T AccumulatedStatic { set; }
     }
 
-    public interface ICombatTemporalStatsBase : ICombatTemporalStatsBaseData, ICombatTemporalStatsBaseInjection
+    ///  /// <summary>
+    /// <inheritdoc cref="ICombatHealthStats{T}"/>
+    /// </summary>
+    public interface ITemporalStats<T> : ITemporalStatsData<T>, ITemporalStatsInjection<T>
     {
-        new float InitiativePercentage { get; set; }
-        new int ActionsPerInitiative { get; set; }
-        new float HarmonyAmount { get; set; }
-
+        new T InitiativePercentage { get; set; }
+        new T ActionsPerInitiative { get; set; }
+        new T HarmonyAmount { get; set; }
     }
 
-    public interface ICombatTemporalStatsBaseData : ICombatTempoStatsData, IHarmonyStatsData
-    { }
-    public interface ICombatTemporalStatsBaseInjection : ICombatTempoStatsInjection, IHarmonyStatsInjection
-    { }
 
-    public interface ICombatTempoStatsData : ICombatTempoStatsData<float>
-    {}
-    public interface ICombatTempoStatsInjection : ICombatTempoStatsInjection<float>
-    {}
-    public interface IHarmonyStatsData : IHarmonyStatsData<float>
-    {}
-
-    public interface IHarmonyStatsInjection : IHarmonyStatsInjection<float>
-    { }
-
-    public interface ICombatTempoStatsData<out T> : IStatsData
-    {
+    public interface ITemporalStatsData<out T> 
+    { 
         T InitiativePercentage { get; }
-        int ActionsPerInitiative { get; }
-    }
-    public interface ICombatTempoStatsInjection<in T>
-    {
-        T InitiativePercentage { set; }
-        int ActionsPerInitiative { set; }
-    }
-    public interface IHarmonyStatsData<out T> : IStatsData
-    {
+        T ActionsPerInitiative { get; }
         T HarmonyAmount { get; }
     }
 
-    public interface IHarmonyStatsInjection<in T>
+    public interface ITemporalStatsInjection<in T> 
     {
+        T InitiativePercentage { set; }
+        T ActionsPerInitiative { set; }
         T HarmonyAmount { set; }
     }
 
-
-
-    public interface IConcentrationStats : IConcentrationStatsData, IConcentrationStatsInjection
+    public interface IConcentrationStats<T> : IConcentrationStatsData<T>, IConcentrationStatsInjection<T>
     {
-        new float Enlightenment { get; set; }
-        new float CriticalChance { get; set; }
-        new float SpeedAmount { get; set; }
+        new T Enlightenment { get; set; }
+        new T CriticalChance { get; set; }
+        new T SpeedAmount { get; set; }
     }
-
-    public interface IConcentrationStatsData : IConcentrationStatsData<float>
-    {}
     public interface IConcentrationStatsData<out T> : IStatsData
     {
         /// <summary>
@@ -178,8 +172,6 @@ namespace Stats
         T SpeedAmount { get; }
     }
 
-    public interface IConcentrationStatsInjection : IConcentrationStatsInjection<float>
-    {}
     public interface IConcentrationStatsInjection<in T>
     {
         T Enlightenment { set; }
@@ -192,40 +184,71 @@ namespace Stats
 
 
 
-    public interface IFullStats : IBasicStats, IFullStatsData, IFullStatsInjection
+    public interface IFullStats<T> : IBasicStats<T>, ICombatHealthStats<T>,
+        IFullStatsData<T>, IFullStatsInjection<T>,
+        ITemporalStats<T>
+    { }
+    public interface IFullStatsData<out T> : IBasicStatsData<T>, ICombatHealthStatsData<T> ,
+        ITemporalStatsData<T>
     { }
 
-    public interface IFullStatsInjection : IBasicStatsInjection, ICombatTemporalStats
-    { }
-    public interface IFullStatsData : IBasicStatsData, ICombatTemporalStats
+    public interface IFullStatsInjection<in T> : IBasicStatsInjection<T>, ICombatHealthStatsInjector<T>, 
+        ITemporalStatsInjection<T>
     { }
 
-    public interface IBasicStats : IBasicStatsData, IBasicStatsInjection
+
+    public interface IBasicStats<T> : IBasicStatsData<T>, IBasicStatsInjection<T>
     {
-        new float AttackPower { get; set; }
-        new float DeBuffPower { get; set; }
-        new float StaticDamagePower { get; set; }
-        new float HealPower { get; set; }
-        new float BuffPower { get; set; }
-        new float BuffReceivePower { get; set; }
-        new float MaxHealth { get; set; }
-        new float MaxMortalityPoints { get; set; }
-        new float DamageReduction { get; set; }
-        new float DeBuffReduction { get; set; }
-        new float InitiativePercentage { get; set; }
-        new int ActionsPerInitiative { get; set; }
-        new float HarmonyAmount { get; set; }
-        new float Enlightenment { get; set; }
-        new float CriticalChance { get; set; }
-        new float SpeedAmount { get; set; }
+        new T AttackPower { get; set; }
+        new T DeBuffPower { get; set; }
+        new T StaticDamagePower { get; set; }
+        new T HealPower { get; set; }
+        new T BuffPower { get; set; }
+        new T BuffReceivePower { get; set; }
+        new T MaxHealth { get; set; }
+        new T MaxMortalityPoints { get; set; }
+        new T DamageReduction { get; set; }
+        new T DeBuffReduction { get; set; }
+        new T InitiativePercentage { get; set; }
+        new T ActionsPerInitiative { get; set; }
+        new T HarmonyAmount { get; set; }
+        new T Enlightenment { get; set; }
+        new T CriticalChance { get; set; }
+        new T SpeedAmount { get; set; }
+    }
+   
 
+    public interface IBasicStatsData<out T> : 
+        IOffensiveStatsData<T>, 
+        ISupportStatsData<T>,
+        IVitalityStatsData<T>, 
+        IConcentrationStatsData<T>, 
+        ITemporalStatsData<T>
+    { }
+
+    public interface IBasicStatsInjection<in T> : 
+        IOffensiveStatsInjection<T>, 
+        ISupportStatsInjection<T>,
+        IVitalityStatsInjection<T>, 
+        IConcentrationStatsInjection<T>, 
+        ITemporalStatsInjection<T>
+    { }
+
+    public interface IBasicStatsHolder<T>
+    {
+        IOffensiveStats<T> OffensiveStats { get; set; }
+        ISupportStats<T> SupportStats { get; set; }
+        IVitalityStats<T> VitalityStats { get; set; }
+        IConcentrationStats<T> ConcentrationStats { get; set; }
+        ITemporalStats<T> TemporalStats { get; set; }
     }
 
-    public interface IBasicStatsData : IOffensiveStatsData, ISupportStatsData,
-        IVitalityStatsData, IConcentrationStatsData, ICombatTemporalStatsBaseData
-    { }
-
-    public interface IBasicStatsInjection : IOffensiveStatsInjection, ISupportStatsInjection,
-        IVitalityStatsInjection, IConcentrationStatsInjection, ICombatTemporalStatsBaseInjection
-    { }
+    public interface IBasicStatsHolderData<out T>
+    {
+        IOffensiveStatsData<T> OffensiveStats { get; }
+        ISupportStatsData<T> SupportStats { get; }
+        IVitalityStatsData<T> VitalityStats { get; }
+        IConcentrationStatsData<T> ConcentrationStats { get; }
+        ITemporalStatsData<T> TemporalStats { get; }
+    }
 }

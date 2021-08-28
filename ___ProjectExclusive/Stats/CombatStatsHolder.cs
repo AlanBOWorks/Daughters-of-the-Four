@@ -1,15 +1,16 @@
 using System;
 using _Team;
 using Characters;
+using CombatConditions;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Stats
 {
 
-    public class CombatStatsHolder : IFullStatsData, IStanceAllData<IBasicStatsData>
+    public class CombatStatsHolder : IFullStatsData<float>, IStanceAllData<IBasicStatsData<float>>
     {
-        public CombatStatsHolder(IFullStatsData presetStats)
+        public CombatStatsHolder(IFullStatsData<float> presetStats)
         {
             BaseStats = new CombatStatsFull(presetStats);
             BuffStats = new CombatStatsFull();
@@ -44,10 +45,14 @@ namespace Stats
         [TitleGroup("Local stats"), PropertyOrder(-10)]
         public int ActionsLefts;
 
+        public IBasicStats<float> GetStats(EnumStats.StatsType statsType)
+        {
+            return UtilsEnumStats.GetStats(this, statsType);
+        }
 
-        private IBasicStatsData TeamStats => TeamData.GetCurrentStanceValue();
-        public IStatsPrimordial GetMultiplierStats() => _multiplierStats;
-        public IStanceData<IBasicStats> GetPositionalStats() => _positionalStats;
+        private IBasicStatsData<float> TeamStats => TeamData.GetCurrentStanceValue();
+        public IMasterStats<float> GetMultiplierStats() => _multiplierStats;
+        public IStanceData<IBasicStats<float>> GetPositionalStats() => _positionalStats;
 
         public CombatingTeam TeamData
         {
@@ -130,7 +135,7 @@ namespace Stats
             set => BaseStats.InitiativePercentage = value;
         }
 
-        public int ActionsPerInitiative
+        public float ActionsPerInitiative
         {
             get => BaseStats.ActionsPerInitiative + TeamStats.ActionsPerInitiative
                                                   + BuffStats.ActionsPerInitiative
@@ -154,7 +159,7 @@ namespace Stats
         public float SpeedAmount => _multiplierStats.ConcentrationAmount * _formulatedStats.SpeedAmount;
        
 
-        private class MultiplierStats : IStatsPrimordial
+        private class MultiplierStats : IMasterStats<float>
         {
             public float OffensivePower { get; set; } = 1;
             public float SupportPower { get; set; } = 1;
@@ -162,7 +167,7 @@ namespace Stats
             public float ConcentrationAmount { get; set; } = 1;
         }
 
-        private class FormulatedStats : IBasicStatsData
+        private class FormulatedStats : IBasicStatsData<float>
         {
             [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
             public CombatStatsFull BaseStats { get; protected set; }
@@ -176,7 +181,7 @@ namespace Stats
             public CombatStatsFull BurstStats { get; protected set; }
 
             [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
-            private IBasicStatsData TeamStats => TeamData.GetCurrentStanceValue();
+            private IBasicStatsData<float> TeamStats => TeamData.GetCurrentStanceValue();
 
             public CombatingTeam TeamData;
 
@@ -248,7 +253,7 @@ namespace Stats
                                                + BuffStats.InitiativePercentage
                                                + BurstStats.InitiativePercentage;
 
-            public int ActionsPerInitiative =>
+            public float ActionsPerInitiative =>
                 BaseStats.ActionsPerInitiative + TeamStats.ActionsPerInitiative
                                                + BuffStats.ActionsPerInitiative
                                                + BurstStats.ActionsPerInitiative;
@@ -293,10 +298,10 @@ namespace Stats
                     BurstStats.DeBuffReduction);
         }
 
-        public IBasicStatsData AttackingStance => _positionalStats.AttackingStance;
-        public IBasicStatsData NeutralStance => _positionalStats.NeutralStance;
-        public IBasicStatsData DefendingStance => _positionalStats.DefendingStance;
-        public IBasicStatsData InAllStances => _formulatedStats;
+        public IBasicStatsData<float> AttackingStance => _positionalStats.AttackingStance;
+        public IBasicStatsData<float> NeutralStance => _positionalStats.NeutralStance;
+        public IBasicStatsData<float> DefendingStance => _positionalStats.DefendingStance;
+        public IBasicStatsData<float> InAllStances => _formulatedStats;
     }
 
 
@@ -323,8 +328,8 @@ namespace Stats
         { }
 
         public PlayerCombatStats(
-            IFullStatsData initialStats,
-            IFullStatsData growStats, IStatsUpgradable currentUpgrades)
+            IFullStatsData<float> initialStats,
+            IFullStatsData<float> growStats, IStatsUpgradable currentUpgrades)
         {
             AttackPower = UtilsStats.GrowFormula(
                 initialStats.AttackPower, growStats.AttackPower,

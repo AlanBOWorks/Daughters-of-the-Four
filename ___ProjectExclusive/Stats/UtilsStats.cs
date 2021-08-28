@@ -20,7 +20,7 @@ namespace Stats
         /// <summary>
         /// Wrappers of the subStats: <br></br>
         /// <see cref="Offensive"/>,<see cref="Support"/>,<see cref="Vitality"/>, <see cref="Concentration"/>,
-        /// <see cref="TemporalCombatStats"/>)
+        /// <see cref="HealthCombatStats"/>)
         /// </summary>
         public enum Primordial
         {
@@ -76,19 +76,25 @@ namespace Stats
         public const int ShieldIndex = HealthIndex + 1;
         public const int AccumulatedStaticIndex = ShieldIndex + 1; 
         public const int MortalityIndex = AccumulatedStaticIndex + 1;
-        public const int HarmonyIndex = MortalityIndex + 1;
+
+        public const int HarmonyIndex = 20000 + 1;
         public const int InitiativeIndex = HarmonyIndex + 1;
         public const int ActionsIndex = InitiativeIndex + 1;
-        public enum TemporalCombatStats
+        public enum HealthCombatStats
         {
             Health = HealthIndex,
             Shield = ShieldIndex,
             AccumulatedStatic = AccumulatedStaticIndex,
             Mortality = MortalityIndex,
+            
+        }
+        public enum TemporalStats
+        {
             Harmony = HarmonyIndex,
             Initiative = InitiativeIndex,
             Actions = ActionsIndex
         }
+
 
         public enum StatsType
         {
@@ -101,14 +107,46 @@ namespace Stats
     public static class UtilsEnumStats
     {
 
-        public static T GetStat<T>(IStatsPrimordial<T> stats, EnumStats.Primordial type)
+        public static IBasicStats<float> GetStats(CombatingEntity entity, EnumStats.StatsType statsType)
+        {
+            var combatStats = entity.CombatStats;
+            return GetStats(combatStats, statsType);
+        }
+
+        public static IBasicStats<float> GetStats(CombatStatsHolder combatStats, EnumStats.StatsType statsType)
+        {
+            switch (statsType)
+            {
+                case EnumStats.StatsType.Base:
+                    return combatStats.BaseStats;
+                case EnumStats.StatsType.Buff:
+                    return combatStats.BuffStats;
+                case EnumStats.StatsType.Burst:
+                    return combatStats.BurstStats;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(statsType), statsType, null);
+            }
+        }
+
+        /// <summary>
+        /// Gets only the [<see cref="EnumStats.StatsType.Buff"/>] || [<see cref="EnumStats.StatsType.Burst"/>]
+        /// </summary>
+        public static IBasicStats<float> GetBuffOrBurstStats(CombatStatsHolder combatStats, EnumStats.StatsType statsType)
+        {
+            return statsType == EnumStats.StatsType.Burst 
+                ? combatStats.BurstStats 
+                : combatStats.BuffStats;
+        }
+
+
+        public static T GetStat<T>(IMasterStats<T> masterStats, EnumStats.Primordial type)
         {
             return type switch
             {
-                EnumStats.Primordial.Offensive => stats.OffensivePower,
-                EnumStats.Primordial.Support => stats.SupportPower,
-                EnumStats.Primordial.Vitality => stats.VitalityAmount,
-                EnumStats.Primordial.Concentration => stats.ConcentrationAmount,
+                EnumStats.Primordial.Offensive => masterStats.OffensivePower,
+                EnumStats.Primordial.Support => masterStats.SupportPower,
+                EnumStats.Primordial.Vitality => masterStats.VitalityAmount,
+                EnumStats.Primordial.Concentration => masterStats.ConcentrationAmount,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
@@ -158,31 +196,39 @@ namespace Stats
             };
         }
 
-        public static float GetStat(ICombatTemporalStats stats, EnumStats.TemporalCombatStats type)
+        public static T GetStat<T>(ICombatHealthStatsData<T> stats, EnumStats.HealthCombatStats type)
         {
             switch (type)
             {
-                case EnumStats.TemporalCombatStats.Health:
+                case EnumStats.HealthCombatStats.Health:
                     return stats.HealthPoints;
-                case EnumStats.TemporalCombatStats.Shield:
+                case EnumStats.HealthCombatStats.Shield:
                     return stats.ShieldAmount;
-                case EnumStats.TemporalCombatStats.AccumulatedStatic:
+                case EnumStats.HealthCombatStats.AccumulatedStatic:
                     return stats.AccumulatedStatic;
-                case EnumStats.TemporalCombatStats.Mortality:
+                case EnumStats.HealthCombatStats.Mortality:
                     return stats.MortalityPoints;
-                case EnumStats.TemporalCombatStats.Harmony:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+        public static T GetStat<T>(ITemporalStatsData<T> stats, EnumStats.TemporalStats type)
+        {
+            switch (type)
+            {
+                case EnumStats.TemporalStats.Harmony:
                     return stats.HarmonyAmount;
-                case EnumStats.TemporalCombatStats.Initiative:
+                case EnumStats.TemporalStats.Initiative:
                     return stats.InitiativePercentage;
-                case EnumStats.TemporalCombatStats.Actions:
+                case EnumStats.TemporalStats.Actions:
                     return stats.ActionsPerInitiative;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
-
-
     }
+
+
 
     public static class UtilsStats
     {
@@ -199,63 +245,77 @@ namespace Stats
             return baseStat + growStat * upgradeAmount;
         }
 
-        public static void Add(IBasicStats injection, IOffensiveStatsData stats)
+        public static void AddByCheck(IBasicStats<float> injection, IStatsData stats)
+        {
+            if (stats is IOffensiveStatsData<float> offensiveStats)
+                Add(injection, offensiveStats);
+            if (stats is ISupportStatsData<float> supportStats)
+                Add(injection, supportStats);
+            if (stats is IVitalityStatsData<float> vitalityStats)
+                Add(injection, vitalityStats);
+            if (stats is IConcentrationStatsData<float> concentrationStats)
+                Add(injection, concentrationStats);
+            if (stats is ITemporalStatsData<float> tempoStats)
+                Add(injection, tempoStats);
+        }
+        public static void Add(IBasicStats<float> injection, IOffensiveStatsData<float> stats)
         {
             injection.AttackPower += stats.AttackPower;
             injection.DeBuffPower += stats.DeBuffPower;
             injection.StaticDamagePower += stats.StaticDamagePower;
         }
-        public static void Add(IBasicStats injection, ISupportStatsData stats)
+        public static void Add(IBasicStats<float> injection, ISupportStatsData<float> stats)
         {
-            injection.HealPower = injection.HealPower + stats.HealPower;
-            injection.BuffPower = injection.BuffPower + stats.BuffPower;
-            injection.BuffReceivePower = injection.BuffReceivePower + stats.BuffReceivePower;
+            injection.HealPower += stats.HealPower;
+            injection.BuffPower += stats.BuffPower;
+            injection.BuffReceivePower += stats.BuffReceivePower;
         }
-        public static void Add(IBasicStats injection, IVitalityStatsData stats)
+        public static void Add(IBasicStats<float> injection, IVitalityStatsData<float> stats)
         {
-            injection.MaxHealth = injection.MaxHealth + stats.MaxHealth;
-            injection.MaxMortalityPoints = injection.MaxMortalityPoints + stats.MaxMortalityPoints;
-            injection.DeBuffReduction = injection.DeBuffReduction + stats.DeBuffReduction;
-            injection.DamageReduction = injection.DamageReduction + stats.DamageReduction;
-        }
-
-        public static void Add(IBasicStats injection, IConcentrationStatsData stats)
-        {
-            injection.SpeedAmount = injection.SpeedAmount + stats.SpeedAmount;
-            injection.CriticalChance = injection.CriticalChance + stats.CriticalChance;
-            injection.Enlightenment = injection.Enlightenment + stats.Enlightenment;
+            injection.MaxHealth += stats.MaxHealth;
+            injection.MaxMortalityPoints += stats.MaxMortalityPoints;
+            injection.DeBuffReduction += stats.DeBuffReduction;
+            injection.DamageReduction += stats.DamageReduction;
         }
 
-        public static void Add(IBasicStats injection, ICombatTempoStatsData stats)
+        public static void Add(IBasicStats<float> injection, IConcentrationStatsData<float> stats)
         {
-            injection.InitiativePercentage = injection.InitiativePercentage + stats.InitiativePercentage;
-            injection.ActionsPerInitiative = injection.ActionsPerInitiative + stats.ActionsPerInitiative;
+            injection.SpeedAmount += stats.SpeedAmount;
+            injection.CriticalChance += stats.CriticalChance;
+            injection.Enlightenment += stats.Enlightenment;
         }
 
-        public static void Add(IBasicStats injection, IBasicStatsData stats)
+        public static void Add(IBasicStats<float> injection, ITemporalStatsData<float> stats)
         {
-            Add(injection, stats as IOffensiveStatsData);
-            Add(injection, stats as ISupportStatsData);
-            Add(injection, stats as IVitalityStatsData);
-            Add(injection, stats as IConcentrationStatsData);
-            Add(injection, stats as ICombatTempoStatsData);
+            injection.InitiativePercentage += stats.InitiativePercentage;
+            injection.ActionsPerInitiative += stats.ActionsPerInitiative;
+            injection.HarmonyAmount += stats.HarmonyAmount;
         }
 
-        public static void OverrideStats(IOffensiveStatsInjection stats, float value = 0)
+        public static void Add(IBasicStats<float> injection, IBasicStatsData<float> stats)
+        {
+            Add(injection, stats as IOffensiveStatsData<float>);
+            Add(injection, stats as ISupportStatsData<float>);
+            Add(injection, stats as IVitalityStatsData<float>);
+            Add(injection, stats as IConcentrationStatsData<float>);
+            Add(injection, stats as ITemporalStatsData<float>);
+        }
+
+        public static void OverrideStats(IOffensiveStatsInjection<float> stats, float value = 0)
         {
             stats.AttackPower = value;
             stats.DeBuffPower = value;
             stats.StaticDamagePower = value;
         }
 
-        public static void OverrideStats(ISupportStatsInjection stats, float value = 0)
+        public static void OverrideStats(ISupportStatsInjection<float> stats, float value = 0)
         {
             stats.HealPower = value;
             stats.BuffPower = value;
             stats.BuffReceivePower = value;
         }
 
-        public static void OverrideStats(IVitalityStatsInjection stats, float value = 0)
+        public static void OverrideStats(IVitalityStatsInjection<float> stats, float value = 0)
         {
             stats.MaxHealth = value;
             stats.MaxMortalityPoints = value;
@@ -263,49 +323,49 @@ namespace Stats
             stats.DamageReduction = value;
         }
 
-        public static void OverrideStats(IConcentrationStatsInjection stats, float value = 0)
+        public static void OverrideStats(IConcentrationStatsInjection<float> stats, float value = 0)
         {
             stats.Enlightenment = value;
             stats.CriticalChance = value;
             stats.SpeedAmount = value;
         }
 
-        public static void OverrideStats(IBasicStatsInjection stats, float value = 0)
+        public static void OverrideStats(IBasicStatsInjection<float> stats, float value = 0)
         {
-            OverrideStats(stats as IOffensiveStatsInjection, value);
-            OverrideStats(stats as ISupportStatsInjection, value);
-            OverrideStats(stats as IVitalityStatsInjection, value);
-            OverrideStats(stats as IConcentrationStatsInjection, value);
+            OverrideStats(stats as IOffensiveStatsInjection<float>, value);
+            OverrideStats(stats as ISupportStatsInjection<float>, value);
+            OverrideStats(stats as IVitalityStatsInjection<float>, value);
+            OverrideStats(stats as IConcentrationStatsInjection<float>, value);
         }
 
-        public static void OverrideStats(ICombatTemporalStatsBaseInjection stats, float value = 0)
+        public static void OverrideStats(ITemporalStatsInjection<float> stats, float value = 0)
         {
             stats.InitiativePercentage = value;
             stats.HarmonyAmount = value;
             stats.ActionsPerInitiative = Mathf.RoundToInt(value);
         }
 
-        public static void OverrideStats(IFullStatsInjection stats, float value)
+        public static void OverrideStats(IFullStatsInjection<float> stats, float value)
         {
-            OverrideStats(stats as IBasicStats, value);
-            OverrideStats(stats as ICombatTemporalStatsBaseInjection, value);
+            OverrideStats(stats as IBasicStats<float>, value);
+            OverrideStats(stats as ITemporalStatsInjection<float>, value);
         }
 
-        public static void CopyStats(IOffensiveStatsInjection injection, IOffensiveStatsData copyFrom)
+        public static void CopyStats(IOffensiveStatsInjection<float> injection, IOffensiveStatsData<float> copyFrom)
         {
             injection.AttackPower = copyFrom.AttackPower;
             injection.DeBuffPower = copyFrom.DeBuffPower;
             injection.StaticDamagePower = copyFrom.StaticDamagePower;
         }
 
-        public static void CopyStats(ISupportStatsInjection injection, ISupportStatsData copyFrom)
+        public static void CopyStats(ISupportStatsInjection<float> injection, ISupportStatsData<float> copyFrom)
         {
             injection.HealPower = copyFrom.HealPower;
             injection.BuffPower = copyFrom.BuffPower;
             injection.BuffReceivePower = copyFrom.BuffReceivePower;
         }
 
-        public static void CopyStats(IVitalityStatsInjection injection, IVitalityStatsData copyFrom)
+        public static void CopyStats(IVitalityStatsInjection<float> injection, IVitalityStatsData<float> copyFrom)
         {
             injection.MaxHealth = copyFrom.MaxHealth;
             injection.MaxMortalityPoints = copyFrom.MaxMortalityPoints;
@@ -313,7 +373,7 @@ namespace Stats
             injection.DeBuffReduction = copyFrom.DeBuffReduction;
         }
 
-        public static void CopyStats(IConcentrationStatsInjection injection, IConcentrationStatsData copyFrom)
+        public static void CopyStats(IConcentrationStatsInjection<float> injection, IConcentrationStatsData<float> copyFrom)
         {
             injection.Enlightenment = copyFrom.Enlightenment;
             injection.CriticalChance = copyFrom.CriticalChance;
@@ -321,23 +381,23 @@ namespace Stats
         }
 
 
-        public static void CopyStats(IBasicStatsInjection injection, IBasicStatsData copyFrom)
+        public static void CopyStats(IBasicStatsInjection<float> injection, IBasicStatsData<float> copyFrom)
         {
-            CopyStats(injection as IOffensiveStatsInjection, copyFrom);
-            CopyStats(injection as ISupportStatsInjection, copyFrom);
-            CopyStats(injection as IVitalityStatsInjection, copyFrom);
-            CopyStats(injection as IConcentrationStatsInjection, copyFrom);
-            CopyStats(injection as ICombatTemporalStatsBaseInjection, copyFrom);
+            CopyStats(injection as IOffensiveStatsInjection<float>, copyFrom);
+            CopyStats(injection as ISupportStatsInjection<float>, copyFrom);
+            CopyStats(injection as IVitalityStatsInjection<float>, copyFrom);
+            CopyStats(injection as IConcentrationStatsInjection<float>, copyFrom);
+            CopyStats(injection as ITemporalStatsInjection<float>, copyFrom);
         }
 
-        public static void CopyStats(ICombatTemporalStatsBaseInjection injection, ICombatTemporalStatsBaseData copyFrom)
+        public static void CopyStats(ITemporalStatsInjection<float> injection, ITemporalStatsData<float> copyFrom)
         {
             injection.HarmonyAmount = copyFrom.HarmonyAmount;
             injection.InitiativePercentage = copyFrom.InitiativePercentage;
             injection.ActionsPerInitiative = copyFrom.ActionsPerInitiative;
         }
 
-        public static void CopyStats(ICombatTemporalStats injection, ICombatTemporalStats copyFrom)
+        public static void CopyStats(ICombatHealthStats<float> injection, ICombatHealthStatsData<float> copyFrom)
         {
             injection.HealthPoints = copyFrom.HealthPoints;
             injection.ShieldAmount = copyFrom.ShieldAmount;
@@ -346,11 +406,10 @@ namespace Stats
         }
 
 
-        public static void CopyStats(IFullStatsInjection injection, IFullStatsData copyFrom)
+        public static void CopyStats(IFullStatsInjection<float> injection, IFullStatsData<float> copyFrom)
         {
-            CopyStats(injection as IBasicStatsInjection, copyFrom);
-            CopyStats(injection as ICombatTemporalStats, copyFrom);
-            
+            CopyStats(injection as IBasicStatsInjection<float>, copyFrom);
+            CopyStats(injection as ICombatHealthStats<float>, copyFrom);
         }
 
         public static void CopyStats(IStatsUpgradable injection, IStatsUpgradable copyFrom)
@@ -440,7 +499,7 @@ namespace Stats
 
         public static void DoDamageToShield(CombatingEntity target, float damage)
         {
-            IFullStatsData stats = target.CombatStats;
+            IFullStats<float> stats = target.CombatStats.BaseStats;
             float shields = stats.ShieldAmount;
 
             if (shields <= 0 || damage <= 0) return;
@@ -458,7 +517,7 @@ namespace Stats
         {
             if(damage <= 0) return;
 
-            ICombatTemporalStats stats = target.CombatStats;
+            ICombatHealthStats<float> stats = target.CombatStats.BaseStats;
 
             UtilsStats.EnqueueTemporalStatsEvent(target);
             UtilsStats.EnqueueDamageEvent(target,damage);
@@ -585,7 +644,7 @@ namespace Stats
         }
 
 
-        public static void SetInitiative(IBasicStats stats, float targetValue)
+        public static void SetInitiative(IBasicStats<float> stats, float targetValue)
         {
             const float lowerCap = 0;
             const float maxCap = GlobalCombatParams.InitiativeCheck;
@@ -595,7 +654,7 @@ namespace Stats
         }
         public static void SetInitiative(CombatingEntity entity, float targetValue, bool isBurstType)
         {
-            IBasicStats stats = isBurstType
+            IBasicStats<float> stats = isBurstType
                 ? entity.CombatStats.BurstStats
                 : entity.CombatStats.BaseStats;
             SetInitiative(stats, targetValue);
@@ -610,7 +669,7 @@ namespace Stats
         {
             var stats = isBurstType 
                 ? entity.CombatStats.BurstStats 
-                : (IBasicStats) entity.CombatStats.BaseStats;
+                : (IBasicStats<float>) entity.CombatStats.BaseStats;
             SetInitiative(stats, stats.InitiativePercentage + addition);
 
 
@@ -621,22 +680,22 @@ namespace Stats
             tempoHandler.CheckAndInjectEntityInitiative(entity);
         }
 
-        public static void SetActionAmount(CombatStatsHolder stats, int targetValue = 0)
+        public static void SetActionAmount(CombatStatsHolder stats, float targetValue = 0)
         {
             const int lowerCap = GlobalCombatParams.ActionsLowerCap;
             const int maxCap = GlobalCombatParams.ActionsPerInitiativeCap;
 
             targetValue = Mathf.Clamp(targetValue, lowerCap, maxCap);
-            stats.ActionsLefts = targetValue;
+            stats.ActionsLefts = Mathf.RoundToInt(targetValue);
         }
 
-        public static void AddActionAmount(CombatStatsHolder stats, int addition = 1)
+        public static void AddActionAmount(CombatStatsHolder stats,float addition = 1)
         {
             SetActionAmount(stats, stats.ActionsLefts + addition);
         }
 
 
-        public static void AddHarmony(CombatingEntity entity, ICombatTemporalStatsBase stats, float addition)
+        public static void AddHarmony(CombatingEntity entity, ITemporalStats<float> stats, float addition)
         {
             float userEnlightenment = entity.CombatStats.Enlightenment; //Generally value = 1;
             addition *= userEnlightenment;
@@ -681,13 +740,13 @@ namespace Stats
             CombatSystemSingleton.CombatTeamControlHandler.DoCounterBurstControl(team,counterBurst);
         }
 
-        public static bool IsCriticalPerformance(IBasicStatsData stats, CombatSkill skill, float criticalCheck)
+        public static bool IsCriticalPerformance(IBasicStatsData<float> stats, CombatSkill skill, float criticalCheck)
         {
             if (!skill.CanCrit) return false;
             return criticalCheck < stats.CriticalChance + skill.CriticalAddition;
         }
 
-        public static bool IsCriticalPerformance(IBasicStats stats, SSkillPreset preset, float criticalCheck)
+        public static bool IsCriticalPerformance(IBasicStats<float> stats, SSkillPreset preset, float criticalCheck)
         {
             if (!preset.canCrit) return false;
             return criticalCheck < stats.CriticalChance + preset.criticalAddition;
@@ -717,7 +776,7 @@ namespace Stats
         }
 
 
-        public static float CalculateShieldsPower(IFullStatsData user)
+        public static float CalculateShieldsPower(IFullStatsData<float> user)
         {
             float shields = user.HealPower + user.BuffPower;
             shields *= .5f; //The average of Heal && buffPower is the Shields power
@@ -725,12 +784,12 @@ namespace Stats
             return shields;
         }
 
-        public static void VariateBuffUser(IBasicStatsData user, ref float buffValue)
+        public static void VariateBuffUser(IBasicStatsData<float> user, ref float buffValue)
         {
             var userBuffPower = user.BuffPower; //Generally value == 1;
             buffValue *= userBuffPower;
         }
-        public static void VariateBuffTarget(IBasicStatsData target, ref float buffValue)
+        public static void VariateBuffTarget(IBasicStatsData<float> target, ref float buffValue)
         {
             var targetReceiveBuffPower = target.BuffReceivePower; //Generally value == 0;
             buffValue += buffValue * targetReceiveBuffPower;

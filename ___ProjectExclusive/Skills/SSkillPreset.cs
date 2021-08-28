@@ -55,7 +55,7 @@ namespace Skills
 
         [Title("Main Condition"),PropertyOrder(90)] 
         [SerializeField]
-        private ConditionUserParams conditionalUse;
+        private UserOnlyConditionParam conditionalUse;
         [TitleGroup("Effects"),PropertyOrder(100)]
         [SerializeField]
         private EffectParams[] effects = new EffectParams[1];
@@ -224,7 +224,7 @@ namespace Skills
     public class SkillArguments
     {
         public CombatingEntity User;
-        public IFullStatsData UserStats;
+        public IFullStatsData<float> UserStats;
         public CombatingEntity InitialTarget;
         public bool IsCritical;
     }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatConditions
 {
-    public abstract class SCondition : ScriptableObject
+    public abstract class SCondition : ScriptableObject, ICondition
     {
         public abstract bool CanApply(CombatingEntity target, float checkValue);
     }
@@ -38,20 +38,22 @@ namespace CombatConditions
             return canBeApply ^ inverseCondition;
         }
     }
-
-
+    
+    /// <summary>
+    /// <inheritdoc cref="IUserConditionHolder"/>
+    /// </summary>
     [Serializable]
-    public struct ConditionUserParams
+    public struct UserOnlyConditionParam
     {
-        public SCondition useCondition;
-        public float conditionCheck;
+        public SCondition condition;
+        public float conditionValue;
         public bool inverseCondition;
 
         public bool CanBeUse(CombatingEntity user)
         {
-            if (useCondition == null) return true;
+            if (condition == null) return true;
 
-            bool canBeUse = useCondition.CanApply(user, conditionCheck);
+            bool canBeUse = condition.CanApply(user, conditionValue);
             return canBeUse ^ inverseCondition;
         }
     }

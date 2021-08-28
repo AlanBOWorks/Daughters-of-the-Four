@@ -11,12 +11,12 @@ namespace CombatConditions
         menuName = "Combat/Conditions/Temporal Stat Check")]
     public class STemporalStatsCondition : SCondition
     {
-        [SerializeField] private EnumStats.TemporalCombatStats checkStats 
-            = EnumStats.TemporalCombatStats.Health;
+        [SerializeField] private EnumStats.TemporalStats checkStats 
+            = EnumStats.TemporalStats.Harmony;
 
         public override bool CanApply(CombatingEntity target, float checkValue)
         {
-            var statValue = UtilsEnumStats.GetStat(target.CombatStats, checkStats);
+            float statValue = UtilsEnumStats.GetStat(target.CombatStats, checkStats);
 
             return checkValue < statValue;
         }

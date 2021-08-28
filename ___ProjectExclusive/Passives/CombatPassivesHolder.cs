@@ -6,44 +6,44 @@ using UnityEngine;
 
 namespace Passives
 {
+    /// <summary>
+    /// Used be [<see cref="CombatingEntity"/>] to hold all <see cref="IPassiveInjector"/>
+    /// </summary>
     public class CombatPassivesHolder
     {
-        public CombatPassivesHolder(CombatingEntity user, IEnumerable<IPassiveBase> passives)
+        public CombatPassivesHolder(CombatingEntity user, ICollection<IPassiveInjector> passives)
         {
-            AllPassives = new List<IPassiveBase>(passives);
-            DoPassives(user,passives);
-        }
-
-        public CombatPassivesHolder(CombatingEntity user, ICollection<IPassiveBase> passives)
-        {
-            AllPassives = new List<IPassiveBase>(passives.Count);
-            foreach (IPassiveBase passive in passives)
+            AllPassives = new List<IPassiveInjector>(passives.Count);
+            foreach (IPassiveInjector passive in passives)
             {
                 AllPassives.Add(passive);
                 passive.InjectPassive(user);
             }
         }
         
-        public readonly List<IPassiveBase> AllPassives;
+        public readonly List<IPassiveInjector> AllPassives;
 
-        private static void DoPassives(CombatingEntity user, IEnumerable<IPassiveBase> passives)
-        {
-            foreach (IPassiveBase passive in passives)
-            {
-                passive.InjectPassive(user);
-            }
-        }
     }
 
+    /// <summary>
+    /// <inheritdoc cref="SPassiveInjector{T}"/>
+    /// <br></br><br></br>
+    /// Base for implementing [<see cref="IPassiveInjector"/>]; It's prefer to use
+    /// [<see cref="SPassiveInjector{T}"/>] unless there's a more specific type of implementation;
+    /// </summary>
+    public abstract class SPassiveInjectorBase : ScriptableObject, IPassiveInjector
+    {
+        public abstract void InjectPassive(CombatingEntity entity);
+    }
 
-
-
-    [Serializable]
-    public abstract class PassiveInjectorsHolder<T>
+    /// <summary>
+    /// Does the job of injecting the passive into the [<seealso cref="CombatingEntity"/>].
+    /// </summary>
+    public abstract class SPassiveInjector<T> : SPassiveInjectorBase
     {
         [SerializeField] protected T[] passives = new T[0];
         protected abstract void DoInjection(CombatingEntity entity, T element);
-        public void InjectPassive(CombatingEntity entity)
+        public override void InjectPassive(CombatingEntity entity)
         {
             for (var i = 0; i < passives.Length; i++)
             {
@@ -52,26 +52,4 @@ namespace Passives
             }
         }
     }
-
-
-    public abstract class PassiveInjector<T> : ScriptableObject, IPassiveBase
-    {
-        public void InjectPassive(CombatingEntity entity)
-        {
-            GetHolder().InjectPassive(entity);
-        }
-
-        protected abstract PassiveInjectorsHolder<T> GetHolder();
-    }
-
-    public abstract class SPassiveInjector<T> : ScriptableObject, IPassiveBase
-    {
-        public void InjectPassive(CombatingEntity entity)
-        {
-            GetHolder().InjectPassive(entity);
-        }
-
-        protected abstract PassiveInjectorsHolder<T> GetHolder();
-    }
-
 }

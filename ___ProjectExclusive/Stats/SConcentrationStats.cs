@@ -5,7 +5,7 @@ namespace Stats
 
     [CreateAssetMenu(fileName = "CONCENTRATION - N [Stats]",
         menuName = "Combat/Stats/Concentration")]
-    public class SConcentrationStats : SStatsBase, IConcentrationStats
+    public class SConcentrationStats : SStatsBase, IConcentrationStats<float>
     {
         [SerializeField] private float enlightenment;
         [SerializeField] private float criticalChance;
@@ -28,6 +28,11 @@ namespace Stats
         {
             get => speedAmount;
             set => speedAmount = value;
+        }
+
+        public override void DoInjection(IBasicStats<float> stats)
+        {
+            UtilsStats.Add(stats,this);
         }
     }
 }

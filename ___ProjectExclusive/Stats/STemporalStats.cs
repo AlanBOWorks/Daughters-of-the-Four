@@ -4,10 +4,10 @@ namespace Stats
 {
     [CreateAssetMenu(fileName = "TEMPORAL(base) - N [Stats]",
         menuName = "Combat/Stats/Temporal(Base)")]
-    public class STemporalStats : SStatsBase, ICombatTemporalStatsBase
+    public class STemporalStats : SStatsBase, ITemporalStats<float>
     {
         [SerializeField] private float initiativePercentage;
-        [SerializeField] private int actionsPerInitiative;
+        [SerializeField] private float actionsPerInitiative;
         [SerializeField] private float harmonyAmount;
         public float InitiativePercentage
         {
@@ -15,7 +15,7 @@ namespace Stats
             set => initiativePercentage = value;
         }
 
-        public int ActionsPerInitiative
+        public float ActionsPerInitiative
         {
             get => actionsPerInitiative;
             set => actionsPerInitiative = value;
@@ -25,6 +25,11 @@ namespace Stats
         {
             get => harmonyAmount;
             set => harmonyAmount = value;
+        }
+
+        public override void DoInjection(IBasicStats<float> stats)
+        {
+            UtilsStats.Add(stats, this);
         }
     }
 }

@@ -159,7 +159,7 @@ namespace _CombatSystem
 
         public void CheckAndInjectEntityInitiative(CombatingEntity entity)
         {
-            IFullStatsData stats = entity.CombatStats;
+            IFullStatsData<float> stats = entity.CombatStats;
             float initiative = stats.InitiativePercentage;
 
             if (initiative < InitiativeCheck) return;
@@ -210,10 +210,11 @@ namespace _CombatSystem
                         if(!entity.IsConscious()) continue;
 
                         // Increment
-                        IFullStatsData stats = entity.CombatStats;
+                        IFullStatsData<float> stats = entity.CombatStats;
+                        IFullStatsInjection<float> injection = entity.CombatStats.BaseStats;
                         float initiative = stats.InitiativePercentage;
                         initiative += deltaIncrement * stats.SpeedAmount * VelocityModifier;
-                        stats.InitiativePercentage = initiative;
+                        injection.InitiativePercentage = initiative;
 
                         // Percentage
                         CallUpdateOnInitiativeBar(entity,stats);
@@ -271,7 +272,7 @@ namespace _CombatSystem
             CallUpdateOnInitiativeBar(entity,stats);
         }
 
-        private void CallUpdateOnInitiativeBar(CombatingEntity entity, ICombatTempoStatsData stats)
+        private void CallUpdateOnInitiativeBar(CombatingEntity entity, ITemporalStatsData<float> stats)
         {
             float initiativePercentage = stats.InitiativePercentage;
             EntitiesBar[entity].FillBar(initiativePercentage);
@@ -419,7 +420,7 @@ namespace _CombatSystem
 
         /// <summary>
         /// Used to resume [<see cref="_Tick"/>] (which was paused by an [<seealso cref="CombatingEntity"/>] when
-        /// it reaches its top [<seealso cref="ICombatTemporalStats.InitiativePercentage"/>])
+        /// it reaches its top [<seealso cref="ICombatHealthStats.InitiativePercentage"/>])
         /// </summary>
         private void StepNextActingEntity()
         {

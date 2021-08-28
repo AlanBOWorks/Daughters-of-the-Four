@@ -31,7 +31,7 @@ namespace _Team
 
         public bool IsInDangerState()
             => State.IsInDanger();
-        public IBasicStatsData GetCurrentStanceValue() 
+        public IBasicStatsData<float> GetCurrentStanceValue() 
             => StatsHolder.GetCurrentStanceValue();
 
     }

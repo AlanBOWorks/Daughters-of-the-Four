@@ -44,11 +44,11 @@ namespace _Team
         public ICharacterArchetypesData<float> GetControlLosePoints() => controlLoses;
 
 
-        IBasicStats IStanceData<IBasicStats>.AttackingStance
+        IBasicStats<float> IStanceData<IBasicStats<float>>.AttackingStance
             => onAttackStats;
-        IBasicStats IStanceData<IBasicStats>.NeutralStance
+        IBasicStats<float> IStanceData<IBasicStats<float>>.NeutralStance
             => onNeutralStats;
-        IBasicStats IStanceData<IBasicStats>.DefendingStance
+        IBasicStats<float> IStanceData<IBasicStats<float>>.DefendingStance
             => onDefendingStats;
 
 
@@ -77,7 +77,7 @@ namespace _Team
     }
 
     public interface ITeamCombatControlHolder : 
-        IStanceData<IBasicStats>
+        IStanceData<IBasicStats<float>>
 
     {
         string ControlName { get; }
@@ -97,6 +97,6 @@ namespace _Team
         ICharacterArchetypesData<float> GetControlLosePoints();
     }
 
-    public interface ITeamCombatControlStats : IStanceElement<IBasicStatsData>
+    public interface ITeamCombatControlStats : IStanceElement<IBasicStatsData<float>>
     { }
 }

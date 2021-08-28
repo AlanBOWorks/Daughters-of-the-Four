@@ -103,7 +103,7 @@ namespace Characters
         {
             if(_onVitalityChange is null) return;
 
-            IVitalityStatsData onStats = entity.CombatStats;
+            IVitalityStatsData<float> onStats = entity.CombatStats;
             foreach (IVitalityChangeListener listener in _onVitalityChange)
             {
                 listener.OnVitalityChange(onStats);
@@ -114,7 +114,7 @@ namespace Characters
         {
             if(_onTemporalStatsChange is null) return;
 
-            ICombatTemporalStats onStats = entity.CombatStats;
+            ICombatHealthStatsData<float> onStats = entity.CombatStats;
             foreach (ITemporalStatsChangeListener listener in _onTemporalStatsChange)
             {
                 listener.OnTemporalStatsChange(onStats);
@@ -460,12 +460,12 @@ namespace Characters
 
     public interface IVitalityChangeListener : ICharacterListener
     {
-        void OnVitalityChange(IVitalityStatsData currentStats);
+        void OnVitalityChange(IVitalityStatsData<float> currentStats);
     }
 
     public interface ITemporalStatsChangeListener : ICharacterListener
     {
-        void OnTemporalStatsChange(ICombatTemporalStats currentStats);
+        void OnTemporalStatsChange(ICombatHealthStatsData<float> currentStats);
     }
 
     public interface IAreaStateChangeListener : ICharacterListener

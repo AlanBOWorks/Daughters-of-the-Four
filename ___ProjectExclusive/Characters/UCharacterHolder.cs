@@ -43,7 +43,7 @@ namespace Characters
 
         [ShowInInspector,DisableInEditorMode]
         public CombatingEntity Entity { get; private set; }
-        public IFullStatsData BaseStats { get; private set; }
+        public IFullStatsData<float> BaseStats { get; private set; }
 
 
     }

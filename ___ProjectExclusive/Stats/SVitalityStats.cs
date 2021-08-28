@@ -5,7 +5,7 @@ namespace Stats
 
     [CreateAssetMenu(fileName = "VITALITY - N [Stats]",
         menuName = "Combat/Stats/Vitality")]
-    public class SVitalityStats : SStatsBase, IVitalityStats
+    public class SVitalityStats : SStatsBase, IVitalityStats<float>
     {
         [SerializeField] private float maxHealth;
         [SerializeField] private float maxMortalityPoints;
@@ -35,6 +35,11 @@ namespace Stats
         {
             get => deBuffReduction;
             set => deBuffReduction = value;
+        }
+
+        public override void DoInjection(IBasicStats<float> stats)
+        {
+            UtilsStats.Add(stats, this);
         }
     }
 }

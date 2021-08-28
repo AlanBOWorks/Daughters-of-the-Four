@@ -9,7 +9,7 @@ using UnityEngine;
 namespace _Team
 {
     public class TeamCombatStatsHolder : ITeamCombatControlStats, 
-        IStanceData<IBasicStatsData>
+        IStanceData<IBasicStatsData<float>>
     {
         private readonly TeamCombatState _state;
 
@@ -57,7 +57,7 @@ namespace _Team
             BurstCounterAmount = holder.GetBurstCounterAmount();
         }
 
-        private void InjectNewStats(IStanceData<IBasicStats> stats)
+        private void InjectNewStats(IStanceData<IBasicStats<float>> stats)
         {
             var attackingStats = stats.AttackingStance;
             var neutralStats = stats.NeutralStance;
@@ -72,11 +72,11 @@ namespace _Team
         }
 
 
-        public IBasicStatsData AttackingStance => PositionalStats.AttackingStance;
-        public IBasicStatsData NeutralStance => PositionalStats.NeutralStance;
-        public IBasicStatsData DefendingStance => PositionalStats.DefendingStance;
+        public IBasicStatsData<float> AttackingStance => PositionalStats.AttackingStance;
+        public IBasicStatsData<float> NeutralStance => PositionalStats.NeutralStance;
+        public IBasicStatsData<float> DefendingStance => PositionalStats.DefendingStance;
 
-        public IBasicStatsData GetCurrentStanceValue() 
+        public IBasicStatsData<float> GetCurrentStanceValue() 
             => PositionalStats.GetCurrentStanceValue();
     }
 }

@@ -50,19 +50,19 @@ namespace _Player
             var stats = entity.CombatStats;
 
             OnVitalityChange(stats);
-            OnTemporalStatsChange(stats);
+            OnTemporalStatsChange(stats.BaseStats);
 
             entity.Events.Subscribe(this);
         }
 
 
-        public void OnVitalityChange(IVitalityStatsData currentStats)
+        public void OnVitalityChange(IVitalityStatsData<float> currentStats)
         {
 
             maxHealth.text = UtilsGameTheme.GetNumericalPrint(currentStats.MaxHealth);
         }
 
-        public void OnTemporalStatsChange(ICombatTemporalStats currentStats)
+        public void OnTemporalStatsChange(ICombatHealthStatsData<float> currentStats)
         {
             healthAmount.text = UtilsGameTheme.GetNumericalPrint(currentStats.HealthPoints);
         }
