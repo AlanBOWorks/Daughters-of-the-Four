@@ -13,7 +13,6 @@ namespace ___ProjectExclusive
 #if UNITY_EDITOR
         [SerializeField] private Button testButton;
 
-        [SerializeField] private TesterStats Stats = new TesterStats();
         private void Awake()
         {
             testButton.onClick.AddListener(TestCode);
@@ -51,17 +50,7 @@ namespace ___ProjectExclusive
             Debug.Log(archetype + " => " +(int)archetype);
         }
 
-        [Button]
-        private void TestStats()
-        {
-            var stat = Stats.OffensiveStats;
-            Debug.Log($"Stats {stat.AttackPower}");
-        }
-
-        [Serializable] private class TesterStats : SerializableHolderStats<float>
-        {
-            
-        }
+       
 #endif
     }
 }

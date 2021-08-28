@@ -1,4 +1,5 @@
-﻿using Characters;
+﻿using System.Collections.Generic;
+using Characters;
 using UnityEngine;
 
 namespace Stats
@@ -9,11 +10,18 @@ namespace Stats
     public interface IStatsData 
     { }
 
+    public interface IConditionalStat : IStatsData
+    {
+        bool CanBeUsed(CombatingEntity user);
+    }
+
     // it's is float because upgrades could be increased in half
     public interface IStatsUpgradable : IMasterStats<float>
     {
         //TODO UpgradeLevel?
     }
+
+
     public interface IMasterStats<T> : IMasterStatsData<T>, IMasterStatsInjection<T> ,IStatsData
     {
         new T OffensivePower { get; set; }
@@ -234,21 +242,50 @@ namespace Stats
         ITemporalStatsInjection<T>
     { }
 
-    public interface IBasicStatsHolder<T>
+
+    public interface ICompositeStatsStructure<out T>
     {
-        IOffensiveStats<T> OffensiveStats { get; set; }
-        ISupportStats<T> SupportStats { get; set; }
-        IVitalityStats<T> VitalityStats { get; set; }
-        IConcentrationStats<T> ConcentrationStats { get; set; }
-        ITemporalStats<T> TemporalStats { get; set; }
+        T OffensiveStats { get; }
+        T SupportStats { get; }
+        T VitalityStats { get; }
+        T ConcentrationStats { get; }
+        T TemporalStats { get; }
     }
 
-    public interface IBasicStatsHolderData<out T>
+    public interface ICompositeStatsHolder<T>
+    {
+        IOffensiveStats<T> OffensiveStats { get; }
+        ISupportStats<T> SupportStats { get; }
+        IVitalityStats<T> VitalityStats { get; }
+        IConcentrationStats<T> ConcentrationStats { get; }
+        ITemporalStats<T> TemporalStats { get; }
+    }
+
+    public interface ICompositeStatsDataHolder<out T>
     {
         IOffensiveStatsData<T> OffensiveStats { get; }
         ISupportStatsData<T> SupportStats { get; }
         IVitalityStatsData<T> VitalityStats { get; }
         IConcentrationStatsData<T> ConcentrationStats { get; }
         ITemporalStatsData<T> TemporalStats { get; }
+    }
+
+
+    public interface ICollectionStats<T>
+    {
+        ICollection<IOffensiveStatsData<T>> OffensiveStats { get; }
+        ICollection<ISupportStatsData<T>> SupportStats { get; }
+        ICollection<IVitalityStatsData<T>> VitalityStats { get; }
+        ICollection<IConcentrationStatsData<T>> ConcentrationStats { get; }
+        ICollection<ITemporalStatsData<T>> TemporalStats { get; }
+    }
+
+    public interface IDictionaryStats<TKey,TValue> 
+    {
+         Dictionary<IOffensiveStatsData<TKey>, TValue> OffensiveStats { get; }
+         Dictionary<ISupportStatsData<TKey>, TValue> SupportStats { get; }
+         Dictionary<IVitalityStatsData<TKey>, TValue> VitalityStats { get; }
+         Dictionary<IConcentrationStatsData<TKey>, TValue> ConcentrationStats { get; }
+         Dictionary<ITemporalStatsData<TKey>, TValue> TemporalStats { get; }
     }
 }

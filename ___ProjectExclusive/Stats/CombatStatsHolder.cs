@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Stats
 {
 
-    public class CombatStatsHolder : IFullStatsData<float>, IStanceAllData<IBasicStatsData<float>>
+    public class CombatStatsHolder : IFullStatsData<float>, IStanceAllData<IBasicStatsData<float>>, ICombatHealthStats<float>
     {
         public CombatStatsHolder(IFullStatsData<float> presetStats)
         {
@@ -19,6 +19,11 @@ namespace Stats
             _positionalStats = PositionalStats.GenerateProvisionalBasics();
             _formulatedStats = new FormulatedStats(this);
             _multiplierStats = new MultiplierStats();
+
+            _serializedStats = new SerializedHashsetStats
+            {
+                _formulatedStats
+            };
         }
 
         [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
@@ -42,6 +47,8 @@ namespace Stats
         private readonly MultiplierStats _multiplierStats;
 
         private readonly FormulatedStats _formulatedStats;
+        private readonly SerializedHashsetStats _serializedStats;
+
         [TitleGroup("Local stats"), PropertyOrder(-10)]
         public int ActionsLefts;
 
@@ -65,7 +72,12 @@ namespace Stats
             _positionalStats.Injection(positionStatsStanceProvider);
         }
 
+        public void Add(IBasicStatsData<float> additionalStats)
+            => _serializedStats.Add(additionalStats);
+        public void Remove(IBasicStatsData<float> removeStats)
+            => _serializedStats.Remove(removeStats);
 
+        
         public void Initialization()
         {
             BaseStats.HealthPoints = BaseStats.MaxHealth;
@@ -121,43 +133,28 @@ namespace Stats
             set => BaseStats.AccumulatedStatic = value;
         }
 
-        public float HarmonyAmount
-        {
-            get => BaseStats.HarmonyAmount + TeamStats.HarmonyAmount + BurstStats.HarmonyAmount;
-            set => BaseStats.HarmonyAmount = value;
-        }
-
-        public float InitiativePercentage
-        {
-            get => BaseStats.InitiativePercentage + TeamStats.InitiativePercentage
-                                                  + BuffStats.InitiativePercentage
-                                                  + BurstStats.InitiativePercentage;
-            set => BaseStats.InitiativePercentage = value;
-        }
-
-        public float ActionsPerInitiative
-        {
-            get => BaseStats.ActionsPerInitiative + TeamStats.ActionsPerInitiative
-                                                  + BuffStats.ActionsPerInitiative
-                                                  + BurstStats.ActionsPerInitiative;
-            set => BaseStats.ActionsPerInitiative = value;
-        }
-
-
         public float AttackPower => _multiplierStats.OffensivePower * _formulatedStats.AttackPower;
         public float DeBuffPower => _multiplierStats.OffensivePower * _formulatedStats.DeBuffPower;
         public float StaticDamagePower => _multiplierStats.OffensivePower * _formulatedStats.StaticDamagePower;
+
         public float HealPower => _multiplierStats.SupportPower * _formulatedStats.HealPower;
         public float BuffPower => _multiplierStats.SupportPower * _formulatedStats.BuffPower;
         public float BuffReceivePower => _multiplierStats.SupportPower * _formulatedStats.BuffReceivePower;
+
         public float MaxHealth => _multiplierStats.VitalityAmount * _formulatedStats.MaxHealth;
         public float MaxMortalityPoints => _multiplierStats.VitalityAmount * _formulatedStats.MaxMortalityPoints;
         public float DamageReduction => _multiplierStats.VitalityAmount * _formulatedStats.DamageReduction;
         public float DeBuffReduction => _multiplierStats.VitalityAmount * _formulatedStats.DeBuffReduction;
+
         public float Enlightenment => _multiplierStats.ConcentrationAmount * _formulatedStats.Enlightenment;
         public float CriticalChance => _multiplierStats.ConcentrationAmount * _formulatedStats.CriticalChance;
         public float SpeedAmount => _multiplierStats.ConcentrationAmount * _formulatedStats.SpeedAmount;
-       
+
+
+        public float HarmonyAmount => _serializedStats.HarmonyAmount;
+        public float InitiativePercentage => _serializedStats.InitiativePercentage;
+        public float ActionsPerInitiative => _serializedStats.ActionsPerInitiative;
+
 
         private class MultiplierStats : IMasterStats<float>
         {

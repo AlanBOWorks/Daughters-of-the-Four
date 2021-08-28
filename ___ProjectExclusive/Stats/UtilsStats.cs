@@ -245,60 +245,60 @@ namespace Stats
             return baseStat + growStat * upgradeAmount;
         }
 
-        public static void AddByCheck(IBasicStats<float> injection, IStatsData stats)
+        public static void AddByCheck(IBasicStats<float> stats, IStatsData injection)
         {
-            if (stats is IOffensiveStatsData<float> offensiveStats)
-                Add(injection, offensiveStats);
-            if (stats is ISupportStatsData<float> supportStats)
-                Add(injection, supportStats);
-            if (stats is IVitalityStatsData<float> vitalityStats)
-                Add(injection, vitalityStats);
-            if (stats is IConcentrationStatsData<float> concentrationStats)
-                Add(injection, concentrationStats);
-            if (stats is ITemporalStatsData<float> tempoStats)
-                Add(injection, tempoStats);
+            if (injection is IOffensiveStatsData<float> offensiveStats)
+                Add(stats, offensiveStats);
+            if (injection is ISupportStatsData<float> supportStats)
+                Add(stats, supportStats);
+            if (injection is IVitalityStatsData<float> vitalityStats)
+                Add(stats, vitalityStats);
+            if (injection is IConcentrationStatsData<float> concentrationStats)
+                Add(stats, concentrationStats);
+            if (injection is ITemporalStatsData<float> tempoStats)
+                Add(stats, tempoStats);
         }
-        public static void Add(IBasicStats<float> injection, IOffensiveStatsData<float> stats)
+        public static void Add(IBasicStats<float> stats, IOffensiveStatsData<float> injection)
         {
-            injection.AttackPower += stats.AttackPower;
-            injection.DeBuffPower += stats.DeBuffPower;
-            injection.StaticDamagePower += stats.StaticDamagePower;
+            stats.AttackPower += injection.AttackPower;
+            stats.DeBuffPower += injection.DeBuffPower;
+            stats.StaticDamagePower += injection.StaticDamagePower;
         }
-        public static void Add(IBasicStats<float> injection, ISupportStatsData<float> stats)
+        public static void Add(IBasicStats<float> stats, ISupportStatsData<float> injection)
         {
-            injection.HealPower += stats.HealPower;
-            injection.BuffPower += stats.BuffPower;
-            injection.BuffReceivePower += stats.BuffReceivePower;
+            stats.HealPower += injection.HealPower;
+            stats.BuffPower += injection.BuffPower;
+            stats.BuffReceivePower += injection.BuffReceivePower;
         }
-        public static void Add(IBasicStats<float> injection, IVitalityStatsData<float> stats)
+        public static void Add(IBasicStats<float> stats, IVitalityStatsData<float> injection)
         {
-            injection.MaxHealth += stats.MaxHealth;
-            injection.MaxMortalityPoints += stats.MaxMortalityPoints;
-            injection.DeBuffReduction += stats.DeBuffReduction;
-            injection.DamageReduction += stats.DamageReduction;
-        }
-
-        public static void Add(IBasicStats<float> injection, IConcentrationStatsData<float> stats)
-        {
-            injection.SpeedAmount += stats.SpeedAmount;
-            injection.CriticalChance += stats.CriticalChance;
-            injection.Enlightenment += stats.Enlightenment;
+            stats.MaxHealth += injection.MaxHealth;
+            stats.MaxMortalityPoints += injection.MaxMortalityPoints;
+            stats.DeBuffReduction += injection.DeBuffReduction;
+            stats.DamageReduction += injection.DamageReduction;
         }
 
-        public static void Add(IBasicStats<float> injection, ITemporalStatsData<float> stats)
+        public static void Add(IBasicStats<float> stats, IConcentrationStatsData<float> injection)
         {
-            injection.InitiativePercentage += stats.InitiativePercentage;
-            injection.ActionsPerInitiative += stats.ActionsPerInitiative;
-            injection.HarmonyAmount += stats.HarmonyAmount;
+            stats.SpeedAmount += injection.SpeedAmount;
+            stats.CriticalChance += injection.CriticalChance;
+            stats.Enlightenment += injection.Enlightenment;
         }
 
-        public static void Add(IBasicStats<float> injection, IBasicStatsData<float> stats)
+        public static void Add(IBasicStats<float> stats, ITemporalStatsData<float> injection)
         {
-            Add(injection, stats as IOffensiveStatsData<float>);
-            Add(injection, stats as ISupportStatsData<float>);
-            Add(injection, stats as IVitalityStatsData<float>);
-            Add(injection, stats as IConcentrationStatsData<float>);
-            Add(injection, stats as ITemporalStatsData<float>);
+            stats.InitiativePercentage += injection.InitiativePercentage;
+            stats.ActionsPerInitiative += injection.ActionsPerInitiative;
+            stats.HarmonyAmount += injection.HarmonyAmount;
+        }
+
+        public static void Add(IBasicStats<float> stats, IBasicStatsData<float> injection)
+        {
+            Add(stats, injection as IOffensiveStatsData<float>);
+            Add(stats, injection as ISupportStatsData<float>);
+            Add(stats, injection as IVitalityStatsData<float>);
+            Add(stats, injection as IConcentrationStatsData<float>);
+            Add(stats, injection as ITemporalStatsData<float>);
         }
 
         public static void OverrideStats(IOffensiveStatsInjection<float> stats, float value = 0)
@@ -443,6 +443,19 @@ namespace Stats
             => GetStatsEvents().EnqueueZeroMortalityListener(target);
     }
 
+    public static class UtilsStatsCollection
+    {
+        public static void Add<T>(ICollectionStats<T> stats, IBasicStatsData<T> injection)
+        {
+            stats.OffensiveStats.Add(injection);
+            stats.SupportStats.Add(injection);
+            stats.VitalityStats.Add(injection);
+            stats.ConcentrationStats.Add(injection);
+            stats.TemporalStats.Add(injection);
+        }
+
+    }
+
     public static class UtilsCombatStats
     {
         public const int PredictedAmountOfSkillsPerState = 4 + 2 + 1; // 4 Unique + 2 common + 1 Ultimate
@@ -499,7 +512,7 @@ namespace Stats
 
         public static void DoDamageToShield(CombatingEntity target, float damage)
         {
-            IFullStats<float> stats = target.CombatStats.BaseStats;
+            ICombatHealthStats<float> stats = target.CombatStats;
             float shields = stats.ShieldAmount;
 
             if (shields <= 0 || damage <= 0) return;
@@ -517,7 +530,7 @@ namespace Stats
         {
             if(damage <= 0) return;
 
-            ICombatHealthStats<float> stats = target.CombatStats.BaseStats;
+            ICombatHealthStats<float> stats = target.CombatStats;
 
             UtilsStats.EnqueueTemporalStatsEvent(target);
             UtilsStats.EnqueueDamageEvent(target,damage);
@@ -579,7 +592,7 @@ namespace Stats
         {
             if(!target.IsConscious() || heal < 0) return;
             
-            var stats = target.CombatStats;
+            CombatStatsHolder stats = target.CombatStats;
 
             float targetHealth = stats.HealthPoints + heal;
             float maxHealth = stats.MaxHealth;
@@ -605,7 +618,7 @@ namespace Stats
 
         public static void DoOverHealTo(CombatingEntity target,float overHeal)
         {
-            var stats = target.CombatStats;
+            CombatStatsHolder stats = target.CombatStats;
             float currentHealth = stats.HealthPoints;
             float maxHealth = stats.MaxHealth;
             float currentOverHeal = currentHealth - maxHealth;
@@ -719,10 +732,11 @@ namespace Stats
             float harmonyVariation = userEnlightenment - targetEnlightenment;
             reduction += reduction * harmonyVariation;
 
-            float targetHarmony = targetStats.HarmonyAmount;
+            var targetHarmonyHolder = targetStats.BaseStats;
+            float targetHarmony = targetHarmonyHolder.HarmonyAmount;
             targetHarmony -= reduction;
             if (targetHarmony < 0) targetHarmony = 0;
-            targetStats.HarmonyAmount = targetHarmony;
+            targetHarmonyHolder.HarmonyAmount = targetHarmony;
         }
 
         public static void AddTeamControl(CombatingTeam team, float addition)
