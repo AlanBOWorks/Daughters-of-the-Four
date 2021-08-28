@@ -15,6 +15,7 @@ namespace Stats
         bool CanBeUsed(CombatingEntity user);
     }
 
+
     // it's is float because upgrades could be increased in half
     public interface IStatsUpgradable : IMasterStats<float>
     {

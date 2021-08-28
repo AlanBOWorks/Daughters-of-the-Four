@@ -64,6 +64,8 @@ namespace Characters
         /// </summary>
         [ShowInInspector]
         public readonly DelayBuffHandler DelayBuffHandler;
+        [ShowInInspector]
+        public CharacterCriticalActionHandler CharacterCriticalBuff { get; private set; }
 
         [ShowInInspector] 
         public CharacterCombatAreasData AreasDataTracker { get; private set; }
@@ -71,8 +73,7 @@ namespace Characters
         [ShowInInspector, NonSerialized] 
         public readonly CombatCharacterEvents Events;
 
-        [ShowInInspector] 
-        public CharacterCriticalActionHandler CharacterCriticalBuff { get; private set; }
+       
 
         [ShowInInspector]
         public CombatSkills CombatSkills { get; private set; }
@@ -127,8 +128,6 @@ namespace Characters
             AreasDataTracker = areasDataTracker;
             CombatStats.Injection(areasDataTracker);
         }
-
-
         public void Injection(CombatSkills combatSkills) => 
             CombatSkills = combatSkills;
         public void Injection(CombatingTeam team)
@@ -139,15 +138,17 @@ namespace Characters
         public void Injection(SDelayBuffPreset criticalBuff) =>
             CharacterCriticalBuff.CriticalBuff = criticalBuff;
 
-        public void Add(IConditionalStat stat)
-        {
+        
+        public void Add(IConditionalStat conditionalStat, IStatsData stats) {
             if (_conditionalStats == null)
             {
                 _conditionalStats = new ConditionalStats(this);
                 CombatStats.Add(_conditionalStats);
             }
-            _conditionalStats.Add(stat);
+
+            _conditionalStats.Add(conditionalStat,stats);
         }
+
 
     }
 }

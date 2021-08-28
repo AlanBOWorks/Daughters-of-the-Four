@@ -112,18 +112,24 @@ namespace Stats
         public Dictionary<IConcentrationStatsData<TKey>, TValue> ConcentrationStats { get; }
         public Dictionary<ITemporalStatsData<TKey>, TValue> TemporalStats { get; }
 
-        public void Add(TValue element)
+        
+        public void Add(TValue value, IStatsData stats)
         {
-            if(element is IOffensiveStatsData<TKey> offensiveStats)
-                Add(offensiveStats,element);
-            if(element is ISupportStatsData<TKey> supportStats)
-                Add(supportStats,element);
-            if(element is IVitalityStatsData<TKey> vitalityStats)
-                Add(vitalityStats,element);
-            if(element is IConcentrationStatsData<TKey> concentrationStats)
-                Add(concentrationStats,element);
-            if(element is ITemporalStatsData<TKey> temporalStats)
-                Add(temporalStats,element);
+            if (stats is IOffensiveStatsData<TKey> offensiveStats)
+                Add(offensiveStats, value);
+            if (stats is ISupportStatsData<TKey> supportStats)
+                Add(supportStats, value);
+            if (stats is IVitalityStatsData<TKey> vitalityStats)
+                Add(vitalityStats, value);
+            if (stats is IConcentrationStatsData<TKey> concentrationStats)
+                Add(concentrationStats, value);
+            if (stats is ITemporalStatsData<TKey> temporalStats)
+                Add(temporalStats, value);
+        }
+        public void Add(TValue value)
+        {
+            if (value is IStatsData stats)
+                Add(value, stats);
         }
 
         public void Add(IOffensiveStatsData<TKey> stats, TValue value)
