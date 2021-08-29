@@ -3,11 +3,115 @@ using System.Collections.Generic;
 using Characters;
 using _CombatSystem;
 using _Team;
+using Stats;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Skills
 {
+    public static class EnumSkills
+    {
+        /// <summary>
+        /// Mainly for AI to have a more concise way of differentiate
+        /// the skill archetype and make better decision. <br></br>
+        /// (Can also be used to determinate with kind of animation should
+        /// be playing)
+        /// </summary>
+        public enum Archetype
+        {
+            Undefined = -1,
+            OffensiveHealth = TargetingType.Offensive | StatDriven.Health,
+            OffensiveStatic = TargetingType.Offensive | StatDriven.Static,
+            /// <summary>
+            /// DeBuff, Mutes
+            /// </summary>
+            OffensiveBuff = TargetingType.Offensive | StatDriven.Buff,
+            /// <summary>
+            /// Disruption Damage
+            /// </summary>
+            OffensiveHarmony = TargetingType.Offensive | StatDriven.Harmony,
+            /// <summary>
+            /// Slow downs, stuns, freezes
+            /// </summary>
+            OffensiveTempo = TargetingType.Offensive | StatDriven.Tempo,
+            /// <summary>
+            /// Team Health/Control damage
+            /// </summary>
+            OffensiveControl = TargetingType.Offensive | StatDriven.Control,
+            /// <summary>
+            /// Alters the Stance
+            /// </summary>
+            OffensiveStance = TargetingType.Offensive | StatDriven.Stance,
+            OffensiveArea = TargetingType.Offensive | StatDriven.Area,
+
+            /// <summary>
+            /// Health (and Mortality)
+            /// </summary>
+            SupportHealth = TargetingType.Support | StatDriven.Health,
+            SupportStatic = TargetingType.Support | StatDriven.Static,
+            SupportBuff = TargetingType.Support | StatDriven.Buff,
+            SupportHarmony = TargetingType.Support | StatDriven.Harmony,
+            SupportTempo = TargetingType.Support | StatDriven.Tempo,
+            SupportControl = TargetingType.Support | StatDriven.Control,
+            SupportStance = TargetingType.Support | StatDriven.Stance,
+            SupportArea = TargetingType.Support | StatDriven.Area,
+        }
+
+        public enum StatDriven
+        {
+            Health = HealthIndex,
+            Static = StaticIndex,
+            Buff = BuffIndex,
+            Harmony = HarmonyIndex,
+            Tempo = TempoIndex,
+            Control = ControlIndex,
+            Stance = StanceIndex,
+            Area = AreaIndex
+        }
+
+
+        private const int HealthIndex = 0;
+        private const int StaticIndex = HealthIndex + 1;
+        private const int BuffIndex = StaticIndex + 1;
+        private const int HarmonyIndex = BuffIndex + 1;
+        private const int TempoIndex = HarmonyIndex + 1;
+        private const int ControlIndex = TempoIndex + 1;
+        private const int StanceIndex = ControlIndex + 1;
+        private const int AreaIndex = StanceIndex + 1;
+
+        /// <summary>
+        /// Types that defines what kind of usage the skill has
+        /// </summary>
+        public enum TargetingType
+        {
+            SelfOnly = SelfOnlyIndex,
+            Offensive = OffensiveIndex,
+            Support = SupportIndex,
+            Other = SelfOnly
+        }
+
+        private const int SelfOnlyIndex = 1000;
+        private const int OffensiveIndex = SelfOnlyIndex * 2;
+        private const int SupportIndex = OffensiveIndex * 3;
+
+        public enum HitType
+        {
+            /// <summary>
+            /// Invoke the event directly on hit
+            /// </summary>
+            DirectHit,
+            /// <summary>
+            /// Each hit will increase the effect; Once on StartSequence all counts will be invoke
+            /// </summary>
+            OnHitIncrease,
+            /// <summary>
+            /// Remove the effect if received hit, else on StartSequence invoke
+            /// </summary>
+            OnHitCancel
+        }
+    }
+
+
     public static class UtilsSkill
     {
 
@@ -241,105 +345,4 @@ namespace Skills
         }
     }
 
-    public static class EnumSkills
-    {
-        /// <summary>
-        /// Mainly for AI to have a more concise way of differentiate
-        /// the skill archetype and make better decision. <br></br>
-        /// (Can also be used to determinate with kind of animation should
-        /// be playing)
-        /// </summary>
-        public enum Archetype
-        {
-            Undefined = -1,
-            OffensiveHealth = TargetingType.Offensive | StatDriven.Health,
-            OffensiveStatic = TargetingType.Offensive | StatDriven.Static,
-            /// <summary>
-            /// DeBuff, Mutes
-            /// </summary>
-            OffensiveBuff = TargetingType.Offensive | StatDriven.Buff,
-            /// <summary>
-            /// Disruption Damage
-            /// </summary>
-            OffensiveHarmony = TargetingType.Offensive | StatDriven.Harmony,
-            /// <summary>
-            /// Slow downs, stuns, freezes
-            /// </summary>
-            OffensiveTempo = TargetingType.Offensive | StatDriven.Tempo,
-            /// <summary>
-            /// Team Health/Control damage
-            /// </summary>
-            OffensiveControl = TargetingType.Offensive | StatDriven.Control,
-            /// <summary>
-            /// Alters the Stance
-            /// </summary>
-            OffensiveStance = TargetingType.Offensive | StatDriven.Stance,
-            OffensiveArea = TargetingType.Offensive | StatDriven.Area,
-
-            /// <summary>
-            /// Health (and Mortality)
-            /// </summary>
-            SupportHealth = TargetingType.Support | StatDriven.Health,
-            SupportStatic = TargetingType.Support | StatDriven.Static,
-            SupportBuff = TargetingType.Support | StatDriven.Buff,
-            SupportHarmony = TargetingType.Support | StatDriven.Harmony,
-            SupportTempo = TargetingType.Support | StatDriven.Tempo,
-            SupportControl = TargetingType.Support | StatDriven.Control,
-            SupportStance = TargetingType.Support | StatDriven.Stance,
-            SupportArea = TargetingType.Support | StatDriven.Area,
-        }
-
-        public enum StatDriven
-        {
-            Health = HealthIndex,
-            Static = StaticIndex,
-            Buff = BuffIndex,
-            Harmony = HarmonyIndex,
-            Tempo = TempoIndex,
-            Control = ControlIndex,
-            Stance = StanceIndex,
-            Area = AreaIndex
-        }
-
-
-        private const int HealthIndex = 0;
-        private const int StaticIndex = HealthIndex +1;
-        private const int BuffIndex = StaticIndex + 1;
-        private const int HarmonyIndex = BuffIndex + 1;
-        private const int TempoIndex = HarmonyIndex + 1;
-        private const int ControlIndex = TempoIndex + 1;
-        private const int StanceIndex = ControlIndex + 1;
-        private const int AreaIndex = StanceIndex + 1;
-
-        /// <summary>
-        /// Types that defines what kind of usage the skill has
-        /// </summary>
-        public enum TargetingType
-        {
-            SelfOnly = SelfOnlyIndex,
-            Offensive = OffensiveIndex,
-            Support = SupportIndex,
-            Other = SelfOnly
-        }
-
-        private const int SelfOnlyIndex = 1000;
-        private const int OffensiveIndex = SelfOnlyIndex *2;
-        private const int SupportIndex = OffensiveIndex *3;
-
-        public enum HitType
-        {
-            /// <summary>
-            /// Invoke the event directly on hit
-            /// </summary>
-            DirectHit,
-            /// <summary>
-            /// Each hit will increase the effect; Once on StartSequence all counts will be invoke
-            /// </summary>
-            OnHitIncrease,
-            /// <summary>
-            /// Remove the effect if received hit, else on StartSequence invoke
-            /// </summary>
-            OnHitCancel
-        }
-    }
 }

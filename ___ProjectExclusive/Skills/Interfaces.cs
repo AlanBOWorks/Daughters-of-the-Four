@@ -46,4 +46,5 @@ namespace Skills
         ICharacterArchetypesData<T> OnDeathSkill();
     }
 
+
 }

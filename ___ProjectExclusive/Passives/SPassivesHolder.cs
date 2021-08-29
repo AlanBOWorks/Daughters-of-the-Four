@@ -16,7 +16,7 @@ namespace Passives
         private string passiveName = "NULL";
 
         [SerializeField,DisableInEditorMode,DisableInPlayMode] 
-        private List<SPassiveInjectorBase> passives = new List<SPassiveInjectorBase>();
+        private List<SPassiveInjector> passives = new List<SPassiveInjector>();
 
 
         public void InjectPassive(CombatingEntity entity)
@@ -44,7 +44,7 @@ namespace Passives
     public class PassiveHolder : IPassiveInjector
     {
         [SerializeField] 
-        private List<SPassiveInjectorBase> passives = new List<SPassiveInjectorBase>();
+        private List<SPassiveInjector> passives = new List<SPassiveInjector>();
         public void InjectPassive(CombatingEntity entity)
         {
             for (int i = 0; i < passives.Count; i++)

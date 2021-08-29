@@ -95,48 +95,65 @@ namespace Stats
             Actions = ActionsIndex
         }
 
+        public const int BaseTypeIndex = 0;
+        public const int BuffTypeIndex = BaseTypeIndex + 1;
+        public const int BurstTypeIndex = BuffTypeIndex + 1;
 
+        public enum BuffType
+        {
+            Buff = StatsType.Buff,
+            Burst = StatsType.Burst
+        }
         public enum StatsType
         {
-            Base,
-            Buff,
-            Burst
+            Base = BaseTypeIndex,
+            Buff = BuffTypeIndex,
+            Burst = BurstTypeIndex
         }
     }
 
     public static class UtilsEnumStats
     {
-
-        public static IBasicStats<float> GetStats(CombatingEntity entity, EnumStats.StatsType statsType)
-        {
-            var combatStats = entity.CombatStats;
-            return GetStats(combatStats, statsType);
-        }
-
-        public static IBasicStats<float> GetStats(CombatStatsHolder combatStats, EnumStats.StatsType statsType)
-        {
-            switch (statsType)
-            {
-                case EnumStats.StatsType.Base:
-                    return combatStats.BaseStats;
-                case EnumStats.StatsType.Buff:
-                    return combatStats.BuffStats;
-                case EnumStats.StatsType.Burst:
-                    return combatStats.BurstStats;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(statsType), statsType, null);
-            }
-        }
-
         /// <summary>
         /// Gets only the [<see cref="EnumStats.StatsType.Buff"/>] || [<see cref="EnumStats.StatsType.Burst"/>]
         /// </summary>
-        public static IBasicStats<float> GetBuffOrBurstStats(CombatStatsHolder combatStats, EnumStats.StatsType statsType)
+        private static T GetBuffType<T>(IStatsHolder<T> holder, int buffIndex)
         {
-            return statsType == EnumStats.StatsType.Burst 
-                ? combatStats.BurstStats 
-                : combatStats.BuffStats;
+            switch (buffIndex)
+            {
+                case EnumStats.BaseTypeIndex:
+                    return holder.GetBase();
+                case EnumStats.BuffTypeIndex:
+                    return holder.GetBuff();
+                case EnumStats.BurstTypeIndex:
+                    return holder.GetBurst();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(holder), buffIndex, "Selected buff type" +
+                                                                                          "is not valid for getting;\n" +
+                                                                                          "Use GetBuffOrBurst() instead");
+            }
         }
+        public static T GetStatsHolder<T>(IStatsHolder<T> holder, EnumStats.StatsType statsType)
+        {
+            return GetBuffType(holder, (int)statsType);
+        }
+
+        public static T GetStatsHolder<T>(IStatsHolder<T> holder, EnumStats.BuffType buffType)
+        {
+            return GetBuffType(holder, (int) buffType);
+        }
+
+        public static T GetBuffOrBurstStats<T>(IStatsHolder<T> holder, int buffIndex)
+        {
+            return buffIndex == EnumStats.BurstTypeIndex
+                ? holder.GetBurst()
+                : holder.GetBuff();
+        }
+
+        public static T GetBuffOrBurstStats<T>(IStatsHolder<T> holder, EnumStats.StatsType statsType)
+            => GetBuffOrBurstStats(holder, (int) statsType);
+        public static T GetBuffOrBurstStats<T>(IStatsHolder<T> holder, EnumStats.BuffType buffType)
+            => GetBuffOrBurstStats(holder, (int) buffType);
 
 
         public static T GetStat<T>(IMasterStats<T> masterStats, EnumStats.Primordial type)

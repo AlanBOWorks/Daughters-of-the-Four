@@ -51,9 +51,7 @@ namespace Characters
         [ShowInInspector, GUIColor(.4f,.8f,.7f)]
         public CombatStatsHolder CombatStats { get; private set; }
 
-        [ShowInInspector]
-        private ConditionalStats _conditionalStats;
-
+       
         /// <summary>
         /// Used to track the damage received, heals, etc.
         /// </summary>
@@ -138,16 +136,11 @@ namespace Characters
         public void Injection(SDelayBuffPreset criticalBuff) =>
             CharacterCriticalBuff.CriticalBuff = criticalBuff;
 
-        
-        public void Add(IConditionalStat conditionalStat, IStatsData stats) {
-            if (_conditionalStats == null)
-            {
-                _conditionalStats = new ConditionalStats(this);
-                CombatStats.Add(_conditionalStats);
-            }
-
-            _conditionalStats.Add(conditionalStat,stats);
+        public void Injection(IBasicStatsData<float> stats)
+        {
+            // TODO
         }
+
 
 
     }

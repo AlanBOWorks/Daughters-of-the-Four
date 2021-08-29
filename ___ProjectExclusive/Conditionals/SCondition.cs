@@ -17,11 +17,16 @@ namespace CombatConditions
     {
         [SerializeField]
         private SCondition condition;
+
         [SuffixLabel("u|%%"), ShowIf("condition"),
          Tooltip("Checks value is equals or below")]
         public float conditionalValue;
+
+        [ShowIf("condition")]
         public bool inverseCondition;
-        [Tooltip("If is the user that needs to be checked or the target")]
+
+        [ShowIf("condition"),
+         Tooltip("If is the user that needs to be checked or the target")]
         public bool isUserCheck;
 
         public bool HasCondition() => condition != null;
@@ -46,7 +51,9 @@ namespace CombatConditions
     public struct UserOnlyConditionParam
     {
         public SCondition condition;
+        [ShowIf("condition")]
         public float conditionValue;
+        [ShowIf("condition")]
         public bool inverseCondition;
 
         public bool CanBeUse(CombatingEntity user)

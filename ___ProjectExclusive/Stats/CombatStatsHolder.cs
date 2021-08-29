@@ -8,7 +8,8 @@ using UnityEngine;
 namespace Stats
 {
 
-    public class CombatStatsHolder : IFullStatsData<float>, IStanceAllData<IBasicStatsData<float>>, ICombatHealthStats<float>
+    public class CombatStatsHolder : IFullStatsData<float>, IStanceAllData<IBasicStatsData<float>>, ICombatHealthStats<float>,
+        IStatsHolder<IBasicStats<float>>
     {
         public CombatStatsHolder(IFullStatsData<float> presetStats)
         {
@@ -20,10 +21,9 @@ namespace Stats
             _formulatedStats = new FormulatedStats(this);
             _multiplierStats = new MultiplierStats();
 
-            _serializedStats = new SerializedHashsetStats
-            {
-                _formulatedStats
-            };
+            _serializedStats = new HashsetStatsHolder(
+                BaseStats, BuffStats, BurstStats);
+
         }
 
         [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
@@ -47,14 +47,14 @@ namespace Stats
         private readonly MultiplierStats _multiplierStats;
 
         private readonly FormulatedStats _formulatedStats;
-        private readonly SerializedHashsetStats _serializedStats;
+        private readonly HashsetStatsHolder _serializedStats;
 
         [TitleGroup("Local stats"), PropertyOrder(-10)]
         public int ActionsLefts;
 
-        public IBasicStats<float> GetStats(EnumStats.StatsType statsType)
+        public IBasicStats<float> GetStatsHolder(EnumStats.StatsType statsType)
         {
-            return UtilsEnumStats.GetStats(this, statsType);
+            return UtilsEnumStats.GetStatsHolder(this, statsType);
         }
 
         private IBasicStatsData<float> TeamStats => TeamData.GetCurrentStanceValue();
@@ -72,12 +72,6 @@ namespace Stats
             _positionalStats.Injection(positionStatsStanceProvider);
         }
 
-        public void Add(IBasicStatsData<float> additionalStats)
-            => _serializedStats.Add(additionalStats);
-        public void Remove(IBasicStatsData<float> removeStats)
-            => _serializedStats.Remove(removeStats);
-
-        
         public void Initialization()
         {
             BaseStats.HealthPoints = BaseStats.MaxHealth;
@@ -164,7 +158,7 @@ namespace Stats
             public float ConcentrationAmount { get; set; } = 1;
         }
 
-        private class FormulatedStats : IBasicStatsData<float>
+        private class FormulatedStats : IBasicStatsData<float>, IStatsHolder<IBasicStats<float>>
         {
             [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
             public CombatStatsFull BaseStats { get; protected set; }
@@ -293,12 +287,19 @@ namespace Stats
                     BaseStats.DeBuffReduction + TeamStats.DeBuffReduction,
                     BuffStats.DeBuffReduction,
                     BurstStats.DeBuffReduction);
+
+            public IBasicStats<float> GetBuff() => BuffStats;
+            public IBasicStats<float> GetBurst() => BurstStats;
+            public IBasicStats<float> GetBase() => BaseStats;
         }
 
         public IBasicStatsData<float> AttackingStance => _positionalStats.AttackingStance;
         public IBasicStatsData<float> NeutralStance => _positionalStats.NeutralStance;
         public IBasicStatsData<float> DefendingStance => _positionalStats.DefendingStance;
         public IBasicStatsData<float> InAllStances => _formulatedStats;
+        public IBasicStats<float> GetBuff() => BuffStats;
+        public IBasicStats<float> GetBurst() => BurstStats;
+        public IBasicStats<float> GetBase() => BaseStats;
     }
 
 
