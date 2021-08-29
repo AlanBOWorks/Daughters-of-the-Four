@@ -9,7 +9,7 @@ namespace Stats
     /// [<see cref="ICombatStatsBasic"/>] based by the [<seealso cref="EnumTeam.Stances"/>]<br></br>
     /// Get mainly by [<see cref="PositionalStats{T}.GetCurrentStanceValue"/>]
     /// </summary>
-    public class PositionalStats : PositionalStats<float>
+    public class PositionalStats : PositionalStats<float>, IBasicStatsData<float>
     {
        
         /// <summary>
@@ -19,8 +19,23 @@ namespace Stats
             base(stanceProvider, new CombatStatsBasic(),
                 new CombatStatsBasic(), new CombatStatsBasic())
         { }
-
-
+        
+        public float AttackPower => GetCurrentStanceValue().AttackPower;
+        public float DeBuffPower => GetCurrentStanceValue().DeBuffPower;
+        public float StaticDamagePower => GetCurrentStanceValue().StaticDamagePower;
+        public float HealPower => GetCurrentStanceValue().HealPower;
+        public float BuffPower => GetCurrentStanceValue().BuffPower;
+        public float BuffReceivePower => GetCurrentStanceValue().BuffReceivePower;
+        public float MaxHealth => GetCurrentStanceValue().MaxHealth;
+        public float MaxMortalityPoints => GetCurrentStanceValue().MaxMortalityPoints;
+        public float DamageReduction => GetCurrentStanceValue().DamageReduction;
+        public float DeBuffReduction => GetCurrentStanceValue().DeBuffReduction;
+        public float Enlightenment => GetCurrentStanceValue().Enlightenment;
+        public float CriticalChance => GetCurrentStanceValue().CriticalChance;
+        public float SpeedAmount => GetCurrentStanceValue().SpeedAmount;
+        public float InitiativePercentage => GetCurrentStanceValue().InitiativePercentage;
+        public float ActionsPerInitiative => GetCurrentStanceValue().ActionsPerInitiative;
+        public float HarmonyAmount => GetCurrentStanceValue().HarmonyAmount;
     }
 
     public class PositionalStats<T> : PositionalStructureBase<IBasicStats<T>>

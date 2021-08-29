@@ -379,6 +379,12 @@ namespace Stats
             burstType = new SerializedHashsetStats(burst);
         }
 
+        public void Add(IBasicStatsData<float> add, EnumStats.StatsType statsType)
+        {
+            var holder = UtilsEnumStats.GetStatsHolder(this, statsType);
+            holder.Add(add);
+        }
+
 
         public float AttackPower =>
             UtilsStats.StatsFormula(

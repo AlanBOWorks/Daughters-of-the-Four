@@ -18,12 +18,10 @@ namespace Stats
             BurstStats = new CombatStatsFull();
 
             _positionalStats = PositionalStats.GenerateProvisionalBasics();
-            _formulatedStats = new FormulatedStats(this);
             _multiplierStats = new MultiplierStats();
 
-            _serializedStats = new HashsetStatsHolder(
-                BaseStats, BuffStats, BurstStats);
-
+            _formulatedStats = new FormulatedStats(this);
+            _formulatedStats.Inject(_positionalStats);
         }
 
         [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
@@ -37,17 +35,18 @@ namespace Stats
         [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
         public CombatStatsFull BurstStats { get; protected set; }
 
-        private readonly PositionalStats _positionalStats;
 
         // By design multiplier are consistent / Burst are temporary and specific;
         // making multipliers Burst type could be confusing.
         // Some buff could increase multiplier and/or a specific stat
         //
         // Eg: increasing the Heal power instead the Support)
+        [ShowInInspector, TabGroup("Multipliers"), GUIColor(.7f,.6f,.4f)]
         private readonly MultiplierStats _multiplierStats;
-
+        [ShowInInspector, TabGroup("Formulated"), GUIColor(.7f, .6f, .4f)]
         private readonly FormulatedStats _formulatedStats;
-        private readonly HashsetStatsHolder _serializedStats;
+        [ShowInInspector, TabGroup("Positional"), GUIColor(.7f, .6f, .4f)]
+        private readonly PositionalStats _positionalStats;
 
         [TitleGroup("Local stats"), PropertyOrder(-10)]
         public int ActionsLefts;
@@ -61,11 +60,7 @@ namespace Stats
         public IMasterStats<float> GetMultiplierStats() => _multiplierStats;
         public IStanceData<IBasicStats<float>> GetPositionalStats() => _positionalStats;
 
-        public CombatingTeam TeamData
-        {
-            get => _formulatedStats.TeamData;
-            set => _formulatedStats.TeamData = value;
-        }
+        public CombatingTeam TeamData { get; set; }
 
         public void Injection(IStanceProvider positionStatsStanceProvider)
         {
@@ -90,20 +85,20 @@ namespace Stats
         {
             UtilsCombatStats.HealToMax(this);
         }
+        public void ResetBurst()
+        {
+            _formulatedStats.ResetBurst();
+        }
 
+        public void ResetInitiativePercentage()
+        {
+            _formulatedStats.ResetInitiative();
+        }
 
-        public float CalculateBaseAttackPower()
-        {
-            return BaseStats.AttackPower + TeamStats.AttackPower;
-        }
-        public float CalculateBaseStaticDamagePower()
-        {
-            return BaseStats.StaticDamagePower + TeamStats.StaticDamagePower;
-        }
-        public float CalculateDamageReduction()
-        {
-            return BaseStats.DamageReduction + TeamStats.DamageReduction;
-        }
+        public float CalculateBaseAttackPower() => _formulatedStats.AttackPower;
+        public float CalculateBaseStaticDamagePower() => _formulatedStats.StaticDamagePower;
+        public float CalculateDamageReduction() => _formulatedStats.DamageReduction;
+
 
         public float HealthPoints
         {
@@ -145,153 +140,9 @@ namespace Stats
         public float SpeedAmount => _multiplierStats.ConcentrationAmount * _formulatedStats.SpeedAmount;
 
 
-        public float HarmonyAmount => _serializedStats.HarmonyAmount;
-        public float InitiativePercentage => _serializedStats.InitiativePercentage;
-        public float ActionsPerInitiative => _serializedStats.ActionsPerInitiative;
-
-
-        private class MultiplierStats : IMasterStats<float>
-        {
-            public float OffensivePower { get; set; } = 1;
-            public float SupportPower { get; set; } = 1;
-            public float VitalityAmount { get; set; } = 1;
-            public float ConcentrationAmount { get; set; } = 1;
-        }
-
-        private class FormulatedStats : IBasicStatsData<float>, IStatsHolder<IBasicStats<float>>
-        {
-            [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
-            public CombatStatsFull BaseStats { get; protected set; }
-            /// <summary>
-            /// This remains active for the whole fight
-            /// </summary>
-            [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.4f, .6f, .8f)]
-            public CombatStatsFull BuffStats { get; protected set; }
-
-            [ShowInInspector, HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
-            public CombatStatsFull BurstStats { get; protected set; }
-
-            [ShowInInspector, HorizontalGroup("Base Stats"), PropertyOrder(-1)]
-            private IBasicStatsData<float> TeamStats => TeamData.GetCurrentStanceValue();
-
-            public CombatingTeam TeamData;
-
-            public FormulatedStats(CombatStatsHolder stats)
-            {
-                BaseStats = stats.BaseStats;
-                BuffStats = stats.BuffStats;
-                BurstStats = stats.BurstStats;
-            }
-
-            public FormulatedStats(CombatStatsHolder stats, CombatingTeam teamData) : this(stats)
-            {
-                TeamData = teamData;
-            }
-
-
-
-
-            public float CalculateBaseAttackPower()
-            {
-                return BaseStats.AttackPower + TeamStats.AttackPower;
-            }
-            public float CalculateBaseStaticDamagePower()
-            {
-                return BaseStats.StaticDamagePower + TeamStats.StaticDamagePower;
-            }
-
-            public float AttackPower =>
-                UtilsStats.StatsFormula(
-                    CalculateBaseAttackPower(),
-                    BuffStats.AttackPower,
-                    BurstStats.AttackPower);
-
-            public float DeBuffPower =>
-                UtilsStats.StatsFormula(
-                    BaseStats.DeBuffPower + TeamStats.DeBuffPower,
-                    BuffStats.DeBuffPower,
-                    BurstStats.DeBuffPower);
-
-
-            public float StaticDamagePower =>
-                UtilsStats.StatsFormula(
-                    CalculateBaseStaticDamagePower(),
-                    BuffStats.StaticDamagePower,
-                    BurstStats.StaticDamagePower);
-
-            public float HealPower =>
-                UtilsStats.StatsFormula(
-                    BaseStats.HealPower + TeamStats.HealPower,
-                    BuffStats.HealPower,
-                    BurstStats.HealPower);
-
-            public float BuffPower =>
-                UtilsStats.StatsFormula(
-                    BaseStats.BuffPower + TeamStats.BuffPower,
-                    BuffStats.BuffPower,
-                    BurstStats.BuffPower);
-
-            public float BuffReceivePower =>
-                UtilsStats.StatsFormula(
-                    BaseStats.BuffReceivePower + TeamStats.BuffReceivePower,
-                    BuffStats.BuffReceivePower,
-                    BurstStats.BuffReceivePower);
-
-            public float HarmonyAmount => BaseStats.HarmonyAmount + TeamStats.HarmonyAmount + BurstStats.HarmonyAmount;
-
-            public float InitiativePercentage =>
-                BaseStats.InitiativePercentage + TeamStats.InitiativePercentage
-                                               + BuffStats.InitiativePercentage
-                                               + BurstStats.InitiativePercentage;
-
-            public float ActionsPerInitiative =>
-                BaseStats.ActionsPerInitiative + TeamStats.ActionsPerInitiative
-                                               + BuffStats.ActionsPerInitiative
-                                               + BurstStats.ActionsPerInitiative;
-
-            public float Enlightenment =>
-                UtilsStats.StatsFormula(
-                    BaseStats.Enlightenment + TeamStats.Enlightenment,
-                    BuffStats.Enlightenment,
-                    BurstStats.Enlightenment);
-
-            public float CriticalChance =>
-                UtilsStats.StatsFormula(
-                    BaseStats.CriticalChance + TeamStats.CriticalChance,
-                    BuffStats.CriticalChance,
-                    BurstStats.CriticalChance);
-
-            public float SpeedAmount =>
-                UtilsStats.StatsFormula(
-                    BaseStats.SpeedAmount + TeamStats.SpeedAmount,
-                    BuffStats.SpeedAmount,
-                    BurstStats.SpeedAmount);
-
-            public float MaxHealth => BaseStats.MaxHealth + TeamStats.MaxHealth;
-
-            public float MaxMortalityPoints => BaseStats.MaxMortalityPoints + TeamStats.MaxMortalityPoints;
-
-            public float CalculateDamageReduction()
-            {
-                return BaseStats.DamageReduction + TeamStats.DamageReduction;
-            }
-
-            public float DamageReduction =>
-                UtilsStats.StatsFormula(
-                    CalculateDamageReduction(),
-                    BuffStats.DamageReduction,
-                    BurstStats.DamageReduction);
-
-            public float DeBuffReduction =>
-                UtilsStats.StatsFormula(
-                    BaseStats.DeBuffReduction + TeamStats.DeBuffReduction,
-                    BuffStats.DeBuffReduction,
-                    BurstStats.DeBuffReduction);
-
-            public IBasicStats<float> GetBuff() => BuffStats;
-            public IBasicStats<float> GetBurst() => BurstStats;
-            public IBasicStats<float> GetBase() => BaseStats;
-        }
+        public float HarmonyAmount => _formulatedStats.HarmonyAmount;
+        public float InitiativePercentage => _formulatedStats.InitiativePercentage;
+        public float ActionsPerInitiative => _formulatedStats.ActionsPerInitiative;
 
         public IBasicStatsData<float> AttackingStance => _positionalStats.AttackingStance;
         public IBasicStatsData<float> NeutralStance => _positionalStats.NeutralStance;
@@ -300,6 +151,64 @@ namespace Stats
         public IBasicStats<float> GetBuff() => BuffStats;
         public IBasicStats<float> GetBurst() => BurstStats;
         public IBasicStats<float> GetBase() => BaseStats;
+
+        private class MultiplierStats : IMasterStats<float>
+        {
+            [ShowInInspector]
+            public float OffensivePower { get; set; } = 1;
+            [ShowInInspector]
+            public float SupportPower { get; set; } = 1;
+            [ShowInInspector]
+            public float VitalityAmount { get; set; } = 1;
+            [ShowInInspector]
+            public float ConcentrationAmount { get; set; } = 1;
+        }
+
+        private class FormulatedStats : HashsetStatsHolder
+        {
+            [HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
+            private CombatStatsFull BaseStats { get; }
+            /// <summary>
+            /// This remains active for the whole fight
+            /// </summary>
+            [HorizontalGroup("Buff Stats"), GUIColor(.4f, .6f, .8f)]
+            private CombatStatsFull BuffStats { get; }
+
+            [HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
+            private CombatStatsFull BurstStats { get; }
+
+            
+
+            public FormulatedStats(CombatStatsHolder stats) :
+                base(stats.BaseStats,stats.BuffStats,stats.BurstStats)
+            {
+                BaseStats = stats.BaseStats;
+                BuffStats = stats.BuffStats;
+                BurstStats = stats.BurstStats;
+            }
+
+            private IBasicStatsData<float> _positionalStats;
+            public void Inject(PositionalStats positionalStats)
+            {
+                if (_positionalStats != null)
+                    baseType.Remove(_positionalStats);
+
+                _positionalStats = positionalStats;
+                baseType.Add(_positionalStats);
+            }
+
+            public void ResetBurst()
+            {
+                buffType.Clear();
+                buffType.Add(BurstStats);
+            }
+
+            public void ResetInitiative()
+            {
+                BaseStats.InitiativePercentage = 0;
+                BurstStats.InitiativePercentage = 0;
+            }
+        }
     }
 
 

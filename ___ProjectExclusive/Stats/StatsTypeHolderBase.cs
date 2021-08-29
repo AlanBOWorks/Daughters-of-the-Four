@@ -1,4 +1,5 @@
 using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Stats
@@ -15,7 +16,7 @@ namespace Stats
             this.baseType = baseType;
         }
 
-        [SerializeField] protected T baseType;
+        [SerializeField, ShowInInspector,PropertyOrder(-10)] protected T baseType;
         public T GetBase() => baseType;
     }
 
@@ -31,8 +32,8 @@ namespace Stats
             this.burstType = burstType;
         }
 
-        [SerializeField] protected T buffType;
-        [SerializeField] protected T burstType;
+        [SerializeField, ShowInInspector] protected T buffType;
+        [SerializeField, ShowInInspector] protected T burstType;
 
         public T GetBuff() => buffType;
         public T GetBurst() => burstType;

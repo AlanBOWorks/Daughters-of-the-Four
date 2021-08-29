@@ -240,8 +240,7 @@ namespace _CombatSystem
             _fillingEntities.Add(entity);
             CombatStatsHolder stats = entity.CombatStats;
 
-            stats.BaseStats.InitiativePercentage = 0;
-            stats.BurstStats.InitiativePercentage = 0;
+            stats.ResetInitiativePercentage();
             stats.RefillInitiativeActions();
             CallUpdateOnInitiativeBar(entity);
 

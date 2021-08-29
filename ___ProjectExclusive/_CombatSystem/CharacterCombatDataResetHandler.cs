@@ -16,7 +16,7 @@ namespace _CombatSystem
 
         public void OnFinisAllActions(CombatingEntity entity)
         {
-            entity.CombatStats.BurstStats.ResetToZero();
+            entity.CombatStats.ResetBurst();
             entity.ReceivedStats.ResetToZero();
         }
 
