@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ___ProjectExclusive;
 using Characters;
 using Sirenix.OdinInspector;
 using Stats;
@@ -15,11 +16,14 @@ namespace Passives
     {
         public CombatPassivesHolder(CombatingEntity user)
         {
-           ConditionalStats = new StatPassives(user);
+            _conditionalStats = new StatPassives(user);
         }
 
         [ShowInInspector]
-        public readonly IBuffHolder<ConditionalStats> ConditionalStats;
+        private readonly StatPassives _conditionalStats;
+        public IBuffHolder<ConditionalStats> ConditionalStats
+            => _conditionalStats;
+        
 
         private class StatPassives : BuffTypeHolder<ConditionalStats>
         {
@@ -28,14 +32,32 @@ namespace Passives
                 buffType = new ConditionalStats(user);
                 burstType = new ConditionalStats(user);
 
-                user.Injection(buffType);
+
+                var formulatedStats = user.CombatStats.GetFormulatedStats();
+                formulatedStats.Add(this);
             }
         }
     }
     
     public abstract class SPassiveInjector : ScriptableObject, IPassiveInjector
     {
+        [SerializeField, PropertyOrder(-100)] 
+        private string statName = "NULL";
+        public string StatName => statName;
+
         public abstract void InjectPassive(CombatingEntity entity);
+
+
+        protected virtual string AssetPrefix()
+        {
+            return "Passive - ";
+        }
+        [Button(ButtonSizes.Large)]
+        private void UpdateAssetName()
+        {
+            name = AssetPrefix() + $"{statName} [Passive]";
+            UtilsGame.UpdateAssetName(this);
+        }
     }
 
 }

@@ -8,9 +8,9 @@ using UnityEngine;
 namespace Passives
 {
 
-    [CreateAssetMenu(fileName = "Passive HOLDER - N [Passives]", 
-        menuName = "Combat/Passives/Holder", order = -100)]
-    public class SPassivesHolder : ScriptableObject, IPassiveHolder
+    [CreateAssetMenu(fileName = "SET Passives - N [PreSet]", 
+        menuName = "Combat/Passives/Passives SET", order = -100)]
+    public class SPassivesSet : ScriptableObject, IPassiveHolder
     {
         [SerializeField] 
         private string passiveName = "NULL";
@@ -34,7 +34,7 @@ namespace Passives
         [Button(ButtonSizes.Large)]
         private void UpdateAssetName()
         {
-            name = $"Passive HOLDER - {passiveName} [Passives]";
+            name = $"SET Passives - {passiveName} [PreSeT]";
             UtilsGame.UpdateAssetName(this);
         } 
 #endif

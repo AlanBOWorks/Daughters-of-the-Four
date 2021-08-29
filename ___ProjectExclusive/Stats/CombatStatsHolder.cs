@@ -47,20 +47,28 @@ namespace Stats
         private readonly FormulatedStats _formulatedStats;
         [ShowInInspector, TabGroup("Positional"), GUIColor(.7f, .6f, .4f)]
         private readonly PositionalStats _positionalStats;
+        private CombatingTeam _teamData;
 
         [TitleGroup("Local stats"), PropertyOrder(-10)]
         public int ActionsLefts;
 
-        public IBasicStats<float> GetStatsHolder(EnumStats.StatsType statsType)
+        private IBasicStatsData<float> TeamStats 
+            => TeamData.GetCurrentStanceValue();
+        public IMasterStats<float> GetMultiplierStats() 
+            => _multiplierStats;
+        public IStanceData<IBasicStats<float>> GetPositionalStats() 
+            => _positionalStats;
+        public HashsetStatsHolder HashsetStats => _formulatedStats;
+
+        public CombatingTeam TeamData
         {
-            return UtilsEnumStats.GetStatsHolder(this, statsType);
+            get => _teamData;
+            set
+            {
+                _teamData = value;
+                _formulatedStats.Inject(value.StatsHolder);
+            }
         }
-
-        private IBasicStatsData<float> TeamStats => TeamData.GetCurrentStanceValue();
-        public IMasterStats<float> GetMultiplierStats() => _multiplierStats;
-        public IStanceData<IBasicStats<float>> GetPositionalStats() => _positionalStats;
-
-        public CombatingTeam TeamData { get; set; }
 
         public void Injection(IStanceProvider positionStatsStanceProvider)
         {
@@ -98,7 +106,6 @@ namespace Stats
         public float CalculateBaseAttackPower() => _formulatedStats.AttackPower;
         public float CalculateBaseStaticDamagePower() => _formulatedStats.StaticDamagePower;
         public float CalculateDamageReduction() => _formulatedStats.DamageReduction;
-
 
         public float HealthPoints
         {
@@ -152,6 +159,9 @@ namespace Stats
         public IBasicStats<float> GetBurst() => BurstStats;
         public IBasicStats<float> GetBase() => BaseStats;
 
+        public HashsetStatsHolder GetFormulatedStats() => _formulatedStats;
+
+
         private class MultiplierStats : IMasterStats<float>
         {
             [ShowInInspector]
@@ -164,7 +174,11 @@ namespace Stats
             public float ConcentrationAmount { get; set; } = 1;
         }
 
-        private class FormulatedStats : HashsetStatsHolder
+        /// <summary>
+        /// Calculates the final <see cref="IStatsData"/> and holds additional(individual) <seealso cref="IStatsData"/>
+        /// that can't be added by value type/directly (such conditional stats)
+        /// </summary>
+        private class FormulatedStats : HashsetStatsHolder, IStatsHolder<IBasicStats<float>>
         {
             [HorizontalGroup("Base Stats"), PropertyOrder(-2), GUIColor(.4f, .8f, .6f)]
             private CombatStatsFull BaseStats { get; }
@@ -176,9 +190,7 @@ namespace Stats
 
             [HorizontalGroup("Buff Stats"), GUIColor(.2f, .3f, .6f)]
             private CombatStatsFull BurstStats { get; }
-
             
-
             public FormulatedStats(CombatStatsHolder stats) :
                 base(stats.BaseStats,stats.BuffStats,stats.BurstStats)
             {
@@ -187,15 +199,23 @@ namespace Stats
                 BurstStats = stats.BurstStats;
             }
 
-            private IBasicStatsData<float> _positionalStats;
+
+            private IBasicStatsData<float> _teamPositionalStats;
+
+            public void Inject(TeamCombatStatsHolder teamStats)
+            {
+                if (_teamPositionalStats != null)
+                    baseType.Remove(_teamPositionalStats);
+
+                _teamPositionalStats = teamStats.PositionalStats;
+                baseType.Add(_teamPositionalStats);
+            }
             public void Inject(PositionalStats positionalStats)
             {
-                if (_positionalStats != null)
-                    baseType.Remove(_positionalStats);
-
-                _positionalStats = positionalStats;
-                baseType.Add(_positionalStats);
+                buffType.Add(positionalStats);
             }
+
+            
 
             public void ResetBurst()
             {
@@ -208,6 +228,13 @@ namespace Stats
                 BaseStats.InitiativePercentage = 0;
                 BurstStats.InitiativePercentage = 0;
             }
+
+
+            IBasicStats<float> IBuffHolder<IBasicStats<float>>.GetBuff() => BuffStats;
+
+            IBasicStats<float> IBuffHolder<IBasicStats<float>>.GetBurst() => BurstStats;
+
+            IBasicStats<float> IStatsHolder<IBasicStats<float>>.GetBase() => BaseStats;
         }
     }
 

@@ -12,7 +12,7 @@ namespace Passives
     public class SStatPassivesInjector : SPassiveInjector,IConditionalStat
     {
         [SerializeField, PropertyOrder(-20)]
-        private EnumStats.StatsType statsType = EnumStats.StatsType.Buff;
+        private EnumStats.BuffType statsType = EnumStats.BuffType.Buff;
         [SerializeField]
         private SStatsBase[] stats = new SStatsBase[0];
 
@@ -29,7 +29,7 @@ namespace Passives
 
             void InjectDirectly()
             {
-                var buffStats = entity.CombatStats.GetStatsHolder(statsType);
+                var buffStats = UtilsEnumStats.GetStatsHolder(entity.CombatStats, statsType);
                 foreach (SStatsBase stat in stats)
                 {
                     stat.DoInjection(buffStats);
@@ -37,14 +37,21 @@ namespace Passives
             }
             void InjectConditional()
             {
+                IBuffHolder<ConditionalStats> conditionalStatsHolder = entity.PassivesHolder.ConditionalStats;
+                var conditionalStats = UtilsEnumStats.GetStatsHolder(conditionalStatsHolder, statsType);
                 foreach (SStatsBase stat in stats)
                 {
-                    //TODO
+                    conditionalStats.Add(stat, this);
                 }
             }
         }
 
         public bool CanBeUsed(CombatingEntity user)
             => conditionParam.CanBeUse(user);
+
+        protected override string AssetPrefix()
+        {
+            return $"Passive STATS {statsType} - ";
+        }
     }
 }

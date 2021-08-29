@@ -41,5 +41,10 @@ namespace Stats
         {
             UtilsStats.Add(stats, this);
         }
+
+        protected override string AssetPrefix()
+        {
+            return "Stat VITALITY - ";
+        }
     }
 }

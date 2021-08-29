@@ -1,4 +1,5 @@
 ﻿using System;
+using ___ProjectExclusive;
 using Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -182,6 +183,18 @@ namespace Stats
     /// </summary>
     public abstract class SStatsBase : ScriptableObject, IStatsData
     {
+        [SerializeField] private string statName = "NULL";
+        public string StatName => statName;
+
         public abstract void DoInjection(IBasicStats<float> stats);
+
+        protected virtual string AssetPrefix() => "STAT - ";
+
+        [Button(ButtonSizes.Large)]
+        private void UpdateAssetName()
+        {
+            name = AssetPrefix() + $"{statName} [Stats]";
+            UtilsGame.UpdateAssetName(this);
+        }
     }
 }

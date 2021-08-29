@@ -181,14 +181,15 @@ namespace _CombatSystem
 
                 CombatingEntity GenerateEntity(ICharacterCombatProvider variable)
                 {
-                    // Instantiate
-                    CombatingEntity entity = new CombatingEntity(variable.CharacterName,
-                        variable.CharacterPrefab);
-
 
                     // x----- CombatData
                     var combatData = variable.GenerateCombatData();
-                    entity.Injection(combatData);
+
+                    // Instantiate
+                    CombatingEntity entity = new CombatingEntity(
+                        variable.CharacterName,
+                        variable.CharacterPrefab,
+                        combatData);
 
                     // x----- Area
                     var characterAreaData = new CharacterCombatAreasData(entityPosition, variable.RangeType);

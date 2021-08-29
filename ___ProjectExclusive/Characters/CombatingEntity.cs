@@ -27,15 +27,19 @@ namespace Characters
     /// exists while there's a Combat and contains the core data for the combating part
     /// </summary>
     public class CombatingEntity
-    { public CombatingEntity(string characterName, GameObject prefab)
+    { 
+        public CombatingEntity(string characterName, GameObject prefab, CombatStatsHolder combatStats)
         {
             CharacterName = characterName;
             InstantiationPrefab = prefab;
+            CombatStats = combatStats;
+
             ReceivedStats = new TrackingStats();
             DelayBuffHandler = new DelayBuffHandler(this);
             Events = new CombatCharacterEvents(this);
             CharacterCriticalBuff = new CharacterCriticalActionHandler(this);
             Guarding = new CharacterGuarding(this);
+            PassivesHolder = new CombatPassivesHolder(this);
 
             Events.Subscribe(Guarding);
         }
@@ -48,14 +52,17 @@ namespace Characters
         [ShowInInspector, NonSerialized] 
         public UCharacterHolder Holder;
 
-        [ShowInInspector, GUIColor(.4f,.8f,.7f)]
-        public CombatStatsHolder CombatStats { get; private set; }
+        [ShowInInspector, GUIColor(.4f, .8f, .7f)]
+        public readonly CombatStatsHolder CombatStats;
 
        
         /// <summary>
         /// Used to track the damage received, heals, etc.
         /// </summary>
         public readonly TrackingStats ReceivedStats;
+
+        [ShowInInspector] 
+        public readonly CombatPassivesHolder PassivesHolder;
 
         /// <summary>
         /// <inheritdoc cref="DelayBuffHandler"/>
@@ -113,14 +120,6 @@ namespace Characters
         public bool CanUseSkills() => UtilsSkill.CanUseSkills(this);
         public EnumCharacter.RoleArchetype Role => AreasDataTracker.Role;
 
-
-        public void Injection(CombatStatsHolder combatStats)
-        {
-            if(CombatStats != null)
-                throw new ArgumentException("Can't inject stats when the Entity already has its Stats");
-            CombatStats = combatStats;
-        }
-
         public void Injection(CharacterCombatAreasData areasDataTracker)
         {
             AreasDataTracker = areasDataTracker;
@@ -136,12 +135,10 @@ namespace Characters
         public void Injection(SDelayBuffPreset criticalBuff) =>
             CharacterCriticalBuff.CriticalBuff = criticalBuff;
 
-        public void Injection(IBasicStatsData<float> stats)
+        [Button]
+        public void Injection(IPassiveInjector injector)
         {
-            // TODO
+            injector.InjectPassive(this);
         }
-
-
-
     }
 }

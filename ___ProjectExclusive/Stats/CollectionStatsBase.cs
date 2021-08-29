@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Stats
@@ -106,30 +108,55 @@ namespace Stats
             TemporalStats = new Dictionary<ITemporalStatsData<TKey>, TValue>();
         }
 
+        [ShowInInspector]
         public Dictionary<IOffensiveStatsData<TKey>, TValue> OffensiveStats { get; }
+        [ShowInInspector]
         public Dictionary<ISupportStatsData<TKey>, TValue> SupportStats { get; }
+        [ShowInInspector]
         public Dictionary<IVitalityStatsData<TKey>, TValue> VitalityStats { get; }
+        [ShowInInspector]
         public Dictionary<IConcentrationStatsData<TKey>, TValue> ConcentrationStats { get; }
+        [ShowInInspector]
         public Dictionary<ITemporalStatsData<TKey>, TValue> TemporalStats { get; }
 
         
-        public void Add(TValue value, IStatsData stats)
+        public void Add(IStatsData stats,TValue value)
         {
-            if (stats is IOffensiveStatsData<TKey> offensiveStats)
-                Add(offensiveStats, value);
-            if (stats is ISupportStatsData<TKey> supportStats)
-                Add(supportStats, value);
-            if (stats is IVitalityStatsData<TKey> vitalityStats)
-                Add(vitalityStats, value);
-            if (stats is IConcentrationStatsData<TKey> concentrationStats)
-                Add(concentrationStats, value);
-            if (stats is ITemporalStatsData<TKey> temporalStats)
-                Add(temporalStats, value);
+            switch (stats)
+            {
+                case IBasicStatsData<TKey> basicStats:
+                    Add(basicStats, value);
+                    break;
+                case IOffensiveStatsData<TKey> offensiveStats:
+                    Add(offensiveStats, value);
+                    break;
+                case ISupportStatsData<TKey> supportStats:
+                    Add(supportStats, value);
+                    break;
+                case IVitalityStatsData<TKey> vitalityStats:
+                    Add(vitalityStats, value);
+                    break;
+                case IConcentrationStatsData<TKey> concentrationStats:
+                    Add(concentrationStats, value);
+                    break;
+                case ITemporalStatsData<TKey> temporalStats:
+                    Add(temporalStats, value);
+                    break;
+            }
         }
+        public void Add(IBasicStatsData<TKey> stats, TValue value)
+        {
+            OffensiveStats.Add(stats, value);
+            SupportStats.Add(stats, value);
+            VitalityStats.Add(stats, value);
+            ConcentrationStats.Add(stats, value);
+            TemporalStats.Add(stats, value);
+        }
+
         public void Add(TValue value)
         {
             if (value is IStatsData stats)
-                Add(value, stats);
+                Add(stats,value);
         }
 
         public void Add(IOffensiveStatsData<TKey> stats, TValue value)
@@ -385,6 +412,12 @@ namespace Stats
             holder.Add(add);
         }
 
+        public void Add<T>(IBuffHolder<T> holder) where T : IBasicStatsData<float>
+        {
+            buffType.Add(holder.GetBuff());
+            burstType.Add(holder.GetBurst());
+        }
+
 
         public float AttackPower =>
             UtilsStats.StatsFormula(
@@ -429,14 +462,11 @@ namespace Stats
         // will provide a variation to that stat (eg: a character could have a permanent +20% of initiative each sequence
         // so during the initiative reset the base will be 0% while the buff remains in 20%, thus only needing 80% to act)
         public float InitiativePercentage =>
-            baseType.InitiativePercentage
-                                           + buffType.InitiativePercentage
-                                           + burstType.InitiativePercentage;
+            baseType.InitiativePercentage + buffType.InitiativePercentage + burstType.InitiativePercentage;
+
         // Summatory because actions (buff and burst) are added in units to base, percentage doesn't make much difference
         public float ActionsPerInitiative =>
-            baseType.ActionsPerInitiative
-                                           + buffType.ActionsPerInitiative
-                                           + burstType.ActionsPerInitiative;
+            baseType.ActionsPerInitiative + buffType.ActionsPerInitiative + burstType.ActionsPerInitiative;
 
         public float Enlightenment =>
             UtilsStats.StatsFormula(
@@ -456,18 +486,16 @@ namespace Stats
                 buffType.SpeedAmount,
                 burstType.SpeedAmount);
 
-        public float MaxHealth => baseType.MaxHealth;
+        public float MaxHealth 
+            => baseType.MaxHealth + buffType.MaxHealth + burstType.MaxHealth;
 
-        public float MaxMortalityPoints => baseType.MaxMortalityPoints;
+        public float MaxMortalityPoints 
+            => baseType.MaxMortalityPoints + buffType.MaxHealth + burstType.MaxHealth;
 
-        public float CalculateDamageReduction()
-        {
-            return baseType.DamageReduction;
-        }
 
         public float DamageReduction =>
             UtilsStats.StatsFormula(
-                CalculateDamageReduction(),
+                baseType.DamageReduction,
                 buffType.DamageReduction,
                 burstType.DamageReduction);
 
