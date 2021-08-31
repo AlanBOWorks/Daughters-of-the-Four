@@ -18,12 +18,13 @@ namespace _CombatSystem
         {
             entity.CombatStats.ResetBurst();
             entity.ReceivedStats.ResetToZero();
+            entity.PassivesHolder.ResetOnFinish();
+
         }
 
         public void OnSkippedEntity(CombatingEntity entity)
         {
-            entity.CombatStats.BurstStats.ResetToZero();
-            entity.ReceivedStats.ResetToZero();
+            OnFinisAllActions(entity);
         }
     }
 }

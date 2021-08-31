@@ -100,6 +100,9 @@ namespace _CombatSystem
 
 
         public const float InitiativeCheck = 1f;
+        /// <summary>
+        /// Max of actions per initiative once the characters is in [<see cref="CombatCharacterEventsBase.OnInitiativeTrigger"/>]
+        /// </summary>
         public const int ActionsPerInitiativeCap = 8;
         public const int ActionsLowerCap = -2;
 

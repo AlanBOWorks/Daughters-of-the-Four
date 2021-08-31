@@ -51,7 +51,7 @@ namespace Passives
 
         protected override string AssetPrefix()
         {
-            return $"Passive STATS {statsType} - ";
+            return $"STATS {statsType} - ";
         }
     }
 }

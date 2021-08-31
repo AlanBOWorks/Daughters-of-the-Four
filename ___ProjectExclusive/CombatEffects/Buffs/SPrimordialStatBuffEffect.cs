@@ -55,7 +55,7 @@ namespace CombatEffects
         [Button(ButtonSizes.Large), GUIColor(.3f, .6f, 1f)]
         private void UpdateAssetName()
         {
-            name = $"Buff _PRIMORDIAL - {buffStat.ToString().ToUpper()} [Buff Effect]";
+            name = $"Buff _MASTER - {buffStat.ToString().ToUpper()} [Buff Effect]";
             UtilsGame.UpdateAssetName(this);
         }
 

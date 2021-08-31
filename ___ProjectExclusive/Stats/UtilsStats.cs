@@ -149,6 +149,19 @@ namespace Stats
         public static T GetStatsHolder<T>(IBuffHolder<T> holder, EnumStats.BuffType buffType)
             => GetStatsHolder(holder, (int) buffType);
 
+        public static IFullStats<float> GetCombatStatsHolder(CombatingEntity entity, EnumStats.StatsType statsType)
+            => GetCombatStatsHolder(entity.CombatStats, statsType);
+        public static IFullStats<float> GetCombatStatsHolder(CombatStatsHolder combatStats, EnumStats.StatsType statsType)
+        {
+            return statsType switch
+            {
+                EnumStats.StatsType.Base => combatStats.BaseStats,
+                EnumStats.StatsType.Buff => combatStats.BuffStats,
+                EnumStats.StatsType.Burst => combatStats.BurstStats,
+                _ => throw new ArgumentOutOfRangeException(nameof(statsType), statsType, null)
+            };
+        }
+
 
         public static T GetStat<T>(IMasterStats<T> masterStats, EnumStats.Primordial type)
         {
@@ -668,33 +681,13 @@ namespace Stats
         }
 
 
-        public static void SetInitiative(IBasicStats<float> stats, float targetValue)
+        public static void SetInitiative(CombatingEntity entity, IBasicStats<float> stats, float targetValue)
         {
             const float lowerCap = 0;
             const float maxCap = GlobalCombatParams.InitiativeCheck;
 
             targetValue = Mathf.Clamp(targetValue, lowerCap, maxCap);
             stats.InitiativePercentage = targetValue;
-        }
-        public static void SetInitiative(CombatingEntity entity, float targetValue, bool isBurstType)
-        {
-            IBasicStats<float> stats = isBurstType
-                ? entity.CombatStats.BurstStats
-                : entity.CombatStats.BaseStats;
-            SetInitiative(stats, targetValue);
-
-            entity.Events.InvokeTemporalStatChange();
-            var tempoHandler = CombatSystemSingleton.TempoHandler;
-
-            tempoHandler.CallUpdateOnInitiativeBar(entity);
-            tempoHandler.CheckAndInjectEntityInitiative(entity);
-        }
-        public static void AddInitiative(CombatingEntity entity, float addition, bool isBurstType)
-        {
-            var stats = isBurstType 
-                ? entity.CombatStats.BurstStats 
-                : (IBasicStats<float>) entity.CombatStats.BaseStats;
-            SetInitiative(stats, stats.InitiativePercentage + addition);
 
 
             entity.Events.InvokeTemporalStatChange();
@@ -703,17 +696,35 @@ namespace Stats
             tempoHandler.CallUpdateOnInitiativeBar(entity);
             tempoHandler.CheckAndInjectEntityInitiative(entity);
         }
+        public static void SetInitiative(CombatingEntity entity, float targetValue, EnumStats.StatsType statsType)
+        {
+            IBasicStats<float> stats = UtilsEnumStats.GetStatsHolder(entity.CombatStats, statsType);
+            SetInitiative(entity, stats, targetValue);
+        }
 
-        public static void SetActionAmount(CombatStatsHolder stats, float targetValue = 0)
+        public static void AddInitiative(CombatingEntity entity, float addition, EnumStats.StatsType statsType)
+        {
+            IBasicStats<float> stats = UtilsEnumStats.GetStatsHolder(entity.CombatStats, statsType);
+            SetInitiative(entity,stats, stats.InitiativePercentage + addition);
+        }
+
+        public static void AddInitiative(CombatingEntity entity, IBasicStats<float> stats, float addition)
+        {
+            SetInitiative(entity, stats, stats.InitiativePercentage + addition);
+        }
+
+
+        public static void SetActionAmount(CombatStatsHolder stats, float targetValue)
         {
             const int lowerCap = GlobalCombatParams.ActionsLowerCap;
             const int maxCap = GlobalCombatParams.ActionsPerInitiativeCap;
 
             targetValue = Mathf.Clamp(targetValue, lowerCap, maxCap);
             stats.ActionsLefts = Mathf.RoundToInt(targetValue);
+
         }
 
-        public static void AddActionAmount(CombatStatsHolder stats,float addition = 1)
+        public static void AddActionAmount(CombatStatsHolder stats,float addition)
         {
             SetActionAmount(stats, stats.ActionsLefts + addition);
         }
@@ -789,6 +800,12 @@ namespace Stats
         {
             return Mathf.Lerp(RandomLow, RandomHigh, randomCheck);
         }
+
+        public static float CalculateRandomModifier()
+        {
+            return Random.Range(RandomLow, RandomHigh);
+        }
+
         public static float UpdateRandomness( ref float randomValue, bool isCritical)
         {
             if (isCritical)

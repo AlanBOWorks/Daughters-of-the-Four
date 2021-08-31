@@ -219,8 +219,8 @@ namespace Stats
 
             public void ResetBurst()
             {
-                buffType.Clear();
-                buffType.Add(BurstStats);
+                burstType.Clear();
+                burstType.Add(BurstStats);
             }
 
             public void ResetInitiative()

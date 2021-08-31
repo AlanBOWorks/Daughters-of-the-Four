@@ -68,11 +68,18 @@ namespace Skills
             CombatSystemSingleton.PerformSkillHandler.DoSkill(target);
         }
 
+        //TODO Change Skill to Effect
         private IEnumerator<float> _DoSkill(CombatingEntity target)
         {
             var skill = _currentSkillTargets.UsingSkill;
-            var skillPreset = skill.Preset;
-            var effectTargets = skillPreset.GetMainEffectTargets(_currentUser, target);
+            var mainEffect = skill.Preset.GetMainEffect();
+
+            List<CombatingEntity> effectTargets;
+            if (mainEffect != null)
+                effectTargets = UtilsTargets.GetEffectTargets(_currentUser, target, mainEffect.GetEffectTarget());
+            else
+                effectTargets = target.CharacterGroup.Self;
+
 
             // TODO make a waitUntil(Animation call for Skill)
             yield return Timing.WaitUntilDone(_currentUser.CombatAnimator.DoAnimation(

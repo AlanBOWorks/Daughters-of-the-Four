@@ -58,23 +58,24 @@ namespace _CombatSystem
 
         public void OnDoMoreActions(CombatingEntity entity)
         {
+            entity.Events.OnDoMoreActions();
+            entity.DelayBuffHandler.OnDoMoreActions();
             foreach (ITempoListener listener in TempoListeners)
             {
                 listener.OnDoMoreActions(entity);
             }
-            entity.Events.OnDoMoreActions();
-            entity.DelayBuffHandler.OnDoMoreActions();
         }
 
         public void OnFinisAllActions(CombatingEntity entity)
         {
+            entity.Events.OnFinisAllActions();
+            entity.CharacterCriticalBuff.OnFinisAllActions();
+
             foreach (ITempoListener listener in TempoListeners)
             {
                 listener.OnFinisAllActions(entity);
             }
 
-            entity.Events.OnFinisAllActions();
-            entity.CharacterCriticalBuff.OnFinisAllActions();
         }
         public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {
@@ -95,11 +96,12 @@ namespace _CombatSystem
 #if UNITY_EDITOR
             Debug.LogWarning($"Skipped character: {entity.CharacterName}");
 #endif
+            
+            entity.Events.OnFinisAllActions();
             foreach (var listener in SkippedListeners)
             {
                 listener.OnSkippedEntity(entity);
             }
-            entity.Events.OnFinisAllActions();
         }
     }
 

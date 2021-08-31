@@ -57,18 +57,9 @@ namespace _Team
             _standByEntities.Add(entity);
             _timerCheck.Add(revivingThreshold);
             if(_team.Count <= _standByEntities.Count)
-                OnAllDeath();
+                OnAllKnockOut();
         }
-        public void Remove(CombatingEntity entity)
-        {
-            for (int i = 0; i < _standByEntities.Count; i++)
-            {
-                if (entity != _standByEntities[i]) continue;
-
-                RemoveAt(i);
-                return;
-            }
-        }
+       
 
         private void RemoveAt(int index)
         {
@@ -87,7 +78,7 @@ namespace _Team
         private const float HarmonyAddition = .5f;
         private const float HarmonyPenalty = -.5f;
         private const int ActionsAddition = 3; 
-        public void OnAllDeath()
+        public void OnAllKnockOut()
         {
             _timerCheck.Clear();
             _standByEntities.Clear();

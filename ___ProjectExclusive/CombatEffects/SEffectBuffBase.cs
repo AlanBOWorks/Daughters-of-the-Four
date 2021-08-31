@@ -8,42 +8,23 @@ namespace CombatEffects
 {
     public abstract class SEffectBuffBase : SEffectBase
     {
-        [InfoBox("$FalseBurstTooltip")]
-        [SerializeField] protected bool isBurstType = false;
+        [SerializeField]
+        protected EnumStats.StatsType statsType = EnumStats.StatsType.Buff;
 
-        protected virtual IFullStats<float> GetBuff(CombatingEntity target)
+        protected IFullStats<float> GetBuff(CombatingEntity target)
         {
-            var stats =
-                isBurstType
-                    ? target.CombatStats.BurstStats
-                    : target.CombatStats.BuffStats;
-            return stats;
+            return UtilsEnumStats.GetCombatStatsHolder(target, statsType);
         }
 
-        protected IFullStats<float> GetBurstOrBase(CombatingEntity target)
-        {
-            var stats =
-                isBurstType
-                    ? target.CombatStats.BurstStats
-                    : (IFullStats<float>) target.CombatStats.BaseStats;
-            return stats;
-        }
 
         [Button(ButtonSizes.Large)]
         private void UpdateAssetName()
         {
-            string burstType = UtilityBuffStats.GetBuffTooltip(isBurstType);
+            string burstType = statsType.ToString();
             name = $"{burstType.ToUpper()}" +
                    $"{GetPrefix()} [ Buff Effect ]";
             RenameAsset();
         }
         protected abstract string GetPrefix();
-
-        protected const string IsBuffPrefix = "False is [Buff] Type";
-        protected const string IsBasePrefix = "False is [Base] Type";
-        protected virtual string FalseBurstTooltip()
-        {
-            return IsBuffPrefix;
-        }
     }
 }

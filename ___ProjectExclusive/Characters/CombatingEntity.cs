@@ -35,13 +35,15 @@ namespace Characters
             CombatStats = combatStats;
 
             ReceivedStats = new TrackingStats();
-            DelayBuffHandler = new DelayBuffHandler(this);
             Events = new CombatCharacterEvents(this);
-            CharacterCriticalBuff = new CharacterCriticalActionHandler(this);
+
+            DelayBuffHandler = new DelayBuffHandler(this);
+            CharacterCriticalBuff = new CharacterCriticalActionHandler(this); //TODO add to events
             Guarding = new CharacterGuarding(this);
             PassivesHolder = new CombatPassivesHolder(this);
 
             Events.Subscribe(Guarding);
+            Events.CheckAndSubscribe(DelayBuffHandler);
         }
         
 

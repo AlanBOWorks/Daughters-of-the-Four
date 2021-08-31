@@ -67,7 +67,7 @@ namespace Skills
                 EnumSkills.TargetingType skillType = skill.GetMainType();
 
 
-                if (skillType == EnumSkills.TargetingType.SelfOnly)
+                if (skillType == EnumSkills.TargetingType.SelfOnly || mainEffect == null)
                 {
                     injectInList.Add(user);
                     return;

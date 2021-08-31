@@ -25,13 +25,13 @@ namespace Stats
         public StatsInteractionHandler()
         {
             _skillArguments = new SkillArguments();
-            _effectPool = new EffectsSeparationHandler();
+            //_effectPool = new EffectsSeparationHandler();
         }
 
         [ShowInInspector]
         private readonly SkillArguments _skillArguments;
 
-        private readonly EffectsSeparationHandler _effectPool;
+        //private readonly EffectsSeparationHandler _effectPool;
 
         private void Injection(CombatingEntity user, CombatingEntity target)
         {
@@ -84,11 +84,8 @@ namespace Stats
 
             _skillArguments.IsCritical = isCritical;
 
-            _effectPool.PreparePool(skill,user,target);
-            _effectPool.DoPoolEffects(_skillArguments);
-
             // vvvvv Simple alternative vvvvv
-            //skillPreset.DoEffects(_skillArguments);
+            skillPreset.DoEffects(_skillArguments);
         }
 
         /// <summary>
@@ -100,9 +97,9 @@ namespace Stats
             public EffectsSeparationHandler()
             { 
                 _targets = new List<CombatingEntity>();
-                _effectsForTarget = new List<Queue<IEffect>>();
+                _effectsForTarget = new List<Queue<EffectParams>>();
 
-                _effectsPooling = new Queue<Queue<IEffect>>();
+                _effectsPooling = new Queue<Queue<EffectParams>>();
             }
 
 
@@ -113,16 +110,22 @@ namespace Stats
             /// <summary>
             /// Keeps track of all effect applying to the <see cref="_targets"/> (they both share the same indexes)
             /// </summary>
-            private readonly List<Queue<IEffect>> _effectsForTarget;
+            private readonly List<Queue<EffectParams>> _effectsForTarget;
 
             /// <summary>
             /// Just save the [<see cref="Queue{T}"/>] by pooling so it avoids GC (it doesn't participates
             /// in the calculations)
             /// </summary>
-            private readonly Queue<Queue<IEffect>> _effectsPooling;
+            private readonly Queue<Queue<EffectParams>> _effectsPooling;
 
+            private Queue<EffectParams> PoolQueue()
+            {
+                if (_effectsPooling.Count <= 0)
+                    return new Queue<EffectParams>();
+                return _effectsPooling.Dequeue();
+            }
 
-            private void AddEffect(CombatingEntity target, IEffect effect)
+            private void AddEffect(CombatingEntity target, EffectParams effect)
             {
                 if (!_targets.Contains(target))
                 {
@@ -149,14 +152,8 @@ namespace Stats
                     effects.Enqueue(effect);
                 }
             }
-            private Queue<IEffect> PoolQueue()
-            {
-                if (_effectsPooling.Count <= 0)
-                    return new Queue<IEffect>();
-                return _effectsPooling.Dequeue();
-            }
 
-            private void AddEffect(List<CombatingEntity> targets, IEffect effect)
+            private void AddEffect(List<CombatingEntity> targets, EffectParams effect)
             {
                 foreach (CombatingEntity effectTarget in targets)
                 {
@@ -187,14 +184,20 @@ namespace Stats
                 }
             }
 
-            private void DoEffectsOn(Queue<IEffect> effects, SkillArguments arguments, CombatingEntity target)
+            private void DoEffectsOn(Queue<EffectParams> effects, SkillArguments arguments, CombatingEntity target)
             {
                 bool isCritical = arguments.IsCritical;
                 while (effects.Count > 0)
                 {
                     var effect = effects.Dequeue();
-                    float randomModifier = CalculateRandom();
-                    effect.DoEffect(arguments,target,randomModifier);
+                    float effectValue = CalculateRandom() * effect.power;
+
+                    // Effect filtering
+                    arguments.User.PassivesHolder.EffectFilters.DoFilterOnAction(effect, ref effectValue);
+                    target.PassivesHolder.EffectFilters.DoFilterOnReaction(effect,ref effectValue);
+
+                    // Do
+                    effect.DoEffect(arguments, target, effectValue);
 
 
                     float CalculateRandom()
@@ -203,7 +206,7 @@ namespace Stats
                         {
                             return isCritical 
                                 ? UtilsCombatStats.RandomHigh 
-                                : UtilsCombatStats.CalculateRandomModifier(Random.value);
+                                : UtilsCombatStats.CalculateRandomModifier();
                         }
 
                         return 1;

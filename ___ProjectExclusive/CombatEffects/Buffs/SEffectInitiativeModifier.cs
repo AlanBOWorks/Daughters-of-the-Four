@@ -20,7 +20,7 @@ namespace CombatEffects
 
         public override void DoEffect(CombatingEntity target, float effectModifier)
         {
-            UtilsCombatStats.AddInitiative(target, effectModifier, isBurstType);
+            UtilsCombatStats.AddInitiative(target, GetBuff(target), effectModifier);
         }
 
         private const string TemporalStatsPrefix = " Temporal Stat - INITIATIVE Modifier";

@@ -70,16 +70,8 @@ namespace Skills
         public EnumSkills.TargetingType GetSkillType() => skillType;
         public EnumSkills.Archetype GetArchetype() => skillArchetype;
         public int CoolDownCost => cooldownCost;
-        public IEffect GetMainEffect() => effects[0];
+        public virtual IEffect GetMainEffect() => effects[0];
 
-
-
-
-
-        public List<CombatingEntity> GetMainEffectTargets(CombatingEntity user,CombatingEntity target)
-        {
-            return UtilsTargets.GetEffectTargets(user, target, effects[0].GetEffectTarget());
-        }
 
         protected virtual void DoEffect(SkillArguments arguments, int effectIndex)
         {
@@ -120,7 +112,7 @@ namespace Skills
         }
 
         
-        public void DoEffects(SkillArguments arguments)
+        public virtual void DoEffects(SkillArguments arguments)
         {
             for (int i = 0; i < effects.Length; i++)
             {

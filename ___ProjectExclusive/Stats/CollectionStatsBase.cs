@@ -119,7 +119,16 @@ namespace Stats
         [ShowInInspector]
         public Dictionary<ITemporalStatsData<TKey>, TValue> TemporalStats { get; }
 
-        
+
+        public void Clear()
+        {
+            OffensiveStats.Clear();
+            SupportStats.Clear();
+            VitalityStats.Clear();
+            ConcentrationStats.Clear();
+            TemporalStats.Clear();
+        }
+
         public void Add(IStatsData stats,TValue value)
         {
             switch (stats)
@@ -465,8 +474,15 @@ namespace Stats
             baseType.InitiativePercentage + buffType.InitiativePercentage + burstType.InitiativePercentage;
 
         // Summatory because actions (buff and burst) are added in units to base, percentage doesn't make much difference
-        public float ActionsPerInitiative =>
-            baseType.ActionsPerInitiative + buffType.ActionsPerInitiative + burstType.ActionsPerInitiative;
+        public float ActionsPerInitiative
+        {
+            get
+            {
+                Debug.Log($"Base {baseType.ActionsPerInitiative} / Buff {buffType.ActionsPerInitiative} / " +
+                          $"Burst {burstType.ActionsPerInitiative}");
+                return baseType.ActionsPerInitiative + buffType.ActionsPerInitiative + burstType.ActionsPerInitiative;
+            }
+        }
 
         public float Enlightenment =>
             UtilsStats.StatsFormula(

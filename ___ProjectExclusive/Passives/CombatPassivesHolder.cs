@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using ___ProjectExclusive;
+using _CombatSystem;
 using Characters;
 using Sirenix.OdinInspector;
 using Stats;
@@ -17,13 +18,22 @@ namespace Passives
         public CombatPassivesHolder(CombatingEntity user)
         {
             _conditionalStats = new StatPassives(user);
+            EffectFilters = new EffectFiltersHolder(user);
         }
 
         [ShowInInspector]
         private readonly StatPassives _conditionalStats;
+
         public IBuffHolder<ConditionalStats> ConditionalStats
             => _conditionalStats;
-        
+
+        [ShowInInspector] 
+        public readonly EffectFiltersHolder EffectFilters;
+
+        public void ResetOnFinish()
+        {
+            _conditionalStats.GetBurst().Clear();
+        }
 
         private class StatPassives : BuffTypeHolder<ConditionalStats>
         {
@@ -37,6 +47,8 @@ namespace Passives
                 formulatedStats.Add(this);
             }
         }
+
+
     }
     
     public abstract class SPassiveInjector : ScriptableObject, IPassiveInjector

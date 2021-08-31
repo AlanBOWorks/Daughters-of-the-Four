@@ -86,9 +86,7 @@ namespace CombatEffects
         {
             var user = arguments.User;
             bool canApplyEffect = true;
-            float powerVariation = power * randomModifier;
-            EffectArguments effectArguments
-                = new EffectArguments(arguments, effectPreset);
+            float effectPower = power * randomModifier;
             if (effectCondition.HasCondition())
             {
                 canApplyEffect = effectCondition.CanApply(user,target);
@@ -96,14 +94,14 @@ namespace CombatEffects
 
             if (canApplyEffect)
             {
-                /* TODO
-                 user.PassivesHolder.DoActionPassiveFilter(
-                    ref effectArguments,ref powerVariation);
-                target.PassivesHolder.DoReActionPassiveFilter(
-                    ref effectArguments,ref powerVariation);
-                */
+                float powerAddition = 0;
+                user.PassivesHolder.EffectFilters.DoFilterOnAction(effectPreset,ref powerAddition);
+                target.PassivesHolder.EffectFilters.DoFilterOnReaction(effectPreset,ref powerAddition);
 
-                effectPreset.DoEffect(arguments, target, powerVariation);
+                effectPower *= 1 + powerAddition;
+                if(effectPower < 0) effectPower = 0;
+
+                effectPreset.DoEffect(arguments, target, effectPower);
             }
             else
             {
@@ -169,16 +167,5 @@ namespace CombatEffects
     }
 
 
-    public struct EffectArguments
-    {
-        public readonly SkillArguments Arguments;
-        public readonly SEffectBase Effect;
-
-        public EffectArguments(SkillArguments arguments, SEffectBase effect)
-        {
-            Arguments = arguments;
-            Effect = effect;
-        }
-    }
 
 }

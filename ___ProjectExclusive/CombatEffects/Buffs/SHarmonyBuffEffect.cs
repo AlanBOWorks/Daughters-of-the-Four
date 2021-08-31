@@ -9,10 +9,6 @@ namespace CombatEffects
         menuName = "Combat/Effects/Buff/Harmony Modifier")]
     public class SHarmonyBuffEffect : SEffectBuffBase
     {
-        protected override IFullStats<float> GetBuff(CombatingEntity target)
-            => GetBurstOrBase(target);
-
-        
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float harmonyAddition = 1)
         {
             float enlightenmentAmount = arguments.UserStats.Enlightenment;
@@ -28,6 +24,5 @@ namespace CombatEffects
 
         private const string TemporalStatsPrefix = " Temporal Stat - HARMONY Modifier";
         protected override string GetPrefix() => TemporalStatsPrefix;
-        protected override string FalseBurstTooltip() => IsBasePrefix;
     }
 }

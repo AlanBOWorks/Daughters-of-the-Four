@@ -63,35 +63,35 @@ namespace Characters
                 CheckAndSubscribe(healthCheckListener);
         }
 
-        protected void CheckAndSubscribe(ITempoListenerVoid listener)
+        public void CheckAndSubscribe(ITempoListenerVoid listener)
         {
             if(_onTempoListeners == null)
                 _onTempoListeners = new List<ITempoListenerVoid>();
             _onTempoListeners.Add(listener);
         }
 
-        protected void CheckAndSubscribe(IVitalityChangeListener listener)
+        public void CheckAndSubscribe(IVitalityChangeListener listener)
         {
             if (_onVitalityChange == null)
                 _onVitalityChange = new List<IVitalityChangeListener>();
             _onVitalityChange.Add(listener);
         }
 
-        protected void CheckAndSubscribe(ITemporalStatsChangeListener listener)
+        public void CheckAndSubscribe(ITemporalStatsChangeListener listener)
         {
             if (_onTemporalStatsChange == null)
                 _onTemporalStatsChange = new List<ITemporalStatsChangeListener>();
             _onTemporalStatsChange.Add(listener);
         }
 
-        protected void CheckAndSubscribe(IAreaStateChangeListener listener)
+        public void CheckAndSubscribe(IAreaStateChangeListener listener)
         {
             if (_onAreaChange == null)
                 _onAreaChange = new List<IAreaStateChangeListener>();
             _onAreaChange.Add(listener);
         }
 
-        protected void CheckAndSubscribe(IHealthZeroListener listener)
+        public void CheckAndSubscribe(IHealthZeroListener listener)
         {
             if (_onHealthZeroListeners == null)
                 _onHealthZeroListeners = new List<IHealthZeroListener>();

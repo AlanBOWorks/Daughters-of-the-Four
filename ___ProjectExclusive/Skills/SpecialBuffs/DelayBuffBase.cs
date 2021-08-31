@@ -44,7 +44,12 @@ namespace Skills
         {
             var handler = GetHandler(buff.GetTickType());
             handler.Add(buff,buffer);
+        }
 
+        public void EnqueueBuff(IDelayBuff buff, CombatingEntity buffer, int stacks)
+        {
+            var handler = GetHandler(buff.GetTickType());
+            handler.Add(buff,buffer,stacks);
         }
 
         protected override void DoActionOn(StackableBuffPool holder)
@@ -58,32 +63,20 @@ namespace Skills
     /// </summary>
     public class StackableBuffPool : List<StackableBuffValues>
     {
-        public void Add(IDelayBuff buff,CombatingEntity buffer)
+        public void Add(IDelayBuff buff, CombatingEntity buffer, int stacks)
         {
             for (var i = 0; i < this.Count; i++)
             {
                 StackableBuffValues buffValues = this[i];
                 if (buff != buffValues.Buff || buffer != buffValues.Buffer) continue;
 
-                this[i] = new StackableBuffValues(buffValues);
+                this[i] = new StackableBuffValues(buffValues, stacks);
                 return;
             }
-            Add(new StackableBuffValues(buff,buffer));
+            Add(new StackableBuffValues(buff, buffer, stacks));
         }
-
-        public void Add(ref StackableBuffValues values)
-        {
-            for (var i = 0; i < Count; i++)
-            {
-                StackableBuffValues buff = this[i];
-                if (buff.Buff != values.Buff || buff.Buffer != values.Buffer) continue;
-
-                this[i] = new StackableBuffValues(buff);
-                return;
-            }
-
-            Add(values);
-        }
+        public void Add(IDelayBuff buff, CombatingEntity buffer)
+            => Add(buff, buffer, 1);
 
         public void Invoke(CombatingEntity target)
         {

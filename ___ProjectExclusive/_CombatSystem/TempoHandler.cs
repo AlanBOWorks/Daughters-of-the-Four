@@ -18,7 +18,7 @@ namespace _CombatSystem
         {
             OnBeforeSequence,
             OnAction,
-            OnSequence,
+            OnAfterSequence,
             OnRound
         }
 

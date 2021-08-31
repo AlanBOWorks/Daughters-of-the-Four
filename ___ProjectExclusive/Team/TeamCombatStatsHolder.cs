@@ -35,7 +35,7 @@ namespace _Team
         }
 
         public const float DefaultLoseThreshold = -.6f;
-        public const float DefaultReviveTime = 2.5f;
+        public const float DefaultReviveTime = 0.5f;
         public TeamCombatStatsHolder(TeamCombatState state, ITeamCombatControlHolder stats)
         {
             _state = state;

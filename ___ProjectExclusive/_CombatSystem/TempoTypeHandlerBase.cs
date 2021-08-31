@@ -19,7 +19,7 @@ namespace _CombatSystem
                     return OnBeforeSequence;
                 case TempoHandler.TickType.OnAction:
                     return OnAction;
-                case TempoHandler.TickType.OnSequence:
+                case TempoHandler.TickType.OnAfterSequence:
                     return OnSequence;
                 case TempoHandler.TickType.OnRound:
                     return OnRound;
