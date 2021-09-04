@@ -19,7 +19,24 @@ namespace Stats
     public interface IFullStats<T> : IBasicStats<T>, ICombatHealthStats<T>,
         IFullStatsData<T>, IFullStatsInjection<T>,
         ITemporalStats<T>
-    { }
+    {
+        new T AttackPower { get; set; }
+        new T DeBuffPower { get; set; }
+        new T StaticDamagePower { get; set; }
+        new T HealPower { get; set; }
+        new T BuffPower { get; set; }
+        new T BuffReceivePower { get; set; }
+        new T MaxHealth { get; set; }
+        new T MaxMortalityPoints { get; set; }
+        new T DamageReduction { get; set; }
+        new T DeBuffReduction { get; set; }
+        new T InitiativePercentage { get; set; }
+        new T ActionsPerInitiative { get; set; }
+        new T HarmonyAmount { get; set; }
+        new T Enlightenment { get; set; }
+        new T CriticalChance { get; set; }
+        new T SpeedAmount { get; set; }
+    }
     public interface IFullStatsData<out T> : IBasicStatsData<T>, ICombatHealthStatsData<T>,
         ITemporalStatsData<T>
     { }

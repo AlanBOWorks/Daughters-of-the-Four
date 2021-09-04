@@ -1,6 +1,7 @@
 ﻿using System;
 using Sirenix.OdinInspector;
 using Skills;
+using Stats;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,12 +16,14 @@ namespace ___ProjectExclusive
         }
         public static GameThemeSingleton Instance { get; } = new GameThemeSingleton();
 
-        [ShowInInspector]
-        public static GameThemeColors ThemeColors;
+        [ShowInInspector, NonSerialized] 
+        public static SGameTheme ThemeVariable;
+
+        public static GameThemeColors ThemeColors => ThemeVariable.ThemeColors;
 
         public void Injection(SGameTheme variable)
         {
-            ThemeColors = variable.ThemeColors;
+            ThemeVariable = variable;
         }
     }
 
@@ -29,7 +32,7 @@ namespace ___ProjectExclusive
     {
         public TextColors textColors = new TextColors();
         public PlayerColors playerColors = new PlayerColors();
-        public CombatTargetColors targetColors = new CombatTargetColors();
+        public CombatEffectColors effectColors = new CombatEffectColors();
     }
 
 
@@ -51,7 +54,7 @@ namespace ___ProjectExclusive
     }
 
     [Serializable]
-    public class CombatTargetColors : SerializableTargetDrivenData<Color>
+    public class CombatEffectColors : SerializableFullDrivenData<Color>
     {}
 
     public static class UtilsGameTheme

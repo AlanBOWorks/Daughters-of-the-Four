@@ -12,25 +12,22 @@ namespace _Team
         public CombatingTeam(ITeamCombatControlHolder holder, int amountOfEntities = AmountOfArchetypes)
             : base(amountOfEntities)
         {
-            State = new TeamCombatState(this);
+            ControlHandler = new TeamCombatControlHandler();
             if (holder != null)
             {
-                StatsHolder = new TeamCombatStatsHolder(State, holder);
+                StatsHolder = new TeamCombatStatsHolder(ControlHandler, holder);
             }
             else
-                StatsHolder = new TeamCombatStatsHolder(State);
+                StatsHolder = new TeamCombatStatsHolder(ControlHandler);
 
             knockOutHandler = new MemberKnockOutHandler(this);
+
         }
 
-        [ShowInInspector] public readonly TeamCombatState State;
+        [ShowInInspector] public readonly TeamCombatControlHandler ControlHandler;
         [ShowInInspector] public readonly TeamCombatStatsHolder StatsHolder;
         [ShowInInspector] public MemberKnockOutHandler knockOutHandler;
 
-
-
-        public bool IsInDangerState()
-            => State.IsInDanger();
         public IBasicStatsData<float> GetCurrentStanceValue() 
             => StatsHolder.GetCurrentStanceValue();
 

@@ -14,9 +14,12 @@ namespace CombatEffects
 
     public abstract class SEffectBase : ScriptableObject, IEffectBase
     {
+        [SerializeField, PreviewField, GUIColor(.4f, .4f, .4f)] 
+        private Sprite effectIcon;
         public abstract void DoEffect(SkillArguments arguments,CombatingEntity target, float effectModifier = 1);
         public abstract void DoEffect(CombatingEntity target, float effectModifier);
 
+        public Sprite GetEffectIcon() => effectIcon;
 
         /// <summary>
         /// Checks if the effect has fail in the random check
@@ -65,8 +68,10 @@ namespace CombatEffects
         protected SEffectBase.EffectTarget effectTarget 
             = SEffectBase.EffectTarget.Target;
 
+        public SEffectBase Preset => effectPreset;
         public SEffectBase.EffectTarget GetEffectTarget() => effectTarget;
         public bool CanPerformRandom() => applyRandomness;
+
 
     }
     [Serializable]
@@ -78,6 +83,9 @@ namespace CombatEffects
 
         [SerializeField, ShowIf("HasCondition")]
         private FailEffectParams[] onFailEffects = new FailEffectParams[0];
+
+
+        public Sprite GetEffectIcon() => effectPreset.GetEffectIcon();
 
         protected bool HasEffects() => effectPreset != null;
         protected bool HasCondition() => effectCondition.HasCondition();
@@ -159,6 +167,8 @@ namespace CombatEffects
 
         bool CanPerformRandom();
         bool CanApplyOnTarget(CombatingEntity entity);
+
+        Sprite GetEffectIcon();
     }
 
     public interface IEffectBase

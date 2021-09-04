@@ -10,7 +10,7 @@ namespace Characters
         public EnumCharacter.RoleArchetype Role;
         public EnumCharacter.FieldPosition CombatFieldPosition;
         public EnumCharacter.RangeType RangeType;
-        private TeamCombatState _teamStateData;
+        private TeamCombatControlHandler _teamControlHandlerData;
 
         private EnumTeam.Stances _forcedState;
         public bool IsForceStance { get; private set; }
@@ -28,9 +28,9 @@ namespace Characters
             _forcedState = initialStance;
         }
 
-        public void Injection(TeamCombatState teamState)
+        public void Injection(TeamCombatControlHandler teamControlHandler)
         {
-            _teamStateData = teamState;
+            _teamControlHandlerData = teamControlHandler;
         }
 
         public void ForceState(EnumTeam.Stances targetStance)
@@ -46,9 +46,9 @@ namespace Characters
         [ShowInInspector]
         public EnumTeam.Stances GetCurrentPositionState()
         {
-            if (IsForceStance || _teamStateData == null)
+            if (IsForceStance || _teamControlHandlerData == null)
                 return _forcedState;
-            return _teamStateData.CurrentStance;
+            return _teamControlHandlerData.CurrentStance;
         }
 
         public EnumTeam.Stances CurrentStance => GetCurrentPositionState();

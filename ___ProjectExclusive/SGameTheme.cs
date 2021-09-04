@@ -1,6 +1,7 @@
 ﻿using System;
 using Sirenix.OdinInspector;
 using Skills;
+using Stats;
 using UnityEngine;
 
 namespace ___ProjectExclusive
@@ -18,7 +19,7 @@ namespace ___ProjectExclusive
         [SerializeField] private GameThemeColors themeColors = new GameThemeColors();
 
 
-        public IStatDrivenEntity<Sprite> SkillIcons => skillIcons;
+        public SerializableFullDrivenData<Sprite> SkillIcons => skillIcons;
         public GameThemeColors ThemeColors => themeColors;
 
         [Button]

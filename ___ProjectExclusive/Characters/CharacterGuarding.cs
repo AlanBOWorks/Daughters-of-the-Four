@@ -87,9 +87,11 @@ namespace Characters
 
         public void VariateTarget(ref CombatingEntity possibleTarget)
         {
+            Debug.Log($"Guarding: {possibleTarget.CharacterName}");
             if (!HasProtector() || Random.value > ProtectionPercentage) return;
 
             possibleTarget = ProtectedBy;
+            Debug.Log($"Guarded by: {possibleTarget.CharacterName}");
         }
 
         public void OnInitiativeTrigger()

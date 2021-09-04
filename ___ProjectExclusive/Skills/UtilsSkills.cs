@@ -189,63 +189,6 @@ namespace Skills
             };
         }
 
-        public static T GetElement<T>(IStatDrivenData<T> elements, EnumSkills.StatDriven type)
-        {
-            return type switch
-            {
-                EnumSkills.StatDriven.Health => elements.Health,
-                EnumSkills.StatDriven.Buff => elements.Buff,
-                EnumSkills.StatDriven.Harmony => elements.Harmony,
-                EnumSkills.StatDriven.Tempo => elements.Tempo,
-                EnumSkills.StatDriven.Control => elements.Control,
-                EnumSkills.StatDriven.Stance => elements.Stance,
-                EnumSkills.StatDriven.Area => elements.Area,
-                _ => throw new NotImplementedException("Not implemented [Stat] was invoked" +
-                                                       $"in the GetElement for [{typeof(T)}]")
-            };
-        }
-
-        public static T GetElement<T>(ITargetDrivenData<T> elements, EnumSkills.TargetingType type)
-        {
-            return type switch
-            {
-                EnumSkills.TargetingType.SelfOnly => elements.SelfOnly,
-                EnumSkills.TargetingType.Offensive => elements.Offensive,
-                EnumSkills.TargetingType.Support => elements.Support,
-                _ => throw new NotImplementedException("Not implemented [Targeting] was invoked" +
-                                                       $"in the GetElement for [{typeof(T)}]")
-            };
-        }
-
-        public static T GetElement<T>(IStatDrivenEntity<T> elements,
-            EnumSkills.TargetingType targetingType, EnumSkills.StatDriven statType)
-        {
-            IStatDriven<T> targetingElement = GetElement(elements, targetingType);
-            T element = GetElement(targetingElement, statType);
-
-
-            switch (element)
-            {
-                case Object unityElement:
-                {
-                    if(!unityElement) 
-                        InjectBackUp();
-                    break;
-                }
-                case null:
-                    InjectBackUp();
-                    break;
-            }
-
-            return element;
-
-            void InjectBackUp()
-            {
-                targetingElement = elements.BackUpElement;
-                element = GetElement(targetingElement, statType);
-            }
-        }
-
         public static EnumSkills.TargetingType GetType(CombatSkill skill)
         {
             return skill.Preset.GetSkillType();

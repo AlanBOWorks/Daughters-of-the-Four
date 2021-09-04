@@ -17,7 +17,7 @@ namespace Skills
         public override bool CanApply(CombatingEntity target, float checkValue)
         {
             var userTeam = target.CharacterGroup.Team;
-            return userTeam.State.CurrentStance == checkStance;
+            return userTeam.ControlHandler.CurrentStance == checkStance;
         }
 
         [Button(ButtonSizes.Large), GUIColor(.3f, .6f, 1f)]

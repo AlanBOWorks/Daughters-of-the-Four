@@ -1,5 +1,7 @@
 ﻿using System;
+using ___ProjectExclusive;
 using Characters;
+using CombatEffects;
 using MPUIKIT;
 using Sirenix.OdinInspector;
 using Skills;
@@ -17,7 +19,8 @@ namespace _Player
 
         // TODO Icon
         // TODO animations by states
-
+        [SerializeField] private Image skillIcon = null;
+        [SerializeField] private Image border = null;
         [SerializeField] private Image selectedIcon = null;
         [SerializeField] private TextMeshProUGUI cooldownHolder = null;
 
@@ -43,7 +46,29 @@ namespace _Player
         {
             CurrentEntity = entity;
             CurrentSkill = skill;
+            UpdateSkillIcon();
+        }
 
+        private void UpdateSkillIcon()
+        {
+            var skillPreset= CurrentSkill.Preset;
+            Sprite skillSprite = skillPreset.GetSkillIcon();
+
+            EnumSkills.TargetingType skillType = skillPreset.GetSkillType();
+            if (skillSprite == null) // backup icon
+            {
+                var spriteThemes = GameThemeSingleton.ThemeVariable.SkillIcons;
+                EnumSkills.StatDriven statType = skillPreset.GetStatDriven();
+                skillSprite = spriteThemes.GetElement(skillType, statType);
+
+            }
+
+            var colorThemes = GameThemeSingleton.ThemeColors;
+            var skillColor = colorThemes.effectColors.GetHolderElement(skillType);
+
+            skillIcon.sprite = skillSprite;
+            skillIcon.color = skillColor;
+            border.color = skillColor;
         }
 
         public void OnPointerEnter(PointerEventData eventData)

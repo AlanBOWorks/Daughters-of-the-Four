@@ -2,6 +2,7 @@ using System;
 using _Team;
 using Characters;
 using CombatConditions;
+using Passives;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -52,13 +53,20 @@ namespace Stats
         [TitleGroup("Local stats"), PropertyOrder(-10)]
         public int ActionsLefts;
 
+
         private IBasicStatsData<float> TeamStats 
             => TeamData.GetCurrentStanceValue();
         public IMasterStats<float> GetMultiplierStats() 
             => _multiplierStats;
         public IStanceData<IBasicStats<float>> GetPositionalStats() 
             => _positionalStats;
-        public HashsetStatsHolder HashsetStats => _formulatedStats;
+
+        /// <summary>
+        /// Use this to add stats to the total calculations
+        /// </summary>
+        public HashsetStatsHolder ListedStats => _formulatedStats;
+
+        public bool IsInDanger() => HarmonyAmount < UtilsHarmony.DangerThreshold;
 
         public CombatingTeam TeamData
         {
@@ -68,6 +76,11 @@ namespace Stats
                 _teamData = value;
                 _formulatedStats.Inject(value.StatsHolder);
             }
+        }
+
+        public void Injection(IHarmonyHolderBase harmonyHolder)
+        {
+
         }
 
         public void Injection(IStanceProvider positionStatsStanceProvider)
@@ -107,48 +120,68 @@ namespace Stats
         public float CalculateBaseStaticDamagePower() => _formulatedStats.StaticDamagePower;
         public float CalculateDamageReduction() => _formulatedStats.DamageReduction;
 
+        [ShowInInspector]
         public float HealthPoints
         {
             get => BaseStats.HealthPoints;
             set => BaseStats.HealthPoints = value;
         }
+        [ShowInInspector]
         public float ShieldAmount
         {
             get => BaseStats.ShieldAmount;
             set => BaseStats.ShieldAmount = value;
         }
+        [ShowInInspector]
         public float MortalityPoints
         {
             get => BaseStats.MortalityPoints;
             set => BaseStats.MortalityPoints = value;
         }
 
+        [ShowInInspector]
         public float AccumulatedStatic
         {
             get => BaseStats.AccumulatedStatic;
             set => BaseStats.AccumulatedStatic = value;
         }
 
+        [ShowInInspector]
         public float AttackPower => _multiplierStats.OffensivePower * _formulatedStats.AttackPower;
+        [ShowInInspector]
         public float DeBuffPower => _multiplierStats.OffensivePower * _formulatedStats.DeBuffPower;
+        [ShowInInspector]
         public float StaticDamagePower => _multiplierStats.OffensivePower * _formulatedStats.StaticDamagePower;
 
+        [ShowInInspector]
         public float HealPower => _multiplierStats.SupportPower * _formulatedStats.HealPower;
+        [ShowInInspector]
         public float BuffPower => _multiplierStats.SupportPower * _formulatedStats.BuffPower;
+        [ShowInInspector]
         public float BuffReceivePower => _multiplierStats.SupportPower * _formulatedStats.BuffReceivePower;
 
+        [ShowInInspector]
         public float MaxHealth => _multiplierStats.VitalityAmount * _formulatedStats.MaxHealth;
+        [ShowInInspector]
         public float MaxMortalityPoints => _multiplierStats.VitalityAmount * _formulatedStats.MaxMortalityPoints;
+        [ShowInInspector]
         public float DamageReduction => _multiplierStats.VitalityAmount * _formulatedStats.DamageReduction;
+        [ShowInInspector]
         public float DeBuffReduction => _multiplierStats.VitalityAmount * _formulatedStats.DeBuffReduction;
 
+        [ShowInInspector]
         public float Enlightenment => _multiplierStats.ConcentrationAmount * _formulatedStats.Enlightenment;
+        [ShowInInspector]
         public float CriticalChance => _multiplierStats.ConcentrationAmount * _formulatedStats.CriticalChance;
+        [ShowInInspector]
         public float SpeedAmount => _multiplierStats.ConcentrationAmount * _formulatedStats.SpeedAmount;
 
 
+        [ShowInInspector]
         public float HarmonyAmount => _formulatedStats.HarmonyAmount;
+        [ShowInInspector]
         public float InitiativePercentage => _formulatedStats.InitiativePercentage;
+        [ShowInInspector]
         public float ActionsPerInitiative => _formulatedStats.ActionsPerInitiative;
 
         public IBasicStatsData<float> AttackingStance => _positionalStats.AttackingStance;

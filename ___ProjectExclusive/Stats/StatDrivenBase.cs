@@ -1,38 +1,12 @@
 using System;
 using Sirenix.OdinInspector;
+using Skills;
 using UnityEngine;
 
-namespace Skills
+namespace Stats
 {
-    public interface IStatDriven<T> : IStatDrivenData<T>, IStatDrivenInjection<T>
-    {
-    }
-
-    public interface IStatDrivenData<out T>
-    {
-
-        T Health { get; }
-        T Static { get; }
-        T Buff { get; }
-        T Harmony { get; }
-        T Tempo { get; }
-        T Control { get; }
-        T Stance { get; }
-        T Area { get; }
-    }
-    public interface IStatDrivenInjection<in T>
-    {
-
-        T Health { set; }
-        T Static { set; }
-        T Buff { set; }
-        T Harmony { set; }
-        T Tempo { set; }
-        T Control { set; }
-        T Stance { set; }
-        T Area { set; }
-    }
-
+    
+    // TODO change name without DATA
     public class StatDrivenData<T> : IStatDriven<T>
     {
         public StatDrivenData()
@@ -61,12 +35,13 @@ namespace Skills
         public T BackUpElement { get; set; }
 
         public T GetElement(EnumSkills.StatDriven statType)
-            => UtilsSkill.GetElement(this, statType);
+            => UtilsEnumStats.GetElement(this, statType);
     }
 
     [Serializable]
     public class SerializableStatDrivenData<T> : IStatDriven<T>
     {
+        [Title("Elements")]
         [SerializeField] protected T health;
         [SerializeField] protected T _static;
         [SerializeField] protected T buff;
@@ -120,24 +95,7 @@ namespace Skills
         }
 
         public T GetElement(EnumSkills.StatDriven statType)
-            => UtilsSkill.GetElement(this, statType);
-    }
-
-
-    public interface ITargetDriven<T> : ITargetDrivenData<T>, ITargetDrivenInjection<T>
-    { }
-
-    public interface ITargetDrivenData<out T>
-    {
-        T SelfOnly { get; }
-        T Offensive { get; }
-        T Support { get; }
-    }
-    public interface ITargetDrivenInjection<in T>
-    {
-        T SelfOnly { set; }
-        T Offensive { set; }
-        T Support { set; }
+            => UtilsEnumStats.GetElement(this, statType);
     }
 
     public class TargetDrivenData<T> : ITargetDriven<T>
@@ -157,7 +115,7 @@ namespace Skills
         public T Support { get; set; }
 
         public T GetElement(EnumSkills.TargetingType targetingType)
-            => UtilsSkill.GetElement(this, targetingType);
+            => UtilsEnumStats.GetElement(this, targetingType);
     }
 
     [Serializable]
@@ -186,7 +144,7 @@ namespace Skills
         }
 
         public T GetElement(EnumSkills.TargetingType targetingType)
-            => UtilsSkill.GetElement(this, targetingType);
+            => UtilsEnumStats.GetElement(this, targetingType);
     }
 
 
@@ -214,48 +172,61 @@ namespace Skills
         IStatDriven<T> BackUpElement { get; }
     }
 
-
-    public abstract class StatDrivenEntity<T> : TargetDrivenData<IStatDriven<T>>, IStatDrivenEntity<T>
+    [Serializable]
+    public class SerializableFullDrivenData<T> : ITargetDrivenData<IStatDrivenFull<T>>, ITargetDrivenExtension<T>
     {
-        protected IStatDriven<T> backUpElement;
+        [SerializeField] private StatDrivenHolder selfOnlyHolder = new StatDrivenHolder();
+        [SerializeField] private StatDrivenHolder offensiveHolder = new StatDrivenHolder();
+        [SerializeField] private StatDrivenHolder supportHolder = new StatDrivenHolder();
+        
+        public IStatDrivenFull<T> SelfOnly => selfOnlyHolder;
+        public IStatDrivenFull<T> Offensive => offensiveHolder;
+        public IStatDrivenFull<T> Support => supportHolder;
 
-        /// <param name="instantiationCopy">
-        /// -True:<br></br>
-        /// Create new objects of [typeof(<see cref="T"/>)] and copies
-        /// all the values of [<paramref name="injection"/>]<br></br>
-        /// -False:<br></br>
-        /// Only takes the references
-        /// </param>
-        protected StatDrivenEntity(IStatDrivenEntity<T> injection, bool instantiationCopy)
+        [Serializable]
+        private class StatDrivenHolder : SerializableStatDrivenData<T>, IStatDrivenFull<T>
         {
-            if (instantiationCopy)
-                InstantiateCopy(injection);
-            else
-                InjectReferences(injection);
+            [SerializeField, Title("Holder"), PropertyOrder(-10)]
+            public T elementHolder;
 
+            public T ElementHolder => elementHolder;
+        }
 
-            void InstantiateCopy(IStatDrivenEntity<T> copyFrom)
+        public T SelfOnlyElement
+        {
+            get => selfOnlyHolder.elementHolder;
+            set => selfOnlyHolder.elementHolder = value;
+        }
+        public T OffensiveElement
+        {
+            get => offensiveHolder.elementHolder;
+            set => offensiveHolder.elementHolder = value;
+        }
+        public T SupportElement
+        {
+            get => supportHolder.elementHolder;
+            set => supportHolder.elementHolder = value;
+        }
+
+        public T GetElement(EnumSkills.TargetingType targetingType, EnumSkills.StatDriven stat)
+        {
+            var holder = UtilsEnumStats.GetElement(this, targetingType);
+            return GetElement();
+
+            T GetElement()
             {
-                SelfOnly = InstantiateNewStats(copyFrom.SelfOnly);
-                Offensive = InstantiateNewStats(copyFrom.Offensive);
-                Support = InstantiateNewStats(copyFrom.Support);
-                backUpElement = InstantiateNewStats(copyFrom.BackUpElement);
-            }
-            void InjectReferences(IStatDrivenEntity<T> copyFrom)
-            {
-                SelfOnly = copyFrom.SelfOnly;
-                Offensive = copyFrom.Offensive;
-                Support = copyFrom.Support;
-                backUpElement = copyFrom.BackUpElement;
+                var element = UtilsEnumStats.GetElement(holder, stat);
+                return element ?? holder.ElementHolder;
             }
         }
 
-        protected abstract IStatDriven<T> InstantiateNewStats(IStatDriven<T> copyFrom);
-        public IStatDriven<T> BackUpElement => backUpElement;
-
-        public T GetElement(EnumSkills.TargetingType targetingType, EnumSkills.StatDriven statType)
-            => UtilsSkill.GetElement(this, targetingType, statType);
+        public T GetHolderElement(EnumSkills.TargetingType targetingType)
+        {
+            var holder = UtilsEnumStats.GetElement(this, targetingType);
+            return holder.ElementHolder;
+        }
     }
+
 
     // Doesn't inherit from [TargetDrivenData<IStatDriven<T>>] since Unity can't Serialize interfaces
     [Serializable]
@@ -277,7 +248,7 @@ namespace Skills
         public IStatDriven<T> BackUpElement => backUpElement;
 
         public T GetElement(EnumSkills.TargetingType targetingType, EnumSkills.StatDriven statType)
-            => UtilsSkill.GetElement(this, targetingType, statType);
+            => UtilsEnumStats.GetElement(this, targetingType, statType);
 
 
 #if UNITY_EDITOR

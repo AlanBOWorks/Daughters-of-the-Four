@@ -5,6 +5,7 @@ using Characters;
 using Skills;
 using SMaths;
 using UnityEngine;
+using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Stats 
@@ -248,6 +249,63 @@ namespace Stats
                     return stats.ActionsPerInitiative;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public static T GetElement<T>(IStatDrivenData<T> elements, EnumSkills.StatDriven type)
+        {
+            return type switch
+            {
+                EnumSkills.StatDriven.Health => elements.Health,
+                EnumSkills.StatDriven.Buff => elements.Buff,
+                EnumSkills.StatDriven.Harmony => elements.Harmony,
+                EnumSkills.StatDriven.Tempo => elements.Tempo,
+                EnumSkills.StatDriven.Control => elements.Control,
+                EnumSkills.StatDriven.Stance => elements.Stance,
+                EnumSkills.StatDriven.Area => elements.Area,
+                _ => throw new NotImplementedException("Not implemented [Stat] was invoked" +
+                                                       $"in the GetElement for [{typeof(T)}]")
+            };
+        }
+
+        public static T GetElement<T>(ITargetDrivenData<T> elements, EnumSkills.TargetingType type)
+        {
+            return type switch
+            {
+                EnumSkills.TargetingType.SelfOnly => elements.SelfOnly,
+                EnumSkills.TargetingType.Offensive => elements.Offensive,
+                EnumSkills.TargetingType.Support => elements.Support,
+                _ => throw new NotImplementedException("Not implemented [Targeting] was invoked" +
+                                                       $"in the GetElement for [{typeof(T)}]")
+            };
+        }
+
+        public static T GetElement<T>(IStatDrivenEntity<T> elements,
+            EnumSkills.TargetingType targetingType, EnumSkills.StatDriven statType)
+        {
+            IStatDriven<T> targetingElement = GetElement(elements, targetingType);
+            T element = GetElement(targetingElement, statType);
+
+
+            switch (element)
+            {
+                case Object unityElement:
+                    {
+                        if (!unityElement)
+                            InjectBackUp();
+                        break;
+                    }
+                case null:
+                    InjectBackUp();
+                    break;
+            }
+
+            return element;
+
+            void InjectBackUp()
+            {
+                targetingElement = elements.BackUpElement;
+                element = GetElement(targetingElement, statType);
             }
         }
     }
@@ -554,7 +612,7 @@ namespace Stats
         {
             if(damage <= 0) return;
 
-            ICombatHealthStats<float> stats = target.CombatStats;
+            var stats = target.CombatStats;
 
             UtilsStats.EnqueueTemporalStatsEvent(target);
             UtilsStats.EnqueueDamageEvent(target,damage);
@@ -571,8 +629,8 @@ namespace Stats
 
 
 
-            bool teamIsInDanger = target.CharacterGroup.Team.IsInDangerState();
-            if (teamIsInDanger)
+            
+            if (stats.IsInDanger())
             {
                 // When in danger, characters receive permanent damage (a.k.a. Mortality damage)
                 stats.MortalityPoints = CalculateDamageOnVitality(stats.MortalityPoints);

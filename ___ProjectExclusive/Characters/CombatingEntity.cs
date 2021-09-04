@@ -28,17 +28,34 @@ namespace Characters
     /// </summary>
     public class CombatingEntity
     { 
-        public CombatingEntity(string characterName, GameObject prefab, CombatStatsHolder combatStats)
+        public CombatingEntity(string characterName, GameObject prefab, EntityInvokerParams invokerParams)
         {
             CharacterName = characterName;
             InstantiationPrefab = prefab;
-            CombatStats = combatStats;
 
-            ReceivedStats = new TrackingStats();
             Events = new CombatCharacterEvents(this);
 
+            //STATS
+            CombatStats = invokerParams.StatsHolder;
+            ReceivedStats = new TrackingStats();
+
+            CharacterCriticalBuff = new CharacterCriticalActionHandler(this)
+            {
+                CriticalBuff = invokerParams.CriticalBuff
+            }; //TODO add to events
+
+
+            //AREAS
+            AreasDataTracker = invokerParams.AreasData;
+            CombatStats.Injection(AreasDataTracker);
+
+            // HARMONY
+            HarmonyHolder = HarmonyHolderConstructor.GenerateHarmonyHolder(this,
+                CombatStats.GetFormulatedStats().GetBuff(),
+                AreasDataTracker.Role);
+
+            // PASSIVES
             DelayBuffHandler = new DelayBuffHandler(this);
-            CharacterCriticalBuff = new CharacterCriticalActionHandler(this); //TODO add to events
             Guarding = new CharacterGuarding(this);
             PassivesHolder = new CombatPassivesHolder(this);
 
@@ -65,6 +82,9 @@ namespace Characters
 
         [ShowInInspector] 
         public readonly CombatPassivesHolder PassivesHolder;
+
+        [ShowInInspector] 
+        public readonly IHarmonyHolderBase HarmonyHolder;
 
         /// <summary>
         /// <inheritdoc cref="DelayBuffHandler"/>
@@ -106,13 +126,11 @@ namespace Characters
             return IsConscious() &&  HasActions() && CanUseSkills();
         }
 
-        public bool IsInDanger() => CharacterGroup.Team.IsInDangerState();
-
         public bool IsAlive() => CombatStats.IsAlive();
 
         public bool IsConscious()
         {
-            if (IsInDanger())
+            if (CombatStats.IsInDanger())
                 return IsAlive();
 
             return CombatStats.HealthPoints > 0;
@@ -122,25 +140,33 @@ namespace Characters
         public bool CanUseSkills() => UtilsSkill.CanUseSkills(this);
         public EnumCharacter.RoleArchetype Role => AreasDataTracker.Role;
 
-        public void Injection(CharacterCombatAreasData areasDataTracker)
-        {
-            AreasDataTracker = areasDataTracker;
-            CombatStats.Injection(areasDataTracker);
-        }
         public void Injection(CombatSkills combatSkills) => 
             CombatSkills = combatSkills;
         public void Injection(CombatingTeam team)
         {
             CombatStats.TeamData = team;
-            AreasDataTracker.Injection(team.State);
+            AreasDataTracker.Injection(team.ControlHandler);
         }
-        public void Injection(SDelayBuffPreset criticalBuff) =>
-            CharacterCriticalBuff.CriticalBuff = criticalBuff;
 
         [Button]
         public void Injection(IPassiveInjector injector)
         {
             injector.InjectPassive(this);
+        }
+    }
+
+    public struct EntityInvokerParams
+    {
+        public readonly CombatStatsHolder StatsHolder;
+        public readonly CharacterCombatAreasData AreasData;
+        public readonly SCriticalBuffPreset CriticalBuff;
+
+        public EntityInvokerParams(
+            CombatStatsHolder statsHolder, CharacterCombatAreasData areasData,SCriticalBuffPreset criticalBuff)
+        {
+            StatsHolder = statsHolder;
+            AreasData = areasData;
+            CriticalBuff = criticalBuff;
         }
     }
 }

@@ -8,13 +8,14 @@ using MEC;
 using Passives;
 using Sirenix.OdinInspector;
 using Skills;
+using Stats;
 using UnityEngine;
 
 namespace _CombatSystem
 {
     public class SystemInvoker : ICombatFinishListener
     {
-        [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
+        [ShowInInspector, DisableInEditorMode]
         private readonly Queue<ICombatPreparationListener> _preparationListeners;
         [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
         private readonly Queue<ICombatAfterPreparationListener> _afterPreparationListeners;
@@ -183,35 +184,32 @@ namespace _CombatSystem
                 {
 
                     // x----- CombatData
-                    var combatData = variable.GenerateCombatData();
+                    CombatStatsHolder combatData = variable.GenerateCombatData();
+                    
+                    // x----- Area
+                    CharacterCombatAreasData areaData = new CharacterCombatAreasData(entityPosition, variable.RangeType);
+
+                    // X----- Critical Buff
+                    SCriticalBuffPreset criticalBuff = variable.GetCriticalBuff();
+                    if (criticalBuff == null)
+                    {
+                        var defaultCriticalBuffs
+                            = CombatSystemSingleton.ParamsVariable.ArchetypesBackupOnNullCriticalBuffs;
+                        criticalBuff = CharacterArchetypes.GetElement(
+                            defaultCriticalBuffs, entityPosition);
+                    }
+
+                    var entityParams = new EntityInvokerParams(combatData,areaData,criticalBuff);
 
                     // Instantiate
                     CombatingEntity entity = new CombatingEntity(
                         variable.CharacterName,
                         variable.CharacterPrefab,
-                        combatData);
+                        entityParams);
 
-                    // x----- Area
-                    var characterAreaData = new CharacterCombatAreasData(entityPosition, variable.RangeType);
-                    entity.Injection(characterAreaData);
-                    
                     // x----- Skills
                     variable.GenerateCombatSkills(entity);
 
-                    // x----- Harmony Buffer
-
-                    // x----- Passives
-                    
-                    // X----- Critical Buff
-                    var criticalBuff = variable.GetCriticalBuff();
-                    if (criticalBuff == null)
-                    {
-                        var defaultCriticalBuffs 
-                            = CombatSystemSingleton.ParamsVariable.ArchetypesBackupOnNullCriticalBuffs;
-                        criticalBuff = CharacterArchetypes.GetElement(
-                            defaultCriticalBuffs, entityPosition);
-                    }
-                    entity.Injection(criticalBuff);
 
                     //TODO onStartAction += OpeningPassivesInjection;
 

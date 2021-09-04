@@ -32,6 +32,8 @@ namespace _Team
                     RemoveAt(i);
             }
         }
+
+        public const float DefaultControlGainPerKnockOut = .1f;
         public void Add(CombatingEntity healthLessEntity)
         {
             if(Contains(healthLessEntity) || !healthLessEntity.IsAlive()) return;
@@ -45,8 +47,7 @@ namespace _Team
             {
                 var teamControlHandler =
                     CombatSystemSingleton.CombatTeamControlHandler;
-                float controlGain = 
-                    CharacterArchetypes.GetElement(statsHolder.ControlLoseOnDeath, healthLessEntity.Role);
+                float controlGain = DefaultControlGainPerKnockOut;
                 controlGain = -controlGain; //Negative since controlLoseOnDeath is negative
 
                 teamControlHandler.DoVariation(_team, controlGain);

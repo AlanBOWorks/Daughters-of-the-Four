@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Characters;
+using Stats;
 using UnityEngine;
 
 namespace Passives
@@ -11,4 +12,10 @@ namespace Passives
 
     public interface IPassiveHolder 
     { }
+
+    public interface IHarmonyHolderBase : IBasicStatsData<float>
+    {
+        float HarmonyLossOnDeath { get; }
+    }
+
 }

@@ -5,15 +5,14 @@ using UnityEngine;
 
 namespace _Team
 {
-    public class TeamCombatState : IStanceProvider
+    public class TeamCombatControlHandler : IStanceProvider
     {
-        public TeamCombatState(CombatingTeam team)
+        public TeamCombatControlHandler()
         {
-            Team = team;
+            LoseControlThreshold = DefaultLosingThreshold;
             _normalStance = EnumTeam.Stances.Neutral;
         }
 
-        public readonly CombatingTeam Team;
 
         [field: ShowInInspector]
         [field: Range(-1,1)]
@@ -22,13 +21,20 @@ namespace _Team
 
         [ShowInInspector] 
         public float BurstControlAmount { get; private set; }
+        public readonly float LoseControlThreshold;
 
+        public const float DefaultLosingThreshold = -.5f;
 
         public float GetControlAmount()
         {
             float control = TeamControlAmount + BurstControlAmount;
 
             return control;
+        }
+
+        public bool IsLosing()
+        {
+            return TeamControlAmount < LoseControlThreshold;
         }
 
         public EnumTeam.Stances CurrentStance => IsForcedStance ? ForceStance : _normalStance;
@@ -44,11 +50,6 @@ namespace _Team
         [ShowInInspector] 
         public bool IsBurstStance;
 
-        public bool IsInDanger()
-        {
-            return GetControlAmount() <= 
-                   Team.StatsHolder.LoseControlThreshold;
-        }
 
         public void VariateStance(EnumTeam.Stances target)
         {

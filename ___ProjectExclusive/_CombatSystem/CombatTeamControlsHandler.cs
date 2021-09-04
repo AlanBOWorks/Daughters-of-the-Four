@@ -43,17 +43,17 @@ namespace _CombatSystem
     }
 
     /// <summary>
-    ///  Keeps track of the [<seealso cref="TeamCombatState.ControlAmount"/>]
+    ///  Keeps track of the [<seealso cref="TeamCombatControlHandler.ControlAmount"/>]
     /// of both [<seealso cref="ICharacterFaction{T}"/>]
     ///  groups and normalize the variations.
     /// </summary>
-    public class CombatTeamControlsHandler : ICharacterFaction<TeamCombatState>, ICombatStartListener,
+    public class CombatTeamControlsHandler : ICharacterFaction<CombatingTeam>, ICombatStartListener,
         IRoundListenerVoid
     {
         public CombatTeamControlsHandler(CombatingTeam playerEntities, CombatingTeam enemyEntities)
         {
-            PlayerFaction = playerEntities.State;
-            EnemyFaction = enemyEntities.State;
+            PlayerFaction = playerEntities;
+            EnemyFaction = enemyEntities;
             _listeners = new List<ITeamVariationListener>();
             _firstCall = true;
         }
@@ -78,17 +78,17 @@ namespace _CombatSystem
         }
 
         [ShowInInspector]
-        public TeamCombatState PlayerFaction { get; }
-        public TeamCombatState EnemyFaction { get; }
+        public CombatingTeam PlayerFaction { get; }
+        public CombatingTeam EnemyFaction { get; }
 
         private bool IsPlayerGroup(CombatingTeam team)
         {
-            return PlayerFaction.Team == team;
+            return PlayerFaction == team;
         }
 
         [Button, HideInEditorMode]
         private void DoVariationPlayer(float controlAddition) => 
-            DoVariation(PlayerFaction.Team, controlAddition);
+            DoVariation(PlayerFaction, controlAddition);
        
         public void DoVariation(CombatingTeam team, float controlAddition)
         {
@@ -102,8 +102,8 @@ namespace _CombatSystem
             if (IsBurstState()) return;
             HandleTeams(team, out var actingTeam, out var receiver);
 
-            actingTeam.IsBurstStance = true;
-            receiver.DoBurstControl(-burstControl); // Is negative because the Control is checked in negatives
+            actingTeam.ControlHandler.IsBurstStance = true;
+            receiver.ControlHandler.DoBurstControl(-burstControl); // Is negative because the Control is checked in negatives
             _burstRoundCount = team.StatsHolder.BurstCounterAmount;
 
             DoVariationCheck(actingTeam, receiver);
@@ -113,7 +113,7 @@ namespace _CombatSystem
         {
             if (!IsBurstState()) return;
             HandleTeams(team, out var actingTeam, out var receiver);
-            actingTeam.DoBurstVariation(counterBurst);
+            actingTeam.ControlHandler.DoBurstVariation(counterBurst);
 
             _burstRoundCount = team.StatsHolder.BurstCounterAmount;
             _burstRoundCount -= _burstRoundCount;
@@ -126,19 +126,21 @@ namespace _CombatSystem
 
         private void FinishBurstControl()
         {
-            PlayerFaction.FinishBurstControl();
-            EnemyFaction.FinishBurstControl();
+            PlayerFaction.ControlHandler.FinishBurstControl();
+            EnemyFaction.ControlHandler.FinishBurstControl();
             InvokeListeners();
         }
 
 
         private void InvokeListeners()
         {
-            float control = PlayerFaction.GetControlAmount()
-                - EnemyFaction.GetControlAmount();
+            var playerControl = PlayerFaction.ControlHandler;
+            var enemyControl = EnemyFaction.ControlHandler;
+            float control = playerControl.GetControlAmount()
+                - enemyControl.GetControlAmount();
             control = Mathf.Clamp(control, -1, 1);
 
-                EnumTeam.Stances stance = PlayerFaction.CurrentStance;
+                EnumTeam.Stances stance = playerControl.CurrentStance;
             if (!_firstCall && stance == _lastPlayerStance)
             {
                 foreach (ITeamVariationListener listener in _listeners)
@@ -156,7 +158,7 @@ namespace _CombatSystem
             }
         }
 
-        private void HandleTeams(CombatingTeam team, out TeamCombatState actor, out TeamCombatState receiver)
+        private void HandleTeams(CombatingTeam team, out CombatingTeam actor, out CombatingTeam receiver)
         {
             if (IsPlayerGroup(team))
             {
@@ -169,10 +171,12 @@ namespace _CombatSystem
                 receiver = PlayerFaction;
             }
         }
-        private void DoVariation(TeamCombatState actingTeam, TeamCombatState receiver, float controlGain)
+        private void DoVariation(CombatingTeam actingTeam, CombatingTeam receiver, float controlGain)
         {
-            DoVariation(ref actingTeam.TeamControlAmount);
-            receiver.TeamControlAmount = -actingTeam.GetControlAmount();
+            var actingControl = actingTeam.ControlHandler;
+            var receiverControl = receiver.ControlHandler;
+            DoVariation(ref actingControl.TeamControlAmount);
+            receiverControl.TeamControlAmount = -actingControl.GetControlAmount();
             DoVariationCheck(actingTeam,receiver);
 
             void DoVariation(ref float controlValue)
@@ -182,10 +186,10 @@ namespace _CombatSystem
             }
         }
 
-        private void DoVariationCheck(TeamCombatState check, TeamCombatState reaction)
+        private void DoVariationCheck(CombatingTeam check, CombatingTeam reaction)
         {
-            bool isAttacking = reaction.IsInDanger();
-            bool isDefending = check.IsInDanger();
+            bool isAttacking = reaction.ControlHandler.IsLosing();
+            bool isDefending = check.ControlHandler.IsLosing();
 
             switch (_lastPlayerStance)
             {
@@ -202,7 +206,7 @@ namespace _CombatSystem
                     CheckForAttacking();
                     break;
                 default:
-                    throw new NotImplementedException($"Team state not supported: {check.CurrentStance}");
+                    throw new NotImplementedException($"Team state not supported: {check.ControlHandler.CurrentStance}");
             }
 
 
@@ -228,11 +232,11 @@ namespace _CombatSystem
 
 
 
-        private static void DoVariation(TeamCombatState actingTeam, TeamCombatState receiver,
+        private static void DoVariation(CombatingTeam actingTeam, CombatingTeam receiver,
             EnumTeam.Stances targetStance)
         {
-            TeamCombatState winner;
-            TeamCombatState loser;
+            CombatingTeam winner;
+            CombatingTeam loser;
             switch (targetStance)
             {
                 case EnumTeam.Stances.Attacking:
@@ -246,8 +250,8 @@ namespace _CombatSystem
                     HandleTeams();
                     break;
                 default:
-                    actingTeam.DoForceStance(EnumTeam.Stances.Neutral);
-                    receiver.DoForceStance(EnumTeam.Stances.Neutral);
+                    actingTeam.ControlHandler.DoForceStance(EnumTeam.Stances.Neutral);
+                    receiver.ControlHandler.DoForceStance(EnumTeam.Stances.Neutral);
                     break;
             }
 
@@ -256,12 +260,12 @@ namespace _CombatSystem
 
             void HandleTeams()
             {
-                winner.DoForceStance(EnumTeam.Stances.Attacking);
-                loser.DoForceStance(EnumTeam.Stances.Defending);
+                winner.ControlHandler.DoForceStance(EnumTeam.Stances.Attacking);
+                loser.ControlHandler.DoForceStance(EnumTeam.Stances.Defending);
             }
-            void InvokeEvent(TeamCombatState target)
+            void InvokeEvent(CombatingTeam targetTeam)
             {
-                foreach (CombatingEntity entity in target.Team)
+                foreach (CombatingEntity entity in targetTeam)
                 {
                     entity.Events.InvokeAreaChange();
                 }

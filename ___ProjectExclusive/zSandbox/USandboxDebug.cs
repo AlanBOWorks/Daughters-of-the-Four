@@ -50,7 +50,7 @@ namespace ___ProjectExclusive
             Debug.Log(archetype + " => " +(int)archetype);
         }
 
-       
+
 #endif
     }
 }

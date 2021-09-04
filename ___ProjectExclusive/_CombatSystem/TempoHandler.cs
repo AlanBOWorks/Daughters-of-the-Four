@@ -210,11 +210,12 @@ namespace _CombatSystem
                         if(!entity.IsConscious()) continue;
 
                         // Increment
-                        IFullStatsData<float> stats = entity.CombatStats;
-                        IFullStatsInjection<float> injection = entity.CombatStats.BaseStats;
-                        float initiative = stats.InitiativePercentage;
+                        CombatStatsHolder stats = entity.CombatStats;
+                        IFullStats<float> baseStats = entity.CombatStats.BaseStats;
+
+                        float initiative = baseStats.InitiativePercentage;
                         initiative += deltaIncrement * stats.SpeedAmount * VelocityModifier;
-                        injection.InitiativePercentage = initiative;
+                        baseStats.InitiativePercentage = initiative;
 
                         // Percentage
                         CallUpdateOnInitiativeBar(entity,stats);

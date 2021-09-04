@@ -12,7 +12,7 @@ namespace Skills
         public override bool CanApply(CombatingEntity target, float checkValue)
         {
             var userTeam = target.CharacterGroup.Team;
-            return userTeam.State.IsBurstStance;
+            return userTeam.ControlHandler.IsBurstStance;
         }
     }
 }

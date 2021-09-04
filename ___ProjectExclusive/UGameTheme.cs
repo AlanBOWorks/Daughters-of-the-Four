@@ -8,9 +8,6 @@ namespace ___ProjectExclusive
         [SerializeField,HideInPlayMode] 
         private SGameTheme theme = null;
 
-        [DisableInEditorMode,ShowInInspector]
-        private GameThemeSingleton _singleton = GameThemeSingleton.Instance; 
-
 
         private void Awake()
         {

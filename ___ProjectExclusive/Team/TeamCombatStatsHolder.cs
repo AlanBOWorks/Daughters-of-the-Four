@@ -11,35 +11,28 @@ namespace _Team
     public class TeamCombatStatsHolder : ITeamCombatControlStats, 
         IStanceData<IBasicStatsData<float>>
     {
-        private readonly TeamCombatState _state;
 
-        [ShowInInspector]
-        public ICharacterArchetypesData<float> ControlLoseOnDeath { get; private set; }
         [ShowInInspector]
         public readonly PositionalStats PositionalStats;
        
 
-        public float LoseControlThreshold;
         public float ReviveTime;
         public int BurstControlLength;
         public int BurstCounterAmount;
 
-        public TeamCombatStatsHolder(TeamCombatState state)
-        {
-            _state = state;
-            PositionalStats = new PositionalStats(state);
+        
 
-            LoseControlThreshold = DefaultLoseThreshold;
+        public TeamCombatStatsHolder(TeamCombatControlHandler controlHandler)
+        {
+            PositionalStats = new PositionalStats(controlHandler);
+
             ReviveTime = DefaultReviveTime;
-            ControlLoseOnDeath = TeamControlLoses.BackUpData;
         }
 
-        public const float DefaultLoseThreshold = -.6f;
         public const float DefaultReviveTime = 0.5f;
-        public TeamCombatStatsHolder(TeamCombatState state, ITeamCombatControlHolder stats)
+        public TeamCombatStatsHolder(TeamCombatControlHandler controlHandler, ITeamCombatControlHolder stats)
         {
-            _state = state;
-            PositionalStats = new PositionalStats(state);
+            PositionalStats = new PositionalStats(controlHandler);
 
             InjectPreset(stats);
         }
@@ -49,9 +42,7 @@ namespace _Team
         {
             InjectNewStats(holder);
        
-            LoseControlThreshold = holder.GetLoseThreshold();
             ReviveTime = holder.GetReviveTime();
-            ControlLoseOnDeath = holder.GetControlLosePoints() ?? TeamControlLoses.BackUpData;
 
             BurstControlLength = holder.GetBurstControlLength();
             BurstCounterAmount = holder.GetBurstCounterAmount();

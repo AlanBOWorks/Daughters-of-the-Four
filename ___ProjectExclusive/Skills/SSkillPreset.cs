@@ -25,7 +25,7 @@ namespace Skills
         [TitleGroup("Details"), PreviewField, GUIColor(.4f, .4f, .4f)]
         [SerializeField, Tooltip("This will be used instead of the generic one"),
         AssetSelector(Paths = UtilsGame.IconsPath,FlattenTreeView = true,DropdownWidth = 500)] 
-        private Sprite specialIcon = null;
+        private Sprite dedicatedIcon = null;
 
         
 
@@ -48,10 +48,12 @@ namespace Skills
         [SerializeField, Tooltip("Used to determinate the limitation of equipment; Hybrid can be used by any range")]
         private EnumCharacter.RangeType rangeType = EnumCharacter.RangeType.HybridRange;
 
-        [TitleGroup("Categorization")]
-        [SerializeField, Tooltip("The main stat this skill interact/represent"),
-         EnumToggleButtons] 
-        private EnumSkills.Archetype skillArchetype = EnumSkills.Archetype.OffensiveHealth;
+        [TitleGroup("Categorization")] 
+        [SerializeField] 
+        private EnumSkills.StatDriven statDriven = EnumSkills.StatDriven.Health;
+
+        [SerializeField, Tooltip("The main stat this skill interact/represent")]
+        private SEffectBase effectRepresentation = null;
 
         [Title("Main Condition"),PropertyOrder(90)] 
         [SerializeField]
@@ -64,11 +66,25 @@ namespace Skills
 
 
         public string SkillName => skillName;
-        public Sprite SpecialIcon => specialIcon;
         public bool CanTargetSelf() => canTargetSelf;
         public EnumCharacter.RangeType GetRangeType() => rangeType;
+        public EnumSkills.StatDriven GetStatDriven() => statDriven;
         public EnumSkills.TargetingType GetSkillType() => skillType;
-        public EnumSkills.Archetype GetArchetype() => skillArchetype;
+
+        public Sprite GetSkillIcon()
+        {
+            var sprite = dedicatedIcon;
+            if (sprite != null) return dedicatedIcon;
+            return effectRepresentation != null 
+                ? effectRepresentation.GetEffectIcon() 
+                : effects[0].GetEffectIcon();
+        }
+        public IEffectBase GetEffectRepresentation()
+        {
+            return effectRepresentation == null 
+                ? effects[0].Preset 
+                : effectRepresentation;
+        }
         public int CoolDownCost => cooldownCost;
         public virtual IEffect GetMainEffect() => effects[0];
 

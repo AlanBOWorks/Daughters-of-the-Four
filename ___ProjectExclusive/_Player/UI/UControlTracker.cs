@@ -57,9 +57,9 @@ namespace _Player
                 // (and player goes to the left)
 
                 enemyPoints.DoPosition(halfWidth,
-                    -enemyEntities.StatsHolder.LoseControlThreshold);
+                    -enemyEntities.ControlHandler.LoseControlThreshold);
                 playerPoints.DoPosition(halfWidth,
-                    playerEntities.StatsHolder.LoseControlThreshold); 
+                    playerEntities.ControlHandler.LoseControlThreshold); 
             }
 
             internal void Show(bool show)

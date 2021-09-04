@@ -6,6 +6,7 @@ using CombatEffects;
 using MEC;
 using Sirenix.OdinInspector;
 using Skills;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Stats
@@ -61,6 +62,7 @@ namespace Stats
             if (isOffensiveSkill && targetGuarding.HasProtector())
             {
                 targetGuarding.VariateTarget(ref target);
+                _skillArguments.InitialTarget = target;
             }
 
             //>>>>>>>>>>>>>>>>>>> DO Randomness

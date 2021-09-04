@@ -14,11 +14,9 @@ namespace _Team
     {
         [Title("Tooltips")] [SerializeField] private string controlName = "NULL";
 
-        [Title("Control")]
-        [SerializeField, Range(-1, 0), SuffixLabel("%00")] 
-        private float loseControlThreshold = TeamCombatStatsHolder.DefaultLoseThreshold;
-        [SerializeField] 
-        private TeamControlLoses controlLoses = new TeamControlLoses();
+        [Title("Control")] 
+        [SerializeField, Range(-1, 1), SuffixLabel("%00")]
+        private float disruptionResistance = .5f;
         [SerializeField,Range(0,100), SuffixLabel("tempoSec"), 
          Tooltip("1 sec equals apr. 1 initiative at 100 Speed")] 
         private float reviveTime = TeamCombatStatsHolder.DefaultReviveTime;
@@ -36,12 +34,10 @@ namespace _Team
         [SerializeField] private CombatStatsFull onDefendingStats;
 
         public string ControlName => controlName;
-        public float GetLoseThreshold() => loseControlThreshold;
         public float GetReviveTime() => reviveTime;
         public int GetBurstControlLength() => controlBurstLength;
         public int GetBurstCounterAmount() => counterBurstAmount;
-
-        public ICharacterArchetypesData<float> GetControlLosePoints() => controlLoses;
+        public float DisruptionResistance => disruptionResistance;
 
 
         IBasicStats<float> IStanceData<IBasicStats<float>>.AttackingStance
@@ -62,26 +58,11 @@ namespace _Team
         }
     }
 
-    [Serializable]
-    public class TeamControlLoses : ICharacterArchetypesData<float>
-    {
-        public static TeamControlLoses BackUpData = new TeamControlLoses();
-
-        [SerializeField, Range(0, 1)] private float frontLiner = .4f;
-        [SerializeField, Range(0, 1)] private float midLiner = .3f;
-        [SerializeField, Range(0, 1)] private float backLiner = .25f;
-
-        public float Vanguard => frontLiner;
-        public float Attacker => midLiner;
-        public float Support => backLiner;
-    }
-
     public interface ITeamCombatControlHolder : 
         IStanceData<IBasicStats<float>>
 
     {
         string ControlName { get; }
-        float GetLoseThreshold();
         float GetReviveTime();
         /// <summary>
         /// How many rounds a BurstControl a team can hold
@@ -94,7 +75,8 @@ namespace _Team
         /// <returns></returns>
         int GetBurstCounterAmount();
 
-        ICharacterArchetypesData<float> GetControlLosePoints();
+        float DisruptionResistance { get; }
+
     }
 
     public interface ITeamCombatControlStats : IStanceElement<IBasicStatsData<float>>
