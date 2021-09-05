@@ -22,7 +22,6 @@ namespace _CombatSystem
             Characters = new CombatCharactersHolder();
             TempoHandler = new TempoHandler();
             PerformSkillHandler = new PerformSkillHandler();
-            StatsInteractionHandler = new StatsInteractionHandler();
             GlobalCharacterChangesEvent = new CombatCharacterEventsBase();
             CharacterEventsTracker = new CharacterEventsTracker();
 
@@ -63,8 +62,6 @@ namespace _CombatSystem
 
         [ShowInInspector]
         public static PerformSkillHandler PerformSkillHandler;
-        [ShowInInspector]
-        public static StatsInteractionHandler StatsInteractionHandler;
         [ShowInInspector] 
         public static CharacterEventsTracker CharacterEventsTracker;
 

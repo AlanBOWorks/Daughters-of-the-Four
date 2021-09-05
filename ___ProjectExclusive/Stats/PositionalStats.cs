@@ -30,7 +30,7 @@ namespace Stats
         public float MaxMortalityPoints => GetCurrentStanceValue().MaxMortalityPoints;
         public float DamageReduction => GetCurrentStanceValue().DamageReduction;
         public float DeBuffReduction => GetCurrentStanceValue().DeBuffReduction;
-        public float Enlightenment => GetCurrentStanceValue().Enlightenment;
+        public float DisruptionResistance => GetCurrentStanceValue().DisruptionResistance;
         public float CriticalChance => GetCurrentStanceValue().CriticalChance;
         public float SpeedAmount => GetCurrentStanceValue().SpeedAmount;
         public float InitiativePercentage => GetCurrentStanceValue().InitiativePercentage;

@@ -12,7 +12,7 @@ namespace Stats
         [SerializeField] private float speedAmount;
 
 
-        public float Enlightenment
+        public float DisruptionResistance
         {
             get => enlightenment;
             set => enlightenment = value;

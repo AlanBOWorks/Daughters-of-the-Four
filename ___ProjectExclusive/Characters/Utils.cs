@@ -125,7 +125,7 @@ namespace Characters
         public static void TeamToggleStance(CombatingEntity teamHolder, EnumTeam.Stances targetStance)
         {
             var team = teamHolder.CharacterGroup.Team;
-            var teamData = team.ControlHandler;
+            var teamData = team.control;
             if (teamData.IsForcedStance)
             {
                 teamData.FinishForceStance();

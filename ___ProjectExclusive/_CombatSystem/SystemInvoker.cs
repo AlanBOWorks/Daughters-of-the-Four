@@ -81,15 +81,12 @@ namespace _CombatSystem
 
                 InitializationPhase();
                 InitializeCombatConditions();
-                Debug.Log("x--- Preparing Combat");
                 PreparationPhase();
 
                 // Small wait for secure some loads
                 yield return Timing.WaitForSeconds(1f);
-                Debug.Log("x--- Starting Combat");
                 // TODO make an starting animation
                 onStartAction.Invoke();
-                Debug.Log("x--- In Combat");
 
                 void InitializationPhase()
                 {

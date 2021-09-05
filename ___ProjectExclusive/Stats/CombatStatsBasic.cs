@@ -33,49 +33,49 @@ namespace Stats
     {
 
         [Title("Offensive")]
-        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent"), LabelWidth(80f)]
         private T attackPower;
-        [SerializeField, SuffixLabel("%00")]
+        [SerializeField, SuffixLabel("%00"), LabelWidth(80f)]
         private T deBuffPower;
 
-        [SerializeField, SuffixLabel("Units")]
+        [SerializeField, SuffixLabel("Units"), LabelWidth(80f)]
         private T staticDamagePower;
 
 
         [Title("Support")]
-        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent"), LabelWidth(80f)]
         private T healPower;
-        [SerializeField, SuffixLabel("%00")]
+        [SerializeField, SuffixLabel("%00"), LabelWidth(80f)]
         private T buffPower;
 
-        [SerializeField, SuffixLabel("%00(Add)")]
+        [SerializeField, SuffixLabel("%00(Add)"), LabelWidth(80f)]
         private T buffReceivePower;
 
         [Title("Vitality")]
-        [SerializeField, SuffixLabel("Units")]
+        [SerializeField, SuffixLabel("Units"), LabelWidth(80f)]
         private T maxHealth;
-        [SerializeField, SuffixLabel("Units")]
+        [SerializeField, SuffixLabel("Units"), LabelWidth(80f)]
         private T maxMortalityPoints;
 
-        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent"), LabelWidth(80f)]
         private T damageReduction;
-        [SerializeField, SuffixLabel("%00"), Tooltip("Counters DeBuffPower")]
+        [SerializeField, SuffixLabel("%00"), Tooltip("Counters DeBuffPower"), LabelWidth(80f)]
         private T deBuffReduction;
 
 
         [Title("Concentration")]
-        [SerializeField, SuffixLabel("%00"), Tooltip("Affects Harmony gain")]
-        private T enlightenment; // before fight this could be modified
-        [SerializeField, SuffixLabel("%00")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Affects Harmony lose"), LabelWidth(80f)]
+        private T disruptionResistance; // before fight this could be modified
+        [SerializeField, SuffixLabel("%00"), LabelWidth(80f)]
         private T criticalChance;
-        [SerializeField, SuffixLabel("u|%%"), Tooltip("[100] is the default value")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("[100, LabelWidth(80f)] is the default value"), LabelWidth(80f)]
         private T speedAmount;
 
-        [SerializeField, SuffixLabel("%00")]
+        [SerializeField, SuffixLabel("%00"), LabelWidth(80f)]
         private T initiativePercentage;
-        [SerializeField, SuffixLabel("Units")]
+        [SerializeField, SuffixLabel("Units"), LabelWidth(80f)]
         private T actionsPerInitiative;
-        [SerializeField, SuffixLabel("%00")]
+        [SerializeField, SuffixLabel("%00"), LabelWidth(80f)]
         private T harmonyAmount;
 
 
@@ -140,10 +140,10 @@ namespace Stats
             set => deBuffReduction = value;
         }
 
-        public T Enlightenment
+        public T DisruptionResistance
         {
-            get => enlightenment;
-            set => enlightenment = value;
+            get => disruptionResistance;
+            set => disruptionResistance = value;
         }
 
         public T CriticalChance

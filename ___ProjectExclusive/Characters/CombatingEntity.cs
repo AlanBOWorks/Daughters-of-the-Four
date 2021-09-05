@@ -145,7 +145,7 @@ namespace Characters
         public void Injection(CombatingTeam team)
         {
             CombatStats.TeamData = team;
-            AreasDataTracker.Injection(team.ControlHandler);
+            AreasDataTracker.Injection(team.control);
         }
 
         [Button]

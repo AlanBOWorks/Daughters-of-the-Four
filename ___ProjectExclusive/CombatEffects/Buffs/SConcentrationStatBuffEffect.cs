@@ -32,7 +32,7 @@ namespace CombatEffects
             switch (buffType)
             {
                 case EnumStats.Concentration.Enlightenment:
-                    buffStats.Enlightenment = buffStats.Enlightenment + effectAmount;
+                    buffStats.DisruptionResistance = buffStats.DisruptionResistance + effectAmount;
                     break;
                 case EnumStats.Concentration.Critical:
                     buffStats.CriticalChance = buffStats.CriticalChance + effectAmount;

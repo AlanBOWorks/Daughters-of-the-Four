@@ -27,13 +27,13 @@ namespace Stats
     public class FullStats<T> : BasicStats<T>, IFullStats<T>
     {
         [Title("Temporal Stats")]
-        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent"), LabelWidth(80f)]
         private T healthPoints; // before fight this could be reduced
-        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent"), LabelWidth(80f)]
         private T shieldAmount; // before fight this could be increased
-        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent"), LabelWidth(80f)]
         private T mortalityPoints; // after fight this could be reduced
-        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent")]
+        [SerializeField, SuffixLabel("u|%%"), Tooltip("Base is Unit; Buff is percent"), LabelWidth(80f)]
         private T accumulatedStatic;
 
         public T HealthPoints

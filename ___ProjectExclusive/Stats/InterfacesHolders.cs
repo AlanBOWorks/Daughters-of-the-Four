@@ -33,7 +33,7 @@ namespace Stats
         new T InitiativePercentage { get; set; }
         new T ActionsPerInitiative { get; set; }
         new T HarmonyAmount { get; set; }
-        new T Enlightenment { get; set; }
+        new T DisruptionResistance { get; set; }
         new T CriticalChance { get; set; }
         new T SpeedAmount { get; set; }
     }
@@ -61,7 +61,7 @@ namespace Stats
         new T InitiativePercentage { get; set; }
         new T ActionsPerInitiative { get; set; }
         new T HarmonyAmount { get; set; }
-        new T Enlightenment { get; set; }
+        new T DisruptionResistance { get; set; }
         new T CriticalChance { get; set; }
         new T SpeedAmount { get; set; }
     }

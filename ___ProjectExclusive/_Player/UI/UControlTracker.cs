@@ -55,11 +55,9 @@ namespace _Player
             {
                 // Negative modifier because threshold is measured in negative values
                 // (and player goes to the left)
-
-                enemyPoints.DoPosition(halfWidth,
-                    -enemyEntities.ControlHandler.LoseControlThreshold);
-                playerPoints.DoPosition(halfWidth,
-                    playerEntities.ControlHandler.LoseControlThreshold); 
+                float loseControlThreshold = CombatTeamControl.DefaultLosingThreshold;
+                enemyPoints.DoPosition(halfWidth, -loseControlThreshold);
+                playerPoints.DoPosition(halfWidth, loseControlThreshold); 
             }
 
             internal void Show(bool show)

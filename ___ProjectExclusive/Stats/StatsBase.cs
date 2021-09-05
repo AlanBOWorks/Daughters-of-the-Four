@@ -146,7 +146,7 @@ namespace Stats
         private T criticalChance;
         [SerializeField, SuffixLabel("u|%%"), Tooltip("[100] is the default value")]
         private T speedAmount;
-        public T Enlightenment
+        public T DisruptionResistance
         {
             get => enlightenment;
             set => enlightenment = value;
@@ -238,7 +238,7 @@ namespace Stats
         public T DamageReduction => VitalityStats.DamageReduction;
         public T DeBuffReduction => VitalityStats.DeBuffReduction;
 
-        public T Enlightenment => ConcentrationStats.Enlightenment;
+        public T DisruptionResistance => ConcentrationStats.DisruptionResistance;
         public T CriticalChance => ConcentrationStats.CriticalChance;
         public T SpeedAmount => ConcentrationStats.SpeedAmount;
 

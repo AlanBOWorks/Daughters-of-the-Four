@@ -166,7 +166,7 @@ namespace Stats
 
     public interface IConcentrationStats<T> : IConcentrationStatsData<T>, IConcentrationStatsInjection<T>
     {
-        new T Enlightenment { get; set; }
+        new T DisruptionResistance { get; set; }
         new T CriticalChance { get; set; }
         new T SpeedAmount { get; set; }
     }
@@ -175,7 +175,7 @@ namespace Stats
         /// <summary>
         /// Affects Harmony
         /// </summary>
-        T Enlightenment { get; }
+        T DisruptionResistance { get; }
 
         T CriticalChance { get; }
         T SpeedAmount { get; }
@@ -183,7 +183,7 @@ namespace Stats
 
     public interface IConcentrationStatsInjection<in T>
     {
-        T Enlightenment { set; }
+        T DisruptionResistance { set; }
         T CriticalChance { set; }
         T SpeedAmount { set; }
     }

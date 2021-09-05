@@ -2,6 +2,7 @@
 using _CombatSystem;
 using _Team;
 using Characters;
+using Passives;
 using Skills;
 using SMaths;
 using UnityEngine;
@@ -214,7 +215,7 @@ namespace Stats
         {
             return type switch
             {
-                EnumStats.Concentration.Enlightenment => stats.Enlightenment,
+                EnumStats.Concentration.Enlightenment => stats.DisruptionResistance,
                 EnumStats.Concentration.Critical => stats.CriticalChance,
                 EnumStats.Concentration.Speed => stats.SpeedAmount,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
@@ -314,9 +315,7 @@ namespace Stats
 
     public static class UtilsStats
     {
-        public static CombatStatsBasic ZeroValuesBasic = new CombatStatsBasic(0);
-        public static CombatStatsFull ZeroValuesFull = new CombatStatsFull(0);
-
+        
         public static float StatsFormula(float baseStat, float buffStat, float burstStat)
         {
             return baseStat * (1 + buffStat) * (1 + burstStat); //Exponential grow for buff * Burst
@@ -364,7 +363,7 @@ namespace Stats
         {
             stats.SpeedAmount += injection.SpeedAmount;
             stats.CriticalChance += injection.CriticalChance;
-            stats.Enlightenment += injection.Enlightenment;
+            stats.DisruptionResistance += injection.DisruptionResistance;
         }
 
         public static void Add(IBasicStats<float> stats, ITemporalStatsData<float> injection)
@@ -407,7 +406,7 @@ namespace Stats
 
         public static void OverrideStats(IConcentrationStatsInjection<float> stats, float value = 0)
         {
-            stats.Enlightenment = value;
+            stats.DisruptionResistance = value;
             stats.CriticalChance = value;
             stats.SpeedAmount = value;
         }
@@ -457,7 +456,7 @@ namespace Stats
 
         public static void CopyStats(IConcentrationStatsInjection<float> injection, IConcentrationStatsData<float> copyFrom)
         {
-            injection.Enlightenment = copyFrom.Enlightenment;
+            injection.DisruptionResistance = copyFrom.DisruptionResistance;
             injection.CriticalChance = copyFrom.CriticalChance;
             injection.SpeedAmount = copyFrom.SpeedAmount;
         }
@@ -612,7 +611,8 @@ namespace Stats
         {
             if(damage <= 0) return;
 
-            var stats = target.CombatStats;
+            CombatStatsHolder stats = target.CombatStats;
+            var statsBase = stats.BaseStats;
 
             UtilsStats.EnqueueTemporalStatsEvent(target);
             UtilsStats.EnqueueDamageEvent(target,damage);
@@ -639,7 +639,7 @@ namespace Stats
             else
             {
                 // If not, just make them KO
-                target.CombatStats.TeamData.knockOutHandler.Add(target);
+                stats.TeamData.knockOutHandler.Add(target);
                 UtilsStats.EnqueueHealthZeroStatsEvent(target);
             }
 
@@ -660,6 +660,7 @@ namespace Stats
             {
                 target.ReceivedStats.DamageReceived = damage;
             }
+
         }
 
         public static void DoStaticDamage(CombatingEntity target, float damage)
@@ -694,7 +695,7 @@ namespace Stats
 
             void ResetAccumulatedStaticDamage()
             {
-                stats.AccumulatedStatic = 0; //By design Heals counts 'StaticDamage'
+                stats.AccumulatedStatic = 0; //By design Heals counters 'StaticDamage'
             }
         }
 
@@ -788,36 +789,35 @@ namespace Stats
         }
 
 
-        public static void AddHarmony(CombatingEntity entity, ITemporalStats<float> stats, float addition)
+        public static void VariateHarmony(CombatingEntity entity, ITemporalStats<float> stats, float variation)
         {
-            float userEnlightenment = entity.CombatStats.Enlightenment; //Generally value = 1;
-            addition *= userEnlightenment;
+            if (variation < 0) //It's a harmony damage
+            {
+                float disruptionResistance = entity.CombatStats.DisruptionResistance;
+                variation += disruptionResistance;
+                if(variation > 0) return;
+            }
+           
 
-            float targetHarmony = stats.HarmonyAmount + addition;
+            float targetHarmony = stats.HarmonyAmount + variation;
             targetHarmony = Mathf.Clamp(
                 targetHarmony, 
                 StatsCap.MinHarmony, StatsCap.MaxHarmony);
             stats.HarmonyAmount = targetHarmony;
 
             UtilsStats.EnqueueTemporalStatsEvent(entity);
+            entity.ReceivedStats.HarmonyAmount += variation;
         }
-        public static void AddHarmony(CombatingEntity entity, float addition)
-            => AddHarmony(entity, entity.CombatStats.BaseStats, addition);
-        public static void RemoveHarmony(CombatingEntity user, CombatingEntity target, float reduction)
-        {
-            var userStats = user.CombatStats;
-            var targetStats = target.CombatStats;
-            float userEnlightenment = userStats.Enlightenment; //Generally value = 1;
-            float targetEnlightenment = targetStats.Enlightenment;
-            float harmonyVariation = userEnlightenment - targetEnlightenment;
-            reduction += reduction * harmonyVariation;
 
-            var targetHarmonyHolder = targetStats.BaseStats;
-            float targetHarmony = targetHarmonyHolder.HarmonyAmount;
-            targetHarmony -= reduction;
-            if (targetHarmony < 0) targetHarmony = 0;
-            targetHarmonyHolder.HarmonyAmount = targetHarmony;
+        public static void VariateHarmony(CombatingEntity entity, float variation)
+            => VariateHarmony(entity, entity.CombatStats.BaseStats,variation);
+
+        public static void DoHarmonyKnockOutDamage(CombatingEntity entity)
+        {
+            float harmonyDamage = entity.HarmonyHolder.HarmonyLossOnDeath;
+            VariateHarmony(entity,harmonyDamage);
         }
+
 
         public static void AddTeamControl(CombatingTeam team, float addition)
         {

@@ -325,14 +325,14 @@ namespace Stats
                 return value;
             }
         }
-        public float Enlightenment
+        public float DisruptionResistance
         {
             get
             {
                 float value = 0;
                 foreach (var stat in this)
                 {
-                    value += stat.Enlightenment;
+                    value += stat.DisruptionResistance;
                 }
                 return value;
             }
@@ -474,21 +474,14 @@ namespace Stats
             baseType.InitiativePercentage + buffType.InitiativePercentage + burstType.InitiativePercentage;
 
         // Summatory because actions (buff and burst) are added in units to base, percentage doesn't make much difference
-        public float ActionsPerInitiative
-        {
-            get
-            {
-                Debug.Log($"Base {baseType.ActionsPerInitiative} / Buff {buffType.ActionsPerInitiative} / " +
-                          $"Burst {burstType.ActionsPerInitiative}");
-                return baseType.ActionsPerInitiative + buffType.ActionsPerInitiative + burstType.ActionsPerInitiative;
-            }
-        }
+        public float ActionsPerInitiative => 
+            baseType.ActionsPerInitiative + buffType.ActionsPerInitiative + burstType.ActionsPerInitiative;
 
-        public float Enlightenment =>
+        public float DisruptionResistance =>
             UtilsStats.StatsFormula(
-                baseType.Enlightenment,
-                buffType.Enlightenment,
-                burstType.Enlightenment);
+                baseType.DisruptionResistance,
+                buffType.DisruptionResistance,
+                burstType.DisruptionResistance);
 
         public float CriticalChance =>
             UtilsStats.StatsFormula(

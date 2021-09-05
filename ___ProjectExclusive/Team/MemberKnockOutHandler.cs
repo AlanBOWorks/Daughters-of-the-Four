@@ -33,25 +33,15 @@ namespace _Team
             }
         }
 
-        public const float DefaultControlGainPerKnockOut = .1f;
         public void Add(CombatingEntity healthLessEntity)
         {
             if(Contains(healthLessEntity) || !healthLessEntity.IsAlive()) return;
 
             var statsHolder = _team.StatsHolder;
 
-                DoControlCalculation();
             Add(healthLessEntity,statsHolder.ReviveTime);
-
-            void DoControlCalculation()
-            {
-                var teamControlHandler =
-                    CombatSystemSingleton.CombatTeamControlHandler;
-                float controlGain = DefaultControlGainPerKnockOut;
-                controlGain = -controlGain; //Negative since controlLoseOnDeath is negative
-
-                teamControlHandler.DoVariation(_team, controlGain);
-            }
+            UtilsCombatStats.DoHarmonyKnockOutDamage(healthLessEntity);
+            
         }
         private void Add(CombatingEntity entity, float revivingThreshold)
         {
@@ -76,8 +66,7 @@ namespace _Team
             entity.Events.OnRevive(entity);
         }
 
-        private const float HarmonyAddition = .5f;
-        private const float HarmonyPenalty = -.5f;
+        private const float ControlGainOnAllKO = .5f;
         private const int ActionsAddition = 3; 
         public void OnAllKnockOut()
         {
@@ -85,18 +74,17 @@ namespace _Team
             _standByEntities.Clear();
             foreach (CombatingEntity entity in _team)
             {
-                UtilsCombatStats.AddHarmony(entity,HarmonyPenalty);
                 CallRevive(entity);
             }
 
             var enemyTeam = _team[0].CharacterGroup.Enemies;
             foreach (CombatingEntity entity in enemyTeam)
             {
-                UtilsCombatStats.AddHarmony(entity,HarmonyAddition);
                 UtilsCombatStats.AddActionAmount(entity.CombatStats,ActionsAddition);
             }
 
             CombatSystemSingleton.GlobalCharacterChangesEvent.OnTeamHealthZero(_team);
+            CombatSystemSingleton.CombatTeamControlHandler.DoVariation(enemyTeam,ControlGainOnAllKO);
         }
 
         public bool Contains(CombatingEntity entity)

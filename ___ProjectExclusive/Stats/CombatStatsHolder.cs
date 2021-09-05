@@ -61,11 +61,6 @@ namespace Stats
         public IStanceData<IBasicStats<float>> GetPositionalStats() 
             => _positionalStats;
 
-        /// <summary>
-        /// Use this to add stats to the total calculations
-        /// </summary>
-        public HashsetStatsHolder ListedStats => _formulatedStats;
-
         public bool IsInDanger() => HarmonyAmount < UtilsHarmony.DangerThreshold;
 
         public CombatingTeam TeamData
@@ -74,7 +69,7 @@ namespace Stats
             set
             {
                 _teamData = value;
-                _formulatedStats.Inject(value.StatsHolder);
+                value.StatsHolder.InjectOn(value);
             }
         }
 
@@ -170,7 +165,7 @@ namespace Stats
         public float DeBuffReduction => _multiplierStats.VitalityAmount * _formulatedStats.DeBuffReduction;
 
         [ShowInInspector]
-        public float Enlightenment => _multiplierStats.ConcentrationAmount * _formulatedStats.Enlightenment;
+        public float DisruptionResistance => _multiplierStats.ConcentrationAmount * _formulatedStats.DisruptionResistance;
         [ShowInInspector]
         public float CriticalChance => _multiplierStats.ConcentrationAmount * _formulatedStats.CriticalChance;
         [ShowInInspector]
@@ -233,16 +228,6 @@ namespace Stats
             }
 
 
-            private IBasicStatsData<float> _teamPositionalStats;
-
-            public void Inject(TeamCombatStatsHolder teamStats)
-            {
-                if (_teamPositionalStats != null)
-                    baseType.Remove(_teamPositionalStats);
-
-                _teamPositionalStats = teamStats.PositionalStats;
-                baseType.Add(_teamPositionalStats);
-            }
             public void Inject(PositionalStats positionalStats)
             {
                 buffType.Add(positionalStats);
@@ -334,8 +319,8 @@ namespace Stats
                 currentUpgrades.VitalityAmount);
 
 
-            Enlightenment = UtilsStats.GrowFormula(
-                initialStats.Enlightenment, growStats.Enlightenment,
+            DisruptionResistance = UtilsStats.GrowFormula(
+                initialStats.DisruptionResistance, growStats.DisruptionResistance,
                 currentUpgrades.ConcentrationAmount);
             CriticalChance = UtilsStats.GrowFormula(
                 initialStats.CriticalChance, growStats.CriticalChance,

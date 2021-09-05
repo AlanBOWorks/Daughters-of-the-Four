@@ -147,7 +147,7 @@ namespace Stats
                 return value;
             }
         }
-        public float Enlightenment
+        public float DisruptionResistance
         {
             get
             {
@@ -155,7 +155,7 @@ namespace Stats
                 foreach (var pair in ConcentrationStats)
                 {
                     if (pair.Value.CanBeUsed(User))
-                        value += pair.Key.Enlightenment;
+                        value += pair.Key.DisruptionResistance;
                 }
                 return value;
             }

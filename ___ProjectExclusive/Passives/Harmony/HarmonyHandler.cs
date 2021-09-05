@@ -45,7 +45,7 @@ namespace Passives
             private readonly CombatStatsHolder _harmonyStatsHolder;
 
             [ShowInInspector]
-            public float HarmonyLossOnDeath => .1f;
+            public float HarmonyLossOnDeath => .3f;
 
             // Positive Harmony Buff
             [ShowInInspector]
@@ -64,7 +64,7 @@ namespace Passives
             public float HealPower => 0;
             public float BuffPower => 0;
             public float BuffReceivePower => 0;
-            public float Enlightenment => 0;
+            public float DisruptionResistance => 0;
             public float CriticalChance => 0;
             public float SpeedAmount => 0;
             public float MaxMortalityPoints => 0;
@@ -82,7 +82,7 @@ namespace Passives
             private readonly CombatStatsHolder _harmonyStatsHolder;
 
             [ShowInInspector]
-            public float HarmonyLossOnDeath => .2f;
+            public float HarmonyLossOnDeath => .4f;
 
             // Positive Harmony Buff
             [ShowInInspector]
@@ -105,7 +105,7 @@ namespace Passives
             public float MaxMortalityPoints => 0;
             public float DamageReduction => 0;
             public float DeBuffReduction => 0;
-            public float Enlightenment => 0;
+            public float DisruptionResistance => 0;
             public float CriticalChance => 0;
             public float SpeedAmount => 0;
             public float HarmonyAmount => 0;
@@ -123,7 +123,7 @@ namespace Passives
             private readonly CombatStatsHolder _harmonyStatsHolder;
 
             [ShowInInspector]
-            public float HarmonyLossOnDeath => .2f;
+            public float HarmonyLossOnDeath => .4f;
 
             // Positive Harmony Buff
             [ShowInInspector]
@@ -143,7 +143,7 @@ namespace Passives
             public float MaxMortalityPoints => 0;
             public float DamageReduction => 0;
             public float DeBuffReduction => 0;
-            public float Enlightenment => 0;
+            public float DisruptionResistance => 0;
             public float CriticalChance => 0;
             public float SpeedAmount => 0;
 
@@ -161,6 +161,11 @@ namespace Passives
         public const float PositiveCheck = .5f;
         public const float NegativeCheck = -.3f;
         public const float DangerThreshold = -.6f;
+        /// <summary>
+        /// Amount of [<see cref="ITemporalStatsData{float}.HarmonyAmount"/>] that the [<seealso cref="CombatingEntity"/>]
+        /// loses when being damaged if it's in [<see cref="DangerThreshold"/>]
+        /// </summary>
+        public const float InDangerHarmonyLossOnHit = .02f;
 
         public static bool IsInDanger(CombatStatsHolder holder) 
             => holder.HarmonyAmount < DangerThreshold;

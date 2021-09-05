@@ -12,19 +12,19 @@ namespace _Team
         public CombatingTeam(ITeamCombatControlHolder holder, int amountOfEntities = AmountOfArchetypes)
             : base(amountOfEntities)
         {
-            ControlHandler = new TeamCombatControlHandler();
+            control = new CombatTeamControl();
             if (holder != null)
             {
-                StatsHolder = new TeamCombatStatsHolder(ControlHandler, holder);
+                StatsHolder = new TeamCombatStatsHolder(control, holder);
             }
             else
-                StatsHolder = new TeamCombatStatsHolder(ControlHandler);
+                StatsHolder = new TeamCombatStatsHolder(control);
 
             knockOutHandler = new MemberKnockOutHandler(this);
 
         }
 
-        [ShowInInspector] public readonly TeamCombatControlHandler ControlHandler;
+        [ShowInInspector] public readonly CombatTeamControl control;
         [ShowInInspector] public readonly TeamCombatStatsHolder StatsHolder;
         [ShowInInspector] public MemberKnockOutHandler knockOutHandler;
 

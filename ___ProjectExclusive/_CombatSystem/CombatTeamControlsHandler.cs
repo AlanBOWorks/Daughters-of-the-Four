@@ -43,7 +43,7 @@ namespace _CombatSystem
     }
 
     /// <summary>
-    ///  Keeps track of the [<seealso cref="TeamCombatControlHandler.ControlAmount"/>]
+    ///  Keeps track of the [<seealso cref="CombatTeamControl.ControlAmount"/>]
     /// of both [<seealso cref="ICharacterFaction{T}"/>]
     ///  groups and normalize the variations.
     /// </summary>
@@ -102,8 +102,8 @@ namespace _CombatSystem
             if (IsBurstState()) return;
             HandleTeams(team, out var actingTeam, out var receiver);
 
-            actingTeam.ControlHandler.IsBurstStance = true;
-            receiver.ControlHandler.DoBurstControl(-burstControl); // Is negative because the Control is checked in negatives
+            actingTeam.control.IsBurstStance = true;
+            receiver.control.DoBurstControl(-burstControl); // Is negative because the Control is checked in negatives
             _burstRoundCount = team.StatsHolder.BurstCounterAmount;
 
             DoVariationCheck(actingTeam, receiver);
@@ -113,7 +113,7 @@ namespace _CombatSystem
         {
             if (!IsBurstState()) return;
             HandleTeams(team, out var actingTeam, out var receiver);
-            actingTeam.ControlHandler.DoBurstVariation(counterBurst);
+            actingTeam.control.DoBurstVariation(counterBurst);
 
             _burstRoundCount = team.StatsHolder.BurstCounterAmount;
             _burstRoundCount -= _burstRoundCount;
@@ -126,16 +126,16 @@ namespace _CombatSystem
 
         private void FinishBurstControl()
         {
-            PlayerFaction.ControlHandler.FinishBurstControl();
-            EnemyFaction.ControlHandler.FinishBurstControl();
+            PlayerFaction.control.FinishBurstControl();
+            EnemyFaction.control.FinishBurstControl();
             InvokeListeners();
         }
 
 
         private void InvokeListeners()
         {
-            var playerControl = PlayerFaction.ControlHandler;
-            var enemyControl = EnemyFaction.ControlHandler;
+            var playerControl = PlayerFaction.control;
+            var enemyControl = EnemyFaction.control;
             float control = playerControl.GetControlAmount()
                 - enemyControl.GetControlAmount();
             control = Mathf.Clamp(control, -1, 1);
@@ -173,23 +173,16 @@ namespace _CombatSystem
         }
         private void DoVariation(CombatingTeam actingTeam, CombatingTeam receiver, float controlGain)
         {
-            var actingControl = actingTeam.ControlHandler;
-            var receiverControl = receiver.ControlHandler;
-            DoVariation(ref actingControl.TeamControlAmount);
-            receiverControl.TeamControlAmount = -actingControl.GetControlAmount();
-            DoVariationCheck(actingTeam,receiver);
-
-            void DoVariation(ref float controlValue)
-            {
-                controlValue += controlGain;
-                if (controlValue > 1) controlValue = 1;
-            }
+            var actingControl = actingTeam.control;
+            var receiverControl = receiver.control;
+            actingControl.VariateControl(controlGain);
+            receiverControl.MirrorEnemy(actingControl);
         }
 
         private void DoVariationCheck(CombatingTeam check, CombatingTeam reaction)
         {
-            bool isAttacking = reaction.ControlHandler.IsLosing();
-            bool isDefending = check.ControlHandler.IsLosing();
+            bool isAttacking = reaction.control.IsLosing();
+            bool isDefending = check.control.IsLosing();
 
             switch (_lastPlayerStance)
             {
@@ -206,7 +199,7 @@ namespace _CombatSystem
                     CheckForAttacking();
                     break;
                 default:
-                    throw new NotImplementedException($"Team state not supported: {check.ControlHandler.CurrentStance}");
+                    throw new NotImplementedException($"Team state not supported: {check.control.CurrentStance}");
             }
 
 
@@ -250,8 +243,8 @@ namespace _CombatSystem
                     HandleTeams();
                     break;
                 default:
-                    actingTeam.ControlHandler.DoForceStance(EnumTeam.Stances.Neutral);
-                    receiver.ControlHandler.DoForceStance(EnumTeam.Stances.Neutral);
+                    actingTeam.control.DoForceStance(EnumTeam.Stances.Neutral);
+                    receiver.control.DoForceStance(EnumTeam.Stances.Neutral);
                     break;
             }
 
@@ -260,8 +253,8 @@ namespace _CombatSystem
 
             void HandleTeams()
             {
-                winner.ControlHandler.DoForceStance(EnumTeam.Stances.Attacking);
-                loser.ControlHandler.DoForceStance(EnumTeam.Stances.Defending);
+                winner.control.DoForceStance(EnumTeam.Stances.Attacking);
+                loser.control.DoForceStance(EnumTeam.Stances.Defending);
             }
             void InvokeEvent(CombatingTeam targetTeam)
             {

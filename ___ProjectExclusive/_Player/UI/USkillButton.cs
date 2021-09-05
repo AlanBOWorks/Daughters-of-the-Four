@@ -19,15 +19,19 @@ namespace _Player
 
         // TODO Icon
         // TODO animations by states
+        [Title("Skill")]
         [SerializeField] private Image skillIcon = null;
-        [SerializeField] private Image border = null;
+        [SerializeField] private TextMeshProUGUI skillName = null;
+        [Title("Tooltips")] 
         [SerializeField] private Image selectedIcon = null;
         [SerializeField] private TextMeshProUGUI cooldownHolder = null;
+        [Title("Aesthetics")]
+        [SerializeField] private Image border = null;
 
         public SkillButtonBehaviour Behaviour { set; private get; }
 
         public CombatingEntity CurrentEntity { get; private set; }
-        [ShowInInspector]
+        [ShowInInspector,DisableInEditorMode]
         public CombatSkill CurrentSkill { get; private set; }
 
         public CombatSkill.State SkillState
@@ -66,9 +70,19 @@ namespace _Player
             var colorThemes = GameThemeSingleton.ThemeColors;
             var skillColor = colorThemes.effectColors.GetHolderElement(skillType);
 
-            skillIcon.sprite = skillSprite;
-            skillIcon.color = skillColor;
-            border.color = skillColor;
+
+            if (skillName != null)
+            {
+                skillName.text = CurrentSkill.SkillName;
+                skillName.color = skillColor;
+            }
+            if (skillIcon != null)
+            {
+                skillIcon.sprite = skillSprite;
+                skillIcon.color = skillColor;
+            }
+            if(border != null)
+                border.color = skillColor;
         }
 
         public void OnPointerEnter(PointerEventData eventData)
@@ -119,7 +133,8 @@ namespace _Player
 
         public void ToggleSelectedIcon(bool set)
         {
-            selectedIcon.gameObject.SetActive(set);
+            if(selectedIcon != null)
+                selectedIcon.gameObject.SetActive(set);
         }
 
         //TODO do mouse handling

@@ -11,14 +11,14 @@ namespace CombatEffects
     {
         public override void DoEffect(SkillArguments arguments, CombatingEntity target, float harmonyAddition = 1)
         {
-            float enlightenmentAmount = arguments.UserStats.Enlightenment;
+            float enlightenmentAmount = arguments.UserStats.DisruptionResistance;
             float harmonyModifier = enlightenmentAmount * harmonyAddition;
             DoEffect(target,harmonyModifier);
         }
         
         public override void DoEffect(CombatingEntity target, float harmonyAddition)
         {
-            UtilsCombatStats.AddHarmony(target,GetBuff(target), harmonyAddition);
+            UtilsCombatStats.VariateHarmony(target,GetBuff(target), harmonyAddition);
             target.Events.InvokeTemporalStatChange();
         }
 

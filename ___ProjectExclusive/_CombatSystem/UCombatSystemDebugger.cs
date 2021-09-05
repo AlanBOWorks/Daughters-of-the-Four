@@ -30,17 +30,17 @@ namespace _CombatSystem
 
         private class TeamDataTracker
         {
-            public TeamCombatControlHandler controlHandler;
+            public CombatTeamControl control;
             public TeamCombatStatsHolder Stats;
         }
 
 
         public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
         {
-            _teamTracker.controlHandler = playerEntities.ControlHandler;
+            _teamTracker.control = playerEntities.control;
             _teamTracker.Stats = playerEntities.StatsHolder;
 
-            _enemyTeamTracker.controlHandler = enemyEntities.ControlHandler;
+            _enemyTeamTracker.control = enemyEntities.control;
             _enemyTeamTracker.Stats = enemyEntities.StatsHolder;
         }
 #else
