@@ -20,7 +20,7 @@ namespace CombatEffects
             var combatStatsHolder = target.CombatStats;
 
             UtilsCombatStats.SetInitiative(target, combatStatsHolder.BaseStats, effectModifier);
-            UtilsCombatStats.SetActionAmount(combatStatsHolder,0);  
+            combatStatsHolder.ResetActionsAmount();
         }
     }
 }

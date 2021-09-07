@@ -773,19 +773,10 @@ namespace Stats
         }
 
 
-        public static void SetActionAmount(CombatStatsHolder stats, float targetValue)
-        {
-            const int lowerCap = GlobalCombatParams.ActionsLowerCap;
-            const int maxCap = GlobalCombatParams.ActionsPerInitiativeCap;
-
-            targetValue = Mathf.Clamp(targetValue, lowerCap, maxCap);
-            stats.ActionsLefts = Mathf.RoundToInt(targetValue);
-
-        }
-
         public static void AddActionAmount(CombatStatsHolder stats,float addition)
         {
-            SetActionAmount(stats, stats.ActionsLefts + addition);
+            int finalAmount = Mathf.RoundToInt(addition);
+            stats.AddActionsAmount(finalAmount);
         }
 
 

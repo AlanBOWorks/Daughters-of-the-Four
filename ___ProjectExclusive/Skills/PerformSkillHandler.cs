@@ -15,16 +15,20 @@ namespace Skills
     /// </summary>
     public class PerformSkillHandler : ICombatAfterPreparationListener, ITempoListener, ISkippedTempoListener
     {
-        [ShowInInspector] private CombatingEntity _currentUser;
-        [ShowInInspector] private readonly SkillTargets _currentSkillTargets;
-        private readonly SkillActionHandler _skillActionHandler;
-
         public PerformSkillHandler()
         {
             int sizeAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
             _currentSkillTargets = new SkillTargets(sizeAllocation); // it could be a whole targets
             _skillActionHandler = new SkillActionHandler();
         }
+
+
+        [ShowInInspector] private CombatingEntity _currentUser;
+        [ShowInInspector] private readonly SkillTargets _currentSkillTargets;
+        private readonly SkillActionHandler _skillActionHandler;
+        private CoroutineHandle _doSkillHandle;
+
+
 
         public void OnAfterPreparation(
             CombatingTeam playerEntities,
@@ -33,8 +37,6 @@ namespace Skills
         {
 
         }
-
-
         public void OnInitiativeTrigger(CombatingEntity entity)
         {
             _currentUser = entity;
@@ -58,45 +60,65 @@ namespace Skills
             OnFinisAllActions(entity);
         }
 
-        private CoroutineHandle _doSkillHandle;
 
-        public void DoSkill(CombatingEntity target)
+        /// <summary>
+        /// Perform the current[<see cref="CombatSkill"/>] and saves it in the [<seealso cref="FateSkillsHandler"/>].
+        /// The used skill will use the default behaviour (eg: cooldown) through [<see cref="CombatSkill.OnSkillUsage"/>]
+        /// </summary>
+        private void NaturalSkillAction(CombatingEntity target)
         {
+            var skill = _currentSkillTargets.UsingSkill;
+            skill.OnSkillUsage();
+
+            _currentUser.FateSkills.SaveSkill(target,skill);
             _doSkillHandle =
                 Timing.RunCoroutineSingleton(_DoSkill(target), _doSkillHandle, SingletonBehavior.Wait);
         }
 
-        public static void SendDoSkill(CombatingEntity target)
+        public void DoSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
         {
-            CombatSystemSingleton.PerformSkillHandler.DoSkill(target);
+            _doSkillHandle =
+                Timing.RunCoroutineSingleton(_DoSkill(skill,user,target), _doSkillHandle, SingletonBehavior.Wait);
         }
+
+        /// <summary>
+        /// <inheritdoc cref="NaturalSkillAction"/>
+        /// </summary>
+        public static void SendNaturalSkillAction(CombatingEntity target)
+        {
+            CombatSystemSingleton.PerformSkillHandler.NaturalSkillAction(target);
+        }
+
 
         //TODO Change Skill to Effect
         private IEnumerator<float> _DoSkill(CombatingEntity target)
         {
             var skill = _currentSkillTargets.UsingSkill;
+            yield return Timing.WaitUntilDone(_DoSkill(skill, _currentUser, target));
+        }
+
+        private IEnumerator<float> _DoSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
+        {
             var mainEffect = skill.Preset.GetMainEffect();
 
             List<CombatingEntity> effectTargets;
             if (mainEffect != null)
-                effectTargets = UtilsTargets.GetEffectTargets(_currentUser, target, mainEffect.GetEffectTarget());
+                effectTargets = UtilsTargets.GetEffectTargets(user, target, mainEffect.GetEffectTarget());
             else
                 effectTargets = target.CharacterGroup.Self;
 
 
             // TODO make a waitUntil(Animation call for Skill)
-            yield return Timing.WaitUntilDone(_currentUser.CombatAnimator.DoAnimation(
-                _currentUser, effectTargets,
-                _currentSkillTargets.UsingSkill));
-            _skillActionHandler.DoSkill(skill, _currentUser, target);
+            yield return Timing.WaitUntilDone(user.CombatAnimator.DoAnimation(
+                user, effectTargets, skill));
+
+
+            CombatSystemSingleton.SkillUsagesEvent.InvokeSkill(skill);
+            _skillActionHandler.DoSkill(skill,user, target);
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
-            skill.OnSkillUsage();
-            CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(_currentUser);
+            CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(user);
             CombatSystemSingleton.CharacterEventsTracker.Invoke();
-
-
-
         }
 
         public List<CombatingEntity> HandlePossibleTargets(CombatSkill skill)

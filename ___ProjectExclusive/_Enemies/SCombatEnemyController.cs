@@ -61,15 +61,11 @@ namespace _Enemies
                 throw new ArgumentException("Skill can't be empty", 
                     new NullReferenceException("The selector of skill had failed in choosing a Skill"));
 
-#if UNITY_EDITOR
-            Debug.Log($"[[ AI ]]] Using Skill: {skill.SkillName}");
-#endif
-
             List<CombatingEntity> possibleTargets
                 = PerformSkillHandler.SendHandlePossibleTargets(skill);
             int randomSelection = Random.Range(0, possibleTargets.Count);
             CombatingEntity selection = possibleTargets[randomSelection];
-            PerformSkillHandler.SendDoSkill(selection);
+            PerformSkillHandler.SendNaturalSkillAction(selection);
         }
 
         private void DoRandomSelection(CombatSkill backupSkillOnZero)

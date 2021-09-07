@@ -76,6 +76,11 @@ namespace ___ProjectExclusive
 
             return generated;
         }
+
+        public static string GetPercentagePrint(float hundredValue)
+        {
+            return $"{hundredValue:000}%";
+        }
     }
 
     public static class UtilsGame

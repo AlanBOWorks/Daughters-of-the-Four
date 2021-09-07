@@ -54,13 +54,17 @@ namespace Characters
                 CombatStats.GetFormulatedStats().GetBuff(),
                 AreasDataTracker.Role);
 
+            // FATE
+            FateSkills = new FateSkillsHandler(this);
+
             // PASSIVES
             DelayBuffHandler = new DelayBuffHandler(this);
             Guarding = new CharacterGuarding(this);
             PassivesHolder = new CombatPassivesHolder(this);
 
             Events.Subscribe(Guarding);
-            Events.CheckAndSubscribe(DelayBuffHandler);
+            Events.Subscribe(DelayBuffHandler);
+
         }
         
 
@@ -104,6 +108,8 @@ namespace Characters
 
         [ShowInInspector]
         public CombatSkills CombatSkills { get; private set; }
+        [ShowInInspector] 
+        public readonly FateSkillsHandler FateSkills;
 
         public ICharacterCombatAnimator CombatAnimator;
 

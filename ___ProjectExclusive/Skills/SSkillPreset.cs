@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ___ProjectExclusive;
+using _CombatSystem;
 using Characters;
 using CombatConditions;
 using CombatEffects;
@@ -96,7 +97,7 @@ namespace Skills
             var isCritical = arguments.IsCritical;
 
 
-            var effect = effects[effectIndex];
+            EffectParams effect = effects[effectIndex];
             var effectTargets = UtilsTargets.GetEffectTargets(user, target, effect.GetEffectTarget());
             float randomModifier;
             UpdateRandomness();
@@ -114,6 +115,7 @@ namespace Skills
                         randomModifier = 1;
 
                     effect.DoEffect(arguments, effectTarget, randomModifier);
+                    CombatSystemSingleton.SkillUsagesEvent.DoEffect(target, effect.Preset, randomModifier);
                 }
             }
             void UpdateRandomness()
@@ -229,11 +231,4 @@ namespace Skills
 
     }
 
-    public class SkillArguments
-    {
-        public CombatingEntity User;
-        public IFullStatsData<float> UserStats;
-        public CombatingEntity InitialTarget;
-        public bool IsCritical;
-    }
 }

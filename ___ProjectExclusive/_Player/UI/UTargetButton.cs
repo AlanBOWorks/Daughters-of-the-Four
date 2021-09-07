@@ -50,7 +50,7 @@ namespace _Player
             {
                 case PointerEventData.InputButton.Left:
                     PlayerEntitySingleton.SkillButtonsHandler.OnSubmitSkill();
-                    PerformSkillHandler.SendDoSkill(_currentTarget);
+                    PerformSkillHandler.SendNaturalSkillAction(_currentTarget);
                     break;
                     //TODO left click?
                 default:

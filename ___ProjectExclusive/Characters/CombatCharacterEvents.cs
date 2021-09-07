@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using _CombatSystem;
 using _Team;
 using CombatEffects;
+using MEC;
 using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
@@ -10,7 +11,7 @@ using UnityEngine;
 namespace Characters
 {
     /// <summary>
-    /// It's an invoker for [<see cref="ICharacterListener"/>] that will be invoked several times
+    /// It's an invoker for [<see cref="ICharacterEventListener"/>] that will be invoked several times
     /// by any way that revolves a 'Character' (such HP changes, stats, buffs and others).<br></br>
     /// Unlike [<seealso cref="ITempoListener"/>] that requires Ticking and will
     /// be invoked in the specific [<seealso cref="CombatingEntity"/>]'s turn, this listeners
@@ -19,7 +20,7 @@ namespace Characters
     /// and that's not the desired behaviour.
     /// <br></br>
     /// <br></br> _____ TL;DR _____ <br></br>
-    /// [<see cref="ICharacterListener"/>]:
+    /// [<see cref="ICharacterEventListener"/>]:
     /// can be invoked by anyone and anywhere (generally an User will invoke 
     /// a specific target's listeners)<br></br>
     /// [<seealso cref="ITempoListener"/>]:
@@ -31,8 +32,10 @@ namespace Characters
         private List<ITempoListenerVoid> _onTempoListeners;
         [ShowInInspector]
         private List<IVitalityChangeListener> _onVitalityChange;
+        [ShowInInspector] 
+        private List<ITemporalStatChangeListener> _onTemporalStatChange;
         [ShowInInspector]
-        private List<ITemporalStatsChangeListener> _onTemporalStatsChange;
+        private List<ICombatHealthChangeListener> _onCombatHealthChange;
         [ShowInInspector]
         private List<IAreaStateChangeListener> _onAreaChange;
 
@@ -41,62 +44,34 @@ namespace Characters
 
         public CombatCharacterEventsBase()
         {
+            _onTempoListeners = new List<ITempoListenerVoid>();
+            
             _onVitalityChange = new List<IVitalityChangeListener>();
-            _onTemporalStatsChange = new List<ITemporalStatsChangeListener>();
+            _onTemporalStatChange = new List<ITemporalStatChangeListener>();
+            _onCombatHealthChange = new List<ICombatHealthChangeListener>();
             _onAreaChange = new List<IAreaStateChangeListener>();
+            
             _onHealthZeroListeners = new List<IHealthZeroListener>();
         }
 
-        public void Subscribe(ICharacterListener listener)
+        public void Subscribe(ICharacterEventListener listener)
         {
             if (listener is ITempoListenerVoid tempoListener)
-                CheckAndSubscribe(tempoListener);
+                _onTempoListeners.Add(tempoListener);
 
             if (listener is IVitalityChangeListener vitalityListener)
-                CheckAndSubscribe(vitalityListener);
-            if (listener is ITemporalStatsChangeListener temporalStatListener)
-                CheckAndSubscribe(temporalStatListener);
+                _onVitalityChange.Add(vitalityListener);
+            if (listener is ITemporalStatChangeListener temporalStatListener)
+                _onTemporalStatChange.Add(temporalStatListener);
+            if (listener is ICombatHealthChangeListener healthChangeListener)
+                _onCombatHealthChange.Add(healthChangeListener);
             if (listener is IAreaStateChangeListener areaStateListener)
-                CheckAndSubscribe(areaStateListener);
+                _onAreaChange.Add(areaStateListener);
 
             if (listener is IHealthZeroListener healthCheckListener)
-                CheckAndSubscribe(healthCheckListener);
+                _onHealthZeroListeners.Add(healthCheckListener);
         }
 
-        public void CheckAndSubscribe(ITempoListenerVoid listener)
-        {
-            if(_onTempoListeners == null)
-                _onTempoListeners = new List<ITempoListenerVoid>();
-            _onTempoListeners.Add(listener);
-        }
-
-        public void CheckAndSubscribe(IVitalityChangeListener listener)
-        {
-            if (_onVitalityChange == null)
-                _onVitalityChange = new List<IVitalityChangeListener>();
-            _onVitalityChange.Add(listener);
-        }
-
-        public void CheckAndSubscribe(ITemporalStatsChangeListener listener)
-        {
-            if (_onTemporalStatsChange == null)
-                _onTemporalStatsChange = new List<ITemporalStatsChangeListener>();
-            _onTemporalStatsChange.Add(listener);
-        }
-
-        public void CheckAndSubscribe(IAreaStateChangeListener listener)
-        {
-            if (_onAreaChange == null)
-                _onAreaChange = new List<IAreaStateChangeListener>();
-            _onAreaChange.Add(listener);
-        }
-
-        public void CheckAndSubscribe(IHealthZeroListener listener)
-        {
-            if (_onHealthZeroListeners == null)
-                _onHealthZeroListeners = new List<IHealthZeroListener>();
-            _onHealthZeroListeners.Add(listener);
-        }
 
 
         public void InvokeVitalityChange(CombatingEntity entity)
@@ -112,10 +87,10 @@ namespace Characters
 
         public void InvokeTemporalStatChange(CombatingEntity entity)
         {
-            if(_onTemporalStatsChange is null) return;
+            if(_onCombatHealthChange is null) return;
 
             ICombatHealthStatsData<float> onStats = entity.CombatStats;
-            foreach (ITemporalStatsChangeListener listener in _onTemporalStatsChange)
+            foreach (ICombatHealthChangeListener listener in _onCombatHealthChange)
             {
                 listener.OnTemporalStatsChange(onStats);
             }
@@ -206,11 +181,11 @@ namespace Characters
     {
         private readonly CombatingEntity _user;
         public readonly OnHitEventHandler OnHitEvent;
-        public CombatCharacterEvents(CombatingEntity user)
+        public CombatCharacterEvents(CombatingEntity user) : base()
         {
             _user = user;
             OnHitEvent = new OnHitEventHandler(user);
-            CheckAndSubscribe(OnHitEvent);
+            base.Subscribe(OnHitEvent);
         }
 
         private static CombatCharacterEventsBase GlobalEvents()
@@ -456,25 +431,28 @@ namespace Characters
     /// <summary>
     /// A listener of stats changes (instead of every frame)
     /// </summary>
-    public interface ICharacterListener { }
+    public interface ICharacterEventListener { }
 
-    public interface IVitalityChangeListener : ICharacterListener
+    public interface IVitalityChangeListener : ICharacterEventListener
     {
         void OnVitalityChange(IVitalityStatsData<float> currentStats);
     }
 
-    public interface ITemporalStatsChangeListener : ICharacterListener
+    public interface ITemporalStatChangeListener : ICharacterEventListener
+    {
+        void OnConcentrationChange(ITemporalStatsData<float> currentStats);
+    }
+    public interface ICombatHealthChangeListener : ICharacterEventListener
     {
         void OnTemporalStatsChange(ICombatHealthStatsData<float> currentStats);
     }
-
-    public interface IAreaStateChangeListener : ICharacterListener
+    public interface IAreaStateChangeListener : ICharacterEventListener
     {
         void OnAreaStateChange(CharacterCombatAreasData data);
     }
 
 
-    public interface IHealthZeroListener : ICharacterListener
+    public interface IHealthZeroListener : ICharacterEventListener
     {
         void OnHealthZero(CombatingEntity entity);
         void OnMortalityZero(CombatingEntity entity);
@@ -482,12 +460,12 @@ namespace Characters
         void OnTeamHealthZero(CombatingTeam losingTeam);
     }
 
-    public interface IBuffDoneListener : ICharacterListener
+    public interface IBuffDoneListener : ICharacterEventListener
     {
         void OnBuffDone(CombatingEntity entity);
     }
 
-    public interface ICriticalActionListener : ICharacterListener
+    public interface ICriticalActionListener : ICharacterEventListener
     {
         void OnCriticalAction(CombatingEntity entity); 
     }

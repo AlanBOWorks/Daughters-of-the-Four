@@ -1,4 +1,5 @@
 using System;
+using _CombatSystem;
 using _Team;
 using Characters;
 using CombatConditions;
@@ -50,9 +51,9 @@ namespace Stats
         private readonly PositionalStats _positionalStats;
         private CombatingTeam _teamData;
 
-        [TitleGroup("Local stats"), PropertyOrder(-10)]
-        public int ActionsLefts;
-
+        [TitleGroup("Local stats")]
+        [PropertyOrder(-10),ShowInInspector]
+        public int ActionsLefts { get; private set; } = 0;
 
         private IBasicStatsData<float> TeamStats 
             => TeamData.GetCurrentStanceValue();
@@ -92,6 +93,24 @@ namespace Stats
         public bool IsAlive() => MortalityPoints > 0;
         public bool HasActionLeft() => ActionsLefts > 0;
 
+        public void ActionsSubtraction()
+        {
+            ActionsLefts--;
+        }
+        public void ResetActionsAmount()
+        {
+            ActionsLefts = 0;
+        }
+
+        public void AddActionsAmount(int amount)
+        {
+            const int lowerCap = GlobalCombatParams.ActionsLowerCap;
+            const int maxCap = GlobalCombatParams.ActionsPerInitiativeCap;
+
+            ActionsLefts += amount;
+
+            ActionsLefts = Mathf.Clamp(ActionsLefts, lowerCap, maxCap);
+        }
 
         public void RefillInitiativeActions()
         {

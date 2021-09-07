@@ -129,14 +129,14 @@ namespace Stats
 #endif
     }
 
-    public interface IHitEventHandler
+    public interface IHitEventHandler 
     {
         void Subscribe(ICombatHitListener listener);
         void UnSubscribe(ICombatHitListener listener);
 
     }
 
-    public interface ICombatHitListener
+    public interface ICombatHitListener : ICharacterEventListener
     {
         void OnDamage(float damage);
         void OnNotBeingHitSequence();

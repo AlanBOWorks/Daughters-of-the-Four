@@ -24,6 +24,7 @@ namespace _CombatSystem
             PerformSkillHandler = new PerformSkillHandler();
             GlobalCharacterChangesEvent = new CombatCharacterEventsBase();
             CharacterEventsTracker = new CharacterEventsTracker();
+            SkillUsagesEvent = new SkillUsagesEvent();
 
             // Locals declarations that wont be used further than durante the CombatInvoker
             var combatControlDeclaration = new CombatControlDeclaration();
@@ -33,6 +34,7 @@ namespace _CombatSystem
             var burstResetHandler = new CharacterCombatDataResetHandler();
             var teamStateTicker = new TeamTempoTicker();
             var onDeathBackUpSkillInjector = new OnDeathSkillInjector();
+            var fateSkillInvoker = new FateSkillsInvoker();
 
             //---- Injections ----
             Invoker.SubscribeListener(Characters);
@@ -44,6 +46,7 @@ namespace _CombatSystem
             // Round check first since is better to finish the combat before all other unnecessary task
             TempoHandler.Subscribe((ITempoListener)PerformSkillHandler);
             TempoHandler.Subscribe((ISkippedTempoListener)PerformSkillHandler);
+            TempoHandler.Subscribe(fateSkillInvoker);
             TempoHandler.Subscribe(skillCooldown);
 
             TempoHandler.Subscribe(staticDamageHandler);
@@ -72,6 +75,8 @@ namespace _CombatSystem
 
         [ShowInInspector] 
         public static CombatCharacterEventsBase GlobalCharacterChangesEvent;
+        [ShowInInspector] 
+        public static SkillUsagesEvent SkillUsagesEvent;
 
         // This are not invoked that usually
         [ShowInInspector]

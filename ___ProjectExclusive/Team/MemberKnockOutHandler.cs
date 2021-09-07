@@ -66,8 +66,7 @@ namespace _Team
             entity.Events.OnRevive(entity);
         }
 
-        private const float ControlGainOnAllKO = .5f;
-        private const int ActionsAddition = 3; 
+        
         public void OnAllKnockOut()
         {
             _timerCheck.Clear();
@@ -77,14 +76,9 @@ namespace _Team
                 CallRevive(entity);
             }
 
-            var enemyTeam = _team[0].CharacterGroup.Enemies;
-            foreach (CombatingEntity entity in enemyTeam)
-            {
-                UtilsCombatStats.AddActionAmount(entity.CombatStats,ActionsAddition);
-            }
-
-            CombatSystemSingleton.GlobalCharacterChangesEvent.OnTeamHealthZero(_team);
-            CombatSystemSingleton.CombatTeamControlHandler.DoVariation(enemyTeam,ControlGainOnAllKO);
+#if UNITY_EDITOR
+            Debug.LogWarning("All Members KO");
+#endif
         }
 
         public bool Contains(CombatingEntity entity)

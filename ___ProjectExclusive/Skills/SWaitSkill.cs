@@ -15,7 +15,7 @@ namespace Skills
             var target = arguments.User;
             var targetStats = target.CombatStats;
             int amountOfActionLeft = targetStats.ActionsLefts;
-            targetStats.ActionsLefts = 0;
+            targetStats.ResetActionsAmount();
             target.DelayBuffHandler.EnqueueBuff(this,target, amountOfActionLeft);
         }
 

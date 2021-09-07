@@ -376,7 +376,7 @@ namespace _CombatSystem
         public void OnDoMoreActions(CombatingEntity entity)
         {
             var currentStats = entity.CombatStats;
-            currentStats.ActionsLefts--;
+            currentStats.ActionsSubtraction();
             if (entity.CanAct())
             {
                 TriggerBasicHandler.OnDoMoreActions(entity);
@@ -384,7 +384,7 @@ namespace _CombatSystem
             }
             else
             {
-                currentStats.ActionsLefts = 0;
+                currentStats.ResetActionsAmount();
                 OnFinisAllActions(entity);
             }
         }
@@ -437,7 +437,9 @@ namespace _CombatSystem
         }
     }
 
-    public interface ITempoTypes<out T>
+
+
+    public interface ITempoTypes<out T> : ICharacterEventListener
     {
         T OnBeforeSequence { get; }
         T OnAction { get; }
@@ -451,28 +453,28 @@ namespace _CombatSystem
         List<IRoundListener> RoundListeners { get; }
         List<ISkippedTempoListener> SkippedListeners { get; }
     }
-    public interface ITempoFullListener : ITempoListener, IRoundListener 
+    public interface ITempoFullListener : ITempoListener, IRoundListener
     { }
 
-    public interface ISkippedTempoListener
+    public interface ISkippedTempoListener : ICharacterEventListener
     {
         void OnSkippedEntity(CombatingEntity entity);
     }
 
-    public interface ITempoListener
+    public interface ITempoListener : ICharacterEventListener
     {
         void OnInitiativeTrigger(CombatingEntity entity);
         void OnDoMoreActions(CombatingEntity entity);
         void OnFinisAllActions(CombatingEntity entity);
     }
-    public interface ITempoListenerVoid
+    public interface ITempoListenerVoid : ICharacterEventListener
     {
         void OnInitiativeTrigger();
         void OnDoMoreActions();
         void OnFinisAllActions();
     }
 
-    public interface ITempoTicker
+    public interface ITempoTicker 
     {
         void TempoTick(float deltaVariation);
     }
@@ -482,11 +484,11 @@ namespace _CombatSystem
         void FillBar(float percentage);
     }
 
-    public interface IRoundListener
+    public interface IRoundListener : ICharacterEventListener
     {
         void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity);
     }
-    public interface IRoundListenerVoid
+    public interface IRoundListenerVoid : ICharacterEventListener
     {
         void OnRoundCompleted();
     }
