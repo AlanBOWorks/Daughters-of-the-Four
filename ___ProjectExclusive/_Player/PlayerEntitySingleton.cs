@@ -50,8 +50,8 @@ namespace _Player
             var invoker = CombatSystemSingleton.Invoker;
             invoker.SubscribeListener(CombatElementsPools);
 
-            var tempoHandler = CombatSystemSingleton.TempoHandler;
-            tempoHandler.InjectPlayerEvents(PlayerCombatEvents);
+            var controllersHandler = CombatSystemSingleton.ControllersHandler;
+            controllersHandler.InjectPlayerEvents(PlayerCombatEvents);
         }
     }
 

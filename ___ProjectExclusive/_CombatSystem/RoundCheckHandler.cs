@@ -48,7 +48,7 @@ namespace _CombatSystem
                 if(lastEntity != entity) return;
 
                 var tempoHandler = CombatSystemSingleton.TempoHandler;
-                tempoHandler.OnRoundCompleted(_allEntities,lastEntity);
+                tempoHandler.OnRoundCompleteSequence(_allEntities,lastEntity);
                 RefreshList();
 
 #if UNITY_EDITOR

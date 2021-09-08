@@ -163,7 +163,7 @@ namespace _CombatSystem
                         listener.OnAfterPreparation(playerEntities, enemyEntities, allEntities);
                     }
 
-                    CombatSystemSingleton.TempoHandler.Inject(enemyFightPreset.GetCombatController());
+                    CombatSystemSingleton.ControllersHandler.Inject(enemyFightPreset.GetCombatController());
                 }
 
                 void StartPhase()
@@ -241,7 +241,6 @@ namespace _CombatSystem
 
         public void OnCombatFinish(CombatingEntity lastEntity, bool isPlayerWin)
         {
-            Debug.Log("x--- Finish Combat ---X");
             foreach (ICombatFinishListener listener in _onFinishListeners)
             {
                 listener.OnCombatFinish(lastEntity,isPlayerWin);

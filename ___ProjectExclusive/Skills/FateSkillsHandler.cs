@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using _CombatSystem;
 using Characters;
+using MEC;
 using UnityEngine;
 
 namespace Skills
 {
-    //TODO add to CombatingEntity
     public class FateSkillsHandler
     {
         public FateSkillsHandler(CombatingEntity user, int fateAmount = 1)
@@ -31,13 +31,14 @@ namespace Skills
             _usedSkills.Push(new FateValue(target,usedSkill));
         }
 
-        public void InvokeFateSkills()
+        public IEnumerator<float> InvokeFateSkills()
         {
             PerformSkillHandler performSkill = CombatSystemSingleton.PerformSkillHandler;
             for (int i = 0; i < FateAmount && _usedSkills.Count > 0; i++)
             {
                 var fateSkill = _usedSkills.Pop();
-                performSkill.DoSkill(fateSkill.UsedSkill,_user,fateSkill.Target);
+                yield return Timing.WaitUntilDone(
+                performSkill._DoSkill(fateSkill.UsedSkill,_user,fateSkill.Target));
             }
             _usedSkills.Clear();
         }
@@ -56,19 +57,4 @@ namespace Skills
         }
     }
 
-    public class FateSkillsInvoker : ITempoListener
-    {
-        public void OnInitiativeTrigger(CombatingEntity entity)
-        {
-            entity.FateSkills.InvokeFateSkills();
-        }
-
-        public void OnDoMoreActions(CombatingEntity entity)
-        {
-        }
-
-        public void OnFinisAllActions(CombatingEntity entity)
-        {
-        }
-    }
 }

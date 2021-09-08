@@ -162,6 +162,22 @@ namespace Skills
             }
         }
 
+        public void ReduceCooldown()
+        {
+            foreach (var skill in AllSkills)
+            {
+                skill.OnCharacterAction();
+            }
+        }
+
+        public void CheckAndResetIdle()
+        {
+            foreach (var skill in AllSkills)
+            {
+                skill.OnCharacterFinish();
+            }
+        }
+
         private class CombatSharedSkills : ISharedSkillsSet<CombatSkill>
         {
             public ISharedSkills<CombatSkill> AttackingSkills { get; private set; }

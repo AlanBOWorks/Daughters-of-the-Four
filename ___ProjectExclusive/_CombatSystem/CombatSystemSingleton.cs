@@ -17,81 +17,97 @@ namespace _CombatSystem
 
         private CombatSystemSingleton()
         {
-
             Invoker = new SystemInvoker();
-            Characters = new CombatCharactersHolder();
-            TempoHandler = new TempoHandler();
-            PerformSkillHandler = new PerformSkillHandler();
-            GlobalCharacterChangesEvent = new CombatCharacterEventsBase();
-            CharacterEventsTracker = new CharacterEventsTracker();
-            SkillUsagesEvent = new SkillUsagesEvent();
-
-            // Locals declarations that wont be used further than durante the CombatInvoker
+            ControllersHandler = new CombatControllersHandler();
             var combatControlDeclaration = new CombatControlDeclaration();
-            var skillCooldown = new SkillCooldownHandler();
-            var staticDamageHandler = new StaticDamageHandler();
-            var roundCheckHandler = new RoundCheckHandler();
-            var burstResetHandler = new CharacterCombatDataResetHandler();
-            var teamStateTicker = new TeamTempoTicker();
-            var onDeathBackUpSkillInjector = new OnDeathSkillInjector();
-            var fateSkillInvoker = new FateSkillsInvoker();
+
+
+            Characters = new CombatCharactersHolder();
+            CharacterEventsTracker = new CharacterEventsTracker();
+            GlobalCharacterChangesEvent = new CombatCharacterEventsBase();
+
+            StaticDamageHandler = new StaticDamageHandler();
+
+            PerformSkillHandler = new PerformSkillHandler();
+            SkillUsagesEvent = new SkillUsagesEvent();
+            OnDeathBackUpSkillInjector = new OnDeathSkillInjector();
+
+            TempoHandler = new TempoHandler();
+            TeamStateTicker = new TeamTempoTicker();
+            RoundCheckHandler = new RoundCheckHandler();
+
+
+
 
             //---- Injections ----
             Invoker.SubscribeListener(Characters);
             Invoker.SubscribeListener(TempoHandler);
             Invoker.SubscribeListener(combatControlDeclaration);
-            Invoker.SubscribeListener(roundCheckHandler);
-            Invoker.SubscribeListener(teamStateTicker);
+            Invoker.SubscribeListener(RoundCheckHandler);
+            Invoker.SubscribeListener(TeamStateTicker);
 
             // Round check first since is better to finish the combat before all other unnecessary task
-            TempoHandler.Subscribe((ITempoListener)PerformSkillHandler);
-            TempoHandler.Subscribe((ISkippedTempoListener)PerformSkillHandler);
-            TempoHandler.Subscribe(fateSkillInvoker);
-            TempoHandler.Subscribe(skillCooldown);
+            TempoHandler.Subscribe(StaticDamageHandler);
 
-            TempoHandler.Subscribe(staticDamageHandler);
-            
-            TempoHandler.Subscribe((ITempoListener) burstResetHandler);
-            TempoHandler.Subscribe((ISkippedTempoListener)burstResetHandler);
+            TempoHandler.Subscribe(TeamStateTicker);
 
-            TempoHandler.Subscribe(teamStateTicker);
-
-            TempoHandler.Subscribe((ITempoListener)roundCheckHandler);
-            TempoHandler.Subscribe((ISkippedTempoListener)roundCheckHandler);
+            TempoHandler.Subscribe((ITempoListener)RoundCheckHandler);
+            TempoHandler.Subscribe((ISkippedTempoListener)RoundCheckHandler);
 
             //---- Events
-            GlobalCharacterChangesEvent.Subscribe(onDeathBackUpSkillInjector);
+            GlobalCharacterChangesEvent.Subscribe(OnDeathBackUpSkillInjector);
+
         }
 
-        [ShowInInspector]
-        public static PerformSkillHandler PerformSkillHandler;
-        [ShowInInspector] 
-        public static CharacterEventsTracker CharacterEventsTracker;
 
+        [Title("Instantiated","General")]
         [ShowInInspector]
-        public static CombatCharactersHolder Characters;
+        public static SystemInvoker Invoker { get; private set; }
+        [ShowInInspector]
+        public static CombatControllersHandler ControllersHandler { get; private set; }
+        
+
+        [Title("Instantiated","Characters")]
+        [ShowInInspector]
+        public static CombatCharactersHolder Characters { get; private set; }
+        [ShowInInspector]
+        public static CharacterEventsTracker CharacterEventsTracker { get; private set; }
+        [ShowInInspector] 
+        public static CombatCharacterEventsBase GlobalCharacterChangesEvent { get; private set; }
+
+
+        [Title("Instantiated", "Stats")]
+        [ShowInInspector]
+        public static StaticDamageHandler StaticDamageHandler { get; private set; }
+
+
+        [Title("Instantiated","Skills")]
+        [ShowInInspector]
+        public static PerformSkillHandler PerformSkillHandler { get; private set; }
+        [ShowInInspector] 
+        public static SkillUsagesEvent SkillUsagesEvent { get; private set; }
+        [ShowInInspector]
+        public static OnDeathSkillInjector OnDeathBackUpSkillInjector { get; private set; }
+
+
+        [Title("Instantiated","Tempo")]
+        [ShowInInspector]
+        public static TempoHandler TempoHandler { get; private set; }
+        [ShowInInspector]
+        public static TeamTempoTicker TeamStateTicker { get; private set; }
+        [ShowInInspector]
+        public static RoundCheckHandler RoundCheckHandler { get; private set; }
+
+
+
+        [Title("Injected")]
         [ShowInInspector]
         public static CombatTeamControlsHandler CombatTeamControlHandler;
-
-        [ShowInInspector] 
-        public static CombatCharacterEventsBase GlobalCharacterChangesEvent;
-        [ShowInInspector] 
-        public static SkillUsagesEvent SkillUsagesEvent;
-
-        // This are not invoked that usually
         [ShowInInspector]
-        public static SystemInvoker Invoker;
-        [ShowInInspector]
-        public static TempoHandler TempoHandler;
-
-        [ShowInInspector] 
         public static CombatConditionsChecker CombatConditionChecker;
-
-        [Title("Global Variables")]
         [ShowInInspector]
         public static SCombatParams ParamsVariable = null;
     }
-
 
     public static class GlobalCombatParams
     {

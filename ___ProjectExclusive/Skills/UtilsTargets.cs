@@ -47,12 +47,7 @@ namespace Skills
             return applyEffectOn;
         }
 
-        public static void InjectPossibleTargets(CombatSkill skill,
-            CombatingEntity user, SkillTargets injectInList)
-        {
-            injectInList.UsingSkill = skill;
-            InjectPossibleTargets(skill, user, injectInList as List<CombatingEntity>);
-        }
+        
         public static void InjectPossibleTargets(SkillBase skill, 
             CombatingEntity user, List<CombatingEntity> injectInList)
         {
@@ -105,7 +100,8 @@ namespace Skills
                 }
                 void AddByEnemyTeam()
                 {
-
+                    Debug.Log($"Using skill: {skill.SkillName}");
+                    Debug.Log($"Agent: {user.CharacterName}");
                     var userAreaTracker = user.AreasDataTracker;
 
                     CombatingTeam enemyTeam = user.CharacterGroup.Enemies;

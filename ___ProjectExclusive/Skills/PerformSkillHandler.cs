@@ -13,51 +13,36 @@ namespace Skills
     /// <summary>
     /// Perform the skill with all event calls in a sequence that syncs with Animations and such
     /// </summary>
-    public class PerformSkillHandler : ICombatAfterPreparationListener, ITempoListener, ISkippedTempoListener
+    public class PerformSkillHandler
     {
         public PerformSkillHandler()
         {
             int sizeAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
-            _currentSkillTargets = new SkillTargets(sizeAllocation); // it could be a whole targets
+            _currentSkillTargets = new List<CombatingEntity>(sizeAllocation); // it could be a whole targets
             _skillActionHandler = new SkillActionHandler();
         }
 
-
-        [ShowInInspector] private CombatingEntity _currentUser;
-        [ShowInInspector] private readonly SkillTargets _currentSkillTargets;
+        [ShowInInspector] 
+        private CombatingEntity _currentUser;
+        [ShowInInspector] 
+        private CombatSkill _currentSkill;
+        [ShowInInspector] 
+        private readonly List<CombatingEntity> _currentSkillTargets;
         private readonly SkillActionHandler _skillActionHandler;
         private CoroutineHandle _doSkillHandle;
 
-
-
-        public void OnAfterPreparation(
-            CombatingTeam playerEntities,
-            CombatingTeam enemyEntities,
-            CharacterArchetypesList<CombatingEntity> allEntities)
-        {
-
-        }
-        public void OnInitiativeTrigger(CombatingEntity entity)
+        public void ResetOnInitiative(CombatingEntity entity)
         {
             _currentUser = entity;
-            _currentSkillTargets.UsingSkill = null;
+            _currentSkill = null;
             _currentSkillTargets.Clear();
         }
 
-        public void OnDoMoreActions(CombatingEntity entity)
-        {
-        }
-
-        public void OnFinisAllActions(CombatingEntity entity)
+        public void ResetOnFinish()
         {
             _currentUser = null;
-            _currentSkillTargets.UsingSkill = null;
+            _currentSkill = null;
             _currentSkillTargets.Clear();
-        }
-
-        public void OnSkippedEntity(CombatingEntity entity)
-        {
-            OnFinisAllActions(entity);
         }
 
 
@@ -67,7 +52,8 @@ namespace Skills
         /// </summary>
         private void NaturalSkillAction(CombatingEntity target)
         {
-            var skill = _currentSkillTargets.UsingSkill;
+            var skill = _currentSkill;
+
             skill.OnSkillUsage();
 
             _currentUser.FateSkills.SaveSkill(target,skill);
@@ -81,6 +67,7 @@ namespace Skills
                 Timing.RunCoroutineSingleton(_DoSkill(skill,user,target), _doSkillHandle, SingletonBehavior.Wait);
         }
 
+
         /// <summary>
         /// <inheritdoc cref="NaturalSkillAction"/>
         /// </summary>
@@ -93,11 +80,10 @@ namespace Skills
         //TODO Change Skill to Effect
         private IEnumerator<float> _DoSkill(CombatingEntity target)
         {
-            var skill = _currentSkillTargets.UsingSkill;
-            yield return Timing.WaitUntilDone(_DoSkill(skill, _currentUser, target));
+            yield return Timing.WaitUntilDone(_DoSkill(_currentSkill, _currentUser, target));
         }
 
-        private IEnumerator<float> _DoSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
+        public IEnumerator<float> _DoSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
         {
             var mainEffect = skill.Preset.GetMainEffect();
 
@@ -113,8 +99,8 @@ namespace Skills
                 user, effectTargets, skill));
 
 
-            CombatSystemSingleton.SkillUsagesEvent.InvokeSkill(skill);
             _skillActionHandler.DoSkill(skill,user, target);
+            CombatSystemSingleton.SkillUsagesEvent.InvokeSkill(skill);
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
             CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(user);
@@ -123,6 +109,7 @@ namespace Skills
 
         public List<CombatingEntity> HandlePossibleTargets(CombatSkill skill)
         {
+            _currentSkill = skill;
             UtilsTargets.InjectPossibleTargets(skill, _currentUser, _currentSkillTargets);
             return _currentSkillTargets;
         }
@@ -196,14 +183,6 @@ namespace Skills
 
     }
 
-    public class SkillTargets : List<CombatingEntity>
-    {
-        public CombatSkill UsingSkill;
-
-        public SkillTargets(int memoryAlloc) : base(memoryAlloc)
-        {
-        }
-    }
 
 
     
