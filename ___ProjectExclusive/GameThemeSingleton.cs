@@ -1,4 +1,5 @@
 ﻿using System;
+using Characters;
 using Sirenix.OdinInspector;
 using Skills;
 using Stats;
@@ -32,10 +33,21 @@ namespace ___ProjectExclusive
     {
         public TextColors textColors = new TextColors();
         public PlayerColors playerColors = new PlayerColors();
+        public RoleColors roleColors = new RoleColors();
         public CombatEffectColors effectColors = new CombatEffectColors();
     }
 
+    [Serializable]
+    public class RoleColors : ICharacterArchetypesData<Color>
+    {
+        public Color vanguardColor = new Color(.9f,.9f,.2f);
+        public Color attackerColor = new Color(.9f,.2f,.4f);
+        public Color supportColor = new Color(.2f, .6f, .8f);
 
+        public Color Vanguard => vanguardColor;
+        public Color Attacker => attackerColor;
+        public Color Support => supportColor;
+    }
 
     [Serializable]
     public class TextColors

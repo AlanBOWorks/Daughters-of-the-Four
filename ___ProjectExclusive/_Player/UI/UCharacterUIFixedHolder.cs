@@ -19,7 +19,6 @@ namespace _Player
 
         [Title("Combat Stats")] 
         [SerializeField] private RoleTooltip roleTooltip = new RoleTooltip();
-        [SerializeField] private TempoFillerTooltip tempoFiller = new TempoFillerTooltip();
         [SerializeField] private HarmonyTooltip harmonyTooltip = new HarmonyTooltip();
 
         [Title("Handlers")]
@@ -31,7 +30,6 @@ namespace _Player
 
             base.Injection(entity);
             roleTooltip.Injection(entity);
-            tempoFiller.Injection(entity);
             buttonHandler.Injection(entity);
             harmonyTooltip.Injection(entity);
         }
@@ -111,30 +109,4 @@ namespace _Player
         }
     }
 
-    //This isn't a ICharacterListener since requires it update every deltaTime
-    [Serializable]
-    internal class TempoFillerTooltip : ITempoFiller
-    {
-        [SerializeField] private RectTransform fillerTransform = null;
-        private float _barWidth;
-
-        private void CalculateStep()
-        {
-            _barWidth = fillerTransform.rect.width;
-        }
-
-
-        public void FillBar(float percentage)
-        {
-            Vector2 reposition = fillerTransform.anchoredPosition;
-            reposition.x = Mathf.Lerp(0, _barWidth, percentage);
-            fillerTransform.anchoredPosition = reposition;
-        }
-
-        public virtual void Injection(CombatingEntity entity)
-        {
-            CombatSystemSingleton.TempoHandler.EntitiesBar.Add(entity, this);
-            CalculateStep();
-        }
-    }
 }
