@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Characters;
 using UnityEngine;
 
 namespace _Team
@@ -65,6 +67,14 @@ namespace _Team
                 default:
                     throw new ArgumentOutOfRangeException(nameof(target), target, null);
             }
+        }
+
+
+        public static void InjectInDictionary<TKey,TValue>(Dictionary<TKey, TValue> dictionary,
+            ITeamsData<ICharacterArchetypesData<TKey>> keys, ITeamsData<ICharacterArchetypesData<TValue>> values)
+        {
+            UtilsCharacterArchetypes.InjectInDictionary(dictionary, keys.PlayerData, values.PlayerData);
+            UtilsCharacterArchetypes.InjectInDictionary(dictionary, keys.EnemyData, values.PlayerData);
         }
     }
 }

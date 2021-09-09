@@ -45,7 +45,7 @@ namespace Skills
             var backUpSkills = (CombatSystemSingleton.ParamsVariable.BackUpSkills);
 
             var roleIndex = (int) entity.Role;
-            var injectionSkill = CharacterArchetypes.GetElement(
+            var injectionSkill = UtilsCharacterArchetypes.GetElement(
                  backUpSkills.OnDeathSkill(), roleIndex);
             if(injectionSkill.Length <= 0) return;
 

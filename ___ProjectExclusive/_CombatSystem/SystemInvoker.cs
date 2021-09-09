@@ -192,7 +192,7 @@ namespace _CombatSystem
                     {
                         var defaultCriticalBuffs
                             = CombatSystemSingleton.ParamsVariable.ArchetypesBackupOnNullCriticalBuffs;
-                        criticalBuff = CharacterArchetypes.GetElement(
+                        criticalBuff = UtilsCharacterArchetypes.GetElement(
                             defaultCriticalBuffs, entityPosition);
                     }
 

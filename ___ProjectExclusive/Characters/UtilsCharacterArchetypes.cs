@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Characters
 {
-    public static class CharacterArchetypes
+    public static class UtilsCharacterArchetypes
     {
         public const int FrontLinerIndex = EnumTeam.FrontLinerIndex;
         public const int MidLinerIndex = FrontLinerIndex + 1;
@@ -150,6 +150,15 @@ namespace Characters
                         new NotImplementedException($"Index of {archetype}"));
             }
         }
+
+
+        public static void InjectInDictionary<TKey, TValue>(Dictionary<TKey, TValue> dictionary,
+            ICharacterArchetypesData<TKey> keys, ICharacterArchetypesData<TValue> values)
+        {
+            dictionary.Add(keys.Vanguard, values.Vanguard);
+            dictionary.Add(keys.Attacker, values.Attacker);
+            dictionary.Add(keys.Support, values.Support);
+        }
     }
 
     public class CharacterArchetypesList<T> : List<T>, ICharacterArchetypes<T>
@@ -210,11 +219,13 @@ namespace Characters
 
 
 
-        public const int FrontLinerIndex = CharacterArchetypes.FrontLinerIndex;
-        public const int MidLinerIndex = CharacterArchetypes.MidLinerIndex;
-        public const int BackLinerIndex = CharacterArchetypes.BackLinerIndex;
-        public const int AmountOfArchetypes = CharacterArchetypes.AmountOfArchetypesAmount;
+        public const int FrontLinerIndex = UtilsCharacterArchetypes.FrontLinerIndex;
+        public const int MidLinerIndex = UtilsCharacterArchetypes.MidLinerIndex;
+        public const int BackLinerIndex = UtilsCharacterArchetypes.BackLinerIndex;
+        public const int AmountOfArchetypes = UtilsCharacterArchetypes.AmountOfArchetypesAmount;
     }
+
+
 
     public class CharacterArchetypes<T> : ICharacterArchetypes<T>
     {
@@ -233,6 +244,18 @@ namespace Characters
             Attacker = data.Attacker;
             Support = data.Support;
         }
+    }
+
+    public abstract class CharacterArchetypes<T, TInjector> : CharacterArchetypes<T>
+    {
+        public void DoInjection(ICharacterArchetypesData<TInjector> injector)
+        {
+            Vanguard = GetElement(injector.Vanguard);
+            Attacker = GetElement(injector.Attacker);
+            Support = GetElement(injector.Support);
+        }
+
+        public abstract T GetElement(TInjector injector);
     }
 
     public class SerializableCharacterArchetypes<T> : ICharacterArchetypes<T>

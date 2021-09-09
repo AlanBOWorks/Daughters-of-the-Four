@@ -59,19 +59,19 @@ namespace _Player
 
 
 
-                const int indexLimit = CharacterArchetypes.AmountOfArchetypesAmount;
+                const int indexLimit = UtilsCharacterArchetypes.AmountOfArchetypesAmount;
                 int elementIndex = i;
                 Transform spawnElement;
                 if (i < indexLimit)
                 {
                     spawnElement =
-                        CharacterArchetypes.GetElement(spawner.PlayerFaction, elementIndex);
+                        UtilsCharacterArchetypes.GetElement(spawner.PlayerFaction, elementIndex);
                 }
                 else
                 {
                     elementIndex -= indexLimit;
                     spawnElement =
-                        CharacterArchetypes.GetElement(spawner.EnemyFaction, elementIndex);
+                        UtilsCharacterArchetypes.GetElement(spawner.EnemyFaction, elementIndex);
                 }
 
                 Vector3 spawnPosition = spawnElement.position;

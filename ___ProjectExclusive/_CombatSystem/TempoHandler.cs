@@ -16,16 +16,10 @@ namespace _CombatSystem
     { public TempoHandler()
         {
             int memoryAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
-
             _events 
                 = new CombatEventsSequencer();
             CombatEventsSequencer = _events;
 
-            _playerTeamFillerHandlers = new TeamFillerHandlers();
-            _enemyTeamFillerHandlers = new TeamFillerHandlers();
-
-            _entitiesBarDictionary
-                = new Dictionary<CombatingEntity, ITempoFiller>(memoryAllocation);
             CombatConditionChecker
                 = new CombatConditionsChecker();
             _roundTracker
@@ -59,12 +53,6 @@ namespace _CombatSystem
         private readonly CombatEventsSequencer _events;
         public readonly ITempoHandlerSequencer CombatEventsSequencer;
 
-        private readonly TeamFillerHandlers _playerTeamFillerHandlers;
-        private readonly TeamFillerHandlers _enemyTeamFillerHandlers;
-        
-        [ShowInInspector]
-        private readonly Dictionary<CombatingEntity, ITempoFiller> _entitiesBarDictionary;
-
         [ShowInInspector]
         private readonly Queue<ITempoTicker> _tickers;
 
@@ -81,17 +69,6 @@ namespace _CombatSystem
         /// </summary>
         private readonly List<CombatingEntity> _roundTracker;
 
-        public ICharacterArchetypesData<List<ITempoFiller>> PlayerTeamFillers => _playerTeamFillerHandlers;
-        public ICharacterArchetypesData<List<ITempoFiller>> EnemyTeamFillers => _enemyTeamFillerHandlers;
-
-        public List<ITempoFiller> GetFillerHolder(EnumCharacter.RoleArchetype role, bool isPlayer)
-        {
-            var fillers = (isPlayer)
-                ? _playerTeamFillerHandlers
-                : _enemyTeamFillerHandlers;
-
-            return UtilsCharacter.GetElement(fillers, role);
-        }
 
         public void Subscribe(ITempoListener listener)
         {
@@ -125,10 +102,6 @@ namespace _CombatSystem
             RefillRoundTracker();
 
             TempoStepModifier = CombatSystemSingleton.ParamsVariable.TempoVelocityModifier;
-
-            _entitiesBarDictionary.Clear();
-            _playerTeamFillerHandlers.InjectInBarDictionary(_entitiesBarDictionary,playerEntities);
-            _enemyTeamFillerHandlers.InjectInBarDictionary(_entitiesBarDictionary,enemyEntities);
         }
         public void StartSequence(CombatingEntity entity)
         {
@@ -177,13 +150,7 @@ namespace _CombatSystem
             if(_fillingEntities.Count > 0) _fillingEntities.Clear();
             _fillingEntities.AddRange(entities);
         }
-        private void ForcedBarUpdate()
-        {
-            foreach (KeyValuePair<CombatingEntity, ITempoFiller> pair in _entitiesBarDictionary)
-            {
-                pair.Value.FillBar(pair.Key.CombatStats.InitiativePercentage);
-            }
-        }
+        
 
         public void CheckAndInjectEntityInitiative(CombatingEntity entity)
         {
@@ -200,6 +167,15 @@ namespace _CombatSystem
         private const float InitiativeCheck = GlobalCombatParams.InitiativeCheck;
         private const float VelocityModifier = GlobalCombatParams.TempoVelocityModifier;
         private CoroutineHandle _loopHandle;
+
+        /// <summary>
+        /// The amount of second each step waits to be done (used for waits)
+        /// </summary>
+        public const float DeltaStepPeriod = .2f;
+        /// <summary>
+        /// The amount of step increment for each [<see cref="DeltaStepPeriod"/>]
+        /// </summary>
+        private const float DeltaStepFrequency = 1/DeltaStepPeriod; //sec
         private IEnumerator<float> _Tick()
         {
             // >>>> PREPARATIONS
@@ -210,8 +186,8 @@ namespace _CombatSystem
             // >>>> COMBAT LOOP
             while (_characters != null)
             {
-                float deltaIncrement = Time.deltaTime * TempoStepModifier;
-                yield return Timing.WaitForOneFrame;
+                float deltaIncrement = Time.deltaTime * TempoStepModifier * DeltaStepFrequency;
+                yield return Timing.WaitForSeconds(DeltaStepPeriod);
 
                 InvokeListeners();
                 DoInitiativeTick();
@@ -300,12 +276,29 @@ namespace _CombatSystem
             CallUpdateOnInitiativeBar(entity,stats);
         }
 
-        private void CallUpdateOnInitiativeBar(CombatingEntity entity, ITemporalStatsData<float> stats)
+        private static void CallUpdateOnInitiativeBar(CombatingEntity entity, ITemporalStatsData<float> stats)
         {
             float initiativePercentage = stats.InitiativePercentage;
-            _entitiesBarDictionary[entity].FillBar(initiativePercentage);
+            var fillers = CombatSystemSingleton.TeamsPersistentElements[entity].TempoFillers;
+            UpdateFillers(fillers,initiativePercentage);
         }
-
+        private static void UpdateFillers(List<ITempoFiller> fillers, float percentage)
+        {
+            for (var i = 0; i < fillers.Count; i++)
+            {
+                ITempoFiller filler = fillers[i];
+                filler.FillBar(percentage);
+            }
+        }
+        private static void ForcedBarUpdate()
+        {
+            var fillers = CombatSystemSingleton.TeamsPersistentElements;
+            foreach (var element in fillers)
+            {
+                float percentage = element.Key.CombatStats.InitiativePercentage;
+                UpdateFillers(element.Value.TempoFillers, percentage);
+            }
+        }
 
 
         private void RefillRoundTracker()
@@ -327,8 +320,6 @@ namespace _CombatSystem
         {
             FinishSequence(lastEntity);
             Timing.KillCoroutines(_loopHandle);
-
-            _entitiesBarDictionary.Clear();
             _actingQueue.Clear();
             _fillingEntities.Clear();
         }
@@ -395,38 +386,38 @@ namespace _CombatSystem
 
     }
 
-    internal class TeamFillerHandlers : ICharacterArchetypesData<List<ITempoFiller>>
+    internal class TeamFillerHandlers : ICharacterArchetypesData<EntityFillerHandler>
     {
-        public TeamFillerHandlers()
+        public TeamFillerHandlers(ICharacterArchetypesData<EntityPersistentElements> elements)
         {
-            vanguard = new EntityFillerHandler();
-            attacker = new EntityFillerHandler();
-            support = new EntityFillerHandler();
+            vanguard = new EntityFillerHandler(elements.Vanguard.TempoFillers);
+            attacker = new EntityFillerHandler(elements.Attacker.TempoFillers);
+            support = new EntityFillerHandler(elements.Support.TempoFillers);
         }
 
         internal readonly EntityFillerHandler vanguard;
         internal readonly EntityFillerHandler attacker;
         internal readonly EntityFillerHandler support;
 
-        public List<ITempoFiller> Vanguard => vanguard;
-        public List<ITempoFiller> Attacker => attacker;
-        public List<ITempoFiller> Support => support;
-
-        public void InjectInBarDictionary(Dictionary<CombatingEntity, ITempoFiller> fillers, CombatingTeam team)
-        {
-            fillers.Add(team.Vanguard,vanguard);
-            fillers.Add(team.Attacker,attacker);
-            fillers.Add(team.Support,support);
-        }
+        public EntityFillerHandler Vanguard => vanguard;
+        public EntityFillerHandler Attacker => attacker;
+        public EntityFillerHandler Support => support;
     }
 
-    internal class EntityFillerHandler : List<ITempoFiller>, ITempoFiller
+    internal class EntityFillerHandler : ITempoFiller
     {
+        public EntityFillerHandler(List<ITempoFiller> fillers)
+        {
+            _fillers = fillers;
+        }
+
+        private readonly List<ITempoFiller> _fillers;
+
         public void FillBar(float percentage)
         {
-            for (int i = 0; i < Count; i++)
+            for (int i = 0; i < _fillers.Count; i++)
             {
-                this[i].FillBar(percentage);
+                _fillers[i].FillBar(percentage);
             }
         }
     }

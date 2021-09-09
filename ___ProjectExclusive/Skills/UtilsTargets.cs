@@ -138,7 +138,7 @@ namespace Skills
                         for (int i = injectInList.Count - 1; i >= 0 && injectInList.Count > 1; i--)
                         {
                             CombatingEntity target = enemyTeam[i];
-                            if (CharacterArchetypes.IsInCloseRange(user, target))
+                            if (UtilsCharacterArchetypes.IsInCloseRange(user, target))
                                 injectInList.Remove(target);
                         }
                     }
@@ -149,7 +149,7 @@ namespace Skills
                         for (int i = injectInList.Count - 1; i >= 0 && injectInList.Count > 1; i--)
                         {
                             CombatingEntity target = enemyTeam[i];
-                            if (!CharacterArchetypes.IsInCloseRange(user, target))
+                            if (!UtilsCharacterArchetypes.IsInCloseRange(user, target))
                                 injectInList.Remove(target);
                         }
 

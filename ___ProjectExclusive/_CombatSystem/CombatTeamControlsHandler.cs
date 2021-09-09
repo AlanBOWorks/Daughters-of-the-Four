@@ -30,7 +30,7 @@ namespace _CombatSystem
                 for (var i = 0; i < entities.Count; i++)
                 {
                     var entity = entities[i];
-                    entity.AreasDataTracker.PositionInTeam = CharacterArchetypes.GetTeamPosition(i);
+                    entity.AreasDataTracker.PositionInTeam = UtilsCharacterArchetypes.GetTeamPosition(i);
                 }
             }
             

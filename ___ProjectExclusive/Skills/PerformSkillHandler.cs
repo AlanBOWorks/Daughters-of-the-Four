@@ -50,7 +50,7 @@ namespace Skills
         /// Perform the current[<see cref="CombatSkill"/>] and saves it in the [<seealso cref="FateSkillsHandler"/>].
         /// The used skill will use the default behaviour (eg: cooldown) through [<see cref="CombatSkill.OnSkillUsage"/>]
         /// </summary>
-        private void NaturalSkillAction(CombatingEntity target)
+        public void DoSkill(CombatingEntity target)
         {
             var skill = _currentSkill;
 
@@ -61,21 +61,11 @@ namespace Skills
                 Timing.RunCoroutineSingleton(_DoSkill(target), _doSkillHandle, SingletonBehavior.Wait);
         }
 
-        public void DoSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
+        public void DoFateSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
         {
             _doSkillHandle =
                 Timing.RunCoroutineSingleton(_DoSkill(skill,user,target), _doSkillHandle, SingletonBehavior.Wait);
         }
-
-
-        /// <summary>
-        /// <inheritdoc cref="NaturalSkillAction"/>
-        /// </summary>
-        public static void SendNaturalSkillAction(CombatingEntity target)
-        {
-            CombatSystemSingleton.PerformSkillHandler.NaturalSkillAction(target);
-        }
-
 
         //TODO Change Skill to Effect
         private IEnumerator<float> _DoSkill(CombatingEntity target)
@@ -113,12 +103,6 @@ namespace Skills
             UtilsTargets.InjectPossibleTargets(skill, _currentUser, _currentSkillTargets);
             return _currentSkillTargets;
         }
-
-        public static List<CombatingEntity> SendHandlePossibleTargets(CombatSkill skill)
-        {
-            return CombatSystemSingleton.PerformSkillHandler.HandlePossibleTargets(skill);
-        }
-
 
         public class SkillActionHandler : SkillArguments
         {

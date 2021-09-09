@@ -2,6 +2,12 @@ using UnityEngine;
 
 namespace _Team
 {
+    public interface ITeamsData<out T>
+    {
+        T PlayerData { get; }
+        T EnemyData { get; }
+    }
+
     public interface IStanceAll<T> : IStance<T>, IStanceAllData<T>, IStanceAllInjector<T>
     {
         /// <summary>

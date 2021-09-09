@@ -25,7 +25,7 @@ namespace _Player
         [Button,DisableInEditorMode]
         public void DoSelectOfCurrent()
         {
-            if(!CharacterArchetypes.IsValid(this))
+            if(!UtilsCharacterArchetypes.IsValid(this))
                 throw new ArgumentException("Invalid selected characters; Some roles are not selected");
 
             var playableCharacters = new PlayableCharactersSelected(this);

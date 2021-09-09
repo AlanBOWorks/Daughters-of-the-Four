@@ -45,13 +45,13 @@ namespace Characters
             void AddEntities(CombatingTeam team, TeamTransforms transforms)
             {
 #if UNITY_EDITOR
-                if (team.Count != CharacterArchetypes.AmountOfArchetypesAmount)
+                if (team.Count != UtilsCharacterArchetypes.AmountOfArchetypesAmount)
                 {
                     throw new NotImplementedException("Can't spawn all entities",
                         new IndexOutOfRangeException($"Not enough elements: {team.Count}"));
                 } 
 #endif
-                CharacterArchetypes.DoParse(team,transforms,InvokeEntity);                
+                UtilsCharacterArchetypes.DoParse(team,transforms,InvokeEntity);                
             }
             void InvokeEntity(CombatingEntity entity, Transform spawnTransform)
             {
@@ -86,7 +86,7 @@ namespace Characters
 
             void RemoveEntities(CombatingTeam team)
             {
-                CharacterArchetypes.DoAction(team,RemoveEntity);
+                UtilsCharacterArchetypes.DoAction(team,RemoveEntity);
             }
 
             void RemoveEntity(CombatingEntity entity)

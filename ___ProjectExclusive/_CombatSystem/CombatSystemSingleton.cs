@@ -19,12 +19,13 @@ namespace _CombatSystem
         {
             Invoker = new SystemInvoker();
             ControllersHandler = new CombatControllersHandler();
+            TeamsPersistentElements = new TeamsPersistentElements();
             var combatControlDeclaration = new CombatControlDeclaration();
 
 
             Characters = new CombatCharactersHolder();
             CharacterEventsTracker = new CharacterEventsTracker();
-            GlobalCharacterChangesEvent = new CombatCharacterEventsBase();
+            GlobalCharacterChangesEvent = new CombatEvents();
 
             StaticDamageHandler = new StaticDamageHandler();
 
@@ -45,6 +46,7 @@ namespace _CombatSystem
             Invoker.SubscribeListener(combatControlDeclaration);
             Invoker.SubscribeListener(RoundCheckHandler);
             Invoker.SubscribeListener(TeamStateTicker);
+            Invoker.SubscribeListener(TeamsPersistentElements);
 
             // Round check first since is better to finish the combat before all other unnecessary task
             TempoHandler.Subscribe(StaticDamageHandler);
@@ -65,7 +67,9 @@ namespace _CombatSystem
         public static SystemInvoker Invoker { get; private set; }
         [ShowInInspector]
         public static CombatControllersHandler ControllersHandler { get; private set; }
-        
+        [ShowInInspector]
+        public static TeamsPersistentElements TeamsPersistentElements { get; private set; }
+
 
         [Title("Instantiated","Characters")]
         [ShowInInspector]
@@ -73,7 +77,7 @@ namespace _CombatSystem
         [ShowInInspector]
         public static CharacterEventsTracker CharacterEventsTracker { get; private set; }
         [ShowInInspector] 
-        public static CombatCharacterEventsBase GlobalCharacterChangesEvent { get; private set; }
+        public static CombatEvents GlobalCharacterChangesEvent { get; private set; }
 
 
         [Title("Instantiated", "Stats")]
@@ -126,7 +130,7 @@ namespace _CombatSystem
 
 
         public const int PredictedAmountOfCharacters = UtilsCharacter.PredictedAmountOfCharactersInBattle;
-        public const int PredictedAmountOfTeamCharacters = CharacterArchetypes.AmountOfArchetypesAmount;
+        public const int PredictedAmountOfTeamCharacters = UtilsCharacterArchetypes.AmountOfArchetypesAmount;
         public const int PredictedAmountOfTeams = 2;
     }
 

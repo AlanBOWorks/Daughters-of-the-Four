@@ -53,7 +53,7 @@ namespace Characters
 
     public static class UtilsCharacter
     {
-        public const int PredictedAmountOfCharactersInBattle = CharacterArchetypes.AmountOfArchetypesAmount * 2;
+        public const int PredictedAmountOfCharactersInBattle = UtilsCharacterArchetypes.AmountOfArchetypesAmount * 2;
 
         public static bool IsAPlayerEntity(CombatingEntity entity)
         {

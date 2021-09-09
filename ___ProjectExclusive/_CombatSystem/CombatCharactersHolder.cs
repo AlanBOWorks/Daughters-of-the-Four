@@ -69,7 +69,7 @@ namespace _CombatSystem
         /// Keep in mind: <br></br>
         /// [<seealso cref="SEffectBase.DoEffect"/>]: Will be used by the DoSkill
         /// in a loop based in the Skill effects and targeting. <br></br>
-        /// [<seealso cref="PerformSkillHandler.DoSkill"/>]: Won't use this Lists directly because just uses
+        /// [<seealso cref="PerformSkillHandler.DoFateSkill"/>]: Won't use this Lists directly because just uses
         /// one target only.
         /// </summary>
         [HideInEditorMode,HideInPlayMode]

@@ -60,12 +60,14 @@ namespace _Enemies
             if(skill == null)
                 throw new ArgumentException("Skill can't be empty", 
                     new NullReferenceException("The selector of skill had failed in choosing a Skill"));
+            var performSkillHandler = CombatSystemSingleton.PerformSkillHandler;
 
             List<CombatingEntity> possibleTargets
-                = PerformSkillHandler.SendHandlePossibleTargets(skill);
+                = performSkillHandler.HandlePossibleTargets(skill);
             int randomSelection = Random.Range(0, possibleTargets.Count);
+
             CombatingEntity selection = possibleTargets[randomSelection];
-            PerformSkillHandler.SendNaturalSkillAction(selection);
+            performSkillHandler.DoSkill(selection);
         }
 
         private void DoRandomSelection(CombatSkill backupSkillOnZero)
