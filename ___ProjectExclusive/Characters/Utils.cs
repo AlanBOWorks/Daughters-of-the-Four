@@ -92,10 +92,8 @@ namespace Characters
     public static class UtilsArea
     {
         public static void InvokeAreaChange(CombatingEntity entity)
-        {
-            entity.Events.InvokeAreaChange();
-            CombatSystemSingleton.GlobalCharacterChangesEvent.InvokeTemporalStatChange(entity);
-        }
+            => CombatSystemSingleton.CombatEventsInvoker.InvokeTemporalStatChange(entity);
+        
 
         public static EnumTeam.Stances ParseStance(float stanceEquivalent)
         {
@@ -135,11 +133,7 @@ namespace Characters
                 teamData.DoForceStance(targetStance);
             }
 
-            foreach (CombatingEntity entity in team)
-            {
-                entity.Events.InvokeAreaChange();
-            }
-            CombatSystemSingleton.GlobalCharacterChangesEvent.InvokeTemporalStatChange(teamHolder);
+            CombatSystemSingleton.CombatEventsInvoker.InvokeTemporalStatChange(teamHolder);
 
         }
 

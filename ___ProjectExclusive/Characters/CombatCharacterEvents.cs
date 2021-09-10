@@ -28,13 +28,13 @@ namespace Characters
     /// </summary>
     public class CombatCharacterEventsBase 
     {
-        [ShowInInspector] protected List<ITempoListenerVoid> onTempoListeners;
-        [ShowInInspector] protected List<IVitalityChangeListener> onVitalityChange;
-        [ShowInInspector] protected List<ITemporalStatChangeListener> onTemporalStatChange;
-        [ShowInInspector] protected List<ICombatHealthChangeListener> onCombatHealthChange;
-        [ShowInInspector] protected List<IAreaStateChangeListener> onAreaChange;
+        [ShowInInspector] public readonly List<ITempoListenerVoid> onTempoListeners;
+        [ShowInInspector] public readonly List<IVitalityChangeListener> onVitalityChange;
+        [ShowInInspector] public readonly List<ITemporalStatChangeListener> onTemporalStatChange;
+        [ShowInInspector] public readonly List<ICombatHealthChangeListener> onCombatHealthChange;
+        [ShowInInspector] public readonly List<IAreaStateChangeListener> onAreaChange;
 
-        [ShowInInspector] protected List<IHealthZeroListener> onHealthZeroListeners;
+        [ShowInInspector] public readonly List<IHealthZeroListener> onHealthZeroListeners;
 
         public CombatCharacterEventsBase()
         {
@@ -67,97 +67,14 @@ namespace Characters
         }
 
 
-        public void InvokeVitalityChange(CombatingEntity entity)
-        {
-            IVitalityStatsData<float> onStats = entity.CombatStats;
-            foreach (IVitalityChangeListener listener in onVitalityChange)
-            {
-                listener.OnVitalityChange(onStats);
-            }
-        }
-
-        public void InvokeTemporalStatChange(CombatingEntity entity)
-        {
-            ICombatHealthStatsData<float> onStats = entity.CombatStats;
-            foreach (ICombatHealthChangeListener listener in onCombatHealthChange)
-            {
-                listener.OnTemporalStatsChange(onStats);
-            }
-        }
-        public void InvokeAreaChange(CombatingEntity entity)
-        {
-            CharacterCombatAreasData areasData = entity.AreasDataTracker;
-            foreach (IAreaStateChangeListener listener in onAreaChange)
-            {
-                listener.OnAreaStateChange(areasData);
-            }
-        }
-
-        public void OnInitiativeTrigger()
-        {
-            foreach (ITempoListenerVoid listener in onTempoListeners)
-            {
-                listener.OnInitiativeTrigger();
-            }
-        }
-
-        public void OnDoMoreActions()
-        {
-            foreach (ITempoListenerVoid listener in onTempoListeners)
-            {
-                listener.OnDoMoreActions();
-            }
-        }
-
-        public void OnFinisAllActions()
-        {
-            foreach (ITempoListenerVoid listener in onTempoListeners)
-            {
-                listener.OnFinisAllActions();
-            }
-        }
-
-        public void OnHealthZero(CombatingEntity entity)
-        {
-            foreach (IHealthZeroListener listener in onHealthZeroListeners)
-            {
-                listener.OnHealthZero(entity);
-            }
-        }
-
-        public void OnMortalityZero(CombatingEntity entity)
-        {
-            foreach (IHealthZeroListener listener in onHealthZeroListeners)
-            {
-                listener.OnMortalityZero(entity);
-            }
-        }
-
-        public void OnRevive(CombatingEntity entity)
-        {
-            foreach (IHealthZeroListener listener in onHealthZeroListeners)
-            {
-                listener.OnRevive(entity);
-            }
-        }
-
-        public void OnTeamHealthZero(CombatingTeam losingTeam)
-        {
-            foreach (IHealthZeroListener listener in onHealthZeroListeners)
-            {
-                listener.OnTeamHealthZero(losingTeam);
-            }
-        }
 
     }
 
     public class CombatCharacterEvents : CombatCharacterEventsBase, IHitEventHandler
     {
-        private readonly CombatingEntity _user;
         public readonly OnHitEventHandler OnHitEvent;
         public CombatCharacterEvents(CombatingEntity user) : base()
         {
-            _user = user;
             OnHitEvent = new OnHitEventHandler(user);
             base.Subscribe(OnHitEvent);
         }
@@ -165,27 +82,6 @@ namespace Characters
         private static CombatCharacterEventsBase GlobalEvents()
         {
             return CombatSystemSingleton.GlobalCharacterChangesEvent;
-        }
-
-        public void InvokeVitalityChange()
-        {
-            // This is to loop Global listeners (like unique UI than is not exclusive to each Entity)
-            GlobalEvents().InvokeVitalityChange(_user);
-            // This is to loop the listeners in the base (the UI over the character for example)
-            InvokeVitalityChange(_user); 
-        }
-
-        public void InvokeTemporalStatChange()
-        {
-            //TODO _user.HarmonyBuffInvoker?.OnTemporalStatsChange();
-            GlobalEvents().InvokeTemporalStatChange(_user);
-            InvokeTemporalStatChange(_user);
-        }
-
-        public void InvokeAreaChange()
-        {
-            GlobalEvents().InvokeAreaChange(_user);
-            InvokeAreaChange(_user);
         }
 
         public void Subscribe(ICombatHitListener listener)
@@ -206,6 +102,8 @@ namespace Characters
         private readonly Queue<CombatingEntity> _temporalStatsEvents;
         [ShowInInspector]
         private readonly EntityValuesQueue _onDamageEvents;
+
+        private readonly Queue<CombatingEntity> _healthChangeEvents;
         private readonly Queue<CombatingEntity> _healthZeroEvents;
         private readonly Queue<CombatingEntity> _mortalityZeroEvents;
         private readonly Queue<CombatingTeam> _groupZeroHealthEvents;
@@ -214,8 +112,10 @@ namespace Characters
         {
             const int amountOfCharacterPerTeam = GlobalCombatParams.PredictedAmountOfTeamCharacters;
             const int amountOfTeams = GlobalCombatParams.PredictedAmountOfTeams;
+
             _temporalStatsEvents = new Queue<CombatingEntity>(amountOfCharacterPerTeam);
             _healthZeroEvents = new Queue<CombatingEntity>(amountOfCharacterPerTeam);
+            _healthChangeEvents = new Queue<CombatingEntity>(amountOfCharacterPerTeam);
             _onDamageEvents = new EntityValuesQueue(amountOfCharacterPerTeam);
 
             _mortalityZeroEvents = new Queue<CombatingEntity>(); // MortalityZero happens less frequently
@@ -226,7 +126,10 @@ namespace Characters
             => EnqueueListener(entity, _temporalStatsEvents);
 
         public void EnqueueOnDamageListener(CombatingEntity entity, float damage)
-            => EnqueueListener(entity, _onDamageEvents, damage);
+        => EnqueueListener(entity, _onDamageEvents, damage);
+         
+        public void EnqueueOnHealthChangeListener(CombatingEntity entity)
+            => EnqueueListener(entity, _healthChangeEvents);
 
         public void EnqueueZeroHealthListener(CombatingEntity entity)
         {
@@ -262,13 +165,16 @@ namespace Characters
             _queueAction = InvokeTemporalStatsAction;
             InvokeQueue(_temporalStatsEvents);
 
+            InvokeDamageQueue();
+            _queueAction = InvokeOnHealthAction;
+            InvokeQueue(_healthChangeEvents);
+
             _queueAction = InvokeZeroHealthAction;
             InvokeQueue(_healthZeroEvents);
 
             _queueAction = InvokeMortalityZeroAction;
             InvokeQueue(_mortalityZeroEvents);
 
-            InvokeDamageQueue();
 
             InvokeTeamQueue(_groupZeroHealthEvents);
 
@@ -310,24 +216,24 @@ namespace Characters
 
 
         private static void InvokeTemporalStatsAction(CombatingEntity entity)
-        {
-            CombatSystemSingleton.GlobalCharacterChangesEvent.InvokeTemporalStatChange(entity);
-        }
+            => CombatSystemSingleton.CombatEventsInvoker.InvokeTemporalStatChange(entity);
 
         private static void InvokeOnDamageAction(CombatingEntity entity, float totalDamage)
         {
             entity.Events.OnHitEvent.OnDamage(totalDamage);
+            InvokeOnHealthAction(entity);
         }
+
+        private static void InvokeOnHealthAction(CombatingEntity entity)
+            => CombatSystemSingleton.CombatEventsInvoker.InvokeOnHealthChange(entity);
 
         private static void InvokeZeroHealthAction(CombatingEntity entity)
-        {
-            CombatSystemSingleton.GlobalCharacterChangesEvent.OnHealthZero(entity);
-        }
+            => CombatSystemSingleton.CombatEventsInvoker.InvokeOnHealthZero(entity);
+        
 
         private static void InvokeMortalityZeroAction(CombatingEntity entity)
-        {
-            CombatSystemSingleton.GlobalCharacterChangesEvent.OnMortalityZero(entity);
-        }
+            => CombatSystemSingleton.CombatEventsInvoker.InvokeOnMortalityZero(entity);
+        
 
         private class EntityValuesQueue 
         {

@@ -101,6 +101,14 @@ namespace Characters
         [ShowInInspector] 
         public CharacterCombatAreasData AreasDataTracker { get; private set; }
 
+        /// <summary>
+        /// Events that are exclusive to the created [<see cref="CombatingEntity"/>] and are given in the
+        /// beginning or during the combat, then removed when this [<see cref="CombatingEntity"/>] is
+        /// destroy (eg: special effects, buffs or passives that are unique to this particular entity).<br></br>
+        /// <br></br>
+        /// For a persistent events exclusive to the each [<see cref="CombatingEntity"/>] that repeats in each
+        /// combat see: [<seealso cref="EntityPersistentElements"/>].
+        /// </summary>
         [ShowInInspector, NonSerialized] 
         public readonly CombatCharacterEvents Events;
 

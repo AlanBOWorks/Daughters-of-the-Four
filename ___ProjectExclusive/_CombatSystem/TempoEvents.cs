@@ -90,7 +90,6 @@ namespace _CombatSystem
             Debug.LogWarning($"Skipped character: {entity.CharacterName}");
 #endif
             
-            entity.Events.OnFinisAllActions();
             foreach (var listener in SkippedListeners)
             {
                 listener.OnSkippedEntity(entity);

@@ -63,7 +63,7 @@ namespace _Team
         private static void CallRevive(CombatingEntity entity)
         {
             entity.CombatStats.Revive();
-            entity.Events.OnRevive(entity);
+            CombatSystemSingleton.CombatEventsInvoker.InvokeOnRevive(entity);
         }
 
         

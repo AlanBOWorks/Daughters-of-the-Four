@@ -15,8 +15,6 @@ namespace CombatEffects
             var user = arguments.User;
             var targetStance = target.AreasDataTracker.GetCurrentPositionState();
             UtilsArea.ToggleStance(user,targetStance);
-
-            user.Events.InvokeAreaChange();
         }
 
 

@@ -10,10 +10,10 @@ namespace _Player
     {
         private static void ShowSkillTargets(CombatSkill skill)
         {
+            var user = TempoHandler.CurrentActingEntity;
             var skillHandler = CombatSystemSingleton.PerformSkillHandler;
             var possibleTargets
-                = skillHandler.HandlePossibleTargets(skill);
-
+                = skillHandler.GetPossibleTargets(skill,user);
             var playerElements
                 = PlayerEntitySingleton.CombatDictionary;
             var predefinedUIElements 

@@ -16,9 +16,9 @@ namespace _CombatSystem
     { public TempoHandler()
         {
             int memoryAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
-            _events 
-                = new CombatEventsSequencer();
-            CombatEventsSequencer = _events;
+            _sequencer 
+                = new CombatInvokeSequencer();
+            CombatEventsSequencer = _sequencer;
 
             CombatConditionChecker
                 = new CombatConditionsChecker();
@@ -50,7 +50,7 @@ namespace _CombatSystem
         public readonly CombatConditionsChecker CombatConditionChecker;
 
         [ShowInInspector, DisableInEditorMode] 
-        private readonly CombatEventsSequencer _events;
+        private readonly CombatInvokeSequencer _sequencer;
         public readonly ITempoHandlerSequencer CombatEventsSequencer;
 
         [ShowInInspector]
@@ -69,20 +69,23 @@ namespace _CombatSystem
         /// </summary>
         private readonly List<CombatingEntity> _roundTracker;
 
+        [ShowInInspector]
+        public static CombatingEntity CurrentActingEntity { get; private set; }
+        
 
         public void Subscribe(ITempoListener listener)
         {
-            _events.TempoListeners.Add(listener);
+            _sequencer.TempoListeners.Add(listener);
         }
 
         public void Subscribe(IRoundListener listener)
         {
-            _events.RoundListeners.Add(listener);
+            _sequencer.RoundListeners.Add(listener);
         }
 
         public void Subscribe(ISkippedTempoListener listener)
         {
-            _events.SkippedListeners.Add(listener);
+            _sequencer.SkippedListeners.Add(listener);
         }
 
         public void Subscribe(ITempoTicker ticker)
@@ -125,7 +128,7 @@ namespace _CombatSystem
         {
             CombatEventsSequencer.FinishSequence(entity);
             if (_loopHandle.IsRunning)
-                StepNextActingEntity();
+                StepEntityOrResumeTempo();
 
             // Do Harmony 
             // TODO entity.HarmonyBuffInvoker?.InvokeBurstStats();
@@ -242,6 +245,8 @@ namespace _CombatSystem
         private void DequeueInvokeNextActor()
         {
             var entity = _actingQueue.Dequeue();
+            CurrentActingEntity = entity;
+
             _fillingEntities.Add(entity);
             CombatStatsHolder stats = entity.CombatStats;
 
@@ -370,7 +375,7 @@ namespace _CombatSystem
         /// Used to resume [<see cref="_Tick"/>] (which was paused by an [<seealso cref="CombatingEntity"/>] when
         /// it reaches its top [<seealso cref="ICombatHealthStats.InitiativePercentage"/>])
         /// </summary>
-        private void StepNextActingEntity()
+        private void StepEntityOrResumeTempo()
         {
             if (HasActingEntities())
             {
@@ -378,6 +383,7 @@ namespace _CombatSystem
             }
             else
             {
+                CurrentActingEntity = null;
                 ForcedBarUpdate();
                 Timing.ResumeCoroutines(_loopHandle);
             }

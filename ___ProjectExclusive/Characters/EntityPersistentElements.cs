@@ -21,11 +21,11 @@ namespace Characters
         public readonly CombatCharacterEventsBase CombatEvents;
     }
 
-    public class TeamsPersistentElements : Dictionary<CombatingEntity,EntityPersistentElements>,
+    public class PersistentElementsDictionary : Dictionary<CombatingEntity,EntityPersistentElements>,
         ITeamsData<ICharacterArchetypesData<EntityPersistentElements>>,
         ICombatPreparationListener
     {
-        public TeamsPersistentElements()
+        public PersistentElementsDictionary()
         {
             PlayerData = new TeamElements();
             EnemyData = new TeamElements();

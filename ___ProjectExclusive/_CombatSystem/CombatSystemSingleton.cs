@@ -19,7 +19,7 @@ namespace _CombatSystem
         {
             Invoker = new SystemInvoker();
             ControllersHandler = new CombatControllersHandler();
-            TeamsPersistentElements = new TeamsPersistentElements();
+            TeamsPersistentElements = new PersistentElementsDictionary();
             var combatControlDeclaration = new CombatControlDeclaration();
 
 
@@ -37,7 +37,7 @@ namespace _CombatSystem
             TeamStateTicker = new TeamTempoTicker();
             RoundCheckHandler = new RoundCheckHandler();
 
-
+            CombatEventsInvoker = new CombatEventsInvoker(GlobalCharacterChangesEvent,TeamsPersistentElements);
 
 
             //---- Injections ----
@@ -47,6 +47,7 @@ namespace _CombatSystem
             Invoker.SubscribeListener(RoundCheckHandler);
             Invoker.SubscribeListener(TeamStateTicker);
             Invoker.SubscribeListener(TeamsPersistentElements);
+            Invoker.SubscribeListener(CombatEventsInvoker);
 
             // Round check first since is better to finish the combat before all other unnecessary task
             TempoHandler.Subscribe(StaticDamageHandler);
@@ -65,10 +66,11 @@ namespace _CombatSystem
         [Title("Instantiated","General")]
         [ShowInInspector]
         public static SystemInvoker Invoker { get; private set; }
+        public static CombatEventsInvoker CombatEventsInvoker { get; private set; }
         [ShowInInspector]
         public static CombatControllersHandler ControllersHandler { get; private set; }
         [ShowInInspector]
-        public static TeamsPersistentElements TeamsPersistentElements { get; private set; }
+        public static PersistentElementsDictionary TeamsPersistentElements { get; private set; }
 
 
         [Title("Instantiated","Characters")]

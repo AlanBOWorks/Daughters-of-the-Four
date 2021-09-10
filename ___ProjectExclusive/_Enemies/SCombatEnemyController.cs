@@ -34,7 +34,7 @@ namespace _Enemies
             var ultimate = skills.UltimateSkill;
             if (ultimate != null && ultimate.Preset != null && !ultimate.IsInCooldown())
             {
-                DoSkill(ultimate);
+                DoSkill(ultimate,entity);
                 return;
             }
 
@@ -42,7 +42,7 @@ namespace _Enemies
 
             if (Random.value < UseWaitChance)
             {
-                DoSkill(waitSkill);
+                DoSkill(waitSkill, entity);
                 return;
             }
 
@@ -50,12 +50,12 @@ namespace _Enemies
             _possibleSkills.Clear();
             UtilsEnemyController.DoInjectionOfSkills(_possibleSkills,entity);
 
-            DoRandomSelection(waitSkill);
+            DoRandomSelection(waitSkill, entity);
         }
 
 
 
-        private static void DoSkill(CombatSkill skill)
+        private static void DoSkill(CombatSkill skill, CombatingEntity user)
         {
             if(skill == null)
                 throw new ArgumentException("Skill can't be empty", 
@@ -63,24 +63,24 @@ namespace _Enemies
             var performSkillHandler = CombatSystemSingleton.PerformSkillHandler;
 
             List<CombatingEntity> possibleTargets
-                = performSkillHandler.HandlePossibleTargets(skill);
+                = performSkillHandler.GetPossibleTargets(skill,user);
             int randomSelection = Random.Range(0, possibleTargets.Count);
 
             CombatingEntity selection = possibleTargets[randomSelection];
-            performSkillHandler.DoSkill(selection);
+            performSkillHandler.DoSkill(skill,user,selection);
         }
 
-        private void DoRandomSelection(CombatSkill backupSkillOnZero)
+        private void DoRandomSelection(CombatSkill backupSkillOnZero, CombatingEntity user)
         {
             if (_possibleSkills.Count <= 0)
             {
-                DoSkill(backupSkillOnZero);
+                DoSkill(backupSkillOnZero, user);
                 return;
             }
 
             int randomSelection = Random.Range(0, _possibleSkills.Count);
             CombatSkill selectedSkill = _possibleSkills[randomSelection];
-            DoSkill(selectedSkill);
+            DoSkill(selectedSkill, user);
         }
     }
 

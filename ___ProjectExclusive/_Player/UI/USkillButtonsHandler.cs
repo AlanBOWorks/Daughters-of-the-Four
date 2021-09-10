@@ -42,8 +42,6 @@ namespace _Player
             skillButtons.AddRange(GetComponentsInChildren<USkillButton>());
         }
 
-
-
         private void Start()
         {
             buttonsBehaviour.Handler = this;

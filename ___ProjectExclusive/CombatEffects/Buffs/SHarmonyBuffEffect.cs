@@ -19,7 +19,6 @@ namespace CombatEffects
         public override void DoEffect(CombatingEntity target, float harmonyAddition)
         {
             UtilsCombatStats.VariateHarmony(target,GetBuff(target), harmonyAddition);
-            target.Events.InvokeTemporalStatChange();
         }
 
         private const string TemporalStatsPrefix = " Temporal Stat - HARMONY Modifier";

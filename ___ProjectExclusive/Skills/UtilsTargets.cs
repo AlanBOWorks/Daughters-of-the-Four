@@ -100,8 +100,6 @@ namespace Skills
                 }
                 void AddByEnemyTeam()
                 {
-                    Debug.Log($"Using skill: {skill.SkillName}");
-                    Debug.Log($"Agent: {user.CharacterName}");
                     var userAreaTracker = user.AreasDataTracker;
 
                     CombatingTeam enemyTeam = user.CharacterGroup.Enemies;

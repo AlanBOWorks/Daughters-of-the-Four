@@ -17,17 +17,22 @@ namespace _Player
 
         private PlayerEntitySingleton()
         {
+            SkillsTracker = new PlayerSkillsTracker();
             PlayerCombatEvents = new PlayerCombatEvents();
             CombatElementsPools = new PlayerCombatElementsPools();
             var targetsHandler = new PlayerTargetsHandler();
 
             //Injections
+            PlayerCombatEvents.Subscribe(SkillsTracker);
             PlayerCombatEvents.Subscribe(targetsHandler);
         }
         public static PlayerEntitySingleton Instance { get; } = new PlayerEntitySingleton();
 
         public static Dictionary<CombatingEntity, PlayerCombatElement> CombatDictionary
             => CombatElementsPools.EntitiesDictionary;
+
+        [ShowInInspector] 
+        public static PlayerSkillsTracker SkillsTracker;
 
         [ShowInInspector] 
         public static PlayerCombatEvents PlayerCombatEvents;

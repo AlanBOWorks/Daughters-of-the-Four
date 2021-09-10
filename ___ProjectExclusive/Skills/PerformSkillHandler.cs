@@ -22,26 +22,19 @@ namespace Skills
             _skillActionHandler = new SkillActionHandler();
         }
 
-        [ShowInInspector] 
-        private CombatingEntity _currentUser;
-        [ShowInInspector] 
-        private CombatSkill _currentSkill;
+        
         [ShowInInspector] 
         private readonly List<CombatingEntity> _currentSkillTargets;
         private readonly SkillActionHandler _skillActionHandler;
         private CoroutineHandle _doSkillHandle;
 
-        public void ResetOnInitiative(CombatingEntity entity)
+        public void ResetOnInitiative()
         {
-            _currentUser = entity;
-            _currentSkill = null;
             _currentSkillTargets.Clear();
         }
 
         public void ResetOnFinish()
         {
-            _currentUser = null;
-            _currentSkill = null;
             _currentSkillTargets.Clear();
         }
 
@@ -50,15 +43,11 @@ namespace Skills
         /// Perform the current[<see cref="CombatSkill"/>] and saves it in the [<seealso cref="FateSkillsHandler"/>].
         /// The used skill will use the default behaviour (eg: cooldown) through [<see cref="CombatSkill.OnSkillUsage"/>]
         /// </summary>
-        public void DoSkill(CombatingEntity target)
+        public void DoSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
         {
-            var skill = _currentSkill;
-
-            skill.OnSkillUsage();
-
-            _currentUser.FateSkills.SaveSkill(target,skill);
+            user.FateSkills.SaveSkill(target,skill);
             _doSkillHandle =
-                Timing.RunCoroutineSingleton(_DoSkill(target), _doSkillHandle, SingletonBehavior.Wait);
+                Timing.RunCoroutineSingleton(_DoSkill(skill,user,target), _doSkillHandle, SingletonBehavior.Wait);
         }
 
         public void DoFateSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
@@ -67,12 +56,7 @@ namespace Skills
                 Timing.RunCoroutineSingleton(_DoSkill(skill,user,target), _doSkillHandle, SingletonBehavior.Wait);
         }
 
-        //TODO Change Skill to Effect
-        private IEnumerator<float> _DoSkill(CombatingEntity target)
-        {
-            yield return Timing.WaitUntilDone(_DoSkill(_currentSkill, _currentUser, target));
-        }
-
+        
         public IEnumerator<float> _DoSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
         {
             var mainEffect = skill.Preset.GetMainEffect();
@@ -97,10 +81,9 @@ namespace Skills
             CombatSystemSingleton.CharacterEventsTracker.Invoke();
         }
 
-        public List<CombatingEntity> HandlePossibleTargets(CombatSkill skill)
+        public List<CombatingEntity> GetPossibleTargets(CombatSkill skill, CombatingEntity user)
         {
-            _currentSkill = skill;
-            UtilsTargets.InjectPossibleTargets(skill, _currentUser, _currentSkillTargets);
+            UtilsTargets.InjectPossibleTargets(skill, user, _currentSkillTargets);
             return _currentSkillTargets;
         }
 

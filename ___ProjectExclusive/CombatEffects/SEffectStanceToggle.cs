@@ -22,7 +22,6 @@ namespace CombatEffects
             if (FailRandom(randomCheck)) return;
 
             UtilsArea.ToggleStance(target, targetStance);
-            target.Events.InvokeAreaChange();
         }
 
         [Button(ButtonSizes.Large)]

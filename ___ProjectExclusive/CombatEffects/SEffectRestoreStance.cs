@@ -1,4 +1,5 @@
-﻿using Characters;
+﻿using _CombatSystem;
+using Characters;
 using Skills;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace CombatEffects
             if (FailRandom(randomCheck)) return;
             target.AreasDataTracker.ForceStateFinish();
 
-            target.Events.InvokeAreaChange();
+            CombatSystemSingleton.CombatEventsInvoker.InvokeAreaChange(target);
         }
     }
 }

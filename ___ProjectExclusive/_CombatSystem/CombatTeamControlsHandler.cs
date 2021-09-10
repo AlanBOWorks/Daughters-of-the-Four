@@ -248,6 +248,7 @@ namespace _CombatSystem
                     break;
             }
 
+            var eventInvoker = CombatSystemSingleton.CombatEventsInvoker;
             InvokeEvent(actingTeam);
             InvokeEvent(receiver);
 
@@ -260,7 +261,7 @@ namespace _CombatSystem
             {
                 foreach (CombatingEntity entity in targetTeam)
                 {
-                    entity.Events.InvokeAreaChange();
+                    eventInvoker.InvokeAreaChange(entity);
                 }
             }
         }

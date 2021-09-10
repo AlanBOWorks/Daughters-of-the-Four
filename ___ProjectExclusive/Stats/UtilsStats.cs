@@ -518,6 +518,9 @@ namespace Stats
             => GetStatsEvents().EnqueueTemporalChangeListener(target);
         public static void EnqueueDamageEvent(CombatingEntity target, float damage)
             => GetStatsEvents().EnqueueOnDamageListener(target, damage);
+        public static void EnqueueOnHealthChangeEvent(CombatingEntity target)
+            => GetStatsEvents().EnqueueOnHealthChangeListener(target);
+
         public static void EnqueueHealthZeroStatsEvent(CombatingEntity target)
             => GetStatsEvents().EnqueueZeroHealthListener(target);
         public static void EnqueueMortalityZeroEvent(CombatingEntity target)
@@ -598,7 +601,6 @@ namespace Stats
 
             if (shields <= 0 || damage <= 0) return;
 
-            UtilsStats.EnqueueTemporalStatsEvent(target);
             UtilsStats.EnqueueDamageEvent(target, damage);
 
             shields -= damage;
@@ -612,9 +614,7 @@ namespace Stats
             if(damage <= 0) return;
 
             CombatStatsHolder stats = target.CombatStats;
-            var statsBase = stats.BaseStats;
 
-            UtilsStats.EnqueueTemporalStatsEvent(target);
             UtilsStats.EnqueueDamageEvent(target,damage);
             SubmitDamageToEntity();
 
@@ -691,7 +691,7 @@ namespace Stats
             }
             ResetAccumulatedStaticDamage();
 
-            UtilsStats.EnqueueTemporalStatsEvent(target);
+            UtilsStats.EnqueueOnHealthChangeEvent(target);
 
             void ResetAccumulatedStaticDamage()
             {
@@ -717,7 +717,7 @@ namespace Stats
 
             stats.HealthPoints = maxHealth + overHeal;
 
-            UtilsStats.EnqueueTemporalStatsEvent(target);
+            UtilsStats.EnqueueOnHealthChangeEvent(target);
         }
 
 
@@ -749,11 +749,12 @@ namespace Stats
             stats.InitiativePercentage = targetValue;
 
 
-            entity.Events.InvokeTemporalStatChange();
+            
             var tempoHandler = CombatSystemSingleton.TempoHandler;
 
             tempoHandler.CallUpdateOnInitiativeBar(entity);
             tempoHandler.CheckAndInjectEntityInitiative(entity);
+            CombatSystemSingleton.CombatEventsInvoker.InvokeTemporalStatChange(entity);
         }
         public static void SetInitiative(CombatingEntity entity, float targetValue, EnumStats.StatsType statsType)
         {

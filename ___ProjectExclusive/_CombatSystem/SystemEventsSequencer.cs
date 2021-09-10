@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace _CombatSystem
 {
-    internal class CombatEventsSequencer : TempoEvents, ITempoHandlerSequencer
+    internal class CombatInvokeSequencer : TempoEvents, ITempoHandlerSequencer
     {
         private CoroutineHandle _currentSequence;
 
@@ -32,7 +32,7 @@ namespace _CombatSystem
 
             void SystemActions()
             {
-                CombatSystemSingleton.PerformSkillHandler.ResetOnInitiative(entity);
+                CombatSystemSingleton.PerformSkillHandler.ResetOnInitiative();
                 CombatSystemSingleton.ControllersHandler.CallForControl(entity);
             }
 
@@ -41,8 +41,7 @@ namespace _CombatSystem
                 entity.DelayBuffHandler.OnInitiativeTrigger();
                 entity.CharacterCriticalBuff.OnInitiativeTrigger();
 
-
-                entity.Events.OnInitiativeTrigger();
+                CombatSystemSingleton.CombatEventsInvoker.OnInitiativeTrigger(entity);
             }
 
             void EventActions()
@@ -62,7 +61,7 @@ namespace _CombatSystem
             {
                 entity.CombatSkills.ReduceCooldown();
                 entity.DelayBuffHandler.OnDoMoreActions();
-                entity.Events.OnDoMoreActions();
+                CombatSystemSingleton.CombatEventsInvoker.OnDoMoreActions(entity);
             }
             void EventActions()
             {

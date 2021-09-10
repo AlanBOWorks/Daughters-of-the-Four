@@ -49,12 +49,13 @@ namespace _Player
             switch (button)
             {
                 case PointerEventData.InputButton.Left:
+                    var currentEntity = TempoHandler.CurrentActingEntity;
+                    var currentSkill = PlayerEntitySingleton.SkillsTracker.CurrentSelectedSkill;
+
                     PlayerEntitySingleton.SkillButtonsHandler.OnSubmitSkill();
-                    CombatSystemSingleton.PerformSkillHandler.DoSkill(_currentTarget);
+                    CombatSystemSingleton.PerformSkillHandler.DoSkill(currentSkill,currentEntity,_currentTarget);
                     break;
-                    //TODO left click?
-                default:
-                    break;
+                    //TODO right click?
             }
         }
     }
