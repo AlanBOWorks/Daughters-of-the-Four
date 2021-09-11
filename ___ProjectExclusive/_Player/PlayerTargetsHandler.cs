@@ -14,29 +14,25 @@ namespace _Player
             var skillHandler = CombatSystemSingleton.PerformSkillHandler;
             var possibleTargets
                 = skillHandler.GetPossibleTargets(skill,user);
-            var playerElements
+            var combatDictionary
                 = PlayerEntitySingleton.CombatDictionary;
-            var predefinedUIElements 
-                = PlayerEntitySingleton.PredefinedUIDictionary;
+            
             foreach (CombatingEntity entity in possibleTargets)
             {
-                playerElements[entity].GetTargetButton().Show();
-                predefinedUIElements[entity].ShowTargetButton();
+                combatDictionary[entity].GetTargetButton().Show();
+                //predefinedUIElements[entity].ShowTargetButton();
             }
         }
 
         private static void HideSkillTargets()
         {
-            var playerElements 
+            var combatDictionary 
                 = PlayerEntitySingleton.CombatDictionary;
-            var predefinedUIElements
-                = PlayerEntitySingleton.PredefinedUIDictionary;
-            foreach (KeyValuePair<CombatingEntity, PlayerCombatElement> playerElement in playerElements)
+            
+            foreach (KeyValuePair<CombatingEntity, PlayerCombatUIElement> playerElement in combatDictionary)
             {
                 var entity = playerElement.Key;
                 playerElement.Value.GetTargetButton().Hide();
-                predefinedUIElements[entity].HideTargetButton();
-
             }
         }
 

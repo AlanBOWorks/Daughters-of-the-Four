@@ -184,13 +184,6 @@ namespace Characters
             
         }
 
-        public CharacterArchetypesList(ICharacterArchetypesData<T> references) : this()
-        {
-            Add(references.Vanguard);
-            Add(references.Attacker);
-            Add(references.Support);
-        }
-
         public void InjectParse<TParse>(
             ICharacterArchetypesData<TParse> references,
             Func<TParse,T> parsingFunc)
@@ -257,7 +250,7 @@ namespace Characters
 
         public abstract T GetElement(TInjector injector);
     }
-
+    [Serializable]
     public class SerializableCharacterArchetypes<T> : ICharacterArchetypes<T>
     {
         [SerializeField] private T _frontLiner;
@@ -284,7 +277,11 @@ namespace Characters
     }
 
     public interface ICharacterArchetypes<T> : ICharacterArchetypesData<T>, ICharacterArchetypesInjection<T>
-    { }
+    {
+        new T Vanguard { get; set; }
+        new T Attacker { get; set; }
+        new T Support { get; set; }
+    }
 
     public interface ICharacterArchetypesData<out T>
     {

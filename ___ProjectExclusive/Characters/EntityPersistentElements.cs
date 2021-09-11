@@ -7,18 +7,33 @@ using UnityEngine;
 
 namespace Characters
 {
-    public class EntityPersistentElements
+    public class EntityPersistentElements : IPersistentEntitySwitchListener
     {
         public EntityPersistentElements()
         {
             TempoFillers = new List<ITempoFiller>();
             CombatEvents = new CombatCharacterEventsBase();
+
+            _entitySwitchListeners = new Queue<IPersistentEntitySwitchListener>();
         }
 
         [ShowInInspector]
         public readonly List<ITempoFiller> TempoFillers;
         [ShowInInspector]
         public readonly CombatCharacterEventsBase CombatEvents;
+
+        [ShowInInspector]
+        private readonly Queue<IPersistentEntitySwitchListener> _entitySwitchListeners;
+        public void SubscribeListener(IPersistentEntitySwitchListener listener)
+            => _entitySwitchListeners.Enqueue(listener);
+
+        public void OnEntitySwitch(CombatingEntity entity)
+        {
+            foreach (IPersistentEntitySwitchListener listener in _entitySwitchListeners)
+            {
+                listener.OnEntitySwitch(entity);
+            }
+        }
     }
 
     public class PersistentElementsDictionary : Dictionary<CombatingEntity,EntityPersistentElements>,
@@ -35,10 +50,41 @@ namespace Characters
         [ShowInInspector]
         public ICharacterArchetypesData<EntityPersistentElements> EnemyData { get; }
 
+
+        public void DoInjectionIn(IPersistentInjectorHolders injection)
+        {
+            var playerInjectors = injection.GetPlayerInjectors();
+            var enemyInjectors = injection.GetEnemyInjectors();
+
+            DoInjection(PlayerData,playerInjectors);
+            DoInjection(EnemyData,enemyInjectors);
+
+            void DoInjection(
+                ICharacterArchetypesData<EntityPersistentElements> elements,
+                ICharacterArchetypesData<IPersistentElementInjector> injectors)
+            {
+                injectors.Vanguard.DoInjection(elements.Vanguard);
+                injectors.Attacker.DoInjection(elements.Attacker);
+                injectors.Support.DoInjection(elements.Support);
+            }
+        }
+
         public EntityPersistentElements GetElement(EnumCharacter.RoleArchetype role, bool isPlayer)
         {
             var dataHolder = (isPlayer) ? PlayerData : EnemyData;
             return UtilsCharacter.GetElement(dataHolder, role);
+        }
+
+        public void OnBeforeStart(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
+        {
+            Clear();
+            UtilsCharacterArchetypes.InjectInDictionary(this, playerEntities, PlayerData);
+            UtilsCharacterArchetypes.InjectInDictionary(this, enemyEntities, EnemyData);
+
+            foreach (var pair in this)
+            {
+                pair.Value.OnEntitySwitch(pair.Key);
+            }
         }
 
         private class TeamElements : CharacterArchetypes<EntityPersistentElements>
@@ -49,13 +95,6 @@ namespace Characters
                 Attacker = new EntityPersistentElements();
                 Support = new EntityPersistentElements();
             }
-        }
-
-        public void OnBeforeStart(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
-        {
-            Clear();
-            UtilsCharacterArchetypes.InjectInDictionary(this, playerEntities, PlayerData);
-            UtilsCharacterArchetypes.InjectInDictionary(this, enemyEntities, EnemyData);
         }
     }
 
@@ -84,5 +123,21 @@ namespace Characters
             public EntityPersistentElements GetElement()
                 => CombatSystemSingleton.TeamsPersistentElements.GetElement(role, isPlayerEntity);
         }
+    }
+
+    public interface IPersistentInjectorHolders
+    {
+        ICharacterArchetypesData<IPersistentElementInjector> GetPlayerInjectors();
+        ICharacterArchetypesData<IPersistentElementInjector> GetEnemyInjectors();
+    }
+
+    public interface IPersistentElementInjector
+    {
+        void DoInjection(EntityPersistentElements persistentElements);
+    }
+
+    public interface IPersistentEntitySwitchListener
+    {
+        void OnEntitySwitch(CombatingEntity entity);
     }
 }

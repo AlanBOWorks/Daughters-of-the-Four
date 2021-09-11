@@ -32,6 +32,7 @@ namespace Characters
         {
             CharacterName = characterName;
             InstantiationPrefab = prefab;
+            IsPlayerEntity = invokerParams.IsPlayerEntity;
 
             Events = new CombatCharacterEvents(this);
 
@@ -70,8 +71,9 @@ namespace Characters
 
         [ShowInInspector,GUIColor(.3f,.5f,1)]
         public readonly string CharacterName;
-
         public readonly GameObject InstantiationPrefab;
+        public readonly bool IsPlayerEntity;
+
         [ShowInInspector, NonSerialized] 
         public UCharacterHolder Holder;
 
@@ -174,13 +176,16 @@ namespace Characters
         public readonly CombatStatsHolder StatsHolder;
         public readonly CharacterCombatAreasData AreasData;
         public readonly SCriticalBuffPreset CriticalBuff;
+        public readonly bool IsPlayerEntity;
 
         public EntityInvokerParams(
-            CombatStatsHolder statsHolder, CharacterCombatAreasData areasData,SCriticalBuffPreset criticalBuff)
+            CombatStatsHolder statsHolder, CharacterCombatAreasData areasData,SCriticalBuffPreset criticalBuff, 
+            bool isPlayerEntity)
         {
             StatsHolder = statsHolder;
             AreasData = areasData;
             CriticalBuff = criticalBuff;
+            IsPlayerEntity = isPlayerEntity;
         }
     }
 }

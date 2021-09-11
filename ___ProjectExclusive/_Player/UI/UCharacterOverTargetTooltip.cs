@@ -9,10 +9,11 @@ namespace _Player
     {
         [SerializeField] private Image targetIcon;
 
-        public override void Injection(CombatingEntity entity, bool isPlayer)
+
+        public override void OnEntitySwitch(CombatingEntity entity)
         {
-            base.Injection(entity, isPlayer);
-            HandleTargetIcon(isPlayer);
+            base.OnEntitySwitch(entity);
+            HandleTargetIcon(entity.IsPlayerEntity);
         }
 
         private void HandleTargetIcon(bool isPlayer)

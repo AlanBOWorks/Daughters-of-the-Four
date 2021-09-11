@@ -9,27 +9,18 @@ using UnityEngine.UI;
 
 namespace _Player
 {
-    public class UTargetButton : MonoBehaviour, IPointerClickHandler
+    public class UTargetButton : MonoBehaviour, IPointerClickHandler, IPersistentElementInjector, IPersistentEntitySwitchListener
     {
         private CombatingEntity _currentTarget; //TODO inject this
-        private Image _button;
+        [SerializeField] private Image button;
         private Tweener _currentTween;
-
-
-        public void Injection(CombatingEntity entity)
-        {
-            _currentTarget = entity;
-            if (_button != null) return;
-            _button = GetComponent<Image>();
-            Hide();
-        }
 
         public void Show()
         {
             gameObject.SetActive(true);
 
-            _button.transform.DOPunchScale(new Vector3(1.01f, 1.01f, 1.01f), .2f, 1,0.5f);
-            _currentTween = _button.DOFade(1, .3f);
+            button.transform.DOPunchScale(new Vector3(1.01f, 1.01f, 1.01f), .2f, 1,0.5f);
+            _currentTween = button.DOFade(1, .3f);
         }
 
         public void Hide()
@@ -39,8 +30,8 @@ namespace _Player
             if (_currentTween != null) 
                 DOTween.Kill(_currentTween);
 
-            _button.transform.localScale = Vector3.one;
-            _button.DOFade(0, .3f);
+            button.transform.localScale = Vector3.one;
+            button.DOFade(0, .3f);
         }
 
         public void OnPointerClick(PointerEventData eventData)
@@ -57,6 +48,17 @@ namespace _Player
                     break;
                     //TODO right click?
             }
+        }
+
+        public void DoInjection(EntityPersistentElements persistentElements)
+        {
+            persistentElements.SubscribeListener(this);
+            gameObject.SetActive(false);
+        }
+
+        public void OnEntitySwitch(CombatingEntity entity)
+        {
+            _currentTarget = entity;
         }
     }
 }

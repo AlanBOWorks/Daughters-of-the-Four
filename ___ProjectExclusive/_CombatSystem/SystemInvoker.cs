@@ -62,11 +62,11 @@ namespace _CombatSystem
         [Button,DisableInEditorMode, GUIColor(.5f,.9f,.8f)]
         public void InvokeCombat(SEnemyFightPreset enemyFightPreset)
         {
-            var playerSelections 
+            ICharacterArchetypesData<ICharacterCombatProvider> playerSelections 
                 = PlayerEntitySingleton.SelectedCharacters;
 
-            CombatingTeam playerEntities = new CombatingTeam(PlayerEntitySingleton.TeamControlStats);
-            CombatingTeam enemyEntities = new CombatingTeam(enemyFightPreset.StatsPreset);
+            CombatingTeam playerEntities = new CombatingTeam(PlayerEntitySingleton.TeamControlStats, true);
+            CombatingTeam enemyEntities = new CombatingTeam(enemyFightPreset.StatsPreset, false);
 
 
             CombatHandle = Timing.RunCoroutine(_DoCombat());
@@ -76,7 +76,6 @@ namespace _CombatSystem
                 #region <<< COMBAT REGION >>>>
                 // This phase could be loaded asynchronously while the player is preparing the characters
                 CharacterArchetypesList<CombatingEntity> allEntities;
-                EnumTeam.GroupPositioning entityPosition;
                 Action onStartAction = StartPhase;
 
                 InitializationPhase();
@@ -90,14 +89,8 @@ namespace _CombatSystem
 
                 void InitializationPhase()
                 {
-                    entityPosition = EnumTeam.GroupPositioning.FrontLine;
-                    playerEntities.InjectParse(playerSelections, GenerateEntity);
-
-                    entityPosition = EnumTeam.GroupPositioning.FrontLine;
-                    enemyEntities.InjectParse(enemyFightPreset, GenerateEntity);
-
-                    DoInitializations(playerEntities);
-                    DoInitializations(enemyEntities);
+                    DoTeamInitializations(playerEntities, playerSelections);
+                    DoTeamInitializations(enemyEntities, enemyFightPreset);
 
                     GenerateAllEntities();
                 }
@@ -108,13 +101,14 @@ namespace _CombatSystem
                     allEntities.AddRange(playerEntities);
                     allEntities.AddRange(enemyEntities);
                 }
-                void DoInitializations(CombatingTeam team)
+
+                void DoTeamInitializations(CombatingTeam team, ICharacterArchetypesData<ICharacterCombatProvider> providers)
                 {
-                    foreach (CombatingEntity entity in team)
+                    foreach (EnumTeam.GroupPositioning positioningValue in Enum.GetValues(typeof(EnumTeam.GroupPositioning)))
                     {
-                        entity.Injection(team);
-                        entity.CombatStats.Initialization();
-                        entity.CombatSkills.Initialization();
+                        var provider = UtilsTeam.GetElement(providers, positioningValue);
+                        var entity = team.GenerateAndPrepareEntity(provider, positioningValue);
+                        team.Add(entity);
                     }
                 }
 
@@ -176,44 +170,6 @@ namespace _CombatSystem
 
 
 
-
-                CombatingEntity GenerateEntity(ICharacterCombatProvider variable)
-                {
-
-                    // x----- CombatData
-                    CombatStatsHolder combatData = variable.GenerateCombatData();
-                    
-                    // x----- Area
-                    CharacterCombatAreasData areaData = new CharacterCombatAreasData(entityPosition, variable.RangeType);
-
-                    // X----- Critical Buff
-                    SCriticalBuffPreset criticalBuff = variable.GetCriticalBuff();
-                    if (criticalBuff == null)
-                    {
-                        var defaultCriticalBuffs
-                            = CombatSystemSingleton.ParamsVariable.ArchetypesBackupOnNullCriticalBuffs;
-                        criticalBuff = UtilsCharacterArchetypes.GetElement(
-                            defaultCriticalBuffs, entityPosition);
-                    }
-
-                    var entityParams = new EntityInvokerParams(combatData,areaData,criticalBuff);
-
-                    // Instantiate
-                    CombatingEntity entity = new CombatingEntity(
-                        variable.CharacterName,
-                        variable.CharacterPrefab,
-                        entityParams);
-
-                    // x----- Skills
-                    variable.GenerateCombatSkills(entity);
-
-
-                    //TODO onStartAction += OpeningPassivesInjection;
-
-                    entityPosition++;
-                    return entity;
-
-                }
                 #endregion
 
 

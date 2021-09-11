@@ -1,3 +1,4 @@
+using Characters;
 using UnityEngine;
 
 namespace _Team
@@ -8,6 +9,10 @@ namespace _Team
         T EnemyData { get; }
     }
 
+    public interface ITeamDataFull<T> : ITeamsData<ICharacterArchetypes<T>>
+    {
+        T GenerateElement();
+    }
     public interface IStanceAll<T> : IStance<T>, IStanceAllData<T>, IStanceAllInjector<T>
     {
         /// <summary>

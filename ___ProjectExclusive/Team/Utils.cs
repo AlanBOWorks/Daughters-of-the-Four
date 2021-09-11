@@ -68,13 +68,48 @@ namespace _Team
                     throw new ArgumentOutOfRangeException(nameof(target), target, null);
             }
         }
-
+        public static T GetElement<T>(ICharacterArchetypesData<T> elements, EnumTeam.GroupPositioning positioning)
+        {
+            return positioning switch
+            {
+                EnumTeam.GroupPositioning.FrontLine => elements.Vanguard,
+                EnumTeam.GroupPositioning.MidLine => elements.Attacker,
+                EnumTeam.GroupPositioning.BackLine => elements.Support,
+                _ => throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null)
+            };
+        }
 
         public static void InjectInDictionary<TKey,TValue>(Dictionary<TKey, TValue> dictionary,
             ITeamsData<ICharacterArchetypesData<TKey>> keys, ITeamsData<ICharacterArchetypesData<TValue>> values)
         {
             UtilsCharacterArchetypes.InjectInDictionary(dictionary, keys.PlayerData, values.PlayerData);
-            UtilsCharacterArchetypes.InjectInDictionary(dictionary, keys.EnemyData, values.PlayerData);
+            UtilsCharacterArchetypes.InjectInDictionary(dictionary, keys.EnemyData, values.EnemyData);
+        }
+
+        public static void DoInjection<T, TInjection>(ITeamsData<ICharacterArchetypesData<T>> elements,
+            ITeamsData<ICharacterArchetypesData<TInjection>> injections, Action<T, TInjection> injectionAction)
+        {
+            UtilsCharacter.DoAction(elements.PlayerData,injections.PlayerData,injectionAction);
+            UtilsCharacter.DoAction(elements.EnemyData,injections.EnemyData,injectionAction);
+        }
+
+        /// <summary>
+        /// Generates object of [<see cref="T"/>] and injects into the [<see cref="elements"/>]
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public static void DoGenerationInjection<T>(ITeamDataFull<T> elements)
+        {
+            var playerData = elements.PlayerData;
+            var enemyData = elements.EnemyData;
+
+            DoInjection(playerData);
+            DoInjection(enemyData);
+            void DoInjection(ICharacterArchetypes<T> holder)
+            {
+                holder.Vanguard = elements.GenerateElement();
+                holder.Attacker = elements.GenerateElement();
+                holder.Support = elements.GenerateElement();
+            }
         }
     }
 }

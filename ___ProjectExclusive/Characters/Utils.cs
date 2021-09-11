@@ -72,6 +72,9 @@ namespace Characters
             };
         }
 
+        public static T GetElement<T>(ICharacterArchetypesData<T> elements, EnumTeam.GroupPositioning positioning)
+            => UtilsTeam.GetElement(elements, positioning);
+
         public static T GetElement<T>(ICharacterRangesData<T> elements, EnumCharacter.RangeType rangeType)
         {
             switch (rangeType)
@@ -85,6 +88,22 @@ namespace Characters
                 default:
                     throw new ArgumentOutOfRangeException(nameof(rangeType), rangeType, null);
             }
+        }
+
+        public static void DoAction<T>(ICharacterArchetypesData<T> elements, Action<T> action)
+        {
+            action(elements.Vanguard);
+            action(elements.Attacker);
+            action(elements.Support);
+        }
+
+        public static void DoAction<T, TSecondary>(ICharacterArchetypesData<T> main, 
+            ICharacterArchetypesData<TSecondary> secondary,
+            Action<T,TSecondary> action)
+        {
+            action(main.Vanguard, secondary.Vanguard);
+            action(main.Attacker, secondary.Attacker);
+            action(main.Support, secondary.Support);
         }
     }
 

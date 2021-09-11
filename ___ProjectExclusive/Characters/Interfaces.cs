@@ -3,6 +3,11 @@ using UnityEngine;
 
 namespace Characters
 {
+    public interface ICombatingEntityInjector
+    {
+        void Injection(CombatingEntity entity);
+    }
+
     public interface ICharacterLore
     {
         string CharacterName { get; }

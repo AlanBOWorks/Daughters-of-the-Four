@@ -26,6 +26,7 @@ namespace _CombatSystem
                 InvokeVitalityChange(entity);
                 InvokeOnHealthChange(entity);
                 InvokeTemporalStatChange(entity);
+                InvokeAreaChange(entity);
             }
         }
 

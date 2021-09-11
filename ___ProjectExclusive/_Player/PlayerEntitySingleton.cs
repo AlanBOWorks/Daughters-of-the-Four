@@ -19,7 +19,7 @@ namespace _Player
         {
             SkillsTracker = new PlayerSkillsTracker();
             PlayerCombatEvents = new PlayerCombatEvents();
-            CombatElementsPools = new PlayerCombatElementsPools();
+            CombatUiElements = new PlayerCombatUIElements();
             var targetsHandler = new PlayerTargetsHandler();
 
             //Injections
@@ -28,8 +28,7 @@ namespace _Player
         }
         public static PlayerEntitySingleton Instance { get; } = new PlayerEntitySingleton();
 
-        public static Dictionary<CombatingEntity, PlayerCombatElement> CombatDictionary
-            => CombatElementsPools.EntitiesDictionary;
+        public static Dictionary<CombatingEntity, PlayerCombatUIElement> CombatDictionary => CombatUiElements.Dictionary;
 
         [ShowInInspector] 
         public static PlayerSkillsTracker SkillsTracker;
@@ -37,10 +36,8 @@ namespace _Player
         [ShowInInspector] 
         public static PlayerCombatEvents PlayerCombatEvents;
         [ShowInInspector]
-        public static PlayerCombatElementsPools CombatElementsPools;
+        public static PlayerCombatUIElements CombatUiElements;
 
-        [ShowInInspector] 
-        public static PredefinedUIHolderDictionary PredefinedUIDictionary;
 
         [ShowInInspector]
         public static USkillButtonsHandler SkillButtonsHandler = null;
@@ -53,10 +50,13 @@ namespace _Player
         public static void DoSubscriptionsToCombatSystem()
         {
             var invoker = CombatSystemSingleton.Invoker;
-            invoker.SubscribeListener(CombatElementsPools);
+            invoker.SubscribeListener(CombatUiElements);
 
             var controllersHandler = CombatSystemSingleton.ControllersHandler;
             controllersHandler.InjectPlayerEvents(PlayerCombatEvents);
+
+            var teamPersistentElements = CombatSystemSingleton.TeamsPersistentElements;
+            teamPersistentElements.DoInjectionIn(CombatUiElements);
         }
     }
 
