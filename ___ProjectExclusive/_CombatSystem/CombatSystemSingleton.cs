@@ -71,6 +71,7 @@ namespace _CombatSystem
         public static CombatEventsInvoker CombatEventsInvoker { get; private set; }
         [ShowInInspector]
         public static CombatControllersHandler ControllersHandler { get; private set; }
+
         [ShowInInspector]
         public static PersistentElementsDictionary TeamsPersistentElements { get; private set; }
 

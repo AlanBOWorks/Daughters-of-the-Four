@@ -13,10 +13,10 @@ namespace _Player
         [SerializeField] 
         private CharacterStanceTooltip stanceTooltip = new CharacterStanceTooltip();
 
-        public override void DoInjection(EntityPersistentElements persistentElements)
+        public override void OnEntitySwitch(CombatingEntity entity)
         {
-            base.DoInjection(persistentElements);
-            persistentElements.CombatEvents.Subscribe(this);
+            base.OnEntitySwitch(entity);
+            entity.Events.Subscribe(this);
         }
 
         protected override Vector3 GetUIPosition(UCharacterHolder holder)

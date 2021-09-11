@@ -21,7 +21,7 @@ namespace _Player
             CameraSingleton.Subscribe(playerHolders);
             CameraSingleton.Subscribe(enemyHolders);
         
-            var playerElements = PlayerEntitySingleton.CombatUiElements;
+            var playerElements = PlayerEntitySingleton.UIDictionary;
             UtilsTeam.DoInjection(playerElements,this,DoInjection);
             void DoInjection(PlayerCombatUIElement element, UCharacterUIHolder holder)
             {
@@ -59,7 +59,7 @@ namespace _Player
     }
 
     public abstract class UCharacterOverTooltipBase : MonoBehaviour,ICombatStartListener, ICombatFinishListener,
-        IPersistentEntitySwitchListener, IPersistentElementInjector
+        IEntitySwitchListener
     {
         [ShowInInspector, HideInEditorMode, DisableInPlayMode]
         protected CombatingEntity currentEntity;
@@ -76,10 +76,7 @@ namespace _Player
         {
             currentEntity = entity;
         }
-        public virtual void DoInjection(EntityPersistentElements persistentElements)
-        {
-            persistentElements.SubscribeListener(this);
-        }
+        
 
         
         public void Injection(Camera projectionCamera)

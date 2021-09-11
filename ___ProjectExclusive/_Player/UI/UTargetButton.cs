@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace _Player
 {
-    public class UTargetButton : MonoBehaviour, IPointerClickHandler, IPersistentElementInjector, IPersistentEntitySwitchListener
+    public class UTargetButton : MonoBehaviour, IPointerClickHandler, IEntitySwitchListener
     {
         private CombatingEntity _currentTarget; //TODO inject this
         [SerializeField] private Image button;
@@ -48,12 +48,6 @@ namespace _Player
                     break;
                     //TODO right click?
             }
-        }
-
-        public void DoInjection(EntityPersistentElements persistentElements)
-        {
-            persistentElements.SubscribeListener(this);
-            gameObject.SetActive(false);
         }
 
         public void OnEntitySwitch(CombatingEntity entity)

@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Characters
 {
-    public interface ICombatingEntityInjector
+    public interface IEntitySwitchListener
     {
-        void Injection(CombatingEntity entity);
+        void OnEntitySwitch(CombatingEntity entity);
     }
 
     public interface ICharacterLore

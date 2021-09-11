@@ -105,6 +105,14 @@ namespace Characters
             action(main.Attacker, secondary.Attacker);
             action(main.Support, secondary.Support);
         }
+
+        public static void DoSwitch(ICharacterArchetypesData<IEntitySwitchListener> switchers,
+            ICharacterArchetypesData<CombatingEntity> entities)
+        {
+            switchers.Vanguard.OnEntitySwitch(entities.Vanguard);
+            switchers.Attacker.OnEntitySwitch(entities.Attacker);
+            switchers.Support.OnEntitySwitch(entities.Support);
+        }
     }
 
 

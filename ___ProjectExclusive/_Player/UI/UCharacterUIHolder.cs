@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _Player
 {
-    public class UCharacterUIHolder : MonoBehaviour, IPersistentElementInjector, IPersistentEntitySwitchListener
+    public class UCharacterUIHolder : MonoBehaviour, IEntitySwitchListener
     {
 
         [TitleGroup("References")]
@@ -31,13 +31,6 @@ namespace _Player
         public void RePosition(Vector3 worldPosition)
         {
             transform.position = _canvasCamera.WorldToScreenPoint(worldPosition);
-        }
-
-        public void DoInjection(EntityPersistentElements persistentElements)
-        {
-            targetTooltip.DoInjection(persistentElements);
-            targetButton.DoInjection(persistentElements);
-            feetTooltip.DoInjection(persistentElements);
         }
 
         public void OnEntitySwitch(CombatingEntity entity)
