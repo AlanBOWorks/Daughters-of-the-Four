@@ -466,18 +466,17 @@ namespace _CombatSystem
         void OnDoMoreActions(CombatingEntity entity);
         void OnFinisAllActions(CombatingEntity entity);
     }
-    public interface ITempoListenerVoid : ICharacterEventListener
-    {
-        void OnInitiativeTrigger();
-        void OnDoMoreActions();
-        void OnFinisAllActions();
-    }
+    
 
     public interface ITempoTicker 
     {
         void TempoTick(float deltaVariation);
     }
 
+    public interface ITempoFillerFull : ITempoFiller
+    {
+        void OnFullBar();
+    }
     public interface ITempoFiller
     {
         void FillBar(float percentage);
@@ -486,9 +485,5 @@ namespace _CombatSystem
     public interface IRoundListener : ICharacterEventListener
     {
         void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity);
-    }
-    public interface IRoundListenerVoid : ICharacterEventListener
-    {
-        void OnRoundCompleted();
     }
 }

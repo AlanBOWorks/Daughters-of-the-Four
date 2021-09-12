@@ -45,8 +45,6 @@ namespace _CombatSystem
 
         public void OnInitiativeTrigger(CombatingEntity entity)
         {
-            
-
             foreach (ITempoListener listener in TempoListeners)
             {
                 listener.OnInitiativeTrigger(entity);
@@ -55,7 +53,6 @@ namespace _CombatSystem
 
         public void OnDoMoreActions(CombatingEntity entity)
         {
-           
             foreach (ITempoListener listener in TempoListeners)
             {
                 listener.OnDoMoreActions(entity);
@@ -79,7 +76,7 @@ namespace _CombatSystem
 
             foreach (CombatingEntity entity in allEntities)
             {
-                entity.DelayBuffHandler.OnRoundCompleted();
+                entity.DelayBuffHandler.OnRoundCompleted(allEntities,lastEntity);
             }
         }
 

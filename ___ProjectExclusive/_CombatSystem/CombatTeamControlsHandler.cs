@@ -48,7 +48,7 @@ namespace _CombatSystem
     ///  groups and normalize the variations.
     /// </summary>
     public class CombatTeamControlsHandler : ICharacterFaction<CombatingTeam>, ICombatStartListener,
-        IRoundListenerVoid
+        IRoundListener
     {
         public CombatTeamControlsHandler(CombatingTeam playerEntities, CombatingTeam enemyEntities)
         {
@@ -272,7 +272,7 @@ namespace _CombatSystem
             _firstCall = false;
         }
 
-        public void OnRoundCompleted()
+        public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {
             if (!IsBurstState()) return;
 

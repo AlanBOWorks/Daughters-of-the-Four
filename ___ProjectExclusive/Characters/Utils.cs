@@ -113,6 +113,14 @@ namespace Characters
             switchers.Attacker.OnEntitySwitch(entities.Attacker);
             switchers.Support.OnEntitySwitch(entities.Support);
         }
+
+        public static void DoInjection<T>(ICharacterArchetypesData<T> injector,
+            ICharacterArchetypesData<EntityPersistentElements> elements) where T : IPersistentElementInjector
+        {
+            injector.Vanguard.DoInjection(elements.Vanguard);
+            injector.Attacker.DoInjection(elements.Attacker);
+            injector.Support.DoInjection(elements.Support);
+        }
     }
 
 

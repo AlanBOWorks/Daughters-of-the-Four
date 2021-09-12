@@ -11,7 +11,7 @@ namespace _Player
         [SerializeField] private HealthListener healthListener = new HealthListener();
         [SerializeField] private TemporalStatsListener temporalStatsListener = new TemporalStatsListener();
 
-        protected override void DoInjection(EntityPersistentElements persistentElements)
+        public override void DoInjection(EntityPersistentElements persistentElements)
         {
             persistentElements.CombatEvents.Subscribe(healthListener);
             persistentElements.CombatEvents.Subscribe(temporalStatsListener);

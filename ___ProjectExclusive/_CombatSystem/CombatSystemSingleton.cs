@@ -22,9 +22,6 @@ namespace _CombatSystem
             TeamsPersistentElements = new PersistentElementsDictionary();
             var combatControlDeclaration = new CombatControlDeclaration();
 
-            PlayerPersistentElements = TeamsPersistentElements.PlayerData;
-            EnemyPersistentElements = TeamsPersistentElements.EnemyData;
-
             Characters = new CombatCharactersHolder();
             CharacterEventsTracker = new CharacterEventsTracker();
             GlobalCharacterChangesEvent = new CombatEvents();
@@ -74,11 +71,6 @@ namespace _CombatSystem
 
         [ShowInInspector]
         public static PersistentElementsDictionary TeamsPersistentElements { get; private set; }
-
-        [ShowInInspector]
-        public static ICharacterArchetypesData<EntityPersistentElements> PlayerPersistentElements { get; private set; }
-        [ShowInInspector]
-        public static ICharacterArchetypesData<EntityPersistentElements> EnemyPersistentElements { get; private set; }
 
         [Title("Instantiated","Characters")]
         [ShowInInspector]

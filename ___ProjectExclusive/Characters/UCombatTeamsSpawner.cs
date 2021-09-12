@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Characters
 {
-    public class UCombatTeamsSpawner : MonoBehaviour, ICharacterFaction<ICharacterArchetypes<Transform>>,
+    public class UCombatTeamsSpawner : MonoBehaviour, ICharacterFaction<ICharacterArchetypesData<Transform>>,
         ICombatPreparationListener, ICombatFinishListener
     {
         [TitleGroup("Spawn Points")]
@@ -18,8 +18,8 @@ namespace Characters
         [Title("Back Up")]
         [SerializeField] private GameObject onNullSpawnPrefab;
 
-        public ICharacterArchetypes<Transform> PlayerFaction => playerFaction;
-        public ICharacterArchetypes<Transform> EnemyFaction => enemyFaction;
+        public ICharacterArchetypesData<Transform> PlayerFaction => playerFaction;
+        public ICharacterArchetypesData<Transform> EnemyFaction => enemyFaction;
 
         private CombatingTeam _playerTeam;
         private CombatingTeam _enemyTeam;
@@ -99,7 +99,7 @@ namespace Characters
 
 
     [Serializable]
-    internal class TeamTransforms : SerializableCharacterArchetypes<Transform>
+    internal class TeamTransforms : MonoCharacterArchetypes<Transform>
     { }
 
 }

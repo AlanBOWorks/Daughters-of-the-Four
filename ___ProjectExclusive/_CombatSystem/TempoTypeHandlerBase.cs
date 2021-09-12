@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using Characters;
 using UnityEngine;
 
 namespace _CombatSystem
 {
-    public abstract class TempoTypeHandlerBase<T> : ITempoListenerVoid, IRoundListenerVoid
+    public abstract class TempoTypeHandlerBase<T> : ITempoListener, IRoundListener
     //,ITempoTypes<T> <<<< uncheck for placeHolding updates
     {
         protected abstract T OnBeforeSequence { get; }
@@ -33,22 +35,22 @@ namespace _CombatSystem
         
         protected abstract void DoActionOn(T onHandler);
 
-        public void OnInitiativeTrigger()
+        public void OnInitiativeTrigger(CombatingEntity entity)
         {
             DoActionOn(OnBeforeSequence);
         }
 
-        public void OnDoMoreActions()
+        public void OnDoMoreActions(CombatingEntity entity)
         {
             DoActionOn(OnAction);
         }
 
-        public void OnFinisAllActions()
+        public void OnFinisAllActions(CombatingEntity entity)
         {
             DoActionOn(OnSequence);
         }
 
-        public void OnRoundCompleted()
+        public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {
             DoActionOn(OnRound);
         }

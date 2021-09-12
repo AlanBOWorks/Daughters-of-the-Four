@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Characters
 {
-    public class CharacterCriticalActionHandler : List<IOnCriticalListener>, ITempoListenerVoid
+    public class CharacterCriticalActionHandler : List<IOnCriticalListener>, ITempoListener
     {
         private readonly CombatingEntity _user;
         public SDelayBuffPreset CriticalBuff { set; private get; }
@@ -42,18 +42,18 @@ namespace Characters
             OnFirstCritical();
         }
 
-        public void OnInitiativeTrigger()
+        public void OnInitiativeTrigger(CombatingEntity entity)
         {
             _isFirstCritical = false;
         }
-        public void OnFinisAllActions()
+        public void OnFinisAllActions(CombatingEntity entity)
         {
             _isFirstCritical = false;
         }
         // There's to [_isFirstCritical = false] because counter attacks can crit as well and trigger
         // this effect once more; In other words => 2 Critical Triggers per Initiative
 
-        public void OnDoMoreActions()
+        public void OnDoMoreActions(CombatingEntity entity)
         { }
     }
 

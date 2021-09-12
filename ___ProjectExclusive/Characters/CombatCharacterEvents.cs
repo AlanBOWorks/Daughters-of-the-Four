@@ -28,7 +28,7 @@ namespace Characters
     /// </summary>
     public class CombatCharacterEventsBase 
     {
-        [ShowInInspector] public readonly List<ITempoListenerVoid> onTempoListeners;
+        [ShowInInspector] public readonly List<ITempoListener> onTempoListeners;
         [ShowInInspector] public readonly List<IVitalityChangeListener> onVitalityChange;
         [ShowInInspector] public readonly List<ITemporalStatChangeListener> onTemporalStatChange;
         [ShowInInspector] public readonly List<ICombatHealthChangeListener> onCombatHealthChange;
@@ -38,7 +38,7 @@ namespace Characters
 
         public CombatCharacterEventsBase()
         {
-            onTempoListeners = new List<ITempoListenerVoid>();
+            onTempoListeners = new List<ITempoListener>();
             
             onVitalityChange = new List<IVitalityChangeListener>();
             onTemporalStatChange = new List<ITemporalStatChangeListener>();
@@ -50,7 +50,7 @@ namespace Characters
 
         public void Subscribe(ICharacterEventListener listener)
         {
-            if (listener is ITempoListenerVoid tempoListener)
+            if (listener is ITempoListener tempoListener)
                 onTempoListeners.Add(tempoListener);
 
             if (listener is IVitalityChangeListener vitalityListener)

@@ -24,24 +24,6 @@ namespace _Team
         public T EnemyData => enemyData;
     }
 
-    [Serializable]
-    public class SerializableNestedTeamData<T> : ITeamsData<ICharacterArchetypesData<T>>
-    {
-        [SerializeField] private TeamElements playerData = new TeamElements();
-        [SerializeField] private TeamElements enemyData = new TeamElements();
-        
-        public ICharacterArchetypesData<T> PlayerData => playerData;
-        public ICharacterArchetypesData<T> EnemyData => enemyData;
-
-        [Serializable]
-        private class TeamElements : SerializableCharacterArchetypes<T>
-        { }
-
-        public void InjectInDictionary<TKey>(Dictionary<TKey, T> dictionary,
-            ITeamsData<ICharacterArchetypesData<TKey>> keys)
-            => UtilsTeam.InjectInDictionary(dictionary, keys, this);
-    }
-
     public abstract class NestedTeamData<T> : ITeamDataFull<T>
     {
         protected NestedTeamData()

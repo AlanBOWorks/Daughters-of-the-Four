@@ -93,6 +93,14 @@ namespace _Team
             UtilsCharacter.DoAction(elements.EnemyData,injections.EnemyData,injectionAction);
         }
 
+        public static void DoInjection(ITeamsData<ICharacterArchetypesData<IPersistentElementInjector>> injectors,
+            ITeamsData<ICharacterArchetypes<EntityPersistentElements>> elements)
+        {
+            UtilsCharacter.DoInjection(injectors.PlayerData,elements.PlayerData);
+            UtilsCharacter.DoInjection(injectors.EnemyData, elements.EnemyData);
+
+        }
+
         /// <summary>
         /// Generates object of [<see cref="T"/>] and injects into the [<see cref="elements"/>]
         /// </summary>

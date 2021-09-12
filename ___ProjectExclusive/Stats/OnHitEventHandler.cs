@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Stats
 {
-    public class OnHitEventHandler : ICombatHitListener, IHitEventHandler, ITempoListenerVoid
+    public class OnHitEventHandler : ICombatHitListener, IHitEventHandler, ITempoListener
     {
         private readonly CombatingEntity _user;
         [ShowInInspector]
@@ -88,16 +88,16 @@ namespace Stats
             _onHitListeners.Remove(listener);
         }
 
-        public void OnInitiativeTrigger()
+        public void OnInitiativeTrigger(CombatingEntity entity)
         {
             OnNotBeingHitSequence();
 
         }
 
-        public void OnDoMoreActions()
+        public void OnDoMoreActions(CombatingEntity entity)
         { }
 
-        public void OnFinisAllActions()
+        public void OnFinisAllActions(CombatingEntity entity)
         { }
 
 

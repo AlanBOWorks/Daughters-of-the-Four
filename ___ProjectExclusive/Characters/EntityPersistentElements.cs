@@ -26,21 +26,29 @@ namespace Characters
     {
         protected override EntityPersistentElements GenerateElement()
         => new EntityPersistentElements();
+
+        public ICharacterArchetypesData<EntityPersistentElements> GetTeamElements(bool isPlayer)
+            => (isPlayer) ? PlayerData : EnemyData;
+    }
+
+    public interface IPersistentElementInjector
+    {
+        void DoInjection(EntityPersistentElements persistentElements);
     }
 
 
-    public abstract class UPersistentElementInjector : MonoBehaviour
+    public abstract class UPersistentElementInjector : MonoBehaviour, IPersistentElementInjector
     {
         [SerializeField] private Parameters parameters = new Parameters();
 
-        private void Start()
+        private void Awake()
         {
             var persistentElements = parameters.GetElement();
             DoInjection(persistentElements);
             parameters = null;
         }
 
-        protected abstract void DoInjection(EntityPersistentElements persistentElements);
+        public abstract void DoInjection(EntityPersistentElements persistentElements);
 
         [Serializable]
         private class Parameters
@@ -54,4 +62,6 @@ namespace Characters
                 => CombatSystemSingleton.TeamsPersistentElements.GetElement(role, isPlayerEntity);
         }
     }
+
+
 }

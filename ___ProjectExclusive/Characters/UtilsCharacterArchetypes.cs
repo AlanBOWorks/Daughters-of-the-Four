@@ -4,6 +4,7 @@ using _CombatSystem;
 using _Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Characters
 {
@@ -250,12 +251,24 @@ namespace Characters
 
         public abstract T GetElement(TInjector injector);
     }
+
     [Serializable]
-    public class SerializableCharacterArchetypes<T> : ICharacterArchetypes<T>
+    public class MonoCharacterArchetypes<T> : ICharacterArchetypesData<T> where T : Object
     {
-        [SerializeField] private T _frontLiner;
-        [SerializeField] private T _midLiner;
-        [SerializeField] private T _backLiner;
+        [SerializeField] private T vanguard;
+        [SerializeField] private T attacker;
+        [SerializeField] private T support;
+        public T Vanguard => vanguard;
+        public T Attacker => attacker;
+        public T Support => support;
+    }
+
+    [Serializable]
+    public class SerializableCharacterArchetypes<T> : ICharacterArchetypes<T> where T : new()
+    {
+        [SerializeField] private T _frontLiner = new T();
+        [SerializeField] private T _midLiner = new T();
+        [SerializeField] private T _backLiner = new T();
 
 
         public T Vanguard
@@ -273,7 +286,25 @@ namespace Characters
             get => _backLiner;
             set => _backLiner = value;
         }
+    }
 
+
+    public abstract class CharacterArchetypesConstructor<T> : ICharacterArchetypesData<T>
+    {
+        public T Vanguard => GenerateObject();
+        public T Attacker => GenerateObject();
+        public T Support => GenerateObject();
+
+        public ICharacterArchetypes<T> GenerateHolder()
+        {
+            CharacterArchetypes<T> generated = new CharacterArchetypes<T>
+            {
+                Vanguard = GenerateObject(), Attacker = GenerateObject(), Support = GenerateObject()
+            };
+            return generated;
+        }
+
+        protected abstract T GenerateObject();
     }
 
     public interface ICharacterArchetypes<T> : ICharacterArchetypesData<T>, ICharacterArchetypesInjection<T>

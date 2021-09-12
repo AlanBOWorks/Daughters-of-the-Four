@@ -19,6 +19,7 @@ namespace _Player
     /// essential to them.</summary>
     public sealed class PlayerCombatUIElement : IEntitySwitchListener
     {
+        public CombatingEntity CurrentEntity { get; private set; }
         public UCharacterUIHolder UIHolder;
 
         public UTargetButton GetTargetButton()
@@ -28,6 +29,7 @@ namespace _Player
 
         public void OnEntitySwitch(CombatingEntity entity)
         {
+            CurrentEntity = entity;
             UIHolder.OnEntitySwitch(entity);
         }
     }

@@ -51,7 +51,7 @@ namespace _CombatSystem
             }
         }
 
-        private Action<ITempoListenerVoid> _tempoAction;
+        private Action<ITempoListener> _tempoAction;
         private void DoTempoActions(CombatingEntity entity)
         {
             DoEvents(
@@ -66,9 +66,9 @@ namespace _CombatSystem
         {
             _tempoAction = TempoAction;
             DoTempoActions(entity);
-            void TempoAction(ITempoListenerVoid listener)
+            void TempoAction(ITempoListener listener)
             {
-                listener.OnInitiativeTrigger();
+                listener.OnInitiativeTrigger(entity);
             }
         }
 
@@ -77,9 +77,9 @@ namespace _CombatSystem
             _tempoAction = TempoAction;
             DoTempoActions(entity);
 
-            void TempoAction(ITempoListenerVoid listener)
+            void TempoAction(ITempoListener listener)
             {
-                listener.OnDoMoreActions();
+                listener.OnDoMoreActions(entity);
             }
         }
 
@@ -88,9 +88,9 @@ namespace _CombatSystem
             _tempoAction = TempoAction;
             DoTempoActions(entity);
 
-            void TempoAction(ITempoListenerVoid listener)
+            void TempoAction(ITempoListener listener)
             {
-                listener.OnFinisAllActions();
+                listener.OnFinisAllActions(entity);
             }
         }
 

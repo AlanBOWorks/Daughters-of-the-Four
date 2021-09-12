@@ -912,4 +912,39 @@ namespace Stats
             return (isPositive) ? GetBuffTooltip(isBuff) : GetDeBuffTooltip(isBuff);
         }
     }
+
+    public static class UtilStringStats
+    {
+        public static string MinusZero = "-N";
+        public static string Zero = "0";
+        public static string One = "1";
+        public static string Two = "2";
+        public static string Three = "3";
+        public static string Four = "4";
+        public static string Five = "5";
+        public static string Six = "6";
+        public static string Seven = "7";
+        public static string Eight = "8";
+        public static string Nine = "9";
+        public static string TenAndPlus = "X";
+
+        public static string GetStaticString(int index)
+        {
+            if (index < 0) return MinusZero;
+            return index switch
+            {
+                0 => Zero,
+                1 => One,
+                2 => Two,
+                3 => Three,
+                4 => Four,
+                5 => Five,
+                6 => Six,
+                7 => Seven,
+                8 => Eight,
+                9 => Nine,
+                _ => TenAndPlus
+            };
+        }
+    }
 }

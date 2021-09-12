@@ -15,7 +15,7 @@ namespace Characters
     /// - Guard/Guarding: means that this will receive the effect instead of the [Target] <br></br>
     /// - Protect/ProtectMe: means that Me/user will not receive the effect but instead a Guardian
     /// </summary>
-    public class CharacterGuarding : ITempoListenerVoid, ICharacterEventListener
+    public class CharacterGuarding : ITempoListener, ICharacterEventListener
     {
         public CharacterGuarding(CombatingEntity user)
         {
@@ -94,15 +94,15 @@ namespace Characters
             Debug.Log($"Guarded by: {possibleTarget.CharacterName}");
         }
 
-        public void OnInitiativeTrigger()
+        public void OnInitiativeTrigger(CombatingEntity entity)
         {
             RemoveGuarding();
         }
 
-        public void OnDoMoreActions()
+        public void OnDoMoreActions(CombatingEntity entity)
         {}
 
-        public void OnFinisAllActions()
+        public void OnFinisAllActions(CombatingEntity entity)
         {} 
     }
 }

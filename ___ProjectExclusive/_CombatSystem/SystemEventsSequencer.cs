@@ -38,8 +38,8 @@ namespace _CombatSystem
 
             void EntityActions()
             {
-                entity.DelayBuffHandler.OnInitiativeTrigger();
-                entity.CharacterCriticalBuff.OnInitiativeTrigger();
+                entity.DelayBuffHandler.OnInitiativeTrigger(entity);
+                entity.CharacterCriticalBuff.OnInitiativeTrigger(entity);
 
                 CombatSystemSingleton.CombatEventsInvoker.OnInitiativeTrigger(entity);
             }
@@ -60,7 +60,7 @@ namespace _CombatSystem
             void EntityActions()
             {
                 entity.CombatSkills.ReduceCooldown();
-                entity.DelayBuffHandler.OnDoMoreActions();
+                entity.DelayBuffHandler.OnDoMoreActions(entity);
                 CombatSystemSingleton.CombatEventsInvoker.OnDoMoreActions(entity);
             }
             void EventActions()
@@ -90,6 +90,8 @@ namespace _CombatSystem
             void SystemActions()
             {
                 CombatSystemSingleton.PerformSkillHandler.ResetOnFinish();
+                CombatSystemSingleton.CombatEventsInvoker.OnFinisAllActions(entity);
+
             }
             void EventActions()
             {
@@ -112,6 +114,7 @@ namespace _CombatSystem
             void SystemActions()
             {
                 CombatSystemSingleton.PerformSkillHandler.ResetOnFinish();
+                CombatSystemSingleton.CombatEventsInvoker.OnFinisAllActions(entity);
             }
         }
 

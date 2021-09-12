@@ -5,6 +5,6 @@ namespace _Player
     public class PlayerArchetypes<T> : CharacterArchetypes<T>
     { }
 
-    public class SerializablePlayerArchetypes<T> : SerializableCharacterArchetypes<T>
+    public class SerializablePlayerArchetypes<T> : SerializableCharacterArchetypes<T> where T : new()
     { }
 }
