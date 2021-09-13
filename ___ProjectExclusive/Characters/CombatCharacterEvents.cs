@@ -16,7 +16,7 @@ namespace Characters
     /// Unlike [<seealso cref="ITempoListener"/>] that requires Ticking and will
     /// be invoked in the specific [<seealso cref="CombatingEntity"/>]'s turn, this listeners
     /// can be invoked by anyone and in anytime. Thus this won't be included in the
-    /// [<seealso cref="TempoHandler"/>] since this Handler only triggers the User (and not targets)
+    /// [<seealso cref="TempoTicker"/>] since this Handler only triggers the User (and not targets)
     /// and that's not the desired behaviour.
     /// <br></br>
     /// <br></br> _____ TL;DR _____ <br></br>

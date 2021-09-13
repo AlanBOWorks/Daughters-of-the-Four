@@ -10,7 +10,7 @@ namespace _Player
     {
         private static void ShowSkillTargets(CombatSkill skill)
         {
-            var user = TempoHandler.CurrentActingEntity;
+            var user = CombatSystemSingleton.CurrentActingEntity;
             var skillHandler = CombatSystemSingleton.PerformSkillHandler;
             var possibleTargets
                 = skillHandler.GetPossibleTargets(skill,user);

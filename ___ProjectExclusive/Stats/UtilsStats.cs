@@ -750,10 +750,10 @@ namespace Stats
 
 
             
-            var tempoHandler = CombatSystemSingleton.TempoHandler;
+            var tempoHandler = CombatSystemSingleton.TempoTicker;
 
-            tempoHandler.CallUpdateOnInitiativeBar(entity);
             tempoHandler.CheckAndInjectEntityInitiative(entity);
+            TempoTicker.CallUpdateOnInitiativeBar(entity);
             CombatSystemSingleton.CombatEventsInvoker.InvokeTemporalStatChange(entity);
         }
         public static void SetInitiative(CombatingEntity entity, float targetValue, EnumStats.StatsType statsType)

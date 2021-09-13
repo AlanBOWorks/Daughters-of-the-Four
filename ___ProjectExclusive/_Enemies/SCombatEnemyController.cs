@@ -67,7 +67,7 @@ namespace _Enemies
             int randomSelection = Random.Range(0, possibleTargets.Count);
 
             CombatingEntity selection = possibleTargets[randomSelection];
-            performSkillHandler.DoSkill(skill,user,selection);
+            performSkillHandler.InjectSkill(skill,user,selection);
         }
 
         private void DoRandomSelection(CombatSkill backupSkillOnZero, CombatingEntity user)

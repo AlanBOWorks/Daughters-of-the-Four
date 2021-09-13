@@ -11,8 +11,8 @@ namespace Skills
     public class SDelayBuffPreset : SSkillPreset, IDelayBuff
     {
         [SerializeField,TitleGroup("Stats")] 
-        protected TempoHandler.TickType tickType 
-            = TempoHandler.TickType.OnBeforeSequence;
+        protected TempoTicker.TickType tickType 
+            = TempoTicker.TickType.OnBeforeSequence;
 
         [SerializeField,TitleGroup("Stats"),Range(0,100)]
         private int maxStack = 1;
@@ -24,7 +24,7 @@ namespace Skills
         private EffectParams[] maxLessEffects = new EffectParams[0];
         */
 
-        public TempoHandler.TickType GetTickType() => tickType;
+        public TempoTicker.TickType GetTickType() => tickType;
         public int MaxStack => maxStack;
 
         protected override void DoEffect(SkillArguments arguments, int effectIndex)

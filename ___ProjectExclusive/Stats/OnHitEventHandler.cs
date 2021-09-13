@@ -114,9 +114,9 @@ namespace Stats
                     _messange = "Reach sequence without Hits";
                 }
             }
-            public TempoHandler.TickType GetTickType()
+            public TempoTicker.TickType GetTickType()
             {
-                return TempoHandler.TickType.OnBeforeSequence;
+                return TempoTicker.TickType.OnBeforeSequence;
             }
 
             public void DoBuff(CombatingEntity user, CombatingEntity target, float stacks)

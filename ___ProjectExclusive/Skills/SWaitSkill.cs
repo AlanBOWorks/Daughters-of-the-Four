@@ -19,7 +19,7 @@ namespace Skills
             target.DelayBuffHandler.EnqueueBuff(this,target, amountOfActionLeft);
         }
 
-        public TempoHandler.TickType GetTickType() => TempoHandler.TickType.OnAfterSequence;
+        public TempoTicker.TickType GetTickType() => TempoTicker.TickType.OnAfterSequence;
 
         public void DoBuff(CombatingEntity user, CombatingEntity target, float stacks)
         {

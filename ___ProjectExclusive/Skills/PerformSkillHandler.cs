@@ -20,9 +20,13 @@ namespace Skills
             int sizeAllocation = UtilsCharacter.PredictedAmountOfCharactersInBattle;
             _currentSkillTargets = new List<CombatingEntity>(sizeAllocation); // it could be a whole targets
             _skillActionHandler = new SkillActionHandler();
+
+            TrackedDoSkill = new PerformedSkill();
         }
 
-        
+        [ShowInInspector]
+        public readonly PerformedSkill TrackedDoSkill;
+
         [ShowInInspector] 
         private readonly List<CombatingEntity> _currentSkillTargets;
         private readonly SkillActionHandler _skillActionHandler;
@@ -43,20 +47,13 @@ namespace Skills
         /// Perform the current[<see cref="CombatSkill"/>] and saves it in the [<seealso cref="FateSkillsHandler"/>].
         /// The used skill will use the default behaviour (eg: cooldown) through [<see cref="CombatSkill.OnSkillUsage"/>]
         /// </summary>
-        public void DoSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
+        public void InjectSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
         {
             user.FateSkills.SaveSkill(target,skill);
-            _doSkillHandle =
-                Timing.RunCoroutineSingleton(_DoSkill(skill,user,target), _doSkillHandle, SingletonBehavior.Wait);
+            TrackedDoSkill.Inject(skill,user,target);
         }
 
-        public void DoFateSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
-        {
-            _doSkillHandle =
-                Timing.RunCoroutineSingleton(_DoSkill(skill,user,target), _doSkillHandle, SingletonBehavior.Wait);
-        }
 
-        
         public IEnumerator<float> _DoSkill(CombatSkill skill, CombatingEntity user, CombatingEntity target)
         {
             var mainEffect = skill.Preset.GetMainEffect();
@@ -77,9 +74,19 @@ namespace Skills
             CombatSystemSingleton.SkillUsagesEvent.InvokeSkill(skill);
 
             //>>>>>>>>>>>>>>>>>>> Finish Do SKILL
-            CombatSystemSingleton.TempoHandler.DoSkillCheckFinish(user);
             CombatSystemSingleton.CharacterEventsTracker.Invoke();
         }
+
+
+        public IEnumerator<float> _DoPerformedSkill()
+        {
+            var skill = TrackedDoSkill.UsedSkill;
+            var user = TrackedDoSkill.User;
+            var target = TrackedDoSkill.Target;
+            TrackedDoSkill.Clear();
+            return _DoSkill(skill,user,target);
+        }
+
 
         public List<CombatingEntity> GetPossibleTargets(CombatSkill skill, CombatingEntity user)
         {
@@ -151,6 +158,30 @@ namespace Skills
     }
 
 
+    public class PerformedSkill
+    {
+        public CombatSkill UsedSkill;
+        public CombatingEntity User;
+        public CombatingEntity Target;
 
+        public bool IsValid()
+        {
+            return UsedSkill != null && User != null && Target != null;
+        }
+
+        public void Inject(CombatSkill skill, CombatingEntity user, CombatingEntity target)
+        {
+            UsedSkill = skill;
+            User = user;
+            Target = target;
+        }
+
+        public void Clear()
+        {
+            UsedSkill = null;
+            User = null;
+            Target = null;
+        }
+    }
     
 }

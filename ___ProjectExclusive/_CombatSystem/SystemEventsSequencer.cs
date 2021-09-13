@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Team;
 using Characters;
 using MEC;
 using Skills;
@@ -8,119 +9,149 @@ using UnityEngine;
 
 namespace _CombatSystem
 {
-    internal class CombatInvokeSequencer : TempoEvents, ITempoHandlerSequencer
+    public class TempoEventsSequencer : TempoEvents
     {
-        private CoroutineHandle _currentSequence;
-
-
-        public void StartSequence(CombatingEntity entity)
+        public TempoEventsSequencer(TempoTicker tempoTicker)
         {
-            //these are invoked here because eventHolder doesn't caches the [CombatEntity]
-            _currentSequence = Timing.RunCoroutineSingleton(
-                _StartingSequence(), _currentSequence, SingletonBehavior.Wait);
+            _requestedEntities = tempoTicker.TempoFullEntities;
+        }
 
-            IEnumerator<float> _StartingSequence()
+        private readonly Queue<CombatingEntity> _requestedEntities;
+        private PerformedSkill _performedSkill;
+        private Func<bool> _checkPerformedSkillValid;
+
+
+        public IEnumerator<float> _CombatSequence()
+        {
+            _performedSkill = CombatSystemSingleton.PerformSkillHandler.TrackedDoSkill;
+            _checkPerformedSkillValid = _performedSkill.IsValid;
+
+            while (_requestedEntities.Count > 0)
             {
+                var entity = _requestedEntities.Dequeue();
+                var stats = entity.CombatStats;
+
+                CombatSystemSingleton.CurrentActingEntity = entity;
+
                 //// FATE Skills
                 var fateSkills = entity.FateSkills;
                 yield return Timing.WaitUntilDone(fateSkills.InvokeFateSkills());
+                AfterFateActions();
 
-                SystemActions();
-                EntityActions();
-                EventActions();
-            }
+                if (!entity.CanAct())
+                {
+                    DoSkipActions();
+                }
+                else
+                {
+                    // MAIN/Choice Actions
+                    do
+                    {
+                        DoMoreActions();
+                        yield return Timing.WaitUntilTrue(_checkPerformedSkillValid);
+                        yield return
+                            Timing.WaitUntilDone(CombatSystemSingleton.PerformSkillHandler._DoPerformedSkill());
 
-            void SystemActions()
-            {
-                CombatSystemSingleton.PerformSkillHandler.ResetOnInitiative();
-                CombatSystemSingleton.ControllersHandler.CallForControl(entity);
-            }
-
-            void EntityActions()
-            {
-                entity.DelayBuffHandler.OnInitiativeTrigger(entity);
-                entity.CharacterCriticalBuff.OnInitiativeTrigger(entity);
-
-                CombatSystemSingleton.CombatEventsInvoker.OnInitiativeTrigger(entity);
-            }
-
-            void EventActions()
-            {
-                OnInitiativeTrigger(entity);
-            }
-        }
-
-        public void DoMoreActionsSequence(CombatingEntity entity)
-        {
-            EntityActions();
-            EventActions();
-            SystemActions();
+                        stats.ActionsSubtraction();
+                    } while (stats.HasActionLeft());
+                }
+                OnFinishActions();
 
 
-            void EntityActions()
-            {
-                entity.CombatSkills.ReduceCooldown();
-                entity.DelayBuffHandler.OnDoMoreActions(entity);
-                CombatSystemSingleton.CombatEventsInvoker.OnDoMoreActions(entity);
-            }
-            void EventActions()
-            {
-                OnDoMoreActions(entity);
-            }
+                void AfterFateActions()
+                {
+                    stats.RefillInitiativeActions();
+                    entity.DelayBuffHandler.OnInitiativeTrigger(entity);
+                    entity.CharacterCriticalBuff.OnInitiativeTrigger(entity);
 
-            void SystemActions()
-            {
-                CombatSystemSingleton.ControllersHandler.CallForControl(entity);
-            }
-        }
+                    CombatSystemSingleton.PerformSkillHandler.ResetOnInitiative();
+                    CombatSystemSingleton.ControllersHandler.CallForControl(entity);
 
-        public void FinishSequence(CombatingEntity entity)
-        {
-            EntityActions();
-            SystemActions();
-            EventActions();
+                    CombatSystemSingleton.CombatEventsInvoker.OnInitiativeTrigger(entity);
+                
+                    foreach (ITempoListener listener in TempoListeners)
+                    {
+                        listener.OnInitiativeTrigger(entity);
+                    }
+                }
 
+                void DoMoreActions()
+                {
+                    
 
-            void EntityActions()
-            {
-                entity.CombatStats.ResetBurst();
-                entity.ReceivedStats.ResetToZero();
-                entity.PassivesHolder.ResetOnFinish();
-            }
-            void SystemActions()
-            {
-                CombatSystemSingleton.PerformSkillHandler.ResetOnFinish();
-                CombatSystemSingleton.CombatEventsInvoker.OnFinisAllActions(entity);
+                    entity.CombatSkills.ReduceCooldown();
+                    entity.DelayBuffHandler.OnDoMoreActions(entity);
+                    CombatSystemSingleton.CombatEventsInvoker.OnDoMoreActions(entity);
 
-            }
-            void EventActions()
-            {
-                OnFinisAllActions(entity);
-            }
+                    foreach (ITempoListener listener in TempoListeners)
+                    {
+                        listener.OnDoMoreActions(entity);
+                    }
 
-        }
+                    CombatSystemSingleton.ControllersHandler.CallForControl(entity);
+                }
 
-        public void SkipSequence(CombatingEntity entity)
-        {
-            SystemActions();
-            EventActions();
+                void OnFinishActions()
+                {
+                    stats.ResetInitiativePercentage();
+                    stats.ResetActionsAmount();
+                    entity.CombatStats.ResetBurst();
+                    entity.ReceivedStats.ResetToZero();
+                    entity.PassivesHolder.ResetOnFinish();
 
+                    TempoTicker.CallUpdateOnInitiativeBar(entity);
 
-            void EventActions()
-            {
-                OnSkippedEntity(entity);
-            }
+                    CombatSystemSingleton.PerformSkillHandler.ResetOnFinish();
+                    CombatSystemSingleton.CombatEventsInvoker.OnFinisAllActions(entity);
 
-            void SystemActions()
-            {
-                CombatSystemSingleton.PerformSkillHandler.ResetOnFinish();
-                CombatSystemSingleton.CombatEventsInvoker.OnFinisAllActions(entity);
+                    foreach (ITempoListener listener in TempoListeners)
+                    {
+                        listener.OnFinisAllActions(entity);
+                    }
+
+                    CombatSystemSingleton.CurrentActingEntity = null;
+                }
+
+                void DoSkipActions()
+                {
+                    foreach (ISkippedTempoListener listener in SkippedListeners)
+                    {
+                        listener.OnSkippedEntity(entity);
+                    }
+                    CombatSystemSingleton.PerformSkillHandler.ResetOnFinish();
+                    CombatSystemSingleton.CombatEventsInvoker.OnFinisAllActions(entity);
+                }
             }
         }
+
 
         public void OnRoundCompleteSequence(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
         {
-            OnRoundCompleted(allEntities,lastEntity);
+            foreach (IRoundListener listener in RoundListeners)
+            {
+                listener.OnRoundCompleted(allEntities, lastEntity);
+            }
+        }
+
+        /// <summary>
+        /// Is just [<see cref="OnDoMoreActions"/>] but just for
+        /// [<seealso cref="Skills.PerformSkillHandler"/>]
+        /// (so it more clear who does the step to the next Action OR calls the finish implicitly)
+        /// </summary>
+        /// <returns>If the Combat is finish</returns>
+        public bool IsCombatFinish(CombatConditionsChecker.FinishState finishCheck, CombatingEntity lastEntity)
+        {
+            switch (finishCheck)
+            {
+                case CombatConditionsChecker.FinishState.PlayerWin:
+                    CombatSystemSingleton.Invoker.OnCombatFinish(lastEntity, true);
+                    return true;
+                case CombatConditionsChecker.FinishState.EnemyWin:
+                    CombatSystemSingleton.Invoker.OnCombatFinish(lastEntity, false);
+                    return true;
+            }
+
+            return false;
         }
 
     }

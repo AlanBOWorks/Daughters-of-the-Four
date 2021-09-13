@@ -93,7 +93,7 @@ namespace _Player
         [SerializeField, Range(-5f, 5f)] private float percentageModifier = 1f;
         public void FillBar(float percentage)
         {
-            fillerTransform.DOPivotX(percentage * percentageModifier, TempoHandler.DeltaStepPeriod);
+            fillerTransform.DOPivotX(percentage * percentageModifier, TempoTicker.DeltaStepPeriod);
         }
 
     }

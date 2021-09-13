@@ -13,17 +13,17 @@ namespace _CombatSystem
         protected abstract T OnSequence { get; }
         protected abstract T OnRound { get; }
 
-        public T GetHandler(TempoHandler.TickType type)
+        public T GetHandler(TempoTicker.TickType type)
         {
             switch (type)
             {
-                case TempoHandler.TickType.OnBeforeSequence:
+                case TempoTicker.TickType.OnBeforeSequence:
                     return OnBeforeSequence;
-                case TempoHandler.TickType.OnAction:
+                case TempoTicker.TickType.OnAction:
                     return OnAction;
-                case TempoHandler.TickType.OnAfterSequence:
+                case TempoTicker.TickType.OnAfterSequence:
                     return OnSequence;
-                case TempoHandler.TickType.OnRound:
+                case TempoTicker.TickType.OnRound:
                     return OnRound;
 
                 default:

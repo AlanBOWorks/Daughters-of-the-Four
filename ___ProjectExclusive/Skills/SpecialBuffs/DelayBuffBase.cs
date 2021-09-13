@@ -12,7 +12,7 @@ namespace Skills
     /// </summary>
     public interface IDelayBuff
     {
-        TempoHandler.TickType GetTickType();
+        TempoTicker.TickType GetTickType();
         void DoBuff(CombatingEntity user, CombatingEntity target, float stacks);
         int MaxStack { get; }
     }
@@ -20,7 +20,7 @@ namespace Skills
 
 
     /// <summary>
-    /// Buff than remains waiting until the selected tick [<seealso cref="TempoHandler.TickType "/>]
+    /// Buff than remains waiting until the selected tick [<seealso cref="TempoTicker.TickType "/>]
     /// is called
     /// </summary>
     public class DelayBuffHandler : TempoTypeHandlerBase<StackableBuffPool>

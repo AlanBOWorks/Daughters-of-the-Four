@@ -32,29 +32,25 @@ namespace _CombatSystem
             SkillUsagesEvent = new SkillUsagesEvent();
             OnDeathBackUpSkillInjector = new OnDeathSkillInjector();
 
-            TempoHandler = new TempoHandler();
+            TempoTicker = new TempoTicker();
+            TempoEventsSequencer = TempoTicker.Sequencer;
             TeamStateTicker = new TeamTempoTicker();
-            RoundCheckHandler = new RoundCheckHandler();
 
             CombatEventsInvoker = new CombatEventsInvoker(GlobalCharacterChangesEvent,TeamsPersistentElements);
 
 
             //---- Injections ----
             Invoker.SubscribeListener(Characters);
-            Invoker.SubscribeListener(TempoHandler);
+            Invoker.SubscribeListener(TempoTicker);
             Invoker.SubscribeListener(combatControlDeclaration);
-            Invoker.SubscribeListener(RoundCheckHandler);
             Invoker.SubscribeListener(TeamStateTicker);
             Invoker.SubscribeListener(TeamsPersistentElements);
             Invoker.SubscribeListener(CombatEventsInvoker);
 
             // Round check first since is better to finish the combat before all other unnecessary task
-            TempoHandler.Subscribe(StaticDamageHandler);
+            TempoTicker.Subscribe(TeamStateTicker);
+            TempoEventsSequencer.Subscribe(StaticDamageHandler);
 
-            TempoHandler.Subscribe(TeamStateTicker);
-
-            TempoHandler.Subscribe((ITempoListener)RoundCheckHandler);
-            TempoHandler.Subscribe((ISkippedTempoListener)RoundCheckHandler);
 
             //---- Events
             GlobalCharacterChangesEvent.Subscribe(OnDeathBackUpSkillInjector);
@@ -97,11 +93,11 @@ namespace _CombatSystem
 
         [Title("Instantiated","Tempo")]
         [ShowInInspector]
-        public static TempoHandler TempoHandler { get; private set; }
+        public static TempoTicker TempoTicker { get; private set; }
+        [ShowInInspector]
+        public static TempoEventsSequencer TempoEventsSequencer { get; private set; }
         [ShowInInspector]
         public static TeamTempoTicker TeamStateTicker { get; private set; }
-        [ShowInInspector]
-        public static RoundCheckHandler RoundCheckHandler { get; private set; }
 
 
 
@@ -112,6 +108,9 @@ namespace _CombatSystem
         public static CombatConditionsChecker CombatConditionChecker;
         [ShowInInspector]
         public static SCombatParams ParamsVariable = null;
+
+        [Title("Utils")] 
+        [ShowInInspector] public static CombatingEntity CurrentActingEntity;
     }
 
     public static class GlobalCombatParams

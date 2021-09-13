@@ -22,7 +22,7 @@ namespace ___ProjectExclusive
         private bool _wasPaused;
         private void TestCode()
         {
-            var tempoHandler = CombatSystemSingleton.TempoHandler;
+            var tempoHandler = CombatSystemSingleton.TempoTicker;
             if (_wasPaused)
                 tempoHandler.DoResume();
             else

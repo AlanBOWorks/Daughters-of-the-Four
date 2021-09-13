@@ -18,7 +18,7 @@ namespace Skills
 
         [SerializeField, EnumToggleButtons] 
         private EnumSkills.HitType hitType = EnumSkills.HitType.OnHitIncrease; 
-        public TempoHandler.TickType GetTickType() => TempoHandler.TickType.OnBeforeSequence;
+        public TempoTicker.TickType GetTickType() => TempoTicker.TickType.OnBeforeSequence;
         public int MaxStack => maxStack;
 
         protected override void DoEffect(SkillArguments arguments, int effectIndex)

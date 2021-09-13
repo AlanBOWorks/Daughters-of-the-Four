@@ -60,7 +60,7 @@ namespace _CombatSystem
             {
                 tempoVelocityModifier = value;
 
-                var currentTempoHandler = CombatSystemSingleton.TempoHandler;
+                var currentTempoHandler = CombatSystemSingleton.TempoTicker;
                 if (currentTempoHandler != null) currentTempoHandler.TempoStepModifier = value;
             }
         }

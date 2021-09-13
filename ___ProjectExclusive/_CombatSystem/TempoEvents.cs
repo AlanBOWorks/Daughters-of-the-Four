@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace _CombatSystem
 {
-    public class TempoEvents : ITempoTriggerHandler
+    public class TempoEvents
     {
         [ShowInInspector]
         public List<ITempoListener> TempoListeners { get; }
@@ -41,56 +41,6 @@ namespace _CombatSystem
         public void UnSubscribe(IRoundListener listener)
         {
             RoundListeners.Remove(listener);
-        }
-
-        public void OnInitiativeTrigger(CombatingEntity entity)
-        {
-            foreach (ITempoListener listener in TempoListeners)
-            {
-                listener.OnInitiativeTrigger(entity);
-            }
-        }
-
-        public void OnDoMoreActions(CombatingEntity entity)
-        {
-            foreach (ITempoListener listener in TempoListeners)
-            {
-                listener.OnDoMoreActions(entity);
-            }
-        }
-
-        public void OnFinisAllActions(CombatingEntity entity)
-        {
-            foreach (ITempoListener listener in TempoListeners)
-            {
-                listener.OnFinisAllActions(entity);
-            }
-
-        }
-        public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
-        {
-            foreach (IRoundListener listener in RoundListeners)
-            {
-                listener.OnRoundCompleted(allEntities, lastEntity);
-            }
-
-            foreach (CombatingEntity entity in allEntities)
-            {
-                entity.DelayBuffHandler.OnRoundCompleted(allEntities,lastEntity);
-            }
-        }
-
-        public void OnSkippedEntity(CombatingEntity entity)
-        {
-            //TODO make something more concrete about this like UI pop up
-#if UNITY_EDITOR
-            Debug.LogWarning($"Skipped character: {entity.CharacterName}");
-#endif
-            
-            foreach (var listener in SkippedListeners)
-            {
-                listener.OnSkippedEntity(entity);
-            }
         }
     }
 

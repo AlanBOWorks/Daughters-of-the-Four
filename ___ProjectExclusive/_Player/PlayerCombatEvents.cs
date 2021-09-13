@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace _Player
 {
-    public class PlayerCombatEvents : TempoEvents, IPlayerSkillListener
+    public class PlayerCombatEvents : TempoEvents, IPlayerSkillListener, ITempoTriggerHandler
     {
         public readonly List<IPlayerSkillListener> SkillListeners;
 
@@ -47,6 +47,46 @@ namespace _Player
             foreach (IPlayerSkillListener listener in SkillListeners)
             {
                 listener.OnSubmitSkill(submitSkill);
+            }
+        }
+
+        public void OnInitiativeTrigger(CombatingEntity entity)
+        {
+            foreach (ITempoListener listener in TempoListeners)
+            {
+                listener.OnInitiativeTrigger(entity);
+            }
+        }
+
+        public void OnDoMoreActions(CombatingEntity entity)
+        {
+            foreach (ITempoListener listener in TempoListeners)
+            {
+                listener.OnDoMoreActions(entity);
+            }
+        }
+
+        public void OnFinisAllActions(CombatingEntity entity)
+        {
+            foreach (ITempoListener listener in TempoListeners)
+            {
+                listener.OnFinisAllActions(entity);
+            }
+        }
+
+        public void OnRoundCompleted(List<CombatingEntity> allEntities, CombatingEntity lastEntity)
+        {
+            foreach (IRoundListener listener in RoundListeners)
+            {
+                listener.OnRoundCompleted(allEntities, lastEntity);
+            }
+        }
+
+        public void OnSkippedEntity(CombatingEntity entity)
+        {
+            foreach (ISkippedTempoListener listener in SkippedListeners)
+            {
+                listener.OnSkippedEntity(entity);
             }
         }
     }
