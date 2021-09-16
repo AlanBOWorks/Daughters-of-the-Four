@@ -7,15 +7,15 @@ using UnityEngine;
 
 namespace _CombatSystem
 {
-    public class CombatControllersHandler
+    public class CombatControllersHandler : ITempoListener
     {
 
         [ShowInInspector, DisableInEditorMode]
-        public ITempoTriggerHandler PlayerTempoHandler { get; private set; }
+        public PlayerCombatEvents PlayerTempoHandler { get; private set; }
         [ShowInInspector, DisableInEditorMode]
         public ICombatEnemyController EnemyController { get; private set; }
 
-        public void InjectPlayerEvents(ITempoTriggerHandler playerTriggerHandler)
+        public void InjectPlayerEvents(PlayerCombatEvents playerTriggerHandler)
         {
             PlayerTempoHandler = playerTriggerHandler;
         }
@@ -28,18 +28,8 @@ namespace _CombatSystem
                 EnemyController = enemyController;
         }
 
-        public void SubscribePlayerEvent(IPlayerTempoListener listener)
-        {
-            PlayerTempoHandler.TempoListeners.Add(listener);
-        }
 
-        public void SubscribePlayerEvent(IPlayerRoundListener listener)
-        {
-            PlayerTempoHandler.RoundListeners.Add(listener);
-        }
-
-
-        public void CallForControl(CombatingEntity entity)
+        private void CallForControl(CombatingEntity entity)
         {
             if (IsForPlayer(entity))
             {
@@ -49,6 +39,17 @@ namespace _CombatSystem
             {
                 EnemyController.DoControlOn(entity);
             }
+        }
+
+        public void OnInitiativeTrigger(CombatingEntity entity)
+        {
+            if (IsForPlayer(entity)) 
+                PlayerTempoHandler.OnInitiativeTrigger(entity);
+        }
+
+        public void OnDoMoreActions(CombatingEntity entity)
+        {
+            CallForControl(entity);
         }
 
         public void OnFinisAllActions(CombatingEntity entity)

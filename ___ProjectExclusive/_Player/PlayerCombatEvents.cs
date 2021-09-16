@@ -91,17 +91,15 @@ namespace _Player
         }
     }
 
-    public interface IPlayerTempoListener : ITempoListener
-    { }
 
-    public interface IPlayerRoundListener : IRoundListener 
-    { }
-
-    public interface IPlayerSkillListener<in T>
+    public interface IPlayerSkillListener<in T> : IPlayerSkillListenerToggle<T>
+    {
+        void OnSubmitSkill(T submitSkill);
+    }
+    public interface IPlayerSkillListenerToggle<in T>
     {
         void OnSkillSelect(T selectedSkill);
         void OnSkillDeselect(T deselectSkill);
-        void OnSubmitSkill(T submitSkill);
     }
 
     public interface IPlayerSkillListener : IPlayerSkillListener<CombatSkill> 

@@ -60,12 +60,11 @@ namespace _CombatSystem
 
                 void AfterFateActions()
                 {
+                    CombatSystemSingleton.PerformSkillHandler.ResetOnInitiative();
+                    
                     stats.RefillInitiativeActions();
                     entity.DelayBuffHandler.OnInitiativeTrigger(entity);
                     entity.CharacterCriticalBuff.OnInitiativeTrigger(entity);
-
-                    CombatSystemSingleton.PerformSkillHandler.ResetOnInitiative();
-                    CombatSystemSingleton.ControllersHandler.CallForControl(entity);
 
                     CombatSystemSingleton.CombatEventsInvoker.OnInitiativeTrigger(entity);
                 
@@ -81,14 +80,13 @@ namespace _CombatSystem
 
                     entity.CombatSkills.ReduceCooldown();
                     entity.DelayBuffHandler.OnDoMoreActions(entity);
-                    CombatSystemSingleton.CombatEventsInvoker.OnDoMoreActions(entity);
+                    CombatSystemSingleton.ControllersHandler.OnDoMoreActions(entity);
 
                     foreach (ITempoListener listener in TempoListeners)
                     {
                         listener.OnDoMoreActions(entity);
                     }
 
-                    CombatSystemSingleton.ControllersHandler.CallForControl(entity);
                 }
 
                 void OnFinishActions()

@@ -15,7 +15,7 @@ namespace _Player
             var possibleTargets
                 = skillHandler.GetPossibleTargets(skill,user);
             var combatDictionary
-                = PlayerEntitySingleton.UIDictionary;
+                = PlayerEntitySingleton.EntitiesUIDictionary;
             
             foreach (CombatingEntity entity in possibleTargets)
             {
@@ -27,7 +27,7 @@ namespace _Player
         private static void HideSkillTargets()
         {
             var combatDictionary 
-                = PlayerEntitySingleton.UIDictionary;
+                = PlayerEntitySingleton.EntitiesUIDictionary;
             
             foreach (KeyValuePair<CombatingEntity, PlayerCombatUIElement> playerElement in combatDictionary)
             {

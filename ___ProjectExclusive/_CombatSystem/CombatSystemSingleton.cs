@@ -36,7 +36,8 @@ namespace _CombatSystem
             TempoEventsSequencer = TempoTicker.Sequencer;
             TeamStateTicker = new TeamTempoTicker();
 
-            CombatEventsInvoker = new CombatEventsInvoker(GlobalCharacterChangesEvent,TeamsPersistentElements);
+            CombatEventsInvoker = 
+                new CombatEventsInvoker(GlobalCharacterChangesEvent,TeamsPersistentElements,ControllersHandler);
 
 
             //---- Injections ----

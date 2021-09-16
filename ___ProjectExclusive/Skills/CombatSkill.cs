@@ -33,6 +33,7 @@ namespace Skills
         [ShowInInspector]
         public int CurrentCooldown { get; private set; }
 
+        //States exits so when doing Skills and the cooldown becomes 0 the skill remains in cooldown
         public enum State
         {
             /// <summary>

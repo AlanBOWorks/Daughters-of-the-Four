@@ -21,7 +21,7 @@ namespace _Player
             CameraSingleton.Subscribe(playerHolders);
             CameraSingleton.Subscribe(enemyHolders);
         
-            var playerElements = PlayerEntitySingleton.UIDictionary;
+            var playerElements = PlayerEntitySingleton.EntitiesUIDictionary;
             UtilsTeam.DoInjection(playerElements,this,DoInjection);
             void DoInjection(PlayerCombatUIElement element, UCharacterUIHolder holder)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _CombatSystem;
 using Characters;
 using Sirenix.OdinInspector;
 using Skills;
@@ -8,8 +9,7 @@ using UnityEngine;
 
 namespace _Player
 {
-    public class USkillButtonsHandler : MonoBehaviour, ISharedSpecialSkills<USkillButton>, 
-        IPlayerTempoListener, IPlayerButtonListener
+    public class USkillButtonsHandler : MonoBehaviour, ISharedSpecialSkills<USkillButton>, ITempoListener
     {
         [TitleGroup("Params")] 
         [SerializeField]
@@ -29,9 +29,6 @@ namespace _Player
         public USkillButton WaitSkill => waitButton;
         public List<USkillButton> AllSkills => skillButtons;
 
-        [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
-        private USkillButton _currentSelectedButton;
-       
 
         [ShowInInspector]
         private Dictionary<CombatSkill, USkillButton> _skillButtons;
@@ -45,13 +42,15 @@ namespace _Player
         private void Start()
         {
             buttonsBehaviour.Handler = this;
-            PlayerEntitySingleton.SkillButtonsHandler = this;
             var combatEvents = PlayerEntitySingleton.PlayerCombatEvents;
             combatEvents.Subscribe(this);
             
             int predictedAmountOfButtons = UtilsCombatStats.PredictedAmountOfSkillsPerState;
             _skillButtons 
                 = new Dictionary<CombatSkill, USkillButton>(predictedAmountOfButtons);
+
+            PlayerEntitySingleton.SkillButtonsDictionary = _skillButtons;
+            PlayerEntitySingleton.PlayerCombatEvents.Subscribe(this);
 
             gameObject.SetActive(false);
             InjectBehaviourUnique();
@@ -144,33 +143,36 @@ namespace _Player
 
         }
 
-        private void UpdateSkills()
-        {
-            foreach (KeyValuePair<CombatSkill, USkillButton> pair in _skillButtons)
-            {
-                pair.Value.UpdateCooldown();
-            }
-        }
-
         private void InjectSkillOnButton(CombatingEntity entity,CombatSkill skill, USkillButton button)
         {
-            button.Injection(entity, skill);
+            button.UpdateSkill(entity, skill);
             _skillButtons.Add(skill, button);
+            button.UpdateCooldown();
             button.Show();
-
         }
 
-        public void ShowButtons()
+        private void ShowButtons()
         {
             gameObject.SetActive(true);
-            foreach (KeyValuePair<CombatSkill, USkillButton> button in _skillButtons)
+            foreach (KeyValuePair<CombatSkill, USkillButton> pair in _skillButtons)
             {
-                button.Value.Show();
+                var button = pair.Value;
+                button.Show();
             }
-            //TODO show animation
         }
 
-        public void HideButtons()
+        private void ShowAndUpdateButtons()
+        {
+            gameObject.SetActive(true);
+            foreach (KeyValuePair<CombatSkill, USkillButton> pair in _skillButtons)
+            {
+                var button = pair.Value;
+                button.UpdateCooldown();
+                button.Show();
+            }
+        }
+
+        private void HideButtons()
         {
             gameObject.SetActive(false);
 
@@ -192,48 +194,12 @@ namespace _Player
 
         public void OnDoMoreActions(CombatingEntity entity)
         {
-            OnInitiativeTrigger(entity);
+            ShowAndUpdateButtons();
         }
 
         public void OnFinisAllActions(CombatingEntity entity)
         {
             HideButtons();
-        }
-
-        public void OnSkillSelect(USkillButton selectedSkill)
-        {
-            //if some other skill, then disable it first
-            if (_currentSelectedButton != null) 
-            {
-                OnSkillDeselect(_currentSelectedButton);
-            }
-
-            _currentSelectedButton = selectedSkill;
-            selectedSkill.OnSkillSelect(selectedSkill);
-
-            var combatSkill = selectedSkill.CurrentSkill;
-
-            PlayerEntitySingleton.PlayerCombatEvents.OnSkillSelect(combatSkill);
-        }
-
-        public void OnSkillDeselect(USkillButton deselectSkill)
-        {
-            //if is the same means that the player wants to disable
-            if (deselectSkill == _currentSelectedButton) 
-            {
-                _currentSelectedButton = null;
-            }
-            deselectSkill.OnSkillDeselect(deselectSkill);
-            PlayerEntitySingleton.PlayerCombatEvents.OnSkillDeselect(deselectSkill.CurrentSkill);
-        }
-
-        public void OnSubmitSkill() => OnSubmitSkill(_currentSelectedButton);
-        public void OnSubmitSkill(USkillButton submitSkill)
-        {
-            HideButtons();
-            submitSkill.OnSubmitSkill(submitSkill);
-            PlayerEntitySingleton.PlayerCombatEvents.OnSubmitSkill(submitSkill.CurrentSkill);
-            _currentSelectedButton = null;
         }
     }
 

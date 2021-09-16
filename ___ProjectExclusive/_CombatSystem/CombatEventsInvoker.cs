@@ -9,15 +9,21 @@ namespace _CombatSystem
 {
     public class CombatEventsInvoker : ICombatAfterPreparationListener
     {
-        public CombatEventsInvoker(CombatEvents globalEvents, PersistentElementsDictionary persistentEvents)
+        public CombatEventsInvoker(CombatEvents globalEvents, PersistentElementsDictionary persistentEvents, 
+            CombatControllersHandler controllersEvents)
         {
             _globalEvents = globalEvents;
             _persistentEvents = persistentEvents;
+
+            _tempoEventsHandlers = new Queue<ITempoListener>(1);
+            _tempoEventsHandlers.Enqueue(controllersEvents);
         }
 
         private readonly CombatEvents _globalEvents;
         private readonly PersistentElementsDictionary _persistentEvents;
+        private readonly Queue<ITempoListener> _tempoEventsHandlers;
 
+        public void Subscribe(ITempoListener listener) => _tempoEventsHandlers.Enqueue(listener);
 
         public void OnAfterPreparation(CombatingTeam playerEntities, CombatingTeam enemyEntities, CharacterArchetypesList<CombatingEntity> allEntities)
         {
@@ -30,7 +36,7 @@ namespace _CombatSystem
             }
         }
 
-        private void DoEvents<T>(List<T> globalEvents, List<T> persistentEvents, List<T> entityEvents, Action<T> action)
+        private static void DoEvents<T>(List<T> globalEvents, List<T> persistentEvents, List<T> entityEvents, Action<T> action)
         {
             for (var i = 0; i < globalEvents.Count; i++)
             {
@@ -60,6 +66,10 @@ namespace _CombatSystem
                 entity.Events.onTempoListeners,
                 _tempoAction
             );
+            foreach (ITempoListener listener in _tempoEventsHandlers)
+            {
+                _tempoAction(listener);
+            }
         }
 
         public void OnInitiativeTrigger(CombatingEntity entity)

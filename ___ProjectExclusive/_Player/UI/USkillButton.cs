@@ -2,6 +2,7 @@
 using ___ProjectExclusive;
 using Characters;
 using CombatEffects;
+using DG.Tweening;
 using MPUIKIT;
 using Sirenix.OdinInspector;
 using Skills;
@@ -13,8 +14,7 @@ using UnityEngine.UI;
 namespace _Player
 {
     public class USkillButton : MonoBehaviour, 
-        IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler,
-        IPlayerButtonListener
+        IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
 
         // TODO Icon
@@ -33,29 +33,45 @@ namespace _Player
         public CombatingEntity CurrentEntity { get; private set; }
         [ShowInInspector,DisableInEditorMode]
         public CombatSkill CurrentSkill { get; private set; }
-
-        public CombatSkill.State SkillState
-        {
-            get => CurrentSkill.SkillState;
-            private set => CurrentSkill.SwitchState(value);
-        }
-
+        
         private bool IsInvalid()
         {
             return CurrentSkill == null || CurrentEntity == null;
 
         }
 
-        public void Injection(CombatingEntity entity, CombatSkill skill)
+        public void OnPointerEnter(PointerEventData eventData)
         {
-            CurrentEntity = entity;
-            CurrentSkill = skill;
-            UpdateSkillIcon();
+            if (IsInvalid()) return;
+
+            USkillTooltipHandler skillTooltip = Behaviour.SkillTooltip;
+            skillTooltip.HandleButton(this);
+            skillTooltip.gameObject.SetActive(true);
         }
 
-        private void UpdateSkillIcon()
+        public void OnPointerExit(PointerEventData eventData)
         {
-            var skillPreset= CurrentSkill.Preset;
+            if (IsInvalid()) return;
+
+            USkillTooltipHandler skillTooltip = Behaviour.SkillTooltip;
+            skillTooltip.gameObject.SetActive(false);
+        }
+
+
+        public void Show()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
+
+        private void UpdateSkillTooltips()
+        {
+            var skillPreset = CurrentSkill.Preset;
             Sprite skillSprite = skillPreset.GetSkillIcon();
 
             EnumSkills.TargetingType skillType = skillPreset.GetSkillType();
@@ -81,39 +97,9 @@ namespace _Player
                 skillIcon.sprite = skillSprite;
                 skillIcon.color = skillColor;
             }
-            if(border != null)
+            if (border != null)
                 border.color = skillColor;
         }
-
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            if (IsInvalid()) return;
-
-            USkillTooltipHandler skillTooltip = Behaviour.SkillTooltip;
-            skillTooltip.HandleButton(this);
-            skillTooltip.gameObject.SetActive(true);
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            if (IsInvalid()) return;
-
-            USkillTooltipHandler skillTooltip = Behaviour.SkillTooltip;
-            skillTooltip.gameObject.SetActive(false);
-        }
-
-
-        public void Show()
-        {
-            gameObject.SetActive(true);
-            UpdateCooldown();
-        }
-
-        public void Hide()
-        {
-            gameObject.SetActive(false);
-        }
-
         public void UpdateCooldown()
         {
             if (!CurrentSkill.CanBeUse(CurrentEntity))
@@ -131,10 +117,19 @@ namespace _Player
             }
         }
 
-        public void ToggleSelectedIcon(bool set)
+        public void UpdateSkill(CombatingEntity entity, CombatSkill skill)
         {
-            if(selectedIcon != null)
-                selectedIcon.gameObject.SetActive(set);
+            CurrentEntity = entity;
+            CurrentSkill = skill;
+            UpdateSkillTooltips();
+        }
+
+        public void ToggleSelectedIcon(bool selected)
+        {
+            if(selectedIcon == null) return;
+
+            selectedIcon.gameObject.SetActive(selected);
+            selectedIcon.rectTransform.DOPunchPosition(Vector3.right, .2f, 4);
         }
 
         //TODO do mouse handling
@@ -150,55 +145,17 @@ namespace _Player
             switch (input)
             {
                 case PointerEventData.InputButton.Left:
-                    HandleLeftClick();
+                    PlayerEntitySingleton.SkillSelectorHandler.OnSkillSelect(CurrentSkill);
                     break;
                 case PointerEventData.InputButton.Right:
                     break;
             }
         }
 
-
-        private void HandleLeftClick()
-        {
-            if (CurrentSkill.IsInCooldown())
-                return;
-            
-
-            switch (SkillState)
-            {
-                case CombatSkill.State.Idle:
-                    PlayerEntitySingleton.SkillButtonsHandler.OnSkillSelect(this);
-                    break;
-                case CombatSkill.State.Selected:
-                    PlayerEntitySingleton.SkillButtonsHandler.OnSkillDeselect(this);
-                    break;
-                case CombatSkill.State.Cooldown:
-                    break;
-                default:
-                    throw new NotImplementedException("Skill Button Click not Implemented");
-            }
-        }
+        
+        
 
 
-        public void OnSkillSelect(USkillButton selectedSkill)
-        {
-            SkillState = CombatSkill.State.Selected;
-            ToggleSelectedIcon(true);
-        }
-
-        public void OnSkillDeselect(USkillButton deselectSkill)
-        {
-            SkillState = CombatSkill.State.Idle;
-            ToggleSelectedIcon(false);
-        }
-
-        public void OnSubmitSkill(USkillButton submitSkill)
-        {
-            // SkillState = CombatSkill.State.Cooldown; <<<< Don't use this; 
-            // The cooldown is call by [PerformSkillHandler] since the AI uses this as well for 
-            // its skill usages (and also could bypass the skill cost <= 0 check)
-            ToggleSelectedIcon(false);
-        }
     }
 
     [Serializable]

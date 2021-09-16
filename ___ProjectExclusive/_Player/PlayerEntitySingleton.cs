@@ -17,43 +17,43 @@ namespace _Player
 
         private PlayerEntitySingleton()
         {
-            SkillsTracker = new PlayerSkillsTracker();
             PlayerCombatEvents = new PlayerCombatEvents();
-            UIDictionary = new PlayerUIDictionary();
+            SkillSelectorHandler = new CombatSkillSelector();
+            EntitiesUIDictionary = new PlayerUIDictionary();
             var targetsHandler = new PlayerTargetsHandler();
 
             //Injections
-            PlayerCombatEvents.Subscribe(SkillsTracker);
             PlayerCombatEvents.Subscribe(targetsHandler);
+            PlayerCombatEvents.Subscribe(SkillSelectorHandler);
         }
         public static PlayerEntitySingleton Instance { get; } = new PlayerEntitySingleton();
 
-        [ShowInInspector] 
-        public static PlayerSkillsTracker SkillsTracker;
+       
 
         [ShowInInspector] 
         public static PlayerCombatEvents PlayerCombatEvents;
         [ShowInInspector]
-        public static PlayerUIDictionary UIDictionary;
+        public static PlayerUIDictionary EntitiesUIDictionary;
 
+        public static Dictionary<CombatSkill, USkillButton> SkillButtonsDictionary;
 
-        [ShowInInspector]
-        public static USkillButtonsHandler SkillButtonsHandler = null;
+        public static CombatSkillSelector SkillSelectorHandler;
+
         [ShowInInspector]
         public static IPlayerArchetypesData<ICharacterCombatProvider> SelectedCharacters = null;
 
         [ShowInInspector] 
         public static ITeamCombatControlHolder TeamControlStats;
 
+        // This is for injecting Player's listeners to Invoker and it self to CombatSingleton; 
+        // The rest of elements should be injected in the PlayerSingleton instead
         public static void DoSubscriptionsToCombatSystem()
         {
             var invoker = CombatSystemSingleton.Invoker;
-            invoker.SubscribeListener(UIDictionary);
-            invoker.SubscribeListener(UIDictionary);
+            invoker.SubscribeListener(EntitiesUIDictionary);
 
             var controllersHandler = CombatSystemSingleton.ControllersHandler;
             controllersHandler.InjectPlayerEvents(PlayerCombatEvents);
-
         }
     }
 

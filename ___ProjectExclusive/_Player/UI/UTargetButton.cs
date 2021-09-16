@@ -40,11 +40,7 @@ namespace _Player
             switch (button)
             {
                 case PointerEventData.InputButton.Left:
-                    var currentEntity = CombatSystemSingleton.CurrentActingEntity;
-                    var currentSkill = PlayerEntitySingleton.SkillsTracker.CurrentSelectedSkill;
-
-                    PlayerEntitySingleton.SkillButtonsHandler.OnSubmitSkill();
-                    CombatSystemSingleton.PerformSkillHandler.InjectSkill(currentSkill,currentEntity,_currentTarget);
+                    PlayerEntitySingleton.SkillSelectorHandler.SubmitTarget(_currentTarget);
                     break;
                     //TODO right click?
             }
