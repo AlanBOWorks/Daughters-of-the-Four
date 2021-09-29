@@ -1,5 +1,4 @@
-﻿using MEC;
-using UnityEngine;
+﻿
 
 namespace StylizedAnimator
 {

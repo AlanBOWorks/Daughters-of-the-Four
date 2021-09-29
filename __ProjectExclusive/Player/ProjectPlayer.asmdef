@@ -1,0 +1,16 @@
+{
+    "name": "ProjectPlayer",
+    "rootNamespace": "",
+    "references": [
+        "GUID:6fa701fd2d6cf254bbbc85e452e546a9"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
