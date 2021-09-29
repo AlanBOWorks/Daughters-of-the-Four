@@ -4,6 +4,7 @@ using CombatSystem.Events;
 using CombatTeam;
 using MEC;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 
 namespace CombatSystem
@@ -46,7 +47,7 @@ namespace CombatSystem
         [Title("Condition")] 
         [ShowInInspector]
         private ICombatEndConditionProvider _conditionProvider;
-        private static readonly ICombatEndConditionProvider _provisionalConditionProvider = new GenericWinCondition(); 
+        private static readonly ICombatEndConditionProvider ProvisionalConditionProvider = new GenericWinCondition(); 
 
         public void InjectCondition(ICombatEndConditionProvider conditionProvider)
         {
@@ -101,7 +102,7 @@ namespace CombatSystem
             yield return Timing.WaitForSeconds(1);
 
             if (_conditionProvider == null) 
-                _conditionProvider = _provisionalConditionProvider;
+                _conditionProvider = ProvisionalConditionProvider;
 
             while (!_conditionProvider.IsCombatFinish())
             {
@@ -134,9 +135,9 @@ namespace CombatSystem
 
                 }
 
-
+                yield return Timing.WaitForSeconds(deltaVariation);
                 // Check (and refill) the end of the Round
-               
+
             }
         }
 
@@ -152,7 +153,7 @@ namespace CombatSystem
                 yield break;
             }
 
-            var entityTempoHandler = CombatSystemSingleton.EntityITempoHandler;
+            var entityTempoHandler = CombatSystemSingleton.EntityTempoHandler;
             var eventsHolder = CombatSystemSingleton.EventsHolder;
 
             eventsHolder.OnInitiativeTrigger(actingEntity);
@@ -189,7 +190,7 @@ namespace CombatSystem
     }
 
     
-    public interface IEntityITempoHandler
+    public interface IEntityTempoHandler
     {
         IEnumerator<float> _RequestFinishAction(CombatingEntity entity);
     }

@@ -9,7 +9,8 @@ using UnityEngine;
 
 namespace CombatSystem.Events
 {
-    public class CombatEntityFixedEvents : ICombatPreparationListener, IFullEventListener<SkillValuesHolders,CombatingEntity,EffectResolution>
+    // This is invoked by the CombatEvents (implicitly by being subscribed to it)
+    internal class CombatEntityFixedEvents : ICombatPreparationListener, IEventListenerHandler<SkillValuesHolders,CombatingEntity,EffectResolution>
     {
 #if UNITY_EDITOR
         [ShowInInspector,TextArea]
@@ -50,11 +51,14 @@ namespace CombatSystem.Events
         public void OnFinishAllActions(CombatingEntity element)
         {
             var stats = element.CombatStats;
+
             element.EventsHolder.OnFinishAllActions(element);
         }
 
         public void OnSkipActions(CombatingEntity element)
         {
+            var stats = element.CombatStats;
+
             element.EventsHolder.OnSkipActions(element);
         }
 
@@ -81,57 +85,55 @@ namespace CombatSystem.Events
             user = skillValues.User;
             target = skillValues.Target;
         }
-        public void OnPerformOffensiveAction(SkillValuesHolders element, EffectResolution value)
-        {
-            ExtractEntities(element, out var user, out var target);
-            user.EventsHolder.OnPerformOffensiveAction(target,value);
-        }
+        
         public void OnReceiveOffensiveAction(SkillValuesHolders element, EffectResolution value)
         {
             ExtractEntities(element, out var user, out var target);
             target.EventsHolder.OnReceiveOffensiveAction(user,value);
-        }
-
-        public void OnPerformSupportAction(SkillValuesHolders element, EffectResolution value)
-        {
-            ExtractEntities(element, out var user, out var target);
-            user.EventsHolder.OnPerformSupportAction(target,value);
+            user.EventsHolder.OnPerformOffensiveAction(target,value);
         }
 
         public void OnReceiveSupportAction(SkillValuesHolders element, EffectResolution value)
         {
             ExtractEntities(element, out var user, out var target);
             target.EventsHolder.OnReceiveSupportAction(user,value);
+            user.EventsHolder.OnPerformSupportAction(target,value);
         }
 
         public void OnRecoveryReceiveAction(SkillValuesHolders element, EffectResolution value)
         {
             ExtractEntities(element, out var user, out var target);
+            OnReceiveSupportAction(element,value);
             target.EventsHolder.OnRecoveryReceiveAction(user,value);
         }
 
         public void OnDamageReceiveAction(SkillValuesHolders element, EffectResolution value)
         {
             ExtractEntities(element, out var user, out var target);
+            OnReceiveOffensiveAction(element,value);
             target.EventsHolder.OnDamageReceiveAction(user,value);
         }
 
         public void OnShieldLost(SkillValuesHolders element, EffectResolution value)
         {
             ExtractEntities(element, out var user, out var target);
+            OnDamageReceiveAction(element,value);
             target.EventsHolder.OnShieldLost(user,value);
         }
 
         public void OnHealthLost(SkillValuesHolders element, EffectResolution value)
         {
             ExtractEntities(element, out var user, out var target);
+            OnDamageReceiveAction(element,value);
             target.EventsHolder.OnHealthLost(user,value);
         }
 
         public void OnMortalityDeath(SkillValuesHolders element, EffectResolution value)
         {
             ExtractEntities(element, out var user, out var target);
+            OnDamageReceiveAction(element,value);
             target.EventsHolder.OnMortalityDeath(user,value);
+            target.Team.Events.OnMemberDeath(target);
         }
     }
 }

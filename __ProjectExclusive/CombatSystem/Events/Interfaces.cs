@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CombatSystem.Events
 { 
-    public interface IFullEventListener<in T,in TTempo, in TValue> : IStatActionListener<T,TTempo,TValue>, IRoundListener<TTempo>
+    public interface IFullEventListener<in T,in TTempo, in TStats> : IStatActionListener<T,TTempo,TStats>, IRoundListener<TTempo>
     { }
 
     public interface IStatActionListener<in T,in TTempo, in TStats> :
@@ -13,14 +13,29 @@ namespace CombatSystem.Events
         ITempoListener<TTempo>
     { }
 
+    public interface IEventListenerHandler<in T, in TTempo, in TStats>:
+        IOffensiveActionReceiverListener<T, TStats>,
+        ISupportActionReceiverListener<T, TStats>,
+        IVitalityChangeListener<T, TStats>,
+        ITempoListener<TTempo>,
+        IRoundListener<TTempo>
+    {
+
+    }
+
+
     /// <summary>
     /// Used when a [<see cref="CombatingEntity"/>] perform an offensive action
     /// </summary>
     /// <typeparam name="T">The type which is passed to all listeners</typeparam>
     /// <typeparam name="TValue">The type of value passed (generally a [<seealso cref="float"/>])</typeparam>
-    public interface IOffensiveActionListener<in T, in TValue>
+    public interface IOffensiveActionListener<in T, in TValue> : IOffensiveActionReceiverListener<T,TValue>
     {
         void OnPerformOffensiveAction(T element, TValue value);
+    }
+
+    public interface IOffensiveActionReceiverListener<in T, in TValue>
+    {
         void OnReceiveOffensiveAction(T element, TValue value);
     }
 
@@ -29,11 +44,16 @@ namespace CombatSystem.Events
     /// </summary>
     /// <typeparam name="T">The type which is passed to all listeners</typeparam>
     /// <typeparam name="TValue">The type of value passed (generally a [<seealso cref="float"/>])</typeparam>
-    public interface ISupportActionListener<in T, in TValue>
+    public interface ISupportActionListener<in T, in TValue> : ISupportActionReceiverListener<T,TValue>
     {
         void OnPerformSupportAction(T element, TValue value);
+    }
+
+    public interface ISupportActionReceiverListener<in T, in TValue>
+    {
         void OnReceiveSupportAction(T element, TValue value);
     }
+
 
     /// <summary>
     /// Used when a [<see cref="CombatingEntity"/>] receive a change on vitality (damage, recovery, health at zero)

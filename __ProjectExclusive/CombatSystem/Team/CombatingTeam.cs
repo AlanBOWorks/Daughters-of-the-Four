@@ -8,17 +8,18 @@ using UnityEngine;
 
 namespace CombatTeam
 {
-    public sealed class CombatingTeam : HashSet<CombatingEntity>, ITeamStructureRead<CombatingEntity>, 
-        IVitalityChangeListener<CombatingEntity,float>
+    public sealed class CombatingTeam : HashSet<CombatingEntity>, ITeamStructureRead<CombatingEntity>,
+        ITeamStateChangeListener
     {
         public CombatingTeam(ITeamProvider generateFromProvider)
         {
-            _stanceHandler = new TeamStanceHandler();
             _livingEntitiesTracker = new HashSet<CombatingEntity>();
 
             Vanguard = GenerateEntity(generateFromProvider.Vanguard);
             Attacker = GenerateEntity(generateFromProvider.Attacker);
             Support = GenerateEntity(generateFromProvider.Support);
+
+            Events = new TeamEvents();
 
             CombatingEntity GenerateEntity(ICombatEntityProvider entityProvider)
             {
@@ -34,56 +35,34 @@ namespace CombatTeam
         private readonly HashSet<CombatingEntity> _livingEntitiesTracker;
         public bool HasLivingEntities() => _livingEntitiesTracker.Count > 0;
 
+        [Title("Data")]
+        public EnumTeam.TeamStance CurrentStance { get; private set; }
 
+        [Title("Members")]
         [ShowInInspector]
         public CombatingEntity Vanguard { get; }
         [ShowInInspector]
         public CombatingEntity Attacker { get; }
         [ShowInInspector]
         public CombatingEntity Support { get; }
-
-        private readonly TeamStanceHandler _stanceHandler;
+        [Title("Events")]
+        [ShowInInspector]
+        public readonly TeamEvents Events;
 
 
         public CombatingTeam EnemyTeam;
 
-        public void Subscribe(ITeamStanceListener listener)
-            => _stanceHandler.Add(listener);
-        public void SwitchStance(EnumTeam.TeamStance targetStance)
-            => _stanceHandler.Invoke(targetStance);
 
-
-        public void OnRecoveryReceiveAction(CombatingEntity element, float value)
+        public void OnStanceChange(EnumTeam.TeamStance switchStance)
         {
+            CurrentStance = switchStance;
         }
 
-        public void OnDamageReceiveAction(CombatingEntity element, float value)
+        public void OnMemberDeath(CombatingEntity member)
         {
-        }
-
-        public void OnShieldLost(CombatingEntity element, float value)
-        {
-        }
-
-        public void OnHealthLost(CombatingEntity element, float value)
-        {
-        }
-
-        public void OnMortalityDeath(CombatingEntity element, float value)
-        {
-            if (_livingEntitiesTracker.Contains(element))
-                _livingEntitiesTracker.Remove(element);
+            if (_livingEntitiesTracker.Contains(member))
+                _livingEntitiesTracker.Remove(member);
         }
     }
 
-    internal class TeamStanceHandler : HashSet<ITeamStanceListener>
-    {
-        public void Invoke(EnumTeam.TeamStance targetStance)
-        {
-            foreach (ITeamStanceListener listener in this)
-            {
-                listener.OnStanceChange(targetStance);
-            }
-        }
-    }
 }

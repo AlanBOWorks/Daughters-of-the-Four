@@ -108,8 +108,7 @@ namespace Stats
         private const float MaxInitiativeRefillRandom = .1f;
         public static void InitiativeResetOnTrigger(CombatStatsHolder statsHolder)
         {
-            float randomRefill = Random.Range(0, MaxInitiativeRefillRandom);
-            statsHolder.TickingInitiative = randomRefill + statsHolder.InitialInitiative;
+            statsHolder.TickingInitiative = 0;
         }
 
     }

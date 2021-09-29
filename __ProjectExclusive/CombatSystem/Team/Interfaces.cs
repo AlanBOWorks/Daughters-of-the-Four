@@ -3,12 +3,6 @@ using UnityEngine;
 
 namespace CombatTeam
 {
-
-    public interface ITeamStanceListener
-    {
-        void OnStanceChange(EnumTeam.TeamStance stance);
-    }
-
     public interface ITeamProvider : ITeamStructureRead<ICombatEntityProvider>
     {
 
@@ -39,5 +33,18 @@ namespace CombatTeam
         T OnAttackStance { get; set; }
         T OnNeutralStance { get; set; }
         T OnDefenseStance { get; set; }
+    }
+
+
+    public interface ITeamStateChangeListener
+    {
+        void OnStanceChange(EnumTeam.TeamStance switchStance);
+        void OnMemberDeath(CombatingEntity member);
+    }
+
+    public interface ITeamStateChangeListener<in THolder>
+    {
+        void OnStanceChange(THolder holder, EnumTeam.TeamStance switchStance);
+        void OnMemberDeath(THolder holder, CombatingEntity member);
     }
 }

@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Stats
@@ -47,8 +48,11 @@ namespace Stats
             _listStats = new ListBehaviourHolder(baseList, buffList, burstList);
         }
 
+        [ShowInInspector]
         public IBaseStats<float> BaseStats { get; }
+        [ShowInInspector,HorizontalGroup()]
         public IBaseStats<float> BuffStats { get; }
+        [ShowInInspector,HorizontalGroup()]
         public IBaseStats<float> BurstStats { get; }
 
         // TODO when conditional stats are created, add this to mathematicals

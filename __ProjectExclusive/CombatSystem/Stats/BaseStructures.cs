@@ -131,10 +131,15 @@ namespace Stats
         /// </summary>
         protected IBaseStatsRead<TPercent> MainStats { get; set; }
 
+        [ShowInInspector]
         public TPercent CurrentShields { get; set; }
+        [ShowInInspector]
         public TPercent CurrentHealth { get; set; }
+        [ShowInInspector]
         public TPercent CurrentMortality { get; set; }
+        [ShowInInspector]
         public TPercent TickingInitiative { get; set; }
+        [ShowInInspector]
         public TUnit CurrentActions { get; set; }
 
 

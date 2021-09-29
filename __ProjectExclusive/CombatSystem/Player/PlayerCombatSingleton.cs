@@ -1,3 +1,5 @@
+using CombatSystem;
+using CombatSystem.Events;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -13,6 +15,7 @@ namespace __ProjectExclusive.Player
         static PlayerCombatSingleton()
         {
             CharactersHolder = new PlayerCharactersHolder();
+            Events = new PlayerEvents();
         }
 
         private PlayerCombatSingleton()
@@ -22,6 +25,12 @@ namespace __ProjectExclusive.Player
 
         [ShowInInspector] 
         public static readonly PlayerCharactersHolder CharactersHolder;
+
+        [ShowInInspector] 
+        public static readonly PlayerEvents Events;
+
+        [ShowInInspector] 
+        public static readonly IEntityTempoHandler EntityTempoHandler;
     }
 
     internal class PlayerCombatSystemWindow : OdinEditorWindow

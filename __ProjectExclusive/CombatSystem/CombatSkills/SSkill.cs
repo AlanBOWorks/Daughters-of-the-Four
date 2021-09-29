@@ -6,7 +6,8 @@ using UnityEngine;
 
 namespace CombatSkills
 {
-    //This is created by the SkillDataBase's Instantiation methods
+    [CreateAssetMenu(fileName = "N [Skill Preset]",
+        menuName = "Combat/Skills/Preset")]
     public class SSkill : ScriptableObject
     {
         [SerializeField] 

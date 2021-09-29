@@ -12,12 +12,5 @@ namespace CombatEffects
             throw new System.NotImplementedException();
         }
 
-        public override void DoDirectEffect(CombatingEntity target, float effectValue)
-        {
-            var stats = target.CombatStats;
-            int currentActions = stats.CurrentActions;
-            UtilsCombatStats.OverrideActionsAmount(stats,0);
-
-        }
     }
 }

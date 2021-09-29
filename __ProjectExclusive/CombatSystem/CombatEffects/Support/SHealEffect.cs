@@ -1,5 +1,6 @@
 using CombatEntity;
 using CombatSkills;
+using CombatSystem;
 using Stats;
 using UnityEngine;
 
@@ -18,12 +19,9 @@ namespace CombatEffects
 
             float targetHealPercent = userHealModifier * healModifier;
             UtilsCombatStats.DoHealTo(target.CombatStats, targetHealPercent,values.IsCritical);
+            CombatSystemSingleton.EventsHolder.OnPerformSupportAction(values,new EffectResolution(this,targetHealPercent));
         }
 
-        public override void DoDirectEffect(CombatingEntity target, float effectValue)
-        {
-            UtilsCombatStats.DoHealTo(target.CombatStats,effectValue);
-        }
 
     }
 }

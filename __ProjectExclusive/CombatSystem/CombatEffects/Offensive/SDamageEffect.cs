@@ -1,5 +1,6 @@
 using CombatEntity;
 using CombatSkills;
+using CombatSystem;
 using Stats;
 using UnityEngine;
 
@@ -25,27 +26,13 @@ namespace CombatEffects
 
             // Final
             float finalDamage = userAttack - targetResistance;
-            ActDamageEffect(user,target,finalDamage);
-        }
+            if(finalDamage <= 0) return;
 
-        public override void DoDirectEffect(CombatingEntity target, float damage)
-        {
-            ActDamageEffect(target,target,damage);
-        }
 
-        private void ActDamageEffect(CombatingEntity user, CombatingEntity target, float finalDamage)
-        {
-            // Act
-            if (finalDamage <= 0)
-            {
-                // Todo invoke ZeroDamage Event
-                return;
-            }
             UtilsCombatStats.DoDamageTo(target.CombatStats, finalDamage);
 
-            // Invoke
             EffectResolution effectResolution = new EffectResolution(this, finalDamage);
-            UtilsStatsEvents.CallOffensiveEvent(user, target, effectResolution);
+            CombatSystemSingleton.EventsHolder.OnDamageReceiveAction(values,effectResolution);
         }
     }
 }

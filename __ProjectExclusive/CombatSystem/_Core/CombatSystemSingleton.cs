@@ -22,6 +22,8 @@ namespace CombatSystem
 
             var combatEntityFixedEvents = new CombatEntityFixedEvents();
 
+            EntityTempoHandler = new EntityTempoHandlerSelector();
+
             // PREPARATION Subscriptions
             CombatPreparationHandler.Subscribe(TempoTicker);
 
@@ -58,11 +60,11 @@ namespace CombatSystem
         [ShowInInspector]
         public static readonly TempoTicker TempoTicker;
 
-        public static readonly IEntityITempoHandler EntityITempoHandler;
+        internal static readonly EntityTempoHandlerSelector EntityTempoHandler;
 
         [Title("Volatile")] 
-        [ShowInInspector, HideInEditorMode] public static CombatingTeam VolatilePlayerTeam;
-        [ShowInInspector, HideInEditorMode] public static CombatingTeam VolatileEnemyTeam;
+        [ShowInInspector, DisableInEditorMode] public static CombatingTeam VolatilePlayerTeam;
+        [ShowInInspector, DisableInEditorMode] public static CombatingTeam VolatileEnemyTeam;
     }
 
     internal class CombatSystemWindow : OdinEditorWindow
