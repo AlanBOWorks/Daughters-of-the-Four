@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using CombatEntity;
+using CombatSkills;
+using CombatTeam;
 using Sirenix.OdinInspector;
 using Stats;
 using UnityEditor;
@@ -23,8 +25,8 @@ namespace __ProjectExclusive.Player
 
         
         [Space]
-        [ShowInInspector,ListDrawerSettings(IsReadOnly = true,NumberOfItemsPerPage = 1, Expanded = true)] 
-        private List<PreviewPreset> _combatPresetPreview;
+        [ShowInInspector,ListDrawerSettings(IsReadOnly = true,NumberOfItemsPerPage = 1, Expanded = true)]
+        internal List<PreviewPreset> _combatPresetPreview;
 
         
         [ResponsiveButtonGroup(DefaultButtonSize = ButtonSizes.Large), GUIColor(.2f,.8f,.5f)]
@@ -71,7 +73,7 @@ namespace __ProjectExclusive.Player
 
 
         [OnInspectorInit]
-        private void ShowPresetPreview()
+        internal void ShowPresetPreview()
         {
             _combatPresetPreview = new List<PreviewPreset>(combatPresets.Count);
             foreach (var preset in combatPresets)
@@ -80,13 +82,15 @@ namespace __ProjectExclusive.Player
             }
         }
 
-        private class PreviewPreset : ICombatEntityUpgradableReflection
+        internal class PreviewPreset : ICombatEntityUpgradableReflection
         {
             public PreviewPreset(SPlayerCombatEntity entityHolder, SCombatEntityUpgradeablePreset preset)
             {
                 _entityHolder = entityHolder;
                 _preset = preset;
                 preset.DoReflection(this);
+
+                _combatSkillPreset = preset.SkillProvider;
             }
 
             private readonly SPlayerCombatEntity _entityHolder;
@@ -97,11 +101,15 @@ namespace __ProjectExclusive.Player
             [ShowInInspector]
             private AreaData _areaData;
 
-            [ShowInInspector,HorizontalGroup()]
+            [ShowInInspector,HorizontalGroup(Title = "___________ Stats ______________________")]
             private BaseStats _baseStats;
 
             [ShowInInspector,HorizontalGroup()] 
             private BaseStats _growStats;
+
+            [Title("Skills")]
+            [ShowInInspector] 
+            private ITeamStanceStructureRead<ICollection<SkillProviderParams>> _combatSkillPreset;
 
             public AreaData AreaDataHolder { set => _areaData = value; }
             public BaseStats BaseStats { set => _baseStats = value; }

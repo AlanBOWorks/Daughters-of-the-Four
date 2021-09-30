@@ -8,7 +8,7 @@ namespace CombatSkills
 {
     [CreateAssetMenu(fileName = "N [Skill Preset]",
         menuName = "Combat/Skills/Preset")]
-    public class SSkill : ScriptableObject
+    public class SSkill : ScriptableObject, ISkill
     {
         [SerializeField] 
         private Skill skillParameters;
@@ -25,6 +25,15 @@ namespace CombatSkills
             name = assetName;
             AssetDatabase.RenameAsset(path, name);
         }
+
+        public string GetSkillName() => skillParameters.GetSkillName();
+        public Sprite GetIcon() => skillParameters.GetIcon();
+        public EnumSkills.TargetType GetTargetType() => skillParameters.GetTargetType();
+        public int GetCooldownAmount() => skillParameters.GetCooldownAmount();
+        public bool CanCrit() => skillParameters.CanCrit();
+        public float GetCritVariation() => skillParameters.GetCritVariation();
+        public IEffect GetDescriptiveEffect() => skillParameters.GetDescriptiveEffect();
+        public EffectParameter[] GetEffects() => skillParameters.GetEffects();
     }
 
 

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using CombatEntity;
+using CombatSkills;
 using CombatSystem;
 using Sirenix.OdinInspector;
 using Stats;
@@ -74,5 +76,7 @@ namespace __ProjectExclusive.Player
             return new CombatingAreaData(CharacterPreset.GetAreaData());
         }
 
+        public ITeamStanceStructureRead<ICollection<SkillProviderParams>> ProvideStanceSkills()
+            => CharacterPreset;
     }
 }

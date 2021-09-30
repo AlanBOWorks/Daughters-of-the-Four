@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatEffects;
 using CombatSkills;
 using CombatSystem.Events;
@@ -16,7 +17,7 @@ namespace CombatEntity
             AreaData = provider.GenerateAreaData();
 
             SkillsHolder 
-                = new CombatEntitySkillsHolder(AreaData.GetRole(),AreaData.GetRangeType());
+                = new CombatEntitySkillsHolder(provider.ProvideStanceSkills(),AreaData.GetRole());
             SkillUsageTracker 
                 = new SkillUsageTracker();
 
@@ -47,5 +48,7 @@ namespace CombatEntity
     {
         CombatStatsHolder GenerateStatsHolder();
         CombatingAreaData GenerateAreaData();
+
+        ITeamStanceStructureRead<ICollection<SkillProviderParams>> ProvideStanceSkills();
     }
 }

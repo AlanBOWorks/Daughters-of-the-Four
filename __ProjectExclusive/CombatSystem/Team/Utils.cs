@@ -46,6 +46,15 @@ namespace CombatTeam
             team.Support = injection.Support;
         }
 
+        public static void InjectElements<T, TParse>(ITeamStanceStructure<T> team,
+            ITeamStanceStructureRead<TParse> injection,
+            Func<TParse, T> parseFunc)
+        {
+            team.OnAttackStance = parseFunc(injection.OnAttackStance);
+            team.OnNeutralStance = parseFunc(injection.OnNeutralStance);
+            team.OnDefenseStance = parseFunc(injection.OnDefenseStance);
+        }
+
         public static void InjectElements<T, TParse>(ITeamStructureInject<T> team, ITeamStructureRead<TParse> injection,
             Func<TParse, T> parseFunc)
         {

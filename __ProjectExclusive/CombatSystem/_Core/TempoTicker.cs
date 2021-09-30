@@ -119,6 +119,7 @@ namespace CombatSystem
                     _activeEntities.Enqueue(entity);
                 }
 
+                yield return Timing.WaitForSeconds(deltaVariation);
 
                 // Wait for emptying actives;
                 while (_activeEntities.Count > 0)
@@ -135,15 +136,17 @@ namespace CombatSystem
 
                 }
 
-                yield return Timing.WaitForSeconds(deltaVariation);
-                // Check (and refill) the end of the Round
+                yield return Timing.WaitForOneFrame;
 
             }
         }
 
         private IEnumerator<float> _DoEntitySequence(CombatingEntity actingEntity)
         {
-            Debug.Log($"Trigger entity: {actingEntity}");
+            var entityTempoHandler = CombatSystemSingleton.EntityTempoHandler;
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+
+            eventsHolder.OnInitiativeTrigger(actingEntity);
             yield return Timing.WaitForOneFrame;
             var stats = actingEntity.CombatStats;
 
@@ -153,10 +156,6 @@ namespace CombatSystem
                 yield break;
             }
 
-            var entityTempoHandler = CombatSystemSingleton.EntityTempoHandler;
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-
-            eventsHolder.OnInitiativeTrigger(actingEntity);
             yield return Timing.WaitUntilDone(entityTempoHandler._RequestFinishAction(actingEntity));
             while (stats.CurrentActions > 1)
             {

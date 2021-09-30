@@ -28,11 +28,18 @@ namespace CombatTeam
         T Support { set; }
     }
 
-    public interface ITeamStanceStructure<T>
+    public interface ITeamStanceStructure<T> : ITeamStanceStructureRead<T>
     {
-        T OnAttackStance { get; set; }
-        T OnNeutralStance { get; set; }
-        T OnDefenseStance { get; set; }
+        new T OnAttackStance { get; set; }
+        new T OnNeutralStance { get; set; }
+        new T OnDefenseStance { get; set; }
+    }
+
+    public interface ITeamStanceStructureRead<out T>
+    {
+        T OnAttackStance { get; }
+        T OnNeutralStance { get; }
+        T OnDefenseStance { get; }
     }
 
 

@@ -10,9 +10,15 @@ namespace CombatSkills
         public CombatingSkill(ISkill preset)
         {
             Preset = preset;
-            _currentCooldownAmount = 0;
             _cooldownOnUsage = preset.GetCooldownAmount(); 
         }
+
+        public CombatingSkill(SkillProviderParams providerParams)
+        {
+            Preset = providerParams.preset;
+            _cooldownOnUsage = Preset.GetCooldownAmount() + providerParams.cooldownVariation;
+        }
+
 
         //this exists because some skill could have their cooldown altered by passives TODO make the passives for that
         private readonly int _cooldownOnUsage;

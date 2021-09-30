@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using CombatEntity;
+using CombatSkills;
+using CombatTeam;
 using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
@@ -24,5 +27,8 @@ namespace __ProjectExclusive.Enemy
         public CombatStatsHolder GenerateStatsHolder() => new CombatStatsHolder(baseStats);
 
         public CombatingAreaData GenerateAreaData() => new CombatingAreaData(areaData);
+
+        public ITeamStanceStructureRead<ICollection<SkillProviderParams>> ProvideStanceSkills()
+            => this;
     }
 }
