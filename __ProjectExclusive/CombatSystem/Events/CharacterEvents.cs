@@ -45,6 +45,11 @@ namespace CombatSystem.Events
         [ShowInInspector, HorizontalGroup("Tempo Events")]
         private readonly List<IRoundListener<TTempo>> _roundListeners;
 
+        public void Subscribe(CharacterEventsHolder<T, TTempo, TStat> slaveEventsHolder)
+        {
+            Subscribe(slaveEventsHolder as IStatActionListener<T, TTempo, TStat>);
+            Subscribe(slaveEventsHolder as IRoundListener<TTempo>);
+        }
 
         public void Subscribe(IFullEventListener<T, TTempo, TStat> listener)
         {

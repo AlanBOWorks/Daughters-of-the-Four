@@ -49,7 +49,6 @@ namespace CombatTeam
         [ShowInInspector]
         public readonly TeamEvents Events;
 
-
         public CombatingTeam EnemyTeam;
 
 

@@ -85,13 +85,9 @@ namespace CombatSystem
         }
 
 
-        // Twelve frames (about half second) between each tick; This is similar to the Character animation frequency of 12/24
-        // frames update per game cycle.
-        // This period is also better for performance since it calculates 12 times less per tick (but it could be possible no use it)
-        private const float DeltaTickPeriod = 12;
-        // Entities requires to reach 1f(100%) initiative and at speed 1 it will require: 12 / 0.01 = 120 ticks
-        // 120 / 20 (20 ticks = 1second aprox.) = 6 seconds
-        private const float TickSpeedModifier = 0.1f;
+        private const float TickPeriodSeconds = .5f;
+        private const int VanguardTickTriggerCheck = 12;
+        private const int EntityTickTriggerCheck = 8;
         private IEnumerator<float> _TickingLoop()
         {
 #if UNITY_EDITOR
@@ -106,20 +102,23 @@ namespace CombatSystem
 
             while (!_conditionProvider.IsCombatFinish())
             {
-                float deltaVariation = DeltaTickPeriod * Timing.DeltaTime;
 
                 // TICKING
                 foreach (var entity in _tickingEntities)
                 {
                     var statsHolder = entity.CombatStats;
-                    float tickIncrement = deltaVariation * statsHolder.InitiativeSpeed * TickSpeedModifier;
+                    float tickIncrement = statsHolder.InitiativeSpeed;
                     statsHolder.TickingInitiative += tickIncrement;
-                    if(statsHolder.TickingInitiative < 1) continue;
+
+                    float tickCheck = (entity.AreaData.GetRole() == EnumTeam.Role.Vanguard)
+                        ? VanguardTickTriggerCheck
+                        : EntityTickTriggerCheck;
+                    if(statsHolder.TickingInitiative < tickCheck) continue;
 
                     _activeEntities.Enqueue(entity);
                 }
 
-                yield return Timing.WaitForSeconds(deltaVariation);
+                yield return Timing.WaitForSeconds(TickPeriodSeconds);
 
                 // Wait for emptying actives;
                 while (_activeEntities.Count > 0)
@@ -143,10 +142,9 @@ namespace CombatSystem
 
         private IEnumerator<float> _DoEntitySequence(CombatingEntity actingEntity)
         {
-            var entityTempoHandler = CombatSystemSingleton.EntityTempoHandler;
+            var entityTempoHandler = CombatSystemSingleton.EntityActionRequestHandler;
             var eventsHolder = CombatSystemSingleton.EventsHolder;
 
-            eventsHolder.OnInitiativeTrigger(actingEntity);
             yield return Timing.WaitForOneFrame;
             var stats = actingEntity.CombatStats;
 
@@ -156,14 +154,8 @@ namespace CombatSystem
                 yield break;
             }
 
-            yield return Timing.WaitUntilDone(entityTempoHandler._RequestFinishAction(actingEntity));
-            while (stats.CurrentActions > 1)
-            {
-                eventsHolder.OnDoMoreActions(actingEntity);
-                yield return Timing.WaitUntilDone(entityTempoHandler._RequestFinishAction(actingEntity));
-            }
+            yield return Timing.WaitUntilDone(entityTempoHandler._RequestFinishActions(actingEntity));
 
-            eventsHolder.OnFinishAllActions(actingEntity);
         }
 
         //TODO make it coroutine when applies
@@ -191,7 +183,7 @@ namespace CombatSystem
     
     public interface IEntityTempoHandler
     {
-        IEnumerator<float> _RequestFinishAction(CombatingEntity entity);
+        IEnumerator<float> _RequestFinishActions(CombatingEntity entity);
     }
 
 }

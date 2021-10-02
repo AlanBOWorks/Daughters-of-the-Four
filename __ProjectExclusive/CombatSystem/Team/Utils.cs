@@ -18,6 +18,17 @@ namespace CombatTeam
         public static T GetElement<T>(ITeamStructureRead<T> team, EnumTeam.TeamPosition teamPosition)
             => GetElement(team, (EnumTeam.Role)teamPosition);
 
+        public static T GetElement<T>(ITeamStanceStructureRead<T> stanceStructure, EnumTeam.TeamStance stance)
+        {
+            return stance switch
+            {
+                EnumTeam.TeamStance.Neutral => stanceStructure.OnNeutralStance,
+                EnumTeam.TeamStance.Attacking => stanceStructure.OnAttackStance,
+                EnumTeam.TeamStance.Defending => stanceStructure.OnDefenseStance,
+                _ => throw new ArgumentOutOfRangeException(nameof(stance), stance, null)
+            };
+        }
+
         public static void InjectElement<T>(ITeamStructureInject<T> team, EnumTeam.Role role, T element)
         {
             switch (role)
@@ -54,6 +65,16 @@ namespace CombatTeam
             team.OnNeutralStance = parseFunc(injection.OnNeutralStance);
             team.OnDefenseStance = parseFunc(injection.OnDefenseStance);
         }
+        public static void InjectElements<T, TParse, TParse2>(ITeamStanceStructure<T> team,
+            ITeamStanceStructureRead<TParse> injection,
+            ITeamStanceStructureRead<TParse2> injectionSecondary,
+            Func<TParse,TParse2, T> parseFunc)
+        {
+            team.OnAttackStance = parseFunc(injection.OnAttackStance, injectionSecondary.OnAttackStance);
+            team.OnNeutralStance = parseFunc(injection.OnNeutralStance, injectionSecondary.OnNeutralStance);
+            team.OnDefenseStance = parseFunc(injection.OnDefenseStance, injectionSecondary.OnDefenseStance);
+        }
+
 
         public static void InjectElements<T, TParse>(ITeamStructureInject<T> team, ITeamStructureRead<TParse> injection,
             Func<TParse, T> parseFunc)
@@ -71,6 +92,23 @@ namespace CombatTeam
             action(team.Attacker);
             action(team.Support);
         }
+
+        public static void DoActionOnTeam<T>(ITeamStanceStructure<T> team, Action<T> action)
+        {
+            action(team.OnAttackStance);
+            action(team.OnNeutralStance);
+            action(team.OnDefenseStance);
+        }
+
+        public static void DoActionOnTeam<T, T2>(ITeamStanceStructure<T> team,
+            ITeamStanceStructureRead<T2> injectAction,
+            Action<T, T2> action)
+        {
+            action(team.OnAttackStance, injectAction.OnAttackStance);
+            action(team.OnNeutralStance, injectAction.OnNeutralStance);
+            action(team.OnDefenseStance, injectAction.OnDefenseStance);
+        }
+
     }
 
 

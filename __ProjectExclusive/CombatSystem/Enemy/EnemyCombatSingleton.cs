@@ -20,6 +20,6 @@ namespace CombatSystem.Enemy
 
 
         [ShowInInspector]
-        public static readonly IEntityTempoHandler EntityTempoHandler;
+        public static readonly IEntitySkillRequestHandler EntitySkillRequestHandler;
     }
 }

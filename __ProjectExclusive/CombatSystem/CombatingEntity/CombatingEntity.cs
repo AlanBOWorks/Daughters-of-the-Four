@@ -17,7 +17,7 @@ namespace CombatEntity
             AreaData = provider.GenerateAreaData();
 
             SkillsHolder 
-                = new CombatEntitySkillsHolder(provider.ProvideStanceSkills(),AreaData.GetRole());
+                = new CombatEntitySkillsHolder(team, provider.ProvideStanceSkills(),AreaData.GetRole());
             SkillUsageTracker 
                 = new SkillUsageTracker();
 
@@ -41,6 +41,10 @@ namespace CombatEntity
 
         [Title("Events")]
         public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, EffectResolution> EventsHolder;
+
+
+        public bool IsAlive() => CombatStats.CurrentMortality > 0;
+        public bool CanAct() => CombatStats.CurrentActions > 0 && IsAlive();
     }
 
 

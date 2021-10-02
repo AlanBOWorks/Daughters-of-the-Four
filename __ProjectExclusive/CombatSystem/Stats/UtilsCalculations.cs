@@ -90,6 +90,8 @@ namespace Stats
         {
             statsHolder.CurrentActions += addition;
         }
+        public static void TickCurrentActions(CombatStatsHolder statsHolder) => VariateActions(statsHolder, -1);
+
         public static void OverrideActionsAmount(CombatStatsHolder statsHolder, int targetAmount)
         {
             statsHolder.CurrentActions = targetAmount;

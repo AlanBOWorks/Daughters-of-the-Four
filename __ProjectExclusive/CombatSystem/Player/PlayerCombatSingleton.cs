@@ -29,8 +29,8 @@ namespace __ProjectExclusive.Player
         [ShowInInspector] 
         public static readonly PlayerEvents Events;
 
-        [ShowInInspector] 
-        public static readonly IEntityTempoHandler EntityTempoHandler;
+        [ShowInInspector]
+        public static readonly IEntitySkillRequestHandler EntitySkillRequestHandler;
     }
 
     internal class PlayerCombatSystemWindow : OdinEditorWindow

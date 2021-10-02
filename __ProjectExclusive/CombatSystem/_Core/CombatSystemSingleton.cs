@@ -20,15 +20,15 @@ namespace CombatSystem
             EventsHolder = new SystemEventsHolder();
             TempoTicker = new TempoTicker();
 
-            var combatEntityFixedEvents = new CombatEntityFixedEvents();
+            EntitiesFixedEvents = new CombatEntityFixedEvents();
 
-            EntityTempoHandler = new EntityTempoHandlerSelector();
+            EntityActionRequestHandler = new EntityActionRequestHandler();
 
             // PREPARATION Subscriptions
             CombatPreparationHandler.Subscribe(TempoTicker);
 
             // EVENTS Subscriptions
-            EventsHolder.Subscribe(combatEntityFixedEvents);
+            EventsHolder.Subscribe(EntitiesFixedEvents);
 
 #if UNITY_EDITOR
             if (_singletonExplanation != null)
@@ -56,15 +56,20 @@ namespace CombatSystem
         [ShowInInspector]
         public static readonly SystemEventsHolder EventsHolder;
 
+        [ShowInInspector] 
+        public static readonly CombatEntityFixedEvents EntitiesFixedEvents;
+
         [Title("Tempo")]
         [ShowInInspector]
         public static readonly TempoTicker TempoTicker;
 
-        internal static readonly EntityTempoHandlerSelector EntityTempoHandler;
+        internal static readonly EntityActionRequestHandler EntityActionRequestHandler;
 
         [Title("Volatile")] 
         [ShowInInspector, DisableInEditorMode] public static CombatingTeam VolatilePlayerTeam;
         [ShowInInspector, DisableInEditorMode] public static CombatingTeam VolatileEnemyTeam;
+
+        public static UCombatSingletonInjectionHandler InjectionHandler;
     }
 
     internal class CombatSystemWindow : OdinEditorWindow
