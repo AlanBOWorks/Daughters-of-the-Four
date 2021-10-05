@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using CombatSystem._Globals;
+using CombatSystem;
 using CombatTeam;
 using Sirenix.OdinInspector;
 using Stats;

@@ -8,7 +8,7 @@ using CombatTeam;
 
 namespace __ProjectExclusive.Player
 {
-    public sealed class PlayerCharactersHolder : ITeamStructure<PlayableCharacterEntity>,
+    public sealed class PlayerCharactersHolder : ITeamRoleStructure<PlayableCharacterEntity>,
         ITeamProvider
     {
        
@@ -17,7 +17,7 @@ namespace __ProjectExclusive.Player
             UtilsTeam.InjectElement(this,role,new PlayableCharacterEntity(preset));
         }
 
-        public void InjectMembers(ITeamStructureRead<SCombatEntityUpgradeablePreset> presets)
+        public void InjectMembers(ITeamRoleStructureRead<SCombatEntityUpgradeablePreset> presets)
         {
             UtilsTeam.InjectElements(this,presets,GenerateEntity);
 
@@ -36,9 +36,9 @@ namespace __ProjectExclusive.Player
         [ShowInInspector]
         public PlayableCharacterEntity Support { get; set; }
 
-        ICombatEntityProvider ITeamStructureRead<ICombatEntityProvider>.Attacker => Attacker;
-        ICombatEntityProvider ITeamStructureRead<ICombatEntityProvider>.Support => Support;
-        ICombatEntityProvider ITeamStructureRead<ICombatEntityProvider>.Vanguard => Support;
+        ICombatEntityProvider ITeamRoleStructureRead<ICombatEntityProvider>.Attacker => Attacker;
+        ICombatEntityProvider ITeamRoleStructureRead<ICombatEntityProvider>.Support => Support;
+        ICombatEntityProvider ITeamRoleStructureRead<ICombatEntityProvider>.Vanguard => Support;
     }
 
     public class PlayableCharacterEntity : ICombatEntityProvider
@@ -56,6 +56,8 @@ namespace __ProjectExclusive.Player
         {
             UtilStats.OverrideStats(UpgradedStats,upgrades);
         }
+
+        public UEntityHolder GetEntityPrefab() => CharacterPreset.GetEntityPrefab();
 
         public CombatStatsHolder GenerateStatsHolder()
         {

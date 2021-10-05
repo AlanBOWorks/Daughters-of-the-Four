@@ -9,10 +9,14 @@ using UnityEngine;
 
 namespace CombatEntity
 {
-    public class CombatingEntity
+    public class CombatingEntity 
     {
         public CombatingEntity(ICombatEntityProvider provider, CombatingTeam team)
         {
+            // Unity.Objects
+            _entityHolderPrefab = provider.GetEntityPrefab();
+
+            // Data
             CombatStats = provider.GenerateStatsHolder();
             AreaData = provider.GenerateAreaData();
 
@@ -27,6 +31,7 @@ namespace CombatEntity
                 = new CharacterEventsHolder<CombatingEntity,CombatingEntity, EffectResolution>();
         }
 
+        private readonly UEntityHolder _entityHolderPrefab;
 
         [Title("Stats")]
         public readonly CombatStatsHolder CombatStats;
@@ -42,17 +47,21 @@ namespace CombatEntity
         [Title("Events")]
         public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, EffectResolution> EventsHolder;
 
+        public UEntityHolder GetEntityPrefab() => _entityHolderPrefab;
 
         public bool IsAlive() => CombatStats.CurrentMortality > 0;
         public bool CanAct() => CombatStats.CurrentActions > 0 && IsAlive();
+
     }
 
 
-    public interface ICombatEntityProvider
+    public interface ICombatEntityProvider 
     {
+        UEntityHolder GetEntityPrefab();
         CombatStatsHolder GenerateStatsHolder();
         CombatingAreaData GenerateAreaData();
 
         ITeamStanceStructureRead<ICollection<SkillProviderParams>> ProvideStanceSkills();
     }
+
 }

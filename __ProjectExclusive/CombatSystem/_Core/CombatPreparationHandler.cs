@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using CombatEntity;
 using Sirenix.OdinInspector;
 using CombatTeam;
+using MEC;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CombatSystem
 {
     public class CombatPreparationHandler
     {
-        public CombatPreparationHandler()
+        public CombatPreparationHandler(int listAlloc = 2)
         {
-            _preparationListeners =new List<ICombatPreparationListener>();
-            _combatFinishListeners = new List<ICombatFinishListener>();
+            _preparationListeners =new List<ICombatPreparationListener>(listAlloc);
+            _combatFinishListeners = new List<ICombatFinishListener>(listAlloc);
+            _eliteListeners = new List<ICombatPreparationEliteListener>();
 
 #if UNITY_EDITOR
             var debugElement = new CombatPreparationDebugger();
@@ -21,30 +24,47 @@ namespace CombatSystem
 
         }
 
-        [ShowInInspector]
+        [ShowInInspector,HorizontalGroup("Main",Title ="_______ Main Listeners ____________")]
         private readonly List<ICombatPreparationListener> _preparationListeners;
+        [ShowInInspector, HorizontalGroup("Main")]
+        private readonly List<ICombatOnBeforeTickPreparation> _beforeTickListeners;
         [ShowInInspector]
         private readonly List<ICombatFinishListener> _combatFinishListeners;
+
+
+        [ShowInInspector] 
+        private readonly List<ICombatPreparationEliteListener> _eliteListeners;
 
         public bool IsCombatActive { get; private set; }
 
         public void Subscribe(ICombatPreparationListener listener)
         {
-            _preparationListeners.Add(listener);
             if(listener is ICombatFinishListener finishListener)
                 _combatFinishListeners.Add(finishListener);
+            if(listener is ICombatPreparationEliteListener eliteListener)
+                _eliteListeners.Add(eliteListener);
+            if(listener is ICombatOnBeforeTickPreparation onBeforeTickListener)
+                _beforeTickListeners.Add(onBeforeTickListener);
+
+            _preparationListeners.Add(listener);
         }
 
-        public void StartCombat(ITeamProvider playerTeamProvider, ITeamProvider enemyTeamProvider)
+        public void StartCombat(string sceneAssetPath, ITeamProvider playerTeamProvider, ITeamProvider enemyTeamProvider, bool isElite)
         {
             if (IsCombatActive)
             {
-#if UNITY_EDITOR
                 throw new AccessViolationException("Trying to start Combat while being in combat.");
-#else
-             return;
-#endif
             }
+
+            Timing.RunCoroutine(_LoadCombat(sceneAssetPath, playerTeamProvider, enemyTeamProvider, isElite));
+        }
+
+        private IEnumerator<float> _LoadCombat(string sceneAssetPath,
+            ITeamProvider playerTeamProvider, ITeamProvider enemyTeamProvider,
+            bool isElite)
+        {
+            var sceneLoadStatus =
+                SceneManager.LoadSceneAsync(sceneAssetPath, LoadSceneMode.Additive);
 
             IsCombatActive = true;
             CombatingTeam playerTeam = new CombatingTeam(playerTeamProvider);
@@ -55,17 +75,31 @@ namespace CombatSystem
             CombatSystemSingleton.VolatilePlayerTeam = playerTeam;
             CombatSystemSingleton.VolatileEnemyTeam = enemyTeam;
 
-
             // ---- PREPARATION ----
-            foreach (var listener in _preparationListeners)
-            {
-                listener.OnPreparationCombat(playerTeam, enemyTeam);
-            }
+            RequestPreparation(_preparationListeners);
+
+
+            yield return Timing.WaitUntilDone(sceneLoadStatus);
 
             // ---- OON START (Before first Tick) ----
-            foreach (var listener in _preparationListeners)
+            RequestOnStart(_preparationListeners);
+
+
+            void RequestPreparation(List<ICombatPreparationListener> listeners)
             {
-                listener.OnStartAndBeforeFirstTick();
+                foreach (var listener in listeners)
+                {
+                    listener.OnPreparationCombat(playerTeam, enemyTeam);
+                }
+            }
+
+
+            void RequestOnStart(List<ICombatPreparationListener> listeners)
+            {
+                foreach (var listener in listeners)
+                {
+                    listener.OnAfterLoadScene();
+                }
             }
         }
 
@@ -81,6 +115,8 @@ namespace CombatSystem
             CombatSystemSingleton.VolatileEnemyTeam = null;
             IsCombatActive = false;
         }
+
+
 
 
 #if UNITY_EDITOR
@@ -100,7 +136,7 @@ namespace CombatSystem
                 Debug.Log($"Enemy entities: {enemyTeam.Count}");
             }
 
-            public void OnStartAndBeforeFirstTick()
+            public void OnAfterLoadScene()
             {
                 Debug.Log("---- [Before] First Tick Combat -----");
             }
@@ -116,10 +152,30 @@ namespace CombatSystem
 
     public interface ICombatPreparationListener
     {
+        /// <summary>
+        /// Events of preparation before or during load
+        /// </summary>
         void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam);
-
-        void OnStartAndBeforeFirstTick();
+        /// <summary>
+        /// Events after the load (not necessary show the screen)
+        /// </summary>
+        void OnAfterLoadScene();
     }
+
+    public interface ICombatOnBeforeTickPreparation
+    {
+        void OnBeforeTicking();
+        void OnFirstTick();
+    }
+
+    /// <summary>
+    /// Could be special music, cinematics, events, etc
+    /// </summary>
+    public interface ICombatPreparationEliteListener
+    {
+        void PrepareEliteCombat();
+    }
+
     public interface ICombatFinishListener
     {
         void OnFinish(CombatingTeam wonTeam);

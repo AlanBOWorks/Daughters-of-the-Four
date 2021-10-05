@@ -35,17 +35,13 @@ namespace CombatSystem.Events
             _enemyTeam = enemyTeam;
         }
 
-        public void OnStartAndBeforeFirstTick()
+        public void OnAfterLoadScene()
         {
         }
 
 
         public void OnInitiativeTrigger(CombatingEntity element)
         {
-            var stats = element.CombatStats;
-            UtilsCombatStats.RefillActions(stats);
-            UtilsCombatStats.InitiativeResetOnTrigger(stats);
-
             element.EventsHolder.OnInitiativeTrigger(element);
             element.SkillUsageTracker.ResetOnStartSequence();
 

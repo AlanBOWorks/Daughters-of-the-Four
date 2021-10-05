@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CombatTeam
 {
-    public sealed class CombatingTeam : HashSet<CombatingEntity>, ITeamStructureRead<CombatingEntity>,
+    public sealed class CombatingTeam : HashSet<CombatingEntity>, ITeamRoleStructureRead<CombatingEntity>,
         ITeamStateChangeListener
     {
         public CombatingTeam(ITeamProvider generateFromProvider)

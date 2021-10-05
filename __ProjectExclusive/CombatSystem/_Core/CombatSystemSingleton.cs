@@ -1,11 +1,13 @@
 using System;
 using CombatEntity;
 using CombatSystem.Events;
+using CombatSystem.PositionHandlers;
 using CombatTeam;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CombatSystem
 {
@@ -18,11 +20,11 @@ namespace CombatSystem
         {
             CombatPreparationHandler = new CombatPreparationHandler();
             EventsHolder = new SystemEventsHolder();
-            TempoTicker = new TempoTicker();
-
             EntitiesFixedEvents = new CombatEntityFixedEvents();
 
+            TempoTicker = new TempoTicker();
             EntityActionRequestHandler = new EntityActionRequestHandler();
+
 
             // PREPARATION Subscriptions
             CombatPreparationHandler.Subscribe(TempoTicker);
@@ -52,6 +54,9 @@ namespace CombatSystem
         [Title("Preparation")]
         [ShowInInspector]
         public static readonly CombatPreparationHandler CombatPreparationHandler;
+        [ShowInInspector] 
+        public static readonly CombatSceneTracker SceneTracker;
+
         [Title("Events")]
         [ShowInInspector]
         public static readonly SystemEventsHolder EventsHolder;
@@ -69,15 +74,18 @@ namespace CombatSystem
         [ShowInInspector, DisableInEditorMode] public static CombatingTeam VolatilePlayerTeam;
         [ShowInInspector, DisableInEditorMode] public static CombatingTeam VolatileEnemyTeam;
 
-        public static UCombatSingletonInjectionHandler InjectionHandler;
+        public static UPositionProviderBase PositionProvider;
+
+
+
     }
 
-    internal class CombatSystemWindow : OdinEditorWindow
+    public class CombatSystemWindow : OdinEditorWindow
     {
         [ShowInInspector]
         private CombatSystemSingleton _system = CombatSystemSingleton.GetInstance();
 
-        [MenuItem("Debug/Combat System")]
+        [MenuItem("Debug/Combat System (MAIN)", false, -100)]
         private static void OpenWindow()
         {
             var window = GetWindow<CombatSystemWindow>();

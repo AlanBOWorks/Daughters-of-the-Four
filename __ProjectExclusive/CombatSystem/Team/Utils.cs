@@ -5,7 +5,7 @@ namespace CombatTeam
 {
     public static class UtilsTeam
     {
-        public static T GetElement<T>(ITeamStructureRead<T> team, EnumTeam.Role role)
+        public static T GetElement<T>(ITeamRoleStructureRead<T> team, EnumTeam.Role role)
         {
             return role switch
             {
@@ -15,7 +15,7 @@ namespace CombatTeam
                 _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
             };
         }
-        public static T GetElement<T>(ITeamStructureRead<T> team, EnumTeam.TeamPosition teamPosition)
+        public static T GetElement<T>(ITeamRoleStructureRead<T> team, EnumTeam.TeamPosition teamPosition)
             => GetElement(team, (EnumTeam.Role)teamPosition);
 
         public static T GetElement<T>(ITeamStanceStructureRead<T> stanceStructure, EnumTeam.TeamStance stance)
@@ -29,7 +29,7 @@ namespace CombatTeam
             };
         }
 
-        public static void InjectElement<T>(ITeamStructureInject<T> team, EnumTeam.Role role, T element)
+        public static void InjectElement<T>(ITeamRoleStructureInject<T> team, EnumTeam.Role role, T element)
         {
             switch (role)
             {
@@ -46,11 +46,11 @@ namespace CombatTeam
                     throw new ArgumentOutOfRangeException(nameof(role), role, null);
             }
         }
-        public static void InjectElement<T>(ITeamStructureInject<T> team, EnumTeam.TeamPosition teamPosition, T element)
+        public static void InjectElement<T>(ITeamRoleStructureInject<T> team, EnumTeam.TeamPosition teamPosition, T element)
             => InjectElement(team, (EnumTeam.Role)teamPosition, element);
 
 
-        public static void InjectElements<T>(ITeamStructureInject<T> team, ITeamStructureRead<T> injection)
+        public static void InjectElements<T>(ITeamRoleStructureInject<T> team, ITeamRoleStructureRead<T> injection)
         {
             team.Vanguard = injection.Vanguard;
             team.Attacker = injection.Attacker;
@@ -76,7 +76,7 @@ namespace CombatTeam
         }
 
 
-        public static void InjectElements<T, TParse>(ITeamStructureInject<T> team, ITeamStructureRead<TParse> injection,
+        public static void InjectElements<T, TParse>(ITeamRoleStructureInject<T> team, ITeamRoleStructureRead<TParse> injection,
             Func<TParse, T> parseFunc)
         {
             team.Vanguard = parseFunc(injection.Vanguard);
@@ -86,21 +86,29 @@ namespace CombatTeam
 
 
 
-        public static void DoActionOnTeam<T>(ITeamStructureRead<T> team, Action<T> action)
+        public static void DoActionOnTeam<T>(ITeamRoleStructureRead<T> team, Action<T> action)
         {
             action(team.Vanguard);
             action(team.Attacker);
             action(team.Support);
         }
+        public static void DoActionOnTeam<T, T2>(ITeamRoleStructureRead<T> team,
+            ITeamRoleStructureRead<T2> injectAction,
+            Action<T, T2> action)
+        {
+            action(team.Vanguard, injectAction.Vanguard);
+            action(team.Attacker, injectAction.Attacker);
+            action(team.Support, injectAction.Support);
+        }
 
-        public static void DoActionOnTeam<T>(ITeamStanceStructure<T> team, Action<T> action)
+        public static void DoActionOnTeam<T>(ITeamStanceStructureRead<T> team, Action<T> action)
         {
             action(team.OnAttackStance);
             action(team.OnNeutralStance);
             action(team.OnDefenseStance);
         }
 
-        public static void DoActionOnTeam<T, T2>(ITeamStanceStructure<T> team,
+        public static void DoActionOnTeam<T, T2>(ITeamStanceStructureRead<T> team,
             ITeamStanceStructureRead<T2> injectAction,
             Action<T, T2> action)
         {
@@ -108,7 +116,7 @@ namespace CombatTeam
             action(team.OnNeutralStance, injectAction.OnNeutralStance);
             action(team.OnDefenseStance, injectAction.OnDefenseStance);
         }
-
+        
     }
 
 

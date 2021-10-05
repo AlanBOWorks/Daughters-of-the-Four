@@ -16,6 +16,13 @@ namespace __ProjectExclusive.Player
         {
             CharactersHolder = new PlayerCharactersHolder();
             Events = new PlayerEvents();
+
+            EntitySkillRequestHandler = new EntityRandomController(); //TODO make it a player controller
+
+#if UNITY_EDITOR
+            Debug.Log("[Player Combat Singleton] instantiated");
+            
+#endif
         }
 
         private PlayerCombatSingleton()
@@ -31,6 +38,16 @@ namespace __ProjectExclusive.Player
 
         [ShowInInspector]
         public static readonly IEntitySkillRequestHandler EntitySkillRequestHandler;
+
+
+        public static void InjectInCombatSystem()
+        {
+#if UNITY_EDITOR
+            Debug.Log("Injecting Player [Singleton]'s Events into Combat [Singleton]");
+#endif
+
+            CombatSystemSingleton.EntitiesFixedEvents.SubscribePlayerEvents(Events);
+        }
     }
 
     internal class PlayerCombatSystemWindow : OdinEditorWindow

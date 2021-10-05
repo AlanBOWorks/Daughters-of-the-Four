@@ -79,7 +79,7 @@ namespace CombatSystem
             }
         }
 
-        public void OnStartAndBeforeFirstTick()
+        public void OnAfterLoadScene()
         {
             Timing.RunCoroutine(_TickingLoop());
         }
@@ -126,6 +126,12 @@ namespace CombatSystem
                     var actingEntity = _activeEntities.Dequeue();
                     //Removes (and adds later) so acted entities has fewer priority that those how didn't 
                     _tickingEntities.Remove(actingEntity);
+
+
+                    var stats = actingEntity.CombatStats;
+                    UtilsCombatStats.RefillActions(stats);
+                    UtilsCombatStats.InitiativeResetOnTrigger(stats);
+
 
                     yield return Timing.WaitUntilDone(_DoEntitySequence(actingEntity));
 
