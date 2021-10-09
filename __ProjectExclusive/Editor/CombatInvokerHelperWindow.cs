@@ -26,7 +26,7 @@ namespace CombatSystem.Editor
         [Button(ButtonSizes.Large), DisableInEditorMode]
         public void InvokeCombatWithThisTeam()
         {
-            GameStateLoader.InvokeInstance();
+            GameStateLoader.LoadPrepareInstances();
 
 
             playerCharacters.InjectInSingleton();

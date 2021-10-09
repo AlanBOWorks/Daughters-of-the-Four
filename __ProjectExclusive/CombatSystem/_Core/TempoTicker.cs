@@ -86,8 +86,7 @@ namespace CombatSystem
 
 
         private const float TickPeriodSeconds = .5f;
-        private const int VanguardTickTriggerCheck = 12;
-        private const int EntityTickTriggerCheck = 8;
+        private const int EntityTickTriggerCheck = 8;//todo make it a param
         private IEnumerator<float> _TickingLoop()
         {
 #if UNITY_EDITOR
@@ -102,18 +101,24 @@ namespace CombatSystem
 
             while (!_conditionProvider.IsCombatFinish())
             {
+#if UNITY_EDITOR
+                Debug.Log("TICKING...");
+#endif
 
                 // TICKING
                 foreach (var entity in _tickingEntities)
                 {
                     var statsHolder = entity.CombatStats;
+                    if(!UtilsCombatStats.IsTickingValid(statsHolder)) 
+                        continue; ///// >>>>>
+
                     float tickIncrement = statsHolder.InitiativeSpeed;
                     statsHolder.TickingInitiative += tickIncrement;
 
-                    float tickCheck = (entity.AreaData.GetRole() == EnumTeam.Role.Vanguard)
-                        ? VanguardTickTriggerCheck
-                        : EntityTickTriggerCheck;
-                    if(statsHolder.TickingInitiative < tickCheck) continue;
+                    float tickCheck = EntityTickTriggerCheck;
+
+                    if(statsHolder.TickingInitiative < tickCheck) 
+                        continue; ///// >>>>>
 
                     _activeEntities.Enqueue(entity);
                 }

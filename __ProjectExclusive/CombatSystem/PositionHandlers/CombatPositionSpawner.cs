@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace CombatSystem.PositionHandlers
 {
-    public class PositionSpawner : ICombatPreparationListener, ICombatFinishListener
+    public class CombatPositionSpawner : ICombatPreparationListener, ICombatFinishListener
     {
-        public PositionSpawner()
+        public CombatPositionSpawner()
         {
             _removeEntitiesOnFinish = new Queue<UEntityHolder>();
         }
@@ -16,24 +16,25 @@ namespace CombatSystem.PositionHandlers
         private CombatingTeam _currentPlayerTeam;
         private CombatingTeam _currentEnemyTeam;
 
-        public void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam)
-        {
-            _currentPlayerTeam = playerTeam;
-            _currentEnemyTeam = enemyTeam;
-        }
 
-        public void OnAfterLoadScene()
+        private void SpawnEntities()
         {
             var positions = CombatSystemSingleton.PositionProvider;
             var playerPositions = positions.GetPlayerTeam();
             var enemyPositions = positions.GetEnemyTeam();
 
-            UtilsTeam.DoActionOnTeam(_currentPlayerTeam,playerPositions,SpawnEntity);
-            UtilsTeam.DoActionOnTeam(_currentEnemyTeam,enemyPositions,SpawnEntity);
+            UtilsTeam.DoActionOnTeam(_currentPlayerTeam, playerPositions, SpawnEntity);
+            UtilsTeam.DoActionOnTeam(_currentEnemyTeam, enemyPositions, SpawnEntity);
 
 
             void SpawnEntity(CombatingEntity entity, Transform onTransform)
             {
+                if (entity == null || onTransform == null)
+                {
+                    Debug.LogWarning("Entity and/or combatPosition[Transform] were null. Ignoring spawn of character");
+                    return;
+                }
+
                 UEntityHolder holder = entity.GetEntityPrefab();
                 if (holder == null)
                 {
@@ -45,12 +46,23 @@ namespace CombatSystem.PositionHandlers
                     holder = provisionalPrefab;
                 }
 
-                Object.Instantiate(holder);
-                holder.Inject(entity);
-                holder.HandleTransformSpawn(onTransform);
+                var instantiatedObject = Object.Instantiate(holder);
+                instantiatedObject.Inject(entity);
+                instantiatedObject.HandleTransformSpawn(onTransform);
 
-                _removeEntitiesOnFinish.Enqueue(holder);
+                _removeEntitiesOnFinish.Enqueue(instantiatedObject);
             }
+        }
+
+        public void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam)
+        {
+            _currentPlayerTeam = playerTeam;
+            _currentEnemyTeam = enemyTeam;
+        }
+
+        public void OnAfterLoadScene()
+        {
+            SpawnEntities();
         }
 
 

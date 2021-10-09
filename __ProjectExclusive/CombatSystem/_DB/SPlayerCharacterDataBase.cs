@@ -36,9 +36,10 @@ namespace CombatSystem._DB
             _previews = new List<SPlayerCombatEntity.PreviewPreset>[entities.Count];
             for (var i = 0; i < entities.Count; i++)
             {
-                var entity = entities[i];
-                _previews[i] = entity._combatPresetPreview;
-                entity.ShowPresetPreview();
+                var sEntity = entities[i];
+                _previews[i] = sEntity._combatPresetPreview;
+                sEntity.ShowPresetPreview();
+                EditorUtility.SetDirty(sEntity);
             }
         }
 
@@ -47,6 +48,8 @@ namespace CombatSystem._DB
         {
             _assetDataBase = AssetDatabase.LoadAssetAtPath<SPlayerCharacterDataBase>(FullAssetPath);
             UploadPreviews(_assetDataBase.GetCharacters());
+
+            EditorUtility.SetDirty(_assetDataBase);
         }
 
         [Button, HideIf("_assetDataBase")]

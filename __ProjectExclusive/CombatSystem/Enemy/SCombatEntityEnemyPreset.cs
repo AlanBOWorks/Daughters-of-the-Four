@@ -12,11 +12,6 @@ namespace __ProjectExclusive.Enemy
         menuName = "Combat/Entity/Enemy Preset")]
     public class SCombatEntityEnemyPreset : SCombatEntityPreset, ICombatEntityInfo, ICombatEntityProvider
     {
-        [Title("Info"), PropertyOrder(-10)] 
-        [SerializeField]
-        private string entityName = "NULL";
-
-        public string GetEntityName() => entityName;
 
         [Button, GUIColor(.7f,.8f,1)]
         private void UpdateAssetName()

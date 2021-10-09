@@ -39,9 +39,12 @@ namespace CombatSystem
         private const float SharedSkillChance = .2f;
         private void DoRequestWithRandom()
         {
-            CombatingSkillsGroup skills = _currentEntity.SkillsHolder.GetCurrentSkills();
+            var skillsHolder = _currentEntity.SkillsHolder;
+            CombatingSkillsGroup skills = skillsHolder.GetCurrentSkills();
             
             var selectedSkill = ChooseSkill(skills);
+            if (selectedSkill == null) selectedSkill = skillsHolder.WaitSkill;
+
             List<CombatingEntity> possibleTargets = UtilsTarget.GetPossibleTargets(_currentEntity, selectedSkill.GetTargetType());
 
             var selectedTarget = ChooseTarget(possibleTargets);
@@ -72,13 +75,15 @@ namespace CombatSystem
             PickFromList(firstCheckPool);
             if (selectedSkill == null)
                 PickFromList(secondCheckPool);
-            // TODO check if still null > Use Wait (Skill)
 
             return selectedSkill;
 
             void PickFromList(List<CombatingSkill> fromSkills)
             {
                 _possibleSkillToPick.Clear();
+
+                if(fromSkills == null) return;
+
                 _possibleSkillToPick.AddRange(fromSkills);
                 while (_possibleSkillToPick.Count > 0)
                 {
@@ -96,6 +101,7 @@ namespace CombatSystem
 
         private static CombatingEntity ChooseTarget(List<CombatingEntity> possibleTargets)
         {
+
             int randomSelection = Random.Range(0, possibleTargets.Count);
             return possibleTargets[randomSelection];
         }

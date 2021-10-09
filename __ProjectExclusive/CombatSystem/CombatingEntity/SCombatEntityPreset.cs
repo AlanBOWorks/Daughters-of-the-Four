@@ -10,7 +10,9 @@ namespace CombatEntity
 {
     public abstract class SCombatEntityPreset : ScriptableObject, ITeamStanceStructureRead<ICollection<SkillProviderParams>>
     {
-        [Title("General")] [SerializeField] private UEntityHolder entityPrefab;
+        [Title("General")] 
+        [SerializeField] protected string entityName = "NULL";
+        [SerializeField] private UEntityHolder entityPrefab;
 
         [Title("Area")] 
         [SerializeField]
@@ -21,7 +23,7 @@ namespace CombatEntity
         [SerializeField, Title("Skills")] 
         private CombatSkillStanceProvider skillProvider = new CombatSkillStanceProvider();
 
-
+        public string GetEntityName() => entityName;
         public UEntityHolder GetEntityPrefab() => entityPrefab;
         public AreaData GetAreaData() => areaData;
         public IBaseStatsRead<float> BaseStats => baseStats;

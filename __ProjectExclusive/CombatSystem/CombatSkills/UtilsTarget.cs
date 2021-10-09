@@ -16,7 +16,6 @@ namespace CombatSystem.CombatSkills
 
             SkillTargetsHolder = new List<CombatingEntity>(listAlloc);
             EffectTargetsHolder = new List<CombatingEntity>(listAlloc);
-            
         }
 
         private static readonly List<CombatingEntity> SkillTargetsHolder;

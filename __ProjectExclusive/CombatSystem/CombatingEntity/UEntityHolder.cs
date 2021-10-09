@@ -13,8 +13,9 @@ namespace CombatEntity
 
         public void HandleTransformSpawn(Transform onRespawn)
         {
-            transform.parent = onRespawn;
-            transform.localPosition = spawnLocalPosition;
+            var transform1 = transform;
+            transform1.parent = onRespawn;
+            transform1.localPosition = spawnLocalPosition;
         }
 
         private CombatingEntity _entity;

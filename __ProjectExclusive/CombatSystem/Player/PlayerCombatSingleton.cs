@@ -15,13 +15,13 @@ namespace __ProjectExclusive.Player
         static PlayerCombatSingleton()
         {
             CharactersHolder = new PlayerCharactersHolder();
-            Events = new PlayerEvents();
+            PlayerEvents = new SystemEventsHolder();
 
             EntitySkillRequestHandler = new EntityRandomController(); //TODO make it a player controller
 
 #if UNITY_EDITOR
             Debug.Log("[Player Combat Singleton] instantiated");
-            
+            PlayerEvents.Subscribe(new DebugSkillEvents());
 #endif
         }
 
@@ -34,7 +34,7 @@ namespace __ProjectExclusive.Player
         public static readonly PlayerCharactersHolder CharactersHolder;
 
         [ShowInInspector] 
-        public static readonly PlayerEvents Events;
+        public static readonly SystemEventsHolder PlayerEvents;
 
         [ShowInInspector]
         public static readonly IEntitySkillRequestHandler EntitySkillRequestHandler;
@@ -46,7 +46,7 @@ namespace __ProjectExclusive.Player
             Debug.Log("Injecting Player [Singleton]'s Events into Combat [Singleton]");
 #endif
 
-            CombatSystemSingleton.EntitiesFixedEvents.SubscribePlayerEvents(Events);
+            CombatSystemSingleton.EventsHolder.Subscribe(PlayerEvents);
         }
     }
 

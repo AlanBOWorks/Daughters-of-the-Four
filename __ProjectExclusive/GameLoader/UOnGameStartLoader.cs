@@ -1,22 +1,32 @@
 using System;
 using __ProjectExclusive.Player;
 using CombatSystem;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace __ProjectExclusive
 {
     public class UOnGameStartLoader : MonoBehaviour
     {
+#if UNITY_EDITOR
+        [InfoBox(Notification, "thisIsACheckBoxJustToShowThisInfo")] 
+        public bool thisIsACheckBoxJustToShowThisInfo = true;
+        private const string Notification = "In the Build this will be invoked in the start Game (since this will " +
+                                           "be invoked in the first scene preparing all).\n _\n " +
+                                           "For debugging is not neccesary. Just call the utility method:\n " +
+                                           "GameStateLoader.LoadPrepareInstances()";
+        [SerializeField]
+        private SOnGameStartLoader _asset;
+
+#endif
+
         private void Awake()
         {
-            OnGameStartLoad();
+            GameStateLoader.LoadPrepareInstances();
             Destroy(this);
         }
 
-        public static void OnGameStartLoad()
-        {
-            GameStateLoader.InvokeInstance();
-        }
+        
     }
 
     public sealed class GameStateLoader
@@ -42,16 +52,22 @@ namespace __ProjectExclusive
 #endif
             // Load Assets
             var loader = SOnGameStartLoader.LoadOrCreateStartLoader();
-            loader.OnGameStartInstantiateObjects();
             LoaderAsset = loader;
+
+            loader.OnStartApplication();
+
+            // Todo change this after introducing OnStartGAme/OnLoadGame
+            loader.OnGameStart();
+            loader.OnLoadGame();
         }
 
         private static readonly GameStateLoader Instance = new GameStateLoader();
         public static readonly SOnGameStartLoader LoaderAsset;
 
-        public static void InvokeInstance()
+        public static void LoadPrepareInstances()
         {
             var instance = Instance;
         }
+
     }
 }

@@ -14,21 +14,31 @@ namespace __ProjectExclusive
         private const string AssetName = "FirstLoadParameters.Asset";
         public const string FullAssetPath = FolderPath + AssetName;
 
+        [SerializeField] private List<GameObject> spawnObjectsOnStartApplication = new List<GameObject>(0);
         [SerializeField] private List<GameObject> spawnObjectsOnStartGame = new List<GameObject>(0);
         [SerializeField] private List<GameObject> spawnObjectsOnLoad = new List<GameObject>(0);
 
+        public List<GameObject> SpawnObjectsOnStartApplication => spawnObjectsOnStartApplication;
         public List<GameObject> SpawnObjectsOnStartGame => spawnObjectsOnStartGame;
         public List<GameObject> SpawnObjectsOnLoad => spawnObjectsOnLoad;
 
-        public void OnGameStartInstantiateObjects()
+        public void OnStartApplication()
         {
-            foreach (var gameObject in spawnObjectsOnStartGame)
+            foreach (var gameObject in spawnObjectsOnStartApplication)
             {
-                Object.Instantiate(gameObject);
+                Instantiate(gameObject);
             }
         }
 
-        public void OnLoadGameInstantiateObjects()
+        public void OnGameStart()
+        {
+            foreach (var gameObject in spawnObjectsOnStartGame)
+            {
+                Instantiate(gameObject);
+            }
+        }
+
+        public void OnLoadGame()
         {
 
         }
@@ -62,16 +72,21 @@ namespace __ProjectExclusive
         private void Load(SOnGameStartLoader loader)
         {
             asset = loader;
-            spawnObjectsOnStartGame = loader.SpawnObjectsOnStartGame;
-            spawnObjectsOnLoad = loader.SpawnObjectsOnLoad;
+            onStartApplication = loader.SpawnObjectsOnStartApplication;
+            onStartGame = loader.SpawnObjectsOnStartGame;
+            onLoad = loader.SpawnObjectsOnLoad;
+
+            EditorUtility.SetDirty(loader);
         }
 
 
         public SOnGameStartLoader asset;
         [ShowInInspector] 
-        public List<GameObject> spawnObjectsOnStartGame;
+        public List<GameObject> onStartApplication;
+        [ShowInInspector] 
+        public List<GameObject> onStartGame;
         [ShowInInspector]
-        public List<GameObject> spawnObjectsOnLoad;
+        public List<GameObject> onLoad;
 
 
     }

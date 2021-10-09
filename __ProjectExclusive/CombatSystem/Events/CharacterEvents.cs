@@ -7,7 +7,7 @@ using UnityEngine;
 namespace CombatSystem.Events
 {
     public class CharacterEventsHolder<T, TTempo, TStat> : 
-        IStatActionListener<T,TTempo,TStat>, IRoundListener<TTempo>
+        IStatActionListener<T,TTempo,TStat>, IEventListenerHandler<T,TTempo,TStat>
     {
         public CharacterEventsHolder()
         {

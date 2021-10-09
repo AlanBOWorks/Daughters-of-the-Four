@@ -1,5 +1,6 @@
 using System;
 using CombatEntity;
+using CombatSkills;
 using CombatSystem;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -8,6 +9,11 @@ namespace Stats
 {
     public static class UtilsCombatStats
     {
+
+        public static bool IsAlive(CombatStatsHolder stats) => stats.CurrentMortality > 0 || stats.CurrentHealth > 0;
+        public static bool CanAct(CombatStatsHolder stats) => stats.CurrentActions > 0 && IsAlive(stats);
+        public static bool IsTickingValid(CombatStatsHolder stats) => IsAlive(stats);
+
         public static void ResetBurstStats(CombatStatsHolder statsHolder)
         {
             statsHolder.ResetBurst();
@@ -107,12 +113,31 @@ namespace Stats
             statsHolder.CurrentActions-= amount;
         }
 
+        public static void ResetActions(CombatStatsHolder statsHolder)
+        {
+            statsHolder.CurrentActions = 0;
+        }
+
         private const float MaxInitiativeRefillRandom = .1f;
         public static void InitiativeResetOnTrigger(CombatStatsHolder statsHolder)
         {
             statsHolder.TickingInitiative = 0;
         }
+    }
 
+
+    public static class UtilsRandomStats
+    {
+        public static bool IsCritical(CombatStatsHolder stats, CombatingSkill skill)
+        {
+            float criticalChance = stats.Critical;
+            float criticalVariation = skill.GetCritVariation();
+
+            criticalChance += criticalVariation;
+
+            if (criticalChance <= 0) return false; //exclude zeros or below (since it could be random: 0 <= critical: 0)
+            return Random.value <= criticalChance; // could be random: 1 <= critical: 1
+        }
     }
     
 }

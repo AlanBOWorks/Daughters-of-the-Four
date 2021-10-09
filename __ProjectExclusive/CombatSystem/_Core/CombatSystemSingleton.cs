@@ -25,9 +25,15 @@ namespace CombatSystem
             TempoTicker = new TempoTicker();
             EntityActionRequestHandler = new EntityActionRequestHandler();
 
+            SceneTracker = new CombatSceneTracker();
+
+            // Secondaries
+            var combatPositionSpawner = new CombatPositionSpawner();
 
             // PREPARATION Subscriptions
             CombatPreparationHandler.Subscribe(TempoTicker);
+            CombatPreparationHandler.Subscribe(combatPositionSpawner);
+            CombatPreparationHandler.Subscribe(EntitiesFixedEvents);
 
             // EVENTS Subscriptions
             EventsHolder.Subscribe(EntitiesFixedEvents);
@@ -52,29 +58,36 @@ namespace CombatSystem
     "The main System of the Combat. Holds all behaviors and events in a static way";
 #endif
         [Title("Preparation")]
-        [ShowInInspector]
+        [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly CombatPreparationHandler CombatPreparationHandler;
-        [ShowInInspector] 
+        [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly CombatSceneTracker SceneTracker;
 
         [Title("Events")]
-        [ShowInInspector]
+        [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly SystemEventsHolder EventsHolder;
 
-        [ShowInInspector] 
+        [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly CombatEntityFixedEvents EntitiesFixedEvents;
 
         [Title("Tempo")]
-        [ShowInInspector]
+        [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly TempoTicker TempoTicker;
 
+        [Title("Skills")]
+        [TabGroup("ReadOnly"), ShowInInspector]
         internal static readonly EntityActionRequestHandler EntityActionRequestHandler;
+        
+        [TabGroup("Temporal"), ShowInInspector, DisableInEditorMode]
+        public static UPositionProviderBase PositionProvider;
+
 
         [Title("Volatile")] 
-        [ShowInInspector, DisableInEditorMode] public static CombatingTeam VolatilePlayerTeam;
-        [ShowInInspector, DisableInEditorMode] public static CombatingTeam VolatileEnemyTeam;
+        [TabGroup("Combat Only"), ShowInInspector, DisableInEditorMode] 
+        public static CombatingTeam VolatilePlayerTeam;
+        [TabGroup("Combat Only"), ShowInInspector, DisableInEditorMode] 
+        public static CombatingTeam VolatileEnemyTeam;
 
-        public static UPositionProviderBase PositionProvider;
 
 
 

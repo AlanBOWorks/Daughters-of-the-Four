@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -32,9 +33,9 @@ namespace Stats
 
         private CombatStatsHolder(BaseStats baseStats, BaseStats buffStats, BaseStats burstStats)
         {
-            BaseStats = baseStats;
-            BuffStats = buffStats;
-            BurstStats = burstStats;
+            BaseStats = baseStats ?? throw new NullReferenceException("Introduced [Base Stats] were null");
+            BuffStats = buffStats ?? throw new NullReferenceException("Introduced [Buff Stats] were null");
+            BurstStats = burstStats ?? throw new NullReferenceException("Introduced [Burst Stats] were null");
 
             var baseList = new ListStats(BaseStats);
             var buffList = new ListStats(BuffStats);
@@ -46,6 +47,9 @@ namespace Stats
             //MathematicaStats is the one which gives the stats to external entities
             MainStats = mathematicalStats;
             _listStats = new ListBehaviourHolder(baseList, buffList, burstList);
+
+            CurrentMortality = MaxMortality;
+            CurrentHealth = MaxHealth;
         }
 
         [ShowInInspector]
@@ -61,7 +65,7 @@ namespace Stats
         public void ResetBurst()
         {
             UtilStats.OverrideByValue(BurstStats,0);
-            _listStats.BurstStats.Clear();
+            _listStats.BurstStats.ResetAsBurstType();
         }
 
         public void SubscribeStats(IBaseStatsRead<float> stats, EnumStats.BehaviourType type)

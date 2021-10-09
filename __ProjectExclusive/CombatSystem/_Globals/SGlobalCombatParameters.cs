@@ -30,11 +30,14 @@ namespace CombatSystem
 
         public UEntityHolder GetProvisionalEntityHolderPrefab() => provisionalEntityHolderPrefab;
 
-        [Title("Skills")]
+        [Title("Skills")] 
+        [SerializeField] private SSkill waitSkill;
         [SerializeField] private SSharedSkillSet vanguardSkills;
         [SerializeField] private SSharedSkillSet attackerSkills;
         [SerializeField] private SSharedSkillSet supportSKills;
 
+
+        public SSkill WaitSkill => waitSkill;
         public SSharedSkillSet Vanguard => vanguardSkills;
         public SSharedSkillSet Attacker => attackerSkills;
         public SSharedSkillSet Support => supportSKills;
@@ -50,10 +53,12 @@ namespace CombatSystem
                 AssetDatabase.LoadAssetAtPath<SGlobalCombatParameters>(SGlobalCombatParameters.AssetLoadPath);
             Parameters = Asset.Parameters;
             ProvisionalEntityHolderPrefab = Parameters.GetProvisionalEntityHolderPrefab();
+
+            EditorUtility.SetDirty(Asset);
         }
         private GlobalCombatParametersSingleton() {}
 
-        [ShowInInspector, DisableIf("_asset")] 
+        [ShowInInspector, DisableIf("Asset")] 
         private static readonly SGlobalCombatParameters Asset;
         [ShowInInspector] 
         public static readonly GlobalCombatParameters Parameters;

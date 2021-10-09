@@ -129,6 +129,7 @@ namespace Stats
         /// <summary>
         /// It's the stats that gives the data to external entities (through <seealso cref="IBaseStats{T}"/>)
         /// </summary>
+        [ShowInInspector]
         protected IBaseStatsRead<TPercent> MainStats { get; set; }
 
         [ShowInInspector]
@@ -269,8 +270,11 @@ namespace Stats
 
         private readonly CompositeAction _compositeAction;
 
+        [ShowInInspector]
         public IBaseStatsRead<T> BaseStats { get; }
+        [ShowInInspector]
         public IBaseStatsRead<T> BuffStats { get; }
+        [ShowInInspector]
         public IBaseStatsRead<T> BurstStats { get; }
 
         public T Attack => _compositeAction(BaseStats.Attack, BuffStats.Attack, BurstStats.Attack);
@@ -296,9 +300,13 @@ namespace Stats
         {
             Add(baseStats);
             _listAction = listOperation;
+            _firstElement = baseStats;
         }
         public delegate T ListAction(T recursionValue, T stat);
         private readonly ListAction _listAction;
+        private IBaseStatsRead<T> _firstElement; //Required for Burst Reset (since it clears itself
+
+        public void SwitchFirstElement(IBaseStatsRead<T> switchElement) => _firstElement = switchElement;
 
         public T Attack
         {
@@ -482,6 +490,15 @@ namespace Stats
                 return amount;
             }
         }
+
+
+        public void ResetAsBurstType()
+        {
+            // >= 1 since we want to leave the first element
+            Clear();
+            Add(_firstElement);
+        }
+
     }
 
     [Serializable]

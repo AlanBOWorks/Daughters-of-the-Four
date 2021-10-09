@@ -13,6 +13,7 @@ namespace CombatEntity
     {
         public CombatingEntity(ICombatEntityProvider provider, CombatingTeam team)
         {
+            _provider = provider;
             // Unity.Objects
             _entityHolderPrefab = provider.GetEntityPrefab();
 
@@ -31,6 +32,8 @@ namespace CombatEntity
                 = new CharacterEventsHolder<CombatingEntity,CombatingEntity, EffectResolution>();
         }
 
+        private readonly ICombatEntityProvider _provider;
+
         private readonly UEntityHolder _entityHolderPrefab;
 
         [Title("Stats")]
@@ -47,16 +50,18 @@ namespace CombatEntity
         [Title("Events")]
         public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, EffectResolution> EventsHolder;
 
+        public string GetEntityName() => _provider.GetEntityName();
         public UEntityHolder GetEntityPrefab() => _entityHolderPrefab;
 
-        public bool IsAlive() => CombatStats.CurrentMortality > 0;
-        public bool CanAct() => CombatStats.CurrentActions > 0 && IsAlive();
+        public bool IsAlive() => UtilsCombatStats.IsAlive(CombatStats);
+        public bool CanAct() => UtilsCombatStats.CanAct(CombatStats);
 
     }
 
 
-    public interface ICombatEntityProvider 
+    public interface ICombatEntityProvider
     {
+        string GetEntityName();
         UEntityHolder GetEntityPrefab();
         CombatStatsHolder GenerateStatsHolder();
         CombatingAreaData GenerateAreaData();

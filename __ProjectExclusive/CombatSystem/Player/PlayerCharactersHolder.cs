@@ -57,6 +57,7 @@ namespace __ProjectExclusive.Player
             UtilStats.OverrideStats(UpgradedStats,upgrades);
         }
 
+        public string GetEntityName() => CharacterPreset.GetEntityName();
         public UEntityHolder GetEntityPrefab() => CharacterPreset.GetEntityPrefab();
 
         public CombatStatsHolder GenerateStatsHolder()

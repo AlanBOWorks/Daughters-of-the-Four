@@ -6,6 +6,7 @@ using CombatSkills;
 using CombatSystem.Enemy;
 using CombatSystem.Events;
 using MEC;
+using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
 
@@ -15,8 +16,16 @@ namespace CombatSystem
     {
         public EntityActionRequestHandler()
         {
+            _actionPerformer = new ActionPerformer();
             _requestedActions = new Queue<SkillUsageValues>();
         }
+
+        private readonly ActionPerformer _actionPerformer;
+
+
+        [ShowInInspector]
+        private readonly Queue<SkillUsageValues> _requestedActions;
+
 
         public IEnumerator<float> _RequestFinishActions(CombatingEntity entity)
         {
@@ -31,18 +40,19 @@ namespace CombatSystem
                 : EnemyCombatSingleton.EntitySkillRequestHandler;
         }
 
-        private IEnumerator<float> _LoopThroughActions(CombatingEntity entity)
+        private IEnumerator<float> _LoopThroughActions(CombatingEntity actionPerformer)
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
 
             yield return Timing.WaitForOneFrame; //TODO request start actions animation;
 
-            eventsHolder.OnInitiativeTrigger(entity);
-            var requestHandler = GetTeamTempoController(entity);
+            eventsHolder.OnInitiativeTrigger(actionPerformer);
+            var requestHandler = GetTeamTempoController(actionPerformer);
 
-            requestHandler.OnRequestAction(entity,_requestedActions);
-            yield return Timing.WaitForOneFrame; 
-            while (entity.CanAct())
+            requestHandler.OnRequestAction(actionPerformer,_requestedActions);
+            yield return Timing.WaitForOneFrame;
+
+            while (actionPerformer.CanAct())
             {
                 while (_requestedActions.Count <= 0) yield return Timing.WaitForOneFrame;
 
@@ -50,20 +60,20 @@ namespace CombatSystem
                 // TODO check if skillUsage is valid (maybe the target is dead, a problem happens or something)
                 // if error is true; Clear the queue and Continue
 
-                UtilsCombatStats.TickCurrentActions(entity.CombatStats);
+                UtilsCombatStats.TickCurrentActions(actionPerformer.CombatStats);
 
                 // TODO Animation Execute and remove this wait
-                yield return Timing.WaitForSeconds(1); // Just to imitate animation
+                SkillParameters actionParameters =
+                    new SkillParameters(request.UsedSkill,actionPerformer,request.Target);
+                yield return Timing.WaitUntilDone(_actionPerformer._PerformSkill(actionParameters));
 
 
-                eventsHolder.OnDoMoreActions(entity);
+                eventsHolder.OnDoMoreActions(actionPerformer);
                 requestHandler.OnDoMoreActions();
-
             }
-            eventsHolder.OnFinishAllActions(entity);
+            eventsHolder.OnFinishAllActions(actionPerformer);
         }
 
-        private readonly Queue<SkillUsageValues> _requestedActions;
 
     }
 

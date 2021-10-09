@@ -9,8 +9,15 @@ namespace CombatSkills
 {
     public class CombatEntitySkillsHolder : ITeamStanceStructure<CombatingSkillsGroup>
     {
+        public CombatEntitySkillsHolder()
+        {
+            var waitSkill = GlobalCombatParametersSingleton.Parameters.WaitSkill;
+            WaitSkill = new CombatingSkill(waitSkill);
+        }
+
         public CombatEntitySkillsHolder(CombatingTeam team,
             ITeamStanceStructureRead<ICollection<SkillProviderParams>> mainSkills, EnumTeam.Role role)
+        : this()
         {
             _team = team;
             UtilsTeam.InjectElements(this,mainSkills, SkillsGroupDeclaration);
@@ -38,7 +45,8 @@ namespace CombatSkills
             => UtilsTeam.GetElement(this, _team.CurrentStance);
 
         private readonly CombatingTeam _team;
-
+        [ShowInInspector] 
+        public readonly CombatingSkill WaitSkill;
         [ShowInInspector]
         public CombatingSkillsGroup OnAttackStance { get; set; }
         [ShowInInspector]

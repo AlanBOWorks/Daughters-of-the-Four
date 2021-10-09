@@ -5,11 +5,12 @@ using UnityEngine;
 
 namespace CombatEffects
 {
+    [CreateAssetMenu(fileName = "Wait [Effect]", menuName = "Combat/Effect/Wait")]
     public class SWait : SEffect
     {
         public override void DoEffect(SkillValuesHolders values, float effectModifier)
         {
-            throw new System.NotImplementedException();
+            UtilsCombatStats.ResetActions(values.Target.CombatStats);
         }
 
     }
