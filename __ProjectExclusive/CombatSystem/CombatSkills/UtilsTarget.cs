@@ -31,7 +31,7 @@ namespace CombatSystem.CombatSkills
                     SkillTargetsHolder.Add(user);
                     break;
                 case EnumSkills.TargetType.Support:
-                    SkillTargetsHolder.AddRange(user.Team);
+                    SkillTargetsHolder.AddRange(user.Team.LivingEntitiesTracker);
                     break;
                 case EnumSkills.TargetType.Offensive:
                     HandlePossibleEnemies(user.Team.EnemyTeam);
@@ -40,11 +40,13 @@ namespace CombatSystem.CombatSkills
                     throw new ArgumentOutOfRangeException();
             }
 
-            //TODO fill the kills
             return SkillTargetsHolder;
         }
 
-        public static List<CombatingEntity> GetPossibleTargets(CombatingEntity user,CombatingEntity target, EnumEffects.TargetType targetType)
+        public static List<CombatingEntity> GetPossibleTargets(
+            CombatingEntity user,
+            CombatingEntity target, 
+            EnumEffects.TargetType targetType)
         {
             EffectTargetsHolder.Clear();
             var list = EffectTargetsHolder;
@@ -86,19 +88,11 @@ namespace CombatSystem.CombatSkills
         {
             if (team.CurrentStance == EnumTeam.TeamStance.Defending)
             {
-
-            }//TODO
-
-            foreach (var member in team)
-            {
-                AddEntity(member);
+                SkillTargetsHolder.Add(team.CollectFrontMostMember());
+                return;
             }
 
-            void AddEntity(CombatingEntity entity)
-            {
-                if (entity.IsAlive())
-                    SkillTargetsHolder.Add(entity);
-            }
+            SkillTargetsHolder.AddRange(team.LivingEntitiesTracker);
         }
     }
 }

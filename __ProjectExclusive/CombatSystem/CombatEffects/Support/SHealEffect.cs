@@ -8,20 +8,18 @@ namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "Heal [Effect]",
         menuName = "Combat/Effect/Heal")]
-    public class SHealEffect : SEffect
+    public class SHealEffect : SSupportEffect
     {
-        public override void DoEffect(SkillValuesHolders values, float healModifier)
+        private const float CritHealModifier = 1.5f;
+        protected override EffectResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical)
         {
-            var user = values.User;
-            var target = values.Target;
-
             float userHealModifier = user.CombatStats.Heal; //It's in percent
 
-            float targetHealPercent = userHealModifier * healModifier;
-            UtilsCombatStats.DoHealTo(target.CombatStats, targetHealPercent,values.IsCritical);
-            CombatSystemSingleton.EventsHolder.OnPerformSupportAction(values,new EffectResolution(this,targetHealPercent));
+            float targetHealPercent = userHealModifier * effectValue;
+            if (isCritical) targetHealPercent *= CritHealModifier;
+
+            UtilsCombatStats.DoHealTo(effectTarget.CombatStats, targetHealPercent);
+            return new EffectResolution(this, targetHealPercent);
         }
-
-
     }
 }

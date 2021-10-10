@@ -50,12 +50,17 @@ namespace CombatEntity
         [Title("Events")]
         public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, EffectResolution> EventsHolder;
 
+        [Title("Unity.Object")]
+        public UEntityHolder InstantiatedHolder { get; private set; }
+
         public string GetEntityName() => _provider.GetEntityName();
         public UEntityHolder GetEntityPrefab() => _entityHolderPrefab;
 
         public bool IsAlive() => UtilsCombatStats.IsAlive(CombatStats);
         public bool CanAct() => UtilsCombatStats.CanAct(CombatStats);
 
+
+        public void Injection(UEntityHolder instantiatedHolder) => InstantiatedHolder = instantiatedHolder;
     }
 
 

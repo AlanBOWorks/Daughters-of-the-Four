@@ -1,4 +1,5 @@
 using CombatEntity;
+using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
 
@@ -34,16 +35,20 @@ namespace CombatSkills
     {
         public SkillValuesHolders() {} //this is just for seeing the references amount
 
+        [ShowInInspector]
         public CombatingSkill UsedSkill { get; private set; }
+        [ShowInInspector]
         public CombatingEntity User { get; private set; }
+        [ShowInInspector]
         public CombatingEntity Target { get; private set; }
+        [ShowInInspector]
         public bool IsCritical { get; private set; }
 
-        public void Inject(SkillParameters parameters)
+        public void Inject(CombatingEntity user) => User = user;
+        public void Inject(SkillUsageValues values)
         {
-            UsedSkill = parameters.UsedSkill;
-            User = parameters.User;
-            Target = parameters.Target;
+            UsedSkill = values.UsedSkill;
+            Target = values.Target;
         }
 
         public void RollForCritical()
@@ -51,6 +56,12 @@ namespace CombatSkills
             IsCritical = UtilsRandomStats.IsCritical(User.CombatStats,UsedSkill);
         }
 
+        public void OnActionClear()
+        {
+            UsedSkill = null;
+            Target = null;
+            IsCritical = false;
+        }
         public void Clear()
         {
             UsedSkill = null;
@@ -58,6 +69,8 @@ namespace CombatSkills
             Target = null;
             IsCritical = false;
         }
+
+        public bool IsValid() => UsedSkill != null && User != null && Target != null;
     }
 
 

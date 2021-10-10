@@ -4,6 +4,7 @@ using CombatSkills;
 using CombatSystem.CombatSkills;
 using CombatSystem.Events;
 using CombatTeam;
+using MEC;
 using UnityEngine;
 
 namespace CombatSystem
@@ -15,42 +16,29 @@ namespace CombatSystem
             _possibleSkillToPick = new List<CombatingSkill>();
         }
 
-        private CombatingEntity _currentEntity;
-        private Queue<SkillUsageValues> _injectInQueue;
         private readonly List<CombatingSkill> _possibleSkillToPick;
-        public void OnRequestAction(CombatingEntity currentEntity, Queue<SkillUsageValues> injectSkillInQueue)
+        
+        public IEnumerator<float> OnRequestAction(SkillValuesHolders values)
         {
-            _injectInQueue = injectSkillInQueue;
-            _currentEntity = currentEntity;
+            var selectedSkill = DoRequestWithRandom(values.User);
+            values.Inject(selectedSkill);
 
-            DoRequestWithRandom();
-        }
-
-        public void OnDoMoreActions()
-        {
-            DoRequestWithRandom();
-        }
-
-        public void OnFailRequest(CombatingEntity currentEntity, Queue<SkillUsageValues> injectSkillInQueue)
-        {
-            DoRequestWithRandom();
+            yield return Timing.WaitForOneFrame;
         }
 
         private const float SharedSkillChance = .2f;
-        private void DoRequestWithRandom()
+        private SkillUsageValues DoRequestWithRandom(CombatingEntity currentEntity)
         {
-            var skillsHolder = _currentEntity.SkillsHolder;
+            var skillsHolder = currentEntity.SkillsHolder;
             CombatingSkillsGroup skills = skillsHolder.GetCurrentSkills();
             
-            var selectedSkill = ChooseSkill(skills);
-            if (selectedSkill == null) selectedSkill = skillsHolder.WaitSkill;
+            var selectedSkill = ChooseSkill(skills) ?? skillsHolder.WaitSkill;
 
-            List<CombatingEntity> possibleTargets = UtilsTarget.GetPossibleTargets(_currentEntity, selectedSkill.GetTargetType());
+            List<CombatingEntity> possibleTargets = UtilsTarget.GetPossibleTargets(currentEntity, selectedSkill.GetTargetType());
 
             var selectedTarget = ChooseTarget(possibleTargets);
 
-            var finalSelection = new SkillUsageValues(selectedSkill, selectedTarget);
-            _injectInQueue.Enqueue(finalSelection);
+            return new SkillUsageValues(selectedSkill, selectedTarget);
         }
 
         private CombatingSkill ChooseSkill(CombatingSkillsGroup skills)

@@ -52,19 +52,16 @@ namespace Stats
             currentHeal += maxHealth * CriticalHealPercentageAddition;
         }
 
-        public static void DoHealTo(CombatStatsHolder stats, float healPercent, bool isCriticalHeal)
+        public static void DoOverHealTo(CombatStatsHolder stats, float healPercent)
         {
             float maxHealth = stats.MaxHealth;
-            float healthMaxCap = maxHealth;
+            float healthMaxCap = maxHealth * (1 + CriticalHealPercentageAddition);
             float currentHealth = stats.CurrentHealth;
+            if(healthMaxCap <= currentHealth) return; //previous overHeal could be higher than new overHeals
+
 
             float healAmount = maxHealth * healPercent;
-
-            if (isCriticalHeal)
-            {
-                ModifyByOverHeal(ref healAmount,maxHealth);
-                healthMaxCap *= 1 + CriticalHealPercentageAddition;
-            }
+            ModifyByOverHeal(ref healAmount, maxHealth);
 
             float targetHealth = currentHealth + healAmount;
             if (targetHealth > healthMaxCap) targetHealth = healthMaxCap;

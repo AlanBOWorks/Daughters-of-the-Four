@@ -11,12 +11,12 @@ namespace CombatEffects
     public class SStanceSwitch : SEffect
     {
         [SerializeField] private EnumTeam.TeamStance targetStance;
-        public override void DoEffect(SkillValuesHolders values, float effectModifier)
-        {
-            var target = values.Target;
-            target.Team.OnStanceChange(targetStance);
-            CombatSystemSingleton.EventsHolder.OnStanceChange(target.Team, targetStance); 
-        }
+        
 
+        protected override void DoEffectOn(SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        {
+            effectTarget.Team.OnStanceChange(targetStance);
+            CombatSystemSingleton.EventsHolder.OnStanceChange(effectTarget.Team, targetStance);
+        }
     }
 }

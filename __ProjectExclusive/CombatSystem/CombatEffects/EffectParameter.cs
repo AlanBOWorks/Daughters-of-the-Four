@@ -5,7 +5,7 @@ using UnityEngine;
 namespace CombatEffects
 {
     [Serializable]
-    public struct EffectParameter : IEffect
+    public struct EffectParameter
     {
         public SEffect effectPreset;
         public EnumEffects.TargetType targetType;
@@ -13,17 +13,12 @@ namespace CombatEffects
         public bool canCrit;
 
         private const float CriticalModifier = .5f;
-        public void DoEffect(SkillValuesHolders values, float additionalEffectValue)
+        public void DoEffect(SkillValuesHolders values)
         {
-            float finalEffectValue = effectModifier + additionalEffectValue;
-            if (canCrit && values.IsCritical)
-                finalEffectValue *= CriticalModifier;
-
-            effectPreset.DoEffect(values,finalEffectValue);
+            float finalEffectValue = effectModifier;
+            bool isEffectCrit = canCrit && values.IsCritical;
+            effectPreset.DoEffect(values, targetType, finalEffectValue, isEffectCrit);
         }
-
-        public void DoEffect(SkillValuesHolders values) => DoEffect(values, 0);
-
     }
 
     /// <summary>

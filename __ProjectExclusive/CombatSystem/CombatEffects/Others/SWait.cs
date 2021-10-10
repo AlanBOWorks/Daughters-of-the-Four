@@ -8,10 +8,9 @@ namespace CombatEffects
     [CreateAssetMenu(fileName = "Wait [Effect]", menuName = "Combat/Effect/Wait")]
     public class SWait : SEffect
     {
-        public override void DoEffect(SkillValuesHolders values, float effectModifier)
+        protected override void DoEffectOn(SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
         {
-            UtilsCombatStats.ResetActions(values.Target.CombatStats);
+            UtilsCombatStats.ResetActions(effectTarget.CombatStats);
         }
-
     }
 }

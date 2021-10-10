@@ -17,14 +17,13 @@ namespace CombatSystem
         public EntityActionRequestHandler()
         {
             _actionPerformer = new ActionPerformer();
-            _requestedActions = new Queue<SkillUsageValues>();
+            _skillValues = new SkillValuesHolders();
         }
 
         private readonly ActionPerformer _actionPerformer;
-
-
         [ShowInInspector]
-        private readonly Queue<SkillUsageValues> _requestedActions;
+        private readonly SkillValuesHolders _skillValues;
+
 
 
         public IEnumerator<float> _RequestFinishActions(CombatingEntity entity)
@@ -40,38 +39,42 @@ namespace CombatSystem
                 : EnemyCombatSingleton.EntitySkillRequestHandler;
         }
 
-        private IEnumerator<float> _LoopThroughActions(CombatingEntity actionPerformer)
+        private IEnumerator<float> _LoopThroughActions(CombatingEntity currentActingEntity)
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
 
             yield return Timing.WaitForOneFrame; //TODO request start actions animation;
 
-            eventsHolder.OnInitiativeTrigger(actionPerformer);
-            var requestHandler = GetTeamTempoController(actionPerformer);
+            _skillValues.Inject(currentActingEntity);
+            eventsHolder.OnInitiativeTrigger(currentActingEntity);
+            var requestHandler = GetTeamTempoController(currentActingEntity);
 
-            requestHandler.OnRequestAction(actionPerformer,_requestedActions);
+
             yield return Timing.WaitForOneFrame;
 
-            while (actionPerformer.CanAct())
+            while (currentActingEntity.CanAct())
             {
-                while (_requestedActions.Count <= 0) yield return Timing.WaitForOneFrame;
+                do
+                {
+                    _skillValues.OnActionClear();
+                    yield return Timing.WaitUntilDone(
+                        requestHandler.OnRequestAction(_skillValues));
+                } while (!_skillValues.IsValid());
+                
 
-                var request = _requestedActions.Dequeue();
                 // TODO check if skillUsage is valid (maybe the target is dead, a problem happens or something)
                 // if error is true; Clear the queue and Continue
 
-                UtilsCombatStats.TickCurrentActions(actionPerformer.CombatStats);
+                UtilsCombatStats.TickCurrentActions(currentActingEntity.CombatStats);
 
                 // TODO Animation Execute and remove this wait
-                SkillParameters actionParameters =
-                    new SkillParameters(request.UsedSkill,actionPerformer,request.Target);
-                yield return Timing.WaitUntilDone(_actionPerformer._PerformSkill(actionParameters));
+               
+                yield return Timing.WaitUntilDone(_actionPerformer._PerformSkill(_skillValues));
+                _skillValues.Clear();
 
-
-                eventsHolder.OnDoMoreActions(actionPerformer);
-                requestHandler.OnDoMoreActions();
+                eventsHolder.OnDoMoreActions(currentActingEntity);
             }
-            eventsHolder.OnFinishAllActions(actionPerformer);
+            eventsHolder.OnFinishAllActions(currentActingEntity);
         }
 
 
@@ -82,8 +85,7 @@ namespace CombatSystem
         // These parameters are for giving the player the possibility of choosing various action in one go
         // even in between animations; For AI this is not necessary since the AI can just decide in the fly.
         // More advance AI could inject a sequence of action in the queue so it feels more intelligent
-        void OnRequestAction(CombatingEntity currentEntity, Queue<SkillUsageValues> injectSkillInQueue);
-        void OnDoMoreActions();
-        void OnFailRequest(CombatingEntity currentEntity, Queue<SkillUsageValues> injectSkillInQueue);
+        IEnumerator<float> OnRequestAction(SkillValuesHolders skillValues);
+
     }
 }

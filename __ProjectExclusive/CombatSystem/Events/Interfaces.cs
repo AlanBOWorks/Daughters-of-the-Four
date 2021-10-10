@@ -63,16 +63,6 @@ namespace CombatSystem.Events
     public interface IVitalityChangeListener<in T, in TValue>
     {
         /// <summary>
-        /// Heals, shields or any protection than avoids a possible death 
-        /// </summary>
-        void OnRecoveryReceiveAction(T element, TValue value);
-        /// <summary>
-        /// Unlike [<seealso cref="IOffensiveActionListener{T,TValue}.OnReceiveOffensiveAction"/>], this listener
-        /// is just for damage (<seealso cref="EnumTeam.Role.Vanguard"/> tends to requires this instead of offensive)
-        /// </summary>
-        void OnDamageReceiveAction(T element, TValue value);
-
-        /// <summary>
         /// Shields were higher thant zero but lost in the action
         /// </summary>
         void OnShieldLost(T element, TValue value);

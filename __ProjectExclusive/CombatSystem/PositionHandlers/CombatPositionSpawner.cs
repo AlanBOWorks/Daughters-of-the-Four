@@ -50,6 +50,8 @@ namespace CombatSystem.PositionHandlers
                 instantiatedObject.Inject(entity);
                 instantiatedObject.HandleTransformSpawn(onTransform);
 
+                entity.Injection(instantiatedObject);
+
                 _removeEntitiesOnFinish.Enqueue(instantiatedObject);
             }
         }

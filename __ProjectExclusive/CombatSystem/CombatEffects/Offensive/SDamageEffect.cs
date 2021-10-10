@@ -8,31 +8,29 @@ namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "Damage [Effect]",
         menuName = "Combat/Effect/Damage")]
-    public class SDamageEffect : SEffect
+    public class SDamageEffect : SOffensiveEffect
     {
         public const float CriticalDamageModifier = 1.25f; 
-        public override void DoEffect(SkillValuesHolders values, float effectModifier)
-        {
-            var user = values.User;
-            var target = values.Target;
+        
 
+
+        protected override EffectResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        {
             float userAttack = user.CombatStats.Attack;
-            float targetResistance = target.CombatStats.DamageResistance;
+            var targetStats = effectTarget.CombatStats;
+            float targetResistance = targetStats.DamageResistance;
 
             // Modifiers
-            if (values.IsCritical)
+            if (isCritical)
                 userAttack *= CriticalDamageModifier;
-            userAttack *= effectModifier;
+            userAttack *= effectValue;
 
             // Final
             float finalDamage = userAttack - targetResistance;
-            if(finalDamage <= 0) return;
+            var effectResolution = new EffectResolution(this, finalDamage);
+            UtilsCombatStats.DoDamageTo(targetStats, finalDamage);
 
-
-            UtilsCombatStats.DoDamageTo(target.CombatStats, finalDamage);
-
-            EffectResolution effectResolution = new EffectResolution(this, finalDamage);
-            CombatSystemSingleton.EventsHolder.OnDamageReceiveAction(values,effectResolution);
+            return effectResolution;
         }
     }
 }

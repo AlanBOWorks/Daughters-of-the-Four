@@ -123,22 +123,6 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnRecoveryReceiveAction(T element, TStat value)
-        {
-            foreach (var listener in _vitalityChangeListeners)
-            {
-                listener.OnRecoveryReceiveAction(element, value);
-            }
-        }
-
-        public void OnDamageReceiveAction(T element, TStat value)
-        {
-            foreach (var listener in _vitalityChangeListeners)
-            {
-                listener.OnDamageReceiveAction(element, value);
-            }
-        }
-
         public void OnShieldLost(T element, TStat value)
         {
             foreach (var listener in _vitalityChangeListeners)

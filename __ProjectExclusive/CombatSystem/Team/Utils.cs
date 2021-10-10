@@ -1,5 +1,6 @@
 
 using System;
+using CombatEntity;
 
 namespace CombatTeam
 {
@@ -116,7 +117,6 @@ namespace CombatTeam
             action(team.OnNeutralStance, injectAction.OnNeutralStance);
             action(team.OnDefenseStance, injectAction.OnDefenseStance);
         }
-        
     }
 
 

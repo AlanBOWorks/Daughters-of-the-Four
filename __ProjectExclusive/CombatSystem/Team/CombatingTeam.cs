@@ -13,7 +13,7 @@ namespace CombatTeam
     {
         public CombatingTeam(ITeamProvider generateFromProvider)
         {
-            _livingEntitiesTracker = new HashSet<CombatingEntity>();
+            LivingEntitiesTracker = new List<CombatingEntity>();
 
             Vanguard = GenerateEntity(generateFromProvider.Vanguard);
             Attacker = GenerateEntity(generateFromProvider.Attacker);
@@ -26,14 +26,14 @@ namespace CombatTeam
                 if (entityProvider == null) return null;
                 var generatedEntity = new CombatingEntity(entityProvider,this);
                 Add(generatedEntity);
-                _livingEntitiesTracker.Add(generatedEntity);
+                LivingEntitiesTracker.Add(generatedEntity);
 
                 return generatedEntity;
             }
         }
 
-        private readonly HashSet<CombatingEntity> _livingEntitiesTracker;
-        public bool HasLivingEntities() => _livingEntitiesTracker.Count > 0;
+        public readonly List<CombatingEntity> LivingEntitiesTracker;
+        public bool HasLivingEntities() => LivingEntitiesTracker.Count > 0;
 
         [Title("Data")]
         public EnumTeam.TeamStance CurrentStance { get; private set; }
@@ -45,11 +45,18 @@ namespace CombatTeam
         public CombatingEntity Attacker { get; }
         [ShowInInspector]
         public CombatingEntity Support { get; }
+
+        public CombatingEntity CollectFrontMostMember() => LivingEntitiesTracker[0];
+        public CombatingEntity CollectBackMostMember() => LivingEntitiesTracker[LivingEntitiesTracker.Count - 1];
+
+
         [Title("Events")]
         [ShowInInspector]
         public readonly TeamEvents Events;
 
+
         public CombatingTeam EnemyTeam;
+
 
 
         public void OnStanceChange(EnumTeam.TeamStance switchStance)
@@ -59,8 +66,12 @@ namespace CombatTeam
 
         public void OnMemberDeath(CombatingEntity member)
         {
-            if (_livingEntitiesTracker.Contains(member))
-                _livingEntitiesTracker.Remove(member);
+            foreach (var entity in LivingEntitiesTracker)
+            {
+                if(entity != member) continue;
+                LivingEntitiesTracker.Remove(member);
+                break;
+            }
         }
     }
 

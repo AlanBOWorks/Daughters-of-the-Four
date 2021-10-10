@@ -73,60 +73,41 @@ namespace CombatSystem.Events
             }
         }
 
-        private static void ExtractEntities(SkillValuesHolders skillValues, out CombatingEntity user,
-            out CombatingEntity target)
-        {
-            user = skillValues.User;
-            target = skillValues.Target;
-        }
+       
         
         public void OnReceiveOffensiveAction(SkillValuesHolders element, EffectResolution value)
         {
-            ExtractEntities(element, out var user, out var target);
-            target.EventsHolder.OnReceiveOffensiveAction(user,value);
-            user.EventsHolder.OnPerformOffensiveAction(target,value);
+           
         }
 
         public void OnReceiveSupportAction(SkillValuesHolders element, EffectResolution value)
         {
-            ExtractEntities(element, out var user, out var target);
-            target.EventsHolder.OnReceiveSupportAction(user,value);
-            user.EventsHolder.OnPerformSupportAction(target,value);
+           
         }
 
         public void OnRecoveryReceiveAction(SkillValuesHolders element, EffectResolution value)
         {
-            ExtractEntities(element, out var user, out var target);
-            OnReceiveSupportAction(element,value);
-            target.EventsHolder.OnRecoveryReceiveAction(user,value);
+           
         }
 
         public void OnDamageReceiveAction(SkillValuesHolders element, EffectResolution value)
         {
-            ExtractEntities(element, out var user, out var target);
-            OnReceiveOffensiveAction(element,value);
-            target.EventsHolder.OnDamageReceiveAction(user,value);
+            
         }
 
         public void OnShieldLost(SkillValuesHolders element, EffectResolution value)
         {
-            ExtractEntities(element, out var user, out var target);
-            OnDamageReceiveAction(element,value);
-            target.EventsHolder.OnShieldLost(user,value);
+            
         }
 
         public void OnHealthLost(SkillValuesHolders element, EffectResolution value)
         {
-            ExtractEntities(element, out var user, out var target);
-            OnDamageReceiveAction(element,value);
-            target.EventsHolder.OnHealthLost(user,value);
+           
         }
 
         public void OnMortalityDeath(SkillValuesHolders element, EffectResolution value)
         {
-            ExtractEntities(element, out var user, out var target);
-            OnDamageReceiveAction(element,value);
-            target.EventsHolder.OnMortalityDeath(user,value);
+            var target = element.Target;
             target.Team.Events.OnMemberDeath(target);
         }
     }
