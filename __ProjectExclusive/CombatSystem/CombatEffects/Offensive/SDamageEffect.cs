@@ -14,7 +14,7 @@ namespace CombatEffects
         
 
 
-        protected override EffectResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical)
         {
             float userAttack = user.CombatStats.Attack;
             var targetStats = effectTarget.CombatStats;
@@ -27,7 +27,7 @@ namespace CombatEffects
 
             // Final
             float finalDamage = userAttack - targetResistance;
-            var effectResolution = new EffectResolution(this, finalDamage);
+            var effectResolution = new SkillComponentResolution(this, finalDamage);
             UtilsCombatStats.DoDamageTo(targetStats, finalDamage);
 
             return effectResolution;

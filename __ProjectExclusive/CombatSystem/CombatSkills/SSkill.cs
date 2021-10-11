@@ -34,6 +34,7 @@ namespace CombatSkills
         public float GetCritVariation() => skillParameters.GetCritVariation();
         public IEffect GetDescriptiveEffect() => skillParameters.GetDescriptiveEffect();
         public EffectParameter[] GetEffects() => skillParameters.GetEffects();
+        public BuffParameter[] GetBuffs() => skillParameters.GetBuffs();
     }
 
 
@@ -64,7 +65,8 @@ namespace CombatSkills
 
         [SerializeField]
         private EffectParameter[] effects = new EffectParameter[0];
-
+        [SerializeField]
+        private BuffParameter[] buffs = new BuffParameter[0];
 
         public void UpdateTargetType(EnumSkills.TargetType type)
         {
@@ -119,10 +121,8 @@ namespace CombatSkills
                 : effects[0].effectPreset;
         }
 
-        public EffectParameter[] GetEffects()
-        {
-            return effects;
-        }
+        public EffectParameter[] GetEffects() => effects;
+        public BuffParameter[] GetBuffs() => buffs;
     }
 
 }

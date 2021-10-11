@@ -11,7 +11,7 @@ namespace CombatEffects
     public class SHealEffect : SSupportEffect
     {
         private const float CritHealModifier = 1.5f;
-        protected override EffectResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical)
         {
             float userHealModifier = user.CombatStats.Heal; //It's in percent
 
@@ -19,7 +19,7 @@ namespace CombatEffects
             if (isCritical) targetHealPercent *= CritHealModifier;
 
             UtilsCombatStats.DoHealTo(effectTarget.CombatStats, targetHealPercent);
-            return new EffectResolution(this, targetHealPercent);
+            return new SkillComponentResolution(this, targetHealPercent);
         }
     }
 }

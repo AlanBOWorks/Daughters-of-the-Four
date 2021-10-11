@@ -11,7 +11,7 @@ using UnityEngine;
 namespace CombatSystem.Events
 {
     // This is invoked by the CombatEvents (implicitly by being subscribed to it)
-    public class CombatEntityFixedEvents : ICombatPreparationListener, IEventListenerHandler<SkillValuesHolders,CombatingEntity,EffectResolution>
+    public class CombatEntityFixedEvents : ICombatPreparationListener, IEventListenerHandler<SkillValuesHolders,CombatingEntity,SkillComponentResolution>
     {
 #if UNITY_EDITOR
         [ShowInInspector,TextArea]
@@ -75,37 +75,37 @@ namespace CombatSystem.Events
 
        
         
-        public void OnReceiveOffensiveAction(SkillValuesHolders element, EffectResolution value)
+        public void OnReceiveOffensiveAction(SkillValuesHolders element, SkillComponentResolution value)
         {
            
         }
 
-        public void OnReceiveSupportAction(SkillValuesHolders element, EffectResolution value)
+        public void OnReceiveSupportAction(SkillValuesHolders element, SkillComponentResolution value)
         {
            
         }
 
-        public void OnRecoveryReceiveAction(SkillValuesHolders element, EffectResolution value)
+        public void OnRecoveryReceiveAction(SkillValuesHolders element, SkillComponentResolution value)
         {
            
         }
 
-        public void OnDamageReceiveAction(SkillValuesHolders element, EffectResolution value)
+        public void OnDamageReceiveAction(SkillValuesHolders element, SkillComponentResolution value)
         {
             
         }
 
-        public void OnShieldLost(SkillValuesHolders element, EffectResolution value)
+        public void OnShieldLost(SkillValuesHolders element, SkillComponentResolution value)
         {
             
         }
 
-        public void OnHealthLost(SkillValuesHolders element, EffectResolution value)
+        public void OnHealthLost(SkillValuesHolders element, SkillComponentResolution value)
         {
            
         }
 
-        public void OnMortalityDeath(SkillValuesHolders element, EffectResolution value)
+        public void OnMortalityDeath(SkillValuesHolders element, SkillComponentResolution value)
         {
             var target = element.Target;
             target.Team.Events.OnMemberDeath(target);

@@ -33,42 +33,59 @@ namespace Stats
 
         private CombatStatsHolder(BaseStats baseStats, BaseStats buffStats, BaseStats burstStats)
         {
-            BaseStats = baseStats ?? throw new NullReferenceException("Introduced [Base Stats] were null");
-            BuffStats = buffStats ?? throw new NullReferenceException("Introduced [Buff Stats] were null");
-            BurstStats = burstStats ?? throw new NullReferenceException("Introduced [Burst Stats] were null");
+            _baseStats = baseStats ?? throw new NullReferenceException("Introduced [Base Stats] were null");
+            _buffStats = buffStats ?? throw new NullReferenceException("Introduced [Buff Stats] were null");
+            _burstStats = burstStats ?? throw new NullReferenceException("Introduced [Burst Stats] were null");
 
             var baseList = new ListStats(BaseStats);
             var buffList = new ListStats(BuffStats);
             var burstList = new ListStats(BurstStats);
 
-
+            ListStatsHolder = new StatBehaviourStructure<ListStats>(baseList,buffList,burstList);
             var mathematicalStats = new MathematicalStats(baseList, buffList, burstList);
 
             //MathematicaStats is the one which gives the stats to external entities
             MainStats = mathematicalStats;
-            _listStats = new ListBehaviourHolder(baseList, buffList, burstList);
+            MasterStats = mathematicalStats.MasterStats;
 
             CurrentMortality = MaxMortality;
             CurrentHealth = MaxHealth;
         }
 
-        [ShowInInspector]
-        public IBaseStats<float> BaseStats { get; }
+        [ShowInInspector] 
+        private BaseStats _baseStats;
         [ShowInInspector,HorizontalGroup()]
-        public IBaseStats<float> BuffStats { get; }
+        private BaseStats _buffStats;
         [ShowInInspector,HorizontalGroup()]
-        public IBaseStats<float> BurstStats { get; }
+        private BaseStats _burstStats;
 
-        // TODO when conditional stats are created, add this to mathematicals
-        private readonly IBehaviourStatsRead<ListStats> _listStats; //This is for the conditionals
+        /// <summary>
+        /// Reference to the basic BaseStats (to modify)
+        /// </summary>
+        public IBaseStats<float> BaseStats => _baseStats;
+        /// <summary>
+        /// Reference to the basic BuffStats
+        /// </summary>
+        public IBaseStats<float> BuffStats => _buffStats;
+        /// <summary>
+        /// Reference to the basic BurstStat
+        /// </summary>
+        public IBaseStats<float> BurstStats => _burstStats;
+
+
+        public readonly IMasterStats<float> MasterStats;
+        /// <summary>
+        /// Reference to a List Structured class for collection type of Stats (conditional primarily)
+        /// </summary>
+        public readonly StatBehaviourStructure<ListStats> ListStatsHolder;
+
 
         public void ResetBurst()
         {
-            UtilStats.OverrideByValue(BurstStats,0);
-            _listStats.BurstStats.ResetAsBurstType();
+            _burstStats.ResetAsBurst();
         }
 
-        public void SubscribeStats(IBaseStatsRead<float> stats, EnumStats.BehaviourType type)
+        public void SubscribeStats(IBaseStatsRead<float> stats, EnumStats.BuffType type)
         {
             //TODO Check if is conditional stats, if true > then add
 
@@ -79,20 +96,5 @@ namespace Stats
 
 
 
-        private class MathematicalStats : BehaviourCombinedStats<float>
-        {
-            public MathematicalStats(
-                IBaseStatsRead<float> baseStats, IBaseStatsRead<float> buffStats, IBaseStatsRead<float> burstStats)
-                : base(baseStats, buffStats, burstStats, UtilStats.CalculateStat)
-            { }
-        }
-
-        private class ListBehaviourHolder : StatBehaviourStructure<ListStats>
-        {
-            public ListBehaviourHolder(ListStats baseStats, ListStats buffStats, ListStats burstStats)
-                : base(baseStats, buffStats, burstStats)
-            {
-            }
-        }
     }
 }

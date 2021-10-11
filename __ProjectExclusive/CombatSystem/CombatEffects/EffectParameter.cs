@@ -1,5 +1,6 @@
 using System;
 using CombatSkills;
+using Stats;
 using UnityEngine;
 
 namespace CombatEffects
@@ -9,30 +10,47 @@ namespace CombatEffects
     {
         public SEffect effectPreset;
         public EnumEffects.TargetType targetType;
-        public float effectModifier;
+        public float effectValue;
         public bool canCrit;
 
         private const float CriticalModifier = .5f;
         public void DoEffect(SkillValuesHolders values)
         {
-            float finalEffectValue = effectModifier;
             bool isEffectCrit = canCrit && values.IsCritical;
-            effectPreset.DoEffect(values, targetType, finalEffectValue, isEffectCrit);
+            effectPreset.DoEffect(values, targetType, effectValue, isEffectCrit);
         }
     }
 
     /// <summary>
     /// Used for events when an effect does its calculations and sends its resolution
+    /// to global/entity events
     /// </summary>
-    public struct EffectResolution
+    public struct SkillComponentResolution
     {
-        public readonly IEffect UsedEffect;
+        public readonly ISkillComponent UsedSkillComponent;
         public readonly float EffectValue;
 
-        public EffectResolution(IEffect usedEffect, float effectValue)
+        public SkillComponentResolution(ISkillComponent usedEffect, float effectValue)
         {
-            UsedEffect = usedEffect;
+            UsedSkillComponent = usedEffect;
             EffectValue = effectValue;
         }
     }
+
+    [Serializable]
+    public struct BuffParameter
+    {
+        public SBuff buffPreset;
+        public EnumEffects.TargetType targetType;
+        public EnumStats.BuffType buffType;
+        public float buffValue;
+        public bool canCrit;
+
+        public void DoBuff(SkillValuesHolders values)
+        {
+            bool isEffectCrit = canCrit && values.IsCritical;
+            buffPreset.DoBuff(values, buffType, targetType, buffValue, isEffectCrit);
+        }
+    }
+
 }

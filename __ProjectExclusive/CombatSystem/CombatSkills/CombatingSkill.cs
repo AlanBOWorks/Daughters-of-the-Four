@@ -60,5 +60,6 @@ namespace CombatSkills
         public float GetCritVariation() => Preset.GetCritVariation();
         public IEffect GetDescriptiveEffect() => Preset.GetDescriptiveEffect();
         public EffectParameter[] GetEffects() => Preset.GetEffects();
+        public BuffParameter[] GetBuffs() => Preset.GetBuffs();
     }
 }

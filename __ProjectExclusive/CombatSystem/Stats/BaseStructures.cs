@@ -502,12 +502,31 @@ namespace Stats
     }
 
     [Serializable]
-    public class MasterStats<T> : IMasterStatsInject<T>, IMasterStatsRead<T>
+    public class MasterStats<T> : IMasterStats<T>
     {
+        public MasterStats() {}
+
+        public MasterStats(T overrideBy)
+        {
+            offensive = overrideBy;
+            support = overrideBy;
+            vitality = overrideBy;
+            concentration = overrideBy;
+        }
+
+        public MasterStats(IMasterStatsRead<T> injection)
+        {
+            offensive = injection.Offensive;
+            support = injection.Support;
+            vitality = injection.Vitality;
+            concentration = injection.Concentration;
+        }
+
         [SerializeField] private T offensive;
         [SerializeField] private T support;
         [SerializeField] private T vitality;
         [SerializeField] private T concentration;
+
 
         public T Offensive
         {

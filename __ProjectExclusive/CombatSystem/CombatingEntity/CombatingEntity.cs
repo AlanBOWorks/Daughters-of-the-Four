@@ -29,7 +29,7 @@ namespace CombatEntity
             Team = team;
 
             EventsHolder 
-                = new CharacterEventsHolder<CombatingEntity,CombatingEntity, EffectResolution>();
+                = new CharacterEventsHolder<CombatingEntity,CombatingEntity, SkillComponentResolution>();
         }
 
         private readonly ICombatEntityProvider _provider;
@@ -48,7 +48,7 @@ namespace CombatEntity
         public readonly CombatingTeam Team;
 
         [Title("Events")]
-        public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, EffectResolution> EventsHolder;
+        public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, SkillComponentResolution> EventsHolder;
 
         [Title("Unity.Object")]
         public UEntityHolder InstantiatedHolder { get; private set; }

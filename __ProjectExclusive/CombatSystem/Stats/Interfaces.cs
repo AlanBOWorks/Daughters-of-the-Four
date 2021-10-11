@@ -2,6 +2,10 @@
 
 namespace Stats
 {
+
+    // This structures uses <T> because not only will be used for float/int (calculations), but also
+    // for animations, sprites, strings, color, etc. (so everything has the same structure)
+
     public interface IMasterStatsRead<out T>
     {
         T Offensive { get; }
@@ -17,7 +21,7 @@ namespace Stats
         T Concentration { set; }
     }
 
-    public interface IUpgradeStats<T> : IMasterStatsInject<T>, IMasterStatsRead<T>
+    public interface IMasterStats<T> : IMasterStatsInject<T>, IMasterStatsRead<T>
     {
         new T Offensive { get; set; }
         new T Support { get; set; }

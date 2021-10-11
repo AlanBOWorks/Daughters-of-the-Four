@@ -4,7 +4,7 @@ namespace Stats
 {
     public static class EnumStats
     {
-        public enum BehaviourType
+        public enum BuffType
         {
             Base,
             Buff,

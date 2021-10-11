@@ -25,6 +25,13 @@ namespace Stats
         {
             UtilStats.OverrideByValue(this,overrideAllBy);
         }
+
+        public void Override(float value)
+        {
+            UtilStats.OverrideByValue(this,value);
+        }
+
+        public void ResetAsBurst() => Override(0);
     }
 
     public class ListStats : ListStats<float>
@@ -41,6 +48,10 @@ namespace Stats
 
     public class MasterStats : MasterStats<float>
     {
+        public MasterStats() {}
+        public MasterStats(float overrideBy) : base(overrideBy) { }
+        public MasterStats(IMasterStatsRead<float> injection) : base(injection) { }
 
+        public void OverrideStats(IMasterStatsRead<float> stats) => UtilStats.OverrideStats(this,stats);
     }
 }

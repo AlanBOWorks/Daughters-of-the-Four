@@ -31,11 +31,11 @@ namespace CombatEffects
             var effectResolution = DoEffectOn(user, effectTarget, effectValue, isCritical);
 
             CombatSystemSingleton.EventsHolder.OnPerformOffensiveAction(values, effectResolution);
-            user.EventsHolder.OnPerformOffensiveAction(user, effectResolution);
+            user.EventsHolder.OnPerformOffensiveAction(effectTarget, effectResolution);
             effectTarget.EventsHolder.OnReceiveOffensiveAction(user, effectResolution);
         }
 
-        protected abstract EffectResolution DoEffectOn(
+        protected abstract SkillComponentResolution DoEffectOn(
             CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical);
     }
 
@@ -48,11 +48,11 @@ namespace CombatEffects
             var effectResolution = DoEffectOn(user, effectTarget, effectValue, isCritical);
 
             CombatSystemSingleton.EventsHolder.OnPerformSupportAction(values, effectResolution);
-            user.EventsHolder.OnPerformSupportAction(user, effectResolution);
+            user.EventsHolder.OnPerformSupportAction(effectTarget, effectResolution);
             effectTarget.EventsHolder.OnReceiveSupportAction(user, effectResolution);
         }
 
-        protected abstract EffectResolution DoEffectOn(
+        protected abstract SkillComponentResolution DoEffectOn(
             CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical);
     }
 }

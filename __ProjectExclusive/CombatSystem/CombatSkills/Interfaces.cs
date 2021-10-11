@@ -13,6 +13,7 @@ namespace CombatSkills
         float GetCritVariation();
         IEffect GetDescriptiveEffect();
         EffectParameter[] GetEffects();
+        BuffParameter[] GetBuffs();
     }
 
     public interface ISkillTypes<T> : ISkillTypesRead<T>, ISkillTypesInject<T>

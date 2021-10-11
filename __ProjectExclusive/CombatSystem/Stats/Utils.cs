@@ -5,9 +5,14 @@ namespace Stats
 {
     public static class UtilStats
     {
-        public static float CalculateStat(float baseStat, float buffStat, float burstStat)
+        public static float StatFormulaStackingBuffs(float baseStat, float buffStat, float burstStat)
         {
             return baseStat * (1+ buffStat) * (1 + burstStat); 
+        }
+
+        public static float StatFormulaPercentageAddition(float baseStat, float buffStat, float burstStat)
+        {
+            return baseStat + buffStat + burstStat;
         }
 
         public static void FuncOn<T>(Func<T,T> func, IBaseStats<T> variate)
@@ -136,13 +141,13 @@ namespace Stats
             onTo.Concentration = readFrom.Concentration;
         }
 
-        public static T GetElement<T>(IBehaviourStatsRead<T> stats, EnumStats.BehaviourType type)
+        public static T GetElement<T>(IBehaviourStatsRead<T> stats, EnumStats.BuffType type)
         {
             return type switch
             {
-                EnumStats.BehaviourType.Base => stats.BaseStats,
-                EnumStats.BehaviourType.Buff => stats.BuffStats,
-                EnumStats.BehaviourType.Burst => stats.BurstStats,
+                EnumStats.BuffType.Base => stats.BaseStats,
+                EnumStats.BuffType.Buff => stats.BuffStats,
+                EnumStats.BuffType.Burst => stats.BurstStats,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
