@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Stats
 {
-    public sealed class CombatStatsHolder : CombatStats<float, int>, IBehaviourStatsRead<IBaseStats<float>>
+    public sealed class CombatStatsHolder : CombatStats<float, int>, IBehaviourStatsRead<IBaseStatsRead<float>>
     {
         /// <summary>_<br></br>
         /// Used for special initial/passives stats for Buff and/or Burst type holder;<br></br>
@@ -19,7 +19,7 @@ namespace Stats
         this(
             new BaseStats(copyBaseStats),
             new BaseStats(copyBuffStats),
-            new BaseStats(copyBurstStats))
+            new BurstStats(copyBurstStats))
         { }
 
 
@@ -28,21 +28,24 @@ namespace Stats
         this(
             new BaseStats(copyBaseStats),
             new BaseStats(),
-            new BaseStats())
+            new BurstStats())
         { }
 
-        private CombatStatsHolder(BaseStats baseStats, BaseStats buffStats, BaseStats burstStats)
+        private CombatStatsHolder(BaseStats baseStats, BaseStats buffStats, BurstStats burstStats)
         {
             _baseStats = baseStats ?? throw new NullReferenceException("Introduced [Base Stats] were null");
-            _buffStats = buffStats ?? throw new NullReferenceException("Introduced [Buff Stats] were null");
             _burstStats = burstStats ?? throw new NullReferenceException("Introduced [Burst Stats] were null");
 
-            var baseList = new ListStats(BaseStats);
-            var buffList = new ListStats(BuffStats);
-            var burstList = new ListStats(BurstStats);
 
-            ListStatsHolder = new StatBehaviourStructure<ListStats>(baseList,buffList,burstList);
-            var mathematicalStats = new MathematicalStats(baseList, buffList, burstList);
+            // buff stats are the only ones with special conditional stats addition; The rest will be checked before
+            // adding, while buff types are checked in each calculation
+            if (buffStats == null)
+                throw new NullReferenceException("Introduced [Buff Stats] were null");
+            _buffStats = new ListStats(buffStats);
+            _buffStatsInitialElement = buffStats;
+
+
+            var mathematicalStats = new MathematicalStats(_baseStats, _buffStats, _burstStats);
 
             //MathematicaStats is the one which gives the stats to external entities
             MainStats = mathematicalStats;
@@ -52,49 +55,48 @@ namespace Stats
             CurrentHealth = MaxHealth;
         }
 
+        [ShowInInspector]
+        public readonly IMasterStats<float> MasterStats;
         [ShowInInspector] 
         private BaseStats _baseStats;
         [ShowInInspector,HorizontalGroup()]
-        private BaseStats _buffStats;
+        private ListStats _buffStats;
+        private readonly IBaseStats<float> _buffStatsInitialElement;
         [ShowInInspector,HorizontalGroup()]
-        private BaseStats _burstStats;
+        private BurstStats _burstStats;
+
+        public BurstStats GetBurstStat() => _burstStats;
 
         /// <summary>
         /// Reference to the basic BaseStats (to modify)
         /// </summary>
-        public IBaseStats<float> BaseStats => _baseStats;
+        public IBaseStatsRead<float> BaseStats => _baseStats;
         /// <summary>
         /// Reference to the basic BuffStats
         /// </summary>
-        public IBaseStats<float> BuffStats => _buffStats;
+        public IBaseStatsRead<float> BuffStats => _buffStats;
         /// <summary>
         /// Reference to the basic BurstStat
         /// </summary>
-        public IBaseStats<float> BurstStats => _burstStats;
+        public IBaseStatsRead<float> BurstStats => _burstStats;
 
-
-        public readonly IMasterStats<float> MasterStats;
         /// <summary>
-        /// Reference to a List Structured class for collection type of Stats (conditional primarily)
+        /// Used for additive type of buff (add, sum, multiply). For conditional types use the special
+        /// getter for conditional buffs
         /// </summary>
-        public readonly StatBehaviourStructure<ListStats> ListStatsHolder;
-
-
-        public void ResetBurst()
+        public IBaseStats<float> GetBuffableStats(EnumStats.BuffType buffType, bool isSelfBuff)
         {
-            _burstStats.ResetAsBurst();
+            switch (buffType)
+            {
+                case EnumStats.BuffType.Base:
+                    return _baseStats;
+                case EnumStats.BuffType.Buff:
+                    return _buffStatsInitialElement;
+                case EnumStats.BuffType.Burst:
+                    return _burstStats.GetStats(isSelfBuff);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(buffType), buffType, null);
+            }
         }
-
-        public void SubscribeStats(IBaseStatsRead<float> stats, EnumStats.BuffType type)
-        {
-            //TODO Check if is conditional stats, if true > then add
-
-            //else
-            IBaseStats<float> targetStats = UtilStats.GetElement(this, type);
-            UtilStats.SumStats(targetStats,stats);
-        }
-
-
-
     }
 }

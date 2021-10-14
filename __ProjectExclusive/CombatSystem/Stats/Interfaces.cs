@@ -34,6 +34,7 @@ namespace Stats
         T Attack { get; }
         T Persistent { get; } //In game it's call static damage, but here is Persistent for naming convenience
         T Debuff { get; }
+        T FollowUp { get; }
     }
 
     public interface ISupportStatsRead<out T>
@@ -41,6 +42,7 @@ namespace Stats
         T Heal { get; }
         T Buff { get; }
         T ReceiveBuff { get; }
+        T Shielding { get; }
     }
 
     public interface IVitalityStatsRead<out T>
@@ -54,10 +56,10 @@ namespace Stats
     public interface IConcentrationStatsRead<out T>
     {
         T InitiativeSpeed { get; }
-        T Critical { get; }
         T InitialInitiative { get; }
         //this could be a float since the sum of all stats could be something like (1.5f + 2.5f = 4 instead of 3)
         T ActionsPerSequence { get; }
+        T Critical { get; }
     }
 
 
@@ -87,6 +89,8 @@ namespace Stats
         T Attack { set; }
         T Persistent { set; } //In game it's call statsic damage, but here is Persistent for naming convenience
         T Debuff { set; }
+        T FollowUp { set; }
+
     }
 
     public interface ISupportStatsInject<in T>
@@ -94,6 +98,7 @@ namespace Stats
         T Heal { set; }
         T Buff { set; }
         T ReceiveBuff { set; }
+        T Shielding { set; }
     }
 
     public interface IVitalityStatsInject<in T>
@@ -146,13 +151,19 @@ namespace Stats
         new T Attack { get; set; }
         new T Persistent { get; set; }
         new T Debuff { get; set; }
+        new T FollowUp { get; set; }
+
         new T Heal { get; set; }
         new T Buff { get; set; }
         new T ReceiveBuff { get; set; }
+        new T Shielding { get; set; }
+
+
         new T MaxHealth { get; set; }
         new T MaxMortality { get; set; }
         new T DebuffResistance { get; set; }
         new T DamageResistance { get; set; }
+
         new T InitiativeSpeed { get; set; }
         new T Critical { get; set; }
         new T InitialInitiative { get; set; }

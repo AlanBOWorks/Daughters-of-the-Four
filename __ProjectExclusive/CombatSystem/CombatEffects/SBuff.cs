@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace CombatEffects
 {
-    public abstract class SBuff : ScriptableObject
+    public abstract class SBuff : SSkillComponentEffect, IBuff
     {
         public void DoBuff(SkillValuesHolders values,EnumStats.BuffType buffType, EnumEffects.TargetType effectTargetType, float effectValue,
             bool isCritical)
@@ -59,15 +59,23 @@ namespace CombatEffects
 
         }
 
+        protected float CalculateBuffStats(SkillValuesHolders values, float buffValue, bool isCritical)
+        {
+            return UtilStats.CalculateBuffPower(values.User.CombatStats,buffValue, isCritical);
+        }
+
         protected SkillComponentResolution DoBuffOn(
             SkillValuesHolders values, CombatingEntity buffTarget, 
             EnumStats.BuffType buffType, float buffValue, bool isCritical)
         {
-            var stats = UtilStats.GetElement(buffTarget.CombatStats, buffType);
-            return DoBuffOn(values, stats, buffValue, isCritical);
+            var statsHolder = buffTarget.CombatStats;
+            bool isSelfBuff = values.User == buffTarget;
+            var targetStats = statsHolder.GetBuffableStats(buffType,isSelfBuff);
+            return DoBuffOn(values, targetStats, buffValue, isCritical);
         }
 
         protected abstract SkillComponentResolution DoBuffOn(SkillValuesHolders values, IBaseStats<float> targetStats, float buffValue,
             bool isCritical);
+
     }
 }

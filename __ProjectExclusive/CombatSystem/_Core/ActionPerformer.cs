@@ -9,8 +9,6 @@ namespace CombatSystem
 {
     public class ActionPerformer
     {
-       
-
         private const float SpaceBetweenAnimations = .12f;
         public IEnumerator<float> _PerformSkill(SkillValuesHolders values)
         {
@@ -30,17 +28,10 @@ namespace CombatSystem
         {
             var skill = values.UsedSkill;
             var effects = skill.GetEffects();
-            var buffs = skill.GetBuffs();
-
-
 
             foreach (EffectParameter effectParameter in effects)
             {
                 effectParameter.DoEffect(values);
-            }
-            foreach (BuffParameter buffParameter in buffs)
-            {
-                buffParameter.DoBuff(values);
             }
             CombatSystemSingleton.EventsHolder.OnSkillUse(values);
         }

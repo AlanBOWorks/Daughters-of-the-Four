@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatEffects;
 using UnityEngine;
 
@@ -7,13 +8,17 @@ namespace CombatSkills
     {
         string GetSkillName();
         Sprite GetIcon();
+
         EnumSkills.TargetType GetTargetType();
+
         int GetCooldownAmount();
         bool CanCrit();
         float GetCritVariation();
-        IEffect GetDescriptiveEffect();
-        EffectParameter[] GetEffects();
-        BuffParameter[] GetBuffs();
+        /// <summary>
+        /// A Key type for checking special cases (if null it should return the first element of [<see cref="GetEffects"/>]]
+        /// </summary>
+        ISkillComponent GetDescriptiveEffect();
+        List<EffectParameter> GetEffects();
     }
 
     public interface ISkillTypes<T> : ISkillTypesRead<T>, ISkillTypesInject<T>

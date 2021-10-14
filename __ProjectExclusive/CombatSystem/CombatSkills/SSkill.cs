@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using CombatEffects;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,7 +10,7 @@ namespace CombatSkills
 {
     [CreateAssetMenu(fileName = "N [Skill Preset]",
         menuName = "Combat/Skills/Preset")]
-    public class SSkill : ScriptableObject, ISkill
+    public class SSkill : ScriptableObject
     {
         [SerializeField] 
         private Skill skillParameters;
@@ -25,16 +27,6 @@ namespace CombatSkills
             name = assetName;
             AssetDatabase.RenameAsset(path, name);
         }
-
-        public string GetSkillName() => skillParameters.GetSkillName();
-        public Sprite GetIcon() => skillParameters.GetIcon();
-        public EnumSkills.TargetType GetTargetType() => skillParameters.GetTargetType();
-        public int GetCooldownAmount() => skillParameters.GetCooldownAmount();
-        public bool CanCrit() => skillParameters.CanCrit();
-        public float GetCritVariation() => skillParameters.GetCritVariation();
-        public IEffect GetDescriptiveEffect() => skillParameters.GetDescriptiveEffect();
-        public EffectParameter[] GetEffects() => skillParameters.GetEffects();
-        public BuffParameter[] GetBuffs() => skillParameters.GetBuffs();
     }
 
 
@@ -52,9 +44,10 @@ namespace CombatSkills
         [SerializeField] 
         private EnumSkills.TargetType skillTargetType = EnumSkills.TargetType.Self;
 
+
         [SerializeField,
          Tooltip("Effect reference for a special case scenario where the main effect is not the descriptive effect")] 
-        private SEffect specialDescriptiveEffect;
+        private SSkillComponentEffect specialDescriptiveEffect;
 
         [SerializeField] 
         private int cooldownAmount = 1;
@@ -64,9 +57,7 @@ namespace CombatSkills
 
 
         [SerializeField]
-        private EffectParameter[] effects = new EffectParameter[0];
-        [SerializeField]
-        private BuffParameter[] buffs = new BuffParameter[0];
+        private List<EffectParameter> effects = new List<EffectParameter>();
 
         public void UpdateTargetType(EnumSkills.TargetType type)
         {
@@ -78,29 +69,14 @@ namespace CombatSkills
             skillName = name;
         }
 
-        public string GetSkillName()
-        {
-            return skillName;
-        }
-
-        public Sprite GetIcon()
-        {
-            return specialSprite;
-        }
-
-        public EnumSkills.TargetType GetTargetType()
-        {
-            return skillTargetType;
-        }
-
-        public int GetCooldownAmount()
-        {
-            return cooldownAmount;
-        }
+        public string GetSkillName() => skillName;
+        public Sprite GetIcon() => specialSprite;
+        public EnumSkills.TargetType GetTargetType() => skillTargetType;
+        public int GetCooldownAmount() => cooldownAmount;
 
         public bool CanCrit()
         {
-            for (var i = 0; i < effects.Length; i++)
+            for (var i = 0; i < effects.Count; i++)
             {
                 EffectParameter effect = effects[i];
                 if (effect.canCrit) return true;
@@ -108,21 +84,40 @@ namespace CombatSkills
 
             return false;
         }
+        public float GetCritVariation() => critVariation;
 
-        public float GetCritVariation()
-        {
-            return critVariation;
-        }
-
-        public IEffect GetDescriptiveEffect()
+        public ISkillComponent GetDescriptiveEffect()
         {
             return specialDescriptiveEffect 
                 ? specialDescriptiveEffect 
-                : effects[0].effectPreset;
+                : effects[0].preset;
+        }
+        public List<EffectParameter> GetEffects() => effects;
+
+#if UNITY_EDITOR
+        [Button]
+        private void AddEffect(SEffect effect)
+        {
+            var addition = new EffectParameter
+            {
+                preset = effect, effectValue = 1, targetType = EnumEffects.TargetType.Target
+            };
+            effects.Add(addition);
         }
 
-        public EffectParameter[] GetEffects() => effects;
-        public BuffParameter[] GetBuffs() => buffs;
+        [Button]
+        private void AddBuff(SBuff buff)
+        {
+            var addition = new EffectParameter
+            {
+                preset = buff,
+                effectValue = 1,
+                targetType = EnumEffects.TargetType.Target,
+                buffType = EnumStats.BuffType.Buff
+            };
+            effects.Add(addition);
+        }
+#endif
     }
 
 }

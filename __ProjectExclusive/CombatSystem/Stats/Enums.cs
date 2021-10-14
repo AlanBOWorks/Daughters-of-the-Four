@@ -56,5 +56,65 @@ namespace Stats
             /// </summary>
             HybridRanged //Means for common skills; selectable/unique skills can be both Melee and Ranged
         }
+
+        public enum MasterStatType
+        {
+            Offensive,
+            Support,
+            Vitality,
+            Concentration
+        }
+
+        public enum OffensiveStatType
+        {
+            Attack,
+            Persistent,
+            DeBuff,
+            FollowUp
+        }
+        public enum SupportStatType
+        {
+            Heal = 10,
+            Buff,
+            ReceiveBuff,
+            Shielding
+        }
+        public enum VitalityStatType
+        {
+            MaxHealth = 100,
+            MaxMortality,
+            DebuffResistance,
+            DamageResistance
+        }
+        public enum ConcentrationStatType
+        {
+            InitiativeSpeed = 1000,
+            InitialInitiative,
+            ActionsPerSequence,
+            Critical
+        }
+
+        public enum BaseStatType
+        {
+            Attack = OffensiveStatType.Attack,
+            Persistent = OffensiveStatType.Persistent,
+            DeBuff = OffensiveStatType.DeBuff,
+            FollowUp = OffensiveStatType.FollowUp,
+
+            Heal = SupportStatType.Heal,
+            Buff = SupportStatType.Buff,
+            ReceiveBuff = SupportStatType.ReceiveBuff,
+            Shielding = SupportStatType.Shielding,
+
+            MaxHealth = VitalityStatType.MaxHealth,
+            MaxMortality = VitalityStatType.MaxMortality,
+            DebuffResistance = VitalityStatType.DebuffResistance,
+            DamageResistance = VitalityStatType.DamageResistance,
+
+            InitiativeSpeed = ConcentrationStatType.InitiativeSpeed,
+            InitialInitiative = ConcentrationStatType.InitialInitiative,
+            ActionsPerSequence = ConcentrationStatType.ActionsPerSequence,
+            Critical = ConcentrationStatType.Critical,
+        }
     }
 }

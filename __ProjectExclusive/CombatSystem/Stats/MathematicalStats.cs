@@ -42,6 +42,9 @@ namespace Stats
         public float Debuff
             => MasterStats.Offensive 
             * UtilStats.StatFormulaPercentageAddition(BaseStats.Debuff, BuffStats.Debuff, BurstStats.Debuff);
+        public float FollowUp
+            => MasterStats.Offensive
+               * UtilStats.StatFormulaPercentageAddition(BaseStats.FollowUp, BuffStats.FollowUp, BurstStats.FollowUp);
 
         public float Heal
             => MasterStats.Support 
@@ -52,6 +55,9 @@ namespace Stats
         public float ReceiveBuff
             => MasterStats.Support 
             * UtilStats.StatFormulaPercentageAddition(BaseStats.ReceiveBuff, BuffStats.ReceiveBuff, BurstStats.ReceiveBuff);
+        public float Shielding
+            => MasterStats.Offensive
+               * UtilStats.StatFormulaPercentageAddition(BaseStats.Shielding, BuffStats.Shielding, BurstStats.Shielding);
 
 
         // Mortality is the exception of all rules since it determines when a character is defeated (that's a special case)

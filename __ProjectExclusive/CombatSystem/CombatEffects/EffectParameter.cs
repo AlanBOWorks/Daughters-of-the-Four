@@ -1,5 +1,6 @@
 using System;
 using CombatSkills;
+using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
 
@@ -8,16 +9,33 @@ namespace CombatEffects
     [Serializable]
     public struct EffectParameter
     {
-        public SEffect effectPreset;
+        [Title("Preset")]
+        public SSkillComponentEffect preset;
+
+        [HorizontalGroup("Type",Title = "_____ Types _________")]
         public EnumEffects.TargetType targetType;
+        [HorizontalGroup("Type")]
+        [ShowIf("IsBuffEffect",Animate = false)]
+        public EnumStats.BuffType buffType;
+
+        [Title("Params")]
         public float effectValue;
         public bool canCrit;
 
-        private const float CriticalModifier = .5f;
+        private bool IsBuffEffect() => preset is IBuff;
+
         public void DoEffect(SkillValuesHolders values)
         {
             bool isEffectCrit = canCrit && values.IsCritical;
-            effectPreset.DoEffect(values, targetType, effectValue, isEffectCrit);
+            switch (preset)
+            {
+                case IEffect effectPreset:
+                    effectPreset.DoEffect(values, targetType, effectValue, isEffectCrit);
+                    return;
+                case IBuff buffPreset:
+                    buffPreset.DoBuff(values,buffType,targetType,effectValue,isEffectCrit);
+                    return;
+            }
         }
     }
 
@@ -37,20 +55,5 @@ namespace CombatEffects
         }
     }
 
-    [Serializable]
-    public struct BuffParameter
-    {
-        public SBuff buffPreset;
-        public EnumEffects.TargetType targetType;
-        public EnumStats.BuffType buffType;
-        public float buffValue;
-        public bool canCrit;
-
-        public void DoBuff(SkillValuesHolders values)
-        {
-            bool isEffectCrit = canCrit && values.IsCritical;
-            buffPreset.DoBuff(values, buffType, targetType, buffValue, isEffectCrit);
-        }
-    }
-
+    public class SSkillComponentEffect : ScriptableObject, ISkillComponent { }
 }

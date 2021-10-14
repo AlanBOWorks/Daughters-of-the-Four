@@ -33,7 +33,6 @@ namespace CombatSystem
             // PREPARATION Subscriptions
             CombatPreparationHandler.Subscribe(TempoTicker);
             CombatPreparationHandler.Subscribe(combatPositionSpawner);
-            CombatPreparationHandler.Subscribe(EntitiesFixedEvents);
 
             // EVENTS Subscriptions
             EventsHolder.Subscribe(EntitiesFixedEvents);

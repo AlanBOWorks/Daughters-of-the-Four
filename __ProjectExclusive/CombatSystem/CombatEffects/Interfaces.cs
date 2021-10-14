@@ -1,5 +1,6 @@
 using CombatEntity;
 using CombatSkills;
+using Stats;
 
 namespace CombatEffects
 {
@@ -15,7 +16,8 @@ namespace CombatEffects
 
     public interface IBuff : ISkillComponent
     {
-        void DoBuff(SkillValuesHolders values, EnumEffects.TargetType effectTargetType, float effectValue,
-            bool isCritical);
+        void DoBuff(SkillValuesHolders values, 
+            EnumStats.BuffType buffType, EnumEffects.TargetType effectTargetType,
+            float effectValue, bool isCritical);
     }
 }

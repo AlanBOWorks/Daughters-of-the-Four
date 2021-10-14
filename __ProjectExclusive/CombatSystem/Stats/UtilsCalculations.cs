@@ -14,10 +14,6 @@ namespace Stats
         public static bool CanAct(CombatStatsHolder stats) => stats.CurrentActions > 0 && IsAlive(stats);
         public static bool IsTickingValid(CombatStatsHolder stats) => IsAlive(stats);
 
-        public static void ResetBurstStats(CombatStatsHolder statsHolder)
-        {
-            statsHolder.ResetBurst();
-        }
 
         // By design shield breaks and health lost stops the over damage
         public static void DoDamageTo(ICombatPercentStats<float> vitality, float damage)

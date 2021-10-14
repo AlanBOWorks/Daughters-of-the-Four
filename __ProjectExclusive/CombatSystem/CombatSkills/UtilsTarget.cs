@@ -32,6 +32,7 @@ namespace CombatSystem.CombatSkills
                     break;
                 case EnumSkills.TargetType.Support:
                     SkillTargetsHolder.AddRange(user.Team.LivingEntitiesTracker);
+                    SkillTargetsHolder.Remove(user); // By design support skills can't target self
                     break;
                 case EnumSkills.TargetType.Offensive:
                     HandlePossibleEnemies(user.Team.EnemyTeam);

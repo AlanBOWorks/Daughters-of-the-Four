@@ -11,30 +11,18 @@ using UnityEngine;
 namespace CombatSystem.Events
 {
     // This is invoked by the CombatEvents (implicitly by being subscribed to it)
-    public class CombatEntityFixedEvents : ICombatPreparationListener, IEventListenerHandler<SkillValuesHolders,CombatingEntity,SkillComponentResolution>
+    public class CombatEntityFixedEvents :IEventListenerHandler<SkillValuesHolders,CombatingEntity,SkillComponentResolution>
     {
 #if UNITY_EDITOR
         [ShowInInspector,TextArea]
         private const string _behaviourExplanation = "A Sigleton event caller for fixed events that occurs always in the same " +
                                                      "pattern (It calls the entities's Events in the required order as a consequence)";
 #endif
-        private CombatingTeam _playerTeam;
-        private CombatingTeam _enemyTeam;
-
-
-        public void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam)
-        {
-            _playerTeam = playerTeam;
-            _enemyTeam = enemyTeam;
-        }
-
-        public void OnAfterLoadScene()
-        {
-        }
-
+       
 
         public void OnInitiativeTrigger(CombatingEntity element)
         {
+            element.CombatStats.GetBurstStat().SelfBurst.ResetAsBurst();
             element.EventsHolder.OnInitiativeTrigger(element);
             element.SkillUsageTracker.ResetOnStartSequence();
         }
@@ -50,6 +38,7 @@ namespace CombatSystem.Events
         public void OnFinishAllActions(CombatingEntity element)
         {
             element.EventsHolder.OnFinishAllActions(element);
+            element.CombatStats.GetBurstStat().ReceivedBurst.ResetAsBurst();
         }
 
         public void OnSkipActions(CombatingEntity element)
@@ -60,17 +49,6 @@ namespace CombatSystem.Events
         public void OnRoundFinish(CombatingEntity lastElement)
         {
             lastElement.EventsHolder.OnRoundFinish(lastElement);
-            DoResetBurst(_enemyTeam);
-            DoResetBurst(_playerTeam);
-
-            // Privates 
-            void DoResetBurst(CombatingTeam team)
-            {
-                foreach (CombatingEntity entity in team)
-                {
-                    UtilsCombatStats.ResetBurstStats(entity.CombatStats);
-                }
-            }
         }
 
        

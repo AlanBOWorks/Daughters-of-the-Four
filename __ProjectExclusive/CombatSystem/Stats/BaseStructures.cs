@@ -13,10 +13,12 @@ namespace Stats
         [SerializeField] private T attack;
         [SerializeField] private T persistent;
         [SerializeField] private T debuff;
+        [SerializeField] private T followUp;
         [Title("Support")]
         [SerializeField] private T heal;
         [SerializeField] private T buff;
         [SerializeField] private T receiveBuff;
+        [SerializeField] private T shielding;
         [Title("Vitality")]
         [SerializeField] private T maxHealth;
         [SerializeField] private T maxMortality;
@@ -46,6 +48,12 @@ namespace Stats
             set => debuff = value;
         }
 
+        public T FollowUp
+        {
+            get => followUp;
+            set => followUp = value;
+        }
+
         public T Heal
         {
             get => heal;
@@ -62,6 +70,12 @@ namespace Stats
         {
             get => receiveBuff;
             set => receiveBuff = value;
+        }
+
+        public T Shielding
+        {
+            get => shielding;
+            set => shielding = value;
         }
 
         public T MaxHealth
@@ -148,9 +162,11 @@ namespace Stats
         public TPercent Attack => MainStats.Attack;
         public TPercent Persistent => MainStats.Persistent;
         public TPercent Debuff => MainStats.Debuff;
+        public TPercent FollowUp => MainStats.FollowUp;
         public TPercent Heal => MainStats.Heal;
         public TPercent Buff => MainStats.Buff;
         public TPercent ReceiveBuff => MainStats.ReceiveBuff;
+        public TPercent Shielding => MainStats.Shielding;
         public TPercent MaxHealth => MainStats.MaxHealth;
         public TPercent MaxMortality => MainStats.MaxMortality;
         public TPercent DebuffResistance => MainStats.DebuffResistance;
@@ -160,139 +176,7 @@ namespace Stats
         public TPercent InitialInitiative => MainStats.InitialInitiative;
         public TPercent ActionsPerSequence => MainStats.ActionsPerSequence;
     }
-
-    public class ReflectionBaseStat<T> : IBaseStats<T>
-    {
-        public ReflectionBaseStat(IBaseStats<T> referencedStats)
-        {
-            ReferencedStats = referencedStats;
-        }
-        public readonly IBaseStats<T> ReferencedStats;
-
-        public T Attack
-        {
-            get => ReferencedStats.Attack;
-            set => ReferencedStats.Attack = value;
-        }
-        public T Persistent
-        {
-            get => ReferencedStats.Persistent;
-            set => ReferencedStats.Persistent = value;
-        }
-        public T Debuff
-        {
-            get => ReferencedStats.Debuff;
-            set => ReferencedStats.Debuff = value;
-        }
-        public T Heal
-        {
-            get => ReferencedStats.Heal;
-            set => ReferencedStats.Heal = value;
-        }
-        public T Buff
-        {
-            get => ReferencedStats.Buff;
-            set => ReferencedStats.Buff = value;
-        }
-        public T ReceiveBuff
-        {
-            get => ReferencedStats.ReceiveBuff;
-            set => ReferencedStats.ReceiveBuff = value;
-        }
-        public T MaxHealth
-        {
-            get => ReferencedStats.MaxHealth;
-            set => ReferencedStats.MaxHealth = value;
-        }
-        public T MaxMortality
-        {
-            get => ReferencedStats.MaxMortality;
-            set => ReferencedStats.MaxMortality = value;
-        }
-        public T DebuffResistance
-        {
-            get => ReferencedStats.DebuffResistance;
-            set => ReferencedStats.DebuffResistance = value;
-        }
-        public T DamageResistance
-        {
-            get => ReferencedStats.DamageResistance;
-            set => ReferencedStats.DamageResistance = value;
-        }
-        public T InitiativeSpeed
-        {
-            get => ReferencedStats.InitiativeSpeed;
-            set => ReferencedStats.InitiativeSpeed = value;
-        }
-        public T Critical
-        {
-            get => ReferencedStats.Critical;
-            set => ReferencedStats.Critical = value;
-        }
-        public T InitialInitiative
-        {
-            get => ReferencedStats.InitialInitiative;
-            set => ReferencedStats.InitialInitiative = value;
-        }
-        public T ActionsPerSequence
-        {
-            get => ReferencedStats.ActionsPerSequence;
-            set => ReferencedStats.ActionsPerSequence = value;
-        }
-    }
-
-    public class StatBehaviourStructure<T> : IBehaviourStatsRead<T>
-    {
-        public StatBehaviourStructure(T baseStats, T buffStats, T burstStats)
-        {
-            BaseStats = baseStats;
-            BuffStats = buffStats;
-            BurstStats = burstStats;
-        }
-
-        public T BaseStats { get; }
-        public T BuffStats { get; }
-        public T BurstStats { get; }
-    }
-
-    public class BehaviourCombinedStats<T> : IBaseStatsRead<T>, IBehaviourStatsRead<IBaseStatsRead<T>>
-    {
-        public BehaviourCombinedStats(IBaseStatsRead<T> baseStats, IBaseStatsRead<T> buffStats, IBaseStatsRead<T> burstStats,
-            CompositeAction compositeAction)
-        {
-            BaseStats = baseStats;
-            BuffStats = buffStats;
-            BurstStats = burstStats;
-            _compositeAction = compositeAction;
-        }
-
-        public delegate T CompositeAction(T baseStat, T buffStat, T burstStat);
-
-        private readonly CompositeAction _compositeAction;
-
-        [ShowInInspector]
-        public IBaseStatsRead<T> BaseStats { get; }
-        [ShowInInspector]
-        public IBaseStatsRead<T> BuffStats { get; }
-        [ShowInInspector]
-        public IBaseStatsRead<T> BurstStats { get; }
-
-        public T Attack => _compositeAction(BaseStats.Attack, BuffStats.Attack, BurstStats.Attack);
-        public T Persistent => _compositeAction(BaseStats.Persistent, BuffStats.Persistent, BurstStats.Persistent);
-        public T Debuff => _compositeAction(BaseStats.Debuff, BuffStats.Debuff, BurstStats.Debuff);
-        public T Heal => _compositeAction(BaseStats.Heal, BuffStats.Heal, BurstStats.Heal);
-        public T Buff => _compositeAction(BaseStats.Buff, BuffStats.Buff, BurstStats.Buff);
-        public T ReceiveBuff => _compositeAction(BaseStats.ReceiveBuff, BuffStats.ReceiveBuff, BurstStats.ReceiveBuff);
-        public T MaxHealth => _compositeAction(BaseStats.MaxHealth, BuffStats.MaxHealth, BurstStats.MaxHealth);
-        public T MaxMortality => _compositeAction(BaseStats.MaxMortality, BuffStats.MaxMortality, BurstStats.MaxMortality);
-        public T DebuffResistance => _compositeAction(BaseStats.DebuffResistance, BuffStats.DebuffResistance, BurstStats.DebuffResistance);
-        public T DamageResistance => _compositeAction(BaseStats.DamageResistance, BuffStats.DamageResistance, BurstStats.DamageResistance);
-        public T InitiativeSpeed => _compositeAction(BaseStats.InitiativeSpeed, BuffStats.InitiativeSpeed, BurstStats.InitiativeSpeed);
-        public T Critical => _compositeAction(BaseStats.Critical, BuffStats.Critical, BurstStats.Critical);
-        public T InitialInitiative => _compositeAction(BaseStats.InitialInitiative, BuffStats.InitialInitiative, BurstStats.InitialInitiative);
-        public T ActionsPerSequence => _compositeAction(BaseStats.ActionsPerSequence, BuffStats.ActionsPerSequence, BurstStats.ActionsPerSequence);
-
-    }
+    
 
     public class ListStats<T> : List<IBaseStatsRead<T>>, IBaseStatsRead<T>
     {
@@ -300,13 +184,10 @@ namespace Stats
         {
             Add(baseStats);
             _listAction = listOperation;
-            _firstElement = baseStats;
         }
         public delegate T ListAction(T recursionValue, T stat);
         private readonly ListAction _listAction;
-        private IBaseStatsRead<T> _firstElement; //Required for Burst Reset (since it clears itself
 
-        public void SwitchFirstElement(IBaseStatsRead<T> switchElement) => _firstElement = switchElement;
 
         public T Attack
         {
@@ -347,6 +228,21 @@ namespace Stats
                 return amount;
             }
         }
+
+        public T FollowUp
+        {
+            get
+            {
+                T amount = this[0].FollowUp;
+                for (var i = 1; i < this.Count; i++)
+                {
+                    IBaseStatsRead<T> stat = this[i];
+                    amount = _listAction(amount, stat.FollowUp);
+                }
+                return amount;
+            }
+        }
+
         public T Heal
         {
             get
@@ -386,6 +282,21 @@ namespace Stats
                 return amount;
             }
         }
+
+        public T Shielding
+        {
+            get
+            {
+                T amount = this[0].Shielding;
+                for (var i = 1; i < this.Count; i++)
+                {
+                    IBaseStatsRead<T> stat = this[i];
+                    amount = _listAction(amount, stat.Shielding);
+                }
+                return amount;
+            }
+        }
+
         public T MaxHealth
         {
             get
@@ -490,15 +401,6 @@ namespace Stats
                 return amount;
             }
         }
-
-
-        public void ResetAsBurstType()
-        {
-            // >= 1 since we want to leave the first element
-            Clear();
-            Add(_firstElement);
-        }
-
     }
 
     [Serializable]

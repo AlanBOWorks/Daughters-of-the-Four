@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatEffects
 {
-    public abstract class SEffect : ScriptableObject, IEffect
+    public abstract class SEffect : SSkillComponentEffect, IEffect
     {
         public void DoEffect(SkillValuesHolders values, EnumEffects.TargetType effectTargetType, float effectValue, bool isCritical)
         {

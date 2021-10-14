@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatEffects;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ namespace CombatSkills
     // Also will keep variation of effects/passives and cooldown when applicable
     public class CombatingSkill : ISkill
     {
+       
         public CombatingSkill(ISkill preset)
         {
             Preset = preset;
@@ -15,7 +17,7 @@ namespace CombatSkills
 
         public CombatingSkill(SkillProviderParams providerParams)
         {
-            Preset = providerParams.preset;
+            Preset = providerParams.preset.GetSkillPreset();
             _cooldownOnUsage = Preset.GetCooldownAmount() + providerParams.cooldownVariation;
         }
 
@@ -24,6 +26,7 @@ namespace CombatSkills
         private readonly int _cooldownOnUsage;
         private int _currentCooldownAmount;
         private EnumSkills.SKillState _currentState;
+
 
         public bool IsInCooldown() => _currentState == EnumSkills.SKillState.InCooldown;
         public void PutInCooldown()
@@ -58,8 +61,7 @@ namespace CombatSkills
         public int GetCooldownAmount() => _currentCooldownAmount;
         public bool CanCrit() => Preset.CanCrit();
         public float GetCritVariation() => Preset.GetCritVariation();
-        public IEffect GetDescriptiveEffect() => Preset.GetDescriptiveEffect();
-        public EffectParameter[] GetEffects() => Preset.GetEffects();
-        public BuffParameter[] GetBuffs() => Preset.GetBuffs();
+        public ISkillComponent GetDescriptiveEffect() => Preset.GetDescriptiveEffect();
+        public List<EffectParameter> GetEffects() => Preset.GetEffects();
     }
 }
