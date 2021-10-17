@@ -9,54 +9,34 @@ namespace CombatEffects
 {
     public abstract class SBuff : SSkillComponentEffect, IBuff
     {
-        public void DoBuff(SkillValuesHolders values,EnumStats.BuffType buffType, EnumEffects.TargetType effectTargetType, float effectValue,
-            bool isCritical)
+        public void DoBuff(
+            SkillValuesHolders values,
+            EnumStats.BuffType buffType, 
+            EnumEffects.TargetType effectTargetType,
+            float effectValue, bool isCritical)
         {
             var user = values.User;
             var skillTarget = values.Target;
+
             var effectTargets = UtilsTarget.GetPossibleTargets(user, skillTarget, effectTargetType);
-
-            switch (values.UsedSkill.GetTargetType())
+            foreach (var effectTarget in effectTargets)
             {
-                case EnumSkills.TargetType.Self:
-                    LoopSelf();
-                    break;
-                case EnumSkills.TargetType.Support:
-                    LoopSupport();
-                    break;
-                case EnumSkills.TargetType.Offensive:
-                    LoopOffensive();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                var resolution = DoBuffOn(values, effectTarget, buffType, effectValue, isCritical);
+                DoEventCalls(user,effectTarget,resolution);
             }
 
-            void LoopSelf()
-            {
-                foreach (var effectTarget in effectTargets)
-                {
-                    DoBuffOn(values, effectTarget,buffType, effectValue, isCritical);
-                }
-            }
-            void LoopOffensive()
-            {
-                foreach (var effectTarget in effectTargets)
-                {
-                    var resolution = DoBuffOn(values, effectTarget, buffType, effectValue, isCritical);
-                    user.EventsHolder.OnPerformSupportAction(effectTarget,resolution);
-                    effectTarget.EventsHolder.OnReceiveSupportAction(user,resolution);
-                }
-            }
-            void LoopSupport()
-            {
-                foreach (var effectTarget in effectTargets)
-                {
-                    var resolution = DoBuffOn(values, effectTarget, buffType, effectValue, isCritical);
-                    user.EventsHolder.OnPerformOffensiveAction(effectTarget, resolution);
-                    effectTarget.EventsHolder.OnReceiveOffensiveAction(user, resolution);
-                }
-            }
+        }
 
+        protected virtual void DoEventCalls(CombatingEntity user, CombatingEntity effectTarget,
+            SkillComponentResolution resolution)
+        {
+            var userEventsHolder = user.EventsHolder;
+            var targetEventsHolder = effectTarget.EventsHolder;
+
+            userEventsHolder.OnPerformSupportAction(effectTarget,ref resolution);
+
+            if(userEventsHolder == targetEventsHolder) return;
+            targetEventsHolder.OnReceiveSupportAction(user,ref resolution);
         }
 
         protected float CalculateBuffStats(SkillValuesHolders values, float buffValue, bool isCritical)

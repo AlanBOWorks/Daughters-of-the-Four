@@ -28,7 +28,6 @@ namespace __ProjectExclusive.Enemy
         [SerializeField] private SCombatEntityEnemyPreset vanguard;
         [SerializeField] private SCombatEntityEnemyPreset attacker;
         [SerializeField] private SCombatEntityEnemyPreset support;
-        [SerializeField] private bool isElite;
         [SerializeField] private SceneAsset combatScene;
 
         public ICombatEntityProvider Vanguard => vanguard;
@@ -37,7 +36,6 @@ namespace __ProjectExclusive.Enemy
 
         public string GetCombatScenePath() => AssetDatabase.GetAssetPath(combatScene);
 
-        public bool IsEliteCombat() => isElite;
 
         public void InvokeCombatWithThisTeam()
             => InvokeCombatFromProvider(this);
@@ -45,8 +43,20 @@ namespace __ProjectExclusive.Enemy
         internal static void InvokeCombatFromProvider(IEnemyCombatProvider provider)
         {
             PlayerCharactersHolder playerTeam = PlayerCombatSingleton.CharactersHolder;
-            CombatSystemSingleton.CombatPreparationHandler.StartCombat(provider.GetCombatScenePath(),
-                playerTeam, provider, provider.IsEliteCombat());
+            var preparationHandler = CombatSystemSingleton.CombatPreparationHandler;
+
+            var scenePath = provider.GetCombatScenePath();
+            if(scenePath != null)
+                preparationHandler.StartCombat(provider.GetCombatScenePath(),
+                playerTeam, provider);
+            else
+            {
+                if(CombatSystemSingleton.PositionProvider == null)
+                    throw new NullReferenceException("There's no Position provider for the combat");
+                preparationHandler.RequestLocalCombat(playerTeam, provider);
+            }
         }
+
+
     }
 }

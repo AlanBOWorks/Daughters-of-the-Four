@@ -1,4 +1,5 @@
 using System;
+using CombatEntity;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -6,23 +7,6 @@ namespace Stats
 {
     public sealed class CombatStatsHolder : CombatStats<float, int>, IBehaviourStatsRead<IBaseStatsRead<float>>
     {
-        /// <summary>_<br></br>
-        /// Used for special initial/passives stats for Buff and/or Burst type holder;<br></br>
-        /// For the rest use the [<see cref="CombatStatsHolder(Stats.IBaseStatsRead{float})"/>]
-        /// constructor
-        /// </summary>
-        public CombatStatsHolder(
-            IBaseStatsRead<float> copyBaseStats, 
-            IBaseStatsRead<float> copyBuffStats, 
-            IBaseStatsRead<float> copyBurstStats)
-        : 
-        this(
-            new BaseStats(copyBaseStats),
-            new BaseStats(copyBuffStats),
-            new BurstStats(copyBurstStats))
-        { }
-
-
         public CombatStatsHolder(IBaseStatsRead<float> copyBaseStats)
         :
         this(
@@ -41,8 +25,7 @@ namespace Stats
             // adding, while buff types are checked in each calculation
             if (buffStats == null)
                 throw new NullReferenceException("Introduced [Buff Stats] were null");
-            _buffStats = new ListStats(buffStats);
-            _buffStatsInitialElement = buffStats;
+            _buffStats = new PairWithConditionalStats(buffStats);
 
 
             var mathematicalStats = new MathematicalStats(_baseStats, _buffStats, _burstStats);
@@ -60,8 +43,7 @@ namespace Stats
         [ShowInInspector] 
         private BaseStats _baseStats;
         [ShowInInspector,HorizontalGroup()]
-        private ListStats _buffStats;
-        private readonly IBaseStats<float> _buffStatsInitialElement;
+        private PairWithConditionalStats _buffStats;
         [ShowInInspector,HorizontalGroup()]
         private BurstStats _burstStats;
 
@@ -80,6 +62,11 @@ namespace Stats
         /// </summary>
         public IBaseStatsRead<float> BurstStats => _burstStats;
 
+        public void Injection(CombatingEntity user)
+        {
+            _buffStats.ConditionalStat.Injection(user);
+        }
+
         /// <summary>
         /// Used for additive type of buff (add, sum, multiply). For conditional types use the special
         /// getter for conditional buffs
@@ -91,7 +78,7 @@ namespace Stats
                 case EnumStats.BuffType.Base:
                     return _baseStats;
                 case EnumStats.BuffType.Buff:
-                    return _buffStatsInitialElement;
+                    return _buffStats.BaseStats;
                 case EnumStats.BuffType.Burst:
                     return _burstStats.GetStats(isSelfBuff);
                 default:

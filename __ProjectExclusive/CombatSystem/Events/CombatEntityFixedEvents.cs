@@ -22,9 +22,9 @@ namespace CombatSystem.Events
 
         public void OnInitiativeTrigger(CombatingEntity element)
         {
-            element.CombatStats.GetBurstStat().SelfBurst.ResetAsBurst();
             element.EventsHolder.OnInitiativeTrigger(element);
             element.SkillUsageTracker.ResetOnStartSequence();
+            element.CombatStats.GetBurstStat().SelfBurst.ResetAsBurst();
         }
 
         public void OnDoMoreActions(CombatingEntity element)
@@ -39,6 +39,7 @@ namespace CombatSystem.Events
         {
             element.EventsHolder.OnFinishAllActions(element);
             element.CombatStats.GetBurstStat().ReceivedBurst.ResetAsBurst();
+            element.GuardHandler.RemoveGuarding();
         }
 
         public void OnSkipActions(CombatingEntity element)
@@ -49,41 +50,48 @@ namespace CombatSystem.Events
         public void OnRoundFinish(CombatingEntity lastElement)
         {
             lastElement.EventsHolder.OnRoundFinish(lastElement);
+            ResetTeamBurst();
+
+            void ResetTeamBurst()
+            {
+                CombatSystemSingleton.VolatilePlayerTeam.DoResetBurst();
+                CombatSystemSingleton.VolatileEnemyTeam.DoResetBurst();
+            }
         }
 
        
         
-        public void OnReceiveOffensiveAction(SkillValuesHolders element, SkillComponentResolution value)
+        public void OnReceiveOffensiveAction(SkillValuesHolders element,ref SkillComponentResolution value)
         {
            
         }
 
-        public void OnReceiveSupportAction(SkillValuesHolders element, SkillComponentResolution value)
+        public void OnReceiveSupportAction(SkillValuesHolders element,ref SkillComponentResolution value)
         {
            
         }
 
-        public void OnRecoveryReceiveAction(SkillValuesHolders element, SkillComponentResolution value)
+        public void OnRecoveryReceiveAction(SkillValuesHolders element,ref SkillComponentResolution value)
         {
            
         }
 
-        public void OnDamageReceiveAction(SkillValuesHolders element, SkillComponentResolution value)
+        public void OnDamageReceiveAction(SkillValuesHolders element,ref SkillComponentResolution value)
         {
             
         }
 
-        public void OnShieldLost(SkillValuesHolders element, SkillComponentResolution value)
+        public void OnShieldLost(SkillValuesHolders element,ref SkillComponentResolution value)
         {
             
         }
 
-        public void OnHealthLost(SkillValuesHolders element, SkillComponentResolution value)
+        public void OnHealthLost(SkillValuesHolders element,ref SkillComponentResolution value)
         {
            
         }
 
-        public void OnMortalityDeath(SkillValuesHolders element, SkillComponentResolution value)
+        public void OnMortalityDeath(SkillValuesHolders element,ref SkillComponentResolution value)
         {
             var target = element.Target;
             target.Team.Events.OnMemberDeath(target);

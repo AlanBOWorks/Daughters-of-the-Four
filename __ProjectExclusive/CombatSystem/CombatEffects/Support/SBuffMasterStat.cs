@@ -10,7 +10,7 @@ namespace CombatEffects
 {
 
     [CreateAssetMenu(fileName = "MASTER - N [Buff]",
-        menuName = "Combat/Effect/Buff MASTER")]
+        menuName = "Combat/Effect/Buff MASTER", order = 101)]
     public class SBuffMasterStat : SEffect
     {
         [SerializeField] private EnumStats.MasterStatType buffStat;
@@ -42,13 +42,20 @@ namespace CombatEffects
                     throw new ArgumentOutOfRangeException();
             }
             var resolution = new SkillComponentResolution(this,finalBuffValue);
-            user.EventsHolder.OnPerformSupportAction(effectTarget,resolution);
-            effectTarget.EventsHolder.OnReceiveSupportAction(user,resolution);
+            CallEvents(user,effectTarget,resolution);
         }
 
+        protected virtual void CallEvents(CombatingEntity user, CombatingEntity effectTarget,
+            SkillComponentResolution resolution)
+        {
+            user.EventsHolder.OnPerformSupportAction(effectTarget,ref resolution);
+            if(user == effectTarget) return;
+
+            effectTarget.EventsHolder.OnReceiveSupportAction(user,ref resolution);
+        }
 
         [Button]
-        private void UpdateAssetName()
+        protected virtual void UpdateAssetName()
         {
             name = "MASTER - " + buffStat.ToString() + " [Buff]";
             UtilsAssets.UpdateAssetName(this);

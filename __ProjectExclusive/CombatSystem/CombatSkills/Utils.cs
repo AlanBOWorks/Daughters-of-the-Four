@@ -12,6 +12,9 @@ namespace CombatSkills
 
     public static class EnumSkills
     {
+        /// <summary>
+        /// [Idle, InCooldown]
+        /// </summary>
         public enum SKillState
         {
             Idle,
@@ -19,6 +22,9 @@ namespace CombatSkills
             //Persistent??
         }
 
+        /// <summary>
+        /// [Self, Support, Offensive]
+        /// </summary>
         public enum TargetType
         {
             Self,

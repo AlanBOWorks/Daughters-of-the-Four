@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace CombatTeam
 {
+    public interface ICombatGroupsStructureRead<out T> : ICombatTeamsStructureRead<ITeamRoleStructureRead<T>> { }
+
     public interface ICombatTeamsStructure<T> : ICombatTeamsStructureRead<T>
     {
         void SetPlayerTeam(T playerTeam);

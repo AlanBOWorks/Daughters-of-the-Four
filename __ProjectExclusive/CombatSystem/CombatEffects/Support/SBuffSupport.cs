@@ -8,7 +8,7 @@ using Utils;
 namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "SUPPORT - N [Buff]",
-        menuName = "Combat/Effect/Buff Support")]
+        menuName = "Combat/Effect/Buff Support", order = 100)]
     public class SBuffSupport : SBuff
     {
         [Title("Params")] 

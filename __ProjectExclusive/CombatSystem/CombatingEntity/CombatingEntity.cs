@@ -26,10 +26,15 @@ namespace CombatEntity
             SkillUsageTracker 
                 = new SkillUsageTracker();
 
+            GuardHandler = new GuardHandler(this);
+
             Team = team;
 
             EventsHolder 
                 = new CharacterEventsHolder<CombatingEntity,CombatingEntity, SkillComponentResolution>();
+
+            // Injection
+            CombatStats.Injection(this);
         }
 
         private readonly ICombatEntityProvider _provider;
@@ -43,7 +48,10 @@ namespace CombatEntity
         [Title("Skills")] 
         public readonly CombatEntitySkillsHolder SkillsHolder;
         public readonly SkillUsageTracker SkillUsageTracker;
-        
+
+        [Title("Guarding")] 
+        public readonly GuardHandler GuardHandler;
+
         [Title("Team")]
         public readonly CombatingTeam Team;
 

@@ -18,9 +18,11 @@ namespace CombatSystem.Editor
             window.Show();
         }
 
-
-        [SerializeField,HorizontalGroup()] private PlayerCharactersSelector playerCharacters = new PlayerCharactersSelector();
-        [SerializeField, HorizontalGroup()] private EnemyCombatProvider enemyCombatProvider = new EnemyCombatProvider();
+        [SerializeField] private SCombatInvokerHelperPreset preset;
+        [SerializeField,HorizontalGroup(), HideIf("preset")]
+        private PlayerCharactersSelector playerCharacters = new PlayerCharactersSelector();
+        [SerializeField, HorizontalGroup(), HideIf("preset")] 
+        private EnemyCombatProvider enemyCombatProvider = new EnemyCombatProvider();
         public bool showCombatDebugWindow = true;
 
         [Button(ButtonSizes.Large), DisableInEditorMode]
@@ -28,6 +30,11 @@ namespace CombatSystem.Editor
         {
             GameStateLoader.LoadPrepareInstances();
 
+            if (preset)
+            {
+                playerCharacters = preset.playerCharacters;
+                enemyCombatProvider = preset.enemyCombatProvider;
+            }
 
             playerCharacters.InjectInSingleton();
             enemyCombatProvider.InvokeCombatWithThisTeam();

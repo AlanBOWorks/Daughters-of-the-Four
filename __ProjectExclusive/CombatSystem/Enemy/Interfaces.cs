@@ -8,7 +8,6 @@ namespace __ProjectExclusive.Enemy
     public interface IEnemyCombatProvider : ITeamProvider
     {
         string GetCombatScenePath();
-        bool IsEliteCombat();
         void InvokeCombatWithThisTeam();
     }
 }

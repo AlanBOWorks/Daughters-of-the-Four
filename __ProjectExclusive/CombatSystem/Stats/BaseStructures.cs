@@ -10,25 +10,25 @@ namespace Stats
     public class BaseStats<T> : IBaseStats<T>
     {
         [Title("Offensive")]
-        [SerializeField] private T attack;
-        [SerializeField] private T persistent;
-        [SerializeField] private T debuff;
-        [SerializeField] private T followUp;
+        [SerializeField, SuffixLabel("u"), LabelWidth(150)] private T attack;
+        [SerializeField, SuffixLabel("u"), LabelWidth(150)] private T persistent;
+        [SerializeField, SuffixLabel("%"), LabelWidth(150)] private T debuff;
+        [SerializeField, SuffixLabel("%"), LabelWidth(150)] private T followUp;
         [Title("Support")]
-        [SerializeField] private T heal;
-        [SerializeField] private T buff;
-        [SerializeField] private T receiveBuff;
-        [SerializeField] private T shielding;
+        [SerializeField, SuffixLabel("u"), LabelWidth(150)] private T heal;
+        [SerializeField, SuffixLabel("%"), LabelWidth(150)] private T buff;
+        [SerializeField, SuffixLabel("%"), LabelWidth(150)] private T receiveBuff;
+        [SerializeField, SuffixLabel("d"), LabelWidth(150)] private T shielding;
         [Title("Vitality")]
-        [SerializeField] private T maxHealth;
-        [SerializeField] private T maxMortality;
-        [SerializeField] private T debuffResistance;
-        [SerializeField] private T damageResistance;
+        [SerializeField, SuffixLabel("u"), LabelWidth(150)] private T maxHealth;
+        [SerializeField, SuffixLabel("u"), LabelWidth(150)] private T maxMortality;
+        [SerializeField, SuffixLabel("%"), LabelWidth(150)] private T debuffResistance;
+        [SerializeField, SuffixLabel("u"), LabelWidth(150)] private T damageResistance;
         [Title("Concentration")]
-        [SerializeField] private T velocity;
-        [SerializeField] private T critical;
-        [SerializeField] private T initialInitiative;
-        [SerializeField] private T actionsPerSequence;
+        [SerializeField, SuffixLabel("d"), LabelWidth(150)] private T velocity;
+        [SerializeField, SuffixLabel("%"), LabelWidth(150)] private T critical;
+        [SerializeField, SuffixLabel("%"), LabelWidth(150)] private T initialInitiative;
+        [SerializeField, SuffixLabel("d"), LabelWidth(150)] private T actionsPerSequence;
 
         public T Attack
         {

@@ -92,58 +92,78 @@ namespace CombatSystem.Events
         public void Subscribe(ITempoListener<TTempo> listener) => _tempoListeners.Add(listener);
         public void Subscribe(IRoundListener<TTempo> listener) => _roundListeners.Add(listener);
 
-        public void OnPerformOffensiveAction(T element, TStat value)
+        public void Invoke(EnumStats.DamageResult damageResult,T element, TStat value)
+        {
+            switch (damageResult)
+            {
+                case EnumStats.DamageResult.None:
+                    break;
+                case EnumStats.DamageResult.ShieldBreak:
+                    OnShieldLost(element,ref value);
+                    break;
+                case EnumStats.DamageResult.HealthLost:
+                    OnHealthLost(element,ref value);
+                    break;
+                case EnumStats.DamageResult.Death:
+                    OnMortalityDeath(element,ref value);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(damageResult), damageResult, null);
+            }
+        }
+
+        public void OnPerformOffensiveAction(T element,ref TStat value)
         {
             foreach (var listener in _offensiveListeners)
             {
-                listener.OnPerformOffensiveAction(element, value);
+                listener.OnPerformOffensiveAction(element,ref value);
             }
         }
 
-        public void OnReceiveOffensiveAction(T element, TStat value)
+        public void OnReceiveOffensiveAction(T element,ref TStat value)
         {
             foreach (var listener in _offensiveReceiveListeners)
             {
-                listener.OnReceiveOffensiveAction(element, value);
+                listener.OnReceiveOffensiveAction(element,ref value);
             }
         }
 
-        public void OnPerformSupportAction(T element, TStat value)
+        public void OnPerformSupportAction(T element,ref TStat value)
         {
             foreach (var listener in _supportListeners)
             {
-                listener.OnPerformSupportAction(element, value);
+                listener.OnPerformSupportAction(element,ref value);
             }
         }
-        public void OnReceiveSupportAction(T element, TStat value)
+        public void OnReceiveSupportAction(T element,ref TStat value)
         {
             foreach (var listener in _supportReceiveListeners)
             {
-                listener.OnReceiveSupportAction(element, value);
+                listener.OnReceiveSupportAction(element,ref value);
             }
         }
 
-        public void OnShieldLost(T element, TStat value)
+        public void OnShieldLost(T element,ref TStat value)
         {
             foreach (var listener in _vitalityChangeListeners)
             {
-                listener.OnShieldLost(element, value);
+                listener.OnShieldLost(element,ref value);
             }
         }
 
-        public void OnHealthLost(T element, TStat value)
+        public void OnHealthLost(T element,ref TStat value)
         {
             foreach (var listener in _vitalityChangeListeners)
             {
-                listener.OnHealthLost(element, value);
+                listener.OnHealthLost(element,ref value);
             }
         }
 
-        public void OnMortalityDeath(T element, TStat value)
+        public void OnMortalityDeath(T element,ref TStat value)
         {
             foreach (var listener in _vitalityChangeListeners)
             {
-                listener.OnMortalityDeath(element, value);
+                listener.OnMortalityDeath(element,ref value);
             }
         }
 

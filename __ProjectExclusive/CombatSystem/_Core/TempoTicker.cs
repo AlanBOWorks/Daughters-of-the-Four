@@ -30,6 +30,7 @@ namespace CombatSystem
 
             _tempoListeners = new HashSet<ITempoListener<CombatingEntity>>();
             _roundListeners = new HashSet<IRoundListener<CombatingEntity>>();
+            _entityTickListeners = new List<IEntityTickListener>();
         }
 
         [HorizontalGroup("Entities", Title = "Entities"), ShowInInspector,HideInEditorMode]
@@ -43,6 +44,9 @@ namespace CombatSystem
         private readonly HashSet<ITempoListener<CombatingEntity>> _tempoListeners;
         [HorizontalGroup("Events", Title = "Events"), ShowInInspector, DisableIf("_roundListeners")]
         private readonly HashSet<IRoundListener<CombatingEntity>> _roundListeners;
+
+        [HorizontalGroup("Events", Title = "Events"), ShowInInspector, DisableIf("_tempoListeners")]
+        private readonly List<IEntityTickListener> _entityTickListeners; 
 
         [Title("Condition")] 
         [ShowInInspector]
@@ -62,6 +66,11 @@ namespace CombatSystem
         public void Subscribe(IRoundListener<CombatingEntity> listener)
         {
             _roundListeners.Add(listener);
+        }
+
+        public void Subscribe(IEntityTickListener listener)
+        {
+            _entityTickListeners.Add(listener);
         }
 
         public void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam)
@@ -86,12 +95,13 @@ namespace CombatSystem
 
 
         private const float TickPeriodSeconds = .5f;
-        private const int EntityTickTriggerCheck = 8;//todo make it a param
+        private const int EntityTickTriggerCheck = 24;//todo make it a param
         private IEnumerator<float> _TickingLoop()
         {
 #if UNITY_EDITOR
             Debug.Log("Starting (TICKING)");
 #endif
+            InjectThreshold(EntityTickTriggerCheck);
 
             //Just to give a space to breath before tempo's ticking
             yield return Timing.WaitForSeconds(1);
@@ -117,7 +127,10 @@ namespace CombatSystem
 
                     float tickCheck = EntityTickTriggerCheck;
 
-                    if(statsHolder.TickingInitiative < tickCheck) 
+                    float currentInitiative = statsHolder.TickingInitiative;
+                    InvokeTickingEvents(entity,currentInitiative);
+
+                    if(currentInitiative < tickCheck) 
                         continue; ///// >>>>>
 
                     _activeEntities.Enqueue(entity);
@@ -148,6 +161,21 @@ namespace CombatSystem
 
                 yield return Timing.WaitForOneFrame;
 
+            }
+
+            void InjectThreshold(float initiativeCheckAmount)
+            {
+                foreach (var listener in _entityTickListeners)
+                {
+                    listener.TickThresholdInjection(initiativeCheckAmount);
+                }
+            }
+            void InvokeTickingEvents(CombatingEntity entity, float currentInitiativeTick)
+            {
+                foreach (var tickListener in _entityTickListeners)
+                {
+                    tickListener.OnTickEntity(entity,currentInitiativeTick);
+                }
             }
         }
 
@@ -197,4 +225,9 @@ namespace CombatSystem
         IEnumerator<float> _RequestFinishActions(CombatingEntity entity);
     }
 
+    public interface IEntityTickListener
+    {
+        void TickThresholdInjection(float initiativeCheckAmount);
+        void OnTickEntity(CombatingEntity entity, float currentTickAmount);
+    }
 }

@@ -55,5 +55,6 @@ namespace CombatEffects
         }
     }
 
-    public class SSkillComponentEffect : ScriptableObject, ISkillComponent { }
+    public abstract class SSkillComponentEffect : ScriptableObject, ISkillComponent {
+    }
 }

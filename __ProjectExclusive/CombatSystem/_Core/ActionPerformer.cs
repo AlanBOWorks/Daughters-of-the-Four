@@ -12,6 +12,7 @@ namespace CombatSystem
         private const float SpaceBetweenAnimations = .12f;
         public IEnumerator<float> _PerformSkill(SkillValuesHolders values)
         {
+            values.Target.GuardHandler.VariateTarget(values);
             values.RollForCritical();
 
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);

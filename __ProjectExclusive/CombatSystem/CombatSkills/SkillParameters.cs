@@ -44,6 +44,8 @@ namespace CombatSkills
         [ShowInInspector]
         public bool IsCritical { get; private set; }
 
+
+        public void DoGuardSwitch(CombatingEntity newTarget) => Target = newTarget;
         public void Inject(CombatingEntity user) => User = user;
         public void Inject(SkillUsageValues values)
         {

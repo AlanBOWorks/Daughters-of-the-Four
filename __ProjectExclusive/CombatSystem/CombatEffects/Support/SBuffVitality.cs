@@ -9,7 +9,7 @@ namespace CombatEffects
 {
 
     [CreateAssetMenu(fileName = "VITALITY - N [Buff]",
-        menuName = "Combat/Effect/Buff Vitality")]
+        menuName = "Combat/Effect/Buff Vitality", order = 100)]
     public class SBuffVitality : SBuff
     {
         [Title("Params")] 

@@ -20,6 +20,7 @@ namespace CombatTeam
             Support = GenerateEntity(generateFromProvider.Support);
 
             Events = new TeamEvents();
+            TeamStats = new TeamStats();
 
             CombatingEntity GenerateEntity(ICombatEntityProvider entityProvider)
             {
@@ -35,8 +36,10 @@ namespace CombatTeam
         public readonly List<CombatingEntity> LivingEntitiesTracker;
         public bool HasLivingEntities() => LivingEntitiesTracker.Count > 0;
 
-        [Title("Data")]
-        public EnumTeam.TeamStance CurrentStance { get; private set; }
+        [Title("Data")] 
+        public readonly TeamStats TeamStats;
+
+        public EnumTeam.TeamStance CurrentStance => TeamStats.CurrentStance;
 
         [Title("Members")]
         [ShowInInspector]
@@ -57,11 +60,17 @@ namespace CombatTeam
 
         public CombatingTeam EnemyTeam;
 
+        public void BurstControl(float addition) => TeamStats.BurstControl += addition;
 
+        public void CompeteControl(float variation)
+        {
+            TeamStats.CompetingControl += variation;
+            EnemyTeam.TeamStats.CompetingControl = TeamStats.CompetingControl;
+        }
 
         public void OnStanceChange(EnumTeam.TeamStance switchStance)
         {
-            CurrentStance = switchStance;
+            TeamStats.CurrentStance = switchStance;
         }
 
         public void OnMemberDeath(CombatingEntity member)
@@ -73,6 +82,8 @@ namespace CombatTeam
                 break;
             }
         }
+
+        public void DoResetBurst() => TeamStats.DoResetBurst();
     }
 
 }

@@ -37,6 +37,10 @@ namespace CombatSystem
             // EVENTS Subscriptions
             EventsHolder.Subscribe(EntitiesFixedEvents);
 
+            // TEMPO Subscription
+            TempoTicker.Subscribe((ITempoListener<CombatingEntity>) EventsHolder);
+            TempoTicker.Subscribe((IRoundListener<CombatingEntity>) EventsHolder);
+
 #if UNITY_EDITOR
             if (_singletonExplanation != null)
                 Debug.Log("[Combat Singleton] instantiated");

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using CombatEntity;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Stats
@@ -34,18 +36,6 @@ namespace Stats
         public void ResetAsBurst() => Override(0);
     }
 
-    public class ListStats : ListStats<float>
-    {
-        public ListStats(IBaseStatsRead<float> baseStats, int length = 1) : base(baseStats, ListOperation, length)
-        {
-        }
-
-        private static float ListOperation(float currentAmount, float stats)
-        {
-            return currentAmount + stats;
-        }
-    }
-
     public class MasterStats : MasterStats<float>
     {
         public MasterStats() {}
@@ -55,18 +45,71 @@ namespace Stats
         public void OverrideStats(IMasterStatsRead<float> stats) => UtilStats.OverrideStats(this,stats);
     }
 
-    public class BurstStats : IBaseStatsRead<float>
+
+    public class PairStatsHolder : IBaseStatsRead<float>
+    {
+        protected IBaseStatsRead<float> Primary;
+        protected IBaseStatsRead<float> Secondary;
+
+        public float Attack => Primary.Attack + Secondary.Attack;
+        public float Persistent => Primary.Persistent + Secondary.Persistent;
+        public float Debuff => Primary.Debuff + Secondary.Debuff;
+        public float FollowUp => Primary.FollowUp + Secondary.Debuff;
+        public float Heal => Primary.Heal + Secondary.Heal;
+        public float Buff => Primary.Buff + Secondary.Buff;
+        public float ReceiveBuff => Primary.ReceiveBuff + Secondary.ReceiveBuff;
+        public float Shielding => Primary.Shielding + Secondary.Shielding;
+        public float MaxHealth => Primary.MaxHealth + Secondary.MaxHealth;
+        public float MaxMortality => Primary.MaxMortality + Secondary.MaxMortality;
+        public float DebuffResistance => Primary.DebuffResistance + Secondary.DebuffResistance;
+        public float DamageResistance => Primary.DamageResistance + Secondary.DamageResistance;
+        public float InitiativeSpeed => Primary.InitiativeSpeed + Secondary.InitiativeSpeed;
+        public float Critical => Primary.Critical + Secondary.Critical;
+        public float InitialInitiative => Primary.InitialInitiative + Secondary.InitialInitiative;
+        public float ActionsPerSequence => Primary.ActionsPerSequence + Secondary.ActionsPerSequence;
+    }
+
+    public class PairWithConditionalStats : PairStatsHolder
+    {
+        public PairWithConditionalStats(BaseStats baseStats)
+        {
+            BaseStats = baseStats;
+            ConditionalStat = new ConditionalStat();
+            InjectStatsInBase();
+        }
+
+        private void InjectStatsInBase()
+        {
+            Primary = BaseStats;
+            Secondary = ConditionalStat;
+        }
+
+        [ShowInInspector]
+        public readonly BaseStats BaseStats;
+        [ShowInInspector]
+        public readonly ConditionalStat ConditionalStat;
+    }
+
+    public class BurstStats : PairStatsHolder
     {
         public BurstStats()
         {
             SelfBurst = new BaseStats();
             ReceivedBurst = new BaseStats();
+            InjectStatsInBase();
         }
 
-        public BurstStats(IBaseStatsRead<float> copyBurstStats)
+        public BurstStats(IBaseStatsRead<float> copyBurstStats) 
         {
             SelfBurst = new BaseStats(copyBurstStats);
             ReceivedBurst = new BaseStats();
+            InjectStatsInBase();
+        }
+
+        private void InjectStatsInBase()
+        {
+            Primary = SelfBurst;
+            Secondary = ReceivedBurst;
         }
 
         /// <summary>
@@ -80,24 +123,5 @@ namespace Stats
 
         public BaseStats GetStats(bool isSelfBuff) => (isSelfBuff) ? SelfBurst : ReceivedBurst;
 
-        public void ResetSelfBurst() => SelfBurst.ResetAsBurst();
-        public void ResetReceiveBurst() => ReceivedBurst.ResetAsBurst();
-
-        public float Attack => SelfBurst.Attack + ReceivedBurst.Attack;
-        public float Persistent => SelfBurst.Persistent + ReceivedBurst.Persistent;
-        public float Debuff => SelfBurst.Debuff + ReceivedBurst.Debuff;
-        public float FollowUp => SelfBurst.FollowUp + ReceivedBurst.Debuff;
-        public float Heal => SelfBurst.Heal + ReceivedBurst.Heal;
-        public float Buff => SelfBurst.Buff + ReceivedBurst.Buff;
-        public float ReceiveBuff => SelfBurst.ReceiveBuff + ReceivedBurst.ReceiveBuff;
-        public float Shielding => SelfBurst.Shielding + ReceivedBurst.Shielding;
-        public float MaxHealth => SelfBurst.MaxHealth + ReceivedBurst.MaxHealth;
-        public float MaxMortality => SelfBurst.MaxMortality + ReceivedBurst.MaxMortality;
-        public float DebuffResistance => SelfBurst.DebuffResistance + ReceivedBurst.DebuffResistance;
-        public float DamageResistance => SelfBurst.DamageResistance + ReceivedBurst.DamageResistance;
-        public float InitiativeSpeed => SelfBurst.InitiativeSpeed + ReceivedBurst.InitiativeSpeed;
-        public float Critical => SelfBurst.Critical + ReceivedBurst.Critical;
-        public float InitialInitiative => SelfBurst.InitialInitiative + ReceivedBurst.InitialInitiative;
-        public float ActionsPerSequence => SelfBurst.ActionsPerSequence + ReceivedBurst.ActionsPerSequence;
     }
 }

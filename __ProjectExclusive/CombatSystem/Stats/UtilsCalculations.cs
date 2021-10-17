@@ -16,28 +16,38 @@ namespace Stats
 
 
         // By design shield breaks and health lost stops the over damage
-        public static void DoDamageTo(ICombatPercentStats<float> vitality, float damage)
+        public static EnumStats.DamageResult DoDamageTo(ICombatPercentStats<float> vitality, float damage)
         {
             if (damage <= 0)
             {
-                return;
+                return EnumStats.DamageResult.None;
             }
 
             if (vitality.CurrentShields >= 1)
             {
                 vitality.CurrentShields -= 1; // by design shields are lost in units
-                return;
+                return vitality.CurrentShields <= 0 
+                    ? EnumStats.DamageResult.ShieldBreak 
+                    : EnumStats.DamageResult.None;
             }
 
             if (vitality.CurrentHealth > 0)
             {
                 vitality.CurrentHealth -= damage;
-                if (vitality.CurrentHealth < 0) vitality.CurrentHealth = 0;
-                return;
+                if (!(vitality.CurrentHealth <= 0)) 
+                    return EnumStats.DamageResult.None;
+
+                vitality.CurrentHealth = 0;
+                return EnumStats.DamageResult.HealthLost;
+
             }
 
             vitality.CurrentMortality -= damage;
-            if (vitality.CurrentMortality < 0) vitality.CurrentMortality = 0;
+            if (!(vitality.CurrentMortality < 0)) 
+                return EnumStats.DamageResult.None;
+
+            vitality.CurrentMortality = 0;
+            return EnumStats.DamageResult.Death;
         }
 
         //Heals are done in percent
@@ -83,6 +93,20 @@ namespace Stats
             stats.CurrentHealth = targetHealth;
         }
 
+        public static void DoShielding(CombatStatsHolder user, CombatStatsHolder target, float shieldingVariation)
+        {
+            var userShielding = user.Shielding;
+            var targetShielding = target.Shielding;
+
+            float shieldIncrement = userShielding * shieldingVariation;
+            float finalShields = target.CurrentShields + shieldIncrement;
+
+            if (finalShields > targetShielding) //By design the max shield amount is given by the target's Shielding stat 
+                finalShields = targetShielding;
+
+            if(finalShields > target.CurrentShields)
+                target.CurrentShields = finalShields;
+        }
 
 
         public static void VariateActions(CombatStatsHolder statsHolder, int addition)

@@ -65,10 +65,8 @@ namespace CombatSystem
                 // TODO check if skillUsage is valid (maybe the target is dead, a problem happens or something)
                 // if error is true; Clear the queue and Continue
 
-                UtilsCombatStats.TickCurrentActions(currentActingEntity.CombatStats);
 
-                // TODO Animation Execute and remove this wait
-               
+                UtilsCombatStats.TickCurrentActions(currentActingEntity.CombatStats);
                 yield return Timing.WaitUntilDone(_actionPerformer._PerformSkill(_skillValues));
                 _skillValues.Clear();
 

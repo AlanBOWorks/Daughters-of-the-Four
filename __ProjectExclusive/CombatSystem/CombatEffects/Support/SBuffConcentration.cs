@@ -8,7 +8,7 @@ using Utils;
 namespace CombatEffects
 {
     [CreateAssetMenu(fileName = "CONCENTRATION - N [Buff]",
-        menuName = "Combat/Effect/Buff Concentration")]
+        menuName = "Combat/Effect/Buff Concentration", order = 100)]
     public class SBuffConcentration : SBuff
     {
         [Title("Params")]
