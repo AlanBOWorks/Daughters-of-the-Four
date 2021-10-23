@@ -8,7 +8,8 @@ using UnityEngine;
 
 namespace __ProjectExclusive.Player
 {
-    public class USkillButtonsHolder : MonoBehaviour, IVirtualSkillInjectionListener, IVirtualSkillInteraction,
+    public class USkillButtonsHolder : MonoBehaviour, IVirtualSkillInjectionListener,
+        IVirtualSkillTargetListener,
         ISkillGroupTypesRead<List<USkillButton>>,
         ITempoListener<CombatingEntity>
     {
@@ -34,7 +35,7 @@ namespace __ProjectExclusive.Player
 
             playerEvents.Subscribe(this as ITempoListener<CombatingEntity>);
             playerEvents.Subscribe(this as IVirtualSkillInjectionListener);
-            playerEvents.Subscribe(this as IVirtualSkillInteraction);
+            playerEvents.Subscribe(this as IVirtualSkillTargetListener);
 
             InjectIntoButtons(mainSkillButtons);
             InjectIntoButtons(sharedSkillButtons);
@@ -51,17 +52,19 @@ namespace __ProjectExclusive.Player
         {
             var selectedSkill = button.GetSkill();
             var possibleTargets =
-                UtilsTarget.GetPossibleTargets(_currentUser, selectedSkill.CurrentSkill.GetTargetType());
+                UtilsTarget.GetPossibleTargets(_currentUser, selectedSkill.GetTargetType());
 
             return new VirtualSkillSelection(selectedSkill,possibleTargets);
         }
 
-        public void OnInjectionSkills(CombatingEntity entity, ISkillGroupTypesRead<List<PlayerVirtualSkill>> skillGroup)
+        public void OnInjectionVirtualSkills(CombatingEntity user, ISkillGroupTypesRead<List<CombatingSkill>> skillGroup)
         {
             UtilSkills.DoActionOn(this,skillGroup,UpdateButtons);
 
-            void UpdateButtons(List<USkillButton> buttons, List<PlayerVirtualSkill> skills)
+            void UpdateButtons(List<USkillButton> buttons, List<CombatingSkill> skills)
             {
+                if(buttons == null || skills == null) return;
+
                 int maxIteration = Mathf.Min(buttons.Count, skills.Count);
                 int i;
                 for (i = 0; i < maxIteration; i++)
@@ -128,28 +131,28 @@ namespace __ProjectExclusive.Player
             }
 
             _currentSelectedButton = button;
+            _currentSelectedButton.OnSelect();
             _clickSelection = HandleSkillSelection(_currentHoverButton);
 
             PlayerCombatSingleton.PlayerEvents.OnSelect(_clickSelection);
 
 #if UNITY_EDITOR
             if (debugSkillSelection)
-                Debug.Log($"Select: {_currentSelectedButton.GetSkill().CurrentSkill.Preset.GetSkillName()}");
+                Debug.Log($"Select: {_currentSelectedButton.GetSkill().Preset.GetSkillName()}");
 #endif
 
 
             void DeselectCurrent()
             {
+                _currentSelectedButton.OnDeselect();
                 PlayerCombatSingleton.PlayerEvents.OnDeselect(_clickSelection);
 
 #if UNITY_EDITOR
                 if (debugSkillSelection)
-                    Debug.Log($"DeSelect: {_currentSelectedButton.GetSkill().CurrentSkill.Preset.GetSkillName()}");
+                    Debug.Log($"DeSelect: {_currentSelectedButton.GetSkill().Preset.GetSkillName()}");
 #endif
             }
         }
-
-
 
         public void OnInitiativeTrigger(CombatingEntity element)
         {
@@ -171,31 +174,11 @@ namespace __ProjectExclusive.Player
             _currentUser = null;
         }
 
-        public void OnSelect(VirtualSkillSelection selection)
-        {
-            _currentSelectedButton.OnSelect();
-        }
-
-        public void OnDeselect(VirtualSkillSelection selection)
-        {
-            _currentSelectedButton.OnDeselect();
-        }
-
-        public void OnSubmit(VirtualSkillSelection selection)
+        public void OnVirtualTargetSelect(CombatingEntity selectedTarget)
         {
             _currentSelectedButton.OnSubmit();
+            _currentSelectedButton = null;
+            PlayerCombatSingleton.PlayerEvents.OnSubmit(_clickSelection);
         }
-
-        public void OnHover(VirtualSkillSelection selection)
-        {
-
-        }
-
-        public void OnHoverExit(VirtualSkillSelection selection)
-        {
-            
-        }
-
-
     }
 }

@@ -120,7 +120,7 @@ namespace __ProjectExclusive.Player
                     pair.Value.Hide();
                 }
                 var selectedTarget = button.GetEntity();
-                PlayerCombatSingleton.PlayerEvents.OnTargetSelect(selectedTarget);
+                PlayerCombatSingleton.PlayerEvents.OnVirtualTargetSelect(selectedTarget);
             }
         }
 

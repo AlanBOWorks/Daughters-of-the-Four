@@ -17,19 +17,19 @@ namespace __ProjectExclusive.Player
 
         private USkillButtonsHolder _holder;
         [SerializeField] private TextMeshProUGUI skillName;
-        private PlayerVirtualSkill _holdingSkill;
+        private CombatingSkill _holdingSkill;
 
 
-        public PlayerVirtualSkill GetSkill() => _holdingSkill;
+        public CombatingSkill GetSkill() => _holdingSkill;
 
         public void ForceUpdate()
         {
-            skillName.text = _holdingSkill.CurrentSkill.GetSkillName();
+            skillName.text = _holdingSkill.GetSkillName();
         }
 
         public void Injection(USkillButtonsHolder holder) => _holder = holder;
 
-        public void Injection(PlayerVirtualSkill skill)
+        public void Injection(CombatingSkill skill)
         {
             _holdingSkill = skill;
             ForceUpdate();

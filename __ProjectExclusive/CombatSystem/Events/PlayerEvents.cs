@@ -9,13 +9,13 @@ using UnityEngine;
 namespace CombatSystem.Events
 {
     public class PlayerEvents : SystemEventsHolder, IVirtualSkillInjectionListener, IVirtualSkillInteraction,
-        IVirtualTargetInteraction
+        IVirtualSkillTargetListener
     {
         public PlayerEvents() : base()
         {
             SkillInteractions = new List<IVirtualSkillInteraction>();
             VirtualSkillInjections = new List<IVirtualSkillInjectionListener>();
-            VirtualTargetListeners = new List<IVirtualTargetInteraction>();
+            VirtualTargetListeners = new List<IVirtualSkillTargetListener>();
         }
 
         /// <summary>
@@ -28,14 +28,14 @@ namespace CombatSystem.Events
         [ShowInInspector]
         public readonly List<IVirtualSkillInteraction> SkillInteractions;
         /// <summary>
-        /// For [<seealso cref="OnInjectionSkills"/>] check: <br></br>
+        /// For [<seealso cref="OnInjectionVirtualSkills"/>] check: <br></br>
         /// - [<seealso cref="PlayerVirtualSkillsInjector.OnInitiativeTrigger"/>]
         /// </summary>
         [ShowInInspector]
         public readonly List<IVirtualSkillInjectionListener> VirtualSkillInjections;
 
         [ShowInInspector] 
-        public readonly List<IVirtualTargetInteraction> VirtualTargetListeners;
+        public readonly List<IVirtualSkillTargetListener> VirtualTargetListeners;
 
         public void Subscribe(IVirtualSkillInteraction listener)
         {
@@ -47,7 +47,7 @@ namespace CombatSystem.Events
             VirtualSkillInjections.Add(listener);
         }
 
-        public void Subscribe(IVirtualTargetInteraction listener)
+        public void Subscribe(IVirtualSkillTargetListener listener)
         {
             VirtualTargetListeners.Add(listener);
         }
@@ -93,19 +93,19 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnInjectionSkills(CombatingEntity user, ISkillGroupTypesRead<List<PlayerVirtualSkill>> skillGroup)
+        public void OnInjectionVirtualSkills(CombatingEntity user, ISkillGroupTypesRead<List<CombatingSkill>> skillGroup)
         {
             foreach (var listener in VirtualSkillInjections)
             {
-                listener.OnInjectionSkills(user,skillGroup);
+                listener.OnInjectionVirtualSkills(user,skillGroup);
             }
         }
 
-        public void OnTargetSelect(CombatingEntity selectedTarget)
+        public void OnVirtualTargetSelect(CombatingEntity selectedTarget)
         {
             foreach (var listener in VirtualTargetListeners)
             {
-                listener.OnTargetSelect(selectedTarget);
+                listener.OnVirtualTargetSelect(selectedTarget);
             }
         }
     }

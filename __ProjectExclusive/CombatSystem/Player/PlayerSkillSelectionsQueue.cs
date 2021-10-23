@@ -21,16 +21,16 @@ namespace __ProjectExclusive.Player
 
         public PlayerSkillSelectionsQueue()
         {
-            _skillsQueue = new Queue<QueueElement>();
+            _skillsQueue = new Queue<SkillUsageValues>();
         }
 
         private CombatingEntity _currentUser;
         [ShowInInspector]
-        private readonly Queue<QueueElement> _skillsQueue;
+        private readonly Queue<SkillUsageValues> _skillsQueue;
 
-        public void SubmitSkill(PlayerVirtualSkill skill, CombatingEntity target)
+        public void SubmitSkill(CombatingSkill skill, CombatingEntity target)
         {
-            var queueElement = new QueueElement(skill,target);
+            var queueElement = new SkillUsageValues(skill,target);
             _skillsQueue.Enqueue(queueElement);
         }
 
@@ -59,7 +59,7 @@ namespace __ProjectExclusive.Player
         /// This checks for more specific conditions that the player might chose incorrectly (such pre-moves
         /// an action towards an enemy and this dies)
         /// </summary>
-        private bool IsValid(QueueElement skill)
+        private bool IsValid(SkillUsageValues skill)
         {
             return true;
         }
@@ -79,23 +79,12 @@ namespace __ProjectExclusive.Player
                     throw new InvalidDataException("The selected element by the player is invalid");
                 }
 
-                var skillInjection = new SkillUsageValues(element.SelectedSkill.CurrentSkill,element.Target);
+                var skillInjection = new SkillUsageValues(element.UsedSkill,element.Target);
                 skillValues.Inject(skillInjection);
                 _submitRequest = true;
             }
 
         }
 
-        public struct QueueElement
-        {
-            public readonly PlayerVirtualSkill SelectedSkill;
-            public readonly CombatingEntity Target;
-
-            public QueueElement(PlayerVirtualSkill selectedSkill, CombatingEntity target)
-            {
-                SelectedSkill = selectedSkill;
-                Target = target;
-            }
-        }
     }
 }
