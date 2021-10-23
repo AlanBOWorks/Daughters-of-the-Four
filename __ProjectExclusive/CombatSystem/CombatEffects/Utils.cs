@@ -8,10 +8,10 @@ namespace CombatEffects
         public enum TargetType
         {
             Self,
-            SelfExclude,
+            SelfAllies,
             SelfTeam,
             Target,
-            TargetExclude,
+            TargetAllies,
             TargetTeam,
             All
         }

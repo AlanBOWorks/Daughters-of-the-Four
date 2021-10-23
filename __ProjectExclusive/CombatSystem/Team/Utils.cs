@@ -1,5 +1,6 @@
 
 using System;
+using CombatEffects;
 using CombatEntity;
 
 namespace CombatTeam
@@ -29,6 +30,8 @@ namespace CombatTeam
                 _ => throw new ArgumentOutOfRangeException(nameof(stance), stance, null)
             };
         }
+
+
 
         public static void InjectElement<T>(ITeamRoleStructureInject<T> team, EnumTeam.Role role, T element)
         {

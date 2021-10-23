@@ -17,8 +17,9 @@ namespace __ProjectExclusive.Player
         public List<USkillButton> SharedSkillTypes => sharedSkillButtons;
         public List<USkillButton> MainSkillTypes => mainSkillButtons;
 
-        private SelectionHandler _hoverHandler;
-        private SelectionHandler _selectionHandler;
+        private CombatingEntity _currentUser;
+       
+        
         private USkillButton _currentHoverButton;
         private USkillButton _currentSelectedButton;
 
@@ -29,9 +30,6 @@ namespace __ProjectExclusive.Player
 
         private void Awake()
         {
-            _hoverHandler = new SelectionHandler();
-            _selectionHandler = new SelectionHandler();
-
             var playerEvents = PlayerCombatSingleton.PlayerEvents;
 
             playerEvents.Subscribe(this as ITempoListener<CombatingEntity>);
@@ -48,7 +46,15 @@ namespace __ProjectExclusive.Player
                 }
             }
         }
-        
+
+        private VirtualSkillSelection HandleSkillSelection(USkillButton button)
+        {
+            var selectedSkill = button.GetSkill();
+            var possibleTargets =
+                UtilsTarget.GetPossibleTargets(_currentUser, selectedSkill.CurrentSkill.GetTargetType());
+
+            return new VirtualSkillSelection(selectedSkill,possibleTargets);
+        }
 
         public void OnInjectionSkills(CombatingEntity entity, ISkillGroupTypesRead<List<PlayerVirtualSkill>> skillGroup)
         {
@@ -75,25 +81,27 @@ namespace __ProjectExclusive.Player
             }
         }
 
+        private VirtualSkillSelection _hoverSelection;
         public void OnHover(USkillButton button)
         {
             // This is a safety check (hover only happens once, but something could go wrong with Unity)
             if (button == _currentHoverButton)
                 return;
 
+
             if (_currentHoverButton != null)
             {
                 ExitHoverCurrent();
             }
 
+            _hoverSelection = HandleSkillSelection(button);
             _currentHoverButton = button;
-            _hoverHandler.InjectButton(button);
 
-            PlayerCombatSingleton.PlayerEvents.OnHover(_hoverHandler);
+            PlayerCombatSingleton.PlayerEvents.OnHover(_hoverSelection);
         }
         private void ExitHoverCurrent()
         {
-            PlayerCombatSingleton.PlayerEvents.OnHoverExit(_hoverHandler);
+            PlayerCombatSingleton.PlayerEvents.OnHoverExit(_hoverSelection);
         }
         public void OnHoverExit(USkillButton button)
         {
@@ -104,6 +112,7 @@ namespace __ProjectExclusive.Player
             ExitHoverCurrent();
         }
 
+        private VirtualSkillSelection _clickSelection;
         public void OnSelect(USkillButton button)
         {
             if (button == _currentSelectedButton)
@@ -119,9 +128,9 @@ namespace __ProjectExclusive.Player
             }
 
             _currentSelectedButton = button;
-            _selectionHandler.InjectButton(button);
+            _clickSelection = HandleSkillSelection(_currentHoverButton);
 
-            PlayerCombatSingleton.PlayerEvents.OnSelect(_selectionHandler);
+            PlayerCombatSingleton.PlayerEvents.OnSelect(_clickSelection);
 
 #if UNITY_EDITOR
             if (debugSkillSelection)
@@ -131,7 +140,7 @@ namespace __ProjectExclusive.Player
 
             void DeselectCurrent()
             {
-                PlayerCombatSingleton.PlayerEvents.OnDeselect(_selectionHandler);
+                PlayerCombatSingleton.PlayerEvents.OnDeselect(_clickSelection);
 
 #if UNITY_EDITOR
                 if (debugSkillSelection)
@@ -144,8 +153,7 @@ namespace __ProjectExclusive.Player
 
         public void OnInitiativeTrigger(CombatingEntity element)
         {
-            _selectionHandler.User = element;
-            _hoverHandler.User = element;
+            _currentUser = element;
         }
 
         public void OnDoMoreActions(CombatingEntity element)
@@ -155,61 +163,39 @@ namespace __ProjectExclusive.Player
 
         public void OnFinishAllActions(CombatingEntity element)
         {
-            _selectionHandler.User = null;
-            _hoverHandler.User = null;
-
+            _currentUser = null;
         }
 
         public void OnSkipActions(CombatingEntity element)
         {
-            _selectionHandler.User = null;
-            _hoverHandler.User = null;
+            _currentUser = null;
         }
 
-        public void OnSelect(IVirtualSkillSelection selection)
+        public void OnSelect(VirtualSkillSelection selection)
         {
             _currentSelectedButton.OnSelect();
         }
 
-        public void OnDeselect(IVirtualSkillSelection selection)
+        public void OnDeselect(VirtualSkillSelection selection)
         {
             _currentSelectedButton.OnDeselect();
         }
 
-        public void OnSubmit(IVirtualSkillSelection selection)
+        public void OnSubmit(VirtualSkillSelection selection)
         {
             _currentSelectedButton.OnSubmit();
-            _selectionHandler.ResetSkillValues();
         }
 
-        public void OnHover(IVirtualSkillSelection selection)
+        public void OnHover(VirtualSkillSelection selection)
         {
+
         }
 
-        public void OnHoverExit(IVirtualSkillSelection selection)
+        public void OnHoverExit(VirtualSkillSelection selection)
         {
             
         }
 
 
-        private class SelectionHandler : IVirtualSkillSelection
-        {
-            public CombatingEntity User { get; set; }
-            public PlayerVirtualSkill PrioritySkill { get; private set; }
-            public List<CombatingEntity> PossibleTargets { get; private set; }
-
-
-            public void InjectButton(USkillButton button)
-            {
-                PrioritySkill = button.GetSkill();
-                PossibleTargets = UtilsTarget.GetPossibleTargets(User, PrioritySkill.CurrentSkill.GetTargetType());
-            }
-
-            public void ResetSkillValues()
-            {
-                PrioritySkill = null;
-                PossibleTargets = null;
-            }
-        }
     }
 }

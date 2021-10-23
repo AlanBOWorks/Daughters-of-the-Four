@@ -81,10 +81,13 @@ namespace CombatSystem
 
         private static void PrepareCombatTeams(ITeamProvider playerTeamProvider, ITeamProvider enemyTeamProvider)
         {
+            var allEntities = CombatSystemSingleton.AllEntities;
+            allEntities.Clear();
+
             CombatingTeam playerTeam = new CombatingTeam(playerTeamProvider);
             CombatingTeam enemyTeam = new CombatingTeam(enemyTeamProvider);
-            playerTeam.EnemyTeam = enemyTeam;
-            enemyTeam.EnemyTeam = playerTeam;
+            playerTeam.Injection(enemyTeam);
+            enemyTeam.Injection(playerTeam);
 
             CombatSystemSingleton.VolatilePlayerTeam = playerTeam;
             CombatSystemSingleton.VolatileEnemyTeam = enemyTeam;

@@ -8,12 +8,14 @@ using UnityEngine;
 
 namespace CombatSystem.Events
 {
-    public class PlayerEvents : SystemEventsHolder, IVirtualSkillInjectionListener, IVirtualSkillInteraction
+    public class PlayerEvents : SystemEventsHolder, IVirtualSkillInjectionListener, IVirtualSkillInteraction,
+        IVirtualTargetInteraction
     {
         public PlayerEvents() : base()
         {
             SkillInteractions = new List<IVirtualSkillInteraction>();
             VirtualSkillInjections = new List<IVirtualSkillInjectionListener>();
+            VirtualTargetListeners = new List<IVirtualTargetInteraction>();
         }
 
         /// <summary>
@@ -32,6 +34,9 @@ namespace CombatSystem.Events
         [ShowInInspector]
         public readonly List<IVirtualSkillInjectionListener> VirtualSkillInjections;
 
+        [ShowInInspector] 
+        public readonly List<IVirtualTargetInteraction> VirtualTargetListeners;
+
         public void Subscribe(IVirtualSkillInteraction listener)
         {
             SkillInteractions.Add(listener);
@@ -42,9 +47,13 @@ namespace CombatSystem.Events
             VirtualSkillInjections.Add(listener);
         }
 
+        public void Subscribe(IVirtualTargetInteraction listener)
+        {
+            VirtualTargetListeners.Add(listener);
+        }
 
 
-        public void OnSelect(IVirtualSkillSelection selection)
+        public void OnSelect(VirtualSkillSelection selection)
         {
             foreach (var listener in SkillInteractions)
             {
@@ -52,7 +61,7 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnDeselect(IVirtualSkillSelection selection)
+        public void OnDeselect(VirtualSkillSelection selection)
         {
             foreach (var listener in SkillInteractions)
             {
@@ -60,7 +69,7 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnSubmit(IVirtualSkillSelection selection)
+        public void OnSubmit(VirtualSkillSelection selection)
         {
             foreach (var listener in SkillInteractions)
             {
@@ -68,7 +77,7 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnHover(IVirtualSkillSelection selection)
+        public void OnHover(VirtualSkillSelection selection)
         {
             foreach (var listener in SkillInteractions)
             {
@@ -76,7 +85,7 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnHoverExit(IVirtualSkillSelection selection)
+        public void OnHoverExit(VirtualSkillSelection selection)
         {
             foreach (var listener in SkillInteractions)
             {
@@ -89,6 +98,14 @@ namespace CombatSystem.Events
             foreach (var listener in VirtualSkillInjections)
             {
                 listener.OnInjectionSkills(user,skillGroup);
+            }
+        }
+
+        public void OnTargetSelect(CombatingEntity selectedTarget)
+        {
+            foreach (var listener in VirtualTargetListeners)
+            {
+                listener.OnTargetSelect(selectedTarget);
             }
         }
     }

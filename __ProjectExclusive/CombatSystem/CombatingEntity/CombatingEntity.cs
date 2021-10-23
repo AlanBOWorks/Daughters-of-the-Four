@@ -29,6 +29,7 @@ namespace CombatEntity
             GuardHandler = new GuardHandler(this);
 
             Team = team;
+            TargetingHolder = new CombatTargetingHolder(this);
 
             EventsHolder 
                 = new CharacterEventsHolder<CombatingEntity,CombatingEntity, SkillComponentResolution>();
@@ -54,6 +55,8 @@ namespace CombatEntity
 
         [Title("Team")]
         public readonly CombatingTeam Team;
+        [ShowInInspector]
+        public readonly CombatTargetingHolder TargetingHolder;
 
         [Title("Events")]
         public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, SkillComponentResolution> EventsHolder;

@@ -162,16 +162,19 @@ namespace __ProjectExclusive.Player
             /// Confirms the action and submit to the action performer or a handler for it
             /// </summary>
             Submit
-
         }
-
     }
 
-    public interface IVirtualSkillSelection
+    public struct VirtualSkillSelection
     {
-        CombatingEntity User { get; }
-        PlayerVirtualSkill PrioritySkill { get; }
-        List<CombatingEntity> PossibleTargets { get; }
+        public VirtualSkillSelection(PlayerVirtualSkill prioritySkill, List<CombatingEntity> possibleTargets)
+        {
+            PrioritySkill = prioritySkill;
+            PossibleTargets = possibleTargets;
+        }
+
+        public readonly PlayerVirtualSkill PrioritySkill;
+        public readonly List<CombatingEntity> PossibleTargets;
     }
 
     public interface IVirtualSkillInjectionListener 
@@ -182,10 +185,15 @@ namespace __ProjectExclusive.Player
 
     public interface IVirtualSkillInteraction
     {
-        void OnSelect(IVirtualSkillSelection selection);
-        void OnDeselect(IVirtualSkillSelection selection);
-        void OnSubmit(IVirtualSkillSelection selection);
-        void OnHover(IVirtualSkillSelection selection);
-        void OnHoverExit(IVirtualSkillSelection selection);
+        void OnSelect(VirtualSkillSelection selection);
+        void OnDeselect(VirtualSkillSelection selection);
+        void OnSubmit(VirtualSkillSelection selection);
+        void OnHover(VirtualSkillSelection selection);
+        void OnHoverExit(VirtualSkillSelection selection);
+    }
+
+    public interface IVirtualTargetInteraction
+    {
+        void OnTargetSelect(CombatingEntity selectedTarget);
     }
 }

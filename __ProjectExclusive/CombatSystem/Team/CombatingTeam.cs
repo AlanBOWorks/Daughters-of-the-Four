@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CombatEntity;
+using CombatSystem;
 using CombatSystem.Events;
 using Sirenix.OdinInspector;
 using Stats;
@@ -8,7 +9,7 @@ using UnityEngine;
 
 namespace CombatTeam
 {
-    public sealed class CombatingTeam : HashSet<CombatingEntity>, ITeamRoleStructureRead<CombatingEntity>,
+    public sealed class CombatingTeam : List<CombatingEntity>, ITeamRoleStructureRead<CombatingEntity>,
         ITeamStateChangeListener
     {
         public CombatingTeam(ITeamProvider generateFromProvider)
@@ -18,9 +19,12 @@ namespace CombatTeam
             Vanguard = GenerateEntity(generateFromProvider.Vanguard);
             Attacker = GenerateEntity(generateFromProvider.Attacker);
             Support = GenerateEntity(generateFromProvider.Support);
-
             Events = new TeamEvents();
             TeamStats = new TeamStats();
+            foreach (var member in this)
+            {
+                member.TargetingHolder.Inject(this);
+            }
 
             CombatingEntity GenerateEntity(ICombatEntityProvider entityProvider)
             {
@@ -28,6 +32,7 @@ namespace CombatTeam
                 var generatedEntity = new CombatingEntity(entityProvider,this);
                 Add(generatedEntity);
                 LivingEntitiesTracker.Add(generatedEntity);
+                CombatSystemSingleton.AllEntities.Add(generatedEntity);
 
                 return generatedEntity;
             }
@@ -58,7 +63,8 @@ namespace CombatTeam
         public readonly TeamEvents Events;
 
 
-        public CombatingTeam EnemyTeam;
+        public CombatingTeam EnemyTeam { get; private set; }
+        public void Injection(CombatingTeam enemyTeam) => EnemyTeam = enemyTeam;
 
         public void BurstControl(float addition) => TeamStats.BurstControl += addition;
 
@@ -79,6 +85,10 @@ namespace CombatTeam
             {
                 if(entity != member) continue;
                 LivingEntitiesTracker.Remove(member);
+                foreach (var ally in LivingEntitiesTracker)
+                {
+                    ally.TargetingHolder.SelfAlliesElement.Remove(member);
+                }
                 break;
             }
         }

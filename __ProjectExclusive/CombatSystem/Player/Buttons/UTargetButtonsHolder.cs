@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CombatCamera;
 using CombatSystem;
+using MEC;
 using UnityEngine;
 
 
@@ -45,6 +46,7 @@ namespace __ProjectExclusive.Player
         {
             instantiatedElement.Injection(_referenceCamera);
             instantiatedElement.Hide();
+            instantiatedElement.Injection(this);
         }
 
         protected override void OnPreparationEntity(CombatingEntity entity, UTargetButton element)
@@ -60,7 +62,7 @@ namespace __ProjectExclusive.Player
 
 
 
-        private void Show(IVirtualSkillSelection selection)
+        private void Show(VirtualSkillSelection selection)
         {
             var possibleTargets = selection.PossibleTargets;
             foreach (CombatingEntity target in possibleTargets)
@@ -68,7 +70,7 @@ namespace __ProjectExclusive.Player
                 _entitiesTracker[target].Show();
             }
         }
-        private void Hide(IVirtualSkillSelection selection)
+        private void Hide(VirtualSkillSelection selection)
         {
             var possibleTargets = selection.PossibleTargets;
             foreach (CombatingEntity target in possibleTargets)
@@ -77,34 +79,49 @@ namespace __ProjectExclusive.Player
             }
         }
 
-        private IVirtualSkillSelection _skillSelectionClick;
-        private IVirtualSkillSelection _skillSelectionHover;
 
-        public void OnSelect(IVirtualSkillSelection selection)
+        public void OnSelect(VirtualSkillSelection selection)
         {
             Show(selection);
-            _skillSelectionClick = selection;
         }
 
-        public void OnDeselect(IVirtualSkillSelection selection)
+        public void OnDeselect(VirtualSkillSelection selection)
         {
             Hide(selection);
-            _skillSelectionClick = null;
         }
 
-        public void OnSubmit(IVirtualSkillSelection selection)
+        public void OnSubmit(VirtualSkillSelection selection)
             => OnDeselect(selection);
 
-        public void OnHover(IVirtualSkillSelection selection)
+        public void OnHover(VirtualSkillSelection selection)
         {
             //Todo show as Hover
-            _skillSelectionHover = selection;
         }
 
-        public void OnHoverExit(IVirtualSkillSelection selection)
+        public void OnHoverExit(VirtualSkillSelection selection)
         {
             //Todo hide as Hover
-            _skillSelectionHover = null;
+        }
+
+        public void OnTargetSelect(UTargetButton button)
+        {
+            foreach (KeyValuePair<CombatingEntity, UTargetButton> pair in _entitiesTracker)
+            {
+                pair.Value.enabled = false;
+            }
+
+            Timing.RunCoroutine(_ProcessSelectionCommand(), Segment.RealtimeUpdate);
+            IEnumerator<float> _ProcessSelectionCommand()
+            {
+                //Just a small offset (.04f) so the eye can sense the ending a little better
+                yield return Timing.WaitForSeconds(UTargetButton.PointerClickAnimationDuration + .04f); 
+                foreach (KeyValuePair<CombatingEntity, UTargetButton> pair in _entitiesTracker)
+                {
+                    pair.Value.Hide();
+                }
+                var selectedTarget = button.GetEntity();
+                PlayerCombatSingleton.PlayerEvents.OnTargetSelect(selectedTarget);
+            }
         }
 
         public void OnMainCameraSwitch(Camera mainCamera)

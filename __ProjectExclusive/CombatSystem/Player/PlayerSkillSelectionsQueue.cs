@@ -77,7 +77,6 @@ namespace __ProjectExclusive.Player
                 if (!IsValid(element))
                 {
                     throw new InvalidDataException("The selected element by the player is invalid");
-                    continue;
                 }
 
                 var skillInjection = new SkillUsageValues(element.SelectedSkill.CurrentSkill,element.Target);

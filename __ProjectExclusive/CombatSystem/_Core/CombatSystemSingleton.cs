@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CombatEntity;
 using CombatSystem.Events;
 using CombatSystem.PositionHandlers;
@@ -29,6 +30,7 @@ namespace CombatSystem
 
             // Secondaries
             var combatPositionSpawner = new CombatPositionSpawner();
+            AllEntities = new List<CombatingEntity>();
 
             // PREPARATION Subscriptions
             CombatPreparationHandler.Subscribe(TempoTicker);
@@ -87,6 +89,7 @@ namespace CombatSystem
 
 
         [Title("Volatile")] 
+        public static List<CombatingEntity> AllEntities;
         [TabGroup("Combat Only"), ShowInInspector, DisableInEditorMode] 
         public static CombatingTeam VolatilePlayerTeam;
         [TabGroup("Combat Only"), ShowInInspector, DisableInEditorMode] 
