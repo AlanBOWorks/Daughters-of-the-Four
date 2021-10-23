@@ -78,7 +78,7 @@ namespace CombatSystem
                     int randomPick = Random.Range(0, _possibleSkillToPick.Count);
                     var possibleSkill = _possibleSkillToPick[randomPick];
                     _possibleSkillToPick.RemoveAt(randomPick);
-                    if (possibleSkill.IsInCooldown())
+                    if (!possibleSkill.CanBeUsed())
                         continue;
                     selectedSkill = possibleSkill;
                     break;

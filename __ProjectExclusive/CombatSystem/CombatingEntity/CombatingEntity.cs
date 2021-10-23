@@ -59,6 +59,7 @@ namespace CombatEntity
         public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, SkillComponentResolution> EventsHolder;
 
         [Title("Unity.Object")]
+        [ShowInInspector]
         public UEntityHolder InstantiatedHolder { get; private set; }
 
         public string GetEntityName() => _provider.GetEntityName();

@@ -18,7 +18,8 @@ namespace CombatSystem
 
 #if UNITY_EDITOR
             var debugElement = new CombatPreparationDebugger();
-            Subscribe(debugElement);
+            Subscribe((ICombatPreparationListener) debugElement);
+            Subscribe(debugElement as ICombatFinishListener);
 #endif
 
         }
@@ -33,10 +34,12 @@ namespace CombatSystem
 
         public void Subscribe(ICombatPreparationListener listener)
         {
-            if(listener is ICombatFinishListener finishListener)
-                _combatFinishListeners.Add(finishListener);
-
             _preparationListeners.Add(listener);
+        }
+
+        public void Subscribe(ICombatFinishListener finishListener)
+        {
+            _combatFinishListeners.Add(finishListener);
         }
 
         public void StartCombat(string sceneAssetPath, ITeamProvider playerTeamProvider, ITeamProvider enemyTeamProvider)
@@ -90,7 +93,7 @@ namespace CombatSystem
         {
             foreach (var listener in listeners)
             {
-                listener.OnAfterLoadScene();
+                listener.OnAfterLoads();
             }
         }
         private static void RequestPreparation(IEnumerable<ICombatPreparationListener> listeners)
@@ -137,7 +140,7 @@ namespace CombatSystem
                 Debug.Log($"Enemy entities: {enemyTeam.Count}");
             }
 
-            public void OnAfterLoadScene()
+            public void OnAfterLoads()
             {
                 Debug.Log("---- [Before] First Tick Combat -----");
             }
@@ -158,9 +161,9 @@ namespace CombatSystem
         /// </summary>
         void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam);
         /// <summary>
-        /// Events after the load (not necessary show the screen)
+        /// Events after all loads from [<see cref="OnPreparationCombat"/>] are done.
         /// </summary>
-        void OnAfterLoadScene();
+        void OnAfterLoads();
     }
 
     public interface ICombatFinishListener

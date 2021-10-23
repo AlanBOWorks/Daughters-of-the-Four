@@ -2,7 +2,8 @@
     "name": "GameLoader",
     "rootNamespace": "",
     "references": [
-        "GUID:cca5db3f28066a146a96630791dbb8b1"
+        "GUID:cca5db3f28066a146a96630791dbb8b1",
+        "GUID:02bf0ffade9ca794b8d122aae142c47e"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

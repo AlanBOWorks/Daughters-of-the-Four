@@ -27,7 +27,7 @@ namespace __ProjectExclusive.Player
             _trackers.Add(entity,element);
         }
 
-        public override void OnAfterLoadScene()
+        public override void OnAfterLoads()
         {
         }
 

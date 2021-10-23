@@ -32,7 +32,8 @@ namespace CombatSystem
 
             // PREPARATION Subscriptions
             CombatPreparationHandler.Subscribe(TempoTicker);
-            CombatPreparationHandler.Subscribe(combatPositionSpawner);
+            CombatPreparationHandler.Subscribe((ICombatPreparationListener) combatPositionSpawner);
+            CombatPreparationHandler.Subscribe((ICombatFinishListener) combatPositionSpawner);
 
             // EVENTS Subscriptions
             EventsHolder.Subscribe(EntitiesFixedEvents);

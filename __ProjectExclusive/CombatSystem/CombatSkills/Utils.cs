@@ -7,7 +7,19 @@ namespace CombatSkills
 {
     public static class UtilSkills
     {
-       
+        public static void DoActionOn<T>(ISkillGroupTypesRead<T> group, Action<T> action)
+        {
+            action(group.SharedSkillTypes);
+            action(group.MainSkillTypes);
+        }
+
+        public static void DoActionOn<T, TSecondary>(ISkillGroupTypesRead<T> primary,
+            ISkillGroupTypesRead<TSecondary> secondary,
+            Action<T, TSecondary> action)
+        {
+            action(primary.SharedSkillTypes, secondary.SharedSkillTypes);
+            action(primary.MainSkillTypes, secondary.MainSkillTypes);
+        }
     }
 
     public static class EnumSkills
@@ -18,7 +30,11 @@ namespace CombatSkills
         public enum SKillState
         {
             Idle,
-            InCooldown
+            Cooldown,
+            /// <summary>
+            /// Can't be used this sequence
+            /// </summary>
+            Silence
             //Persistent??
         }
 

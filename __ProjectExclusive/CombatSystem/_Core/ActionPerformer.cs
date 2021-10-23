@@ -34,6 +34,7 @@ namespace CombatSystem
             {
                 effectParameter.DoEffect(values);
             }
+            skill.PutInCooldown();
             CombatSystemSingleton.EventsHolder.OnSkillUse(values);
         }
     }

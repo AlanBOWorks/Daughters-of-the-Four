@@ -38,7 +38,7 @@ namespace __ProjectExclusive.Player
 
         ICombatEntityProvider ITeamRoleStructureRead<ICombatEntityProvider>.Attacker => Attacker;
         ICombatEntityProvider ITeamRoleStructureRead<ICombatEntityProvider>.Support => Support;
-        ICombatEntityProvider ITeamRoleStructureRead<ICombatEntityProvider>.Vanguard => Support;
+        ICombatEntityProvider ITeamRoleStructureRead<ICombatEntityProvider>.Vanguard => Vanguard;
     }
 
     public class PlayableCharacterEntity : ICombatEntityProvider

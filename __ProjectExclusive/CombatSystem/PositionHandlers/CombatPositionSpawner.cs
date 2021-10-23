@@ -62,7 +62,7 @@ namespace CombatSystem.PositionHandlers
             _currentEnemyTeam = enemyTeam;
         }
 
-        public void OnAfterLoadScene()
+        public void OnAfterLoads()
         {
             SpawnEntities();
         }

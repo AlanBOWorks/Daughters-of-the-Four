@@ -20,7 +20,9 @@ namespace CombatTeam
 
         protected virtual void Awake()
         {
-            CombatSystemSingleton.CombatPreparationHandler.Subscribe(this);
+            var preparationHandler = CombatSystemSingleton.CombatPreparationHandler;
+            preparationHandler.Subscribe(this as ICombatPreparationListener);
+            preparationHandler.Subscribe(this as ICombatFinishListener);
         }
 
         public void OnPreparationCombat(CombatingTeam preparedPlayerTeam, CombatingTeam preparedEnemyTeam)
@@ -30,7 +32,7 @@ namespace CombatTeam
         }
 
         protected abstract void DoInjection(CombatingEntity entity, T element);
-        public abstract void OnAfterLoadScene();
+        public abstract void OnAfterLoads();
         public abstract void OnFinish(CombatingTeam wonTeam);
 
 

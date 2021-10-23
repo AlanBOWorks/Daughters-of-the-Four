@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 
 namespace CombatSystem.Events
 {
-    public sealed class SystemEventsHolder : CharacterEventsHolder<SkillValuesHolders,CombatingEntity,SkillComponentResolution>,
+    public class SystemEventsHolder : CharacterEventsHolder<SkillValuesHolders,CombatingEntity,SkillComponentResolution>,
         ITeamStateChangeListener<CombatingTeam>,
         ISkillEventListener
     {

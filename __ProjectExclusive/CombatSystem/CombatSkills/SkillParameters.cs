@@ -5,20 +5,6 @@ using UnityEngine;
 
 namespace CombatSkills
 {
-    public struct SkillParameters : ISkillParameters
-    {
-        public SkillParameters(CombatingSkill skill, CombatingEntity user, CombatingEntity target)
-        {
-            UsedSkill = skill;
-            User = user;
-            Target = target;
-        }
-
-        public CombatingSkill UsedSkill { get; }
-        public CombatingEntity User { get; }
-        public CombatingEntity Target { get; set; } //Set because: This can be switch by guarding skills
-    }
-
     public struct SkillUsageValues
     {
         public readonly CombatingSkill UsedSkill;

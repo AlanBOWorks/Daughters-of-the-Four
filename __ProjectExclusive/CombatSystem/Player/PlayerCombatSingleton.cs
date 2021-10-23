@@ -15,9 +15,19 @@ namespace __ProjectExclusive.Player
         static PlayerCombatSingleton()
         {
             CharactersHolder = new PlayerCharactersHolder();
-            PlayerEvents = new SystemEventsHolder();
+            PlayerEvents = new PlayerEvents();
 
-            EntitySkillRequestHandler = new EntityRandomController(); //TODO make it a player controller
+
+
+            VirtualSkillsInjector = new PlayerVirtualSkillsInjector();
+            SkillSelectionsQueue = new PlayerSkillSelectionsQueue();
+
+            EntitySkillRequestHandler = SkillSelectionsQueue;
+            // For Debug: >>> EntitySkillRequestHandler = new EntityRandomController(); //TODO make it a player controller
+
+            // Subscriptions
+            PlayerEvents.Subscribe(VirtualSkillsInjector);
+            PlayerEvents.Subscribe(SkillSelectionsQueue);
 
 #if UNITY_EDITOR
             Debug.Log("[Player Combat Singleton] instantiated");
@@ -30,12 +40,24 @@ namespace __ProjectExclusive.Player
 
         public static PlayerCombatSingleton GetInstance() => Instance;
 
-        [ShowInInspector] 
+        [TabGroup("Player System")]
+        [ShowInInspector, Title("Characters")] 
         public static readonly PlayerCharactersHolder CharactersHolder;
 
-        [ShowInInspector] 
-        public static readonly SystemEventsHolder PlayerEvents;
+        [TabGroup("Player System")]
+        [ShowInInspector, Title("Events")]
+        public static readonly PlayerEvents PlayerEvents;
 
+
+        [TabGroup("Player System")]
+        [ShowInInspector]
+        public static readonly PlayerSkillSelectionsQueue SkillSelectionsQueue;
+        [TabGroup("Player System")]
+        [ShowInInspector]
+        public static readonly PlayerVirtualSkillsInjector VirtualSkillsInjector;
+
+
+        [TabGroup("Combat System")]
         [ShowInInspector]
         public static readonly IEntitySkillRequestHandler EntitySkillRequestHandler;
 

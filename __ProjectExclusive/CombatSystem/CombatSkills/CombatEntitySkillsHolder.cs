@@ -26,7 +26,7 @@ namespace CombatSkills
                 UtilsTeam.GetElement(GlobalCombatParametersSingleton.SharedSkills, role);
             if(globalSharedSkills != null) 
                 UtilsTeam.DoActionOnTeam(this, globalSharedSkills, GenerateAndInjectSharedSkill);
-            else Debug.Log("NULL");
+            else Debug.LogWarning("NULL: Global Skills");
 
 
 
@@ -54,6 +54,13 @@ namespace CombatSkills
         [ShowInInspector]
         public CombatingSkillsGroup OnDefenseStance { get; set; }
 
+        public void TickCoolDowns()
+        {
+            OnAttackStance.TickCoolDowns();
+            OnNeutralStance.TickCoolDowns();
+            OnDefenseStance.TickCoolDowns();
+        }
+
     }
 
     public class CombatingSkillsGroup : ISkillGroupTypesRead<CombatingSkillsList>
@@ -77,6 +84,12 @@ namespace CombatSkills
         public CombatingSkillsList SharedSkillTypes { get; set; }
         [ShowInInspector,HorizontalGroup()]
         public CombatingSkillsList MainSkillTypes { get; }
+
+        public void TickCoolDowns()
+        {
+            SharedSkillTypes?.TickCooldowns();
+            MainSkillTypes?.TickCooldowns();
+        }
     }
 
     public class CombatingSkillsList : List<CombatingSkill>
@@ -107,7 +120,7 @@ namespace CombatSkills
             }
         }
 
-        public void TickCooldown()
+        public void TickCooldowns()
         {
             foreach (var skill in this)
             {
@@ -115,11 +128,11 @@ namespace CombatSkills
             }
         }
 
-        public void RefreshCooldown()
+        public void SilenceSkills()
         {
-            foreach (CombatingSkill skill in this)
+            foreach (var skill in this)
             {
-                skill.TickRefresh();
+                skill.Silence();
             }
         }
     }

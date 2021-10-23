@@ -1,5 +1,6 @@
 using System;
 using __ProjectExclusive.Player;
+using CombatCamera;
 using CombatSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -39,10 +40,8 @@ namespace __ProjectExclusive
 
             // Instantiate CombatSingleton
             CombatSystemSingleton.GetInstance();
-            // Instantiate PlayerCombatSingleton
-            // vv It's no really necessary to use this, but it's looks better and I think I could do something stupid
-            // thinking the there's something missing in here. 
-            PlayerCombatSingleton.GetInstance(); 
+            PlayerCombatSingleton.GetInstance();
+            CombatCameraSingleton.GetInstance();
 
             // Do Injections
             PlayerCombatSingleton.InjectInCombatSystem();

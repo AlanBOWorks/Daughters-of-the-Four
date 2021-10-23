@@ -88,13 +88,13 @@ namespace CombatSystem
             }
         }
 
-        public void OnAfterLoadScene()
+        public void OnAfterLoads()
         {
             Timing.RunCoroutine(_TickingLoop());
         }
 
 
-        private const float TickPeriodSeconds = .5f;
+        private const float TickPeriodSeconds = .2f;
         private const int EntityTickTriggerCheck = 24;//todo make it a param
         private IEnumerator<float> _TickingLoop()
         {
@@ -182,7 +182,6 @@ namespace CombatSystem
         private IEnumerator<float> _DoEntitySequence(CombatingEntity actingEntity)
         {
             var entityTempoHandler = CombatSystemSingleton.EntityActionRequestHandler;
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
 
             yield return Timing.WaitForOneFrame;
             var stats = actingEntity.CombatStats;
@@ -193,6 +192,7 @@ namespace CombatSystem
                 yield break;
             }
 
+            // The EntityActionRequestHandler deals with the event of OnInitiativeTrigger(Entity)
             yield return Timing.WaitUntilDone(entityTempoHandler._RequestFinishActions(actingEntity));
 
         }

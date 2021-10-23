@@ -22,9 +22,10 @@ namespace CombatSystem.Events
 
         public void OnInitiativeTrigger(CombatingEntity element)
         {
-            element.EventsHolder.OnInitiativeTrigger(element);
-            element.SkillUsageTracker.ResetOnStartSequence();
             element.CombatStats.GetBurstStat().SelfBurst.ResetAsBurst();
+            element.SkillUsageTracker.ResetOnStartSequence();
+            element.SkillsHolder.TickCoolDowns();
+            element.EventsHolder.OnInitiativeTrigger(element);
         }
 
         public void OnDoMoreActions(CombatingEntity element)

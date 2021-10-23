@@ -27,24 +27,22 @@ namespace CombatSkills
         private int _currentCooldownAmount;
         private EnumSkills.SKillState _currentState;
 
-
-        public bool IsInCooldown() => _currentState == EnumSkills.SKillState.InCooldown;
+        public EnumSkills.SKillState GetState() => _currentState;
+        public bool CanBeUsed() => _currentState == EnumSkills.SKillState.Idle;
         public void PutInCooldown()
         {
             _currentCooldownAmount = _cooldownOnUsage;
             // cooldown == 0 are special skills that can't be put in cooldown
-            if (_currentCooldownAmount > 0) _currentState = EnumSkills.SKillState.InCooldown;
+            if (_currentCooldownAmount > 0) _currentState = EnumSkills.SKillState.Cooldown;
         }
+        public void Silence() => _currentState = EnumSkills.SKillState.Silence;
+
         public void TickCooldown()
         {
             _currentCooldownAmount--;
-        }
-        /// <summary>
-        /// Resets the state of the 
-        /// </summary>
-        public void TickRefresh()
-        {
-            if(_currentCooldownAmount > 0) return;
+            if (_currentCooldownAmount > 0) return;
+            _currentCooldownAmount = 0;
+
             _currentState = EnumSkills.SKillState.Idle;
         }
         public void ForceRefresh()
