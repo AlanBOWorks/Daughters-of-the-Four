@@ -10,7 +10,9 @@ using UnityEngine;
 
 namespace __ProjectExclusive.Player
 {
-    public class PlayerSkillSelectionsQueue : ITempoListener<CombatingEntity>, IEntitySkillRequestHandler
+    public class PlayerSkillSelectionsQueue : IEntitySkillRequestHandler,
+        IVirtualSkillTargetListener,
+        IVirtualSkillInteraction
     {
 #if UNITY_EDITOR
         [ShowInInspector, TextArea] 
@@ -24,33 +26,47 @@ namespace __ProjectExclusive.Player
             _skillsQueue = new Queue<SkillUsageValues>();
         }
 
-        private CombatingEntity _currentUser;
         [ShowInInspector]
         private readonly Queue<SkillUsageValues> _skillsQueue;
 
-        public void SubmitSkill(CombatingSkill skill, CombatingEntity target)
+        private CombatingEntity _selectedTarget;
+        private CombatingSkill _selectedSkill;
+
+       
+
+        // TARGET LISTENER
+        public void OnVirtualTargetSelect(CombatingEntity selectedTarget)
         {
-            var queueElement = new SkillUsageValues(skill,target);
+            _selectedTarget = selectedTarget;
+            HandleQueue();
+        }
+
+        // SKILL LISTENER
+        public void OnSelect(VirtualSkillSelection selection) {}
+        public void OnDeselect(VirtualSkillSelection selection) {}
+        public void OnSubmit(VirtualSkillSelection selection)
+        {
+            _selectedSkill = selection.PrioritySkill;
+            HandleQueue();
+        }
+        public void OnHover(VirtualSkillSelection selection) {}
+        public void OnHoverExit(VirtualSkillSelection selection) {}
+
+
+        private void HandleQueue()
+        {
+            if(_selectedSkill == null || _selectedTarget == null) return;
+
+            var queueElement = new SkillUsageValues(_selectedSkill,_selectedTarget);
             _skillsQueue.Enqueue(queueElement);
+
+            ResetSelections();
         }
 
-        public void OnInitiativeTrigger(CombatingEntity element)
+        private void ResetSelections()
         {
-            _currentUser = element;
-            _skillsQueue.Clear();
-        }
-
-        public void OnDoMoreActions(CombatingEntity element)
-        {
-        }
-
-        public void OnFinishAllActions(CombatingEntity element)
-        {
-            _skillsQueue.Clear();
-        }
-
-        public void OnSkipActions(CombatingEntity element)
-        {
+            _selectedSkill = null;
+            _selectedTarget = null;
         }
 
         //TODO make the check if is correct the parameters (eg: the target is dead, skill has a problem or something)
@@ -67,7 +83,7 @@ namespace __ProjectExclusive.Player
         private bool QueueHasElements() => _skillsQueue.Count > 0;
 
         private bool _submitRequest;
-        public IEnumerator<float> OnRequestAction(SkillValuesHolders skillValues)
+        public IEnumerator<float> HandleRequestAction(SkillValuesHolders skillValues)
         {
             _submitRequest = false;
             while (!_submitRequest)

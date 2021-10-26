@@ -20,6 +20,7 @@ namespace CombatSystem.Events
             _vitalityChangeListeners = new List<IVitalityChangeListener<T,TStat>>();
 
             _tempoListeners = new List<ITempoListener<TTempo>>();
+            _tempoDisruptionListeners = new List<ITempoDisruptionListener<TTempo>>();
             _roundListeners = new List<IRoundListener<TTempo>>();
         }
 
@@ -41,23 +42,40 @@ namespace CombatSystem.Events
         [ShowInInspector, HorizontalGroup("Tempo Events", 
              Title = "________________________ Tempo Events ________________________")]
         private readonly List<ITempoListener<TTempo>> _tempoListeners;
+        private readonly List<ITempoDisruptionListener<TTempo>> _tempoDisruptionListeners;
 
         [ShowInInspector, HorizontalGroup("Tempo Events")]
         private readonly List<IRoundListener<TTempo>> _roundListeners;
 
-        public void Subscribe(CharacterEventsHolder<T, TTempo, TStat> slaveEventsHolder)
+        public virtual void SubscribeListener(object listener)
+        {
+            if(listener is IOffensiveActionReceiverListener<T,TStat> offensiveListener)
+                Subscribe(offensiveListener);
+            if(listener is ISupportActionReceiverListener<T,TStat> supportListener)
+                Subscribe(supportListener);
+            if(listener is IVitalityChangeListener<T,TStat> vitalityChangeListener)
+                Subscribe(vitalityChangeListener);
+            if(listener is ITempoListener<TTempo> tempoListener)
+                Subscribe(tempoListener);
+            if(listener is IRoundListener<TTempo> roundListener)
+                Subscribe(roundListener);
+        }
+
+
+        private void Subscribe(CharacterEventsHolder<T, TTempo, TStat> slaveEventsHolder)
         {
             Subscribe(slaveEventsHolder as IStatActionListener<T, TTempo, TStat>);
             Subscribe(slaveEventsHolder as IRoundListener<TTempo>);
         }
 
-        public void Subscribe(IFullEventListener<T, TTempo, TStat> listener)
+
+        private void Subscribe(IFullEventListener<T, TTempo, TStat> listener)
         {
             Subscribe(listener as IStatActionListener<T, TTempo, TStat>);
             Subscribe(listener as IRoundListener<TTempo>);
         }
 
-        public void Subscribe(IEventListenerHandler<T, TTempo, TStat> listener)
+        private void Subscribe(IEventListenerHandler<T, TTempo, TStat> listener)
         {
             Subscribe(listener as IOffensiveActionReceiverListener<T,TStat>);
             Subscribe(listener as ISupportActionReceiverListener<T,TStat>);
@@ -66,7 +84,7 @@ namespace CombatSystem.Events
             Subscribe(listener as IRoundListener<TTempo>);
         }
 
-        public void Subscribe(IStatActionListener<T,TTempo,TStat> listener)
+        private void Subscribe(IStatActionListener<T,TTempo,TStat> listener)
         {
             Subscribe(listener as IOffensiveActionReceiverListener<T, TStat>);
             Subscribe(listener as ISupportActionReceiverListener<T, TStat>);
@@ -75,42 +93,24 @@ namespace CombatSystem.Events
         }
 
 
-        public void Subscribe(IOffensiveActionReceiverListener<T, TStat> listener)
+        private void Subscribe(IOffensiveActionReceiverListener<T, TStat> listener)
         {
             _offensiveReceiveListeners.Add(listener);
             if(listener is IOffensiveActionListener<T,TStat> offensiveActionListener)
                 _offensiveListeners.Add(offensiveActionListener);
         }
 
-        public void Subscribe(ISupportActionReceiverListener<T, TStat> listener)
+        private void Subscribe(ISupportActionReceiverListener<T, TStat> listener)
         {
             _supportReceiveListeners.Add(listener);
             if(listener is ISupportActionListener<T,TStat> supportActionListener)
                 _supportListeners.Add(supportActionListener);
         }
-        public void Subscribe(IVitalityChangeListener<T, TStat> listener) => _vitalityChangeListeners.Add(listener);
-        public void Subscribe(ITempoListener<TTempo> listener) => _tempoListeners.Add(listener);
-        public void Subscribe(IRoundListener<TTempo> listener) => _roundListeners.Add(listener);
 
-        public void Invoke(EnumStats.DamageResult damageResult,T element, TStat value)
-        {
-            switch (damageResult)
-            {
-                case EnumStats.DamageResult.None:
-                    break;
-                case EnumStats.DamageResult.ShieldBreak:
-                    OnShieldLost(element,ref value);
-                    break;
-                case EnumStats.DamageResult.HealthLost:
-                    OnHealthLost(element,ref value);
-                    break;
-                case EnumStats.DamageResult.Death:
-                    OnMortalityDeath(element,ref value);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(damageResult), damageResult, null);
-            }
-        }
+        private void Subscribe(IVitalityChangeListener<T, TStat> listener) => _vitalityChangeListeners.Add(listener);
+        private void Subscribe(ITempoListener<TTempo> listener) => _tempoListeners.Add(listener);
+        private void Subscribe(IRoundListener<TTempo> listener) => _roundListeners.Add(listener);
+
 
         public void OnPerformOffensiveAction(T element,ref TStat value)
         {
@@ -159,27 +159,19 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnMortalityDeath(T element,ref TStat value)
-        {
-            foreach (var listener in _vitalityChangeListeners)
-            {
-                listener.OnMortalityDeath(element,ref value);
-            }
-        }
-
-        public void OnInitiativeTrigger(TTempo element)
+        public void OnFirstAction(TTempo element)
         {
             foreach (var listener in _tempoListeners)
             {
-                listener.OnInitiativeTrigger(element);
+                listener.OnFirstAction(element);
             }
         }
 
-        public void OnDoMoreActions(TTempo element)
+        public void OnFinishAction(TTempo element)
         {
             foreach (var listener in _tempoListeners)
             {
-                listener.OnDoMoreActions(element);
+                listener.OnFinishAction(element);
             }
         }
 
@@ -191,11 +183,11 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnSkipActions(TTempo element)
+        public void OnCantAct(TTempo element)
         {
-            foreach (var listener in _tempoListeners)
+            foreach (var listener in _tempoDisruptionListeners)
             {
-                listener.OnSkipActions(element);
+                listener.OnCantAct(element);
             }
         }
 

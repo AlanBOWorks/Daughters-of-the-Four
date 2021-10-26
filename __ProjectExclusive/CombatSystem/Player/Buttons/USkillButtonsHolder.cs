@@ -31,11 +31,8 @@ namespace __ProjectExclusive.Player
 
         private void Awake()
         {
-            var playerEvents = PlayerCombatSingleton.PlayerEvents;
+            PlayerCombatSingleton.SubscribeEventListener(this);
 
-            playerEvents.Subscribe(this as ITempoListener<CombatingEntity>);
-            playerEvents.Subscribe(this as IVirtualSkillInjectionListener);
-            playerEvents.Subscribe(this as IVirtualSkillTargetListener);
 
             InjectIntoButtons(mainSkillButtons);
             InjectIntoButtons(sharedSkillButtons);
@@ -154,23 +151,36 @@ namespace __ProjectExclusive.Player
             }
         }
 
-        public void OnInitiativeTrigger(CombatingEntity element)
+
+        private void ShowCanvas()
         {
-            _currentUser = element;
+            gameObject.SetActive(true);
+        }
+        private void HideCanvas()
+        {
+            gameObject.SetActive(false);
         }
 
-        public void OnDoMoreActions(CombatingEntity element)
+        public void OnFirstAction(CombatingEntity element)
+        {
+            _currentUser = element;
+            ShowCanvas();
+        }
+
+        public void OnFinishAction(CombatingEntity element)
         {
             
         }
 
         public void OnFinishAllActions(CombatingEntity element)
         {
+            HideCanvas();
             _currentUser = null;
         }
 
-        public void OnSkipActions(CombatingEntity element)
+        public void OnCantAct(CombatingEntity element)
         {
+            HideCanvas();
             _currentUser = null;
         }
 

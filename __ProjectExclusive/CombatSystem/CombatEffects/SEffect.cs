@@ -25,7 +25,8 @@ namespace CombatEffects
 
     public abstract class SOffensiveEffect : SEffect
     {
-        protected override void DoEffectOn(SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        protected override void DoEffectOn(
+            SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
         {
             var user = values.User;
             var effectResolution = DoEffectOn(user, effectTarget, effectValue, isCritical);

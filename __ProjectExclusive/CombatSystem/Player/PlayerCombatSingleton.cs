@@ -1,3 +1,4 @@
+using CombatEntity;
 using CombatSystem;
 using CombatSystem.Events;
 using Sirenix.OdinInspector;
@@ -23,15 +24,16 @@ namespace __ProjectExclusive.Player
             SkillSelectionsQueue = new PlayerSkillSelectionsQueue();
 
             EntitySkillRequestHandler = SkillSelectionsQueue;
-            // For Debug: >>> EntitySkillRequestHandler = new EntityRandomController(); //TODO make it a player controller
+            // For Debug: vvvv
+            EntitySkillRequestHandler = new EntityRandomController(); //TODO make it a player controller
 
             // Subscriptions
-            PlayerEvents.Subscribe(VirtualSkillsInjector);
-            PlayerEvents.Subscribe(SkillSelectionsQueue);
+            PlayerEvents.SubscribeListener(VirtualSkillsInjector);
+            PlayerEvents.SubscribeListener(SkillSelectionsQueue);
 
 #if UNITY_EDITOR
             Debug.Log("[Player Combat Singleton] instantiated");
-            PlayerEvents.Subscribe(new DebugSkillEvents());
+            PlayerEvents.SubscribeListener(new DebugSkillEvents());
 #endif
         }
 
@@ -61,6 +63,11 @@ namespace __ProjectExclusive.Player
         [ShowInInspector]
         public static readonly IEntitySkillRequestHandler EntitySkillRequestHandler;
 
+        public static void SubscribeEventListener(object listener)
+        {
+            PlayerEvents.SubscribeListener(listener);
+        }
+
 
         public static void InjectInCombatSystem()
         {
@@ -68,7 +75,7 @@ namespace __ProjectExclusive.Player
             Debug.Log("Injecting Player [Singleton]'s Events into Combat [Singleton]");
 #endif
 
-            CombatSystemSingleton.EventsHolder.Subscribe(PlayerEvents);
+            CombatSystemSingleton.EventsHolder.SubscribeListener(PlayerEvents);
         }
     }
 

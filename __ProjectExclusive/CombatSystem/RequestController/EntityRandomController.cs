@@ -18,7 +18,7 @@ namespace CombatSystem
 
         private readonly List<CombatingSkill> _possibleSkillToPick;
         
-        public IEnumerator<float> OnRequestAction(SkillValuesHolders values)
+        public IEnumerator<float> HandleRequestAction(SkillValuesHolders values)
         {
             var selectedSkill = DoRequestWithRandom(values.User);
             values.Inject(selectedSkill);

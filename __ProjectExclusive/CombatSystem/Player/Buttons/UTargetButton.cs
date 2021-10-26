@@ -1,4 +1,5 @@
 using System;
+using CombatCamera;
 using CombatEntity;
 using DG.Tweening;
 using Sirenix.OdinInspector;
@@ -17,8 +18,6 @@ namespace __ProjectExclusive.Player
         [ShowInInspector]
         private CombatingEntity _currentUser;
 
-        [ShowInInspector]
-        private Camera _referenceCamera;
         private RectTransform _movingButton;
 
         private UTargetButtonsHolder _holder;
@@ -28,7 +27,6 @@ namespace __ProjectExclusive.Player
 
 
         public void Injection(UTargetButtonsHolder holder) => _holder = holder;
-        public void Injection(Camera referenceCamera) => _referenceCamera = referenceCamera;
         public void Injection(CombatingEntity user) => _currentUser = user;
 
         public void Show()
@@ -46,7 +44,7 @@ namespace __ProjectExclusive.Player
         {
             Transform onObject = _currentUser.InstantiatedHolder.transform;
 
-            _movingButton.position = _referenceCamera.WorldToScreenPoint(onObject.position);
+            _movingButton.position = CombatCameraSingleton.CombatUICamera.WorldToScreenPoint(onObject.position);
         }
 
 

@@ -20,19 +20,19 @@ namespace CombatSystem.Events
 #endif
        
 
-        public void OnInitiativeTrigger(CombatingEntity element)
+        public void OnFirstAction(CombatingEntity element)
         {
             element.CombatStats.GetBurstStat().SelfBurst.ResetAsBurst();
             element.SkillUsageTracker.ResetOnStartSequence();
             element.SkillsHolder.TickCoolDowns();
-            element.EventsHolder.OnInitiativeTrigger(element);
+            element.EventsHolder.OnFirstAction(element);
         }
 
-        public void OnDoMoreActions(CombatingEntity element)
+        public void OnFinishAction(CombatingEntity element)
         {
             var stats = element.CombatStats;
             UtilsCombatStats.DecreaseActions(stats);
-            element.EventsHolder.OnDoMoreActions(element);
+            element.EventsHolder.OnFinishAction(element);
 
         }
 
@@ -43,9 +43,9 @@ namespace CombatSystem.Events
             element.GuardHandler.RemoveGuarding();
         }
 
-        public void OnSkipActions(CombatingEntity element)
+        public void OnCantAct(CombatingEntity element)
         {
-            element.EventsHolder.OnSkipActions(element);
+            element.EventsHolder.OnCantAct(element);
         }
 
         public void OnRoundFinish(CombatingEntity lastElement)
@@ -84,18 +84,14 @@ namespace CombatSystem.Events
 
         public void OnShieldLost(SkillValuesHolders element,ref SkillComponentResolution value)
         {
-            
+            var target = element.Target;
+            target.EventsHolder.OnShieldLost(element.User,ref value);
         }
 
         public void OnHealthLost(SkillValuesHolders element,ref SkillComponentResolution value)
         {
-           
-        }
-
-        public void OnMortalityDeath(SkillValuesHolders element,ref SkillComponentResolution value)
-        {
             var target = element.Target;
-            target.Team.Events.OnMemberDeath(target);
+            target.EventsHolder.OnHealthLost(element.User, ref value);
         }
     }
 }

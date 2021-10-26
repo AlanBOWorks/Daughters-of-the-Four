@@ -16,38 +16,37 @@ namespace Stats
 
 
         // By design shield breaks and health lost stops the over damage
-        public static EnumStats.DamageResult DoDamageTo(ICombatPercentStats<float> vitality, float damage)
+        public static void DoDamageTo(ICombatPercentStats<float> vitality, float damage)
         {
             if (damage <= 0)
             {
-                return EnumStats.DamageResult.None;
+                return;
             }
 
             if (vitality.CurrentShields >= 1)
             {
                 vitality.CurrentShields -= 1; // by design shields are lost in units
-                return vitality.CurrentShields <= 0 
-                    ? EnumStats.DamageResult.ShieldBreak 
-                    : EnumStats.DamageResult.None;
+                if (vitality.CurrentShields <= 0)
+                {
+                    vitality.CurrentShields = 0;
+                    CombatSystemSingleton.DamageReceiveEvents.OnShieldLost();
+                }
             }
 
             if (vitality.CurrentHealth > 0)
             {
                 vitality.CurrentHealth -= damage;
-                if (!(vitality.CurrentHealth <= 0)) 
-                    return EnumStats.DamageResult.None;
+                if (!(vitality.CurrentHealth <= 0)) return;
 
                 vitality.CurrentHealth = 0;
-                return EnumStats.DamageResult.HealthLost;
-
+                CombatSystemSingleton.DamageReceiveEvents.OnHealthLost();
             }
 
             vitality.CurrentMortality -= damage;
-            if (!(vitality.CurrentMortality < 0)) 
-                return EnumStats.DamageResult.None;
+            if (!(vitality.CurrentMortality < 0)) return;
 
             vitality.CurrentMortality = 0;
-            return EnumStats.DamageResult.Death;
+            CombatSystemSingleton.DamageReceiveEvents.OnMortalityDeath();
         }
 
         //Heals are done in percent
@@ -113,7 +112,6 @@ namespace Stats
         {
             statsHolder.CurrentActions += addition;
         }
-        public static void TickCurrentActions(CombatStatsHolder statsHolder) => VariateActions(statsHolder, -1);
 
         public static void OverrideActionsAmount(CombatStatsHolder statsHolder, int targetAmount)
         {
@@ -123,10 +121,12 @@ namespace Stats
         public static void RefillActions(CombatStatsHolder statsHolder)
         {
             statsHolder.CurrentActions = Mathf.RoundToInt(statsHolder.ActionsPerSequence);
+            Debug.Log($"REFILL actions: {statsHolder.CurrentActions}");
         }
 
         public static void DecreaseActions(CombatStatsHolder statsHolder, int amount = 1)
         {
+            Debug.Log($"Decreasing actions: {statsHolder.CurrentActions} > {statsHolder.CurrentActions -amount}");
             statsHolder.CurrentActions-= amount;
         }
 

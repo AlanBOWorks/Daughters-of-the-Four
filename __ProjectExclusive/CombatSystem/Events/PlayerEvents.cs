@@ -29,7 +29,7 @@ namespace CombatSystem.Events
         public readonly List<IVirtualSkillInteraction> SkillInteractions;
         /// <summary>
         /// For [<seealso cref="OnInjectionVirtualSkills"/>] check: <br></br>
-        /// - [<seealso cref="PlayerVirtualSkillsInjector.OnInitiativeTrigger"/>]
+        /// - [<seealso cref="PlayerVirtualSkillsInjector.OnFirstAction"/>]
         /// </summary>
         [ShowInInspector]
         public readonly List<IVirtualSkillInjectionListener> VirtualSkillInjections;
@@ -37,17 +37,28 @@ namespace CombatSystem.Events
         [ShowInInspector] 
         public readonly List<IVirtualSkillTargetListener> VirtualTargetListeners;
 
-        public void Subscribe(IVirtualSkillInteraction listener)
+        public override void SubscribeListener(object listener)
+        {
+            base.SubscribeListener(listener);
+            if(listener is IVirtualSkillInteraction skillInteractionListener)
+                Subscribe(skillInteractionListener);
+            if(listener is IVirtualSkillInjectionListener skillInjectionListener)
+                Subscribe(skillInjectionListener);
+            if(listener is IVirtualSkillTargetListener skillTargetListener)
+                Subscribe(skillTargetListener);
+        }
+
+        private void Subscribe(IVirtualSkillInteraction listener)
         {
             SkillInteractions.Add(listener);
         }
 
-        public void Subscribe(IVirtualSkillInjectionListener listener)
+        private void Subscribe(IVirtualSkillInjectionListener listener)
         {
             VirtualSkillInjections.Add(listener);
         }
 
-        public void Subscribe(IVirtualSkillTargetListener listener)
+        private void Subscribe(IVirtualSkillTargetListener listener)
         {
             VirtualTargetListeners.Add(listener);
         }

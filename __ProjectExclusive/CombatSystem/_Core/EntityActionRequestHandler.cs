@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace CombatSystem
 {
-    internal class EntityActionRequestHandler : IEntityTempoHandler
+    internal class EntityActionRequestHandler : IEntityTempoHandler, ITempoListener<CombatingEntity>
     {
         public EntityActionRequestHandler()
         {
@@ -25,6 +25,25 @@ namespace CombatSystem
         private readonly SkillValuesHolders _skillValues;
 
 
+        public void OnFirstAction(CombatingEntity element)
+        {
+            _skillValues.Inject(element);
+        }
+
+        public void OnFinishAction(CombatingEntity element)
+        {
+            _skillValues.OnActionClear();
+        }
+
+        public void OnFinishAllActions(CombatingEntity element)
+        {
+            _skillValues.Clear();
+        }
+
+        public void OnCantAct(CombatingEntity element)
+        {
+            _skillValues.Clear();
+        }
 
         public IEnumerator<float> _RequestFinishActions(CombatingEntity entity)
         {
@@ -46,7 +65,7 @@ namespace CombatSystem
             yield return Timing.WaitForOneFrame; //TODO request start actions animation;
 
             _skillValues.Inject(currentActingEntity);
-            eventsHolder.OnInitiativeTrigger(currentActingEntity);
+            eventsHolder.OnFirstAction(currentActingEntity);
             var requestHandler = GetTeamTempoController(currentActingEntity);
 
 
@@ -56,21 +75,17 @@ namespace CombatSystem
             {
                 do
                 {
-                    _skillValues.OnActionClear();
+                    // using waitUntilDone except waitUntilTrue(_skillValues.IsValid) is because the player
+                    // might use these values correctly but changes the opinion and switch same values.
                     yield return Timing.WaitUntilDone(
-                        requestHandler.OnRequestAction(_skillValues));
+                        requestHandler.HandleRequestAction(_skillValues));
                 } while (!_skillValues.IsValid());
                 
-
-                // TODO check if skillUsage is valid (maybe the target is dead, a problem happens or something)
-                // if error is true; Clear the queue and Continue
-
-
-                UtilsCombatStats.TickCurrentActions(currentActingEntity.CombatStats);
                 yield return Timing.WaitUntilDone(_actionPerformer._PerformSkill(_skillValues));
-                _skillValues.Clear();
-
-                eventsHolder.OnDoMoreActions(currentActingEntity);
+                eventsHolder.OnFinishAction(currentActingEntity);
+                // Death events are meant to be the last events to be send (since some previous events could prevent death
+                // conditions and this could create false positives)
+                CombatSystemSingleton.EntityDeathHandler.HandleDeaths(); 
             }
             eventsHolder.OnFinishAllActions(currentActingEntity);
         }
@@ -83,7 +98,7 @@ namespace CombatSystem
         // These parameters are for giving the player the possibility of choosing various action in one go
         // even in between animations; For AI this is not necessary since the AI can just decide in the fly.
         // More advance AI could inject a sequence of action in the queue so it feels more intelligent
-        IEnumerator<float> OnRequestAction(SkillValuesHolders skillValues);
+        IEnumerator<float> HandleRequestAction(SkillValuesHolders skillValues);
 
     }
 }

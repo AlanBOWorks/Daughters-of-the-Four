@@ -76,14 +76,4 @@ namespace CombatEntity
     }
 
 
-    public interface ICombatEntityProvider
-    {
-        string GetEntityName();
-        UEntityHolder GetEntityPrefab();
-        CombatStatsHolder GenerateStatsHolder();
-        CombatingAreaData GenerateAreaData();
-
-        ITeamStanceStructureRead<ICollection<SkillProviderParams>> ProvideStanceSkills();
-    }
-
 }

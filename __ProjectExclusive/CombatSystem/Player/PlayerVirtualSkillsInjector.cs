@@ -28,19 +28,19 @@ namespace __ProjectExclusive.Player
 
 
 
-        public void OnInitiativeTrigger(CombatingEntity element)
+        public void OnFirstAction(CombatingEntity element)
         {
             var currentSkills = element.SkillsHolder.GetCurrentSkills();
             PlayerCombatSingleton.PlayerEvents.OnInjectionVirtualSkills(element,currentSkills);
         }
 
-        public void OnDoMoreActions(CombatingEntity element)
+        public void OnFinishAction(CombatingEntity element)
         {}
 
         public void OnFinishAllActions(CombatingEntity element)
         {}
 
-        public void OnSkipActions(CombatingEntity element)
+        public void OnCantAct(CombatingEntity element)
         {}
 
     }
@@ -64,6 +64,10 @@ namespace __ProjectExclusive.Player
        
     }
 
+    /// <summary>
+    /// Unlike [<seealso cref="ISkillEventListener"/>], which events are send at the moment of executing, this listener
+    /// are meant to be used while in the middle process to select the a skill. 
+    /// </summary>
     public interface IVirtualSkillInteraction
     {
         void OnSelect(VirtualSkillSelection selection);

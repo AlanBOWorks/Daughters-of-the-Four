@@ -20,29 +20,36 @@ namespace CombatSystem
         static CombatSystemSingleton()
         {
             CombatPreparationHandler = new CombatPreparationHandler();
+
             EventsHolder = new SystemEventsHolder();
             EntitiesFixedEvents = new CombatEntityFixedEvents();
+            DamageReceiveEvents = new DamageReceiveEventsInvoker();
+
+            EntityDeathHandler = new CombatEntityDeathHandler();
 
             TempoTicker = new TempoTicker();
             EntityActionRequestHandler = new EntityActionRequestHandler();
 
             SceneTracker = new CombatSceneTracker();
 
-            // Secondaries
+            // ---->>>> Secondaries
             var combatPositionSpawner = new CombatPositionSpawner();
             AllEntities = new List<CombatingEntity>();
 
-            // PREPARATION Subscriptions
+            // ---->>>> PREPARATION Subscriptions
             CombatPreparationHandler.Subscribe(TempoTicker);
             CombatPreparationHandler.Subscribe((ICombatPreparationListener) combatPositionSpawner);
             CombatPreparationHandler.Subscribe((ICombatFinishListener) combatPositionSpawner);
 
-            // EVENTS Subscriptions
-            EventsHolder.Subscribe(EntitiesFixedEvents);
+            // ---->>>> EVENTS Subscriptions
+            EventsHolder.SubscribeListener(EntitiesFixedEvents);
+            // Second because the Characters could have an event that changes the value of some event's Invoker (suck reducing damage)
+            // OnReceiveOffensive, so this can represent the real damage afterwards
+            EventsHolder.SubscribeListener(DamageReceiveEvents);
 
-            // TEMPO Subscription
-            TempoTicker.Subscribe((ITempoListener<CombatingEntity>) EventsHolder);
-            TempoTicker.Subscribe((IRoundListener<CombatingEntity>) EventsHolder);
+            // ---->>>> TEMPO Subscription
+            TempoTicker.SubscribeListener(EventsHolder);
+            TempoTicker.SubscribeListener(EntityActionRequestHandler);
 
 #if UNITY_EDITOR
             if (_singletonExplanation != null)
@@ -72,9 +79,11 @@ namespace CombatSystem
         [Title("Events")]
         [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly SystemEventsHolder EventsHolder;
-
         [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly CombatEntityFixedEvents EntitiesFixedEvents;
+        public static readonly DamageReceiveEventsInvoker DamageReceiveEvents;
+
+        public static readonly CombatEntityDeathHandler EntityDeathHandler;
 
         [Title("Tempo")]
         [TabGroup("ReadOnly"), ShowInInspector]
@@ -83,21 +92,17 @@ namespace CombatSystem
         [Title("Skills")]
         [TabGroup("ReadOnly"), ShowInInspector]
         internal static readonly EntityActionRequestHandler EntityActionRequestHandler;
-        
-        [TabGroup("Temporal"), ShowInInspector, DisableInEditorMode]
+
+        // Temporal can remain more than couple combats but can change from external reasons (change scene normally)
+        [TabGroup("Temporal"), ShowInInspector, DisableInEditorMode] 
         public static UPositionProviderBase PositionProvider;
 
-
-        [Title("Volatile")] 
+        [TabGroup("Combat Only"), ShowInInspector, DisableInEditorMode] 
         public static List<CombatingEntity> AllEntities;
         [TabGroup("Combat Only"), ShowInInspector, DisableInEditorMode] 
         public static CombatingTeam VolatilePlayerTeam;
         [TabGroup("Combat Only"), ShowInInspector, DisableInEditorMode] 
         public static CombatingTeam VolatileEnemyTeam;
-
-
-
-
     }
 
     public class CombatSystemWindow : OdinEditorWindow

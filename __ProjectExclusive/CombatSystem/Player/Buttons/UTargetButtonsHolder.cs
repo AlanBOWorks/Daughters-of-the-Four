@@ -11,25 +11,18 @@ using UnityEngine;
 
 namespace __ProjectExclusive.Player
 {
-    public class UTargetButtonsHolder : UPersistentTeamStructurePoolerBase<UTargetButton>, IVirtualSkillInteraction,
-        ICombatCameraSwitchListener
+    public class UTargetButtonsHolder : UPersistentTeamStructurePoolerBase<UTargetButton>, IVirtualSkillInteraction
     {
         private void Start()
         {
             _entitiesTracker = new Dictionary<CombatingEntity, UTargetButton>();
 
-            CombatCameraSingleton.SubscribeListener(this);
-            PlayerCombatSingleton.PlayerEvents.Subscribe(this);
+            PlayerCombatSingleton.SubscribeEventListener(this);
         }
 
 
-        private void OnDestroy()
-        {
-            CombatCameraSingleton.UnSubscribe(this);
-        }
 
         private Dictionary<CombatingEntity, UTargetButton> _entitiesTracker;
-        private Camera _referenceCamera;
 
         public override void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam)
         {
@@ -44,7 +37,6 @@ namespace __ProjectExclusive.Player
 
         protected override void OnPoolElement(ref UTargetButton instantiatedElement)
         {
-            instantiatedElement.Injection(_referenceCamera);
             instantiatedElement.Hide();
             instantiatedElement.Injection(this);
         }
@@ -105,37 +97,35 @@ namespace __ProjectExclusive.Player
 
         public void OnTargetSelect(UTargetButton button)
         {
-            foreach (KeyValuePair<CombatingEntity, UTargetButton> pair in _entitiesTracker)
-            {
-                pair.Value.enabled = false;
-            }
+            DisableButtons();
+            SendValues();
+            Timing.RunCoroutine(
+                _DisableAnimation(), Segment.RealtimeUpdate);
+            
 
-            Timing.RunCoroutine(_ProcessSelectionCommand(), Segment.RealtimeUpdate);
-            IEnumerator<float> _ProcessSelectionCommand()
+            void DisableButtons()
+            {
+                foreach (KeyValuePair<CombatingEntity, UTargetButton> pair in _entitiesTracker)
+                {
+                    pair.Value.enabled = false;
+                }
+            }
+            void SendValues()
+            {
+                var selectedTarget = button.GetEntity();
+                PlayerCombatSingleton.PlayerEvents.OnVirtualTargetSelect(selectedTarget);
+            }
+            IEnumerator<float> _DisableAnimation()
             {
                 //Just a small offset (.04f) so the eye can sense the ending a little better
-                yield return Timing.WaitForSeconds(UTargetButton.PointerClickAnimationDuration + .04f); 
+                yield return Timing.WaitForSeconds(UTargetButton.PointerClickAnimationDuration + .04f);
                 foreach (KeyValuePair<CombatingEntity, UTargetButton> pair in _entitiesTracker)
                 {
                     pair.Value.Hide();
                 }
-                var selectedTarget = button.GetEntity();
-                PlayerCombatSingleton.PlayerEvents.OnVirtualTargetSelect(selectedTarget);
             }
         }
 
-        public void OnMainCameraSwitch(Camera mainCamera)
-        {
-            _referenceCamera = mainCamera;
-            foreach (var pair in _entitiesTracker)
-            {
-                pair.Value.Injection(_referenceCamera);
-            }
-        }
 
-        public void OnUICameraSwitch(Camera uiCamera)
-        {
-            
-        }
     }
 }

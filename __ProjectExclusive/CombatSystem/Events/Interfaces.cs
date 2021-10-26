@@ -69,29 +69,20 @@ namespace CombatSystem.Events
         /// Health were higher that zero but lost in the action
         /// </summary>
         void OnHealthLost(T element,ref TValue value);
-
-        /// <summary>
-        /// Invoked once the character can't remain acting
-        /// </summary>
-        void OnMortalityDeath(T element,ref TValue value);
     }
 
     public interface ITempoListener<in T>
     {
-        void OnInitiativeTrigger(T element);
-        void OnDoMoreActions(T element);
-        /// <summary>
-        /// Invoke once at least the [<see cref="CombatingEntity"/>] has 1 action and can't no longer act (by spending all actions or waiting)
-        /// </summary>
-        /// <param name="element"></param>
+        void OnFirstAction(T element);
+        void OnFinishAction(T element);
         void OnFinishAllActions(T element);
-        /// <summary>
-        /// Unlike [<seealso cref="OnFinishAllActions"/>], this is invoked only when the character was forced to
-        /// not acting (by stun, removing actions or some external force)
-        /// </summary>
-        /// <param name="element"></param>
-        void OnSkipActions(T element);
     }
+
+    public interface ITempoDisruptionListener<in T>
+    {
+        void OnCantAct(T element);
+    }
+
 
     public interface IRoundListener<in T>
     {

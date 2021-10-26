@@ -14,7 +14,7 @@ namespace __ProjectExclusive.Player
         {
             base.Awake();
             _trackers = new Dictionary<CombatingEntity, UTickTracker>();
-            CombatSystemSingleton.TempoTicker.Subscribe(this);
+            CombatSystemSingleton.TempoTicker.SubscribeListener(this);
         }
 
         private Dictionary<CombatingEntity, UTickTracker> _trackers;

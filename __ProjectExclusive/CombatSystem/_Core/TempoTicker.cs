@@ -58,17 +58,27 @@ namespace CombatSystem
             _conditionProvider = conditionProvider;
         }
 
-        public void Subscribe(ITempoListener<CombatingEntity> listener)
+        public void SubscribeListener(object listener)
+        {
+            if(listener is ITempoListener<CombatingEntity> tempoListener)
+                Subscribe(tempoListener);
+            if(listener is IRoundListener<CombatingEntity> roundListener)
+                Subscribe(roundListener);
+            if(listener is IEntityTickListener tickListener)
+                Subscribe(tickListener);
+        }
+
+        private void Subscribe(ITempoListener<CombatingEntity> listener)
         {
             _tempoListeners.Add(listener);
         }
 
-        public void Subscribe(IRoundListener<CombatingEntity> listener)
+        private void Subscribe(IRoundListener<CombatingEntity> listener)
         {
             _roundListeners.Add(listener);
         }
 
-        public void Subscribe(IEntityTickListener listener)
+        private void Subscribe(IEntityTickListener listener)
         {
             _entityTickListeners.Add(listener);
         }
@@ -184,15 +194,14 @@ namespace CombatSystem
             var entityTempoHandler = CombatSystemSingleton.EntityActionRequestHandler;
 
             yield return Timing.WaitForOneFrame;
-            var stats = actingEntity.CombatStats;
 
-            if (stats.CurrentActions <= 0)
+            if (actingEntity.CanAct())
             {
-                CombatSystemSingleton.EventsHolder.OnSkipActions(actingEntity);
+                CombatSystemSingleton.EventsHolder.OnCantAct(actingEntity);
                 yield break;
             }
 
-            // The EntityActionRequestHandler deals with the event of OnInitiativeTrigger(Entity)
+            // The EntityActionRequestHandler deals with the event of OnFirstAction(Entity)
             yield return Timing.WaitUntilDone(entityTempoHandler._RequestFinishActions(actingEntity));
 
         }

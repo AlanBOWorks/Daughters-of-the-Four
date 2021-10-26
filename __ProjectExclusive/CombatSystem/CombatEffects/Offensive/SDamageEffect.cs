@@ -28,8 +28,6 @@ namespace CombatEffects
             // Final
             float finalDamage = userAttack - targetResistance;
             var effectResolution = new SkillComponentResolution(this, finalDamage);
-            var damageResult = UtilsCombatStats.DoDamageTo(targetStats, finalDamage);
-            effectTarget.EventsHolder.Invoke(damageResult,user,effectResolution);
 
             return effectResolution;
         }
