@@ -6,15 +6,15 @@ using UnityEngine;
 namespace CombatSystem.Events
 {
     public sealed class DamageReceiveEventsInvoker : 
-        IOffensiveActionReceiverListener<SkillValuesHolders,SkillComponentResolution>
+        IOffensiveActionReceiverListener<CombatEntityPairAction, SkillComponentResolution>
     {
        
 
-        private SkillValuesHolders _skillsHolder;
+        private CombatEntityPairAction _actors;
         private SkillComponentResolution _values;
-        public void OnReceiveOffensiveAction(SkillValuesHolders element, ref SkillComponentResolution value)
+        public void OnReceiveOffensiveAction(CombatEntityPairAction element, ref SkillComponentResolution value)
         {
-            _skillsHolder = element;
+            _actors = element;
             _values = value;
 
         }
@@ -22,18 +22,18 @@ namespace CombatSystem.Events
         public void OnShieldLost()
         {
             var events = CombatSystemSingleton.EventsHolder;
-            events.OnShieldLost(_skillsHolder, ref _values);
+            events.OnShieldLost(_actors, ref _values);
         }
 
         public void OnHealthLost()
         {
             var events = CombatSystemSingleton.EventsHolder;
-            events.OnHealthLost(_skillsHolder, ref _values);
+            events.OnHealthLost(_actors, ref _values);
         }
 
         public void OnMortalityDeath()
         {
-            CombatSystemSingleton.EntityDeathHandler.EnQueueEntity(_skillsHolder.Target);
+            CombatSystemSingleton.EntityDeathHandler.EnQueueEntity(_actors.Target);
         }
     }
 }

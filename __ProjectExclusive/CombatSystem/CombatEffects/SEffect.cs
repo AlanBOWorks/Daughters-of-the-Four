@@ -2,6 +2,7 @@ using CombatEntity;
 using CombatSkills;
 using CombatSystem;
 using CombatSystem.CombatSkills;
+using CombatSystem.Events;
 using UnityEngine;
 
 namespace CombatEffects
@@ -13,47 +14,37 @@ namespace CombatEffects
             var user = values.User;
             var skillTarget = values.Target;
             var effectTargets = UtilsTarget.GetPossibleTargets(user, skillTarget, effectTargetType);
+
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
             foreach (var effectTarget in effectTargets)
             {
-                DoEffectOn(values,effectTarget,effectValue, isCritical);
+                var entities = new CombatEntityPairAction(user, effectTarget);
+                var effectResolution = DoEffectOn(user, effectTarget, effectValue, isCritical);
+                DoEventCall(eventsHolder,entities,ref effectResolution);
             }
         }
 
-        protected abstract void DoEffectOn(SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical);
+        protected abstract void DoEventCall(SystemEventsHolder systemEvents,CombatEntityPairAction entities,ref SkillComponentResolution resolution);
+        protected abstract SkillComponentResolution DoEffectOn(
+            CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical);
     }
 
 
     public abstract class SOffensiveEffect : SEffect
     {
-        protected override void DoEffectOn(
-            SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
         {
-            var user = values.User;
-            var effectResolution = DoEffectOn(user, effectTarget, effectValue, isCritical);
-
-            CombatSystemSingleton.EventsHolder.OnPerformOffensiveAction(values,ref effectResolution);
-            user.EventsHolder.OnPerformOffensiveAction(effectTarget,ref effectResolution);
-            effectTarget.EventsHolder.OnReceiveOffensiveAction(user,ref effectResolution);
+            systemEvents.OnReceiveOffensiveAction(entities,ref resolution);
         }
-
-        protected abstract SkillComponentResolution DoEffectOn(
-            CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical);
     }
 
     public abstract class SSupportEffect : SEffect
     {
-        protected override void DoEffectOn(
-            SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
         {
-            var user = values.User;
-            var effectResolution = DoEffectOn(user, effectTarget, effectValue, isCritical);
-
-            CombatSystemSingleton.EventsHolder.OnPerformSupportAction(values,ref effectResolution);
-            user.EventsHolder.OnPerformSupportAction(effectTarget,ref effectResolution);
-            effectTarget.EventsHolder.OnReceiveSupportAction(user,ref effectResolution);
+            systemEvents.OnReceiveSupportAction(entities, ref resolution);
         }
-
-        protected abstract SkillComponentResolution DoEffectOn(
-            CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical);
     }
 }

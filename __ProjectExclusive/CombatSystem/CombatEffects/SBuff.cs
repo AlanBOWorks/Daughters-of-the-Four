@@ -1,7 +1,9 @@
 using System;
 using CombatEntity;
 using CombatSkills;
+using CombatSystem;
 using CombatSystem.CombatSkills;
+using CombatSystem.Events;
 using Stats;
 using UnityEngine;
 
@@ -19,24 +21,21 @@ namespace CombatEffects
             var skillTarget = values.Target;
 
             var effectTargets = UtilsTarget.GetPossibleTargets(user, skillTarget, effectTargetType);
+
+            var systemEvents = CombatSystemSingleton.EventsHolder;
             foreach (var effectTarget in effectTargets)
             {
                 var resolution = DoBuffOn(values, effectTarget, buffType, effectValue, isCritical);
-                DoEventCalls(user,effectTarget,resolution);
+                var entities = new CombatEntityPairAction(user,effectTarget);
+                DoEventCalls(systemEvents,entities,ref resolution);
             }
 
         }
 
-        protected virtual void DoEventCalls(CombatingEntity user, CombatingEntity effectTarget,
-            SkillComponentResolution resolution)
+        protected virtual void DoEventCalls(SystemEventsHolder systemEvents,CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
         {
-            var userEventsHolder = user.EventsHolder;
-            var targetEventsHolder = effectTarget.EventsHolder;
-
-            userEventsHolder.OnPerformSupportAction(effectTarget,ref resolution);
-
-            if(userEventsHolder == targetEventsHolder) return;
-            targetEventsHolder.OnReceiveSupportAction(user,ref resolution);
+            systemEvents.OnReceiveSupportAction(entities,ref resolution);
         }
 
         protected float CalculateBuffStats(SkillValuesHolders values, float buffValue, bool isCritical)

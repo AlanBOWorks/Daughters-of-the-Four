@@ -1,6 +1,7 @@
 using CombatEntity;
 using CombatSkills;
 using CombatSystem;
+using CombatSystem.Events;
 using CombatTeam;
 using Sirenix.OdinInspector;
 using Stats;
@@ -15,12 +16,19 @@ namespace CombatEffects
     {
         [SerializeField] private EnumTeam.TeamStance targetStance;
         
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
+        {
+            CombatSystemSingleton.EventsHolder.OnStanceChange(entities.Target.Team, targetStance);
+        }
 
-        protected override void DoEffectOn(SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue,
+            bool isCritical)
         {
             effectTarget.Team.OnStanceChange(targetStance);
-            CombatSystemSingleton.EventsHolder.OnStanceChange(effectTarget.Team, targetStance);
+            return new SkillComponentResolution(this, 1);
         }
+
 
         [Button]
         private void UpdateAssetName()
@@ -28,5 +36,6 @@ namespace CombatEffects
             name = "TEAM - " + targetStance.ToString() + " Stance Switch [Effect]";
             UtilsAssets.UpdateAssetName(this);
         }
+
     }
 }

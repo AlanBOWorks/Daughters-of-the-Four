@@ -1,5 +1,6 @@
 using CombatEntity;
 using CombatSkills;
+using CombatSystem.Events;
 using Stats;
 using UnityEngine;
 
@@ -10,12 +11,21 @@ namespace CombatEffects
     public class SShielding : SEffect
     {
         private const float AdditionShieldingAddition = .5f;
-        protected override void DoEffectOn(SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
+
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
+        {
+            systemEvents.OnReceiveSupportAction(entities,ref resolution);
+        }
+
+        protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float shieldAddition,
+            bool isCritical)
         {
             if (isCritical)
-                effectValue += AdditionShieldingAddition;
+                shieldAddition += AdditionShieldingAddition;
 
-            UtilsCombatStats.DoShielding(values.User.CombatStats,effectTarget.CombatStats,effectValue);
+            UtilsCombatStats.DoShielding(user.CombatStats, effectTarget.CombatStats, shieldAddition);
+            return new SkillComponentResolution(this,shieldAddition);
         }
     }
 }

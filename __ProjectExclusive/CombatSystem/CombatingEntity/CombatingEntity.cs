@@ -31,8 +31,8 @@ namespace CombatEntity
             Team = team;
             TargetingHolder = new CombatTargetingHolder(this);
 
-            EventsHolder 
-                = new CharacterEventsHolder<CombatingEntity,CombatingEntity, SkillComponentResolution>();
+            /*EventsHolder 
+                = new CharacterEventsHolder<CombatingEntity,CombatingEntity, SkillComponentResolution>();*/
 
             // Injection
             CombatStats.Injection(this);
@@ -59,7 +59,7 @@ namespace CombatEntity
         public readonly CombatTargetingHolder TargetingHolder;
 
         [Title("Events")]
-        public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, SkillComponentResolution> EventsHolder;
+        //public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, SkillComponentResolution> EventsHolder;
 
         [Title("Unity.Object")]
         [ShowInInspector]
@@ -75,5 +75,15 @@ namespace CombatEntity
         public void Injection(UEntityHolder instantiatedHolder) => InstantiatedHolder = instantiatedHolder;
     }
 
+    public struct CombatEntityPairAction
+    {
+        public readonly CombatingEntity User;
+        public readonly CombatingEntity Target;
 
+        public CombatEntityPairAction(CombatingEntity user, CombatingEntity target)
+        {
+            User = user;
+            Target = target;
+        }
+    }
 }

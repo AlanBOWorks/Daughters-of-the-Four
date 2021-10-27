@@ -2,52 +2,11 @@ using CombatTeam;
 using UnityEngine;
 
 namespace CombatSystem.Events
-{ 
-    public interface IFullEventListener<in T,in TTempo, TStats> : IStatActionListener<T,TTempo,TStats>, IRoundListener<TTempo>
-    { }
-
-    public interface IStatActionListener<in T,in TTempo, TStats> :
-        IOffensiveActionListener<T, TStats>,
-        ISupportActionListener<T, TStats>,
-        IVitalityChangeListener<T, TStats>,
-        ITempoListener<TTempo>
-    { }
-
-    public interface IEventListenerHandler<in T, in TTempo, TStats>:
-        IOffensiveActionReceiverListener<T, TStats>,
-        ISupportActionReceiverListener<T, TStats>,
-        IVitalityChangeListener<T, TStats>,
-        ITempoListener<TTempo>,
-        IRoundListener<TTempo>
-    {
-
-    }
-
-
-    /// <summary>
-    /// Used when a [<see cref="CombatingEntity"/>] perform an offensive action
-    /// </summary>
-    /// <typeparam name="T">The type which is passed to all listeners</typeparam>
-    public interface IOffensiveActionListener<in T, TValue> : IOffensiveActionReceiverListener<T,TValue>
-    {
-        void OnPerformOffensiveAction(T element,ref TValue value);
-    }
-
+{
     public interface IOffensiveActionReceiverListener<in T, TValue>
     {
         void OnReceiveOffensiveAction(T element,ref TValue value);
     }
-
-    /// <summary>
-    /// Used when a [<see cref="CombatingEntity"/>] perform a support action
-    /// </summary>
-    /// <typeparam name="T">The type which is passed to all listeners</typeparam>
-    /// <typeparam name="TValue">The type of value passed (generally a [<seealso cref="float"/>])</typeparam>
-    public interface ISupportActionListener<in T, TValue> : ISupportActionReceiverListener<T,TValue>
-    {
-        void OnPerformSupportAction(T element,ref TValue value);
-    }
-
     public interface ISupportActionReceiverListener<in T, TValue>
     {
         void OnReceiveSupportAction(T element,ref TValue value);

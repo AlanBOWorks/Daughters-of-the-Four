@@ -1,6 +1,8 @@
 using System;
 using CombatEntity;
 using CombatSkills;
+using CombatSystem;
+using CombatSystem.Events;
 using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
@@ -16,10 +18,9 @@ namespace CombatEffects
         [SerializeField] private EnumStats.MasterStatType buffStat;
         public EnumStats.MasterStatType GetBuffType() => buffStat;
 
-        protected override void DoEffectOn(
-            SkillValuesHolders values, CombatingEntity effectTarget, float buffValue, bool isCritical)
+        protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float buffValue,
+            bool isCritical)
         {
-            var user = values.User;
             var targetStats = effectTarget.CombatStats.MasterStats;
 
             float finalBuffValue = UtilStats.CalculateBuffPower(user.CombatStats, buffValue, isCritical);
@@ -41,17 +42,12 @@ namespace CombatEffects
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            var resolution = new SkillComponentResolution(this,finalBuffValue);
-            CallEvents(user,effectTarget,resolution);
+            return new SkillComponentResolution(this, finalBuffValue);
         }
-
-        protected virtual void CallEvents(CombatingEntity user, CombatingEntity effectTarget,
-            SkillComponentResolution resolution)
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
         {
-            user.EventsHolder.OnPerformSupportAction(effectTarget,ref resolution);
-            if(user == effectTarget) return;
-
-            effectTarget.EventsHolder.OnReceiveSupportAction(user,ref resolution);
+            CombatSystemSingleton.EventsHolder.OnReceiveSupportAction(entities,ref resolution);
         }
 
         [Button]
@@ -60,5 +56,6 @@ namespace CombatEffects
             name = "MASTER - " + buffStat.ToString() + " [Buff]";
             UtilsAssets.UpdateAssetName(this);
         }
+
     }
 }

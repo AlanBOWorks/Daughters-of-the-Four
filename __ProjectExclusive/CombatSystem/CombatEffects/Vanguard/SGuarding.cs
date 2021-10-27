@@ -2,18 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using CombatEntity;
 using CombatSkills;
+using CombatSystem.Events;
 using UnityEngine;
 
 namespace CombatEffects
 {
     public class SGuarding : SEffect
     {
-        protected override void DoEffectOn(SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
         {
-            if(effectValue < 1 || effectValue <= Random.value) return;
+            systemEvents.OnReceiveSupportAction(entities,ref resolution);
+        }
 
-            var user = values.User;
+        protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue,
+            bool isCritical)
+        {
+            if (effectValue < 1 || effectValue <= Random.value)
+                return new SkillComponentResolution(this, 0);
+
             user.GuardHandler.GuardTarget(effectTarget);
+            return new SkillComponentResolution(this,1);
+
         }
     }
 

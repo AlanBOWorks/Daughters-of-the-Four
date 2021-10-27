@@ -1,4 +1,5 @@
 using CombatEntity;
+using CombatSystem.Events;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Utils;
@@ -10,14 +11,10 @@ namespace CombatEffects
         menuName = "Combat/Effect/DE-Buff MASTER", order = 101)]
     public class SDeBuffMasterStat : SBuffMasterStat
     {
-        
-        protected override void CallEvents(CombatingEntity user, CombatingEntity effectTarget,
-            SkillComponentResolution resolution)
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
         {
-            user.EventsHolder.OnPerformSupportAction(effectTarget,ref resolution);
-            if(user == effectTarget) return;
-
-            effectTarget.EventsHolder.OnReceiveOffensiveAction(user,ref resolution);
+            systemEvents.OnReceiveOffensiveAction(entities,ref resolution);
         }
 
         [Button]

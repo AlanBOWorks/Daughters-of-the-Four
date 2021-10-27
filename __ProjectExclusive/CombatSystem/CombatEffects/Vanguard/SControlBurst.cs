@@ -1,5 +1,6 @@
 using CombatEntity;
 using CombatSkills;
+using CombatSystem.Events;
 using UnityEngine;
 
 namespace CombatEffects
@@ -9,11 +10,18 @@ namespace CombatEffects
     public class SControlBurst : SEffect
     {
         private const float ControlCriticalModifier = 1.25f;
-        protected override void DoEffectOn(SkillValuesHolders values, CombatingEntity effectTarget, float effectValue, bool isCritical)
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
         {
-            if (isCritical) 
-                effectValue *= ControlCriticalModifier;
-            effectTarget.Team.BurstControl(effectValue);
+        }
+
+        protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float controlAddition,
+            bool isCritical)
+        {
+            if (isCritical)
+                controlAddition *= ControlCriticalModifier;
+            effectTarget.Team.BurstControl(controlAddition);
+            return new SkillComponentResolution(this, controlAddition);
         }
     }
 }
