@@ -7,7 +7,7 @@ using UnityEngine;
 namespace CombatTeam
 {
     public abstract class UPersistentTeamStructurePoolerBase<T> : MonoBehaviour, ICombatTeamsStructureRead<T>,
-        ICombatPreparationListener, ICombatFinishListener
+        ICombatPreparationListener, ICombatDisruptionListener
     where T : UnityEngine.Object
     {
         protected virtual void Awake()
@@ -16,7 +16,7 @@ namespace CombatTeam
             _enemyElementsPool = new PoolerHandler();
 
             var preparationHandler = CombatSystemSingleton.CombatPreparationHandler;
-            preparationHandler.Subscribe(this as ICombatFinishListener);
+            preparationHandler.Subscribe(this as ICombatDisruptionListener);
             preparationHandler.Subscribe(this as ICombatPreparationListener);
         }
 
@@ -52,11 +52,16 @@ namespace CombatTeam
         }
 
         public abstract void OnAfterLoads();
-        public virtual void OnFinish(CombatingTeam wonTeam)
+        public abstract void OnCombatPause();
+        public abstract void OnCombatResume();
+
+        public virtual void OnCombatExit()
         {
             _playerElementsPool.ResetPools();
             _enemyElementsPool.ResetPools();
         }
+
+
 
         private sealed class PoolerHandler
         {
@@ -92,5 +97,6 @@ namespace CombatTeam
                 }
             }
         }
+
     }
 }

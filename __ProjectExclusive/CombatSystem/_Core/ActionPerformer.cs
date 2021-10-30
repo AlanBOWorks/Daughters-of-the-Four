@@ -18,7 +18,10 @@ namespace CombatSystem
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
 
             var entityHolder = values.Performer.InstantiatedHolder;
-            yield return Timing.WaitUntilDone(entityHolder.AnimationHandler._DoPerformSkillAnimation(values));
+
+            if(entityHolder != null && entityHolder.AnimationHandler != null)
+                yield return Timing.WaitUntilDone(entityHolder.AnimationHandler._DoPerformSkillAnimation(values));
+
             yield return Timing.WaitForOneFrame;
             DoEffects(values);
 

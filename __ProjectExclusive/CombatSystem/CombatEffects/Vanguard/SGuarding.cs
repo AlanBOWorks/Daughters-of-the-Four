@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem.Events;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatEffects
@@ -35,7 +36,9 @@ namespace CombatEffects
         }
 
         private readonly CombatingEntity _user;
+        [ShowInInspector]
         public CombatingEntity CurrentGuarding { get; private set; }
+        [ShowInInspector]
         public CombatingEntity GuardedBy { get; private set; }
 
         public void GuardTarget(CombatingEntity guardTarget)

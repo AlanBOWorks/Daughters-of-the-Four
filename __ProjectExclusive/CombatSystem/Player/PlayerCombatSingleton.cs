@@ -65,6 +65,8 @@ namespace __ProjectExclusive.Player
         [ShowInInspector]
         public static readonly IEntitySkillRequestHandler EntitySkillRequestHandler;
 
+        [TabGroup("Instantiations")] 
+        public static GameObject CombatUiReference;
 
 
         public static void InjectInCombatSystem()

@@ -35,6 +35,16 @@ namespace __ProjectExclusive.Player
         {
         }
 
+        public override void OnCombatPause()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void OnCombatResume()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void OnPoolElement(ref UTargetButton instantiatedElement)
         {
             instantiatedElement.Hide();
@@ -47,8 +57,9 @@ namespace __ProjectExclusive.Player
             element.Injection(entity);
         }
 
-        public override void OnFinish(CombatingTeam wonTeam)
+        public override void OnCombatExit()
         {
+            base.OnCombatExit();
             _entitiesTracker.Clear();
         }
 

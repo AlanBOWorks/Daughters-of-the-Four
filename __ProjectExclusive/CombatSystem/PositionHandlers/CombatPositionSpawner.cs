@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatSystem.PositionHandlers
 {
-    public class CombatPositionSpawner : ICombatPreparationListener, ICombatFinishListener
+    public class CombatPositionSpawner : ICombatPreparationListener, ICombatDisruptionListener
     {
         public CombatPositionSpawner()
         {
@@ -72,6 +72,21 @@ namespace CombatSystem.PositionHandlers
 
         public void OnFinish(CombatingTeam wonTeam)
         {
+            
+        }
+
+
+        public void OnCombatPause()
+        {
+            
+        }
+
+        public void OnCombatResume()
+        {
+        }
+
+        public void OnCombatExit()
+        {
             while (_removeEntitiesOnFinish.Count > 0)
             {
                 var entityHolder = _removeEntitiesOnFinish.Dequeue();
@@ -81,8 +96,5 @@ namespace CombatSystem.PositionHandlers
             _currentPlayerTeam = null;
             _currentEnemyTeam = null;
         }
-
-
-
     }
 }

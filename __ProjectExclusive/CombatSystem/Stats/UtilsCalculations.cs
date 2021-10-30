@@ -121,12 +121,10 @@ namespace Stats
         public static void RefillActions(CombatStatsHolder statsHolder)
         {
             statsHolder.CurrentActions = Mathf.RoundToInt(statsHolder.ActionsPerSequence);
-            Debug.Log($"REFILL actions: {statsHolder.CurrentActions}");
         }
 
         public static void DecreaseActions(CombatStatsHolder statsHolder, int amount = 1)
         {
-            Debug.Log($"Decreasing actions: {statsHolder.CurrentActions} > {statsHolder.CurrentActions -amount}");
             statsHolder.CurrentActions-= amount;
         }
 

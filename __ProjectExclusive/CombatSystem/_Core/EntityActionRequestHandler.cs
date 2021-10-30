@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace CombatSystem
 {
-    internal class EntityActionRequestHandler : IEntityTempoHandler
+    public sealed class EntityActionRequestHandler : IEntityTempoHandler, ICombatDisruptionListener
     {
         public EntityActionRequestHandler()
         {
@@ -24,6 +24,9 @@ namespace CombatSystem
         [ShowInInspector]
         private readonly SkillValuesHolders _skillValues;
 
+        public static IEntitySkillRequestHandler PlayerForcedEntitySkillRequestHandler;
+        public static IEntitySkillRequestHandler EnemyForcedEntitySkillRequestHandler;
+
         public IEnumerator<float> _RequestFinishActions(CombatingEntity entity)
         {
             return _LoopThroughActions(entity);
@@ -33,9 +36,19 @@ namespace CombatSystem
         {
             return CombatSystemSingleton.VolatilePlayerTeam.Contains(entity) //Is Players?
 
-                ? PlayerCombatSingleton.EntitySkillRequestHandler
-                : EnemyCombatSingleton.EntitySkillRequestHandler;
+                ? GetPlayerEntityRequestHandler()
+                : GetEnemyEntityRequestHandler();
         }
+
+        private static IEntitySkillRequestHandler GetPlayerEntityRequestHandler()
+        {
+            return PlayerForcedEntitySkillRequestHandler ?? PlayerCombatSingleton.EntitySkillRequestHandler;
+        }
+        private static IEntitySkillRequestHandler GetEnemyEntityRequestHandler()
+        {
+            return EnemyForcedEntitySkillRequestHandler ?? EnemyCombatSingleton.EntitySkillRequestHandler;
+        }
+
 
         private IEnumerator<float> _LoopThroughActions(CombatingEntity currentActingEntity)
         {
@@ -73,6 +86,20 @@ namespace CombatSystem
         }
 
 
+        public void OnCombatPause()
+        {
+            
+        }
+
+        public void OnCombatResume()
+        {
+        }
+
+        public void OnCombatExit()
+        {
+            EnemyForcedEntitySkillRequestHandler = null;
+            PlayerForcedEntitySkillRequestHandler = null;
+        }
     }
 
     public interface IEntitySkillRequestHandler

@@ -63,6 +63,9 @@ namespace __ProjectExclusive
         private static readonly GameStateLoader Instance = new GameStateLoader();
         public static readonly SOnGameStartLoader LoaderAsset;
 
+        /// <summary>
+        /// This load all necessary Singleons (some will instantiate the proper GOs)
+        /// </summary>
         public static void LoadPrepareInstances()
         {
             var instance = Instance;

@@ -202,6 +202,11 @@ namespace CombatSystem
 
     public interface ICombatFinishListener
     {
+        /// <summary>
+        /// Natural exit of the combat with a passed element [<see cref="CombatingTeam"/>].<br></br>
+        /// For a forced exit see [<seealso cref="ICombatDisruptionListener.OnCombatExit"/>]
+        /// </summary>
+        /// <param name="wonTeam"></param>
         void OnFinish(CombatingTeam wonTeam);
     }
 

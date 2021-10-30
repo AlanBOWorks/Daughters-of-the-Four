@@ -27,9 +27,9 @@ namespace CombatEffects
 
             // Final
             float finalDamage = userAttack - targetResistance;
-            var effectResolution = new SkillComponentResolution(this, finalDamage);
 
-            return effectResolution;
+            UtilsCombatStats.DoDamageTo(effectTarget.CombatStats, finalDamage);
+            return new SkillComponentResolution(this, finalDamage);
         }
     }
 }

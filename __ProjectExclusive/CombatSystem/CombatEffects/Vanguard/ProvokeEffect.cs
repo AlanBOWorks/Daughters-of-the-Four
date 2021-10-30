@@ -20,6 +20,7 @@ namespace CombatEffects
         }
         public void OnReceiveOffensiveAction(CombatingEntity offensiveReceiver)
         {
+            if(CurrentBait == null) return;
             if (CurrentBait != offensiveReceiver)
             {
                 CurrentBait.ProvokeEffects.Invoke();

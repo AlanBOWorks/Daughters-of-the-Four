@@ -20,6 +20,10 @@ namespace CombatSystem.CombatSkills
                 _ => throw new ArgumentOutOfRangeException(nameof(targetingType), targetingType, null)
             };
         }
+
+        public static List<CombatingEntity> GetPossibleTargets(CombatingEntity user, CombatingSkill skill)
+            => GetPossibleTargets(user, skill.GetTargetType());
+
         public static List<CombatingEntity> GetPossibleTargets(
         CombatingEntity user,
         CombatingEntity target, 
@@ -46,5 +50,7 @@ namespace CombatSystem.CombatSkills
             }
         }
 
+        public static List<CombatingEntity> GetPossibleTargets(CombatingEntity user, CombatingEntity target, EffectParameter effect) 
+            => GetPossibleTargets(user, target, effect.targetType);
     }
 }

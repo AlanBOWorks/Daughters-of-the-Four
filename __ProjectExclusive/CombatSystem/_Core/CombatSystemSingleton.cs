@@ -44,7 +44,7 @@ namespace CombatSystem
                 TempoTicker);
             CombatPreparationHandler.Subscribe((ICombatPreparationListener) 
                 combatPositionSpawner);
-            CombatPreparationHandler.Subscribe((ICombatFinishListener) 
+            CombatPreparationHandler.Subscribe((ICombatDisruptionListener) 
                 combatPositionSpawner);
 
             // ---->>>> EVENTS Subscriptions

@@ -127,9 +127,9 @@ namespace CombatTeam
     {
         public enum Role
         {
-            Vanguard,
-            Attacker,
-            Support
+            Vanguard = 0,
+            Attacker = 1,
+            Support = 2
         }
 
         /// <summary>
