@@ -17,7 +17,7 @@ namespace __ProjectExclusive.Player
         {
             _entitiesTracker = new Dictionary<CombatingEntity, UTargetButton>();
 
-            PlayerCombatSingleton.SubscribeEventListener(this);
+            PlayerCombatSingleton.PlayerEvents.Subscribe(this);
         }
 
 

@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace CombatSystem
 {
-    internal class EntityActionRequestHandler : IEntityTempoHandler, ITempoListener<CombatingEntity>
+    internal class EntityActionRequestHandler : IEntityTempoHandler
     {
         public EntityActionRequestHandler()
         {
@@ -23,27 +23,6 @@ namespace CombatSystem
         private readonly ActionPerformer _actionPerformer;
         [ShowInInspector]
         private readonly SkillValuesHolders _skillValues;
-
-
-        public void OnFirstAction(CombatingEntity element)
-        {
-            _skillValues.Inject(element);
-        }
-
-        public void OnFinishAction(CombatingEntity element)
-        {
-            _skillValues.OnActionClear();
-        }
-
-        public void OnFinishAllActions(CombatingEntity element)
-        {
-            _skillValues.Clear();
-        }
-
-        public void OnCantAct(CombatingEntity element)
-        {
-            _skillValues.Clear();
-        }
 
         public IEnumerator<float> _RequestFinishActions(CombatingEntity entity)
         {
@@ -62,6 +41,7 @@ namespace CombatSystem
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
 
+
             yield return Timing.WaitForOneFrame; //TODO request start actions animation;
 
             _skillValues.Inject(currentActingEntity);
@@ -75,6 +55,7 @@ namespace CombatSystem
             {
                 do
                 {
+                    _skillValues.OnActionClear();
                     // using waitUntilDone except waitUntilTrue(_skillValues.IsValid) is because the player
                     // might use these values correctly but changes the opinion and switch same values.
                     yield return Timing.WaitUntilDone(
@@ -88,6 +69,7 @@ namespace CombatSystem
                 CombatSystemSingleton.EntityDeathHandler.HandleDeaths(); 
             }
             eventsHolder.OnFinishAllActions(currentActingEntity);
+            _skillValues.Clear();
         }
 
 

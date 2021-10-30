@@ -21,7 +21,7 @@ namespace CombatSystem.Events
             _vitalityChangeListeners = new List<IVitalityChangeListener<THolder,TValue>>();
 
             _tempoListeners = new List<ITempoListener<TTempo>>();
-            _tempoDisruptionListeners = new List<ITempoDisruptionListener<TTempo>>();
+            _tempoDisruptionListeners = new List<ITempoAlternateListener<TTempo>>();
             _roundListeners = new List<IRoundListener<TTempo>>();
         }
 
@@ -39,42 +39,28 @@ namespace CombatSystem.Events
         [ShowInInspector, HorizontalGroup("Tempo Events", 
              Title = "________________________ Tempo Events ________________________")]
         private readonly List<ITempoListener<TTempo>> _tempoListeners;
-        private readonly List<ITempoDisruptionListener<TTempo>> _tempoDisruptionListeners;
+        private readonly List<ITempoAlternateListener<TTempo>> _tempoDisruptionListeners;
 
         [ShowInInspector, HorizontalGroup("Tempo Events")]
         private readonly List<IRoundListener<TTempo>> _roundListeners;
 
-        public virtual void SubscribeListener(object listener)
-        {
-            if(listener is IOffensiveActionReceiverListener<THolder, TValue> offensiveListener)
-                Subscribe(offensiveListener);
-            if(listener is ISupportActionReceiverListener<THolder, TValue> supportListener)
-                Subscribe(supportListener);
-            if(listener is IVitalityChangeListener<THolder,TValue> vitalityChangeListener)
-                Subscribe(vitalityChangeListener);
-            if(listener is ITempoListener<TTempo> tempoListener)
-                Subscribe(tempoListener);
-            if(listener is ITempoDisruptionListener<TTempo> tempoDisruptionListener)
-                Subscribe(tempoDisruptionListener);
-            if(listener is IRoundListener<TTempo> roundListener)
-                Subscribe(roundListener);
-        }
-
-        private void Subscribe(IOffensiveActionReceiverListener<THolder, TValue> listener)
+        public void Subscribe(IOffensiveActionReceiverListener<THolder, TValue> listener)
         {
             _offensiveReceiveListeners.Add(listener);
         }
 
-        private void Subscribe(ISupportActionReceiverListener<THolder, TValue> listener)
+        public void Subscribe(ISupportActionReceiverListener<THolder, TValue> listener)
         {
             _supportReceiveListeners.Add(listener);
         }
 
-        private void Subscribe(IVitalityChangeListener<THolder, TValue> listener) => _vitalityChangeListeners.Add(listener);
-        private void Subscribe(ITempoListener<TTempo> listener) => _tempoListeners.Add(listener);
-        private void Subscribe(ITempoDisruptionListener<TTempo> listener) => _tempoDisruptionListeners.Add(listener);
-        private void Subscribe(IRoundListener<TTempo> listener) => _roundListeners.Add(listener);
-        
+        public void Subscribe(IVitalityChangeListener<THolder, TValue> listener) => _vitalityChangeListeners.Add(listener);
+        public void Subscribe(ITempoListener<TTempo> listener) => _tempoListeners.Add(listener);
+        public void Subscribe(ITempoAlternateListener<TTempo> listener) => _tempoDisruptionListeners.Add(listener);
+        public void Subscribe(IRoundListener<TTempo> listener) => _roundListeners.Add(listener);
+
+
+        public void UnSubscribe(ITempoListener<TTempo> listener) => _tempoListeners.Remove(listener);
 
         public void OnReceiveOffensiveAction(THolder element,ref TValue value)
         {

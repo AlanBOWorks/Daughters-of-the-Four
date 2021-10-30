@@ -7,11 +7,20 @@ namespace CombatSystem.Events
     {
         void OnReceiveOffensiveAction(T element,ref TValue value);
     }
+    public interface IOffensiveActionReceiverListener<in T>
+    {
+        void OnReceiveOffensiveAction(T element);
+    }
+
     public interface ISupportActionReceiverListener<in T, TValue>
     {
         void OnReceiveSupportAction(T element,ref TValue value);
     }
-
+    public interface ISupportActionReceiverListener<in T>
+    {
+        void OnReceiveSupportAction(T element);
+    }
+   
 
     /// <summary>
     /// Used when a [<see cref="CombatingEntity"/>] receive a change on vitality (damage, recovery, health at zero)
@@ -37,7 +46,7 @@ namespace CombatSystem.Events
         void OnFinishAllActions(T element);
     }
 
-    public interface ITempoDisruptionListener<in T>
+    public interface ITempoAlternateListener<in T>
     {
         void OnCantAct(T element);
     }

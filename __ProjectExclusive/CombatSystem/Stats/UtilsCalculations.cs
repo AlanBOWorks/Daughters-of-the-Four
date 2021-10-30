@@ -145,16 +145,17 @@ namespace Stats
 
     public static class UtilsRandomStats
     {
-        public static bool IsCritical(CombatStatsHolder stats, CombatingSkill skill)
+        public static bool IsCritical(CombatStatsHolder stats, float percentageVariation = 0)
         {
             float criticalChance = stats.Critical;
-            float criticalVariation = skill.GetCritVariation();
-
-            criticalChance += criticalVariation;
+            criticalChance += percentageVariation;
 
             if (criticalChance <= 0) return false; //exclude zeros or below (since it could be random: 0 <= critical: 0)
             return Random.value <= criticalChance; // could be random: 1 <= critical: 1
         }
+
+        public static bool IsCritical(CombatStatsHolder stats, CombatingSkill skill)
+            => IsCritical(stats, skill.GetCritVariation());
     }
     
 }

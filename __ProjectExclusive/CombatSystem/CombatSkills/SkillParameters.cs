@@ -21,28 +21,45 @@ namespace CombatSkills
     {
         public SkillValuesHolders() {} //this is just for seeing the references amount
 
+        public SkillValuesHolders(CombatingEntity target)
+        {
+            Target = target;
+        }
+
         [ShowInInspector]
         public CombatingSkill UsedSkill { get; private set; }
         [ShowInInspector]
-        public CombatingEntity User { get; private set; }
+        public CombatingEntity Performer { get; private set; }
         [ShowInInspector]
         public CombatingEntity Target { get; private set; }
         [ShowInInspector]
         public bool IsCritical { get; private set; }
 
 
-        public void DoGuardSwitch(CombatingEntity newTarget) => Target = newTarget;
-        public void Inject(CombatingEntity user) => User = user;
+        public void SwitchTarget(CombatingEntity newTarget) => Target = newTarget;
+        public void Inject(CombatingEntity performer) => Performer = performer;
         public void Inject(SkillUsageValues values)
         {
             UsedSkill = values.UsedSkill;
             Target = values.Target;
         }
 
-        public void RollForCritical()
+        public void RollForCritical(CombatingEntity performer)
         {
-            IsCritical = UtilsRandomStats.IsCritical(User.CombatStats,UsedSkill);
+            IsCritical = UtilsRandomStats.IsCritical(performer.CombatStats, UsedSkill);
         }
+        public void RollForCritical() => RollForCritical(Performer);
+
+        /// <summary>
+        /// Rolls for critical only using the raw values of the Stats (<see cref="RollForCritical"/> used the <see cref="UsedSkill"/>)
+        /// </summary>
+        public void RollForCriticalRawStats(CombatingEntity performer)
+        {
+            IsCritical = UtilsRandomStats.IsCritical(performer.CombatStats);
+
+        }
+        public void RollForCriticalRawStats() => RollForCriticalRawStats(Performer);
+
 
         public void OnActionClear()
         {
@@ -53,20 +70,25 @@ namespace CombatSkills
         public void Clear()
         {
             UsedSkill = null;
-            User = null;
+            Performer = null;
             Target = null;
             IsCritical = false;
         }
 
-        public bool IsValid() => UsedSkill != null && User != null && Target != null;
+        public bool IsValid() => UsedSkill != null && Performer != null && Target != null;
     }
 
+    public interface ISkillValues
+    {
+        CombatingEntity Performer { get; }
+        CombatingEntity Target { get; }
+        bool IsCritical { get; }
+    }
 
-
-    internal interface ISkillParameters
+    public interface ISkillParameters : ISkillValues
     {
         CombatingSkill UsedSkill { get; }
-        CombatingEntity User { get; }
-        CombatingEntity Target { get; }
+       
+
     }
 }

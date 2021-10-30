@@ -11,10 +11,11 @@ namespace CombatSystem
 {
     public class CombatPreparationHandler
     {
-        public CombatPreparationHandler(int listAlloc = 2)
+        public CombatPreparationHandler()
         {
-            _preparationListeners =new List<ICombatPreparationListener>(listAlloc);
-            _combatFinishListeners = new List<ICombatFinishListener>(listAlloc);
+            _preparationListeners = new HashSet<ICombatPreparationListener>();
+            _combatFinishListeners = new HashSet<ICombatFinishListener>();
+            _combatDisruptionListeners = new HashSet<ICombatDisruptionListener>();
 
 #if UNITY_EDITOR
             var debugElement = new CombatPreparationDebugger();
@@ -25,10 +26,12 @@ namespace CombatSystem
         }
 
         [ShowInInspector,HorizontalGroup("Main",Title ="_______ Main Listeners ____________")]
-        private readonly List<ICombatPreparationListener> _preparationListeners;
-        [ShowInInspector]
-        private readonly List<ICombatFinishListener> _combatFinishListeners;
+        private readonly HashSet<ICombatPreparationListener> _preparationListeners;
 
+        [ShowInInspector,HorizontalGroup("Disruption Listeners")]
+        private readonly HashSet<ICombatFinishListener> _combatFinishListeners;
+        [ShowInInspector, HorizontalGroup("Disruption Listeners")]
+        private readonly HashSet<ICombatDisruptionListener> _combatDisruptionListeners;
 
         public bool IsCombatActive { get; private set; }
 
@@ -36,10 +39,13 @@ namespace CombatSystem
         {
             _preparationListeners.Add(listener);
         }
-
         public void Subscribe(ICombatFinishListener finishListener)
         {
             _combatFinishListeners.Add(finishListener);
+        }
+        public void Subscribe(ICombatDisruptionListener disruptionListener)
+        {
+            _combatDisruptionListeners.Add(disruptionListener);
         }
 
         public void StartCombat(string sceneAssetPath, ITeamProvider playerTeamProvider, ITeamProvider enemyTeamProvider)
@@ -109,6 +115,34 @@ namespace CombatSystem
             }
         }
 
+        public void RequestPause()
+        {
+            foreach (var listener in _combatDisruptionListeners)
+            {
+                listener.OnCombatPause();
+            }
+        }
+
+        public void RequestResume()
+        {
+            foreach (var listener in _combatDisruptionListeners)
+            {
+                listener.OnCombatResume();
+            }
+        }
+
+        public void RequestExitCombat()
+        {
+            foreach (var listener in _combatDisruptionListeners)
+            {
+                listener.OnCombatExit();
+            }
+
+
+            CombatSystemSingleton.VolatilePlayerTeam = null;
+            CombatSystemSingleton.VolatileEnemyTeam = null;
+            IsCombatActive = false;
+        }
 
         [Button, ShowIf("IsCombatActive")]
         public void RequestFinishCombat(CombatingTeam wonTeam)
@@ -117,10 +151,7 @@ namespace CombatSystem
             {
                 listener.OnFinish(wonTeam);
             }
-
-            CombatSystemSingleton.VolatilePlayerTeam = null;
-            CombatSystemSingleton.VolatileEnemyTeam = null;
-            IsCombatActive = false;
+            RequestExitCombat();
         }
 
 
@@ -173,7 +204,15 @@ namespace CombatSystem
     {
         void OnFinish(CombatingTeam wonTeam);
     }
-    // TODO make the provider/s and its listeners
-    
 
+    public interface ICombatDisruptionListener
+    {
+        void OnCombatPause();
+        void OnCombatResume();
+        /// <summary>
+        /// Forced or natural, the combat exits its running state
+        /// </summary>
+        void OnCombatExit();
+    }
+    
 }

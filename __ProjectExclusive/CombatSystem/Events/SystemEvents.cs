@@ -25,19 +25,19 @@ namespace CombatSystem.Events
         [ShowInInspector]
         private readonly SkillEvents _skillEvents;
 
-        public override void SubscribeListener(object listener)
+        /*public override void SubscribeListener(object listener)
         {
             base.SubscribeListener(listener);
             if(listener is ISkillEventListener skillEventListener)
                 Subscribe(skillEventListener);
             if (listener is ITeamStateChangeListener<CombatingTeam> teamChangeListener)
                 Subscribe(teamChangeListener);
-        }
+        }*/
 
-        private void Subscribe(ITeamStateChangeListener<CombatingTeam> listener) 
+        public void Subscribe(ITeamStateChangeListener<CombatingTeam> listener) 
             => _teamStateChangeListeners.Add(listener);
 
-        private void Subscribe(ISkillEventListener listener)
+        public void Subscribe(ISkillEventListener listener)
             => _skillEvents.Subscribe(listener);
 
         public void OnStanceChange(CombatingTeam holder, EnumTeam.TeamStance switchStance)

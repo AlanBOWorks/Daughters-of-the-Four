@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CombatEffects;
 using CombatEntity;
 using CombatSystem.Events;
 using CombatSystem.PositionHandlers;
@@ -27,8 +28,8 @@ namespace CombatSystem
 
             EntityDeathHandler = new CombatEntityDeathHandler();
 
-            TempoTicker = new TempoTicker();
             EntityActionRequestHandler = new EntityActionRequestHandler();
+            TempoTicker = new TempoTicker(EntityActionRequestHandler);
 
             SceneTracker = new CombatSceneTracker();
 
@@ -37,19 +38,29 @@ namespace CombatSystem
             AllEntities = new List<CombatingEntity>();
 
             // ---->>>> PREPARATION Subscriptions
-            CombatPreparationHandler.Subscribe(TempoTicker);
-            CombatPreparationHandler.Subscribe((ICombatPreparationListener) combatPositionSpawner);
-            CombatPreparationHandler.Subscribe((ICombatFinishListener) combatPositionSpawner);
+            CombatPreparationHandler.Subscribe((ICombatPreparationListener) 
+                TempoTicker);
+            CombatPreparationHandler.Subscribe((ICombatDisruptionListener) 
+                TempoTicker);
+            CombatPreparationHandler.Subscribe((ICombatPreparationListener) 
+                combatPositionSpawner);
+            CombatPreparationHandler.Subscribe((ICombatFinishListener) 
+                combatPositionSpawner);
 
             // ---->>>> EVENTS Subscriptions
-            EventsHolder.SubscribeListener(EntitiesFixedEvents);
+            EventsHolder.Subscribe((ITempoListener<CombatingEntity>) 
+                EntitiesFixedEvents);
+            EventsHolder.Subscribe((IRoundListener<CombatingEntity>) 
+                EntitiesFixedEvents);
+            EventsHolder.Subscribe((IOffensiveActionReceiverListener<CombatEntityPairAction,SkillComponentResolution>) 
+                EntitiesFixedEvents);
+            EventsHolder.Subscribe((ISupportActionReceiverListener<CombatEntityPairAction,SkillComponentResolution>) 
+                EntitiesFixedEvents);
+
             // Second because the Characters could have an event that changes the value of some event's Invoker (suck reducing damage)
             // OnReceiveOffensive, so this can represent the real damage afterwards
-            EventsHolder.SubscribeListener(DamageReceiveEvents);
+            EventsHolder.Subscribe(DamageReceiveEvents);
 
-            // ---->>>> TEMPO Subscription
-            TempoTicker.SubscribeListener(EventsHolder);
-            TempoTicker.SubscribeListener(EntityActionRequestHandler);
 
 #if UNITY_EDITOR
             if (_singletonExplanation != null)

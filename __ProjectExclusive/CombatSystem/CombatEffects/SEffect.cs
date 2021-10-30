@@ -9,16 +9,15 @@ namespace CombatEffects
 {
     public abstract class SEffect : SSkillComponentEffect, IEffect
     {
-        public void DoEffect(SkillValuesHolders values, EnumEffects.TargetType effectTargetType, float effectValue, bool isCritical)
+        public void DoEffect(CombatEntityPairAction entities, EnumEffects.TargetType effectTargetType, float effectValue, bool isCritical)
         {
-            var user = values.User;
-            var skillTarget = values.Target;
+            var user = entities.User;
+            var skillTarget = entities.Target;
             var effectTargets = UtilsTarget.GetPossibleTargets(user, skillTarget, effectTargetType);
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             foreach (var effectTarget in effectTargets)
             {
-                var entities = new CombatEntityPairAction(user, effectTarget);
                 var effectResolution = DoEffectOn(user, effectTarget, effectValue, isCritical);
                 DoEventCall(eventsHolder,entities,ref effectResolution);
             }

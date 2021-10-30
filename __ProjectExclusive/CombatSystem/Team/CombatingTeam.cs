@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CombatEffects;
 using CombatEntity;
 using CombatSystem;
 using CombatSystem.Events;
@@ -19,12 +20,18 @@ namespace CombatTeam
             Vanguard = GenerateEntity(generateFromProvider.Vanguard);
             Attacker = GenerateEntity(generateFromProvider.Attacker);
             Support = GenerateEntity(generateFromProvider.Support);
+
             Events = new TeamEvents();
+            ProvokeHandler = new ProvokeHandler();
+
             TeamStats = new TeamStats();
+
             foreach (var member in this)
             {
                 member.TargetingHolder.Inject(this);
             }
+
+
 
             CombatingEntity GenerateEntity(ICombatEntityProvider entityProvider)
             {
@@ -61,7 +68,8 @@ namespace CombatTeam
         [Title("Events")]
         [ShowInInspector]
         public readonly TeamEvents Events;
-
+        [ShowInInspector]
+        public readonly ProvokeHandler ProvokeHandler;
 
         public CombatingTeam EnemyTeam { get; private set; }
         public void Injection(CombatingTeam enemyTeam) => EnemyTeam = enemyTeam;

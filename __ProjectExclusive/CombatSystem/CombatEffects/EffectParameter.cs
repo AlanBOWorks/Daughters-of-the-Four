@@ -1,4 +1,5 @@
 using System;
+using CombatEntity;
 using CombatSkills;
 using Sirenix.OdinInspector;
 using Stats;
@@ -15,25 +16,38 @@ namespace CombatEffects
         [HorizontalGroup("Type",Title = "_____ Types _________")]
         public EnumEffects.TargetType targetType;
         [HorizontalGroup("Type")]
-        [ShowIf("IsBuffEffect",Animate = false)]
+        [ShowIf("IsBuffType",Animate = false)]
         public EnumStats.BuffType buffType;
 
         [Title("Params")]
         public float effectValue;
         public bool canCrit;
 
-        private bool IsBuffEffect() => preset is IBuff;
+        // Used in ShowIf
+        private bool IsBuffType() => !(preset is IEffect);
 
-        public void DoEffect(SkillValuesHolders values)
+        public void DoEffect(ISkillValues values)
         {
             bool isEffectCrit = canCrit && values.IsCritical;
+            var entities = new CombatEntityPairAction(values.Performer,values.Target);
+            DoEffect(entities,isEffectCrit);
+        }
+
+        public void DoEffect(CombatEntityPairAction entities,bool isEffectCrit = false)
+        {
+            if (buffType == EnumStats.BuffType.Provoke)
+            {
+                entities.Target.ProvokeEffects.Enqueue(this);
+                return;
+            }
+
             switch (preset)
             {
                 case IEffect effectPreset:
-                    effectPreset.DoEffect(values, targetType, effectValue, isEffectCrit);
+                    effectPreset.DoEffect(entities, targetType, effectValue, isEffectCrit);
                     return;
                 case IBuff buffPreset:
-                    buffPreset.DoBuff(values,buffType,targetType,effectValue,isEffectCrit);
+                    buffPreset.DoBuff(entities, buffType, targetType, effectValue, isEffectCrit);
                     return;
             }
         }

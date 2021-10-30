@@ -27,7 +27,7 @@ namespace CombatEffects
         }
     }
 
-    public class GuardHandler
+    public sealed class GuardHandler
     {
         public GuardHandler(CombatingEntity user)
         {
@@ -64,7 +64,7 @@ namespace CombatEffects
         public void VariateTarget(SkillValuesHolders values)
         {
             if (GuardedBy != null)
-                values.DoGuardSwitch(GuardedBy);
+                values.SwitchTarget(GuardedBy);
         }
     }
 }

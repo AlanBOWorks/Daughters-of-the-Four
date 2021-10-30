@@ -37,7 +37,7 @@ namespace CombatSystem.Events
         [ShowInInspector] 
         public readonly List<IVirtualSkillTargetListener> VirtualTargetListeners;
 
-        public override void SubscribeListener(object listener)
+        /*public override void SubscribeListener(object listener)
         {
             base.SubscribeListener(listener);
             if(listener is IVirtualSkillInteraction skillInteractionListener)
@@ -46,19 +46,19 @@ namespace CombatSystem.Events
                 Subscribe(skillInjectionListener);
             if(listener is IVirtualSkillTargetListener skillTargetListener)
                 Subscribe(skillTargetListener);
-        }
+        }*/
 
-        private void Subscribe(IVirtualSkillInteraction listener)
+        public void Subscribe(IVirtualSkillInteraction listener)
         {
             SkillInteractions.Add(listener);
         }
 
-        private void Subscribe(IVirtualSkillInjectionListener listener)
+        public void Subscribe(IVirtualSkillInjectionListener listener)
         {
             VirtualSkillInjections.Add(listener);
         }
 
-        private void Subscribe(IVirtualSkillTargetListener listener)
+        public void Subscribe(IVirtualSkillTargetListener listener)
         {
             VirtualTargetListeners.Add(listener);
         }

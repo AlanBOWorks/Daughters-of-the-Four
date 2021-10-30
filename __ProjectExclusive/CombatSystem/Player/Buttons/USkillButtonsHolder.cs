@@ -10,8 +10,8 @@ namespace __ProjectExclusive.Player
 {
     public class USkillButtonsHolder : MonoBehaviour, IVirtualSkillInjectionListener,
         IVirtualSkillTargetListener,
-        ISkillGroupTypesRead<List<USkillButton>>,
-        ITempoListener<CombatingEntity>
+        ITempoListener<CombatingEntity>,
+        ISkillGroupTypesRead<List<USkillButton>>
     {
         [SerializeField, HorizontalGroup()] private List<USkillButton> mainSkillButtons = new List<USkillButton>();
         [SerializeField, HorizontalGroup()] private List<USkillButton> sharedSkillButtons = new List<USkillButton>();
@@ -31,7 +31,10 @@ namespace __ProjectExclusive.Player
 
         private void Awake()
         {
-            PlayerCombatSingleton.SubscribeEventListener(this);
+            var playerEvents = PlayerCombatSingleton.PlayerEvents;
+            playerEvents.Subscribe(this as IVirtualSkillTargetListener);
+            playerEvents.Subscribe(this as IVirtualSkillInjectionListener);
+            playerEvents.Subscribe(this as ITempoListener<CombatingEntity>);
 
 
             InjectIntoButtons(mainSkillButtons);

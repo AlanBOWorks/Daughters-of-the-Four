@@ -14,13 +14,13 @@ namespace CombatEffects
     public interface IEffect : ISkillComponent
     {
         //SkillValuesHolders is a reference used for calculations; for events is better use CombatEntityPairAction
-        void DoEffect(SkillValuesHolders values, EnumEffects.TargetType effectTargetType, float effectModifier, bool isEffectCrit);
+        void DoEffect(CombatEntityPairAction entities, EnumEffects.TargetType effectTargetType, float effectModifier, bool isEffectCrit);
     }
 
     public interface IBuff : ISkillComponent
     {
 
-        void DoBuff(SkillValuesHolders values, 
+        void DoBuff(CombatEntityPairAction entities, 
             EnumStats.BuffType buffType, EnumEffects.TargetType effectTargetType,
             float effectValue, bool isCritical);
     }

@@ -27,12 +27,13 @@ namespace CombatEntity
                 = new SkillUsageTracker();
 
             GuardHandler = new GuardHandler(this);
+            ProvokeEffects = new ProvokeEffectsHolder(this);
 
             Team = team;
             TargetingHolder = new CombatTargetingHolder(this);
 
-            /*EventsHolder 
-                = new CharacterEventsHolder<CombatingEntity,CombatingEntity, SkillComponentResolution>();*/
+            EventsHolder = new CombatingEntityEvents();
+
 
             // Injection
             CombatStats.Injection(this);
@@ -53,13 +54,17 @@ namespace CombatEntity
         [Title("Guarding")] 
         public readonly GuardHandler GuardHandler;
 
+        [Title("Provoke")] 
+        public readonly ProvokeEffectsHolder ProvokeEffects;
+
         [Title("Team")]
         public readonly CombatingTeam Team;
         [ShowInInspector]
         public readonly CombatTargetingHolder TargetingHolder;
 
         [Title("Events")]
-        //public readonly CharacterEventsHolder<CombatingEntity, CombatingEntity, SkillComponentResolution> EventsHolder;
+        public readonly CombatingEntityEvents EventsHolder;
+
 
         [Title("Unity.Object")]
         [ShowInInspector]

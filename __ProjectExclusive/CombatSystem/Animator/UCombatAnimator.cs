@@ -44,7 +44,7 @@ namespace CombatSystem.Animator
             private const float ReceiveSkillDuration = .6f;
             public IEnumerator<float> _DoPerformSkillAnimation(SkillValuesHolders skillValues)
             {
-                var holder = skillValues.User.InstantiatedHolder;
+                var holder = skillValues.Performer.InstantiatedHolder;
                 holder.transform.DOPunchPosition(Vector3.up, DoSkillDuration, 4);
 
                 yield return Timing.WaitForSeconds(DoSkillDuration + SpaceBetweenAnimations);
@@ -52,7 +52,7 @@ namespace CombatSystem.Animator
 
             public IEnumerator<float> _DoReceiveSkillAnimation(SkillValuesHolders skillValues)
             {
-                var holder = skillValues.User.InstantiatedHolder;
+                var holder = skillValues.Performer.InstantiatedHolder;
                 holder.transform.DOPunchPosition(Vector3.forward, ReceiveSkillDuration, 6);
 
                 yield return Timing.WaitForSeconds(DoSkillDuration + SpaceBetweenAnimations);

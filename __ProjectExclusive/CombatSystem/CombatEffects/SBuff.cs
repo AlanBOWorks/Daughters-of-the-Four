@@ -12,21 +12,20 @@ namespace CombatEffects
     public abstract class SBuff : SSkillComponentEffect, IBuff
     {
         public void DoBuff(
-            SkillValuesHolders values,
+            CombatEntityPairAction entities,
             EnumStats.BuffType buffType, 
             EnumEffects.TargetType effectTargetType,
             float effectValue, bool isCritical)
         {
-            var user = values.User;
-            var skillTarget = values.Target;
+            var user = entities.User;
+            var skillTarget = entities.Target;
 
             var effectTargets = UtilsTarget.GetPossibleTargets(user, skillTarget, effectTargetType);
 
             var systemEvents = CombatSystemSingleton.EventsHolder;
             foreach (var effectTarget in effectTargets)
             {
-                var resolution = DoBuffOn(values, effectTarget, buffType, effectValue, isCritical);
-                var entities = new CombatEntityPairAction(user,effectTarget);
+                var resolution = DoBuffOn(user, effectTarget, buffType, effectValue, isCritical);
                 DoEventCalls(systemEvents,entities,ref resolution);
             }
 
@@ -38,22 +37,22 @@ namespace CombatEffects
             systemEvents.OnReceiveSupportAction(entities,ref resolution);
         }
 
-        protected float CalculateBuffStats(SkillValuesHolders values, float buffValue, bool isCritical)
+        protected float CalculateBuffStats(CombatingEntity performer, float buffValue, bool isCritical)
         {
-            return UtilStats.CalculateBuffPower(values.User.CombatStats,buffValue, isCritical);
+            return UtilStats.CalculateBuffPower(performer.CombatStats,buffValue, isCritical);
         }
 
         protected SkillComponentResolution DoBuffOn(
-            SkillValuesHolders values, CombatingEntity buffTarget, 
+            CombatingEntity performer, CombatingEntity buffTarget, 
             EnumStats.BuffType buffType, float buffValue, bool isCritical)
         {
             var statsHolder = buffTarget.CombatStats;
-            bool isSelfBuff = values.User == buffTarget;
+            bool isSelfBuff = performer == buffTarget;
             var targetStats = statsHolder.GetBuffableStats(buffType,isSelfBuff);
-            return DoBuffOn(values, targetStats, buffValue, isCritical);
+            return DoBuffOn(performer, targetStats, buffValue, isCritical);
         }
 
-        protected abstract SkillComponentResolution DoBuffOn(SkillValuesHolders values, IBaseStats<float> targetStats, float buffValue,
+        protected abstract SkillComponentResolution DoBuffOn(CombatingEntity performer, IBaseStats<float> targetStats, float buffValue,
             bool isCritical);
 
     }

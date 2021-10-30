@@ -39,7 +39,7 @@ namespace CombatSystem.Events
         public void OnSkillUse(SkillValuesHolders values)
         {
             Debug.Log($"Used Skill: {values.UsedSkill.GetSkillName()}____ \n" +
-                      $"- User >>> {values.User.GetEntityName()} \n" +
+                      $"- Performer >>> {values.Performer.GetEntityName()} \n" +
                       $"- Target >>> {values.Target.GetEntityName()}");
         }
     }

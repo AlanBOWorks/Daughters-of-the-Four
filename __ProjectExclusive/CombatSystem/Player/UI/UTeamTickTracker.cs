@@ -14,7 +14,7 @@ namespace __ProjectExclusive.Player
         {
             base.Awake();
             _trackers = new Dictionary<CombatingEntity, UTickTracker>();
-            CombatSystemSingleton.TempoTicker.SubscribeListener(this);
+            CombatSystemSingleton.TempoTicker.Subscribe(this);
         }
 
         private Dictionary<CombatingEntity, UTickTracker> _trackers;
@@ -31,7 +31,17 @@ namespace __ProjectExclusive.Player
         {
         }
 
-        public override void OnFinish(CombatingTeam wonTeam)
+        public override void OnCombatPause()
+        {
+            
+        }
+
+        public override void OnCombatResume()
+        {
+            
+        }
+
+        public override void OnCombatExit()
         {
             _trackers.Clear();
         }

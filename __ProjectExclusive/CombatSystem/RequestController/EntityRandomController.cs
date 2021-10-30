@@ -20,7 +20,7 @@ namespace CombatSystem
         
         public IEnumerator<float> HandleRequestAction(SkillValuesHolders values)
         {
-            var selectedSkill = DoRequestWithRandom(values.User);
+            var selectedSkill = DoRequestWithRandom(values.Performer);
             values.Inject(selectedSkill);
 
             yield return Timing.WaitForOneFrame;

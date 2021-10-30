@@ -1,4 +1,5 @@
 using System;
+using CombatEntity;
 using CombatSkills;
 using Sirenix.OdinInspector;
 using Stats;
@@ -17,9 +18,10 @@ namespace CombatEffects
         [SerializeField] private EnumStats.OffensiveStatType buffStat;
         public EnumStats.OffensiveStatType GetBuffType() => buffStat;
 
-        protected override SkillComponentResolution DoBuffOn(SkillValuesHolders values, IBaseStats<float> targetStats, float buffValue, bool isCritical)
+        protected override SkillComponentResolution DoBuffOn(
+            CombatingEntity performer, IBaseStats<float> targetStats, float buffValue, bool isCritical)
         {
-            float finalBuffValue = CalculateBuffStats(values, buffValue, isCritical);
+            float finalBuffValue = CalculateBuffStats(performer, buffValue, isCritical);
 
             switch (buffStat)
             {

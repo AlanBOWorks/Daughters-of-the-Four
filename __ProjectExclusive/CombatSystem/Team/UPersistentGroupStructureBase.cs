@@ -7,7 +7,7 @@ using UnityEngine;
 namespace CombatTeam
 {
     public abstract class UPersistentGroupStructureBase<T> : MonoBehaviour, ICombatGroupsStructureRead<T>,
-        ICombatPreparationListener, ICombatFinishListener
+        ICombatPreparationListener, ICombatDisruptionListener
         where T : UnityEngine.Object
     {
         [SerializeField,HorizontalGroup()] 
@@ -22,7 +22,7 @@ namespace CombatTeam
         {
             var preparationHandler = CombatSystemSingleton.CombatPreparationHandler;
             preparationHandler.Subscribe(this as ICombatPreparationListener);
-            preparationHandler.Subscribe(this as ICombatFinishListener);
+            preparationHandler.Subscribe(this as ICombatDisruptionListener);
         }
 
         public void OnPreparationCombat(CombatingTeam preparedPlayerTeam, CombatingTeam preparedEnemyTeam)
@@ -33,8 +33,9 @@ namespace CombatTeam
 
         protected abstract void DoInjection(CombatingEntity entity, T element);
         public abstract void OnAfterLoads();
-        public abstract void OnFinish(CombatingTeam wonTeam);
-
+        public abstract void OnCombatPause();
+        public abstract void OnCombatResume();
+        public abstract void OnCombatExit();
 
         [Serializable]
         protected class TeamElement : ITeamRoleStructureRead<T>

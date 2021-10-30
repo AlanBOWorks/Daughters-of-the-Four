@@ -20,6 +20,8 @@ namespace CombatSystem.PositionHandlers
         private void SpawnEntities()
         {
             var positions = CombatSystemSingleton.PositionProvider;
+            if(positions == null) return;
+
             var playerPositions = positions.GetPlayerTeam();
             var enemyPositions = positions.GetEnemyTeam();
 

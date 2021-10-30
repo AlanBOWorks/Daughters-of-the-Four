@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CombatSystem
 {
-    public class TempoTicker : ICombatPreparationListener
+    public class TempoTicker : ICombatPreparationListener, ICombatDisruptionListener
     {
 #if UNITY_EDITOR
         [ShowInInspector, TextArea] private const string BehaviourExplanation =
@@ -22,16 +22,17 @@ namespace CombatSystem
             => nonUsedStringInReal == BehaviourExplanation;
 #endif
 
-        public TempoTicker()
+        public TempoTicker(IEntityTempoHandler requestHandler)
         {
+            _requestActionHandler = requestHandler;
             _tickingEntities = new HashSet<CombatingEntity>();
             _activeEntities = new Queue<CombatingEntity>(GameParams.DefaultMemberPerCombat);
             _roundTracker = new HashSet<CombatingEntity>();
 
-            _tempoListeners = new HashSet<ITempoListener<CombatingEntity>>();
-            _roundListeners = new HashSet<IRoundListener<CombatingEntity>>();
             _entityTickListeners = new List<IEntityTickListener>();
         }
+
+        private readonly IEntityTempoHandler _requestActionHandler;
 
         [HorizontalGroup("Entities", Title = "Entities"), ShowInInspector,HideInEditorMode]
         private readonly HashSet<CombatingEntity> _tickingEntities;
@@ -40,45 +41,29 @@ namespace CombatSystem
         [HorizontalGroup("Entities", Title = "Entities"), ShowInInspector,HideInEditorMode]
         private readonly HashSet<CombatingEntity> _roundTracker;
 
-        [HorizontalGroup("Events", Title = "Events"), ShowInInspector, DisableIf("_tempoListeners")]
-        private readonly HashSet<ITempoListener<CombatingEntity>> _tempoListeners;
-        [HorizontalGroup("Events", Title = "Events"), ShowInInspector, DisableIf("_roundListeners")]
-        private readonly HashSet<IRoundListener<CombatingEntity>> _roundListeners;
 
-        [HorizontalGroup("Events", Title = "Events"), ShowInInspector, DisableIf("_tempoListeners")]
+        [HorizontalGroup("Events", Title = "Events"), ShowInInspector]
         private readonly List<IEntityTickListener> _entityTickListeners; 
 
         [Title("Condition")] 
         [ShowInInspector]
         private ICombatEndConditionProvider _conditionProvider;
-        private static readonly ICombatEndConditionProvider ProvisionalConditionProvider = new GenericWinCondition(); 
+        private static readonly ICombatEndConditionProvider ProvisionalConditionProvider = new GenericWinCondition();
 
+        public CombatingEntity CurrentActingEntity { get; private set; }
+
+        public bool IsRunning() => _coroutineHandle.IsRunning;
+        public bool IsPaused() => _coroutineHandle.IsAliveAndPaused;
+        public bool HasActingEntity() => CurrentActingEntity != null;
+
+
+        private CoroutineHandle _coroutineHandle;
         public void InjectCondition(ICombatEndConditionProvider conditionProvider)
         {
             _conditionProvider = conditionProvider;
         }
 
-        public void SubscribeListener(object listener)
-        {
-            if(listener is ITempoListener<CombatingEntity> tempoListener)
-                Subscribe(tempoListener);
-            if(listener is IRoundListener<CombatingEntity> roundListener)
-                Subscribe(roundListener);
-            if(listener is IEntityTickListener tickListener)
-                Subscribe(tickListener);
-        }
-
-        private void Subscribe(ITempoListener<CombatingEntity> listener)
-        {
-            _tempoListeners.Add(listener);
-        }
-
-        private void Subscribe(IRoundListener<CombatingEntity> listener)
-        {
-            _roundListeners.Add(listener);
-        }
-
-        private void Subscribe(IEntityTickListener listener)
+        public void Subscribe(IEntityTickListener listener)
         {
             _entityTickListeners.Add(listener);
         }
@@ -100,7 +85,7 @@ namespace CombatSystem
 
         public void OnAfterLoads()
         {
-            Timing.RunCoroutine(_TickingLoop());
+            _coroutineHandle = Timing.RunCoroutine(_TickingLoop());
         }
 
 
@@ -152,6 +137,7 @@ namespace CombatSystem
                 while (_activeEntities.Count > 0)
                 {
                     var actingEntity = _activeEntities.Dequeue();
+                    CurrentActingEntity = actingEntity;
                     //Removes (and adds later) so acted entities has fewer priority that those how didn't 
                     _tickingEntities.Remove(actingEntity);
 
@@ -164,9 +150,9 @@ namespace CombatSystem
                     yield return Timing.WaitUntilDone(_DoEntitySequence(actingEntity));
 
                     //Finish the acting
+                    CurrentActingEntity = null;
                     _tickingEntities.Add(actingEntity);
                     _DoRoundEndCheck(actingEntity);
-
                 }
 
                 yield return Timing.WaitForOneFrame;
@@ -189,20 +175,22 @@ namespace CombatSystem
             }
         }
 
+        private CoroutineHandle _requestActionCoroutineHandle;
         private IEnumerator<float> _DoEntitySequence(CombatingEntity actingEntity)
         {
-            var entityTempoHandler = CombatSystemSingleton.EntityActionRequestHandler;
 
             yield return Timing.WaitForOneFrame;
 
-            if (actingEntity.CanAct())
+            if (!actingEntity.CanAct())
             {
                 CombatSystemSingleton.EventsHolder.OnCantAct(actingEntity);
                 yield break;
             }
 
             // The EntityActionRequestHandler deals with the event of OnFirstAction(Entity)
-            yield return Timing.WaitUntilDone(entityTempoHandler._RequestFinishActions(actingEntity));
+            _requestActionCoroutineHandle 
+                = Timing.RunCoroutine(_requestActionHandler._RequestFinishActions(actingEntity));
+            yield return Timing.WaitUntilDone(_requestActionCoroutineHandle);
 
         }
 
@@ -210,8 +198,6 @@ namespace CombatSystem
         private void _DoRoundEndCheck(CombatingEntity checkingEntity)
         {
             if (! _roundTracker.Contains(checkingEntity)) return;
-
-
 
             if (_roundTracker.Count == 1) //This means is the las entity
             {
@@ -225,6 +211,34 @@ namespace CombatSystem
             {
                 _roundTracker.Remove(checkingEntity);
             }
+        }
+
+        public void OnCombatPause()
+        {
+            if (_requestActionCoroutineHandle.IsRunning)
+            {
+                _requestActionCoroutineHandle.IsAliveAndPaused = true;
+            }
+            else
+            {
+                _coroutineHandle.IsAliveAndPaused = true;
+            }
+        }
+        public void OnCombatResume()
+        {
+            if (_requestActionCoroutineHandle.IsRunning)
+            {
+                _requestActionCoroutineHandle.IsAliveAndPaused = false;
+            }
+            else
+            {
+                _coroutineHandle.IsAliveAndPaused = false;
+            }
+        }
+        public void OnCombatExit()
+        {
+            _coroutineHandle.IsRunning = false;
+            _requestActionCoroutineHandle.IsRunning = false;
         }
     }
 
