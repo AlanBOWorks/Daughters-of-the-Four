@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatEffects;
 using CombatEntity;
+using CombatSkills;
 using CombatSystem.Events;
 using CombatSystem.PositionHandlers;
 using CombatTeam;
@@ -34,6 +35,7 @@ namespace CombatSystem
             SceneTracker = new CombatSceneTracker();
 
             // ---->>>> Secondaries
+            var actionEventDiscriminator = new CombatingActionEventDiscriminator();
             var combatPositionSpawner = new CombatPositionSpawner();
             AllEntities = new List<CombatingEntity>();
 
@@ -52,10 +54,11 @@ namespace CombatSystem
                 EntitiesFixedEvents);
             EventsHolder.Subscribe((IRoundListener<CombatingEntity>) 
                 EntitiesFixedEvents);
-            EventsHolder.Subscribe((IOffensiveActionReceiverListener<CombatEntityPairAction,SkillComponentResolution>) 
+            EventsHolder.Subscribe((IOffensiveActionReceiverListener<CombatEntityPairAction,CombatingSkill,SkillComponentResolution>) 
                 EntitiesFixedEvents);
-            EventsHolder.Subscribe((ISupportActionReceiverListener<CombatEntityPairAction,SkillComponentResolution>) 
+            EventsHolder.Subscribe((ISupportActionReceiverListener<CombatEntityPairAction, CombatingSkill, SkillComponentResolution>) 
                 EntitiesFixedEvents);
+            EventsHolder.Subscribe(actionEventDiscriminator);
 
             // Second because the Characters could have an event that changes the value of some event's Invoker (suck reducing damage)
             // OnReceiveOffensive, so this can represent the real damage afterwards
@@ -93,7 +96,6 @@ namespace CombatSystem
         [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly CombatEntityFixedEvents EntitiesFixedEvents;
         public static readonly DamageReceiveEventsInvoker DamageReceiveEvents;
-
         public static readonly CombatEntityDeathHandler EntityDeathHandler;
 
         [Title("Tempo")]

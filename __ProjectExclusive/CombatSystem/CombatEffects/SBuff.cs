@@ -34,7 +34,7 @@ namespace CombatEffects
         protected virtual void DoEventCalls(SystemEventsHolder systemEvents,CombatEntityPairAction entities,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveSupportAction(entities,ref resolution);
+            systemEvents.OnReceiveSupportEffect(entities,ref resolution);
         }
 
         protected float CalculateBuffStats(CombatingEntity performer, float buffValue, bool isCritical)

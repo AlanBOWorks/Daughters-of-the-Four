@@ -23,22 +23,25 @@ namespace CombatSystem
                 yield return Timing.WaitUntilDone(entityHolder.AnimationHandler._DoPerformSkillAnimation(values));
 
             yield return Timing.WaitForOneFrame;
-            DoEffects(values);
+            PerformSkill(values);
 
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
         }
 
-        private static void DoEffects(SkillValuesHolders values)
+        private static void PerformSkill(SkillValuesHolders values)
         {
             var skill = values.UsedSkill;
             var effects = skill.GetEffects();
+
+            // Before effects because OnSkillUse could have buff/reaction effects that mitigates/amplified effects
+            CombatSystemSingleton.EventsHolder.OnSkillUse(values);
 
             foreach (EffectParameter effectParameter in effects)
             {
                 effectParameter.DoEffect(values);
             }
             skill.PutInCooldown();
-            CombatSystemSingleton.EventsHolder.OnSkillUse(values);
         }
+
     }
 }

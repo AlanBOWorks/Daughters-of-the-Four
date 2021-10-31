@@ -52,5 +52,6 @@ namespace CombatSystem.CombatSkills
 
         public static List<CombatingEntity> GetPossibleTargets(CombatingEntity user, CombatingEntity target, EffectParameter effect) 
             => GetPossibleTargets(user, target, effect.targetType);
+
     }
 }

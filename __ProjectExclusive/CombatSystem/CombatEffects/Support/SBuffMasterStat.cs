@@ -47,7 +47,7 @@ namespace CombatEffects
         protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
             ref SkillComponentResolution resolution)
         {
-            CombatSystemSingleton.EventsHolder.OnReceiveSupportAction(entities,ref resolution);
+            CombatSystemSingleton.EventsHolder.OnReceiveSupportEffect(entities,ref resolution);
         }
 
         [Button]

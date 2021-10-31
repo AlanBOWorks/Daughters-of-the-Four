@@ -34,7 +34,7 @@ namespace CombatEffects
         protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveOffensiveAction(entities,ref resolution);
+            systemEvents.OnReceiveOffensiveEffect(entities,ref resolution);
         }
     }
 
@@ -43,7 +43,7 @@ namespace CombatEffects
         protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveSupportAction(entities, ref resolution);
+            systemEvents.OnReceiveSupportEffect(entities, ref resolution);
         }
     }
 }

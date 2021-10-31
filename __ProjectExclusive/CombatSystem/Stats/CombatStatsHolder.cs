@@ -67,6 +67,8 @@ namespace Stats
             _buffStats.ConditionalStat.Injection(user);
         }
 
+        public bool HasNoActions() => CurrentActions <= 0;
+
         /// <summary>
         /// Used for additive type of buff (add, sum, multiply). For conditional types use the special
         /// getter for conditional buffs

@@ -22,32 +22,75 @@ namespace Stats
             {
                 return;
             }
+            bool blockedByShields = DoDamageToShields(vitality);
+            if(blockedByShields) return;
 
-            if (vitality.CurrentShields >= 1)
-            {
-                vitality.CurrentShields -= 1; // by design shields are lost in units
-                if (vitality.CurrentShields <= 0)
-                {
-                    vitality.CurrentShields = 0;
-                    CombatSystemSingleton.DamageReceiveEvents.OnShieldLost();
-                }
-            }
+            bool blockedByHealth = DoDamageToHealth(vitality,damage);
+            if(blockedByHealth) return;
 
-            if (vitality.CurrentHealth > 0)
-            {
-                vitality.CurrentHealth -= damage;
-                if (!(vitality.CurrentHealth <= 0)) return;
+            DoDamageToMortality(vitality, damage);
+        }
 
-                vitality.CurrentHealth = 0;
-                CombatSystemSingleton.DamageReceiveEvents.OnHealthLost();
-            }
+        public static void AddPersistentDamage(CombatStats<float, int> stats, float damagePerSequence)
+        {
+            DoDamageToShields(stats);
+            // By design PersistentDamage pass through shields while damaging it
+            stats.CurrentPersistentDamage += damagePerSequence;
+        }
 
+        public static void DoCurrentPersistentDamage(CombatStats<float, int> stats)
+        {
+            float currentAccumulatedDamage = stats.CurrentPersistentDamage;
+            if(currentAccumulatedDamage <= 0) return;
+
+            DoDamageTo(stats,currentAccumulatedDamage);
+        }
+
+        /// <returns>If damages was blocked</returns>
+        public static bool DoDamageToShields(ICombatPercentStats<float> vitality)
+        {
+            // Shields can only block if there's at least 1 shield; 0.5f will be not considered enough shields
+            if(vitality.CurrentShields < 1) return false; //See the DoDamageToHealth's comment about the return's reason being there
+
+            vitality.CurrentShields -= 1; // by design shields are lost in units
+            if (vitality.CurrentShields > 0) return true;
+
+            vitality.CurrentShields = 0;
+            CombatSystemSingleton.DamageReceiveEvents.OnShieldLost();
+            return true;
+        }
+
+        /// <returns>If damage was blocked</returns>
+        public static bool DoDamageToHealth(ICombatPercentStats<float> vitality, float damage)
+        {
+            /*  Returns was added because by design damage only happens in block of stats (to simply
+                chucks of damage information that the player needs to process).
+                If there's enough shields, then shields it's the only thing the player will take on account;
+                If there's not enough shields but health, then health it's the only thing the player will take on account;
+                If there's nothing protecting but Mortality, then only mortality will be taken part on the calculations
+                
+            */
+            if (vitality.CurrentHealth <= 0) return false;
+
+            vitality.CurrentHealth -= damage;
+            if(vitality.CurrentHealth > 0) return true;
+
+            vitality.CurrentHealth = 0;
+            CombatSystemSingleton.DamageReceiveEvents.OnHealthLost();
+            return true;
+        }
+        // Doesn't have return (bool) because it's the last stats in the damage calculations and the returns (bool) were
+        // for avoid the next damage calculation
+        public static void DoDamageToMortality(ICombatPercentStats<float> vitality, float damage)
+        {
             vitality.CurrentMortality -= damage;
-            if (!(vitality.CurrentMortality < 0)) return;
+            if(vitality.CurrentMortality > 0) return;
 
             vitality.CurrentMortality = 0;
             CombatSystemSingleton.DamageReceiveEvents.OnMortalityDeath();
         }
+
+
 
         //Heals are done in percent
         public const float CriticalHealPercentageAddition = .25f;
@@ -57,7 +100,7 @@ namespace Stats
             currentHeal += maxHealth * CriticalHealPercentageAddition;
         }
 
-        public static void DoOverHealTo(CombatStatsHolder stats, float healPercent)
+        public static void DoOverHealTo(CombatStats<float, int> stats, float healPercent)
         {
             float maxHealth = stats.MaxHealth;
             float healthMaxCap = maxHealth * (1 + CriticalHealPercentageAddition);
@@ -75,7 +118,7 @@ namespace Stats
             stats.CurrentHealth = targetHealth;
         }
 
-        public static void DoHealTo(CombatStatsHolder stats, float healPercent)
+        public static void DoHealTo(CombatStats<float, int> stats, float healPercent)
         {
             float maxHealth = stats.MaxHealth;
             float healthMaxCap = maxHealth;
@@ -90,9 +133,10 @@ namespace Stats
 
 
             stats.CurrentHealth = targetHealth;
+            stats.CurrentPersistentDamage = 0; //By design heals remove all persistentDamage
         }
 
-        public static void DoShielding(CombatStatsHolder user, CombatStatsHolder target, float shieldingVariation)
+        public static void DoShielding(CombatStats<float, int> user, CombatStats<float, int> target, float shieldingVariation)
         {
             var userShielding = user.Shielding;
             var targetShielding = target.Shielding;
@@ -108,33 +152,33 @@ namespace Stats
         }
 
 
-        public static void VariateActions(CombatStatsHolder statsHolder, int addition)
+        public static void VariateActions(CombatStats<float, int> statsHolder, int addition)
         {
             statsHolder.CurrentActions += addition;
         }
 
-        public static void OverrideActionsAmount(CombatStatsHolder statsHolder, int targetAmount)
+        public static void OverrideActionsAmount(CombatStats<float, int> statsHolder, int targetAmount)
         {
             statsHolder.CurrentActions = targetAmount;
         }
 
-        public static void RefillActions(CombatStatsHolder statsHolder)
+        public static void RefillActions(CombatStats<float, int> statsHolder)
         {
             statsHolder.CurrentActions = Mathf.RoundToInt(statsHolder.ActionsPerSequence);
         }
 
-        public static void DecreaseActions(CombatStatsHolder statsHolder, int amount = 1)
+        public static void DecreaseActions(CombatStats<float, int> statsHolder, int amount = 1)
         {
             statsHolder.CurrentActions-= amount;
         }
 
-        public static void ResetActions(CombatStatsHolder statsHolder)
+        public static void ResetActions(CombatStats<float, int> statsHolder)
         {
             statsHolder.CurrentActions = 0;
         }
 
         private const float MaxInitiativeRefillRandom = .1f;
-        public static void InitiativeResetOnTrigger(CombatStatsHolder statsHolder)
+        public static void InitiativeResetOnTrigger(CombatStats<float, int> statsHolder)
         {
             statsHolder.TickingInitiative = 0;
         }

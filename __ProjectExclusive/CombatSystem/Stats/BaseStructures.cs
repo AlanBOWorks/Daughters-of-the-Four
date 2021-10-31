@@ -156,6 +156,8 @@ namespace Stats
         public TPercent TickingInitiative { get; set; }
         [ShowInInspector]
         public TUnit CurrentActions { get; set; }
+        [ShowInInspector]
+        public TPercent CurrentPersistentDamage { get; set; }
 
 
 

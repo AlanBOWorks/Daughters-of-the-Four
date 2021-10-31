@@ -11,7 +11,7 @@ namespace CombatEffects
         protected override void DoEventCalls(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveOffensiveAction(entities,ref resolution);
+            systemEvents.OnReceiveOffensiveEffect(entities,ref resolution);
         }
     }
 }

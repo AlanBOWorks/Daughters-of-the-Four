@@ -13,7 +13,7 @@ namespace CombatEffects
         protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveSupportAction(entities,ref resolution);
+            systemEvents.OnReceiveSupportEffect(entities,ref resolution);
         }
 
         protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue,

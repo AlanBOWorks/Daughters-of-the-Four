@@ -15,20 +15,15 @@ namespace CombatSystem.Events
     public class CombatEntityFixedEvents :
         ITempoListener<CombatingEntity>, 
         IRoundListener<CombatingEntity>,
-        IOffensiveActionReceiverListener<CombatEntityPairAction,SkillComponentResolution>,
-        ISupportActionReceiverListener<CombatEntityPairAction,SkillComponentResolution>
+        IOffensiveActionReceiverListener<CombatEntityPairAction,CombatingSkill,SkillComponentResolution>,
+        ISupportActionReceiverListener<CombatEntityPairAction, CombatingSkill, SkillComponentResolution>
     {
 #if UNITY_EDITOR
         [ShowInInspector,TextArea]
         private const string _behaviourExplanation = "A Sigleton event caller for fixed events that occurs always in the same " +
                                                      "pattern (It calls the entities's Events in the required order as a consequence)";
 #endif
-        public CombatEntityFixedEvents()
-        {
-            _entityEventInvoker = new CombatEntityEventInvoker();
-        }
-
-        private readonly CombatEntityEventInvoker _entityEventInvoker;
+       
 
 
         public void OnFirstAction(CombatingEntity entity)
@@ -42,7 +37,6 @@ namespace CombatSystem.Events
             entity.SkillUsageTracker.ResetOnStartSequence();
             entity.SkillsHolder.TickCoolDowns();
 
-            _entityEventInvoker.InjectUser(entity);
         }
 
         public void OnFinishAction(CombatingEntity entity)
@@ -50,15 +44,13 @@ namespace CombatSystem.Events
             var stats = entity.CombatStats;
             UtilsCombatStats.DecreaseActions(stats);
 
-            _entityEventInvoker.InvokeEvents();
-
         }
 
         public void OnFinishAllActions(CombatingEntity entity)
         {
             entity.CombatStats.GetBurstStat().ReceivedBurst.ResetAsBurst();
+            UtilsCombatStats.DoCurrentPersistentDamage(entity.CombatStats);
 
-            _entityEventInvoker.OnFinishAllActions();
         }
 
 
@@ -73,83 +65,25 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnReceiveOffensiveAction(CombatEntityPairAction element, ref SkillComponentResolution value)
+        public void OnReceiveOffensiveAction(CombatEntityPairAction element, CombatingSkill skill)
         {
-            var receiver = element.Target;
-            _entityEventInvoker.OnReceiveOffensiveAction(receiver);
+            // todo call for reactionEvents
         }
 
-        public void OnReceiveSupportAction(CombatEntityPairAction element, ref SkillComponentResolution value)
+        public void OnReceiveOffensiveEffect(CombatEntityPairAction element, ref SkillComponentResolution effectResolution)
         {
-            var receiver = element.Target;
-            _entityEventInvoker.OnReceiveOffensiveAction(receiver);
-        }
-    }
-
-    internal sealed class CombatEntityEventInvoker : 
-        IOffensiveActionReceiverListener<CombatingEntity>,
-        ISupportActionReceiverListener<CombatingEntity>
-    {
-        public CombatEntityEventInvoker()
-        {
-            _offensiveCalls = new HashSet<CombatingEntity>();
-            _supportCalls = new HashSet<CombatingEntity>();
+           
         }
 
-        private CombatingEntity _currentEntity;
-
-        private readonly HashSet<CombatingEntity> _offensiveCalls;
-        private readonly HashSet<CombatingEntity> _supportCalls;
-
-
-        public void OnReceiveOffensiveAction(CombatingEntity receiver)
+        public void OnReceiveSupportAction(CombatEntityPairAction element, CombatingSkill skill)
         {
-            if(_offensiveCalls.Contains(receiver)) return;
-            _offensiveCalls.Add(receiver);
-
-        }
-        public void OnReceiveSupportAction(CombatingEntity receiver)
-        {
-            if(_supportCalls.Contains(receiver)) return;
-            _supportCalls.Add(receiver);
-
+            // todo call for reactionEvents
         }
 
-        private void CallOffensiveListeners()
+        public void OnReceiveSupportEffect(CombatEntityPairAction element, ref SkillComponentResolution effectResolution)
         {
-            foreach (var receiver in _offensiveCalls)
-            {
-                receiver.EventsHolder.OnReceiveOffensiveAction(_currentEntity);
-                receiver.Team.ProvokeHandler.OnReceiveOffensiveAction(receiver);
-            }
-
-
-            _offensiveCalls.Clear();
-        }
-
-        private void CallSupportListeners()
-        {
-            foreach (var receiver in _supportCalls)
-            {
-                receiver.EventsHolder.OnReceiveSupportAction(_currentEntity);
-            }
-            _supportCalls.Clear();
-        }
-
-        public void InjectUser(CombatingEntity user)
-        {
-            _currentEntity = user;
-        }
-
-        public void InvokeEvents()
-        {
-            CallOffensiveListeners();
-            CallSupportListeners();
-        }
-
-        public void OnFinishAllActions()
-        {
-            _currentEntity = null;
+            
         }
     }
+
 }

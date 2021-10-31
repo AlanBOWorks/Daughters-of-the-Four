@@ -6,19 +6,19 @@ using UnityEngine;
 
 namespace CombatSystem.Events
 {
-    public class CharacterEventsHolder<THolder, TTempo, TValue> :
-        IOffensiveActionReceiverListener<THolder, TValue>,
-        ISupportActionReceiverListener<THolder, TValue>,
-        IVitalityChangeListener<THolder, TValue>,
+    public class CharacterEventsHolder<THolder, TTempo, TSkill, TEffect> :
+        IOffensiveActionReceiverListener<THolder, TSkill, TEffect>,
+        ISupportActionReceiverListener<THolder, TSkill, TEffect>,
+        IVitalityChangeListener<THolder, TSkill>,
         ITempoListener<TTempo>
     {
         public CharacterEventsHolder()
         {
-            _offensiveReceiveListeners = new List<IOffensiveActionReceiverListener<THolder, TValue>>();
+            _offensiveReceiveListeners = new List<IOffensiveActionReceiverListener<THolder, TSkill, TEffect>>();
 
-            _supportReceiveListeners = new List<ISupportActionReceiverListener<THolder, TValue>>();
+            _supportReceiveListeners = new List<ISupportActionReceiverListener<THolder, TSkill, TEffect>>();
 
-            _vitalityChangeListeners = new List<IVitalityChangeListener<THolder,TValue>>();
+            _vitalityChangeListeners = new List<IVitalityChangeListener<THolder,TSkill>>();
 
             _tempoListeners = new List<ITempoListener<TTempo>>();
             _tempoDisruptionListeners = new List<ITempoAlternateListener<TTempo>>();
@@ -27,14 +27,14 @@ namespace CombatSystem.Events
 
         [ShowInInspector,HorizontalGroup("Offensive Events", 
              Title = "________________________ Offensive Events ________________________")]
-        private readonly List<IOffensiveActionReceiverListener<THolder,TValue>> _offensiveReceiveListeners;
+        private readonly List<IOffensiveActionReceiverListener<THolder,TSkill, TEffect>> _offensiveReceiveListeners;
         [ShowInInspector, HorizontalGroup("Support Events", 
              Title = "________________________ Support Events ________________________")]
-        private readonly List<ISupportActionReceiverListener<THolder,TValue>> _supportReceiveListeners;
+        private readonly List<ISupportActionReceiverListener<THolder,TSkill, TEffect>> _supportReceiveListeners;
 
         [ShowInInspector, HorizontalGroup("Reaction stats", 
              Title = "________________________ Reaction Events ________________________")]
-        private readonly List<IVitalityChangeListener<THolder,TValue>> _vitalityChangeListeners;
+        private readonly List<IVitalityChangeListener<THolder,TSkill>> _vitalityChangeListeners;
 
         [ShowInInspector, HorizontalGroup("Tempo Events", 
              Title = "________________________ Tempo Events ________________________")]
@@ -44,17 +44,17 @@ namespace CombatSystem.Events
         [ShowInInspector, HorizontalGroup("Tempo Events")]
         private readonly List<IRoundListener<TTempo>> _roundListeners;
 
-        public void Subscribe(IOffensiveActionReceiverListener<THolder, TValue> listener)
+        public void Subscribe(IOffensiveActionReceiverListener<THolder, TSkill, TEffect> listener)
         {
             _offensiveReceiveListeners.Add(listener);
         }
 
-        public void Subscribe(ISupportActionReceiverListener<THolder, TValue> listener)
+        public void Subscribe(ISupportActionReceiverListener<THolder, TSkill, TEffect> listener)
         {
             _supportReceiveListeners.Add(listener);
         }
 
-        public void Subscribe(IVitalityChangeListener<THolder, TValue> listener) => _vitalityChangeListeners.Add(listener);
+        public void Subscribe(IVitalityChangeListener<THolder, TSkill> listener) => _vitalityChangeListeners.Add(listener);
         public void Subscribe(ITempoListener<TTempo> listener) => _tempoListeners.Add(listener);
         public void Subscribe(ITempoAlternateListener<TTempo> listener) => _tempoDisruptionListeners.Add(listener);
         public void Subscribe(IRoundListener<TTempo> listener) => _roundListeners.Add(listener);
@@ -62,34 +62,51 @@ namespace CombatSystem.Events
 
         public void UnSubscribe(ITempoListener<TTempo> listener) => _tempoListeners.Remove(listener);
 
-        public void OnReceiveOffensiveAction(THolder element,ref TValue value)
+        public void OnReceiveOffensiveAction(THolder element, TSkill skillValue)
         {
             foreach (var listener in _offensiveReceiveListeners)
             {
-                listener.OnReceiveOffensiveAction(element,ref value);
+                listener.OnReceiveOffensiveAction(element, skillValue);
             }
         }
-        public void OnReceiveSupportAction(THolder element,ref TValue value)
+
+        public void OnReceiveOffensiveEffect(THolder element, ref TEffect effectValue)
+        {
+            foreach (var listener in _offensiveReceiveListeners)
+            {
+                listener.OnReceiveOffensiveEffect(element,ref effectValue);
+            }
+        }
+
+        public void OnReceiveSupportAction(THolder element, TSkill skillValue)
         {
             foreach (var listener in _supportReceiveListeners)
             {
-                listener.OnReceiveSupportAction(element,ref value);
+                listener.OnReceiveSupportAction(element, skillValue);
             }
         }
 
-        public void OnShieldLost(THolder element,ref TValue value)
+        public void OnReceiveSupportEffect(THolder element, ref TEffect effectValue)
         {
-            foreach (var listener in _vitalityChangeListeners)
+            foreach (var listener in _supportReceiveListeners)
             {
-                listener.OnShieldLost(element,ref value);
+                listener.OnReceiveSupportEffect(element, ref effectValue);
             }
         }
 
-        public void OnHealthLost(THolder element,ref TValue value)
+        public void OnShieldLost(THolder element, TSkill value)
         {
             foreach (var listener in _vitalityChangeListeners)
             {
-                listener.OnHealthLost(element,ref value);
+                listener.OnShieldLost(element, value);
+            }
+        }
+
+        public void OnHealthLost(THolder element, TSkill value)
+        {
+            foreach (var listener in _vitalityChangeListeners)
+            {
+                listener.OnHealthLost(element, value);
             }
         }
 
