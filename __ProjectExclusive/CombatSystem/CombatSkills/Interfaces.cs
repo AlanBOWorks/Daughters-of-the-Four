@@ -4,20 +4,34 @@ using UnityEngine;
 
 namespace CombatSkills
 {
-    public interface ISkill
+    public interface ISkill : ISkillDescription, ISkillStats,ISkillEffectParameters
+    { }
+
+    public interface ISkillPlayerFeedback
     {
         string GetSkillName();
         Sprite GetIcon();
+    }
 
-        EnumSkills.TargetType GetTargetType();
-
-        int GetCooldownAmount();
-        bool CanCrit();
-        float GetCritVariation();
+    public interface ISkillDescription : ISkillPlayerFeedback
+    {
         /// <summary>
         /// A Key type for checking special cases (if null it should return the first element of [<see cref="GetEffects"/>]]
         /// </summary>
         ISkillComponent GetDescriptiveEffect();
+    }
+
+    public interface ISkillStats
+    {
+        EnumSkills.TargetType GetTargetType();
+        int GetCooldownAmount();
+        bool CanCrit();
+        float GetCritVariation();
+    }
+    public interface ISkillEffectParameters
+    {
+        bool IsMainEffectAfterListEffects { get; }
+        EffectParameter GetMainEffect();
         List<EffectParameter> GetEffects();
     }
 

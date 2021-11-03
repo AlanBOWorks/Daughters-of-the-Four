@@ -41,7 +41,7 @@ namespace CombatSkills
         private Sprite specialSprite;
 
         [Title("Params")] 
-        [SerializeField] 
+        [SerializeField,EnumPaging] 
         private EnumSkills.TargetType skillTargetType = EnumSkills.TargetType.Self;
 
 
@@ -55,6 +55,13 @@ namespace CombatSkills
         [SerializeField, ShowIf("CanCrit")] 
         private float critVariation;
 
+        [Title("Effects")]
+        [BoxGroup("Main Effect")]
+        [SerializeField,ToggleLeft] 
+        private bool isMainEffectAfterListEffects;
+        [BoxGroup("Main Effect")]
+        [SerializeField]
+        private EffectParameter mainEffect = new EffectParameter();
 
         [SerializeField]
         private List<EffectParameter> effects = new List<EffectParameter>();
@@ -92,6 +99,10 @@ namespace CombatSkills
                 ? specialDescriptiveEffect 
                 : effects[0].preset;
         }
+
+        public bool IsMainEffectAfterListEffects => isMainEffectAfterListEffects;
+        public EffectParameter GetMainEffect() => mainEffect;
+
         public List<EffectParameter> GetEffects() => effects;
 
 #if UNITY_EDITOR

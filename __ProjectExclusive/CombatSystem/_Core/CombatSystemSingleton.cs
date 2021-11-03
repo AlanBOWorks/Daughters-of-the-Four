@@ -8,6 +8,7 @@ using CombatSystem.PositionHandlers;
 using CombatTeam;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
+using Stats;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -35,6 +36,7 @@ namespace CombatSystem
             SceneTracker = new CombatSceneTracker();
 
             // ---->>>> Secondaries
+            var teamEventsDiscriminator = new TeamEventsDiscriminator();
             var actionEventDiscriminator = new CombatingActionEventDiscriminator();
             var combatPositionSpawner = new CombatPositionSpawner();
             AllEntities = new List<CombatingEntity>();
@@ -44,6 +46,8 @@ namespace CombatSystem
                 TempoTicker);
             CombatPreparationHandler.Subscribe((ICombatDisruptionListener) 
                 TempoTicker);
+            CombatPreparationHandler.Subscribe(
+                teamEventsDiscriminator);
             CombatPreparationHandler.Subscribe((ICombatPreparationListener) 
                 combatPositionSpawner);
             CombatPreparationHandler.Subscribe((ICombatDisruptionListener) 
@@ -58,6 +62,7 @@ namespace CombatSystem
                 EntitiesFixedEvents);
             EventsHolder.Subscribe((ISupportActionReceiverListener<CombatEntityPairAction, CombatingSkill, SkillComponentResolution>) 
                 EntitiesFixedEvents);
+            EventsHolder.Subscribe(teamEventsDiscriminator);
             EventsHolder.Subscribe(actionEventDiscriminator);
 
             // Second because the Characters could have an event that changes the value of some event's Invoker (suck reducing damage)
@@ -106,9 +111,11 @@ namespace CombatSystem
         [TabGroup("ReadOnly"), ShowInInspector]
         internal static readonly EntityActionRequestHandler EntityActionRequestHandler;
 
-        // Temporal can remain more than couple combats but can change from external reasons (change scene normally)
-        [TabGroup("Temporal"), ShowInInspector, DisableInEditorMode] 
+
+        // Temporal can remain more than couple combats (or until close app) but could be modified by external reasons
+        [TabGroup("Temporal"), ShowInInspector, DisableInEditorMode]
         public static UPositionProviderBase PositionProvider;
+       
 
         [TabGroup("Combat Only"), ShowInInspector, DisableInEditorMode] 
         public static List<CombatingEntity> AllEntities;

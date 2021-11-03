@@ -20,6 +20,17 @@ namespace CombatSkills
             action(primary.SharedSkillTypes, secondary.SharedSkillTypes);
             action(primary.MainSkillTypes, secondary.MainSkillTypes);
         }
+
+        public static T GetElement<T>(ISkillTypesRead<T> skillsStructures, EnumSkills.TargetType targetType)
+        {
+            return targetType switch
+            {
+                EnumSkills.TargetType.Self => skillsStructures.SelfType,
+                EnumSkills.TargetType.Support => skillsStructures.SupportType,
+                EnumSkills.TargetType.Offensive => skillsStructures.OffensiveType,
+                _ => throw new ArgumentOutOfRangeException(nameof(targetType), targetType, null)
+            };
+        }
     }
 
     public static class EnumSkills

@@ -31,15 +31,25 @@ namespace CombatSystem
         private static void PerformSkill(SkillValuesHolders values)
         {
             var skill = values.UsedSkill;
+            var mainEffect = skill.GetMainEffect();
             var effects = skill.GetEffects();
+
 
             // Before effects because OnSkillUse could have buff/reaction effects that mitigates/amplified effects
             CombatSystemSingleton.EventsHolder.OnSkillUse(values);
+
+            if(!skill.IsMainEffectAfterListEffects)
+                mainEffect.DoEffect(values);
 
             foreach (EffectParameter effectParameter in effects)
             {
                 effectParameter.DoEffect(values);
             }
+            if (skill.IsMainEffectAfterListEffects)
+                mainEffect.DoEffect(values);
+
+
+
             skill.PutInCooldown();
         }
 

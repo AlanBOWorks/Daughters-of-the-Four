@@ -42,7 +42,7 @@ namespace Stats
     }
 
     [Serializable]
-    public class CondensedMasterStructure<T> : IMasterStats<T>, IBaseStats<T>
+    public class CondensedMasterStructure<TMaster,TElement> : IMasterStats<TMaster>, IBaseStats<TElement>
     {
         [SerializeField, HorizontalGroup("External Action")]
         private OffensiveWrapper offensiveValues = new OffensiveWrapper();
@@ -54,146 +54,146 @@ namespace Stats
         private ConcentrationWrapper concentrationValues = new ConcentrationWrapper();
 
         // MASTER
-        public T Offensive
+        public TMaster Offensive
         {
             get => offensiveValues.offensiveElement;
             set => offensiveValues.offensiveElement = value;
         }
-        public T Support
+        public TMaster Support
         {
             get => supportValues.supportElement;
             set => supportValues.supportElement = value;
         }
-        public T Vitality
+        public TMaster Vitality
         {
             get => vitalityValues.vitalityElement;
             set => vitalityValues.vitalityElement = value;
         }
-        public T Concentration
+        public TMaster Concentration
         {
             get => concentrationValues.concentrationElement;
             set => concentrationValues.concentrationElement = value;
         }
 
         // OFFENSIVE
-        public T Attack
+        public TElement Attack
         {
-            get => offensiveValues.attack ?? offensiveValues.offensiveElement;
+            get => offensiveValues.attack;
             set => offensiveValues.attack = value;
         }
-        public T Persistent
+        public TElement Persistent
         {
-            get => offensiveValues.persistent ?? offensiveValues.offensiveElement;
+            get => offensiveValues.persistent;
             set => offensiveValues.persistent = value;
         }
-        public T Debuff
+        public TElement Debuff
         {
-            get => offensiveValues.debuff ?? offensiveValues.offensiveElement;
+            get => offensiveValues.debuff;
             set => offensiveValues.debuff = value;
         }
-        public T FollowUp
+        public TElement FollowUp
         {
-            get => offensiveValues.followUp ?? offensiveValues.offensiveElement;
+            get => offensiveValues.followUp;
             set => offensiveValues.followUp = value;
         }
 
         // SUPPORT
-        public T Heal
+        public TElement Heal
         {
-            get => supportValues.heal ?? supportValues.supportElement;
+            get => supportValues.heal;
             set => supportValues.heal = value;
         }
-        public T Buff
+        public TElement Buff
         {
-            get => supportValues.buff ?? supportValues.supportElement;
+            get => supportValues.buff;
             set => supportValues.buff = value;
         }
-        public T ReceiveBuff
+        public TElement ReceiveBuff
         {
-            get => supportValues.receiveBuff ?? supportValues.supportElement;
+            get => supportValues.receiveBuff;
             set => supportValues.receiveBuff = value;
         }
-        public T Shielding
+        public TElement Shielding
         {
-            get => supportValues.shielding ?? supportValues.supportElement;
+            get => supportValues.shielding;
             set => supportValues.shielding = value;
         }
 
         // VITALITY
-        public T MaxHealth
+        public TElement MaxHealth
         {
-            get => vitalityValues.maxHealth ?? vitalityValues.vitalityElement;
+            get => vitalityValues.maxHealth;
             set => vitalityValues.maxHealth = value;
         }
-        public T MaxMortality
+        public TElement MaxMortality
         {
-            get => vitalityValues.maxMortality ?? vitalityValues.vitalityElement;
+            get => vitalityValues.maxMortality;
             set => vitalityValues.maxMortality = value;
         }
-        public T DebuffResistance
+        public TElement DebuffResistance
         {
-            get => vitalityValues.debuffResistance ?? vitalityValues.vitalityElement;
+            get => vitalityValues.debuffResistance;
             set => vitalityValues.debuffResistance = value;
         }
-        public T DamageResistance
+        public TElement DamageResistance
         {
-            get => vitalityValues.damageResistance ?? vitalityValues.vitalityElement;
+            get => vitalityValues.damageResistance;
             set => vitalityValues.damageResistance = value;
         }
 
         // CONCENTRATION
-        public T InitiativeSpeed
+        public TElement InitiativeSpeed
         {
-            get => concentrationValues.initiativeSpeed ?? concentrationValues.concentrationElement;
+            get => concentrationValues.initiativeSpeed;
             set => concentrationValues.initiativeSpeed = value;
         }
-        public T InitialInitiative
+        public TElement InitialInitiative
         {
-            get => concentrationValues.initialInitiative ?? concentrationValues.concentrationElement;
+            get => concentrationValues.initialInitiative;
             set => concentrationValues.initiativeSpeed = value;
         }
-        public T ActionsPerSequence
+        public TElement ActionsPerSequence
         {
-            get => concentrationValues.actionsPerSequence ?? concentrationValues.concentrationElement;
+            get => concentrationValues.actionsPerSequence;
             set => concentrationValues.actionsPerSequence = value;
         }
-        public T Critical
+        public TElement Critical
         {
-            get => concentrationValues.critical ?? concentrationValues.concentrationElement;
+            get => concentrationValues.critical;
             set => concentrationValues.critical = value;
         }
 
         [Serializable]
-        private class OffensiveWrapper : IOffensiveStatsInject<T>, IOffensiveStatsRead<T>
+        private class OffensiveWrapper : IOffensiveStatsInject<TElement>, IOffensiveStatsRead<TElement>
         {
             [Title("Master")]
-            public T offensiveElement;
+            public TMaster offensiveElement;
 
             [Title("SubElement")]
-            public T attack;
-            public T persistent;
-            public T debuff;
-            public T followUp;
+            public TElement attack;
+            public TElement persistent;
+            public TElement debuff;
+            public TElement followUp;
 
-            public T Attack
+            public TElement Attack
             {
                 get => attack;
                 set => attack = value;
             }
 
-            public T Persistent
+            public TElement Persistent
             {
                 get => persistent;
                 set => persistent = value;
             }
 
-            public T Debuff
+            public TElement Debuff
             {
                 get => debuff;
                 set => debuff = value;
             }
 
-            public T FollowUp
+            public TElement FollowUp
             {
                 get => followUp;
                 set => followUp = value;
@@ -201,35 +201,35 @@ namespace Stats
         }
 
         [Serializable]
-        private class SupportWrapper : ISupportStatsRead<T>, ISupportStatsInject<T>
+        private class SupportWrapper : ISupportStatsRead<TElement>, ISupportStatsInject<TElement>
         {
             [Title("Master")]
-            public T supportElement;
+            public TMaster supportElement;
             [Title("SubElement")]
-            public T heal;
-            public T buff;
-            public T receiveBuff;
-            public T shielding;
+            public TElement heal;
+            public TElement buff;
+            public TElement receiveBuff;
+            public TElement shielding;
 
-            public T Heal
+            public TElement Heal
             {
                 get => heal;
                 set => heal = value;
             }
 
-            public T Buff
+            public TElement Buff
             {
                 get => buff;
                 set => buff = value;
             }
 
-            public T ReceiveBuff
+            public TElement ReceiveBuff
             {
                 get => receiveBuff;
                 set => receiveBuff = value;
             }
 
-            public T Shielding
+            public TElement Shielding
             {
                 get => shielding;
                 set => shielding = value;
@@ -237,33 +237,33 @@ namespace Stats
         }
 
         [Serializable]
-        private class VitalityWrapper : IVitalityStatsRead<T>, IVitalityStatsInject<T>
+        private class VitalityWrapper : IVitalityStatsRead<TElement>, IVitalityStatsInject<TElement>
         {
             [Title("Master")] 
-            public T vitalityElement;
+            public TMaster vitalityElement;
 
             [Title("SubElements")] 
-            public T maxHealth;
-            public T maxMortality;
-            public T debuffResistance;
-            public T damageResistance;
+            public TElement maxHealth;
+            public TElement maxMortality;
+            public TElement debuffResistance;
+            public TElement damageResistance;
 
-            public T MaxHealth
+            public TElement MaxHealth
             {
                 get => maxHealth;
                 set => maxHealth = value;
             }
-            public T MaxMortality
+            public TElement MaxMortality
             {
                 get => maxMortality;
                 set => maxMortality = value;
             }
-            public T DebuffResistance
+            public TElement DebuffResistance
             {
                 get => debuffResistance;
                 set => debuffResistance = value;
             }
-            public T DamageResistance
+            public TElement DamageResistance
             {
                 get => damageResistance;
                 set => damageResistance = value;
@@ -271,40 +271,42 @@ namespace Stats
         }
 
         [Serializable]
-        private class ConcentrationWrapper : IConcentrationStatsRead<T>, IConcentrationStatsInject<T>
+        private class ConcentrationWrapper : IConcentrationStatsRead<TElement>, IConcentrationStatsInject<TElement>
         {
             [Title("Master")] 
-            public T concentrationElement;
+            public TMaster concentrationElement;
 
             [Title("SubElements")] 
-            public T initiativeSpeed;
-            public T initialInitiative;
-            public T actionsPerSequence;
-            public T critical;
+            public TElement initiativeSpeed;
+            public TElement initialInitiative;
+            public TElement actionsPerSequence;
+            public TElement critical;
 
-            public T InitiativeSpeed
+            public TElement InitiativeSpeed
             {
                 get => initiativeSpeed;
                 set => initiativeSpeed = value;
             }
 
-            public T InitialInitiative
+            public TElement InitialInitiative
             {
                 get => initialInitiative;
                 set => initialInitiative = value;
             }
 
-            public T ActionsPerSequence
+            public TElement ActionsPerSequence
             {
                 get => actionsPerSequence;
                 set => actionsPerSequence = value;
             }
 
-            public T Critical
+            public TElement Critical
             {
                 get => critical;
                 set => critical = value;
             }
         }
     }
+
+
 }

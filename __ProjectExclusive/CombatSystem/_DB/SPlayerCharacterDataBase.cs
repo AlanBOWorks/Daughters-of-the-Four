@@ -26,6 +26,7 @@ namespace CombatSystem._DB
         private SPlayerCharacterDataBase _assetDataBase;
 
         [ShowInInspector, ShowIf("_assetDataBase"), TabGroup("Assets")]
+        [InlineEditor(InlineEditorObjectFieldModes.Boxed)]
         private List<SPlayerCombatEntity> _assets;
         [ShowInInspector, ShowIf("_assetDataBase"), TabGroup("Preview"), PropertyOrder(-10)]
         private List<SPlayerCombatEntity.PreviewPreset>[] _previews;

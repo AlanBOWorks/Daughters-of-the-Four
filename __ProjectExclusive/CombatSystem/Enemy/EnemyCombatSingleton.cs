@@ -1,3 +1,4 @@
+using CombatSystem.Events;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace CombatSystem.Enemy
 
         static EnemyCombatSingleton()
         {
+            EventsHolder = new EnemyEvents();
         }
 
         private EnemyCombatSingleton()
@@ -18,7 +20,8 @@ namespace CombatSystem.Enemy
 
         public static EnemyCombatSingleton GetInstance() => Instance;
 
-
+        [ShowInInspector] 
+        public static readonly EnemyEvents EventsHolder;
         [ShowInInspector]
         public static readonly IEntitySkillRequestHandler EntitySkillRequestHandler;
     }

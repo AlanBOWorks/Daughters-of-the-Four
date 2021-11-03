@@ -1,8 +1,11 @@
 using CombatSkills;
 using DG.Tweening;
+using MPUIKIT;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace __ProjectExclusive.Player
@@ -16,10 +19,18 @@ namespace __ProjectExclusive.Player
         }
 
         private USkillButtonsHolder _holder;
-        [SerializeField] private TextMeshProUGUI skillName;
+        [Title("Tooltips")]
+        [SerializeField] 
+        private TextMeshProUGUI skillName;
+        [Title("Visuals")]
+        [SerializeField] 
+        private Image icon;
+        [SerializeField] 
+        private MPImage borderHolder;
+
+        private Color _skillColor = Color.white;
+
         private CombatingSkill _holdingSkill;
-
-
         public CombatingSkill GetSkill() => _holdingSkill;
 
         public void ForceUpdate()
@@ -34,6 +45,13 @@ namespace __ProjectExclusive.Player
             _holdingSkill = skill;
             ForceUpdate();
         }
+        public void Injection(Sprite iconSprite, Color iconColor)
+        {
+            icon.sprite = iconSprite;
+            icon.color = iconColor;
+
+            _skillColor = iconColor;
+        }
 
         public void ResetState()
         {
@@ -42,17 +60,35 @@ namespace __ProjectExclusive.Player
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            RectTransform recTransform = transform as RectTransform;
-            recTransform.DOScale(new Vector3(1.1f, 1.1f,1), .2f);
+            DOTween.Kill(transform);
+            HoverState();
             _holder.OnHover(this);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             DOTween.Kill(transform);
-            transform.localScale = Vector3.one;
+            InitialState();
             _holder.OnHoverExit(this);
+        }
 
+        private const float HoverAnimationDuration = .2f;
+        private void HoverState()
+        {
+            RectTransform recTransform = transform as RectTransform;
+            recTransform.DOLocalMoveY(12, HoverAnimationDuration);
+
+            borderHolder.CrossFadeColor(_skillColor, HoverAnimationDuration, true,false);
+        }
+
+        private void InitialState()
+        {
+            var buttonTransform = transform;
+            Vector3 localPosition = buttonTransform.localPosition;
+            localPosition.y = 0;
+            buttonTransform.localPosition = localPosition;
+
+            borderHolder.OutlineColor = Color.white;
         }
 
         public void OnPointerClick(PointerEventData eventData)

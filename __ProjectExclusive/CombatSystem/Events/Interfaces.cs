@@ -1,8 +1,25 @@
+using CombatEffects;
+using CombatEntity;
+using CombatSkills;
 using CombatTeam;
 using UnityEngine;
 
 namespace CombatSystem.Events
 {
+    public interface ICharactersEvents<in THolder, in TTempo,in TSkill, TEffect> :
+        IOffensiveActionReceiverListener<THolder, TSkill, TEffect>,
+        ISupportActionReceiverListener<THolder, TSkill, TEffect>,
+        IVitalityChangeListener<THolder, TSkill>,
+        ITempoListener<TTempo>,
+        ITempoAlternateListener<TTempo>,
+        IRoundListener<TTempo>
+    { }
+    public interface ICharactersEvents : 
+        ICharactersEvents<CombatEntityPairAction, CombatingEntity, CombatingSkill, SkillComponentResolution>
+    { }
+    public interface ICombatSystemEvents : ICharactersEvents, ITeamStateChangeListener<CombatingTeam>, ISkillEventListener
+    { }
+
     public interface IOffensiveActionReceiverListener<in T,in TAction, TEffect>
     {
         void OnReceiveOffensiveAction(T element, TAction value);

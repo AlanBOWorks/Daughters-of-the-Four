@@ -1,9 +1,11 @@
 using CombatEntity;
+using CombatSkills;
 using CombatSystem;
 using CombatSystem.Events;
 using CombatTeam;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
+using Stats;
 using UnityEditor;
 using UnityEngine;
 
@@ -26,7 +28,7 @@ namespace __ProjectExclusive.Player
 
             EntitySkillRequestHandler = SkillSelectionsQueue;
             // For Debug: vvvv
-            EntitySkillRequestHandler = new EntityRandomController(); //TODO make it a player controller
+            //EntitySkillRequestHandler = new EntityRandomController(); 
 
             // Subscriptions
             PlayerEvents.Subscribe(VirtualSkillsInjector);
@@ -69,14 +71,22 @@ namespace __ProjectExclusive.Player
         public static GameObject CombatUiReference;
 
 
+        public static IMasterStatsRead<Color> CombatMasterStatColors;
+        public static IBaseStatsRead<Color> CombatBaseStatsColors;
+        public static ITeamRoleStructureRead<Color> CombatRoleStructureColors;
+        public static ISkillTypes<Color> CombatSkillTypesColors;
+
+        public static IMasterStatsRead<Sprite> CombatMasterStatsIcons;
+        public static IBaseStatsRead<Sprite> CombatBaseStatsIcons;
+        public static ITeamRoleStructureRead<Sprite> CombatRolesIcons;
+        public static ISkillTypesRead<Sprite> CombatSkillTypesIcons;
+
         public static void InjectInCombatSystem()
         {
 #if UNITY_EDITOR
             Debug.Log("Injecting Player [Singleton]'s Events into Combat [Singleton]");
 #endif
-
-            CombatSystemSingleton.EventsHolder.Subscribe(PlayerEvents as ISkillEventListener);
-            CombatSystemSingleton.EventsHolder.Subscribe(PlayerEvents as ITeamStateChangeListener<CombatingTeam>);
+            
         }
     }
 

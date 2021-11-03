@@ -10,7 +10,9 @@ namespace CombatSystem.Events
         IOffensiveActionReceiverListener<THolder, TSkill, TEffect>,
         ISupportActionReceiverListener<THolder, TSkill, TEffect>,
         IVitalityChangeListener<THolder, TSkill>,
-        ITempoListener<TTempo>
+        ITempoListener<TTempo>,
+        ITempoAlternateListener<TTempo>,
+        IRoundListener<TTempo>
     {
         public CharacterEventsHolder()
         {

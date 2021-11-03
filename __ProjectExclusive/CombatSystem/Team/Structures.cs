@@ -1,10 +1,11 @@
 using System;
+using CombatSkills;
 using UnityEngine;
 
 namespace CombatTeam
 {
     [Serializable]
-    public class RoleArchetypeStructure<T> : ITeamRoleStructure<T>
+    public class RoleArchetypeStructure<T> : ITeamRoleStructure<T>, ISkillTypes<T>, ITeamStanceStructure<T>
     {
         [SerializeField]
         private T vanguard;
@@ -19,14 +20,46 @@ namespace CombatTeam
             get => vanguard;
             set => vanguard = value;
         }
-
         public T Attacker
         {
             get => attacker;
             set => attacker = value;
         }
-
         public T Support
+        {
+            get => support;
+            set => support = value;
+        }
+
+
+        public T SelfType
+        {
+            get => vanguard;
+            set => vanguard = value;
+        }
+        public T OffensiveType
+        {
+            get => attacker;
+            set => attacker = value;
+        }
+        public T SupportType
+        {
+            get => support;
+            set => support = value;
+        }
+
+
+        public T OnAttackStance
+        {
+            get => vanguard;
+            set => vanguard = value;
+        }
+        public T OnNeutralStance
+        {
+            get => attacker;
+            set => attacker = value;
+        }
+        public T OnDefenseStance
         {
             get => support;
             set => support = value;
@@ -34,7 +67,7 @@ namespace CombatTeam
     }
 
     [Serializable]
-    public class RoleArchetypeObjectStructure<T> : ITeamRoleStructure<T> where T : new()
+    public class SerializableRoleArchetypeStructure<T> : ITeamRoleStructure<T> where T : new()
     {
         [SerializeField]
         private T vanguard = new T();

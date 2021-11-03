@@ -60,6 +60,8 @@ namespace CombatSkills
         public bool CanCrit() => Preset.CanCrit();
         public float GetCritVariation() => Preset.GetCritVariation();
         public ISkillComponent GetDescriptiveEffect() => Preset.GetDescriptiveEffect();
+        public bool IsMainEffectAfterListEffects => Preset.IsMainEffectAfterListEffects;
+        public EffectParameter GetMainEffect() => Preset.GetMainEffect();
         public List<EffectParameter> GetEffects() => Preset.GetEffects();
     }
 }

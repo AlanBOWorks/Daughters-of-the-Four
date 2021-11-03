@@ -72,7 +72,15 @@ namespace __ProjectExclusive.Player
                     var skill = skills[i];
                     var button = buttons[i];
 
+                    var skillType = skill.GetTargetType();
+                    var iconColor = 
+                        UtilSkills.GetElement(PlayerCombatSingleton.CombatSkillTypesColors, skillType);
+                    Sprite skillIcon = 
+                        skill.GetIcon() ?? UtilSkills.GetElement(PlayerCombatSingleton.CombatSkillTypesIcons, skillType);
+                   
+
                     button.Injection(skill);
+                    button.Injection(skillIcon,iconColor);
                     button.gameObject.SetActive(true);
                 }
 

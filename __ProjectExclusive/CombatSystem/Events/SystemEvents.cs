@@ -9,8 +9,7 @@ namespace CombatSystem.Events
 {
     public class SystemEventsHolder :
         CharacterEventsHolder<CombatEntityPairAction, CombatingEntity,CombatingSkill,SkillComponentResolution>,
-        ITeamStateChangeListener<CombatingTeam>,
-        ISkillEventListener
+        ICombatSystemEvents
     {
         public SystemEventsHolder() : base()
         {
@@ -25,14 +24,16 @@ namespace CombatSystem.Events
         [ShowInInspector]
         private readonly SkillEvents _skillEvents;
 
-        /*public override void SubscribeListener(object listener)
+        public void Subscribe(ICombatSystemEvents listener)
         {
-            base.SubscribeListener(listener);
-            if(listener is ISkillEventListener skillEventListener)
-                Subscribe(skillEventListener);
-            if (listener is ITeamStateChangeListener<CombatingTeam> teamChangeListener)
-                Subscribe(teamChangeListener);
-        }*/
+            Subscribe(listener as IOffensiveActionReceiverListener<CombatEntityPairAction,CombatingSkill,SkillComponentResolution>);
+            Subscribe(listener as ISupportActionReceiverListener<CombatEntityPairAction,CombatingSkill,SkillComponentResolution>);
+            Subscribe(listener as IVitalityChangeListener<CombatEntityPairAction,CombatingSkill>);
+            Subscribe(listener as ITempoListener<CombatingEntity>);
+            Subscribe(listener as ITeamStateChangeListener<CombatingTeam>);
+            Subscribe(listener as ISkillEventListener);
+            Subscribe(listener as IRoundListener<CombatingEntity>);
+        }
 
         public void Subscribe(ITeamStateChangeListener<CombatingTeam> listener) 
             => _teamStateChangeListeners.Add(listener);
