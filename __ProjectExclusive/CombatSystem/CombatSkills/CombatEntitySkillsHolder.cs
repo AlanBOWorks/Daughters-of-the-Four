@@ -12,7 +12,7 @@ namespace CombatSkills
         public CombatEntitySkillsHolder()
         {
             var waitSkill = GlobalCombatParametersSingleton.Parameters.WaitSkill;
-            WaitSkill = new CombatingSkill(waitSkill.GetSkillPreset());
+            WaitSkill = new CombatingSkill(waitSkill);
         }
 
         public CombatEntitySkillsHolder(CombatingTeam team,
@@ -107,7 +107,7 @@ namespace CombatSkills
         {
             foreach (var preset in presets)
             {
-                Add(new CombatingSkill(preset.GetSkillPreset()));
+                Add(new CombatingSkill(preset));
             }
         }
 

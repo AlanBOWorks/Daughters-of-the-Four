@@ -43,7 +43,7 @@ namespace CombatEffects
             while (Count > 0)
             {
                 var effect = Dequeue();
-                effect.DoEffect(entities);
+                effect.DoDirectEffect(entities);
             }
         }
     }

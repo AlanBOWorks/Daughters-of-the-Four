@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace CombatEffects
 {
+
+    [CreateAssetMenu(fileName = "Guarding [Effect]",
+        menuName = "Combat/Effect/Guarding")]
     public class SGuarding : SEffect
     {
         protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,

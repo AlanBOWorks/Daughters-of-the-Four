@@ -19,28 +19,50 @@ namespace CombatEffects
         [ShowIf("IsBuffType",Animate = false)]
         public EnumStats.BuffType buffType;
 
+
         [Title("Params")]
         public float effectValue;
+        [HorizontalGroup()]
         public bool canCrit;
+        [HorizontalGroup()]
+        public bool isProvokeEffect;
 
-        // Used in ShowIf
+#if UNITY_EDITOR
+        // ___________ Used in ShowIf [Do not remove]
         private bool IsBuffType() => !(preset is IEffect);
+#endif
 
-        public void DoEffect(ISkillValues values)
-        {
-            bool isEffectCrit = canCrit && values.IsCritical;
-            var entities = new CombatEntityPairAction(values.Performer,values.Target);
-            DoEffect(entities,isEffectCrit);
-        }
 
-        public void DoEffect(CombatEntityPairAction entities,bool isEffectCrit = false)
+        // Was needed a way to make the provoke effect implemented but invoking 
+        // this method in the provoke will inject itself once more making a recursive loop;
+        // Because of that it was separated in two methods, this being the default one using
+        // during actions and DoDirectEffect for the actual effect logic
+        /// <summary>
+        /// Logic for the Action segment; It will perform the effect of the Skill or inject into another system
+        /// depending of the parameters
+        /// </summary>
+        public void DoActionEffect(ISkillValues values)
         {
-            if (buffType == EnumStats.BuffType.Provoke)
+            var target = values.Target;
+            if (isProvokeEffect)
             {
-                entities.Target.ProvokeEffects.Enqueue(this);
+                target.ProvokeEffects.Enqueue(this);
                 return;
             }
 
+            var performer = values.Performer;
+            bool isEffectCrit = canCrit && values.IsCritical;
+            var entities = new CombatEntityPairAction(performer, target);
+
+            DoDirectEffect(entities,isEffectCrit);
+        }
+
+        /// <summary>
+        /// Does directly the effects. For checking states or special conditions that the skill could perform (such provoke)
+        /// use [<seealso cref="DoActionEffect"/>] instead
+        /// </summary>
+        public void DoDirectEffect(CombatEntityPairAction entities,bool isEffectCrit = false)
+        {
             switch (preset)
             {
                 case IEffect effectPreset:

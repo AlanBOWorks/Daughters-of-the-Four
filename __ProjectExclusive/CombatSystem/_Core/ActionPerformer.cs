@@ -39,14 +39,14 @@ namespace CombatSystem
             CombatSystemSingleton.EventsHolder.OnSkillUse(values);
 
             if(!skill.IsMainEffectAfterListEffects)
-                mainEffect.DoEffect(values);
+                mainEffect.DoActionEffect(values);
 
             foreach (EffectParameter effectParameter in effects)
             {
-                effectParameter.DoEffect(values);
+                effectParameter.DoActionEffect(values);
             }
             if (skill.IsMainEffectAfterListEffects)
-                mainEffect.DoEffect(values);
+                mainEffect.DoActionEffect(values);
 
 
 

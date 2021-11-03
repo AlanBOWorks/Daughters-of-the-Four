@@ -17,7 +17,7 @@ namespace CombatEntity
             // Unity.Objects
             _entityHolderPrefab = provider.GetEntityPrefab();
 
-            // Data
+            // Combat Data
             CombatStats = provider.GenerateStatsHolder();
             AreaData = provider.GenerateAreaData();
 
@@ -26,12 +26,16 @@ namespace CombatEntity
             SkillUsageTracker 
                 = new SkillUsageTracker();
 
+            // Special Mechanics
+            FollowUpHandler = new FollowUpHandler(this);
             GuardHandler = new GuardHandler(this);
             ProvokeEffects = new ProvokeEffectsHolder(this);
 
+            // Combat Entity's Holders
             Team = team;
             TargetingHolder = new CombatTargetingHolder(this);
 
+            // Events
             EventsHolder = new CombatingEntityEvents();
 
 
@@ -50,6 +54,9 @@ namespace CombatEntity
         [Title("Skills")] 
         public readonly CombatEntitySkillsHolder SkillsHolder;
         public readonly SkillUsageTracker SkillUsageTracker;
+
+        [Title("Follow Up")] 
+        public readonly FollowUpHandler FollowUpHandler;
 
         [Title("Guarding")] 
         public readonly GuardHandler GuardHandler;

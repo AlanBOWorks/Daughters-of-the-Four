@@ -8,8 +8,7 @@ namespace Stats
         {
             Base,
             Buff,
-            Burst,
-            Provoke
+            Burst
         }
 
         public enum OffensiveType

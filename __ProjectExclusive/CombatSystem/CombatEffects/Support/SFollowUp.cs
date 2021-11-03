@@ -1,0 +1,26 @@
+using CombatEntity;
+using CombatSystem.Events;
+using UnityEngine;
+
+namespace CombatEffects
+{
+
+    [CreateAssetMenu(fileName = "SuppOFFENSIVE - Follow Up [Effect]",
+        menuName = "Combat/Effect/Follow Up")]
+    public class SFollowUp : SEffect
+    {
+
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+            ref SkillComponentResolution resolution)
+        {
+            systemEvents.OnReceiveSupportEffect(entities,ref resolution);
+        }
+
+        protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue,
+            bool isCritical)
+        {
+            user.FollowUpHandler.SwitchFollowTarget(effectTarget);
+            return new SkillComponentResolution(this,effectValue);
+        }
+    }
+}

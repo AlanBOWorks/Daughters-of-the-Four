@@ -54,6 +54,7 @@ namespace CombatSystem
 
         public bool IsRunning() => _coroutineHandle.IsRunning;
         public bool IsPaused() => _coroutineHandle.IsAliveAndPaused;
+        public bool IsFinish() => !_coroutineHandle.IsRunning && !_requestActionCoroutineHandle.IsRunning;
         public bool HasActingEntity() => CurrentActingEntity != null;
 
 

@@ -48,6 +48,15 @@ namespace Stats
 
     public class PairStatsHolder : IBaseStatsRead<float>
     {
+        protected PairStatsHolder()
+        {}
+
+        public PairStatsHolder(IBaseStatsRead<float> primary, IBaseStatsRead<float> secondary)
+        {
+            Primary = primary;
+        }
+
+
         protected IBaseStatsRead<float> Primary;
         protected IBaseStatsRead<float> Secondary;
 
@@ -67,6 +76,19 @@ namespace Stats
         public float Critical => Primary.Critical + Secondary.Critical;
         public float InitialInitiative => Primary.InitialInitiative + Secondary.InitialInitiative;
         public float ActionsPerSequence => Primary.ActionsPerSequence + Secondary.ActionsPerSequence;
+    }
+
+    public class PairWithFollowUpStats : PairStatsHolder
+    {
+        public PairWithFollowUpStats(BaseStats baseStats)
+        {
+            BaseStats = baseStats;
+            FollowUpStats = new FollowUpStats();
+        }
+        [ShowInInspector]
+        public readonly BaseStats BaseStats;
+        [ShowInInspector]
+        public readonly FollowUpStats FollowUpStats;
     }
 
     public class PairWithConditionalStats : PairStatsHolder

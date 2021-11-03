@@ -17,9 +17,13 @@ namespace Stats
 
         private CombatStatsHolder(BaseStats baseStats, BaseStats buffStats, BurstStats burstStats)
         {
-            _baseStats = baseStats ?? throw new NullReferenceException("Introduced [Base Stats] were null");
-            _burstStats = burstStats ?? throw new NullReferenceException("Introduced [Burst Stats] were null");
+            if(baseStats == null)
+                throw new NullReferenceException("Introduced [Base Stats] were null");
+            if(burstStats == null)
+                throw new NullReferenceException("Introduced [Burst Stats] were null");
 
+            _baseStats = new PairWithFollowUpStats(baseStats);
+            _burstStats = burstStats;
 
             // buff stats are the only ones with special conditional stats addition; The rest will be checked before
             // adding, while buff types are checked in each calculation
@@ -41,12 +45,13 @@ namespace Stats
         [ShowInInspector]
         public readonly IMasterStats<float> MasterStats;
         [ShowInInspector] 
-        private BaseStats _baseStats;
+        private PairWithFollowUpStats _baseStats;
         [ShowInInspector,HorizontalGroup()]
         private PairWithConditionalStats _buffStats;
         [ShowInInspector,HorizontalGroup()]
         private BurstStats _burstStats;
 
+        public FollowUpStats GetFollowUpStat() => _baseStats.FollowUpStats;
         public BurstStats GetBurstStat() => _burstStats;
 
         /// <summary>
@@ -78,7 +83,7 @@ namespace Stats
             switch (buffType)
             {
                 case EnumStats.BuffType.Base:
-                    return _baseStats;
+                    return _baseStats.BaseStats;
                 case EnumStats.BuffType.Buff:
                     return _buffStats.BaseStats;
                 case EnumStats.BuffType.Burst:

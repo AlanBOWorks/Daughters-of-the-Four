@@ -17,7 +17,7 @@ namespace CombatSkills
 
         public CombatingSkill(SkillProviderParams providerParams)
         {
-            Preset = providerParams.preset.GetSkillPreset();
+            Preset = providerParams.preset;
             _cooldownOnUsage = Preset.GetCooldownAmount() + providerParams.cooldownVariation;
         }
 
