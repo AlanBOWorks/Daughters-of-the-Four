@@ -54,11 +54,11 @@ namespace CombatSkills
         [ShowInInspector]
         public CombatingSkillsGroup OnDefenseStance { get; set; }
 
-        public void TickCoolDowns()
+        public void ResetCosts()
         {
-            OnAttackStance.TickCoolDowns();
-            OnNeutralStance.TickCoolDowns();
-            OnDefenseStance.TickCoolDowns();
+            OnAttackStance.ResetCost();
+            OnNeutralStance.ResetCost();
+            OnDefenseStance.ResetCost();
         }
 
     }
@@ -85,10 +85,10 @@ namespace CombatSkills
         [ShowInInspector,HorizontalGroup()]
         public CombatingSkillsList MainSkillTypes { get; }
 
-        public void TickCoolDowns()
+        public void ResetCost()
         {
-            SharedSkillTypes?.TickCooldowns();
-            MainSkillTypes?.TickCooldowns();
+            SharedSkillTypes?.ResetCost();
+            MainSkillTypes?.ResetCost();
         }
     }
 
@@ -120,11 +120,11 @@ namespace CombatSkills
             }
         }
 
-        public void TickCooldowns()
+        public void ResetCost()
         {
             foreach (var skill in this)
             {
-                skill.TickCooldown();
+                skill.ResetCost();
             }
         }
 

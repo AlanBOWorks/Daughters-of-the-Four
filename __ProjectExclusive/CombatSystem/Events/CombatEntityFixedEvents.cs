@@ -35,8 +35,6 @@ namespace CombatSystem.Events
             entity.GuardHandler.RemoveGuarding();
             entity.CombatStats.GetBurstStat().SelfBurst.ResetAsBurst();
             entity.SkillUsageTracker.ResetOnStartSequence();
-            entity.SkillsHolder.TickCoolDowns();
-
         }
 
         public void OnFinishAction(CombatingEntity entity)
@@ -49,6 +47,8 @@ namespace CombatSystem.Events
         public void OnFinishAllActions(CombatingEntity entity)
         {
             entity.CombatStats.GetBurstStat().ReceivedBurst.ResetAsBurst();
+            entity.SkillsHolder.ResetCosts();
+
             UtilsCombatStats.DoCurrentPersistentDamage(entity.CombatStats);
 
         }

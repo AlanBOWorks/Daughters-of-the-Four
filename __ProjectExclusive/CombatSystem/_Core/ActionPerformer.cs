@@ -50,7 +50,7 @@ namespace CombatSystem
 
 
 
-            skill.PutInCooldown();
+            skill.OnUseIncreaseCost();
         }
 
     }

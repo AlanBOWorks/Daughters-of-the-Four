@@ -12,35 +12,41 @@ namespace CombatSkills
     public class SSkill : ScriptableObject,ISkill
     {
         [Title("UI")]
-        [SerializeField, GUIColor(.3f,.6f,.9f)]
+        [SerializeField, GUIColor(.3f,.6f,.9f),VerticalGroup("UI"), TableColumnWidth(120)]
         private string skillName = "NULL_SKILL";
 
-        [SerializeField, PreviewField, GUIColor(.2f, .2f, .2f)]
+        [SerializeField, PreviewField(ObjectFieldAlignment.Center), GUIColor(.2f, .2f, .2f),TableColumnWidth(20)]
         private Sprite specialSprite;
 
         [Title("Params")]
         [SerializeField, EnumPaging, GUIColor(.7f,.2f,.2f)]
+        [VerticalGroup("Params")]
         private EnumSkills.TargetType skillTargetType = EnumSkills.TargetType.Self;
 
-
+        [VerticalGroup("Params"), TableColumnWidth(150)]
         [SerializeField,
          Tooltip("Effect reference for a special case scenario where the main effect is not the descriptive effect")]
         private SSkillComponentEffect specialDescriptiveEffect;
 
+        [VerticalGroup("Params")]
         [SerializeField]
-        private int cooldownAmount = 1;
+        private int useCost = 1;
 
+        [VerticalGroup("Params")]
         [SerializeField, ShowIf("CanCrit")]
         private float critVariation;
 
         [Title("Effects")]
-        [BoxGroup("Main Effect"), GUIColor(1f,.8f,.8f)]
+        [VerticalGroup("MainEffect"),TableColumnWidth(150)]
+        [GUIColor(1f,.8f,.8f)]
         [SerializeField, ToggleLeft]
         private bool isMainEffectAfterListEffects;
-        [BoxGroup("Main Effect"), GUIColor(1f, .8f, .8f)]
+        [VerticalGroup("MainEffect")]
+        [GUIColor(1f, .8f, .8f)]
         [SerializeField]
         private EffectParameter mainEffect = new EffectParameter();
 
+        [VerticalGroup("Secondary Effect"),TableColumnWidth(150)]
         [SerializeField]
         private List<EffectParameter> effects = new List<EffectParameter>();
 
@@ -52,7 +58,7 @@ namespace CombatSkills
         public string GetSkillName() => skillName;
         public Sprite GetIcon() => specialSprite;
         public EnumSkills.TargetType GetTargetType() => skillTargetType;
-        public int GetCooldownAmount() => cooldownAmount;
+        public int GetUseCost() => useCost;
 
         public bool CanCrit()
         {
@@ -81,7 +87,8 @@ namespace CombatSkills
         public List<EffectParameter> GetEffects() => effects;
 
 #if UNITY_EDITOR
-        [Button]
+        [TableColumnWidth(100)]
+        [Button,VerticalGroup("Actions")]
         private void AddEffect(SEffect effect)
         {
             var addition = new EffectParameter
@@ -93,7 +100,7 @@ namespace CombatSkills
             effects.Add(addition);
         }
 
-        [Button]
+        [Button, VerticalGroup("Actions")]
         private void AddBuff(SBuff buff)
         {
             var addition = new EffectParameter
@@ -106,7 +113,7 @@ namespace CombatSkills
             effects.Add(addition);
         }
 
-        [Button(ButtonSizes.Large), GUIColor(.3f, .6f, .9f)]
+        [Button(ButtonSizes.Large), GUIColor(.3f, .6f, .9f), VerticalGroup("Actions")]
         private void UpdateAssetName()
         {
             name = GetTargetType().ToString().ToUpper() + " - " +skillName + " [Skill]";

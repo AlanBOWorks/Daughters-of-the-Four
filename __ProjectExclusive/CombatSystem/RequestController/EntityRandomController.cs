@@ -32,7 +32,7 @@ namespace CombatSystem
             var skillsHolder = currentEntity.SkillsHolder;
             CombatingSkillsGroup skills = skillsHolder.GetCurrentSkills();
             
-            var selectedSkill = ChooseSkill(skills) ?? skillsHolder.WaitSkill;
+            var selectedSkill = ChooseSkill(skills,currentEntity) ?? skillsHolder.WaitSkill;
 
             List<CombatingEntity> possibleTargets = UtilsTarget.GetPossibleTargets(currentEntity, selectedSkill.GetTargetType());
 
@@ -41,7 +41,7 @@ namespace CombatSystem
             return new SkillUsageValues(selectedSkill, selectedTarget);
         }
 
-        private CombatingSkill ChooseSkill(CombatingSkillsGroup skills)
+        private CombatingSkill ChooseSkill(CombatingSkillsGroup skills, CombatingEntity user)
         {
             CombatingSkill selectedSkill = null;
 
@@ -78,7 +78,7 @@ namespace CombatSystem
                     int randomPick = Random.Range(0, _possibleSkillToPick.Count);
                     var possibleSkill = _possibleSkillToPick[randomPick];
                     _possibleSkillToPick.RemoveAt(randomPick);
-                    if (!possibleSkill.CanBeUsed())
+                    if (!possibleSkill.CanBeUsed(user.CombatStats))
                         continue;
                     selectedSkill = possibleSkill;
                     break;

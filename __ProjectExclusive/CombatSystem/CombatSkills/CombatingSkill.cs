@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CombatEffects;
+using Stats;
 using UnityEngine;
 
 namespace CombatSkills
@@ -12,51 +13,38 @@ namespace CombatSkills
         public CombatingSkill(ISkill preset)
         {
             Preset = preset;
-            _cooldownOnUsage = preset.GetCooldownAmount(); 
+            _originalUseCost = preset.GetUseCost(); 
         }
 
         public CombatingSkill(SkillProviderParams providerParams)
         {
             Preset = providerParams.preset;
-            _cooldownOnUsage = Preset.GetCooldownAmount() + providerParams.cooldownVariation;
+            _originalUseCost = Preset.GetUseCost() + providerParams.cooldownVariation;
         }
 
 
         //this exists because some skill could have their cooldown altered by passives TODO make the passives for that
-        private readonly int _cooldownOnUsage;
-        private int _currentCooldownAmount;
+        private readonly int _originalUseCost;
+        private int _currentUseCost;
         private EnumSkills.SKillState _currentState;
 
-        public EnumSkills.SKillState GetState() => _currentState;
-        public bool CanBeUsed() => _currentState == EnumSkills.SKillState.Idle;
-        public void PutInCooldown()
-        {
-            _currentCooldownAmount = _cooldownOnUsage;
-            // cooldown == 0 are special skills that can't be put in cooldown
-            if (_currentCooldownAmount > 0) _currentState = EnumSkills.SKillState.Cooldown;
-        }
+        public bool CanBeUsed(CombatStatsHolder stats) =>
+            _currentState == EnumSkills.SKillState.Idle
+            && stats.CurrentActions >= _currentUseCost;
+       
         public void Silence() => _currentState = EnumSkills.SKillState.Silence;
-
-        public void TickCooldown()
+        public void ResetCost()
         {
-            _currentCooldownAmount--;
-            if (_currentCooldownAmount > 0) return;
-            _currentCooldownAmount = 0;
-
+            _currentUseCost = _originalUseCost;
             _currentState = EnumSkills.SKillState.Idle;
         }
-        public void ForceRefresh()
-        {
-            _currentCooldownAmount = 0;
-            _currentState = EnumSkills.SKillState.Idle;
-        }
-
+        public void OnUseIncreaseCost() => _currentUseCost++;
 
         public readonly ISkill Preset;
         public string GetSkillName() => Preset.GetSkillName();
         public Sprite GetIcon() => Preset.GetIcon();
         public EnumSkills.TargetType GetTargetType() => Preset.GetTargetType();
-        public int GetCooldownAmount() => _currentCooldownAmount;
+        public int GetUseCost() => _currentUseCost;
         public bool CanCrit() => Preset.CanCrit();
         public float GetCritVariation() => Preset.GetCritVariation();
         public ISkillComponent GetDescriptiveEffect() => Preset.GetDescriptiveEffect();

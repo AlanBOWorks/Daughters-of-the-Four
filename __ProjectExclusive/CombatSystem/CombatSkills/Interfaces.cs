@@ -24,7 +24,7 @@ namespace CombatSkills
     public interface ISkillStats
     {
         EnumSkills.TargetType GetTargetType();
-        int GetCooldownAmount();
+        int GetUseCost();
         bool CanCrit();
         float GetCritVariation();
     }
