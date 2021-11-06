@@ -11,23 +11,23 @@ namespace __ProjectExclusive.GameTheme
         [SerializeField] private SGameIconTheme iconsTheme;
         private void Awake()
         {
-            PlayerCombatSingleton.CombatMasterStatColors 
-                = colorsTheme.GetMasterStructureColors();
+            PlayerCombatSingleton.CombatMasterStatColors
+                = colorsTheme.GetMasterTypes();
             PlayerCombatSingleton.CombatBaseStatsColors
-                = colorsTheme.GetBaseStatStructureColors();
+                = colorsTheme.GetBaseStatsTypes();
             PlayerCombatSingleton.CombatRoleStructureColors
-                = colorsTheme.GetRoleStructureColors();
+                = colorsTheme.GetRoleTypes();
             PlayerCombatSingleton.CombatSkillTypesColors
-                = colorsTheme.GetSkillTypesStructureColors();
+                = colorsTheme.GetSkillTypes();
 
             PlayerCombatSingleton.CombatMasterStatsIcons
-                = iconsTheme.GetMasterStructureIcons();
+                = iconsTheme.GetMasterTypes();
             PlayerCombatSingleton.CombatBaseStatsIcons
-                = iconsTheme.GetBaseStatsStructureIcons();
+                = iconsTheme.GetBaseStatsTypes();
             PlayerCombatSingleton.CombatRolesIcons
-                = iconsTheme.GetRoleStructureIcons();
+                = iconsTheme.GetRoleTypes();
             PlayerCombatSingleton.CombatSkillTypesIcons
-                = iconsTheme.GetSkillTypesIcons();
+                = iconsTheme.GetSkillTypes();
 
             Destroy(this);
         }

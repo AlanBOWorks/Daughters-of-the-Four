@@ -25,6 +25,9 @@ namespace __ProjectExclusive.Player
         [Title("Visuals")]
         [SerializeField] 
         private Image icon;
+
+        [SerializeField] 
+        private MPImage background;
         [SerializeField] 
         private MPImage borderHolder;
 
@@ -51,6 +54,7 @@ namespace __ProjectExclusive.Player
             icon.color = iconColor;
 
             _skillColor = iconColor;
+            borderHolder.color = iconColor;
         }
 
         public void ResetState()
@@ -78,7 +82,6 @@ namespace __ProjectExclusive.Player
             RectTransform recTransform = transform as RectTransform;
             recTransform.DOLocalMoveY(12, HoverAnimationDuration);
 
-            borderHolder.CrossFadeColor(_skillColor, HoverAnimationDuration, true,false);
         }
 
         private void InitialState()
@@ -88,7 +91,7 @@ namespace __ProjectExclusive.Player
             localPosition.y = 0;
             buttonTransform.localPosition = localPosition;
 
-            borderHolder.OutlineColor = Color.white;
+            borderHolder.color = background.color;
         }
 
         public void OnPointerClick(PointerEventData eventData)

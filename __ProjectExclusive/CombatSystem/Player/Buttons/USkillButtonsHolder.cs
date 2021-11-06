@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CombatEntity;
 using CombatSkills;
@@ -8,10 +9,10 @@ using UnityEngine;
 
 namespace __ProjectExclusive.Player
 {
-    public class USkillButtonsHolder : MonoBehaviour, IVirtualSkillInjectionListener,
+    public class USkillButtonsHolder : MonoBehaviour, ISkillGroupTypesRead<List<USkillButton>>,
+        IVirtualSkillInjectionListener,
         IVirtualSkillTargetListener,
-        ITempoListener<CombatingEntity>,
-        ISkillGroupTypesRead<List<USkillButton>>
+        ITempoListener<CombatingEntity>
     {
         [SerializeField, HorizontalGroup()] private List<USkillButton> mainSkillButtons = new List<USkillButton>();
         [SerializeField, HorizontalGroup()] private List<USkillButton> sharedSkillButtons = new List<USkillButton>();
@@ -75,9 +76,10 @@ namespace __ProjectExclusive.Player
                     var skillType = skill.GetTargetType();
                     var iconColor = 
                         UtilSkills.GetElement(PlayerCombatSingleton.CombatSkillTypesColors, skillType);
-                    Sprite skillIcon = 
-                        skill.GetIcon() ?? UtilSkills.GetElement(PlayerCombatSingleton.CombatSkillTypesIcons, skillType);
-                   
+                    Sprite skillIcon = skill.GetIcon();
+                    if (skillIcon == null)
+                        skillIcon = UtilSkills.GetElement(PlayerCombatSingleton.CombatSkillTypesIcons, skillType);
+                  
 
                     button.Injection(skill);
                     button.Injection(skillIcon,iconColor);

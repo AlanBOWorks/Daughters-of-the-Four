@@ -29,6 +29,26 @@ namespace Stats
         new T Concentration { get; set; }
     }
 
+
+    public interface ICondensedOffensiveStat<TMaster,TElement> : IOffensiveStatsInject<TElement>, IOffensiveStatsRead<TElement>
+    {
+        TMaster Offensive { get; set; }
+        new TElement Attack { get; set; }
+        new TElement Persistent { get; set; }
+        new TElement Debuff { get; set; }
+        new TElement FollowUp { get; set; }
+    }
+
+    public interface ICondensedSupportStat<TMaster,TElement> : ISupportStatsRead<TElement>, ISupportStatsInject<TElement>
+    {
+        TMaster Support { get; set; }
+        new TElement Heal { get; set; }
+        new TElement Shielding { get; set; }
+        new TElement Buff { get; set; }
+        new TElement ReceiveBuff { get; set; }
+    }
+
+
     public interface IOffensiveStatsRead<out T>
     {
         T Attack { get; }
@@ -40,9 +60,9 @@ namespace Stats
     public interface ISupportStatsRead<out T>
     {
         T Heal { get; }
+        T Shielding { get; }
         T Buff { get; }
         T ReceiveBuff { get; }
-        T Shielding { get; }
     }
 
     public interface IVitalityStatsRead<out T>
@@ -96,9 +116,9 @@ namespace Stats
     public interface ISupportStatsInject<in T>
     {
         T Heal { set; }
+        T Shielding { set; }
         T Buff { set; }
         T ReceiveBuff { set; }
-        T Shielding { set; }
     }
 
     public interface IVitalityStatsInject<in T>
@@ -112,10 +132,10 @@ namespace Stats
     public interface IConcentrationStatsInject<in T>
     {
         T InitiativeSpeed{ set; }
-        T Critical { set; }
         T InitialInitiative { set; }
         //this could be a float since the sum of all stats could be something like (1.5f + 2.5f = 4 instead of 3)
         T ActionsPerSequence { set; }
+        T Critical { set; }
     }
 
 

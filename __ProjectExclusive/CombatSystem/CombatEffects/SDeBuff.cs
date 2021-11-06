@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using CombatEntity;
+using CombatSkills;
 using CombatSystem.Events;
+using Stats;
 using UnityEngine;
 
 namespace CombatEffects
@@ -13,5 +15,7 @@ namespace CombatEffects
         {
             systemEvents.OnReceiveOffensiveEffect(entities,ref resolution);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.DeBuff;
     }
 }

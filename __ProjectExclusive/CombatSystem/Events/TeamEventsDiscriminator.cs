@@ -38,7 +38,7 @@ namespace CombatSystem.Events
         public void OnFirstAction(CombatingEntity entity)
         {
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnFinishAction(entity);
+            eventsHolder.OnFirstAction(entity);
         }
 
         public void OnFinishAction(CombatingEntity entity)

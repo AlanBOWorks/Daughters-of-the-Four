@@ -9,6 +9,7 @@ namespace CombatEffects
     /// </summary>
     public interface ISkillComponent
     {
+        EnumSkills.SkillInteractionType GetComponentType();
     }
 
     public interface IEffect : ISkillComponent

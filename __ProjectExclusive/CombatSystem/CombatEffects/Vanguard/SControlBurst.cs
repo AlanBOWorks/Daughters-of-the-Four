@@ -1,6 +1,7 @@
 using CombatEntity;
 using CombatSkills;
 using CombatSystem.Events;
+using Stats;
 using UnityEngine;
 
 namespace CombatEffects
@@ -23,5 +24,7 @@ namespace CombatEffects
             effectTarget.Team.BurstControl(controlAddition);
             return new SkillComponentResolution(this, controlAddition);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Buff;
     }
 }

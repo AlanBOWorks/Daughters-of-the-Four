@@ -12,7 +12,7 @@ namespace CombatSystem.Animator
     public class UCombatAnimator : UEntityHolderListener
     {
         [SerializeField, HideInPlayMode] 
-        private SCombatAnimationsHandler animationsHandler;
+        private UCombatAnimationsHandler animationsHandler;
         [HideInEditorMode,ShowInInspector]
         private ICombatAnimationHandler _animationHandler;
 
@@ -45,25 +45,26 @@ namespace CombatSystem.Animator
             public IEnumerator<float> _DoPerformSkillAnimation(SkillValuesHolders skillValues)
             {
                 var holder = skillValues.Performer.InstantiatedHolder;
+                DOTween.Kill(holder.transform);
                 holder.transform.DOPunchPosition(Vector3.up, DoSkillDuration, 4);
 
                 yield return Timing.WaitForSeconds(DoSkillDuration + SpaceBetweenAnimations);
             }
 
-            public IEnumerator<float> _DoReceiveSkillAnimation(SkillValuesHolders skillValues)
+            public void _DoReceiveSkillAnimation(SkillValuesHolders skillValues)
             {
                 var holder = skillValues.Performer.InstantiatedHolder;
-                holder.transform.DOPunchPosition(Vector3.forward, ReceiveSkillDuration, 6);
+                DOTween.Kill(holder.transform);
 
-                yield return Timing.WaitForSeconds(DoSkillDuration + SpaceBetweenAnimations);
+                holder.transform.DOPunchPosition(Vector3.forward, ReceiveSkillDuration, 6);
             }
         }
     }
 
-    public abstract class SCombatAnimationsHandler : ScriptableObject, ICombatAnimationHandler
+    public abstract class UCombatAnimationsHandler : MonoBehaviour, ICombatAnimationHandler
     {
         public abstract IEnumerator<float> _DoPerformSkillAnimation(SkillValuesHolders skillValues);
-        public abstract IEnumerator<float> _DoReceiveSkillAnimation(SkillValuesHolders skillValues);
+        public abstract void _DoReceiveSkillAnimation(SkillValuesHolders skillValues);
 
     }
 
@@ -71,6 +72,6 @@ namespace CombatSystem.Animator
     {
 
         IEnumerator<float> _DoPerformSkillAnimation(SkillValuesHolders skillValues);
-        IEnumerator<float> _DoReceiveSkillAnimation(SkillValuesHolders skillValues);
+        void _DoReceiveSkillAnimation(SkillValuesHolders skillValues);
     }
 }

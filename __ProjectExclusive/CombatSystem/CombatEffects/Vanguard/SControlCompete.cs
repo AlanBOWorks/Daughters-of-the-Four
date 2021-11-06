@@ -1,6 +1,7 @@
 using CombatEntity;
 using CombatSkills;
 using CombatSystem.Events;
+using Stats;
 using UnityEngine;
 
 namespace CombatEffects
@@ -26,5 +27,7 @@ namespace CombatEffects
 
             return new SkillComponentResolution(this,controlVariation);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Control;
     }
 }

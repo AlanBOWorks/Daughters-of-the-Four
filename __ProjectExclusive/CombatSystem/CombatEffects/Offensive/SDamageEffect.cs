@@ -31,5 +31,7 @@ namespace CombatEffects
             UtilsCombatStats.DoDamageTo(effectTarget.CombatStats, finalDamage);
             return new SkillComponentResolution(this, finalDamage);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Attack;
     }
 }

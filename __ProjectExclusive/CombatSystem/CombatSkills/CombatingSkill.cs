@@ -9,18 +9,14 @@ namespace CombatSkills
     // Also will keep variation of effects/passives and cooldown when applicable
     public class CombatingSkill : ISkill
     {
-       
-        public CombatingSkill(ISkill preset)
+        protected CombatingSkill(ISkill preset, int useCost)
         {
             Preset = preset;
-            _originalUseCost = preset.GetUseCost(); 
+            _originalUseCost = useCost;
         }
 
-        public CombatingSkill(SkillProviderParams providerParams)
-        {
-            Preset = providerParams.preset;
-            _originalUseCost = Preset.GetUseCost() + providerParams.cooldownVariation;
-        }
+        public CombatingSkill(ISkill preset) : this(preset,preset.GetUseCost())
+        { }
 
 
         //this exists because some skill could have their cooldown altered by passives TODO make the passives for that
@@ -38,7 +34,7 @@ namespace CombatSkills
             _currentUseCost = _originalUseCost;
             _currentState = EnumSkills.SKillState.Idle;
         }
-        public void OnUseIncreaseCost() => _currentUseCost++;
+        public virtual void OnUseIncreaseCost() => _currentUseCost++;
 
         public readonly ISkill Preset;
         public string GetSkillName() => Preset.GetSkillName();
@@ -51,5 +47,26 @@ namespace CombatSkills
         public bool IsMainEffectAfterListEffects => Preset.IsMainEffectAfterListEffects;
         public EffectParameter GetMainEffect() => Preset.GetMainEffect();
         public List<EffectParameter> GetEffects() => Preset.GetEffects();
+    }
+
+    public class ControlCombatingSkill : CombatingSkill
+    {
+        private const float UseCostToControlConversionRate = .1f;
+        private const float FinalCostAddition = .05f;
+        private const int ControlSkillUseCostFixedAmount = 1;
+
+        public ControlCombatingSkill(ISkill preset) : base(preset, ControlSkillUseCostFixedAmount)
+        {
+            ControlCost = preset.GetUseCost() * UseCostToControlConversionRate;
+            ControlCost += FinalCostAddition;
+            if (ControlCost < 0) ControlCost = 0; //This is a safety check
+        }
+
+        public readonly float ControlCost;
+
+        public override void OnUseIncreaseCost()
+        {
+            //By design ControlCombatingSkills cost always 1
+        }
     }
 }

@@ -1,4 +1,6 @@
 using CombatEntity;
+using CombatSkills;
+using Stats;
 using UnityEngine;
 
 namespace CombatTeam
@@ -74,4 +76,11 @@ namespace CombatTeam
         void OnStanceChange(THolder holder, EnumTeam.TeamStance switchStance);
         void OnMemberDeath(THolder holder, CombatingEntity member);
     }
+
+    public interface IVanguardSpecialization<TMaster, TElement> : ICondensedDominionStructure<TMaster,TElement>
+    { }
+    public interface IAttackersSpecialization<TMaster, TElement> : ICondensedOffensiveStat<TMaster,TElement> 
+    { }
+    public interface ISupportSpecialization<TMaster,TElement> : ICondensedSupportStat<TMaster, TElement> 
+    { }
 }

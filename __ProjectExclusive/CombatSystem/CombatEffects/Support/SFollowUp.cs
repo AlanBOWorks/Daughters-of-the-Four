@@ -1,5 +1,7 @@
 using CombatEntity;
+using CombatSkills;
 using CombatSystem.Events;
+using Stats;
 using UnityEngine;
 
 namespace CombatEffects
@@ -22,5 +24,7 @@ namespace CombatEffects
             user.FollowUpHandler.SwitchFollowTarget(effectTarget);
             return new SkillComponentResolution(this,effectValue);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.FollowUp;
     }
 }

@@ -33,30 +33,5 @@ namespace CombatSkills
         }
     }
 
-    public static class EnumSkills
-    {
-        /// <summary>
-        /// [Idle, InCooldown]
-        /// </summary>
-        public enum SKillState
-        {
-            Idle,
-            Cooldown,
-            /// <summary>
-            /// Can't be used this sequence
-            /// </summary>
-            Silence
-            //Persistent??
-        }
-
-        /// <summary>
-        /// [Self, Support, Offensive]
-        /// </summary>
-        public enum TargetType
-        {
-            Self,
-            Support,
-            Offensive
-        }
-    }
+    
 }

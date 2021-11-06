@@ -51,11 +51,6 @@ namespace Stats
         protected PairStatsHolder()
         {}
 
-        public PairStatsHolder(IBaseStatsRead<float> primary, IBaseStatsRead<float> secondary)
-        {
-            Primary = primary;
-        }
-
 
         protected IBaseStatsRead<float> Primary;
         protected IBaseStatsRead<float> Secondary;
@@ -84,6 +79,9 @@ namespace Stats
         {
             BaseStats = baseStats;
             FollowUpStats = new FollowUpStats();
+
+            Primary = BaseStats;
+            Secondary = FollowUpStats;
         }
         [ShowInInspector]
         public readonly BaseStats BaseStats;
@@ -97,14 +95,11 @@ namespace Stats
         {
             BaseStats = baseStats;
             ConditionalStat = new ConditionalStat();
-            InjectStatsInBase();
-        }
 
-        private void InjectStatsInBase()
-        {
             Primary = BaseStats;
             Secondary = ConditionalStat;
         }
+
 
         [ShowInInspector]
         public readonly BaseStats BaseStats;

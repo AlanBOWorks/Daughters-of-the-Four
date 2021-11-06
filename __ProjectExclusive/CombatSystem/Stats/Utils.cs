@@ -202,5 +202,183 @@ namespace Stats
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
+
+        public static T GetElement<T>(IMasterStatsRead<T> masterStatsStructure, EnumStats.MasterStatType type)
+        {
+            switch (type)
+            {
+                case EnumStats.MasterStatType.Offensive:
+                    return masterStatsStructure.Offensive;
+                case EnumStats.MasterStatType.Support:
+                    return masterStatsStructure.Support;
+                case EnumStats.MasterStatType.Vitality:
+                    return masterStatsStructure.Vitality;
+                case EnumStats.MasterStatType.Concentration:
+                    return masterStatsStructure.Concentration;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public static T GetElement<T>(IOffensiveStatsRead<T> offensiveStructure, EnumStats.OffensiveStatType type)
+        {
+            switch (type)
+            {
+                case EnumStats.OffensiveStatType.Attack:
+                    return offensiveStructure.Attack;
+                case EnumStats.OffensiveStatType.Persistent:
+                    return offensiveStructure.Persistent;
+                case EnumStats.OffensiveStatType.DeBuff:
+                    return offensiveStructure.Debuff;
+                case EnumStats.OffensiveStatType.FollowUp:
+                    return offensiveStructure.FollowUp;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public static T GetElement<T>(ICondensedOffensiveStat<T,T> offensiveStructure, EnumStats.OffensiveStatType type)
+        where T : class
+        {
+            var element = GetElement(offensiveStructure as IOffensiveStatsRead<T>, type);
+            return element ?? offensiveStructure.Offensive;
+        }
+
+        public static T GetElement<T>(ISupportStatsRead<T> supportStructure, EnumStats.SupportStatType type)
+        {
+            switch (type)
+            {
+                case EnumStats.SupportStatType.Heal:
+                    return supportStructure.Heal;
+                case EnumStats.SupportStatType.Buff:
+                    return supportStructure.Buff;
+                case EnumStats.SupportStatType.ReceiveBuff:
+                    return supportStructure.ReceiveBuff;
+                case EnumStats.SupportStatType.Shielding:
+                    return supportStructure.Shielding;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public static T GetElement<T>(ICondensedSupportStat<T, T> supportStructure, EnumStats.SupportStatType type)
+        where T : class
+        {
+            var element = GetElement(supportStructure as ISupportStatsRead<T>, type);
+            return element ?? supportStructure.Support;
+        }
+
+        public static T GetElement<T>(IVitalityStatsRead<T> vitalityStructure, EnumStats.VitalityStatType type)
+        {
+            switch (type)
+            {
+                case EnumStats.VitalityStatType.MaxHealth:
+                    return vitalityStructure.MaxHealth;
+                case EnumStats.VitalityStatType.MaxMortality:
+                    return vitalityStructure.MaxMortality;
+                case EnumStats.VitalityStatType.DebuffResistance:
+                    return vitalityStructure.DebuffResistance;
+                case EnumStats.VitalityStatType.DamageResistance:
+                    return vitalityStructure.DamageResistance;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public static T GetElement<T>(IConcentrationStatsRead<T> concentrationStructure,
+            EnumStats.ConcentrationStatType type)
+        {
+            switch (type)
+            {
+                case EnumStats.ConcentrationStatType.InitiativeSpeed:
+                    return concentrationStructure.InitiativeSpeed;
+                case EnumStats.ConcentrationStatType.InitialInitiative:
+                    return concentrationStructure.InitialInitiative;
+                case EnumStats.ConcentrationStatType.ActionsPerSequence:
+                    return concentrationStructure.ActionsPerSequence;
+                case EnumStats.ConcentrationStatType.Critical:
+                    return concentrationStructure.Critical;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+
+        public static T GetElement<T>(IBaseStatsRead<T> baseStatsStructure, EnumStats.BaseStatType type)
+        {
+            switch (type)
+            {
+                case EnumStats.BaseStatType.Attack:
+                    return baseStatsStructure.Attack;
+                case EnumStats.BaseStatType.Persistent:
+                    return baseStatsStructure.Persistent;
+                case EnumStats.BaseStatType.DeBuff:
+                    return baseStatsStructure.Debuff;
+                case EnumStats.BaseStatType.FollowUp:
+                    return baseStatsStructure.FollowUp;
+
+                case EnumStats.BaseStatType.Heal:
+                    return baseStatsStructure.Heal;
+                case EnumStats.BaseStatType.Buff:
+                    return baseStatsStructure.Buff;
+                case EnumStats.BaseStatType.ReceiveBuff:
+                    return baseStatsStructure.ReceiveBuff;
+                case EnumStats.BaseStatType.Shielding:
+                    return baseStatsStructure.Shielding;
+
+                case EnumStats.BaseStatType.MaxHealth:
+                    return baseStatsStructure.MaxHealth;
+                case EnumStats.BaseStatType.MaxMortality:
+                    return baseStatsStructure.MaxMortality;
+                case EnumStats.BaseStatType.DebuffResistance:
+                    return baseStatsStructure.DebuffResistance;
+                case EnumStats.BaseStatType.DamageResistance:
+                    return baseStatsStructure.DamageResistance;
+
+                case EnumStats.BaseStatType.InitiativeSpeed:
+                    return baseStatsStructure.InitiativeSpeed;
+                case EnumStats.BaseStatType.InitialInitiative:
+                    return baseStatsStructure.InitialInitiative;
+                case EnumStats.BaseStatType.ActionsPerSequence:
+                    return baseStatsStructure.ActionsPerSequence;
+                case EnumStats.BaseStatType.Critical:
+                    return baseStatsStructure.Critical;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public static T GetElement<T>(IBaseStatsRead<T> baseStatsStructure, IMasterStatsRead<T> backUpElements,
+            EnumStats.BaseStatType type)
+        where T : class
+        {
+            var element = GetElement(baseStatsStructure, type);
+            if (element != null) return element;
+
+            return type switch
+            {
+                EnumStats.BaseStatType.Attack => backUpElements.Offensive,
+                EnumStats.BaseStatType.Persistent => backUpElements.Offensive,
+                EnumStats.BaseStatType.DeBuff => backUpElements.Offensive,
+                EnumStats.BaseStatType.FollowUp => backUpElements.Offensive,
+
+                EnumStats.BaseStatType.Heal => backUpElements.Support,
+                EnumStats.BaseStatType.Buff => backUpElements.Support,
+                EnumStats.BaseStatType.ReceiveBuff => backUpElements.Support,
+                EnumStats.BaseStatType.Shielding => backUpElements.Support,
+
+                EnumStats.BaseStatType.MaxHealth => backUpElements.Vitality,
+                EnumStats.BaseStatType.MaxMortality => backUpElements.Vitality,
+                EnumStats.BaseStatType.DebuffResistance => backUpElements.Vitality,
+                EnumStats.BaseStatType.DamageResistance => backUpElements.Vitality,
+
+                EnumStats.BaseStatType.InitiativeSpeed => backUpElements.Concentration,
+                EnumStats.BaseStatType.InitialInitiative => backUpElements.Concentration,
+                EnumStats.BaseStatType.ActionsPerSequence => backUpElements.Concentration,
+                EnumStats.BaseStatType.Critical => backUpElements.Concentration,
+
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
     }
 }

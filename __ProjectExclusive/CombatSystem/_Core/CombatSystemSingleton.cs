@@ -62,8 +62,10 @@ namespace CombatSystem
                 EntitiesFixedEvents);
             EventsHolder.Subscribe((ISupportActionReceiverListener<CombatEntityPairAction, CombatingSkill, SkillComponentResolution>) 
                 EntitiesFixedEvents);
-            EventsHolder.Subscribe(teamEventsDiscriminator);
-            EventsHolder.Subscribe(actionEventDiscriminator);
+            EventsHolder.Subscribe(
+                teamEventsDiscriminator);
+            EventsHolder.Subscribe(
+                actionEventDiscriminator);
 
             // Second because the Characters could have an event that changes the value of some event's Invoker (suck reducing damage)
             // OnReceiveOffensive, so this can represent the real damage afterwards

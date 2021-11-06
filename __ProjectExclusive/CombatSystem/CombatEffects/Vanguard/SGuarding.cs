@@ -4,6 +4,7 @@ using CombatEntity;
 using CombatSkills;
 using CombatSystem.Events;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 
 namespace CombatEffects
@@ -29,6 +30,8 @@ namespace CombatEffects
             return new SkillComponentResolution(this,1);
 
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Shielding;
     }
 
     public sealed class GuardHandler

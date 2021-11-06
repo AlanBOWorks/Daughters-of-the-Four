@@ -27,5 +27,7 @@ namespace CombatEffects
             UtilsCombatStats.DoShielding(user.CombatStats, effectTarget.CombatStats, shieldAddition);
             return new SkillComponentResolution(this,shieldAddition);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Shielding;
     }
 }

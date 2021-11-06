@@ -114,9 +114,11 @@ namespace CombatSkills
         public CombatingSkillsList(ICollection<SkillProviderParams> presets)
         : base(presets.Count)
         {
-            foreach (SkillProviderParams preset in presets)
+            foreach (SkillProviderParams provider in presets)
             {
-                Add(new CombatingSkill(preset));
+                Add(!provider.isControlSkill
+                    ? new CombatingSkill(provider.preset)
+                    : new ControlCombatingSkill(provider.preset));
             }
         }
 

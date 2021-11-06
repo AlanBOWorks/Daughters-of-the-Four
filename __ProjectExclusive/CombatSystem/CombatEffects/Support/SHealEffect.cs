@@ -21,5 +21,7 @@ namespace CombatEffects
             UtilsCombatStats.DoHealTo(effectTarget.CombatStats, targetHealPercent);
             return new SkillComponentResolution(this, targetHealPercent);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Heal;
     }
 }

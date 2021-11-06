@@ -61,4 +61,29 @@ namespace CombatSkills
         T SharedSkillTypes { get; }
         T MainSkillTypes { get; }
     }
+
+    public interface ICondensedDominionStructure<TMaster, TElement> : 
+        IDominionStructureInject<TElement>, IDominionStructureRead<TElement>
+    {
+        TMaster Dominion { get; set; }
+        new TElement Guard { get; set; }
+        new TElement Control { get; set; }
+        new TElement Provoke { get; set; }
+        new TElement Stance { get; set; }
+    }
+
+    public interface IDominionStructureRead<out T>
+    {
+        T Guard { get; }
+        T Control { get; }
+        T Provoke { get; }
+        T Stance { get; }
+    }
+    public interface IDominionStructureInject<in T>
+    {
+        T Guard { set; }
+        T Control { set; }
+        T Provoke { set; }
+        T Stance { set; }
+    }
 }

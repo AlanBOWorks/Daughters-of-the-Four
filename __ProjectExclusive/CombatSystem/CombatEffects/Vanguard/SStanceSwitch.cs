@@ -37,5 +37,6 @@ namespace CombatEffects
             UtilsAssets.UpdateAssetName(this);
         }
 
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Stance;
     }
 }

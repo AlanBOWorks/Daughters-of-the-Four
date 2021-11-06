@@ -55,5 +55,6 @@ namespace CombatEffects
         protected abstract SkillComponentResolution DoBuffOn(CombatingEntity performer, IBaseStats<float> targetStats, float buffValue,
             bool isCritical);
 
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Buff;
     }
 }

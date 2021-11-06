@@ -92,5 +92,6 @@ namespace CombatEffects
     }
 
     public abstract class SSkillComponentEffect : ScriptableObject, ISkillComponent {
+        public abstract EnumSkills.SkillInteractionType GetComponentType();
     }
 }

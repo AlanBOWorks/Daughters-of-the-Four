@@ -21,6 +21,6 @@ namespace CombatSkills
     public struct SkillProviderParams
     {
         public SSkill preset;
-        public int cooldownVariation;
+        public bool isControlSkill;
     }
 }

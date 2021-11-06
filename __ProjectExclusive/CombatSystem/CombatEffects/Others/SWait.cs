@@ -22,5 +22,7 @@ namespace CombatEffects
             UtilsCombatStats.ResetActions(effectTarget.CombatStats);
             return new SkillComponentResolution(this, afterWaitInitiativeAddition);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Wait;
     }
 }

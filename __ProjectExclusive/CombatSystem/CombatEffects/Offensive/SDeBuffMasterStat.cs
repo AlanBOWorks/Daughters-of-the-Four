@@ -1,6 +1,8 @@
 using CombatEntity;
+using CombatSkills;
 using CombatSystem.Events;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 using Utils;
 
@@ -23,5 +25,7 @@ namespace CombatEffects
             name = "DeMASTER - " + GetBuffType().ToString() + " [DeBuff]";
             UtilsAssets.UpdateAssetName(this);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.DeBuff;
     }
 }

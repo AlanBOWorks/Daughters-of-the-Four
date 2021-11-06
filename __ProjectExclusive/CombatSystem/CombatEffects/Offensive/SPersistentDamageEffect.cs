@@ -1,4 +1,5 @@
 using CombatEntity;
+using CombatSkills;
 using CombatSystem.Events;
 using Stats;
 using UnityEngine;
@@ -20,5 +21,7 @@ namespace CombatEffects
             UtilsCombatStats.AddPersistentDamage(effectTarget.CombatStats,effectValue);
             return new SkillComponentResolution(this,effectValue);
         }
+
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Persistent;
     }
 }
