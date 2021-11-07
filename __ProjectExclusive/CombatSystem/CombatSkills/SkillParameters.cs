@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using CombatEntity;
+using CombatSystem.CombatSkills;
 using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
@@ -24,6 +26,8 @@ namespace CombatSkills
         public SkillValuesHolders(CombatingEntity target)
         {
             Target = target;
+            PreComputedOffensiveTargets = new HashSet<CombatingEntity>();
+            PreComputedSupportTargets = new HashSet<CombatingEntity>();
         }
 
         [ShowInInspector]
@@ -35,6 +39,15 @@ namespace CombatSkills
         [ShowInInspector]
         public bool IsCritical { get; private set; }
 
+        /// <summary>
+        /// The virtual amount of targets to handle (it's not the real targets handle by the skill). <br></br>
+        /// This was made primarily for [<seealso cref="CombatSystem.Animator"/>]
+        /// </summary>
+        public readonly HashSet<CombatingEntity> PreComputedOffensiveTargets;
+        /// <summary>
+        /// <inheritdoc cref="PreComputedOffensiveTargets"/>
+        /// </summary>
+        public readonly HashSet<CombatingEntity> PreComputedSupportTargets;
 
         public void SwitchTarget(CombatingEntity newTarget) => Target = newTarget;
         public void Inject(CombatingEntity performer) => Performer = performer;
@@ -42,6 +55,60 @@ namespace CombatSkills
         {
             UsedSkill = values.UsedSkill;
             Target = values.Target;
+            PreComputeTargets();
+        }
+
+        /* Problem: animator can't know the whole set of targets (if is just an individual, a group or all entities).
+         * Solution: pre-compute the possibles targets in a Collection and use it.
+         * Note: since the skills will not hold more than 10 effects at once, this operation should not be that expensive
+         */
+        private void PreComputeTargets()
+        {
+            var skill = UsedSkill;
+            bool isOffensive = skill.GetTargetType() == EnumSkills.TargetType.Offensive;
+            if(isOffensive)
+                InjectTargetsAsOffensive();
+            else
+                InjectTargetsAsSupport();
+        }
+
+        private void InjectTargetsAsOffensive()
+        {
+            foreach (var effectParameter in UsedSkill.GetEffects())
+            {
+                var targets = UtilsTarget.GetPossibleTargets(Performer, Target, effectParameter);
+                foreach (var target in targets)
+                {
+                    InjectTarget(target);
+                }
+            }
+        }
+
+        private void InjectTargetsAsSupport()
+        {
+            foreach (var effectParameter in UsedSkill.GetEffects())
+            {
+                var targets = UtilsTarget.GetPossibleTargets(Performer, Target, effectParameter);
+                foreach (var target in targets)
+                {
+                    InjectTarget(PreComputedSupportTargets,target);
+                }
+            }
+        }
+
+        private void InjectTarget(CombatingEntity target)
+        {
+            bool isAlly = Performer.Team.Contains(target);
+            var collection = (isAlly)
+                ? PreComputedSupportTargets
+                : PreComputedOffensiveTargets;
+            InjectTarget(collection,target);
+        }
+
+        private static void InjectTarget(ISet<CombatingEntity> collection, CombatingEntity target)
+        {
+            if (collection.Contains(target)) return;
+            collection.Add(target);
         }
 
         public void RollForCritical(CombatingEntity performer)
@@ -51,7 +118,8 @@ namespace CombatSkills
         public void RollForCritical() => RollForCritical(Performer);
 
         /// <summary>
-        /// Rolls for critical only using the raw values of the Stats (<see cref="RollForCritical"/> used the <see cref="UsedSkill"/>)
+        /// Rolls for critical only using the raw values of the Stats
+        /// (<see cref="RollForCritical()"/> used the <see cref="UsedSkill"/>)
         /// </summary>
         public void RollForCriticalRawStats(CombatingEntity performer)
         {
@@ -66,13 +134,13 @@ namespace CombatSkills
             UsedSkill = null;
             Target = null;
             IsCritical = false;
+            PreComputedOffensiveTargets.Clear();
+            PreComputedSupportTargets.Clear();
         }
         public void Clear()
         {
-            UsedSkill = null;
             Performer = null;
-            Target = null;
-            IsCritical = false;
+            OnActionClear();
         }
 
         public bool IsValid() => UsedSkill != null && Performer != null && Target != null;

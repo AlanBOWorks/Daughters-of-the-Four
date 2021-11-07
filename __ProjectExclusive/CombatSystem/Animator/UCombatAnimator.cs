@@ -5,6 +5,7 @@ using CombatSkills;
 using DG.Tweening;
 using MEC;
 using Sirenix.OdinInspector;
+using Stats;
 using UnityEngine;
 
 namespace CombatSystem.Animator
@@ -73,5 +74,16 @@ namespace CombatSystem.Animator
 
         IEnumerator<float> _DoPerformSkillAnimation(SkillValuesHolders skillValues);
         void _DoReceiveSkillAnimation(SkillValuesHolders skillValues);
+    }
+
+    public abstract class SCombatIdleAnimations : ScriptableObject
+    {
+        public abstract void ReturnToIdle();
+    }
+
+    public abstract class SCombatAnimationsHolder : ScriptableObject
+    {
+        public abstract AnimationClip GetPerformActionAnimation(SkillValuesHolders skillValues);
+        public abstract AnimationClip GetReceiveActionAnimation(SkillValuesHolders skillValues);
     }
 }

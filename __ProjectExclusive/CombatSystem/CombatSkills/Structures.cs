@@ -147,9 +147,7 @@ namespace CombatSkills
 
     [Serializable]
     public class SkillInteractionsStructure<TMaster,TElement> :
-        ICondensedOffensiveStat<TMaster, TElement>,
-        ICondensedSupportStat<TMaster, TElement>,
-        ICondensedDominionStructure<TMaster,TElement>
+        ICondensedSkillInteractionStructure<TMaster,TElement>
     {
         [SerializeField, TabGroup("Offensive")]
         private OffensiveWrapper offensiveValues = new OffensiveWrapper();

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CombatEffects;
+using Stats;
 using UnityEngine;
 
 namespace CombatSkills
@@ -61,6 +62,29 @@ namespace CombatSkills
         T SharedSkillTypes { get; }
         T MainSkillTypes { get; }
     }
+
+    public interface ICondensedSkillInteractionStructure<TMaster, TElement> :
+        ICondensedDominionStructure<TMaster,TElement>,
+        ICondensedOffensiveStat<TMaster,TElement>,
+        ICondensedSupportStat<TMaster,TElement>,
+        ISkillInteractionStructureInject<TElement>,
+        ISkillInteractionStructureRead<TElement>
+    {
+
+    }
+
+    public interface ISkillInteractionStructureRead<out TElement> :
+        IOffensiveStatsRead<TElement>,
+        ISupportStatsRead<TElement>,
+        IDominionStructureRead<TElement>
+    { }
+    public interface ISkillInteractionStructureInject<in TElement> :
+        IOffensiveStatsInject<TElement>,
+        ISupportStatsInject<TElement>,
+        IDominionStructureInject<TElement>
+    { }
+
+
 
     public interface ICondensedDominionStructure<TMaster, TElement> : 
         IDominionStructureInject<TElement>, IDominionStructureRead<TElement>
