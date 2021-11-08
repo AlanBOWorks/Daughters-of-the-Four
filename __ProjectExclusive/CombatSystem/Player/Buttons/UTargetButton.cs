@@ -10,18 +10,10 @@ namespace __ProjectExclusive.Player
 {
     public class UTargetButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
-        private void Awake()
-        {
-            _movingButton = (RectTransform)transform;
-        }
-
         [ShowInInspector]
         private CombatingEntity _currentUser;
 
-        private RectTransform _movingButton;
-
         private UTargetButtonsHolder _holder;
-
 
         public CombatingEntity GetEntity() => _currentUser;
 
@@ -40,12 +32,7 @@ namespace __ProjectExclusive.Player
             gameObject.SetActive(false);
         }
 
-        private void LateUpdate()
-        {
-            Transform onObject = _currentUser.InstantiatedHolder.transform;
-
-            _movingButton.position = CombatCameraSingleton.CombatMainCamera.WorldToScreenPoint(onObject.position);
-        }
+       
 
 
         public void OnPointerClick(PointerEventData eventData)

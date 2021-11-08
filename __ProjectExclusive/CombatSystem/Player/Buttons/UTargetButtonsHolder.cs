@@ -11,59 +11,47 @@ using UnityEngine;
 
 namespace __ProjectExclusive.Player
 {
-    public class UTargetButtonsHolder : UPersistentTeamStructurePoolerBase<UTargetButton>, IVirtualSkillInteraction
+    public class UTargetButtonsHolder : MonoBehaviour, IVirtualSkillInteraction, ICanvasPivotOverEntityListener,
+        ICombatDisruptionListener
     {
         private void Start()
         {
             _entitiesTracker = new Dictionary<CombatingEntity, UTargetButton>();
 
             PlayerCombatSingleton.PlayerEvents.Subscribe(this);
+            CombatSystemSingleton.CombatPreparationHandler.Subscribe(this);
+
+            subscribeToCanvasPooler.PoolListeners.Add(this);
         }
-
-
+        [SerializeField] 
+        private UCanvasPivotOverEntities subscribeToCanvasPooler;
 
         private Dictionary<CombatingEntity, UTargetButton> _entitiesTracker;
 
-        public override void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam)
+
+        public void OnPooledElement(CombatingEntity user, UPivotOverEntity pivotOverEntity)
         {
-            _entitiesTracker.Clear();
-            base.OnPreparationCombat(playerTeam, enemyTeam);
-
+            var pivotReferences = pivotOverEntity.GetReferences();
+            var targetButton = pivotReferences.GetTargetButton();
+            _entitiesTracker.Add(user, targetButton);
+            targetButton.Injection(this);
+            targetButton.Injection(user);
+            targetButton.Hide();
         }
-
-        public override void OnAfterLoads()
-        {
-        }
-
-        public override void OnCombatPause()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnCombatResume()
+        public void OnCombatPause()
         {
             throw new NotImplementedException();
         }
 
-        protected override void OnPoolElement(ref UTargetButton instantiatedElement)
+        public void OnCombatResume()
         {
-            instantiatedElement.Hide();
-            instantiatedElement.Injection(this);
+            throw new NotImplementedException();
         }
 
-        protected override void OnPreparationEntity(CombatingEntity entity, UTargetButton element)
+        public void OnCombatExit()
         {
-            _entitiesTracker.Add(entity,element);
-            element.Injection(entity);
-        }
-
-        public override void OnCombatExit()
-        {
-            base.OnCombatExit();
             _entitiesTracker.Clear();
         }
-
-
 
         private void Show(VirtualSkillSelection selection)
         {

@@ -7,6 +7,10 @@ namespace CombatEntity
 {
     public class UEntityHolder : MonoBehaviour
     {
+        [Title("References")]
+        [SerializeField]
+        private Transform uiPivot;
+
         [Title("Parameters")]
         [SerializeField] private Vector3 spawnLocalPosition;
         [Title("Events")]
@@ -15,6 +19,9 @@ namespace CombatEntity
         [Title("Behaviour")] 
         [NonSerialized]
         public ICombatAnimationHandler AnimationHandler;
+
+
+        public Transform GetUIPivot() => uiPivot;
 
         private void Awake()
         {
