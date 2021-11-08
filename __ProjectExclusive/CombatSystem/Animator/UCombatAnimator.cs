@@ -14,28 +14,21 @@ namespace CombatSystem.Animator
     {
         [SerializeField, HideInPlayMode] 
         private UCombatAnimationsHandler animationsHandler;
-        [HideInEditorMode,ShowInInspector]
-        private ICombatAnimationHandler _animationHandler;
-
-        public IEnumerator<float> HandleAction(SkillValuesHolders skillValues)
-            => animationsHandler._DoPerformSkillAnimation(skillValues);
 
         public override void Inject(UEntityHolder holder)
         {
+            ICombatAnimationHandler animationHandler;
             if (animationsHandler == null)
             {
-                _animationHandler = new ProvisionalAnimator();
+                animationHandler = new ProvisionalAnimator();
             }
             else
             {
-                _animationHandler = animationsHandler;
+                animationHandler = animationsHandler;
             }
 
-            holder.AnimationHandler = _animationHandler;
+            holder.AnimationHandler = animationHandler;
         }
-
-
-
 
 
         private class ProvisionalAnimator : ICombatAnimationHandler
@@ -43,6 +36,23 @@ namespace CombatSystem.Animator
             private const float SpaceBetweenAnimations = .2f;
             private const float DoSkillDuration = .8f;
             private const float ReceiveSkillDuration = .6f;
+            public void DoIntroductionAnimation(CombatingEntity user)
+            {
+                
+            }
+
+            public void DoSwitchToIdleState(CombatingEntity user)
+            {
+                
+            }
+
+            public void DoPerformSkillAnimation(SkillValuesHolders skillValues)
+            {
+                var holder = skillValues.Performer.InstantiatedHolder;
+                DOTween.Kill(holder.transform);
+                holder.transform.DOPunchPosition(Vector3.up, DoSkillDuration, 4);
+            }
+
             public IEnumerator<float> _DoPerformSkillAnimation(SkillValuesHolders skillValues)
             {
                 var holder = skillValues.Performer.InstantiatedHolder;
@@ -60,25 +70,36 @@ namespace CombatSystem.Animator
                 holder.transform.DOPunchPosition(Vector3.forward, ReceiveSkillDuration, 6);
             }
         }
+
     }
 
     public abstract class UCombatAnimationsHandler : MonoBehaviour, ICombatAnimationHandler
     {
+        public abstract void DoIntroductionAnimation(CombatingEntity user);
+        public abstract void DoSwitchToIdleState(CombatingEntity user);
+        public abstract void DoPerformSkillAnimation(SkillValuesHolders skillValues);
         public abstract IEnumerator<float> _DoPerformSkillAnimation(SkillValuesHolders skillValues);
         public abstract void _DoReceiveSkillAnimation(SkillValuesHolders skillValues);
-
     }
 
     public interface ICombatAnimationHandler
     {
+        void DoIntroductionAnimation(CombatingEntity user);
+        void DoSwitchToIdleState(CombatingEntity user);
 
+        /// <summary>
+        /// Used by the system to wait a special animation to be finish
+        /// </summary>
         IEnumerator<float> _DoPerformSkillAnimation(SkillValuesHolders skillValues);
+        void DoPerformSkillAnimation(SkillValuesHolders skillValues);
+
         void _DoReceiveSkillAnimation(SkillValuesHolders skillValues);
     }
 
-    public abstract class SCombatIdleAnimations : ScriptableObject
+    public abstract class SCombatStandByAnimationsHolder : ScriptableObject
     {
-        public abstract void ReturnToIdle();
+        public abstract AnimationClip GetStartingCombatAnimation();
+        public abstract AnimationClip GetIdleAnimation(CombatingEntity user);
     }
 
     public abstract class SCombatAnimationsHolder : ScriptableObject

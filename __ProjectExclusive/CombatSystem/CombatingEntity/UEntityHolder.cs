@@ -37,6 +37,7 @@ namespace CombatEntity
             var transform1 = transform;
             transform1.parent = onRespawn;
             transform1.localPosition = spawnLocalPosition;
+            transform1.localRotation = Quaternion.identity;
         }
 
     }

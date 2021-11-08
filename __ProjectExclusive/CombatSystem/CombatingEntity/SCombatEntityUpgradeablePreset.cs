@@ -6,6 +6,10 @@ using UnityEngine.Serialization;
 
 namespace CombatEntity
 {
+
+
+    [CreateAssetMenu(fileName = "N - Role (RANGE) [Preset]",
+        menuName = "Combat/Entity/Upgradable Entity Preset")]
     public class SCombatEntityUpgradeablePreset : SCombatEntityPreset
     {
         [SerializeField, HorizontalGroup("Stats"), Tooltip("Stats which the character gains each upgrade")]
@@ -17,6 +21,12 @@ namespace CombatEntity
             reflection.BaseStats = baseStats;
             reflection.GrowStats = growStats;
             reflection.AreaDataHolder = areaData;
+        }
+
+        [Button]
+        private void UpdateAssetName()
+        {
+            UpdateAssetName(entityName);
         }
     }
 

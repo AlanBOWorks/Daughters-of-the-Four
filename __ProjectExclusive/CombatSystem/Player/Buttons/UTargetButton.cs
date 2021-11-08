@@ -44,7 +44,7 @@ namespace __ProjectExclusive.Player
         {
             Transform onObject = _currentUser.InstantiatedHolder.transform;
 
-            _movingButton.position = CombatCameraSingleton.CombatUICamera.WorldToScreenPoint(onObject.position);
+            _movingButton.position = CombatCameraSingleton.CombatMainCamera.WorldToScreenPoint(onObject.position);
         }
 
 

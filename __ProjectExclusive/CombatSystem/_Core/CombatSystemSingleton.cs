@@ -1,17 +1,15 @@
-using System;
 using System.Collections.Generic;
 using CombatEffects;
 using CombatEntity;
 using CombatSkills;
+using CombatSystem.Animator;
 using CombatSystem.Events;
 using CombatSystem.PositionHandlers;
 using CombatTeam;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
-using Stats;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace CombatSystem
 {
@@ -39,6 +37,7 @@ namespace CombatSystem
             var teamEventsDiscriminator = new TeamEventsDiscriminator();
             var actionEventDiscriminator = new CombatingActionEventDiscriminator();
             var combatPositionSpawner = new CombatPositionSpawner();
+            var initialAnimationRequester = new InitialAnimationsRequester();
             AllEntities = new List<CombatingEntity>();
 
             // ---->>>> PREPARATION Subscriptions
@@ -52,6 +51,8 @@ namespace CombatSystem
                 combatPositionSpawner);
             CombatPreparationHandler.Subscribe((ICombatDisruptionListener) 
                 combatPositionSpawner);
+            CombatPreparationHandler.Subscribe(
+                initialAnimationRequester);
 
             // ---->>>> EVENTS Subscriptions
             EventsHolder.Subscribe((ITempoListener<CombatingEntity>) 

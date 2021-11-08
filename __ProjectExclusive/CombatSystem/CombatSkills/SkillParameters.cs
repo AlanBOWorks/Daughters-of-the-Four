@@ -21,13 +21,15 @@ namespace CombatSkills
 
     public sealed class SkillValuesHolders : ISkillParameters
     {
-        public SkillValuesHolders() {} //this is just for seeing the references amount
-
-        public SkillValuesHolders(CombatingEntity target)
+        public SkillValuesHolders()
         {
-            Target = target;
             PreComputedOffensiveTargets = new HashSet<CombatingEntity>();
             PreComputedSupportTargets = new HashSet<CombatingEntity>();
+        } //this is just for seeing the references amount
+
+        public SkillValuesHolders(CombatingEntity target) : this()
+        {
+            Target = target;
         }
 
         [ShowInInspector]
@@ -43,10 +45,12 @@ namespace CombatSkills
         /// The virtual amount of targets to handle (it's not the real targets handle by the skill). <br></br>
         /// This was made primarily for [<seealso cref="CombatSystem.Animator"/>]
         /// </summary>
+        [ShowInInspector,DisableInPlayMode,HideInEditorMode]
         public readonly HashSet<CombatingEntity> PreComputedOffensiveTargets;
         /// <summary>
         /// <inheritdoc cref="PreComputedOffensiveTargets"/>
         /// </summary>
+        [ShowInInspector,DisableInPlayMode,HideInEditorMode]
         public readonly HashSet<CombatingEntity> PreComputedSupportTargets;
 
         public void SwitchTarget(CombatingEntity newTarget) => Target = newTarget;

@@ -8,7 +8,7 @@ using UnityEngine;
 namespace CombatSystem.Animator
 {
 
-    [CreateAssetMenu(fileName = "N [Single Animations]",
+    [CreateAssetMenu(fileName = "N [Combat Single Animations]",
         menuName = "Combat/Animations/Single Animations")]
     public class SCombatAnimationsSingle : SCombatAnimationsHolder
     {
@@ -19,14 +19,12 @@ namespace CombatSystem.Animator
 
         public override AnimationClip GetPerformActionAnimation(SkillValuesHolders skillValues)
         {
-            var animationType = UtilSkills.GetInteractionType(skillValues);
-            return UtilSkills.GetElementSafe(performActions, animationType);
+            return UtilSkills.GetElementSafe(performActions, skillValues);
         }
 
         public override AnimationClip GetReceiveActionAnimation(SkillValuesHolders skillValues)
         {
-            var animationType = UtilSkills.GetInteractionType(skillValues);
-            return UtilSkills.GetElementSafe(receiveActions, animationType);
+            return UtilSkills.GetElementSafe(receiveActions, skillValues);
         }
 
 

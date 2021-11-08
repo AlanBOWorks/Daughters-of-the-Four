@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
+using Sirenix.OdinInspector.Editor;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -14,7 +17,9 @@ namespace CombatCamera
 
         public static CombatCameraSingleton GetInstance() => Instance;
 
+        [ShowInInspector]
         public static Camera CombatMainCamera { get; private set; }
+        [ShowInInspector]
         public static Camera CombatUICamera { get; private set; }
 
 
@@ -39,6 +44,19 @@ namespace CombatCamera
             }
 
             CombatUICamera = camera;
+        }
+    }
+
+    public class CombatCameraWindow : OdinEditorWindow
+    {
+        [ShowInInspector]
+        private CombatCameraSingleton _cameraSingleton = CombatCameraSingleton.GetInstance();
+
+        [MenuItem("Debug/Combat Cameras", false)]
+        private static void OpenWindow()
+        {
+            var window = GetWindow<CombatCameraWindow>();
+            window.Show();
         }
     }
 }

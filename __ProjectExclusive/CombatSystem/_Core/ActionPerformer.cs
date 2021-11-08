@@ -10,6 +10,7 @@ namespace CombatSystem
     public class ActionPerformer
     {
         private const float SpaceBetweenAnimations = .12f;
+        private const float MaxWaitBetweenAnimations = 1f; 
         public IEnumerator<float> _PerformSkill(SkillValuesHolders values)
         {
             values.Target.GuardHandler.VariateTarget(values);
@@ -17,10 +18,17 @@ namespace CombatSystem
 
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
 
-            var entityHolder = values.Performer.InstantiatedHolder;
+            var performer = values.Performer;
+            var entityHolder = performer.InstantiatedHolder;
+            var animationHandler = entityHolder.AnimationHandler;
 
-            if(entityHolder != null && entityHolder.AnimationHandler != null)
-                yield return Timing.WaitUntilDone(entityHolder.AnimationHandler._DoPerformSkillAnimation(values));
+            if (entityHolder != null && animationHandler != null)
+            {
+                // Todo check for special animation and do wait below
+                // yield return Timing.WaitUntilDone(animationHandler._DoPerformSkillAnimation(values));
+                animationHandler.DoPerformSkillAnimation(values);
+                yield return Timing.WaitForSeconds(MaxWaitBetweenAnimations);
+            }
 
             yield return Timing.WaitForOneFrame;
             PerformSkill(values);

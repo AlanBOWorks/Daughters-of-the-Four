@@ -60,10 +60,12 @@ namespace CombatSkills
                 EnumSkills.SkillInteractionType.Persistent => structure.Persistent,
                 EnumSkills.SkillInteractionType.DeBuff => structure.Debuff,
                 EnumSkills.SkillInteractionType.FollowUp => structure.FollowUp,
+
                 EnumSkills.SkillInteractionType.Heal => structure.Heal,
                 EnumSkills.SkillInteractionType.Buff => structure.Buff,
                 EnumSkills.SkillInteractionType.ReceiveBuff => structure.ReceiveBuff,
                 EnumSkills.SkillInteractionType.Shielding => structure.Shielding,
+
                 EnumSkills.SkillInteractionType.Guard => structure.Guard,
                 EnumSkills.SkillInteractionType.Control => structure.Control,
                 EnumSkills.SkillInteractionType.Provoke => structure.Provoke,
@@ -80,10 +82,12 @@ namespace CombatSkills
                 EnumSkills.SkillInteractionType.Persistent => structure.Persistent,
                 EnumSkills.SkillInteractionType.DeBuff => structure.Debuff,
                 EnumSkills.SkillInteractionType.FollowUp => structure.FollowUp,
+
                 EnumSkills.SkillInteractionType.Heal => structure.Heal,
                 EnumSkills.SkillInteractionType.Buff => structure.Buff,
                 EnumSkills.SkillInteractionType.ReceiveBuff => structure.ReceiveBuff,
                 EnumSkills.SkillInteractionType.Shielding => structure.Shielding,
+
                 EnumSkills.SkillInteractionType.Guard => structure.Guard,
                 EnumSkills.SkillInteractionType.Control => structure.Control,
                 EnumSkills.SkillInteractionType.Provoke => structure.Provoke,
@@ -142,20 +146,21 @@ namespace CombatSkills
         {
             var skill = skillValues.UsedSkill;
             var mainType = skill.GetMainEffect().preset.GetComponentType();
-            var element = GetElementSafe(structure, mainType) ?? GetElementMasterSafe(structure, mainType);
-            
-            if (element != null) return element;
+
+            var element = GetElementSafe(structure, mainType);
+            if (!element.Equals(null)) return element;
+            element = GetElementMasterSafe(structure,mainType);
+            if (!element.Equals(null)) return element;
 
             // Problem: The mainType could be a non returning switch(value) [eg: MaxHealth] and can't return a valid element
             // Solution: Use the targetType and use a generic element [masterElement] to return at least something
             // Exception: Maybe the master also are null, in that case there's nothing that can be done in this part
             var targetType = skill.GetTargetType();
-
             return targetType switch
             {
                 EnumSkills.TargetType.Self => structure.Dominion,
                 EnumSkills.TargetType.Support => structure.Support,
-                EnumSkills.TargetType.Offensive => structure.Dominion,
+                EnumSkills.TargetType.Offensive => structure.Offensive,
                 _ => throw new ArgumentOutOfRangeException()
             };
         }

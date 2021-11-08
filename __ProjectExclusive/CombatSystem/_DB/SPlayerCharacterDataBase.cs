@@ -25,23 +25,13 @@ namespace CombatSystem._DB
         [ShowInInspector, HideIf("_assetDataBase")] 
         private SPlayerCharacterDataBase _assetDataBase;
 
-        [ShowInInspector, ShowIf("_assetDataBase"), TabGroup("Assets")]
-        [InlineEditor(InlineEditorObjectFieldModes.Boxed)]
+        [ShowInInspector, ShowIf("_assetDataBase")]
+        [InlineEditor(InlineEditorModes.GUIAndHeader, Expanded = true)]
         private List<SPlayerCombatEntity> _assets;
-        [ShowInInspector, ShowIf("_assetDataBase"), TabGroup("Preview"), PropertyOrder(-10)]
-        private List<SPlayerCombatEntity.PreviewPreset>[] _previews;
 
         private void UploadPreviews(List<SPlayerCombatEntity> entities)
         {
             _assets = entities;
-            _previews = new List<SPlayerCombatEntity.PreviewPreset>[entities.Count];
-            for (var i = 0; i < entities.Count; i++)
-            {
-                var sEntity = entities[i];
-                _previews[i] = sEntity._combatPresetPreview;
-                sEntity.ShowPresetPreview();
-                EditorUtility.SetDirty(sEntity);
-            }
         }
 
         [OnInspectorInit]
