@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CombatEffects;
+using Sirenix.OdinInspector;
 using Stats;
 using UnityEngine;
 
@@ -13,14 +14,16 @@ namespace CombatSkills
         {
             Preset = preset;
             _originalUseCost = useCost;
+            _currentUseCost = useCost;
         }
 
         public CombatingSkill(ISkill preset) : this(preset,preset.GetUseCost())
         { }
 
 
-        //this exists because some skill could have their cooldown altered by passives TODO make the passives for that
+        [ShowInInspector]
         private readonly int _originalUseCost;
+        [ShowInInspector]
         private int _currentUseCost;
         private EnumSkills.SKillState _currentState;
 
@@ -35,6 +38,8 @@ namespace CombatSkills
             _currentState = EnumSkills.SKillState.Idle;
         }
         public virtual void OnUseIncreaseCost() => _currentUseCost++;
+
+
 
         public readonly ISkill Preset;
         public string GetSkillName() => Preset.GetSkillName();

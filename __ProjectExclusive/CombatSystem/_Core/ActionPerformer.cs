@@ -15,6 +15,7 @@ namespace CombatSystem
         {
             values.Target.GuardHandler.VariateTarget(values);
             values.RollForCritical();
+            PerformSkill(values);
 
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
 
@@ -31,7 +32,6 @@ namespace CombatSystem
             }
 
             yield return Timing.WaitForOneFrame;
-            PerformSkill(values);
 
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
         }
@@ -41,6 +41,7 @@ namespace CombatSystem
             var skill = values.UsedSkill;
             var mainEffect = skill.GetMainEffect();
             var effects = skill.GetEffects();
+            skill.OnUseIncreaseCost();
 
 
             // Before effects because OnSkillUse could have buff/reaction effects that mitigates/amplified effects
@@ -58,7 +59,6 @@ namespace CombatSystem
 
 
 
-            skill.OnUseIncreaseCost();
         }
 
     }

@@ -28,6 +28,8 @@ namespace __ProjectExclusive.GameTheme
                 = iconsTheme.GetRoleTypes();
             PlayerCombatSingleton.CombatSkillTypesIcons
                 = iconsTheme.GetSkillTypes();
+            PlayerCombatSingleton.SkillInteractionIcons
+                = iconsTheme;
 
             Destroy(this);
         }

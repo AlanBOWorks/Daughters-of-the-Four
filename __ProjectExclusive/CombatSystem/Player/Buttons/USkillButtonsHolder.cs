@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatEntity;
 using CombatSkills;
+using CombatSystem;
 using CombatSystem.CombatSkills;
 using CombatSystem.Events;
 using Sirenix.OdinInspector;
@@ -12,7 +13,8 @@ namespace __ProjectExclusive.Player
     public class USkillButtonsHolder : MonoBehaviour, ISkillGroupTypesRead<List<USkillButton>>,
         IVirtualSkillInjectionListener,
         IVirtualSkillTargetListener,
-        ITempoListener<CombatingEntity>
+        ITempoListener<CombatingEntity>,
+        ISkillEventListener
     {
         [SerializeField, HorizontalGroup()] private List<USkillButton> mainSkillButtons = new List<USkillButton>();
         [SerializeField, HorizontalGroup()] private List<USkillButton> sharedSkillButtons = new List<USkillButton>();
@@ -20,7 +22,7 @@ namespace __ProjectExclusive.Player
         public List<USkillButton> MainSkillTypes => mainSkillButtons;
 
         private CombatingEntity _currentUser;
-       
+        private Dictionary<CombatingSkill, USkillButton> _buttonsDictionary;
         
         private USkillButton _currentHoverButton;
         private USkillButton _currentSelectedButton;
@@ -32,10 +34,13 @@ namespace __ProjectExclusive.Player
 
         private void Awake()
         {
+            _buttonsDictionary = new Dictionary<CombatingSkill, USkillButton>();
+
             var playerEvents = PlayerCombatSingleton.PlayerEvents;
             playerEvents.Subscribe(this as IVirtualSkillTargetListener);
             playerEvents.Subscribe(this as IVirtualSkillInjectionListener);
             playerEvents.Subscribe(this as ITempoListener<CombatingEntity>);
+            CombatSystemSingleton.EventsHolder.Subscribe(this);
 
 
             InjectIntoButtons(mainSkillButtons);
@@ -60,6 +65,7 @@ namespace __ProjectExclusive.Player
 
         public void OnInjectionVirtualSkills(CombatingEntity user, ISkillGroupTypesRead<List<CombatingSkill>> skillGroup)
         {
+            _buttonsDictionary.Clear();
             UtilSkills.DoActionOn(this,skillGroup,UpdateButtons);
 
             void UpdateButtons(List<USkillButton> buttons, List<CombatingSkill> skills)
@@ -78,12 +84,16 @@ namespace __ProjectExclusive.Player
                         UtilSkills.GetElement(PlayerCombatSingleton.CombatSkillTypesColors, skillType);
                     Sprite skillIcon = skill.GetIcon();
                     if (skillIcon == null)
-                        skillIcon = UtilSkills.GetElement(PlayerCombatSingleton.CombatSkillTypesIcons, skillType);
-                  
+                    {
+                        var effectType = skill.GetMainEffect().preset.GetComponentType();
+                        skillIcon = UtilSkills.GetElement(PlayerCombatSingleton.SkillInteractionIcons, effectType);
+                    }
+
 
                     button.Injection(skill);
                     button.Injection(skillIcon,iconColor);
                     button.gameObject.SetActive(true);
+                    _buttonsDictionary.Add(skill,button);
                 }
 
                 for (; i < mainSkillButtons.Count; i++)
@@ -199,9 +209,15 @@ namespace __ProjectExclusive.Player
 
         public void OnVirtualTargetSelect(CombatingEntity selectedTarget)
         {
-            _currentSelectedButton.OnSubmit();
+            var button = _currentSelectedButton;
+            button.OnSubmit();
             _currentSelectedButton = null;
             PlayerCombatSingleton.PlayerEvents.OnSubmit(_clickSelection);
+        }
+
+        public void OnSkillUse(SkillValuesHolders values)
+        {
+            _buttonsDictionary[values.UsedSkill].UpdateCost();
         }
     }
 }

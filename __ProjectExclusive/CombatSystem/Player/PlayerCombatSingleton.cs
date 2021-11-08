@@ -81,6 +81,7 @@ namespace __ProjectExclusive.Player
         public static IBaseStatsRead<Sprite> CombatBaseStatsIcons;
         public static ITeamRoleStructureRead<Sprite> CombatRolesIcons;
         public static ISkillTypesRead<Sprite> CombatSkillTypesIcons;
+        public static ISkillInteractionStructureRead<Sprite> SkillInteractionIcons;
 
         public static void InjectInCombatSystem()
         {

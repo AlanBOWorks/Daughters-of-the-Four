@@ -7,7 +7,8 @@ using UnityEngine;
 
 namespace GameTheme
 {
-    public abstract class SGameThemeHolder<TMaster,TElement> : ScriptableObject
+    public abstract class SGameThemeHolder<TMaster,TElement> : ScriptableObject,
+        ISkillInteractionStructureRead<TElement>
     {
         [SerializeField]
         private MasterTypesThemeHolder masterTypesTheme = new MasterTypesThemeHolder();
@@ -24,6 +25,7 @@ namespace GameTheme
         public ITeamRoleStructure<TElement> GetRoleTypes() => roleTypesTheme;
         public ISkillTypes<TElement> GetSkillTypes() => skillTypesTheme;
 
+
         [Serializable, GUIColor(.3f, .3f, .3f)]
         private class MasterTypesThemeHolder : CondensedMasterStructure<TMaster, TElement>
         { }
@@ -39,6 +41,20 @@ namespace GameTheme
         private class SkillTypesThemeHolder : SkillTypeStructure<TElement>
         { }
 
+        public TElement Attack => masterTypesTheme.Attack;
+        public TElement Persistent => masterTypesTheme.Persistent;
+        public TElement Debuff => masterTypesTheme.Persistent;
+        public TElement FollowUp => masterTypesTheme.FollowUp;
+
+        public TElement Heal => masterTypesTheme.Heal;
+        public TElement Shielding => masterTypesTheme.Shielding;
+        public TElement Buff => masterTypesTheme.Buff;
+        public TElement ReceiveBuff => masterTypesTheme.ReceiveBuff;
+
+        public TElement Guard => dominionTypesTheme.guard;
+        public TElement Control => dominionTypesTheme.control;
+        public TElement Provoke => dominionTypesTheme.provoke;
+        public TElement Stance => dominionTypesTheme.stance;
     }
 
 }

@@ -26,19 +26,29 @@ namespace __ProjectExclusive.Player
         [SerializeField] 
         private Image icon;
 
-        [SerializeField] 
+        [SerializeField,HorizontalGroup("Background")] 
         private MPImage background;
-        [SerializeField] 
+        [SerializeField, HorizontalGroup("Background")] 
         private MPImage borderHolder;
 
-        private Color _skillColor = Color.white;
+        [SerializeField, HorizontalGroup("Cost")]
+        private MPImage costHolder;
+        [SerializeField, HorizontalGroup("Cost")]
+        private TextMeshProUGUI costText;
 
+        [ShowInInspector,ShowIf("_holdingSkill")]
         private CombatingSkill _holdingSkill;
         public CombatingSkill GetSkill() => _holdingSkill;
 
         public void ForceUpdate()
         {
             skillName.text = _holdingSkill.GetSkillName();
+            UpdateCost();
+        }
+        public void UpdateCost()
+        {
+            int currentCost = _holdingSkill.GetUseCost();
+            costText.text = UtilsText.GetSingleDigit(currentCost);
         }
 
         public void Injection(USkillButtonsHolder holder) => _holder = holder;
@@ -48,19 +58,21 @@ namespace __ProjectExclusive.Player
             _holdingSkill = skill;
             ForceUpdate();
         }
-        public void Injection(Sprite iconSprite, Color iconColor)
+        public void Injection(Sprite iconSprite, Color primaryColor)
         {
             icon.sprite = iconSprite;
-            icon.color = iconColor;
+            icon.color = primaryColor;
 
-            _skillColor = iconColor;
-            borderHolder.color = iconColor;
+            borderHolder.color = primaryColor;
+            costHolder.color = primaryColor;
+
         }
 
         public void ResetState()
         {
             _holdingSkill = null;
         }
+
 
         public void OnPointerEnter(PointerEventData eventData)
         {
@@ -90,13 +102,14 @@ namespace __ProjectExclusive.Player
             Vector3 localPosition = buttonTransform.localPosition;
             localPosition.y = 0;
             buttonTransform.localPosition = localPosition;
-
-            borderHolder.color = background.color;
+            buttonTransform.localScale = Vector3.one;
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
             _holder.OnSelect(this);
+            RectTransform recTransform = transform as RectTransform;
+            recTransform.DOPunchScale(new Vector3(.98f, .98f, 1), .2f, 2);
         }
 
 
@@ -112,8 +125,7 @@ namespace __ProjectExclusive.Player
 
         public void OnSubmit()
         {
-            // todo Hide Selected
-            // todo Update to cooldown
+            // todo submit (animation)
         }
     }
 }
