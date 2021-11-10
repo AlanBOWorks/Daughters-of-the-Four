@@ -85,6 +85,36 @@ namespace CombatSystem.Events
             eventsHolder.OnSkillUse(values);
         }
 
+        public void OnSkillCostIncreases(SkillValuesHolders values)
+        {
+            var entity = values.Performer;
+            var eventsHolder = GetEventsHolder(entity);
+            eventsHolder.OnSkillCostIncreases(values);
+        }
+
+        public void OnBeforeAnimation(SkillValuesHolders element)
+        {
+            var entity = element.Performer;
+            var eventsHolder = GetEventsHolder(entity);
+            eventsHolder.OnBeforeAnimation(element);
+        }
+
+        public void OnAnimationClimax(SkillValuesHolders element)
+        {
+            var entity = element.Performer;
+            var eventsHolder = GetEventsHolder(entity);
+            eventsHolder.OnAnimationClimax(element);
+
+        }
+
+        public void OnAnimationHaltFinish(SkillValuesHolders element)
+        {
+            var entity = element.Performer;
+            var eventsHolder = GetEventsHolder(entity);
+            eventsHolder.OnAnimationHaltFinish(element);
+
+        }
+
         public void OnReceiveOffensiveAction(CombatEntityPairAction pair, CombatingSkill value)
         {
             var entity = pair.User;
@@ -122,5 +152,6 @@ namespace CombatSystem.Events
             var eventsHolder = GetEventsHolder(entity);
             eventsHolder.OnRoundFinish(entity);
         }
+
     }
 }

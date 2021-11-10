@@ -217,6 +217,10 @@ namespace __ProjectExclusive.Player
 
         public void OnSkillUse(SkillValuesHolders values)
         {
+        }
+
+        public void OnSkillCostIncreases(SkillValuesHolders values)
+        {
             _buttonsDictionary[values.UsedSkill].UpdateCost();
         }
     }

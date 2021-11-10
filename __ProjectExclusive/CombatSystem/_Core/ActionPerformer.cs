@@ -15,13 +15,15 @@ namespace CombatSystem
         {
             values.Target.GuardHandler.VariateTarget(values);
             values.RollForCritical();
-            PerformSkill(values);
 
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
+            PerformSkill(values);
 
             var performer = values.Performer;
             var entityHolder = performer.InstantiatedHolder;
             var animationHandler = entityHolder.AnimationHandler;
+            var eventHolder = CombatSystemSingleton.EventsHolder;
+            eventHolder.OnBeforeAnimation(values);
 
             if (entityHolder != null && animationHandler != null)
             {
@@ -30,6 +32,7 @@ namespace CombatSystem
                 animationHandler.DoPerformSkillAnimation(values);
                 yield return Timing.WaitForSeconds(MaxWaitBetweenAnimations);
             }
+            eventHolder.OnAnimationHaltFinish(values);
 
             yield return Timing.WaitForOneFrame;
 
@@ -41,13 +44,14 @@ namespace CombatSystem
             var skill = values.UsedSkill;
             var mainEffect = skill.GetMainEffect();
             var effects = skill.GetEffects();
-            skill.OnUseIncreaseCost();
-
 
             // Before effects because OnSkillUse could have buff/reaction effects that mitigates/amplified effects
-            CombatSystemSingleton.EventsHolder.OnSkillUse(values);
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            eventsHolder.OnSkillUse(values);
+            skill.OnUseIncreaseCost();
+            eventsHolder.OnSkillCostIncreases(values);
 
-            if(!skill.IsMainEffectAfterListEffects)
+            if (!skill.IsMainEffectAfterListEffects)
                 mainEffect.DoActionEffect(values);
 
             foreach (EffectParameter effectParameter in effects)

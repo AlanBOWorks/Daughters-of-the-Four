@@ -38,6 +38,7 @@ namespace CombatSystem
             var actionEventDiscriminator = new CombatingActionEventDiscriminator();
             var combatPositionSpawner = new CombatPositionSpawner();
             var initialAnimationRequester = new InitialAnimationsRequester();
+            var animationEventsHelper = new AnimationEventsHelper();
             AllEntities = new List<CombatingEntity>();
 
             // ---->>>> PREPARATION Subscriptions
@@ -63,10 +64,14 @@ namespace CombatSystem
                 EntitiesFixedEvents);
             EventsHolder.Subscribe((ISupportActionReceiverListener<CombatEntityPairAction, CombatingSkill, SkillComponentResolution>) 
                 EntitiesFixedEvents);
+            EventsHolder.Subscribe((ISkillEventListener)
+                EntitiesFixedEvents);
             EventsHolder.Subscribe(
                 teamEventsDiscriminator);
             EventsHolder.Subscribe(
                 actionEventDiscriminator);
+            EventsHolder.Subscribe(
+                animationEventsHelper);
 
             // Second because the Characters could have an event that changes the value of some event's Invoker (suck reducing damage)
             // OnReceiveOffensive, so this can represent the real damage afterwards
@@ -101,6 +106,7 @@ namespace CombatSystem
         [Title("Events")]
         [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly SystemEventsHolder EventsHolder;
+
         [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly CombatEntityFixedEvents EntitiesFixedEvents;
         public static readonly DamageReceiveEventsInvoker DamageReceiveEvents;

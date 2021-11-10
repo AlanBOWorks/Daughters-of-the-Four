@@ -17,7 +17,8 @@ namespace CombatSystem.Events
     public interface ICharactersEvents : 
         ICharactersEvents<CombatEntityPairAction, CombatingEntity, CombatingSkill, SkillComponentResolution>
     { }
-    public interface ICombatSystemEvents : ICharactersEvents, ITeamStateChangeListener<CombatingTeam>, ISkillEventListener
+    public interface ICombatSystemEvents : ICharactersEvents, ITeamStateChangeListener<CombatingTeam>, ISkillEventListener,
+        IAnimationsListener<SkillValuesHolders>
     { }
 
     public interface IOffensiveActionReceiverListener<in T,in TAction, TEffect>
@@ -76,5 +77,34 @@ namespace CombatSystem.Events
     public interface IRoundListener<in T>
     {
         void OnRoundFinish(T lastElement);
+    }
+
+
+    public interface ISkillEventListener
+    {
+        /// <summary>
+        /// After the skill is used (internally) but before to [<seealso cref="OnSkillCostIncreases"/>]
+        /// </summary>
+        /// <param name="values"></param>
+        void OnSkillUse(SkillValuesHolders values);
+        /// <summary>
+        /// Events happens after the skill cost of the skill is increased
+        /// </summary>
+        /// <param name="values"></param>
+        void OnSkillCostIncreases(SkillValuesHolders values);
+    }
+
+    public interface IAnimationsListener<in T>
+    {
+        void OnBeforeAnimation(T element);
+        /// <summary>
+        /// Event that is invoked by the animation itself (normally the 'hit' in an attacking animation)
+        /// </summary>
+        void OnAnimationClimax(T element);
+        /// <summary>
+        /// Once the animation can be considered 'finished' as it reaches its end or the time limit was reached
+        /// (the animation could be still played until the next animation is requested) 
+        /// </summary>
+        void OnAnimationHaltFinish(T element);
     }
 }

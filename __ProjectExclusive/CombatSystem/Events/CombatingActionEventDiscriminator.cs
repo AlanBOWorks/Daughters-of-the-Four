@@ -25,5 +25,8 @@ namespace CombatSystem.Events
                 CombatSystemSingleton.EventsHolder.OnReceiveSupportAction(entitiesPair,skill);
         }
 
+        public void OnSkillCostIncreases(SkillValuesHolders values)
+        {
+        }
     }
 }

@@ -32,5 +32,28 @@ namespace __ProjectExclusive
                 _ => NinePlus
             };
         }
+
+        /// <summary>
+        /// Tries to get a single digit; If is not a single digit, it will be cast like a normal string
+        /// </summary>
+        /// <param name="targetDigit"></param>
+        /// <returns></returns>
+        public static string TryGetSingleDigit(int targetDigit)
+        {
+            return targetDigit switch
+            {
+                0 => Zero,
+                1 => One,
+                2 => Two,
+                3 => Three,
+                4 => Four,
+                5 => Five,
+                6 => Six,
+                7 => Seven,
+                8 => Eight,
+                9 => Nine,
+                _ => targetDigit.ToString()
+            };
+        }
     }
 }

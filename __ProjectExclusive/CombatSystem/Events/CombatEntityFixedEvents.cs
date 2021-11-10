@@ -16,7 +16,8 @@ namespace CombatSystem.Events
         ITempoListener<CombatingEntity>, 
         IRoundListener<CombatingEntity>,
         IOffensiveActionReceiverListener<CombatEntityPairAction,CombatingSkill,SkillComponentResolution>,
-        ISupportActionReceiverListener<CombatEntityPairAction, CombatingSkill, SkillComponentResolution>
+        ISupportActionReceiverListener<CombatEntityPairAction, CombatingSkill, SkillComponentResolution>,
+        ISkillEventListener
     {
 #if UNITY_EDITOR
         [ShowInInspector,TextArea]
@@ -40,7 +41,6 @@ namespace CombatSystem.Events
         public void OnFinishAction(CombatingEntity entity)
         {
             var stats = entity.CombatStats;
-            UtilsCombatStats.DecreaseActions(stats);
 
         }
 
@@ -83,6 +83,17 @@ namespace CombatSystem.Events
         public void OnReceiveSupportEffect(CombatEntityPairAction element, ref SkillComponentResolution effectResolution)
         {
             
+        }
+
+        public void OnSkillUse(SkillValuesHolders values)
+        {
+            var entity = values.Performer;
+            var skill = values.UsedSkill;
+            UtilsCombatStats.DecreaseActions(entity.CombatStats,skill.GetUseCost());
+        }
+
+        public void OnSkillCostIncreases(SkillValuesHolders values)
+        {
         }
     }
 

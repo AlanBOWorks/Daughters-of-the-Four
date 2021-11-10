@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatSystem.Events
 {
-    public class CharacterEventsHolder<THolder, TTempo, TSkill, TEffect> :
+    public class CombatEventsHolderBase<THolder, TTempo, TSkill, TEffect> :
         IOffensiveActionReceiverListener<THolder, TSkill, TEffect>,
         ISupportActionReceiverListener<THolder, TSkill, TEffect>,
         IVitalityChangeListener<THolder, TSkill>,
@@ -14,55 +14,62 @@ namespace CombatSystem.Events
         ITempoAlternateListener<TTempo>,
         IRoundListener<TTempo>
     {
-        public CharacterEventsHolder()
+        public CombatEventsHolderBase()
         {
-            _offensiveReceiveListeners = new List<IOffensiveActionReceiverListener<THolder, TSkill, TEffect>>();
+            _offensiveReceiveListeners = new HashSet<IOffensiveActionReceiverListener<THolder, TSkill, TEffect>>();
 
-            _supportReceiveListeners = new List<ISupportActionReceiverListener<THolder, TSkill, TEffect>>();
+            _supportReceiveListeners = new HashSet<ISupportActionReceiverListener<THolder, TSkill, TEffect>>();
 
-            _vitalityChangeListeners = new List<IVitalityChangeListener<THolder,TSkill>>();
+            _vitalityChangeListeners = new HashSet<IVitalityChangeListener<THolder, TSkill>>();
 
-            _tempoListeners = new List<ITempoListener<TTempo>>();
-            _tempoDisruptionListeners = new List<ITempoAlternateListener<TTempo>>();
-            _roundListeners = new List<IRoundListener<TTempo>>();
+            _tempoListeners = new HashSet<ITempoListener<TTempo>>();
+            _tempoDisruptionListeners = new HashSet<ITempoAlternateListener<TTempo>>();
+            _roundListeners = new HashSet<IRoundListener<TTempo>>();
         }
 
-        [ShowInInspector,HorizontalGroup("Offensive Events", 
-             Title = "________________________ Offensive Events ________________________")]
-        private readonly List<IOffensiveActionReceiverListener<THolder,TSkill, TEffect>> _offensiveReceiveListeners;
-        [ShowInInspector, HorizontalGroup("Support Events", 
-             Title = "________________________ Support Events ________________________")]
-        private readonly List<ISupportActionReceiverListener<THolder,TSkill, TEffect>> _supportReceiveListeners;
+        [ShowInInspector, HorizontalGroup("Actions Events",
+             Title = "________________________ Actions Events ________________________")]
+        private readonly HashSet<IOffensiveActionReceiverListener<THolder, TSkill, TEffect>> _offensiveReceiveListeners;
+        [ShowInInspector, HorizontalGroup("Actions Events")]
+        private readonly HashSet<ISupportActionReceiverListener<THolder, TSkill, TEffect>> _supportReceiveListeners;
 
-        [ShowInInspector, HorizontalGroup("Reaction stats", 
+        [ShowInInspector, HorizontalGroup("Reaction stats",
              Title = "________________________ Reaction Events ________________________")]
-        private readonly List<IVitalityChangeListener<THolder,TSkill>> _vitalityChangeListeners;
+        private readonly HashSet<IVitalityChangeListener<THolder, TSkill>> _vitalityChangeListeners;
 
-        [ShowInInspector, HorizontalGroup("Tempo Events", 
+        [ShowInInspector, HorizontalGroup("Tempo Events",
              Title = "________________________ Tempo Events ________________________")]
-        private readonly List<ITempoListener<TTempo>> _tempoListeners;
-        private readonly List<ITempoAlternateListener<TTempo>> _tempoDisruptionListeners;
+        private readonly HashSet<ITempoListener<TTempo>> _tempoListeners;
+        private readonly HashSet<ITempoAlternateListener<TTempo>> _tempoDisruptionListeners;
 
         [ShowInInspector, HorizontalGroup("Tempo Events")]
-        private readonly List<IRoundListener<TTempo>> _roundListeners;
+        private readonly HashSet<IRoundListener<TTempo>> _roundListeners;
 
-        public void Subscribe(IOffensiveActionReceiverListener<THolder, TSkill, TEffect> listener)
+        protected void Subscribe(CombatEventsHolderBase<THolder, TTempo, TSkill, TEffect> listener)
         {
             _offensiveReceiveListeners.Add(listener);
-        }
-
-        public void Subscribe(ISupportActionReceiverListener<THolder, TSkill, TEffect> listener)
-        {
             _supportReceiveListeners.Add(listener);
+            _vitalityChangeListeners.Add(listener);
+            _tempoListeners.Add(listener);
+            _tempoDisruptionListeners.Add(listener);
+            _roundListeners.Add(listener);
+            _tempoListeners.Remove(listener);
         }
 
-        public void Subscribe(IVitalityChangeListener<THolder, TSkill> listener) => _vitalityChangeListeners.Add(listener);
-        public void Subscribe(ITempoListener<TTempo> listener) => _tempoListeners.Add(listener);
-        public void Subscribe(ITempoAlternateListener<TTempo> listener) => _tempoDisruptionListeners.Add(listener);
-        public void Subscribe(IRoundListener<TTempo> listener) => _roundListeners.Add(listener);
-
-
-        public void UnSubscribe(ITempoListener<TTempo> listener) => _tempoListeners.Remove(listener);
+        public void Subscribe(IOffensiveActionReceiverListener<THolder, TSkill, TEffect> listener) => 
+            _offensiveReceiveListeners.Add(listener);
+        public void Subscribe(ISupportActionReceiverListener<THolder, TSkill, TEffect> listener) => 
+            _supportReceiveListeners.Add(listener);
+        public void Subscribe(IVitalityChangeListener<THolder, TSkill> listener) => 
+            _vitalityChangeListeners.Add(listener);
+        public void Subscribe(ITempoListener<TTempo> listener) => 
+            _tempoListeners.Add(listener);
+        public void Subscribe(ITempoAlternateListener<TTempo> listener) =>
+            _tempoDisruptionListeners.Add(listener);
+        public void Subscribe(IRoundListener<TTempo> listener) => 
+            _roundListeners.Add(listener);
+        public void UnSubscribe(ITempoListener<TTempo> listener) =>
+            _tempoListeners.Remove(listener);
 
         public void OnReceiveOffensiveAction(THolder element, TSkill skillValue)
         {
