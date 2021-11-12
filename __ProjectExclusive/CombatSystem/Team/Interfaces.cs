@@ -30,6 +30,11 @@ namespace CombatTeam
 
     }
 
+    public interface ITeamRoleStructureExtended<T> : ITeamRoleStructure<T>, ITeamRoleStructureReadExtended<T>
+    {
+        new T OthersRole { get; set; }
+    }
+
     public interface ITeamRoleStructure<T> : ITeamRoleStructureRead<T>, ITeamRoleStructureInject<T>
     {
         new T Vanguard { get; set; }
@@ -37,6 +42,10 @@ namespace CombatTeam
         new T Support { get; set; }
     }
 
+    public interface ITeamRoleStructureReadExtended<out T> : ITeamRoleStructureRead<T>
+    {
+        T OthersRole { get; }
+    }
     public interface ITeamRoleStructureRead<out T>
     {
         T Vanguard { get; }

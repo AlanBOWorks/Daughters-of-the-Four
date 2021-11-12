@@ -25,9 +25,13 @@ namespace Utils
             return path.Remove(removeAt);
         }
     
-        public static T CreateAsset<T>(string folderPath, string assetName,bool addIdToName, bool addAssetExtension) where T : ScriptableObject
+        /// <param name="addIdToName">The instantiation ID</param>
+        /// <param name="addAssetExtension">If you want to add the '.asset'</param>
+        /// <returns></returns>
+        public static TScriptableObject CreateAsset<TScriptableObject>(string folderPath, string assetName,bool addIdToName, bool addAssetExtension) 
+            where TScriptableObject : ScriptableObject
         {
-            T generatedAsset = ScriptableObject.CreateInstance<T>();
+            TScriptableObject generatedAsset = ScriptableObject.CreateInstance<TScriptableObject>();
 
             string generatedAssetName = assetName;
             string creationPath = folderPath + assetName;
@@ -46,15 +50,19 @@ namespace Utils
             return generatedAsset;
         }
 
-        public static T CreateAsset<T>(string folderPath) where T : ScriptableObject
+
+        public static TScriptableObject CreateAsset<TScriptableObject>(string folderPath) 
+            where TScriptableObject : ScriptableObject
         {
-            T generatedAsset = ScriptableObject.CreateInstance<T>();
+            TScriptableObject generatedAsset = ScriptableObject.CreateInstance<TScriptableObject>();
             string assetName = generatedAsset.GetInstanceID().ToString();
 
             var creationPath = folderPath + assetName + AssetExtension;
             AssetDatabase.CreateAsset(generatedAsset, creationPath);
             return generatedAsset;
         }
+
+
 
         public static void Destroy(ScriptableObject asset)
         {

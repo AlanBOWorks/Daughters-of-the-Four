@@ -1,14 +1,11 @@
-using System;
 using System.Collections.Generic;
 using __ProjectExclusive.Player;
+using CombatEffects;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem.Enemy;
-using CombatSystem.Events;
 using MEC;
 using Sirenix.OdinInspector;
-using Stats;
-using UnityEngine;
 
 namespace CombatSystem
 {
@@ -16,11 +13,9 @@ namespace CombatSystem
     {
         public EntityActionRequestHandler()
         {
-            _actionPerformer = new ActionPerformer();
             _skillValues = new SkillValuesHolders();
         }
 
-        private readonly ActionPerformer _actionPerformer;
         [ShowInInspector]
         private readonly SkillValuesHolders _skillValues;
 
@@ -55,7 +50,7 @@ namespace CombatSystem
             var eventsHolder = CombatSystemSingleton.EventsHolder;
 
 
-            yield return Timing.WaitForOneFrame; //TODO request start actions animation;
+            yield return Timing.WaitForOneFrame; //TODO request start actions animation; ( UI shows the entity turns on screen)
 
             _skillValues.Inject(currentActingEntity);
             eventsHolder.OnFirstAction(currentActingEntity);
@@ -74,8 +69,8 @@ namespace CombatSystem
                     yield return Timing.WaitUntilDone(
                         requestHandler.HandleRequestAction(_skillValues));
                 } while (!_skillValues.IsValid());
-                
-                yield return Timing.WaitUntilDone(_actionPerformer._PerformSkill(_skillValues));
+
+                yield return Timing.WaitUntilDone(_PerformSkill(_skillValues));
                 eventsHolder.OnFinishAction(currentActingEntity);
                 // Death events are meant to be the last events to be send (since some previous events could prevent death
                 // conditions and this could create false positives)
@@ -99,6 +94,63 @@ namespace CombatSystem
         {
             EnemyForcedEntitySkillRequestHandler = null;
             PlayerForcedEntitySkillRequestHandler = null;
+        }
+
+
+        private const float SpaceBetweenAnimations = .12f;
+        private const float MaxWaitBetweenAnimations = 1f;
+        public IEnumerator<float> _PerformSkill(SkillValuesHolders values)
+        {
+            values.Target.GuardHandler.VariateTarget(values);
+            values.RollForCritical();
+
+            yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
+            PerformSkill(values);
+
+            var performer = values.Performer;
+            var entityHolder = performer.InstantiatedHolder;
+            var animationHandler = entityHolder.AnimationHandler;
+            var eventHolder = CombatSystemSingleton.EventsHolder;
+            eventHolder.OnBeforeAnimation(values);
+
+            if (entityHolder != null && animationHandler != null)
+            {
+                // Todo check for special animation and do wait below
+                // yield return Timing.WaitUntilDone(animationHandler._DoPerformSkillAnimation(values));
+                animationHandler.DoPerformSkillAnimation(values);
+                yield return Timing.WaitForSeconds(MaxWaitBetweenAnimations);
+            }
+            eventHolder.OnAnimationHaltFinish(values);
+
+            yield return Timing.WaitForOneFrame;
+
+            yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
+        }
+
+        private static void PerformSkill(SkillValuesHolders values)
+        {
+            var skill = values.UsedSkill;
+            var mainEffect = skill.GetMainEffect();
+            var effects = skill.GetEffects();
+
+            // Before effects because OnSkillUse could have buff/reaction effects that mitigates/amplified effects
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            eventsHolder.OnSkillUse(values);
+            skill.OnUseIncreaseCost();
+            eventsHolder.OnSkillCostIncreases(values);
+
+            if (!skill.IsMainEffectAfterListEffects)
+                mainEffect.DoActionEffect(values);
+
+            foreach (EffectParameter effectParameter in effects)
+            {
+                effectParameter.DoActionEffect(values);
+            }
+            if (skill.IsMainEffectAfterListEffects)
+                mainEffect.DoActionEffect(values);
+
+
+
         }
     }
 
