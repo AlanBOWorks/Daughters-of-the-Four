@@ -21,31 +21,24 @@ namespace CombatSystem
 
         public static IEntitySkillRequestHandler PlayerForcedEntitySkillRequestHandler;
         public static IEntitySkillRequestHandler EnemyForcedEntitySkillRequestHandler;
-
-        public IEnumerator<float> _RequestFinishActions(CombatingEntity entity)
+        
+        public void OnCombatPause()
         {
-            return _LoopThroughActions(entity);
+
         }
 
-        private static IEntitySkillRequestHandler GetTeamTempoController(CombatingEntity entity)
+        public void OnCombatResume()
         {
-            return CombatSystemSingleton.VolatilePlayerTeam.Contains(entity) //Is Players?
-
-                ? GetPlayerEntityRequestHandler()
-                : GetEnemyEntityRequestHandler();
         }
 
-        private static IEntitySkillRequestHandler GetPlayerEntityRequestHandler()
+        public void OnCombatExit()
         {
-            return PlayerForcedEntitySkillRequestHandler ?? PlayerCombatSingleton.EntitySkillRequestHandler;
-        }
-        private static IEntitySkillRequestHandler GetEnemyEntityRequestHandler()
-        {
-            return EnemyForcedEntitySkillRequestHandler ?? EnemyCombatSingleton.EntitySkillRequestHandler;
+            EnemyForcedEntitySkillRequestHandler = null;
+            PlayerForcedEntitySkillRequestHandler = null;
         }
 
 
-        private IEnumerator<float> _LoopThroughActions(CombatingEntity currentActingEntity)
+        public IEnumerator<float> _RequestFinishActions(CombatingEntity currentActingEntity)
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
 
@@ -74,26 +67,26 @@ namespace CombatSystem
                 eventsHolder.OnFinishAction(currentActingEntity);
                 // Death events are meant to be the last events to be send (since some previous events could prevent death
                 // conditions and this could create false positives)
-                CombatSystemSingleton.EntityDeathHandler.HandleDeaths(); 
+                CombatSystemSingleton.EntityDeathHandler.HandleDeaths();
             }
             eventsHolder.OnFinishAllActions(currentActingEntity);
             _skillValues.Clear();
         }
 
-
-        public void OnCombatPause()
+        private static IEntitySkillRequestHandler GetTeamTempoController(CombatingEntity entity)
         {
-            
-        }
+            return CombatSystemSingleton.VolatilePlayerTeam.Contains(entity) //Is Players?
 
-        public void OnCombatResume()
-        {
-        }
-
-        public void OnCombatExit()
-        {
-            EnemyForcedEntitySkillRequestHandler = null;
-            PlayerForcedEntitySkillRequestHandler = null;
+                ? GetPlayerEntityRequestHandler()
+                : GetEnemyEntityRequestHandler();
+            IEntitySkillRequestHandler GetPlayerEntityRequestHandler()
+            {
+                return PlayerForcedEntitySkillRequestHandler ?? PlayerCombatSingleton.EntitySkillRequestHandler;
+            }
+            IEntitySkillRequestHandler GetEnemyEntityRequestHandler()
+            {
+                return EnemyForcedEntitySkillRequestHandler ?? EnemyCombatSingleton.EntitySkillRequestHandler;
+            }
         }
 
 
@@ -105,7 +98,7 @@ namespace CombatSystem
             values.RollForCritical();
 
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
-            PerformSkill(values);
+            PerformSkill();
 
             var performer = values.Performer;
             var entityHolder = performer.InstantiatedHolder;
@@ -125,33 +118,31 @@ namespace CombatSystem
             yield return Timing.WaitForOneFrame;
 
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
-        }
 
-        private static void PerformSkill(SkillValuesHolders values)
-        {
-            var skill = values.UsedSkill;
-            var mainEffect = skill.GetMainEffect();
-            var effects = skill.GetEffects();
-
-            // Before effects because OnSkillUse could have buff/reaction effects that mitigates/amplified effects
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnSkillUse(values);
-            skill.OnUseIncreaseCost();
-            eventsHolder.OnSkillCostIncreases(values);
-
-            if (!skill.IsMainEffectAfterListEffects)
-                mainEffect.DoActionEffect(values);
-
-            foreach (EffectParameter effectParameter in effects)
+            void PerformSkill()
             {
-                effectParameter.DoActionEffect(values);
+                var skill = values.UsedSkill;
+                var mainEffect = skill.GetMainEffect();
+                var effects = skill.GetEffects();
+
+                // Before effects because OnSkillUse could have buff/reaction effects that mitigates/amplified effects
+                var eventsHolder = CombatSystemSingleton.EventsHolder;
+                eventsHolder.OnSkillUse(values);
+                skill.OnUseIncreaseCost();
+                eventsHolder.OnSkillCostIncreases(values);
+
+                if (!skill.IsMainEffectAfterListEffects)
+                    mainEffect.DoActionEffect(values);
+
+                foreach (EffectParameter effectParameter in effects)
+                {
+                    effectParameter.DoActionEffect(values);
+                }
+                if (skill.IsMainEffectAfterListEffects)
+                    mainEffect.DoActionEffect(values);
             }
-            if (skill.IsMainEffectAfterListEffects)
-                mainEffect.DoActionEffect(values);
-
-
-
         }
+
     }
 
     public interface IEntitySkillRequestHandler
