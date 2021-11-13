@@ -29,7 +29,8 @@ namespace CombatSystem
             EntityDeathHandler = new CombatEntityDeathHandler();
 
             EntityActionRequestHandler = new EntityActionRequestHandler();
-            TempoTicker = new TempoTicker(EntityActionRequestHandler);
+            TempoTicker = new TempoTicker();
+            CombatingEntitiesTicker = new CombatingEntitiesTicker();
 
             SceneTracker = new CombatSceneTracker();
 
@@ -42,10 +43,11 @@ namespace CombatSystem
             AllEntities = new List<CombatingEntity>();
 
             // ---->>>> PREPARATION Subscriptions
-            CombatPreparationHandler.Subscribe((ICombatPreparationListener) 
-                TempoTicker);
             CombatPreparationHandler.Subscribe((ICombatDisruptionListener) 
                 TempoTicker);
+            CombatPreparationHandler.Subscribe(
+                CombatingEntitiesTicker);
+
             CombatPreparationHandler.Subscribe(
                 teamEventsDiscriminator);
             CombatPreparationHandler.Subscribe((ICombatPreparationListener) 
@@ -72,6 +74,9 @@ namespace CombatSystem
                 actionEventDiscriminator);
             EventsHolder.Subscribe(
                 animationEventsHelper);
+
+            // ---->>>>> TEMPO Subscriptions
+            TempoTicker.TickListeners.Add(CombatingEntitiesTicker);
 
             // Second because the Characters could have an event that changes the value of some event's Invoker (suck reducing damage)
             // OnReceiveOffensive, so this can represent the real damage afterwards
@@ -115,6 +120,8 @@ namespace CombatSystem
         [Title("Tempo")]
         [TabGroup("ReadOnly"), ShowInInspector]
         public static readonly TempoTicker TempoTicker;
+        [TabGroup("ReadOnly"), ShowInInspector]
+        public static CombatingEntitiesTicker CombatingEntitiesTicker;
 
         [Title("Skills")]
         [TabGroup("ReadOnly"), ShowInInspector]

@@ -102,8 +102,9 @@ namespace CombatSystem
         {
             foreach (var listener in listeners)
             {
-                listener.OnAfterLoads();
+                listener.OnAfterLoadsCombat();
             }
+            CombatSystemSingleton.TempoTicker.StartTicking();
         }
         private static void RequestPreparation(IEnumerable<ICombatPreparationListener> listeners)
         {
@@ -174,7 +175,7 @@ namespace CombatSystem
                 Debug.Log($"Enemy entities: {enemyTeam.Count}");
             }
 
-            public void OnAfterLoads()
+            public void OnAfterLoadsCombat()
             {
                 Debug.Log("---- [Before] First Tick Combat -----");
             }
@@ -197,7 +198,7 @@ namespace CombatSystem
         /// <summary>
         /// Events after all loads from [<see cref="OnPreparationCombat"/>] are done.
         /// </summary>
-        void OnAfterLoads();
+        void OnAfterLoadsCombat();
     }
 
     public interface ICombatFinishListener

@@ -17,7 +17,7 @@ namespace CombatSystem.Events
             _playerTeam = playerTeam;
         }
 
-        public void OnAfterLoads()
+        public void OnAfterLoadsCombat()
         {
         }
 

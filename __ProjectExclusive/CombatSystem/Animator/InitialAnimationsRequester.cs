@@ -14,7 +14,7 @@ namespace CombatSystem.Animator
             _enemyTeam = enemyTeam;
         }
 
-        public void OnAfterLoads()
+        public void OnAfterLoadsCombat()
         {
             InvokeInitialAnimations(_playerTeam);
             InvokeInitialAnimations(_enemyTeam);

@@ -30,7 +30,7 @@ namespace __ProjectExclusive.Player
             }
         }
 
-        public override void OnAfterLoads()
+        public override void OnAfterLoadsCombat()
         {
         }
 

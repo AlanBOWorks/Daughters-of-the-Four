@@ -32,7 +32,7 @@ namespace CombatTeam
         }
 
         protected abstract void DoInjection(CombatingEntity entity, T element);
-        public abstract void OnAfterLoads();
+        public abstract void OnAfterLoadsCombat();
         public abstract void OnCombatPause();
         public abstract void OnCombatResume();
         public abstract void OnCombatExit();

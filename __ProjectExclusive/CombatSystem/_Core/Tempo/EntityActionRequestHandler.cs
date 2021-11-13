@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using __ProjectExclusive.Player;
 using CombatEffects;
@@ -9,16 +10,18 @@ using Sirenix.OdinInspector;
 
 namespace CombatSystem
 {
-    public sealed class EntityActionRequestHandler : IEntityTempoHandler, ICombatDisruptionListener
+    public sealed class EntityActionRequestHandler : ICombatDisruptionListener
     {
         public EntityActionRequestHandler()
         {
+            ActionsQueue = new Queue<IEnumerator<float>>();
             _skillValues = new SkillValuesHolders();
         }
 
         [ShowInInspector]
         private readonly SkillValuesHolders _skillValues;
 
+        public readonly Queue<IEnumerator<float>> ActionsQueue;
         public static IEntitySkillRequestHandler PlayerForcedEntitySkillRequestHandler;
         public static IEntitySkillRequestHandler EnemyForcedEntitySkillRequestHandler;
         
@@ -37,40 +40,14 @@ namespace CombatSystem
             PlayerForcedEntitySkillRequestHandler = null;
         }
 
-
-        public IEnumerator<float> _RequestFinishActions(CombatingEntity currentActingEntity)
+        private CoroutineHandle _priorityActionHandle;
+        public void RequestPriorityAction(IEnumerator<float> resumeAfterAction)
         {
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-
-
-            yield return Timing.WaitForOneFrame; //TODO request start actions animation; ( UI shows the entity turns on screen)
-
-            _skillValues.Inject(currentActingEntity);
-            eventsHolder.OnFirstAction(currentActingEntity);
-            var requestHandler = GetTeamTempoController(currentActingEntity);
-
-
-            yield return Timing.WaitForOneFrame;
-
-            while (currentActingEntity.CanAct())
-            {
-                do
-                {
-                    _skillValues.OnActionClear();
-                    // using waitUntilDone except waitUntilTrue(_skillValues.IsValid) is because the player
-                    // might use these values correctly but changes the opinion and switch same values.
-                    yield return Timing.WaitUntilDone(
-                        requestHandler.HandleRequestAction(_skillValues));
-                } while (!_skillValues.IsValid());
-
-                yield return Timing.WaitUntilDone(_PerformSkill(_skillValues));
-                eventsHolder.OnFinishAction(currentActingEntity);
-                // Death events are meant to be the last events to be send (since some previous events could prevent death
-                // conditions and this could create false positives)
-                CombatSystemSingleton.EntityDeathHandler.HandleDeaths();
-            }
-            eventsHolder.OnFinishAllActions(currentActingEntity);
-            _skillValues.Clear();
+            if (_priorityActionHandle.IsRunning)
+                throw new NotSupportedException($"[{typeof(EntityActionRequestHandler)}] can't handle two pausing coroutines at the same time;" +
+                                                "Let the current pausing coroutine finish before requesting another pause.");
+            _priorityActionHandle = Timing.RunCoroutine(resumeAfterAction);
+            Timing.WaitForOtherHandles(_currentHandle,_priorityActionHandle);
         }
 
         private static IEntitySkillRequestHandler GetTeamTempoController(CombatingEntity entity)
@@ -89,11 +66,42 @@ namespace CombatSystem
             }
         }
 
+        private CoroutineHandle _currentHandle;
+        public IEnumerator<float> _RequestEntityActions(CombatingEntity currentActingEntity)
+        {
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            _currentHandle = Timing.CurrentCoroutine;
+
+            yield return Timing.WaitForOneFrame; //TODO request start actions animation; ( UI shows the entity turns on screen)
+
+            _skillValues.Inject(currentActingEntity);
+            eventsHolder.OnFirstAction(currentActingEntity);
+            var requestHandler = GetTeamTempoController(currentActingEntity);
+
+
+            yield return Timing.WaitForOneFrame;
+
+            while (currentActingEntity.CanAct())
+            {
+                _skillValues.OnActionClear();
+                _currentHandle = Timing.RunCoroutine(requestHandler.HandleRequestAction(_skillValues));
+                yield return Timing.WaitUntilTrue(_skillValues.IsValid);
+                _currentHandle = Timing.RunCoroutine(_PerformSkill());
+                yield return Timing.WaitUntilDone(_currentHandle);
+                eventsHolder.OnFinishAction(currentActingEntity);
+                // Death events are meant to be the last events to be send (since some previous events could prevent death
+                // conditions and this could create false positives)
+                CombatSystemSingleton.EntityDeathHandler.HandleDeaths();
+            }
+            eventsHolder.OnFinishAllActions(currentActingEntity);
+            _skillValues.Clear();
+        }
 
         private const float SpaceBetweenAnimations = .12f;
         private const float MaxWaitBetweenAnimations = 1f;
-        public IEnumerator<float> _PerformSkill(SkillValuesHolders values)
+        public IEnumerator<float> _PerformSkill()
         {
+            var values = _skillValues;
             values.Target.GuardHandler.VariateTarget(values);
             values.RollForCritical();
 

@@ -51,7 +51,7 @@ namespace CombatTeam
             }
         }
 
-        public abstract void OnAfterLoads();
+        public abstract void OnAfterLoadsCombat();
         public abstract void OnCombatPause();
         public abstract void OnCombatResume();
 

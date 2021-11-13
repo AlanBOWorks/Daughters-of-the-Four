@@ -46,8 +46,10 @@ namespace __ProjectExclusive.Player
 
         private void LateUpdate()
         {
+            if(_currentUser == (null))
+                return;
             var holder = _currentUser.InstantiatedHolder;
-            if(_currentUser.Equals(null) || holder.Equals(null)) 
+            if(ReferenceEquals(holder,null)) 
                 return;
             Transform holderTransform = holder.transform;
 
