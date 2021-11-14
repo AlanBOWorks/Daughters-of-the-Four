@@ -20,8 +20,8 @@ namespace __ProjectExclusive.Enemy
         }
 
         public CombatStatsHolder GenerateStatsHolder() => new CombatStatsHolder(baseStats);
+        public AreaData GenerateAreaData() => areaData;
 
-        public CombatingAreaData GenerateAreaData() => new CombatingAreaData(areaData);
 
         public ITeamStanceStructureRead<ICollection<SkillProviderParams>> ProvideStanceSkills()
             => this;

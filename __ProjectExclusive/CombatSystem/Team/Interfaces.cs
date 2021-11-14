@@ -18,12 +18,30 @@ namespace CombatTeam
         T GetEnemyTeam();
     }
 
-    public interface ITeamTargetingStructure<out T>
+    public interface IFullTargetingStructure<T> : IFullTargetingStructureRead<T>
+    {
+        new T SelfElement { get; set; }
+        new T SelfTeamElement { get; set; }
+        new T SelfAlliesElement { get; set; }
+        new T TargetElement { get; set; }
+        new T TargetTeamElement { get; set; }
+        new T TargetAlliesElement { get; set; }
+    }
+
+    public interface IFullTargetingStructureRead<out T> : ITeamTargetingStructureRead<T>
+    {
+        T TargetElement { get; }
+        T TargetTeamElement { get; }
+        T TargetAlliesElement { get; }
+    }
+    public interface ITeamTargetingStructureRead<out T>
     {
         T SelfElement { get; }
         T SelfTeamElement { get; }
         T SelfAlliesElement { get; }
     }
+
+
 
     public interface ITeamProvider : ITeamRoleStructureRead<ICombatEntityProvider>
     {

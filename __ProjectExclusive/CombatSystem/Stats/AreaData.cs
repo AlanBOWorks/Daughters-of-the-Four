@@ -26,15 +26,4 @@ namespace Stats
         public EnumTeam.TeamPosition GetPositioning() => EnumTeam.ParseEnum(role);
     }
 
-    public class CombatingAreaData : AreaData
-    {
-        public CombatingAreaData(AreaData copyFrom)
-        {
-            rangeType = copyFrom.GetRangeType();
-            role = copyFrom.GetRole();
-        }
-
-        //This will be altered by skills
-        public EnumTeam.FieldPosition CurrentFieldPosition = EnumTeam.FieldPosition.InTeam;
-    }
 }

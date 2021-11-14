@@ -10,7 +10,8 @@ namespace CombatSystem.CombatSkills
 {
     public sealed class UtilsTarget
     {
-        public static List<CombatingEntity> GetPossibleTargets(CombatingEntity user, EnumSkills.TargetType targetingType)
+        public static List<CombatingEntity> GetPossibleTargets(EnumSkills.TargetType targetingType,
+            CombatingEntity user)
         {
             return targetingType switch
             {
@@ -21,37 +22,20 @@ namespace CombatSystem.CombatSkills
             };
         }
 
-        public static List<CombatingEntity> GetPossibleTargets(CombatingEntity user, CombatingSkill skill)
-            => GetPossibleTargets(user, skill.GetTargetType());
+        public static List<CombatingEntity> GetPossibleTargets(CombatingSkill skill, CombatingEntity user)
+            => GetPossibleTargets(skill.GetTargetType(), user);
 
-        public static List<CombatingEntity> GetPossibleTargets(
-        CombatingEntity user,
-        CombatingEntity target, 
-        EnumEffects.TargetType targetType)
+        public static List<CombatingEntity> GetPossibleTargets(EnumEffects.TargetType targetType, CombatingEntity user,
+            CombatingEntity target)
         {
-            switch (targetType)
-            {
-                case EnumEffects.TargetType.Self:
-                    return user.TargetingHolder.SelfElement;
-                case EnumEffects.TargetType.SelfAllies:
-                    return user.TargetingHolder.SelfAlliesElement;
-                case EnumEffects.TargetType.SelfTeam:
-                    return user.TargetingHolder.SelfTeamElement;
-                case EnumEffects.TargetType.Target:
-                    return target.TargetingHolder.SelfElement;
-                case EnumEffects.TargetType.TargetAllies:
-                    return target.TargetingHolder.SelfAlliesElement;
-                case EnumEffects.TargetType.TargetTeam:
-                    return target.TargetingHolder.SelfTeamElement;
-                case EnumEffects.TargetType.All:
-                    return CombatSystemSingleton.AllEntities;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(targetType), targetType, null);
-            }
+            var userTargeting = user.TargetingHolder;
+            var targetTargeting = target.TargetingHolder;
+            return UtilsEffects.GetElement(targetType, userTargeting, targetTargeting);
         }
 
-        public static List<CombatingEntity> GetPossibleTargets(CombatingEntity user, CombatingEntity target, EffectParameter effect) 
-            => GetPossibleTargets(user, target, effect.targetType);
+        public static List<CombatingEntity> GetPossibleTargets(EffectParameter effect, CombatingEntity user,
+            CombatingEntity target) 
+            => GetPossibleTargets(effect.targetType, user, target);
 
     }
 }

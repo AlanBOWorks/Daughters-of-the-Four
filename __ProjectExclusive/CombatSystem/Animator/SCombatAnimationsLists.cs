@@ -38,14 +38,14 @@ namespace CombatSystem.Animator
         {
             public AnimationClip GetAnimationClip(EnumStats.OffensiveStatType type)
             {
-                var clips = UtilStats.GetElement(this, type);
+                var clips = UtilStats.GetElement(type, this);
                 if (clips.Count <= 0)
                     clips = Offensive;
                 return HandleAnimationClips(clips);
             }
             public AnimationClip GetAnimationClip(EnumStats.SupportStatType type)
             {
-                var clips = UtilStats.GetElement(this, type);
+                var clips = UtilStats.GetElement(type, this);
                 if (clips.Count <= 0)
                     clips = Support;
                 return HandleAnimationClips(clips);

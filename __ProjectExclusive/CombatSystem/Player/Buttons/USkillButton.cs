@@ -1,3 +1,4 @@
+using __ProjectExclusive.Localizations;
 using CombatSkills;
 using DG.Tweening;
 using MPUIKIT;
@@ -42,7 +43,7 @@ namespace __ProjectExclusive.Player
 
         public void ForceUpdate()
         {
-            skillName.text = _holdingSkill.GetSkillName();
+            skillName.text = TranslatorSkill.GetText(_holdingSkill.Preset);
             UpdateCost();
         }
         public void UpdateCost()
@@ -60,6 +61,8 @@ namespace __ProjectExclusive.Player
         }
         public void Injection(Sprite iconSprite, Color primaryColor)
         {
+            skillName.color = primaryColor;
+
             icon.sprite = iconSprite;
             icon.color = primaryColor;
 

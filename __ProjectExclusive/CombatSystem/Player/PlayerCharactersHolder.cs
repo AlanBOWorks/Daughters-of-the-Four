@@ -14,7 +14,7 @@ namespace __ProjectExclusive.Player
        
         public void InjectMember(SCombatEntityUpgradeablePreset preset, EnumTeam.Role role)
         {
-            UtilsTeam.InjectElement(this,role,new PlayableCharacterEntity(preset));
+            UtilsTeam.InjectElement(role,this, new PlayableCharacterEntity(preset));
         }
 
         public void InjectMembers(ITeamRoleStructureRead<SCombatEntityUpgradeablePreset> presets)
@@ -74,9 +74,9 @@ namespace __ProjectExclusive.Player
             return new CombatStatsHolder(combatingStats);
         }
 
-        public CombatingAreaData GenerateAreaData()
+        public AreaData GenerateAreaData()
         {
-            return new CombatingAreaData(CharacterPreset.GetAreaData());
+            return (CharacterPreset.GetAreaData());
         }
 
         public ITeamStanceStructureRead<ICollection<SkillProviderParams>> ProvideStanceSkills()

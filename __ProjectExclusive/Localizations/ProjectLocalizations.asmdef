@@ -1,5 +1,5 @@
 {
-    "name": "ProjectLocalizationsCore",
+    "name": "ProjectLocalizations",
     "rootNamespace": "",
     "references": [
         "GUID:ccdbbd5c7cb114949a686ae4fe06d208"

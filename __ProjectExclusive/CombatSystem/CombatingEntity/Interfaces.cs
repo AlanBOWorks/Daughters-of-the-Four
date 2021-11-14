@@ -27,7 +27,7 @@ namespace CombatEntity
     public interface ICombatStatsProvider
     {
         CombatStatsHolder GenerateStatsHolder();
-        CombatingAreaData GenerateAreaData();
+        AreaData GenerateAreaData();
     }
 
     public interface ICombatSkillsProvider

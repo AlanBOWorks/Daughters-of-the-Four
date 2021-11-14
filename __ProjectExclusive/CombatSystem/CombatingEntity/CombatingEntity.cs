@@ -49,7 +49,7 @@ namespace CombatEntity
 
         [Title("Stats")]
         public readonly CombatStatsHolder CombatStats;
-        public readonly CombatingAreaData AreaData;
+        public readonly AreaData AreaData;
 
         [Title("Skills")] 
         public readonly CombatEntitySkillsHolder SkillsHolder;

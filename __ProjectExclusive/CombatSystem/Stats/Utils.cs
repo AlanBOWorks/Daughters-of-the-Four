@@ -192,7 +192,7 @@ namespace Stats
             onTo.Concentration = readFrom.Concentration;
         }
 
-        public static T GetElement<T>(IBehaviourStatsRead<T> stats, EnumStats.BuffType type)
+        public static T GetElement<T>(EnumStats.BuffType type, IBehaviourStatsRead<T> stats)
         {
             return type switch
             {
@@ -203,7 +203,7 @@ namespace Stats
             };
         }
 
-        public static T GetElement<T>(IMasterStatsRead<T> masterStatsStructure, EnumStats.MasterStatType type)
+        public static T GetElement<T>(EnumStats.MasterStatType type, IMasterStatsRead<T> masterStatsStructure)
         {
             switch (type)
             {
@@ -220,7 +220,7 @@ namespace Stats
             }
         }
 
-        public static T GetElement<T>(IOffensiveStatsRead<T> offensiveStructure, EnumStats.OffensiveStatType type)
+        public static T GetElement<T>(EnumStats.OffensiveStatType type, IOffensiveStatsRead<T> offensiveStructure)
         {
             switch (type)
             {
@@ -237,14 +237,15 @@ namespace Stats
             }
         }
 
-        public static T GetElement<T>(ICondensedOffensiveStat<T,T> offensiveStructure, EnumStats.OffensiveStatType type)
+        public static T GetElement<T>(EnumStats.OffensiveStatType type,
+            ICondensedOffensiveStat<T, T> offensiveStructure)
         where T : class
         {
-            var element = GetElement(offensiveStructure as IOffensiveStatsRead<T>, type);
+            var element = GetElement(type, offensiveStructure as IOffensiveStatsRead<T>);
             return element ?? offensiveStructure.Offensive;
         }
 
-        public static T GetElement<T>(ISupportStatsRead<T> supportStructure, EnumStats.SupportStatType type)
+        public static T GetElement<T>(EnumStats.SupportStatType type, ISupportStatsRead<T> supportStructure)
         {
             switch (type)
             {
@@ -261,14 +262,14 @@ namespace Stats
             }
         }
 
-        public static T GetElement<T>(ICondensedSupportStat<T, T> supportStructure, EnumStats.SupportStatType type)
+        public static T GetElement<T>(EnumStats.SupportStatType type, ICondensedSupportStat<T, T> supportStructure)
         where T : class
         {
-            var element = GetElement(supportStructure as ISupportStatsRead<T>, type);
+            var element = GetElement(type, supportStructure as ISupportStatsRead<T>);
             return element ?? supportStructure.Support;
         }
 
-        public static T GetElement<T>(IVitalityStatsRead<T> vitalityStructure, EnumStats.VitalityStatType type)
+        public static T GetElement<T>(EnumStats.VitalityStatType type, IVitalityStatsRead<T> vitalityStructure)
         {
             switch (type)
             {
@@ -285,8 +286,8 @@ namespace Stats
             }
         }
 
-        public static T GetElement<T>(IConcentrationStatsRead<T> concentrationStructure,
-            EnumStats.ConcentrationStatType type)
+        public static T GetElement<T>(EnumStats.ConcentrationStatType type,
+            IConcentrationStatsRead<T> concentrationStructure)
         {
             switch (type)
             {
@@ -304,7 +305,7 @@ namespace Stats
         }
 
 
-        public static T GetElement<T>(IBaseStatsRead<T> baseStatsStructure, EnumStats.BaseStatType type)
+        public static T GetElement<T>(EnumStats.BaseStatType type, IBaseStatsRead<T> baseStatsStructure)
         {
             switch (type)
             {
@@ -348,11 +349,11 @@ namespace Stats
             }
         }
 
-        public static T GetElement<T>(IBaseStatsRead<T> baseStatsStructure, IMasterStatsRead<T> backUpElements,
-            EnumStats.BaseStatType type)
+        public static T GetElement<T>(EnumStats.BaseStatType type, IBaseStatsRead<T> baseStatsStructure,
+            IMasterStatsRead<T> backUpElements)
         where T : class
         {
-            var element = GetElement(baseStatsStructure, type);
+            var element = GetElement(type, baseStatsStructure);
             if (element != null) return element;
 
             return type switch

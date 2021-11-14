@@ -58,7 +58,7 @@ namespace __ProjectExclusive.Player
         {
             var selectedSkill = button.GetSkill();
             var possibleTargets =
-                UtilsTarget.GetPossibleTargets(_currentUser, selectedSkill.GetTargetType());
+                UtilsTarget.GetPossibleTargets(selectedSkill.GetTargetType(), _currentUser);
 
             return new VirtualSkillSelection(selectedSkill,possibleTargets);
         }
@@ -81,12 +81,12 @@ namespace __ProjectExclusive.Player
 
                     var skillType = skill.GetTargetType();
                     var iconColor = 
-                        UtilSkills.GetElement(PlayerCombatSingleton.CombatSkillTypesColors, skillType);
+                        UtilSkills.GetElement(skillType, PlayerCombatSingleton.CombatSkillTypesColors);
                     Sprite skillIcon = skill.GetIcon();
                     if (skillIcon == null)
                     {
                         var effectType = skill.GetMainEffect().preset.GetComponentType();
-                        skillIcon = UtilSkills.GetElement(PlayerCombatSingleton.SkillInteractionIcons, effectType);
+                        skillIcon = UtilSkills.GetElement(effectType, PlayerCombatSingleton.SkillInteractionIcons);
                     }
 
 

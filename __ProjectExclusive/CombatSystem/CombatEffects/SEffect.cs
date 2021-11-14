@@ -13,7 +13,7 @@ namespace CombatEffects
         {
             var user = entities.User;
             var skillTarget = entities.Target;
-            var effectTargets = UtilsTarget.GetPossibleTargets(user, skillTarget, effectTargetType);
+            var effectTargets = UtilsTarget.GetPossibleTargets(effectTargetType, user, skillTarget);
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             foreach (var effectTarget in effectTargets)

@@ -34,7 +34,7 @@ namespace CombatSystem
             
             var selectedSkill = ChooseSkill(skills,currentEntity) ?? skillsHolder.WaitSkill;
 
-            List<CombatingEntity> possibleTargets = UtilsTarget.GetPossibleTargets(currentEntity, selectedSkill.GetTargetType());
+            List<CombatingEntity> possibleTargets = UtilsTarget.GetPossibleTargets(selectedSkill.GetTargetType(), currentEntity);
 
             var selectedTarget = ChooseTarget(possibleTargets);
 

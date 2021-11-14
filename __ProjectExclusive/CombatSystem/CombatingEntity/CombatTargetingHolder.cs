@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatEntity
 {
-    public class CombatTargetingHolder : ITeamTargetingStructure<List<CombatingEntity>>
+    public class CombatTargetingHolder : ITeamTargetingStructureRead<List<CombatingEntity>>
     {
         public CombatTargetingHolder(CombatingEntity self)
         {

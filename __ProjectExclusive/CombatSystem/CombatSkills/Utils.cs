@@ -29,7 +29,7 @@ namespace CombatSkills
             action(primary.MainSkillTypes, secondary.MainSkillTypes);
         }
 
-        public static T GetElement<T>(ISkillTypesRead<T> skillsStructures, EnumSkills.TargetType targetType)
+        public static T GetElement<T>(EnumSkills.TargetType targetType, ISkillTypesRead<T> skillsStructures)
         {
             return targetType switch
             {
@@ -52,7 +52,7 @@ namespace CombatSkills
             };
         }
 
-        public static T GetElement<T>(ISkillInteractionStructureRead<T> structure, EnumSkills.SkillInteractionType type)
+        public static T GetElement<T>(EnumSkills.SkillInteractionType type, ISkillInteractionStructureRead<T> structure)
         {
             return type switch
             {
@@ -73,7 +73,8 @@ namespace CombatSkills
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
-        public static T GetElementSafe<T>(ISkillInteractionStructureRead<T> structure, EnumSkills.SkillInteractionType type)
+        public static T GetElementSafe<T>(EnumSkills.SkillInteractionType type,
+            ISkillInteractionStructureRead<T> structure)
         where T : class
         {
             return type switch
@@ -96,8 +97,8 @@ namespace CombatSkills
             };
         }
 
-        public static T GetElementMaster<T>(ICondensedSkillInteractionStructure<T,T> structure,
-            EnumSkills.SkillInteractionType type)
+        public static T GetElementMaster<T>(EnumSkills.SkillInteractionType type,
+            ICondensedSkillInteractionStructure<T, T> structure)
         {
             return type switch
             {
@@ -118,8 +119,8 @@ namespace CombatSkills
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
-        public static T GetElementMasterSafe<T>(ICondensedSkillInteractionStructure<T, T> structure,
-            EnumSkills.SkillInteractionType type)
+        public static T GetElementMasterSafe<T>(EnumSkills.SkillInteractionType type,
+            ICondensedSkillInteractionStructure<T, T> structure)
         where T : class
         {
             return type switch
@@ -140,16 +141,16 @@ namespace CombatSkills
             };
         }
 
-        public static T GetElementSafe<T>(ICondensedSkillInteractionStructure<T, T> structure,
-            SkillValuesHolders skillValues)
+        public static T GetElementSafe<T>(SkillValuesHolders skillValues,
+            ICondensedSkillInteractionStructure<T, T> structure)
         where T : class
         {
             var skill = skillValues.UsedSkill;
             var mainType = skill.GetMainEffect().preset.GetComponentType();
 
-            var element = GetElementSafe(structure, mainType);
+            var element = GetElementSafe(mainType, structure);
             if (!element.Equals(null)) return element;
-            element = GetElementMasterSafe(structure,mainType);
+            element = GetElementMasterSafe(mainType, structure);
             if (!element.Equals(null)) return element;
 
             // Problem: The mainType could be a non returning switch(value) [eg: MaxHealth] and can't return a valid element

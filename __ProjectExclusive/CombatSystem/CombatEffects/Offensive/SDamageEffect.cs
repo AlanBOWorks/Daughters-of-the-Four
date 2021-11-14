@@ -1,3 +1,4 @@
+using __ProjectExclusive.Localizations;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem;

@@ -80,7 +80,7 @@ namespace CombatSkills
         {
             foreach (var effectParameter in UsedSkill.GetEffects())
             {
-                var targets = UtilsTarget.GetPossibleTargets(Performer, Target, effectParameter);
+                var targets = UtilsTarget.GetPossibleTargets(effectParameter, Performer, Target);
                 foreach (var target in targets)
                 {
                     InjectTarget(target);
@@ -92,7 +92,7 @@ namespace CombatSkills
         {
             foreach (var effectParameter in UsedSkill.GetEffects())
             {
-                var targets = UtilsTarget.GetPossibleTargets(Performer, Target, effectParameter);
+                var targets = UtilsTarget.GetPossibleTargets(effectParameter, Performer, Target);
                 foreach (var target in targets)
                 {
                     InjectTarget(PreComputedSupportTargets,target);

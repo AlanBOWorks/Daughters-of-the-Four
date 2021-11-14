@@ -19,12 +19,12 @@ namespace CombatSystem.Animator
 
         public override AnimationClip GetPerformActionAnimation(SkillValuesHolders skillValues)
         {
-            return UtilSkills.GetElementSafe(performActions, skillValues);
+            return UtilSkills.GetElementSafe(skillValues, performActions);
         }
 
         public override AnimationClip GetReceiveActionAnimation(SkillValuesHolders skillValues)
         {
-            return UtilSkills.GetElementSafe(receiveActions, skillValues);
+            return UtilSkills.GetElementSafe(skillValues, receiveActions);
         }
 
 

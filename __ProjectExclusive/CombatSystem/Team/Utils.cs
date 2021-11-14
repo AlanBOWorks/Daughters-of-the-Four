@@ -18,7 +18,7 @@ namespace CombatTeam
                 _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
             };
         }
-        public static T GetElement<T>(ITeamRoleStructureRead<T> team, EnumTeam.TeamPosition teamPosition)
+        public static T GetElement<T>(EnumTeam.TeamPosition teamPosition, ITeamRoleStructureRead<T> team)
             => GetElement(team, (EnumTeam.Role)teamPosition);
 
         public static T GetElement<T>(ITeamStanceStructureRead<T> stanceStructure, EnumTeam.TeamStance stance)
@@ -32,7 +32,8 @@ namespace CombatTeam
             };
         }
 
-        public static T GetElement<T>(CondensedMasterStructure<T, T> structure, EnumStats.OffensiveStatType offensiveType)
+        public static T GetElement<T>(EnumStats.OffensiveStatType offensiveType,
+            CondensedMasterStructure<T, T> structure)
         {
             var element = offensiveType switch
             {
@@ -45,7 +46,7 @@ namespace CombatTeam
 
             return element ?? structure.Offensive;
         }
-        public static T GetElement<T>(CondensedMasterStructure<T, T> structure, EnumStats.SupportStatType supportType)
+        public static T GetElement<T>(EnumStats.SupportStatType supportType, CondensedMasterStructure<T, T> structure)
         {
             var element = supportType switch
             {
@@ -59,7 +60,7 @@ namespace CombatTeam
             return element ?? structure.Support;
         }
 
-        public static T GetElement<T>(CondensedMasterStructure<T, T> structure, EnumStats.VitalityStatType vitalityType)
+        public static T GetElement<T>(EnumStats.VitalityStatType vitalityType, CondensedMasterStructure<T, T> structure)
         {
             var element = vitalityType switch
             {
@@ -73,8 +74,8 @@ namespace CombatTeam
             return element ?? structure.Vitality;
         }
 
-        public static T GetElement<T>(CondensedMasterStructure<T, T> structure,
-            EnumStats.ConcentrationStatType concentrationType)
+        public static T GetElement<T>(EnumStats.ConcentrationStatType concentrationType,
+            CondensedMasterStructure<T, T> structure)
         {
             var element = concentrationType switch
             {
@@ -89,7 +90,7 @@ namespace CombatTeam
         }
 
 
-        public static void InjectElement<T>(ITeamRoleStructureInject<T> team, EnumTeam.Role role, T element)
+        public static void InjectElement<T>(EnumTeam.Role role, ITeamRoleStructureInject<T> team, T element)
         {
             switch (role)
             {
@@ -106,8 +107,9 @@ namespace CombatTeam
                     throw new ArgumentOutOfRangeException(nameof(role), role, null);
             }
         }
-        public static void InjectElement<T>(ITeamRoleStructureInject<T> team, EnumTeam.TeamPosition teamPosition, T element)
-            => InjectElement(team, (EnumTeam.Role)teamPosition, element);
+        public static void InjectElement<T>(EnumTeam.TeamPosition teamPosition, ITeamRoleStructureInject<T> team,
+            T element)
+            => InjectElement((EnumTeam.Role)teamPosition, team, element);
 
 
         public static void InjectElements<T>(ITeamRoleStructureInject<T> team, ITeamRoleStructureRead<T> injection)
@@ -198,13 +200,6 @@ namespace CombatTeam
             FrontLine = Role.Vanguard,
             MidLine = Role.Attacker,
             BackLine = Role.Support
-        }
-
-        public enum FieldPosition
-        {
-            InTeam,
-            DivingEnemy,
-            OutPosition
         }
 
         public enum TeamStance

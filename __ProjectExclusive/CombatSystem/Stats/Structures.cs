@@ -55,12 +55,12 @@ namespace Stats
         [SerializeField, HorizontalGroup("Self Action")]
         private ConcentrationWrapper concentrationValues = new ConcentrationWrapper();
 
-        public TMaster GetElement(EnumStats.MasterStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.OffensiveStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.SupportStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.VitalityStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.ConcentrationStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.BaseStatType type) => UtilStats.GetElement(this, type);
+        public TMaster GetElement(EnumStats.MasterStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.OffensiveStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.SupportStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.VitalityStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.ConcentrationStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.BaseStatType type) => UtilStats.GetElement(type, this);
 
         public OffensiveWrapper<TMaster, TElement> GetOffensiveWrapper() => offensiveValues;
         public SupportWrapper<TMaster, TElement> GetSupportWrapper() => supportValues;
@@ -213,12 +213,12 @@ namespace Stats
         [SerializeField, HorizontalGroup("Self Action")]
         private ConcentrationWrapper concentrationValues = new ConcentrationWrapper();
 
-        public TMaster GetElement(EnumStats.MasterStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.OffensiveStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.SupportStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.VitalityStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.ConcentrationStatType type) => UtilStats.GetElement(this, type);
-        public TElement GetElement(EnumStats.BaseStatType type) => UtilStats.GetElement(this, type);
+        public TMaster GetElement(EnumStats.MasterStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.OffensiveStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.SupportStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.VitalityStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.ConcentrationStatType type) => UtilStats.GetElement(type, this);
+        public TElement GetElement(EnumStats.BaseStatType type) => UtilStats.GetElement(type, this);
 
         public SerializableOffensiveWrapper<TMaster, TElement> GetOffensiveWrapper() => offensiveValues;
         public SerializableSupportWrapper<TMaster, TElement> GetSupportWrapper() => supportValues;
