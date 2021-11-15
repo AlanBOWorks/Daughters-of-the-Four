@@ -1,3 +1,5 @@
+using __ProjectExclusive.Localizations;
+using __ProjectExclusive.Player;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem;
@@ -38,5 +40,14 @@ namespace CombatEffects
         }
 
         public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Stance;
+        public override Color GetDescriptiveColor()
+        {
+            return PlayerCombatSingleton.SkillInteractionColors.Stance;
+        }
+
+        public override string GetEffectValueText(float effectValue)
+        {
+            return TranslatorTeam.GetText(targetStance);
+        }
     }
 }

@@ -52,7 +52,7 @@ namespace CombatSystem.Animator
             }
             public AnimationClip GetAnimationClip(EnumSkills.DominionType type)
             {
-                var clips = UtilSkills.GetElement(this, type);
+                var clips = UtilSkills.GetElement(type, this);
                 if (clips.Count <= 0)
                     clips = Dominion;
                 return HandleAnimationClips(clips);

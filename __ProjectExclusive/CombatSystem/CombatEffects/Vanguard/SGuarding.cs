@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using __ProjectExclusive.Player;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem.Events;
@@ -32,6 +33,15 @@ namespace CombatEffects
         }
 
         public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Shielding;
+        public override Color GetDescriptiveColor()
+        {
+            return PlayerCombatSingleton.SkillInteractionColors.Guard;
+        }
+
+        public override string GetEffectValueText(float effectValue)
+        {
+            return effectValue.ToString("F1") + "%";
+        }
     }
 
     public sealed class GuardHandler

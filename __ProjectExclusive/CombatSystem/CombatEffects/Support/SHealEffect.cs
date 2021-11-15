@@ -1,3 +1,4 @@
+using __ProjectExclusive.Player;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem;
@@ -23,5 +24,14 @@ namespace CombatEffects
         }
 
         public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Heal;
+        public override Color GetDescriptiveColor()
+        {
+            return PlayerCombatSingleton.SkillInteractionColors.Heal;
+        }
+
+        public override string GetEffectValueText(float effectValue)
+        {
+            return effectValue.ToString("####");
+        }
     }
 }

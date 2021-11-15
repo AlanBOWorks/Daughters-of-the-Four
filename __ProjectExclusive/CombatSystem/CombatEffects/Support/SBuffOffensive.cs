@@ -1,4 +1,5 @@
 using System;
+using __ProjectExclusive.Localizations;
 using CombatEntity;
 using CombatSkills;
 using Sirenix.OdinInspector;
@@ -40,6 +41,11 @@ namespace CombatEffects
             }
             return new SkillComponentResolution(this,finalBuffValue);
         }
+        protected override string GetBuffTooltip()
+        {
+            return TranslatorStats.GetText(buffStat);
+        }
+
 
         [Button]
         private void UpdateAssetName()

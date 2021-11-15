@@ -93,5 +93,7 @@ namespace CombatEffects
 
     public abstract class SSkillComponentEffect : ScriptableObject, ISkillComponent {
         public abstract EnumSkills.SkillInteractionType GetComponentType();
+        public abstract Color GetDescriptiveColor();
+        public abstract string GetEffectValueText(float effectValue);
     }
 }

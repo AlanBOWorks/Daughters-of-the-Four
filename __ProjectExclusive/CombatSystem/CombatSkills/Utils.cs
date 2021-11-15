@@ -40,7 +40,7 @@ namespace CombatSkills
             };
         }
 
-        public static T GetElement<T>(IDominionStructureRead<T> dominionStructure, EnumSkills.DominionType type)
+        public static T GetElement<T>(EnumSkills.DominionType type, IDominionStructureRead<T> dominionStructure)
         {
             return type switch
             {

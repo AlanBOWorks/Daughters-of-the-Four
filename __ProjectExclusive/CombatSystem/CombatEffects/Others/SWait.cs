@@ -24,5 +24,14 @@ namespace CombatEffects
         }
 
         public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Wait;
+        public override Color GetDescriptiveColor()
+        {
+            return Color.white;
+        }
+
+        public override string GetEffectValueText(float effectValue)
+        {
+            return null;
+        }
     }
 }

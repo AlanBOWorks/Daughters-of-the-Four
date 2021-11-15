@@ -1,6 +1,7 @@
 using CombatEntity;
 using CombatSkills;
 using Stats;
+using UnityEngine;
 
 namespace CombatEffects
 {
@@ -10,6 +11,8 @@ namespace CombatEffects
     public interface ISkillComponent
     {
         EnumSkills.SkillInteractionType GetComponentType();
+        Color GetDescriptiveColor();
+        string GetEffectValueText(float effectValue);
     }
 
     public interface IEffect : ISkillComponent

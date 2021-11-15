@@ -1,4 +1,5 @@
 using System;
+using __ProjectExclusive.Player;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem;
@@ -56,5 +57,16 @@ namespace CombatEffects
             bool isCritical);
 
         public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Buff;
+
+        public override Color GetDescriptiveColor()
+        {
+            return PlayerCombatSingleton.SkillInteractionColors.Buff;
+        }
+        public override string GetEffectValueText(float effectValue)
+        {
+            return effectValue.ToString("F1") + "% " + GetBuffTooltip();
+        }
+
+        protected abstract string GetBuffTooltip();
     }
 }

@@ -1,4 +1,6 @@
 using System;
+using __ProjectExclusive.Localizations;
+using __ProjectExclusive.Player;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem;
@@ -49,6 +51,20 @@ namespace CombatEffects
         {
             CombatSystemSingleton.EventsHolder.OnReceiveSupportEffect(entities,ref resolution);
         }
+        
+        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Buff;
+        public override Color GetDescriptiveColor()
+        {
+            return PlayerCombatSingleton.SkillInteractionColors.Buff;
+        }
+
+        public override string GetEffectValueText(float effectValue)
+        {
+            return effectValue.ToString("F1") + "% " + TranslatorStats.GetText(buffStat);
+        }
+
+
+
 
         [Button]
         protected virtual void UpdateAssetName()
@@ -56,7 +72,5 @@ namespace CombatEffects
             name = "MASTER - " + buffStat.ToString() + " [Buff]";
             UtilsAssets.UpdateAssetName(this);
         }
-
-        public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Buff;
     }
 }

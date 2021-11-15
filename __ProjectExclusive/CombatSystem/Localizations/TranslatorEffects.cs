@@ -1,25 +1,36 @@
 using System;
 using CombatEffects;
 using CombatTeam;
+using Stats;
 using UnityEngine;
 
 namespace __ProjectExclusive.Localizations
 {
     public static class TranslatorEffects 
     {
+        private static IFullTargetingStructureRead<string> _targetingLocalizationHolder = new TargetingProvisionalText();
+
         public static string GetText(EnumEffects.TargetType effectType)
         {
-            var currentLanguage = LocalizationSingleton.GameLanguage;
-            IFullTargetingStructureRead<string> targetingTexts;
-            if(currentLanguage != LocalizationsEnum.Language.dev_en)
-                throw new NotImplementedException(
-                    $"[{typeof(EnumEffects.TargetType)}.{currentLanguage}] language is not implemented");
-
-            targetingTexts = ProvisionalTargetingTexts;
-            return UtilsEffects.GetElement(effectType, targetingTexts);
+            return UtilsEffects.GetElement(effectType, _targetingLocalizationHolder);
         }
 
-        private static readonly IFullTargetingStructureRead<string> ProvisionalTargetingTexts = new TargetingProvisionalText();
+        public static string GetText(EffectParameter effect)
+        {
+            var component = effect.preset;
+            var effectColor = component.GetDescriptiveColor();
+            string effectText 
+                = $"<#{ColorUtility.ToHtmlStringRGB(effectColor)}>"
+                + EffectsLocalizationHandler.GetEffectLocalization(component) 
+                + "</color>: " 
+                + component.GetEffectValueText(effect.effectValue);
+            return effectText;
+        }
+
+        public static void SwitchTargetingTextHolder(IFullTargetingStructureRead<string> holder)
+        {
+            _targetingLocalizationHolder = holder;
+        }
         private class TargetingProvisionalText : IFullTargetingStructureRead<string>
         {
             private const string SelfTypeText = "Self";

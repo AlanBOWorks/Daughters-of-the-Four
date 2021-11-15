@@ -23,9 +23,10 @@ namespace __ProjectExclusive.Player
         [Title("Tooltips")]
         [SerializeField] 
         private TextMeshProUGUI skillName;
-        [Title("Visuals")]
-        [SerializeField] 
+        [SerializeField,HorizontalGroup("Icon")] 
         private Image icon;
+        [SerializeField, HorizontalGroup("Icon")]
+        private MPImage iconBorder;
 
         [SerializeField,HorizontalGroup("Background")] 
         private MPImage background;
@@ -37,6 +38,9 @@ namespace __ProjectExclusive.Player
         [SerializeField, HorizontalGroup("Cost")]
         private TextMeshProUGUI costText;
 
+        [SerializeField] 
+        private TextMeshProUGUI mainEffectDescription;
+
         [ShowInInspector,ShowIf("_holdingSkill")]
         private CombatingSkill _holdingSkill;
         public CombatingSkill GetSkill() => _holdingSkill;
@@ -44,6 +48,10 @@ namespace __ProjectExclusive.Player
         public void ForceUpdate()
         {
             skillName.text = TranslatorSkill.GetText(_holdingSkill.Preset);
+            
+            var mainEffect = _holdingSkill.GetMainEffect();
+            mainEffectDescription.text = TranslatorEffects.GetText(mainEffect);
+
             UpdateCost();
         }
         public void UpdateCost()
@@ -61,10 +69,10 @@ namespace __ProjectExclusive.Player
         }
         public void Injection(Sprite iconSprite, Color primaryColor)
         {
-            skillName.color = primaryColor;
 
             icon.sprite = iconSprite;
             icon.color = primaryColor;
+            iconBorder.color = primaryColor;
 
             borderHolder.color = primaryColor;
             costHolder.color = primaryColor;

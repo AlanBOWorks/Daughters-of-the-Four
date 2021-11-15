@@ -70,15 +70,14 @@ namespace __ProjectExclusive.Player
         [TabGroup("Instantiations")] 
         public static GameObject CombatUiReference;
 
-        [ShowInInspector,HorizontalGroup("Theme")]
+        [ShowInInspector, HorizontalGroup("Theme")]
         public static IMasterStatsRead<Color> CombatMasterStatColors;
-        public static IBaseStatsRead<Color> CombatBaseStatsColors;
         public static ITeamRoleStructureRead<Color> CombatRoleStructureColors;
         public static ISkillTypesRead<Color> CombatSkillTypesColors;
+        public static ISkillInteractionStructureRead<Color> SkillInteractionColors;
 
         [ShowInInspector, HorizontalGroup("Theme")]
         public static IMasterStatsRead<Sprite> CombatMasterStatsIcons;
-        public static IBaseStatsRead<Sprite> CombatBaseStatsIcons;
         public static ITeamRoleStructureRead<Sprite> CombatRolesIcons;
         public static ISkillTypesRead<Sprite> CombatSkillTypesIcons;
         public static ISkillInteractionStructureRead<Sprite> SkillInteractionIcons;

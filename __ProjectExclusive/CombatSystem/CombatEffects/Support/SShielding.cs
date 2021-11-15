@@ -1,3 +1,4 @@
+using __ProjectExclusive.Player;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem.Events;
@@ -29,5 +30,14 @@ namespace CombatEffects
         }
 
         public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Shielding;
+        public override Color GetDescriptiveColor()
+        {
+            return PlayerCombatSingleton.SkillInteractionColors.Shielding;
+        }
+
+        public override string GetEffectValueText(float effectValue)
+        {
+            return effectValue.ToString("F1") + "u";
+        }
     }
 }

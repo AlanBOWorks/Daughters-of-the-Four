@@ -13,17 +13,15 @@ namespace __ProjectExclusive.GameTheme
         {
             PlayerCombatSingleton.CombatMasterStatColors
                 = colorsTheme.GetMasterTypes();
-            PlayerCombatSingleton.CombatBaseStatsColors
-                = colorsTheme.GetBaseStatsTypes();
             PlayerCombatSingleton.CombatRoleStructureColors
                 = colorsTheme.GetRoleTypes();
             PlayerCombatSingleton.CombatSkillTypesColors
                 = colorsTheme.GetSkillTypes();
+            PlayerCombatSingleton.SkillInteractionColors
+                = colorsTheme;
 
             PlayerCombatSingleton.CombatMasterStatsIcons
                 = iconsTheme.GetMasterTypes();
-            PlayerCombatSingleton.CombatBaseStatsIcons
-                = iconsTheme.GetBaseStatsTypes();
             PlayerCombatSingleton.CombatRolesIcons
                 = iconsTheme.GetRoleTypes();
             PlayerCombatSingleton.CombatSkillTypesIcons

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using __ProjectExclusive.Player;
 using CombatEntity;
 using CombatSkills;
 using CombatSystem.Events;
@@ -17,5 +18,10 @@ namespace CombatEffects
         }
 
         public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.DeBuff;
+        public override Color GetDescriptiveColor()
+        {
+            return PlayerCombatSingleton.SkillInteractionColors.Debuff;
+        }
+
     }
 }
