@@ -24,7 +24,10 @@ namespace CombatSystem.Animator
         {
             foreach (var member in team)
             {
-                member.InstantiatedHolder.AnimationHandler?.DoIntroductionAnimation(member);
+                var holder = member.InstantiatedHolder;
+                if(holder == null) continue;
+
+                holder.AnimationHandler?.DoIntroductionAnimation(member);
             }
         }
     }

@@ -15,7 +15,7 @@ namespace CombatSystem.Events
         IRoundListener<TTempo>
     { }
     public interface ICharactersEvents : 
-        ICharactersEvents<CombatEntityPairAction, CombatingEntity, CombatingSkill, SkillComponentResolution>
+        ICharactersEvents<ISkillParameters, CombatingEntity, CombatingSkill, SkillComponentResolution>
     { }
     public interface ICombatSystemEvents : ICharactersEvents, ITeamStateChangeListener<CombatingTeam>, ISkillEventListener,
         IAnimationsListener<SkillValuesHolders>

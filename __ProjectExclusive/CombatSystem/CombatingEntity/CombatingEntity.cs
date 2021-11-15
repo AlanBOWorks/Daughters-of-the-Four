@@ -87,15 +87,4 @@ namespace CombatEntity
         public void Injection(UEntityHolder instantiatedHolder) => InstantiatedHolder = instantiatedHolder;
     }
 
-    public struct CombatEntityPairAction
-    {
-        public readonly CombatingEntity User;
-        public readonly CombatingEntity Target;
-
-        public CombatEntityPairAction(CombatingEntity user, CombatingEntity target)
-        {
-            User = user;
-            Target = target;
-        }
-    }
 }

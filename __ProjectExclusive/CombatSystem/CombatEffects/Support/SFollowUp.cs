@@ -13,10 +13,10 @@ namespace CombatEffects
     public class SFollowUp : SEffect
     {
 
-        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveSupportEffect(entities,ref resolution);
+            systemEvents.OnReceiveSupportEffect(parameters,ref resolution);
         }
 
         protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue,

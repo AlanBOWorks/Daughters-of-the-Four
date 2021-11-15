@@ -21,7 +21,10 @@ namespace CombatSkills
         [Title("Params")]
         [SerializeField, EnumPaging, GUIColor(.7f,.2f,.2f)]
         [VerticalGroup("Params")]
-        private EnumSkills.TargetType skillTargetType = EnumSkills.TargetType.Self;
+        private EnumSkills.TargetType skillTargetType = EnumSkills.TargetType.Offensive;
+        [VerticalGroup("Params")]
+        [SerializeField]
+        private EnumEffects.TargetType effectTargetType = EnumEffects.TargetType.Target;
 
         [VerticalGroup("Params"), TableColumnWidth(150)]
         [SerializeField,
@@ -58,6 +61,8 @@ namespace CombatSkills
         public string GetSkillName() => skillName;
         public Sprite GetIcon() => specialSprite;
         public EnumSkills.TargetType GetTargetType() => skillTargetType;
+        public EnumEffects.TargetType GetEffectTargetType() => effectTargetType;
+
         public int GetUseCost() => useCost;
 
         public bool CanCrit()
@@ -95,7 +100,6 @@ namespace CombatSkills
             {
                 preset = effect,
                 effectValue = 1,
-                targetType = EnumEffects.TargetType.Target
             };
             effects.Add(addition);
         }
@@ -107,7 +111,6 @@ namespace CombatSkills
             {
                 preset = buff,
                 effectValue = 1,
-                targetType = EnumEffects.TargetType.Target,
                 buffType = EnumStats.BuffType.Buff
             };
             effects.Add(addition);

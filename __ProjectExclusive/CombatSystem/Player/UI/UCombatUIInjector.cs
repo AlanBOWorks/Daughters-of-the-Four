@@ -13,7 +13,6 @@ namespace __ProjectExclusive.Player
                 throw new OverflowException("There's more than one Player Combat UI");
 
             PlayerCombatSingleton.CombatUiReference = this.gameObject;
-            Destroy(this); 
         }
     }
 }

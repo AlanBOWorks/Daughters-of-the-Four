@@ -16,13 +16,12 @@ namespace CombatSystem.Events
 
             if(user == target) return;
 
-            var entitiesPair = new CombatEntityPairAction(user,target);
             var skill = values.UsedSkill;
             
             if(skill.GetTargetType() == EnumSkills.TargetType.Offensive)
-                CombatSystemSingleton.EventsHolder.OnReceiveOffensiveAction(entitiesPair,skill);
+                CombatSystemSingleton.EventsHolder.OnReceiveOffensiveAction(values,skill);
             else
-                CombatSystemSingleton.EventsHolder.OnReceiveSupportAction(entitiesPair,skill);
+                CombatSystemSingleton.EventsHolder.OnReceiveSupportAction(values,skill);
         }
 
         public void OnSkillCostIncreases(SkillValuesHolders values)

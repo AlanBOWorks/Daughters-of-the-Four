@@ -46,10 +46,10 @@ namespace CombatEffects
             }
             return new SkillComponentResolution(this, finalBuffValue);
         }
-        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
             ref SkillComponentResolution resolution)
         {
-            CombatSystemSingleton.EventsHolder.OnReceiveSupportEffect(entities,ref resolution);
+            CombatSystemSingleton.EventsHolder.OnReceiveSupportEffect(parameters,ref resolution);
         }
         
         public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.Buff;

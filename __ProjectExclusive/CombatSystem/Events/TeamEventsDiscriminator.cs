@@ -54,17 +54,17 @@ namespace CombatSystem.Events
         }
 
 
-        public void OnShieldLost(CombatEntityPairAction pair, CombatingSkill value)
+        public void OnShieldLost(ISkillParameters parameters, CombatingSkill value)
         {
-            var entity = pair.User;
+            var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnShieldLost(pair, value);
+            eventsHolder.OnShieldLost(parameters, value);
         }
-        public void OnHealthLost(CombatEntityPairAction pair, CombatingSkill value)
+        public void OnHealthLost(ISkillParameters parameters, CombatingSkill value)
         {
-            var entity = pair.User;
+            var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnHealthLost(pair,value);
+            eventsHolder.OnHealthLost(parameters,value);
         }
         public void OnStanceChange(CombatingTeam team, EnumTeam.TeamStance switchStance)
         {
@@ -115,31 +115,32 @@ namespace CombatSystem.Events
 
         }
 
-        public void OnReceiveOffensiveAction(CombatEntityPairAction pair, CombatingSkill value)
+        public void OnReceiveOffensiveAction(ISkillParameters parameters, CombatingSkill value)
         {
-            var entity = pair.User;
+            var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnReceiveOffensiveAction(pair,value);
+            eventsHolder.OnReceiveOffensiveAction(parameters, value);
         }
 
-        public void OnReceiveOffensiveEffect(CombatEntityPairAction pair, ref SkillComponentResolution value)
+        public void OnReceiveOffensiveEffect(ISkillParameters parameters, ref SkillComponentResolution value)
         {
-            var entity = pair.User;
+            var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnReceiveOffensiveEffect(pair,ref value);
+            eventsHolder.OnReceiveOffensiveEffect(parameters, ref value);
         }
-        public void OnReceiveSupportAction(CombatEntityPairAction pair, CombatingSkill value)
+        public void OnReceiveSupportAction(ISkillParameters parameters, CombatingSkill value)
         {
-            var entity = pair.User;
+            var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnReceiveSupportAction(pair, value);
+            eventsHolder.OnReceiveSupportAction(parameters, value);
         }
-        public void OnReceiveSupportEffect(CombatEntityPairAction pair, ref SkillComponentResolution value)
+        public void OnReceiveSupportEffect(ISkillParameters parameters, ref SkillComponentResolution value)
         {
-            var entity = pair.User;
+            var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnReceiveSupportEffect(pair, ref value);
+            eventsHolder.OnReceiveSupportEffect(parameters, ref value);
         }
+
 
         public void OnCantAct(CombatingEntity entity)
         {

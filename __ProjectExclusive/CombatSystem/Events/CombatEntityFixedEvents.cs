@@ -15,8 +15,8 @@ namespace CombatSystem.Events
     public class CombatEntityFixedEvents :
         ITempoListener<CombatingEntity>, 
         IRoundListener<CombatingEntity>,
-        IOffensiveActionReceiverListener<CombatEntityPairAction,CombatingSkill,SkillComponentResolution>,
-        ISupportActionReceiverListener<CombatEntityPairAction, CombatingSkill, SkillComponentResolution>,
+        IOffensiveActionReceiverListener<ISkillParameters,CombatingSkill,SkillComponentResolution>,
+        ISupportActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>,
         ISkillEventListener
     {
 #if UNITY_EDITOR
@@ -29,10 +29,6 @@ namespace CombatSystem.Events
 
         public void OnFirstAction(CombatingEntity entity)
         {
-#if UNITY_EDITOR
-            Debug.Log($"---- >> INITIATIVE: {entity.GetEntityName()}");
-#endif
-
             entity.GuardHandler.RemoveGuarding();
             entity.CombatStats.GetBurstStat().SelfBurst.ResetAsBurst();
             entity.SkillUsageTracker.ResetOnStartSequence();
@@ -65,24 +61,24 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnReceiveOffensiveAction(CombatEntityPairAction element, CombatingSkill skill)
+        public void OnReceiveOffensiveAction(ISkillParameters element, CombatingSkill skill)
         {
             // todo call for reactionEvents
         }
 
-        public void OnReceiveOffensiveEffect(CombatEntityPairAction element, ref SkillComponentResolution effectResolution)
+        public void OnReceiveOffensiveEffect(ISkillParameters element, ref SkillComponentResolution effectResolution)
         {
-           
+
         }
 
-        public void OnReceiveSupportAction(CombatEntityPairAction element, CombatingSkill skill)
+        public void OnReceiveSupportAction(ISkillParameters element, CombatingSkill skill)
         {
             // todo call for reactionEvents
         }
 
-        public void OnReceiveSupportEffect(CombatEntityPairAction element, ref SkillComponentResolution effectResolution)
+        public void OnReceiveSupportEffect(ISkillParameters element, ref SkillComponentResolution effectResolution)
         {
-            
+
         }
 
         public void OnSkillUse(SkillValuesHolders values)

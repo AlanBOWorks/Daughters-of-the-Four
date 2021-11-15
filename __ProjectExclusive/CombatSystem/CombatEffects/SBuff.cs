@@ -12,30 +12,27 @@ namespace CombatEffects
 {
     public abstract class SBuff : SSkillComponentEffect, IBuff
     {
-        public void DoBuff(
-            CombatEntityPairAction entities,
-            EnumStats.BuffType buffType, 
-            EnumEffects.TargetType effectTargetType,
+        public void DoBuff(ISkillParameters parameters,
+            EnumStats.BuffType buffType,
             float effectValue, bool isCritical)
         {
-            var user = entities.User;
-            var skillTarget = entities.Target;
+            var user = parameters.Performer;
 
-            var effectTargets = UtilsTarget.GetPossibleTargets(effectTargetType, user, skillTarget);
+            var effectTargets = parameters.EffectTargets;
 
             var systemEvents = CombatSystemSingleton.EventsHolder;
             foreach (var effectTarget in effectTargets)
             {
                 var resolution = DoBuffOn(user, effectTarget, buffType, effectValue, isCritical);
-                DoEventCalls(systemEvents,entities,ref resolution);
+                DoEventCalls(systemEvents,parameters,ref resolution);
             }
 
         }
 
-        protected virtual void DoEventCalls(SystemEventsHolder systemEvents,CombatEntityPairAction entities,
+        protected virtual void DoEventCalls(SystemEventsHolder systemEvents,ISkillParameters parameters,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveSupportEffect(entities,ref resolution);
+            systemEvents.OnReceiveSupportEffect(parameters,ref resolution);
         }
 
         protected float CalculateBuffStats(CombatingEntity performer, float buffValue, bool isCritical)

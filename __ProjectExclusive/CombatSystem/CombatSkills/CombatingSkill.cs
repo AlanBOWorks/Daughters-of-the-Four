@@ -45,6 +45,8 @@ namespace CombatSkills
         public string GetSkillName() => Preset.GetSkillName();
         public Sprite GetIcon() => Preset.GetIcon();
         public EnumSkills.TargetType GetTargetType() => Preset.GetTargetType();
+        public EnumEffects.TargetType GetEffectTargetType() => Preset.GetEffectTargetType();
+
         public int GetUseCost() => _currentUseCost;
         public bool CanCrit() => Preset.CanCrit();
         public float GetCritVariation() => Preset.GetCritVariation();

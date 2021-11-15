@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CombatEntity;
 using CombatSystem.CombatSkills;
@@ -23,17 +24,10 @@ namespace CombatSkills
     {
         public SkillValuesHolders()
         {
-            PreComputedOffensiveTargets = new HashSet<CombatingEntity>();
-            PreComputedSupportTargets = new HashSet<CombatingEntity>();
+            
         } //this is just for seeing the references amount
 
-        public SkillValuesHolders(CombatingEntity target) : this()
-        {
-            Target = target;
-        }
-
-        [ShowInInspector]
-        public CombatingSkill UsedSkill { get; private set; }
+        
         [ShowInInspector]
         public CombatingEntity Performer { get; private set; }
         [ShowInInspector]
@@ -41,79 +35,27 @@ namespace CombatSkills
         [ShowInInspector]
         public bool IsCritical { get; private set; }
 
-        /// <summary>
-        /// The virtual amount of targets to handle (it's not the real targets handle by the skill). <br></br>
-        /// This was made primarily for [<seealso cref="CombatSystem.Animator"/>]
-        /// </summary>
-        [ShowInInspector,DisableInPlayMode,HideInEditorMode]
-        public readonly HashSet<CombatingEntity> PreComputedOffensiveTargets;
-        /// <summary>
-        /// <inheritdoc cref="PreComputedOffensiveTargets"/>
-        /// </summary>
-        [ShowInInspector,DisableInPlayMode,HideInEditorMode]
-        public readonly HashSet<CombatingEntity> PreComputedSupportTargets;
+        [ShowInInspector]
+        public CombatingSkill UsedSkill { get; private set; }
+
+        public ICollection<CombatingEntity> EffectTargets { get; private set; }
+
+       
 
         public void SwitchTarget(CombatingEntity newTarget) => Target = newTarget;
         public void Inject(CombatingEntity performer) => Performer = performer;
         public void Inject(SkillUsageValues values)
         {
+            if(Performer == null)
+                throw new NullReferenceException($"Performer is null for [{typeof(SkillValuesHolders)}]");
+
             UsedSkill = values.UsedSkill;
             Target = values.Target;
-            PreComputeTargets();
+            EffectTargets = UtilsTarget.GetPossibleTargets(UsedSkill.GetEffectTargetType(), Performer, Target);
         }
 
-        /* Problem: animator can't know the whole set of targets (if is just an individual, a group or all entities).
-         * Solution: pre-compute the possibles targets in a Collection and use it.
-         * Note: since the skills will not hold more than 10 effects at once, this operation should not be that expensive
-         */
-        private void PreComputeTargets()
-        {
-            var skill = UsedSkill;
-            bool isOffensive = skill.GetTargetType() == EnumSkills.TargetType.Offensive;
-            if(isOffensive)
-                InjectTargetsAsOffensive();
-            else
-                InjectTargetsAsSupport();
-        }
+        
 
-        private void InjectTargetsAsOffensive()
-        {
-            foreach (var effectParameter in UsedSkill.GetEffects())
-            {
-                var targets = UtilsTarget.GetPossibleTargets(effectParameter, Performer, Target);
-                foreach (var target in targets)
-                {
-                    InjectTarget(target);
-                }
-            }
-        }
-
-        private void InjectTargetsAsSupport()
-        {
-            foreach (var effectParameter in UsedSkill.GetEffects())
-            {
-                var targets = UtilsTarget.GetPossibleTargets(effectParameter, Performer, Target);
-                foreach (var target in targets)
-                {
-                    InjectTarget(PreComputedSupportTargets,target);
-                }
-            }
-        }
-
-        private void InjectTarget(CombatingEntity target)
-        {
-            bool isAlly = Performer.Team.Contains(target);
-            var collection = (isAlly)
-                ? PreComputedSupportTargets
-                : PreComputedOffensiveTargets;
-            InjectTarget(collection,target);
-        }
-
-        private static void InjectTarget(ISet<CombatingEntity> collection, CombatingEntity target)
-        {
-            if (collection.Contains(target)) return;
-            collection.Add(target);
-        }
 
         public void RollForCritical(CombatingEntity performer)
         {
@@ -138,8 +80,6 @@ namespace CombatSkills
             UsedSkill = null;
             Target = null;
             IsCritical = false;
-            PreComputedOffensiveTargets.Clear();
-            PreComputedSupportTargets.Clear();
         }
         public void Clear()
         {
@@ -160,7 +100,7 @@ namespace CombatSkills
     public interface ISkillParameters : ISkillValues
     {
         CombatingSkill UsedSkill { get; }
-       
+        ICollection<CombatingEntity> EffectTargets { get; }
 
     }
 }

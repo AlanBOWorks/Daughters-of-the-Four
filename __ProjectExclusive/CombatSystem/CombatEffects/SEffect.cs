@@ -9,21 +9,21 @@ namespace CombatEffects
 {
     public abstract class SEffect : SSkillComponentEffect, IEffect
     {
-        public void DoEffect(CombatEntityPairAction entities, EnumEffects.TargetType effectTargetType, float effectValue, bool isCritical)
+        public void DoEffect(ISkillParameters parameters, float effectValue, bool isCritical)
         {
-            var user = entities.User;
-            var skillTarget = entities.Target;
-            var effectTargets = UtilsTarget.GetPossibleTargets(effectTargetType, user, skillTarget);
+            var user = parameters.Performer;
+            var effectTargets = parameters.EffectTargets;
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             foreach (var effectTarget in effectTargets)
             {
                 var effectResolution = DoEffectOn(user, effectTarget, effectValue, isCritical);
-                DoEventCall(eventsHolder,entities,ref effectResolution);
+                DoEventCall(eventsHolder,parameters,ref effectResolution);
             }
         }
 
-        protected abstract void DoEventCall(SystemEventsHolder systemEvents,CombatEntityPairAction entities,ref SkillComponentResolution resolution);
+        protected abstract void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
+            ref SkillComponentResolution resolution);
         protected abstract SkillComponentResolution DoEffectOn(
             CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical);
     }
@@ -31,19 +31,19 @@ namespace CombatEffects
 
     public abstract class SOffensiveEffect : SEffect
     {
-        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveOffensiveEffect(entities,ref resolution);
+            systemEvents.OnReceiveOffensiveEffect(parameters,ref resolution);
         }
     }
 
     public abstract class SSupportEffect : SEffect
     {
-        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveSupportEffect(entities, ref resolution);
+            systemEvents.OnReceiveSupportEffect(parameters, ref resolution);
         }
     }
 }

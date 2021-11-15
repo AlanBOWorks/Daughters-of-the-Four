@@ -37,9 +37,6 @@ namespace CombatSystem
         private ICombatEndConditionProvider _conditionProvider;
         private static readonly ICombatEndConditionProvider ProvisionalConditionProvider = new GenericWinCondition();
 
-        public CombatingEntity CurrentActingEntity { get; private set; }
-
-
         public void InjectCondition(ICombatEndConditionProvider conditionProvider)
         {
             _conditionProvider = conditionProvider;

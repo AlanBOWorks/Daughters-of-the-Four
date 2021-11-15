@@ -22,9 +22,6 @@ namespace CombatSystem.CombatSkills
             };
         }
 
-        public static List<CombatingEntity> GetPossibleTargets(CombatingSkill skill, CombatingEntity user)
-            => GetPossibleTargets(skill.GetTargetType(), user);
-
         public static List<CombatingEntity> GetPossibleTargets(EnumEffects.TargetType targetType, CombatingEntity user,
             CombatingEntity target)
         {
@@ -33,9 +30,6 @@ namespace CombatSystem.CombatSkills
             return UtilsEffects.GetElement(targetType, userTargeting, targetTargeting);
         }
 
-        public static List<CombatingEntity> GetPossibleTargets(EffectParameter effect, CombatingEntity user,
-            CombatingEntity target) 
-            => GetPossibleTargets(effect.targetType, user, target);
 
     }
 }

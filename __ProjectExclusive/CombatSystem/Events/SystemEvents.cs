@@ -9,7 +9,7 @@ using Sirenix.OdinInspector;
 namespace CombatSystem.Events
 {
     public class SystemEventsHolder :
-        CombatEventsHolderBase<CombatEntityPairAction, CombatingEntity,CombatingSkill,SkillComponentResolution>,
+        CombatEventsHolderBase<ISkillParameters, CombatingEntity,CombatingSkill,SkillComponentResolution>,
         ICombatSystemEvents
     {
         public SystemEventsHolder() : base()
@@ -41,12 +41,18 @@ namespace CombatSystem.Events
         }
         public void Subscribe(ICombatSystemEvents listener)
         {
-            Subscribe(listener as IOffensiveActionReceiverListener<CombatEntityPairAction,CombatingSkill,SkillComponentResolution>);
-            Subscribe(listener as ISupportActionReceiverListener<CombatEntityPairAction,CombatingSkill,SkillComponentResolution>);
-            Subscribe(listener as IVitalityChangeListener<CombatEntityPairAction,CombatingSkill>);
-            Subscribe(listener as ITempoListener<CombatingEntity>);
-            Subscribe(listener as ITempoAlternateListener<CombatingEntity>);
-            Subscribe(listener as IRoundListener<CombatingEntity>);
+            Subscribe(listener 
+                as IOffensiveActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>);
+            Subscribe(listener 
+                as ISupportActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>);
+            Subscribe(listener 
+                as IVitalityChangeListener<ISkillParameters, CombatingSkill>);
+            Subscribe(listener 
+                as ITempoListener<CombatingEntity>);
+            Subscribe(listener 
+                as ITempoAlternateListener<CombatingEntity>);
+            Subscribe(listener 
+                as IRoundListener<CombatingEntity>);
 
             _teamStateChangeListeners.Add(listener);
             _skillEvents.Add(listener);

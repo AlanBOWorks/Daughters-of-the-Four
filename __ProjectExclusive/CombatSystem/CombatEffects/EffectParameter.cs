@@ -12,10 +12,7 @@ namespace CombatEffects
     {
         [Title("Preset")]
         public SSkillComponentEffect preset;
-
-        [HorizontalGroup("Type",Title = "_____ Types _________")]
-        public EnumEffects.TargetType targetType;
-        [HorizontalGroup("Type")]
+        
         [ShowIf("IsBuffType",Animate = false)]
         public EnumStats.BuffType buffType;
 
@@ -41,35 +38,33 @@ namespace CombatEffects
         /// Logic for the Action segment; It will perform the effect of the Skill or inject into another system
         /// depending of the parameters
         /// </summary>
-        public void DoActionEffect(ISkillValues values)
+        public void DoActionEffect(ISkillParameters parameters)
         {
-            var target = values.Target;
+            var target = parameters.Target;
             if (isProvokeEffect)
             {
-                target.ProvokeEffects.Enqueue(this);
+                target.ProvokeEffects.Enqueue(this, parameters.UsedSkill);
                 return;
             }
 
-            var performer = values.Performer;
-            bool isEffectCrit = canCrit && values.IsCritical;
-            var entities = new CombatEntityPairAction(performer, target);
+            bool isEffectCrit = canCrit && parameters.IsCritical;
 
-            DoDirectEffect(entities,isEffectCrit);
+            DoDirectEffect(parameters,isEffectCrit);
         }
 
         /// <summary>
         /// Does directly the effects. For checking states or special conditions that the skill could perform (such provoke)
         /// use [<seealso cref="DoActionEffect"/>] instead
         /// </summary>
-        public void DoDirectEffect(CombatEntityPairAction entities,bool isEffectCrit = false)
+        public void DoDirectEffect(ISkillParameters parameters,bool isEffectCrit = false)
         {
             switch (preset)
             {
                 case IEffect effectPreset:
-                    effectPreset.DoEffect(entities, targetType, effectValue, isEffectCrit);
+                    effectPreset.DoEffect(parameters, effectValue, isEffectCrit);
                     return;
                 case IBuff buffPreset:
-                    buffPreset.DoBuff(entities, buffType, targetType, effectValue, isEffectCrit);
+                    buffPreset.DoBuff(parameters, buffType, effectValue, isEffectCrit);
                     return;
             }
         }

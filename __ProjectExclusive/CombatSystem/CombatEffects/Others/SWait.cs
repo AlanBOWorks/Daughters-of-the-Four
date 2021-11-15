@@ -9,7 +9,7 @@ namespace CombatEffects
     [CreateAssetMenu(fileName = "Wait [Effect]", menuName = "Combat/Effect/Wait")]
     public class SWait : SEffect
     {
-        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
             ref SkillComponentResolution resolution)
         {
             // todo make WaitEventCall

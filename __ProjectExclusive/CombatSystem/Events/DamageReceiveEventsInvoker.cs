@@ -8,10 +8,10 @@ namespace CombatSystem.Events
     // Calling events through CombatSystemSingleton.EventsHolder was a struggle;
     // This wrapper class is meant to reduce the possible errors making the code for the Damage event's calls.
     // Just call this events and everything should be simpler
-    public sealed class DamageReceiveEventsInvoker : 
-        IOffensiveActionReceiverListener<CombatEntityPairAction,CombatingSkill, SkillComponentResolution>
+    public sealed class DamageReceiveEventsInvoker :
+        IOffensiveActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>
     {
-        private CombatEntityPairAction _actors;
+        private ISkillParameters _actors;
         private CombatingSkill _usedSkill;
 
         public void OnShieldLost()
@@ -31,15 +31,15 @@ namespace CombatSystem.Events
             CombatSystemSingleton.EntityDeathHandler.EnQueueEntity(_actors.Target);
         }
 
-        public void OnReceiveOffensiveAction(CombatEntityPairAction element, CombatingSkill skill)
+        public void OnReceiveOffensiveAction(ISkillParameters element, CombatingSkill skill)
         {
             _actors = element;
             _usedSkill = skill;
         }
 
-        public void OnReceiveOffensiveEffect(CombatEntityPairAction element, ref SkillComponentResolution value)
+        public void OnReceiveOffensiveEffect(ISkillParameters element, ref SkillComponentResolution value)
         {
-            
+
         }
     }
 }

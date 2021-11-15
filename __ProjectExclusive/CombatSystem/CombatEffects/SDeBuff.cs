@@ -11,10 +11,10 @@ namespace CombatEffects
 {
     public abstract class SDeBuff : SBuff
     {
-        protected override void DoEventCalls(SystemEventsHolder systemEvents, CombatEntityPairAction entities,
+        protected override void DoEventCalls(SystemEventsHolder systemEvents, ISkillParameters parameters,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveOffensiveEffect(entities,ref resolution);
+            systemEvents.OnReceiveOffensiveEffect(parameters,ref resolution);
         }
 
         public override EnumSkills.SkillInteractionType GetComponentType() => EnumSkills.SkillInteractionType.DeBuff;

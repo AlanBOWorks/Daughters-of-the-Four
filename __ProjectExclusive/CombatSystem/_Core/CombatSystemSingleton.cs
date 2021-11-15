@@ -62,9 +62,9 @@ namespace CombatSystem
                 EntitiesFixedEvents);
             EventsHolder.Subscribe((IRoundListener<CombatingEntity>) 
                 EntitiesFixedEvents);
-            EventsHolder.Subscribe((IOffensiveActionReceiverListener<CombatEntityPairAction,CombatingSkill,SkillComponentResolution>) 
+            EventsHolder.Subscribe((IOffensiveActionReceiverListener<ISkillParameters,CombatingSkill,SkillComponentResolution>) 
                 EntitiesFixedEvents);
-            EventsHolder.Subscribe((ISupportActionReceiverListener<CombatEntityPairAction, CombatingSkill, SkillComponentResolution>) 
+            EventsHolder.Subscribe((ISupportActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>) 
                 EntitiesFixedEvents);
             EventsHolder.Subscribe((ISkillEventListener)
                 EntitiesFixedEvents);

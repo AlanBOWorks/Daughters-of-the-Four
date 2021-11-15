@@ -53,6 +53,7 @@ namespace CombatSystem
         private readonly HashSet<CombatingEntity> _tickingEntities;
         [HorizontalGroup("Entities", Title = "Entities"), ShowInInspector, HideInEditorMode]
         private readonly Queue<CombatingEntity> _activeEntities;
+        public CombatingEntity LastActingEntity { get; private set; }
 
         public bool HasActingEntity() => _activeEntities.Count > 0;
 
@@ -93,16 +94,16 @@ namespace CombatSystem
             if(_roundTickAmount < FullTickAmount) return;
 
             _roundTickAmount = 0;
-            CombatSystemSingleton.EventsHolder.OnRoundFinish(_lastActingEntity);
+            CombatSystemSingleton.EventsHolder.OnRoundFinish(LastActingEntity);
         }
 
-        private CombatingEntity _lastActingEntity;
         private IEnumerator<float> _DoEntitiesActions()
         {
+            yield return Timing.WaitForOneFrame;
             while (_activeEntities.Count > 0)
             {
                 var actingEntity = _activeEntities.Dequeue();
-                _lastActingEntity = actingEntity;
+                LastActingEntity = actingEntity;
                 //Removes (and adds later) so acted entities has fewer priority that those how didn't 
                 _tickingEntities.Remove(actingEntity);
 

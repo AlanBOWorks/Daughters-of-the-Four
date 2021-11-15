@@ -34,11 +34,6 @@ namespace __ProjectExclusive.Player
             PlayerEvents.Subscribe(VirtualSkillsInjector);
             PlayerEvents.Subscribe((IVirtualSkillInteraction) SkillSelectionsQueue);
             PlayerEvents.Subscribe(SkillSelectionsQueue as IVirtualSkillTargetListener);
-
-#if UNITY_EDITOR
-            Debug.Log("[Player Combat Singleton] instantiated");
-            PlayerEvents.Subscribe(new DebugSkillEvents());
-#endif
         }
 
         private PlayerCombatSingleton()

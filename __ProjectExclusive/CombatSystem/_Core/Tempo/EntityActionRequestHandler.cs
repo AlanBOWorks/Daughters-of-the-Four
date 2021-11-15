@@ -108,17 +108,19 @@ namespace CombatSystem
             yield return Timing.WaitForSeconds(SpaceBetweenAnimations);
             PerformSkill();
 
+            var eventHolder = CombatSystemSingleton.EventsHolder;
+
             var performer = values.Performer;
             var entityHolder = performer.InstantiatedHolder;
-            var animationHandler = entityHolder.AnimationHandler;
-            var eventHolder = CombatSystemSingleton.EventsHolder;
+
             eventHolder.OnBeforeAnimation(values);
 
-            if (entityHolder != null && animationHandler != null)
+            if (entityHolder != null)
             {
+                var animationHandler = entityHolder.AnimationHandler;
                 // Todo check for special animation and do wait below
                 // yield return Timing.WaitUntilDone(animationHandler._DoPerformSkillAnimation(values));
-                animationHandler.DoPerformSkillAnimation(values);
+                animationHandler?.DoPerformSkillAnimation(values);
                 yield return Timing.WaitForSeconds(MaxWaitBetweenAnimations);
             }
             eventHolder.OnAnimationHaltFinish(values);
