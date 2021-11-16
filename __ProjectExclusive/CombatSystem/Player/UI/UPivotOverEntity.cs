@@ -4,7 +4,7 @@ using CombatEntity;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace __ProjectExclusive.Player
+namespace __ProjectExclusive.Player.UI
 {
     public class UPivotOverEntity : MonoBehaviour
     {
@@ -18,8 +18,8 @@ namespace __ProjectExclusive.Player
         private PivotOverEntityReferences references = new PivotOverEntityReferences();
 
         [Title("Parameters")]
-        [SerializeField, Range(0,1)]
-        private float fixedPointLerp = .1f;
+        [SerializeField,Min(0)] 
+        private float clampDistance = 1f;
 
         [SerializeField] 
         private Vector3 fixedPointOffset = Vector3.up * .5f;
@@ -55,11 +55,10 @@ namespace __ProjectExclusive.Player
 
 
             Transform pivot = holder.GetUIPivot();
+            Vector3 pivotPosition = pivot.position;
+            Vector3 fixedPosition = holderTransform.position + fixedPointOffset;
 
-            Vector3 canvasPosition = Vector3.LerpUnclamped(
-                pivot.position,
-                    (holderTransform.position + fixedPointOffset),
-                fixedPointLerp);
+            Vector3 canvasPosition = Vector3.MoveTowards(pivotPosition, fixedPosition, clampDistance);
 
             _movingButton.position = CombatCameraSingleton.CombatMainCamera.WorldToScreenPoint(canvasPosition);
         }
@@ -68,7 +67,13 @@ namespace __ProjectExclusive.Player
     [Serializable]
     internal class PivotOverEntityReferences
     {
-        [SerializeField] private UTargetButton targetButton;
+        [SerializeField] 
+        private UTargetButton targetButton;
+
+        [SerializeField] 
+        private UHealthStateUIHolder healthState;
+
         public UTargetButton GetTargetButton() => targetButton;
+        public UHealthStateUIHolder GetHealthStateHolder() => healthState;
     }
 }

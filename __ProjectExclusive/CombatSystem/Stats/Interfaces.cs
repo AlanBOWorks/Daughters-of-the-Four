@@ -150,6 +150,39 @@ namespace Stats
         T TickingInitiative { set; }
     }
 
+    public interface ICombatHealth<T> : ICombatHealthRead<T>, ICombatHealthInject<T>
+    {
+        new T MaxHealth { get; set; }
+        new T MaxMortality { get; set; }
+
+        new T CurrentHealth { get; set; }
+        new T CurrentMortality { get; set; }
+
+        new T CurrentShields { get; set; }
+    }
+    public interface ICombatHealthRead<out T>
+    {
+        T MaxHealth { get; }
+        T MaxMortality { get; }
+
+        T CurrentHealth { get; }
+        T CurrentMortality { get; }
+
+        T CurrentShields { get; }
+    }
+    public interface ICombatHealthInject<in T>
+    {
+        T MaxHealth { set; }
+        T MaxMortality { set; }
+
+        T CurrentHealth { set; }
+        T CurrentMortality { set; }
+
+        T CurrentShields { set; }
+    }
+
+
+
     /// <summary>
     /// Stats that only exist in combat and generally unit related
     /// </summary>

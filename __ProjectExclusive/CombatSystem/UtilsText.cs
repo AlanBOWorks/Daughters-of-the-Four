@@ -157,5 +157,19 @@ namespace __ProjectExclusive
                 _ => targetDigit.ToString("00")
             };
         }
+
+        /// <summary>
+        /// Generates a string from a float with a format('0000') with multiplier argot (1k = 1000)
+        /// </summary>
+        public static string ConstructMaxFourDigit(float amount)
+        {
+            if (amount >= 1000)
+            {
+                amount *= 0.001f;
+                return amount.ToString("0000K");
+            }
+
+            return amount.ToString("0000");
+        }
     }
 }

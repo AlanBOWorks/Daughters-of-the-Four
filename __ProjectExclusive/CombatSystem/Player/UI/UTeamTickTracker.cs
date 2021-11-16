@@ -6,7 +6,7 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
-namespace __ProjectExclusive.Player
+namespace __ProjectExclusive.Player.UI
 {
     public class UTeamTickTracker : UPersistentGroupStructureBase<UTickTracker>, IEntityTickListener
     {

@@ -132,7 +132,8 @@ namespace Stats
     [Serializable]
     public class CombatStats<TPercent,TUnit> :
         IOffensiveStatsRead<TPercent>, ISupportStatsRead<TPercent>, IVitalityStatsRead<TPercent>, IConcentrationStatsRead<TPercent>,
-        ICombatPercentStats<TPercent>, ICombatUnitStats<TUnit>
+        ICombatPercentStats<TPercent>, ICombatUnitStats<TUnit>,
+        ICombatHealthRead<TPercent>
     {
         public CombatStats(IBaseStatsRead<TPercent> mainStatsHolder)
         {

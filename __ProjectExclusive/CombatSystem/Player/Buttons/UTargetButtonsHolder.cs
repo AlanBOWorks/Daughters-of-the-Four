@@ -9,9 +9,9 @@ using MEC;
 using UnityEngine;
 
 
-namespace __ProjectExclusive.Player
+namespace __ProjectExclusive.Player.UI
 {
-    public class UTargetButtonsHolder : MonoBehaviour, IVirtualSkillInteraction, ICanvasPivotOverEntityListener,
+    public class UTargetButtonsHolder : UCanvasPivotOverEntityListener, IVirtualSkillInteraction, 
         ICombatDisruptionListener
     {
         private void Start()
@@ -21,15 +21,13 @@ namespace __ProjectExclusive.Player
             PlayerCombatSingleton.PlayerEvents.Subscribe(this);
             CombatSystemSingleton.CombatPreparationHandler.Subscribe(this);
 
-            subscribeToCanvasPooler.PoolListeners.Add(this);
         }
-        [SerializeField] 
-        private UCanvasPivotOverEntities subscribeToCanvasPooler;
+       
 
         private Dictionary<CombatingEntity, UTargetButton> _entitiesTracker;
 
 
-        public void OnPooledElement(CombatingEntity user, UPivotOverEntity pivotOverEntity)
+        public override void OnPooledElement(CombatingEntity user, UPivotOverEntity pivotOverEntity)
         {
             var pivotReferences = pivotOverEntity.GetReferences();
             var targetButton = pivotReferences.GetTargetButton();

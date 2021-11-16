@@ -4,7 +4,7 @@ using CombatSystem.Events;
 using TMPro;
 using UnityEngine;
 
-namespace __ProjectExclusive.Player
+namespace __ProjectExclusive.Player.UI
 {
     public class UCurrentControllingEntity : MonoBehaviour, ITempoListener<CombatingEntity>, ISkillEventListener
     {
