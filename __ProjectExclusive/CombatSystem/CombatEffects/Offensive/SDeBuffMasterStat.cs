@@ -14,10 +14,10 @@ namespace CombatEffects
         menuName = "Combat/Effect/DE-Buff MASTER", order = 101)]
     public class SDeBuffMasterStat : SBuffMasterStat
     {
-        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatingEntity receiver,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveOffensiveEffect(parameters,ref resolution);
+            systemEvents.OnReceiveOffensiveEffect(receiver,ref resolution);
         }
 
         [Button]

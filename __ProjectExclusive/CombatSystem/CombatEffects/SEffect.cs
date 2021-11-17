@@ -18,11 +18,11 @@ namespace CombatEffects
             foreach (var effectTarget in effectTargets)
             {
                 var effectResolution = DoEffectOn(user, effectTarget, effectValue, isCritical);
-                DoEventCall(eventsHolder,parameters,ref effectResolution);
+                DoEventCall(eventsHolder,effectTarget,ref effectResolution);
             }
         }
 
-        protected abstract void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
+        protected abstract void DoEventCall(SystemEventsHolder systemEvents, CombatingEntity receiver,
             ref SkillComponentResolution resolution);
         protected abstract SkillComponentResolution DoEffectOn(
             CombatingEntity user, CombatingEntity effectTarget, float effectValue, bool isCritical);
@@ -31,19 +31,19 @@ namespace CombatEffects
 
     public abstract class SOffensiveEffect : SEffect
     {
-        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatingEntity receiver,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveOffensiveEffect(parameters,ref resolution);
+            systemEvents.OnReceiveOffensiveEffect(receiver,ref resolution);
         }
     }
 
     public abstract class SSupportEffect : SEffect
     {
-        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatingEntity receiver,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveSupportEffect(parameters, ref resolution);
+            systemEvents.OnReceiveSupportEffect(receiver, ref resolution);
         }
     }
 }

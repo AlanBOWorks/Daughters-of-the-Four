@@ -12,7 +12,7 @@ namespace CombatEffects
     public class SControlBurst : SEffect
     {
         private const float ControlCriticalModifier = 1.25f;
-        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatingEntity receiver,
             ref SkillComponentResolution resolution)
         {
         }

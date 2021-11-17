@@ -15,8 +15,8 @@ namespace CombatSystem.Events
     public class CombatEntityFixedEvents :
         ITempoListener<CombatingEntity>, 
         IRoundListener<CombatingEntity>,
-        IOffensiveActionReceiverListener<ISkillParameters,CombatingSkill,SkillComponentResolution>,
-        ISupportActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>,
+        IOffensiveActionReceiverListener<ISkillParameters,CombatingEntity,SkillComponentResolution>,
+        ISupportActionReceiverListener<ISkillParameters, CombatingEntity, SkillComponentResolution>,
         ISkillEventListener
     {
 #if UNITY_EDITOR
@@ -42,11 +42,9 @@ namespace CombatSystem.Events
 
         public void OnFinishAllActions(CombatingEntity entity)
         {
+            UtilsCombatStats.DoCurrentPersistentDamage(entity.CombatStats);
             entity.CombatStats.GetBurstStat().ReceivedBurst.ResetAsBurst();
             entity.SkillsHolder.ResetCosts();
-
-            UtilsCombatStats.DoCurrentPersistentDamage(entity.CombatStats);
-
         }
 
 
@@ -61,22 +59,22 @@ namespace CombatSystem.Events
             }
         }
 
-        public void OnReceiveOffensiveAction(ISkillParameters element, CombatingSkill skill)
+        public void OnReceiveOffensiveAction(ISkillParameters holder, CombatingEntity receiver)
         {
             // todo call for reactionEvents
         }
 
-        public void OnReceiveOffensiveEffect(ISkillParameters element, ref SkillComponentResolution effectResolution)
+        public void OnReceiveOffensiveEffect(CombatingEntity receiver, ref SkillComponentResolution value)
         {
 
         }
 
-        public void OnReceiveSupportAction(ISkillParameters element, CombatingSkill skill)
+        public void OnReceiveSupportAction(ISkillParameters holder, CombatingEntity receiver)
         {
             // todo call for reactionEvents
         }
 
-        public void OnReceiveSupportEffect(ISkillParameters element, ref SkillComponentResolution effectResolution)
+        public void OnReceiveSupportEffect(CombatingEntity receiver, ref SkillComponentResolution value)
         {
 
         }

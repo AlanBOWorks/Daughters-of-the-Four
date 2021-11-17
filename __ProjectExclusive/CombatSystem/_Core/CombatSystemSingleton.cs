@@ -36,7 +36,7 @@ namespace CombatSystem
 
             // ---->>>> Secondaries
             var teamEventsDiscriminator = new TeamEventsDiscriminator();
-            var actionEventDiscriminator = new CombatingActionEventDiscriminator();
+            var actionEventDiscriminator = new CombatingEventActionSinglePass();
             var combatPositionSpawner = new CombatPositionSpawner();
             var initialAnimationRequester = new InitialAnimationsRequester();
             var animationEventsHelper = new AnimationEventsHelper();
@@ -62,9 +62,9 @@ namespace CombatSystem
                 EntitiesFixedEvents);
             EventsHolder.Subscribe((IRoundListener<CombatingEntity>) 
                 EntitiesFixedEvents);
-            EventsHolder.Subscribe((IOffensiveActionReceiverListener<ISkillParameters,CombatingSkill,SkillComponentResolution>) 
+            EventsHolder.Subscribe((IOffensiveActionReceiverListener<ISkillParameters,CombatingEntity,SkillComponentResolution>) 
                 EntitiesFixedEvents);
-            EventsHolder.Subscribe((ISupportActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>) 
+            EventsHolder.Subscribe((ISupportActionReceiverListener<ISkillParameters, CombatingEntity, SkillComponentResolution>) 
                 EntitiesFixedEvents);
             EventsHolder.Subscribe((ISkillEventListener)
                 EntitiesFixedEvents);

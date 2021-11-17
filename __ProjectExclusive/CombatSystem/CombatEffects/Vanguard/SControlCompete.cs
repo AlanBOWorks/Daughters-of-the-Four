@@ -14,7 +14,7 @@ namespace CombatEffects
         private const float ControlCriticalVariation = 1.25f;
         
 
-        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatingEntity receiver,
             ref SkillComponentResolution resolution)
         {
         }

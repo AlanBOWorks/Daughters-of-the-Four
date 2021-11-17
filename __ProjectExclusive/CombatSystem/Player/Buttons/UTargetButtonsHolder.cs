@@ -16,7 +16,6 @@ namespace __ProjectExclusive.Player.UI
     {
         private void Start()
         {
-            _entitiesTracker = new Dictionary<CombatingEntity, UTargetButton>();
 
             PlayerCombatSingleton.PlayerEvents.Subscribe(this);
             CombatSystemSingleton.CombatPreparationHandler.Subscribe(this);
@@ -24,18 +23,23 @@ namespace __ProjectExclusive.Player.UI
         }
        
 
-        private Dictionary<CombatingEntity, UTargetButton> _entitiesTracker;
+        private Dictionary<CombatingEntity, UPivotOverEntity> _entitiesTracker;
 
 
         public override void OnPooledElement(CombatingEntity user, UPivotOverEntity pivotOverEntity)
         {
             var pivotReferences = pivotOverEntity.GetReferences();
             var targetButton = pivotReferences.GetTargetButton();
-            _entitiesTracker.Add(user, targetButton);
             targetButton.Injection(this);
             targetButton.Injection(user);
             targetButton.Hide();
         }
+
+        public override void InjectDictionary(Dictionary<CombatingEntity, UPivotOverEntity> dictionary)
+        {
+            _entitiesTracker = dictionary;
+        }
+
         public void OnCombatPause()
         {
             throw new NotImplementedException();
@@ -48,7 +52,6 @@ namespace __ProjectExclusive.Player.UI
 
         public void OnCombatExit()
         {
-            _entitiesTracker.Clear();
         }
 
         private void Show(VirtualSkillSelection selection)
@@ -56,7 +59,9 @@ namespace __ProjectExclusive.Player.UI
             var possibleTargets = selection.PossibleTargets;
             foreach (CombatingEntity target in possibleTargets)
             {
-                _entitiesTracker[target].Show();
+                var element = _entitiesTracker[target];
+                var targetHolder = GetButton(element);
+                targetHolder.Show();
             }
         }
         private void Hide(VirtualSkillSelection selection)
@@ -64,7 +69,9 @@ namespace __ProjectExclusive.Player.UI
             var possibleTargets = selection.PossibleTargets;
             foreach (CombatingEntity target in possibleTargets)
             {
-                _entitiesTracker[target].Hide();
+                var element = _entitiesTracker[target];
+                var targetHolder = GetButton(element);
+                targetHolder.Hide();
             }
         }
 
@@ -102,9 +109,10 @@ namespace __ProjectExclusive.Player.UI
 
             void DisableButtons()
             {
-                foreach (KeyValuePair<CombatingEntity, UTargetButton> pair in _entitiesTracker)
+                foreach (var pair in _entitiesTracker)
                 {
-                    pair.Value.enabled = false;
+                    var targetHolder = GetButton(pair.Value);
+                    targetHolder.enabled = false;
                 }
             }
             void SendValues()
@@ -116,13 +124,14 @@ namespace __ProjectExclusive.Player.UI
             {
                 //Just a small offset (.04f) so the eye can sense the ending a little better
                 yield return Timing.WaitForSeconds(UTargetButton.PointerClickAnimationDuration + .04f);
-                foreach (KeyValuePair<CombatingEntity, UTargetButton> pair in _entitiesTracker)
+                foreach (var pair in _entitiesTracker)
                 {
-                    pair.Value.Hide();
+                    var targetHolder = GetButton(pair.Value);
+                    targetHolder.Hide();
                 }
             }
         }
 
-
+        private UTargetButton GetButton(UPivotOverEntity pivot) => pivot.GetReferences().GetTargetButton();
     }
 }

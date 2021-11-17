@@ -6,37 +6,40 @@ using UnityEngine;
 
 namespace CombatSystem.Events
 {
-    public interface ICharactersEvents<in THolder, in TTempo,in TSkill, TEffect> :
-        IOffensiveActionReceiverListener<THolder, TSkill, TEffect>,
-        ISupportActionReceiverListener<THolder, TSkill, TEffect>,
-        IVitalityChangeListener<THolder, TSkill>,
-        ITempoListener<TTempo>,
-        ITempoAlternateListener<TTempo>,
-        IRoundListener<TTempo>
+    public interface ICharactersEvents<in THolder, in TActor,in TActionReceiver, TEffect> :
+        IOffensiveActionReceiverListener<THolder, TActionReceiver, TEffect>,
+        ISupportActionReceiverListener<THolder, TActionReceiver, TEffect>,
+
+        IVitalityLostListener<THolder, TActionReceiver>,
+        IDamageReceiverListener<THolder,TActionReceiver>,
+
+        ITempoListener<TActor>,
+        ITempoAlternateListener<TActor>,
+        IRoundListener<TActor>
     { }
     public interface ICharactersEvents : 
-        ICharactersEvents<ISkillParameters, CombatingEntity, CombatingSkill, SkillComponentResolution>
+        ICharactersEvents<ISkillParameters, CombatingEntity, CombatingEntity, SkillComponentResolution>
     { }
     public interface ICombatSystemEvents : ICharactersEvents, ITeamStateChangeListener<CombatingTeam>, ISkillEventListener,
         IAnimationsListener<SkillValuesHolders>
     { }
 
-    public interface IOffensiveActionReceiverListener<in T,in TAction, TEffect>
+    public interface IOffensiveActionReceiverListener<in THolder,in TReceiver, TEffect>
     {
-        void OnReceiveOffensiveAction(T element, TAction value);
-        //ref because by design some listener could change the value (this was made so passive/reaction could be possible,
+        void OnReceiveOffensiveAction(THolder holder, TReceiver receiver);
+        //ref because by design some listener could change the receiver (this was made so passive/reaction could be possible,
         // passives such damage reduction, counter attacks, etc)
-        void OnReceiveOffensiveEffect(T element, ref TEffect value); 
+        void OnReceiveOffensiveEffect(TReceiver receiver, ref TEffect value); 
     }
     public interface IOffensiveActionReceiverListener<in T>
     {
         void OnReceiveOffensiveAction(T element);
     }
 
-    public interface ISupportActionReceiverListener<in T,in TAction, TEffect>
+    public interface ISupportActionReceiverListener<in THolder,in TReceiver, TEffect>
     {
-        void OnReceiveSupportAction(T element, TAction value);
-        void OnReceiveSupportEffect(T element, ref TEffect value);
+        void OnReceiveSupportAction(THolder holder, TReceiver receiver);
+        void OnReceiveSupportEffect(TReceiver receiver, ref TEffect value);
     }
     public interface ISupportActionReceiverListener<in T>
     {
@@ -47,18 +50,29 @@ namespace CombatSystem.Events
     /// <summary>
     /// Used when a [<see cref="CombatingEntity"/>] receive a change on vitality (damage, recovery, health at zero)
     /// </summary>
-    /// <typeparam name="T">The type which is passed to all listeners</typeparam>
-    /// <typeparam name="TAction">The type of value passed (generally a [<seealso cref="float"/>])</typeparam>
-    public interface IVitalityChangeListener<in T,in TAction>
+    public interface IVitalityLostListener<in T,in TReceiver>
     {
         /// <summary>
         /// Shields were higher thant zero but lost in the action
         /// </summary>
-        void OnShieldLost(T element, TAction value);
+        void OnShieldLost(T element, TReceiver receiver);
         /// <summary>
         /// Health were higher that zero but lost in the action
         /// </summary>
-        void OnHealthLost(T element, TAction value);
+        void OnHealthLost(T element, TReceiver receiver);
+        /// <summary>
+        /// This is summon when the mortality reach zero; this normally happens once and then
+        /// entities could be revived through HP, meaning that this events will not be invoked
+        /// yet [<seealso cref="ITeamStateChangeListener.OnMemberDeath"/>] can still be invoked
+        /// as consequence
+        /// </summary>
+        void OnMortalityLost(T element, TReceiver receiver);
+    }
+    public interface IDamageReceiverListener<in T, in TReceiver> 
+    {
+        void OnShieldDamage(T element, TReceiver receiver);
+        void OnHealthDamage(T element, TReceiver receiver);
+        void OnMortalityDamage(T element, TReceiver receiver);
     }
 
     public interface ITempoListener<in T>

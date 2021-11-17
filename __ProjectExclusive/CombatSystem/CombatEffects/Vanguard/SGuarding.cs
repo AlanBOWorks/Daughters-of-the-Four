@@ -15,10 +15,10 @@ namespace CombatEffects
         menuName = "Combat/Effect/Guarding")]
     public class SGuarding : SEffect
     {
-        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatingEntity receiver,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveSupportEffect(parameters,ref resolution);
+            systemEvents.OnReceiveSupportEffect(receiver,ref resolution);
         }
 
         protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue,

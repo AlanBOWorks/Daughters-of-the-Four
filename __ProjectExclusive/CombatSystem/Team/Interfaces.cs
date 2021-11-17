@@ -101,6 +101,13 @@ namespace CombatTeam
     public interface ITeamStateChangeListener<in THolder>
     {
         void OnStanceChange(THolder holder, EnumTeam.TeamStance switchStance);
+        /// <summary>
+        /// This is invoked only when the member is death; losing the mortality is not the only
+        /// way to trigger this event:<br></br>
+        /// <example>
+        /// eg - it could be 0 Mortality with some HP; then losing the HP will mean death as well
+        /// </example>
+        /// </summary>
         void OnMemberDeath(THolder holder, CombatingEntity member);
     }
 

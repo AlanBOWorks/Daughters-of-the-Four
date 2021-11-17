@@ -87,7 +87,7 @@ namespace Stats
             if(vitality.CurrentMortality > 0) return;
 
             vitality.CurrentMortality = 0;
-            CombatSystemSingleton.DamageReceiveEvents.OnMortalityDeath();
+            CombatSystemSingleton.DamageReceiveEvents.OnMortalityLost();
         }
 
 

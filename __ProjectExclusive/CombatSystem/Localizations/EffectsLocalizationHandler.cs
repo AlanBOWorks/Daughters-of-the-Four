@@ -19,6 +19,10 @@ namespace __ProjectExclusive.Localizations
         {
             public string GetLocalization(ISkillComponent element)
             {
+                if (element is ScriptableObject scriptableObject)
+                {
+                    return scriptableObject.name;
+                }
                 return element.ToString();
             }
         }

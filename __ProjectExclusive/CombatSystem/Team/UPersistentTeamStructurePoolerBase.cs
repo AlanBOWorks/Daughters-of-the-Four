@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatEntity;
 using CombatSystem;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatTeam
@@ -14,6 +15,7 @@ namespace CombatTeam
         {
             _playerElementsPool = new PoolerHandler();
             _enemyElementsPool = new PoolerHandler();
+            EntitiesDictionary = new Dictionary<CombatingEntity, T>();
 
             var preparationHandler = CombatSystemSingleton.CombatPreparationHandler;
             preparationHandler.Subscribe(this as ICombatDisruptionListener);
@@ -27,6 +29,9 @@ namespace CombatTeam
         private PoolerHandler _enemyElementsPool;
         public T GetPlayerTeam() => PoolElement(_playerElementsPool, playerPrefab);
         public T GetEnemyTeam() => PoolElement(_enemyElementsPool, enemyPrefab);
+        [ShowInInspector]
+        protected Dictionary<CombatingEntity, T> EntitiesDictionary;
+
 
         private T PoolElement(PoolerHandler pooler, T prefab)
         {
@@ -38,6 +43,7 @@ namespace CombatTeam
         protected abstract void OnPreparationEntity(CombatingEntity entity, T element);
         public virtual void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam)
         {
+            EntitiesDictionary.Clear();
             DoPreparationPool(playerTeam,_playerElementsPool,playerPrefab);
             DoPreparationPool(enemyTeam,_enemyElementsPool,enemyPrefab);
 
@@ -47,6 +53,7 @@ namespace CombatTeam
                 {
                     var pooledElement = PoolElement(pooler, prefab);
                     OnPreparationEntity(member,pooledElement);
+                    EntitiesDictionary.Add(member,pooledElement);
                 }
             }
         }

@@ -54,18 +54,26 @@ namespace CombatSystem.Events
         }
 
 
-        public void OnShieldLost(ISkillParameters parameters, CombatingSkill value)
+        public void OnShieldLost(ISkillParameters parameters, CombatingEntity receiver)
         {
             var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnShieldLost(parameters, value);
+            eventsHolder.OnShieldLost(parameters, receiver);
         }
-        public void OnHealthLost(ISkillParameters parameters, CombatingSkill value)
+        public void OnHealthLost(ISkillParameters parameters, CombatingEntity receiver)
         {
             var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnHealthLost(parameters,value);
+            eventsHolder.OnHealthLost(parameters,receiver);
         }
+
+        public void OnMortalityLost(ISkillParameters parameters, CombatingEntity receiver)
+        {
+            var entity = parameters.Performer;
+            var eventsHolder = GetEventsHolder(entity);
+            eventsHolder.OnMortalityLost(parameters, receiver);
+        }
+
         public void OnStanceChange(CombatingTeam team, EnumTeam.TeamStance switchStance)
         {
             var eventsHolder = GetEventsHolder(team);
@@ -115,30 +123,28 @@ namespace CombatSystem.Events
 
         }
 
-        public void OnReceiveOffensiveAction(ISkillParameters parameters, CombatingSkill value)
+        public void OnReceiveOffensiveAction(ISkillParameters holder, CombatingEntity receiver)
         {
-            var entity = parameters.Performer;
+            var entity = holder.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnReceiveOffensiveAction(parameters, value);
+            eventsHolder.OnReceiveOffensiveAction(holder, receiver);
         }
 
-        public void OnReceiveOffensiveEffect(ISkillParameters parameters, ref SkillComponentResolution value)
+        public void OnReceiveOffensiveEffect(CombatingEntity entity, ref SkillComponentResolution value)
         {
-            var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnReceiveOffensiveEffect(parameters, ref value);
+            eventsHolder.OnReceiveOffensiveEffect(entity, ref value);
         }
-        public void OnReceiveSupportAction(ISkillParameters parameters, CombatingSkill value)
+        public void OnReceiveSupportAction(ISkillParameters holder, CombatingEntity receiver)
         {
-            var entity = parameters.Performer;
+            var entity = holder.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnReceiveSupportAction(parameters, value);
+            eventsHolder.OnReceiveSupportAction(holder, receiver);
         }
-        public void OnReceiveSupportEffect(ISkillParameters parameters, ref SkillComponentResolution value)
+        public void OnReceiveSupportEffect(CombatingEntity entity, ref SkillComponentResolution value)
         {
-            var entity = parameters.Performer;
             var eventsHolder = GetEventsHolder(entity);
-            eventsHolder.OnReceiveSupportEffect(parameters, ref value);
+            eventsHolder.OnReceiveSupportEffect(entity, ref value);
         }
 
 
@@ -154,5 +160,22 @@ namespace CombatSystem.Events
             eventsHolder.OnRoundFinish(entity);
         }
 
+        public void OnShieldDamage(ISkillParameters element, CombatingEntity receiver)
+        {
+            var eventsHolder = GetEventsHolder(receiver);
+            eventsHolder.OnShieldDamage(element, receiver);
+        }
+
+        public void OnHealthDamage(ISkillParameters element, CombatingEntity receiver)
+        {
+            var eventsHolder = GetEventsHolder(receiver);
+            eventsHolder.OnHealthDamage(element, receiver);
+        }
+
+        public void OnMortalityDamage(ISkillParameters element, CombatingEntity receiver)
+        {
+            var eventsHolder = GetEventsHolder(receiver);
+            eventsHolder.OnMortalityDamage(element, receiver);
+        }
     }
 }

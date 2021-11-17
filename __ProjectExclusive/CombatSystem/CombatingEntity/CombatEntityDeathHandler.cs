@@ -34,6 +34,9 @@ namespace CombatEntity
             // TODO call revive for team and system
         }
 
+        // Problem: effects needs the entity being alive to do their effects before the skill's behaviour ends
+        // Solution: enqueue the dead entity in a queue and calls it after the skill ends performing
+        // Possibles problems: could have incompatibilities with Revive and/or event calls related to Health
         public void HandleDeaths()
         {
             for (var i = _deathQueue.Count - 1; i >= 0; i--)

@@ -20,6 +20,9 @@ namespace CombatSystem
 
         public void OnPreparationCombat(CombatingTeam playerTeam, CombatingTeam enemyTeam)
         {
+            _activeEntities.Clear();
+            _tickingEntities.Clear();
+
             AddEntities(playerTeam);
             AddEntities(enemyTeam);
             InjectTickAmountCheck();
@@ -55,7 +58,10 @@ namespace CombatSystem
         private readonly Queue<CombatingEntity> _activeEntities;
         public CombatingEntity LastActingEntity { get; private set; }
 
-        public bool HasActingEntity() => _activeEntities.Count > 0;
+        public bool HasActingEntity()
+        {
+            return _activeEntities.Count > 0;
+        }
 
 
         private const int FullTickAmount = 24;//todo make it a param
@@ -99,7 +105,6 @@ namespace CombatSystem
 
         private IEnumerator<float> _DoEntitiesActions()
         {
-            yield return Timing.WaitForOneFrame;
             while (_activeEntities.Count > 0)
             {
                 var actingEntity = _activeEntities.Dequeue();

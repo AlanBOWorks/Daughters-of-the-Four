@@ -18,10 +18,10 @@ namespace CombatEffects
     {
         [SerializeField] private EnumTeam.TeamStance targetStance;
         
-        protected override void DoEventCall(SystemEventsHolder systemEvents, ISkillParameters parameters,
+        protected override void DoEventCall(SystemEventsHolder systemEvents, CombatingEntity receiver,
             ref SkillComponentResolution resolution)
         {
-            CombatSystemSingleton.EventsHolder.OnStanceChange(parameters.Target.Team, targetStance);
+            CombatSystemSingleton.EventsHolder.OnStanceChange(receiver.Team, targetStance);
         }
 
         protected override SkillComponentResolution DoEffectOn(CombatingEntity user, CombatingEntity effectTarget, float effectValue,

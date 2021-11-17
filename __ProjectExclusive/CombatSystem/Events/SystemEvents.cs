@@ -9,7 +9,7 @@ using Sirenix.OdinInspector;
 namespace CombatSystem.Events
 {
     public class SystemEventsHolder :
-        CombatEventsHolderBase<ISkillParameters, CombatingEntity,CombatingSkill,SkillComponentResolution>,
+        CombatEventsHolderBase<ISkillParameters, CombatingEntity,CombatingEntity,SkillComponentResolution>,
         ICombatSystemEvents
     {
         public SystemEventsHolder() : base()
@@ -42,11 +42,13 @@ namespace CombatSystem.Events
         public void Subscribe(ICombatSystemEvents listener)
         {
             Subscribe(listener 
-                as IOffensiveActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>);
+                as IOffensiveActionReceiverListener<ISkillParameters, CombatingEntity, SkillComponentResolution>);
             Subscribe(listener 
-                as ISupportActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>);
+                as ISupportActionReceiverListener<ISkillParameters, CombatingEntity, SkillComponentResolution>);
             Subscribe(listener 
-                as IVitalityChangeListener<ISkillParameters, CombatingSkill>);
+                as IVitalityLostListener<ISkillParameters, CombatingEntity>);
+            Subscribe(listener
+                as IDamageReceiverListener<ISkillParameters,CombatingEntity>);
             Subscribe(listener 
                 as ITempoListener<CombatingEntity>);
             Subscribe(listener 

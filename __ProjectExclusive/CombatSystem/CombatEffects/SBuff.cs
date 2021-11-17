@@ -24,15 +24,15 @@ namespace CombatEffects
             foreach (var effectTarget in effectTargets)
             {
                 var resolution = DoBuffOn(user, effectTarget, buffType, effectValue, isCritical);
-                DoEventCalls(systemEvents,parameters,ref resolution);
+                DoEventCalls(systemEvents,effectTarget,ref resolution);
             }
 
         }
 
-        protected virtual void DoEventCalls(SystemEventsHolder systemEvents,ISkillParameters parameters,
+        protected virtual void DoEventCalls(SystemEventsHolder systemEvents, CombatingEntity receiver,
             ref SkillComponentResolution resolution)
         {
-            systemEvents.OnReceiveSupportEffect(parameters,ref resolution);
+            systemEvents.OnReceiveSupportEffect(receiver,ref resolution);
         }
 
         protected float CalculateBuffStats(CombatingEntity performer, float buffValue, bool isCritical)

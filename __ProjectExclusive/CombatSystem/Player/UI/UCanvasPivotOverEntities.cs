@@ -19,6 +19,7 @@ namespace __ProjectExclusive.Player.UI
             }
         }
 
+        [ShowInInspector]
         private HashSet<ICanvasPivotOverEntityListener> _listeners;
         internal ICollection<ICanvasPivotOverEntityListener> PoolListeners => _listeners;
 
@@ -38,6 +39,10 @@ namespace __ProjectExclusive.Player.UI
 
         public override void OnAfterLoadsCombat()
         {
+            foreach (var listener in _listeners)
+            {
+                listener.InjectDictionary(EntitiesDictionary);
+            }
         }
 
         public override void OnCombatPause()
@@ -59,10 +64,12 @@ namespace __ProjectExclusive.Player.UI
         public bool hideThisBox = false;
 #endif
         public abstract void OnPooledElement(CombatingEntity user, UPivotOverEntity pivotOverEntity);
+        public abstract void InjectDictionary(Dictionary<CombatingEntity, UPivotOverEntity> dictionary);
     }
 
     internal interface ICanvasPivotOverEntityListener
     {
         void OnPooledElement(CombatingEntity user, UPivotOverEntity pivotOverEntity);
+        void InjectDictionary(Dictionary<CombatingEntity, UPivotOverEntity> dictionary);
     }
 }

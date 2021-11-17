@@ -9,35 +9,50 @@ namespace CombatSystem.Events
     // This wrapper class is meant to reduce the possible errors making the code for the Damage event's calls.
     // Just call this events and everything should be simpler
     public sealed class DamageReceiveEventsInvoker :
-        IOffensiveActionReceiverListener<ISkillParameters, CombatingSkill, SkillComponentResolution>
+        IOffensiveActionReceiverListener<ISkillParameters, CombatingEntity, SkillComponentResolution>
     {
-        private ISkillParameters _actors;
-        private CombatingSkill _usedSkill;
+        private ISkillParameters _skillParameters;
+        private CombatingEntity _receiver;
 
         public void OnShieldLost()
         {
             var events = CombatSystemSingleton.EventsHolder;
-            events.OnShieldLost(_actors, _usedSkill);
+            events.OnShieldLost(_skillParameters, _receiver);
         }
 
         public void OnHealthLost()
         {
             var events = CombatSystemSingleton.EventsHolder;
-            events.OnHealthLost(_actors, _usedSkill);
+            events.OnHealthLost(_skillParameters, _receiver);
+            HandlePossibleDeath();
         }
-
-        public void OnMortalityDeath()
+        public void OnMortalityLost()
         {
-            CombatSystemSingleton.EntityDeathHandler.EnQueueEntity(_actors.Target);
+            var events = CombatSystemSingleton.EventsHolder;
+            events.OnMortalityLost(_skillParameters,_receiver);
+            HandlePossibleDeath();
         }
 
-        public void OnReceiveOffensiveAction(ISkillParameters element, CombatingSkill skill)
+        private void HandlePossibleDeath()
         {
-            _actors = element;
-            _usedSkill = skill;
+            var stats = _receiver.CombatStats;
+            if(stats.CurrentMortality > 0 || stats.CurrentHealth > 0) return;
+
+            OnMortalityDeath();
         }
 
-        public void OnReceiveOffensiveEffect(ISkillParameters element, ref SkillComponentResolution value)
+        private void OnMortalityDeath()
+        {
+            CombatSystemSingleton.EntityDeathHandler.EnQueueEntity(_skillParameters.Target);
+        }
+
+        public void OnReceiveOffensiveAction(ISkillParameters holder, CombatingEntity receiver)
+        {
+            _skillParameters = holder;
+            _receiver = receiver;
+        }
+
+        public void OnReceiveOffensiveEffect(CombatingEntity receiver, ref SkillComponentResolution value)
         {
 
         }
