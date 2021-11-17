@@ -148,17 +148,26 @@ namespace CombatSystem.Events
         }
         public void OnShieldDamage(THolder element, TActionReceiver receiver)
         {
-            throw new NotImplementedException();
+            foreach (var listener in _damageReceiverListeners)
+            {
+                listener.OnShieldDamage(element,receiver);
+            }
         }
 
         public void OnHealthDamage(THolder element, TActionReceiver receiver)
         {
-            throw new NotImplementedException();
+            foreach (var listener in _damageReceiverListeners)
+            {
+                listener.OnHealthDamage(element, receiver);
+            }
         }
 
         public void OnMortalityDamage(THolder element, TActionReceiver receiver)
         {
-            throw new NotImplementedException();
+            foreach (var listener in _damageReceiverListeners)
+            {
+                listener.OnMortalityDamage(element, receiver);
+            }
         }
 
 

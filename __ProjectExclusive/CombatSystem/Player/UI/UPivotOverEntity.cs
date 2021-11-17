@@ -58,7 +58,7 @@ namespace __ProjectExclusive.Player.UI
             Vector3 pivotPosition = pivot.position;
             Vector3 fixedPosition = holderTransform.position + fixedPointOffset;
 
-            Vector3 canvasPosition = Vector3.MoveTowards(pivotPosition, fixedPosition, clampDistance);
+            Vector3 canvasPosition = Vector3.MoveTowards( fixedPosition, pivotPosition, clampDistance);
 
             _movingButton.position = CombatCameraSingleton.CombatMainCamera.WorldToScreenPoint(canvasPosition);
         }
@@ -73,7 +73,11 @@ namespace __ProjectExclusive.Player.UI
         [SerializeField] 
         private UHealthStateUIHolder healthState;
 
+        [SerializeField] 
+        private UActionsStateUIHolder actionsState;
+
         public UTargetButton GetTargetButton() => targetButton;
         public UHealthStateUIHolder GetHealthStateHolder() => healthState;
+        public UActionsStateUIHolder GetUActionsStateHolder() => actionsState;
     }
 }

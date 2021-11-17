@@ -53,10 +53,17 @@ namespace Stats
             if(vitality.CurrentShields < 1) return false; //See the DoDamageToHealth's comment about the return's reason being there
 
             vitality.CurrentShields -= 1; // by design shields are lost in units
-            if (vitality.CurrentShields > 0) return true;
+            var damageEvents = CombatSystemSingleton.DamageReceiveEvents;
+
+            if (vitality.CurrentShields > 0)
+            {
+                damageEvents.OnShieldDamage();
+                return true;
+            }
 
             vitality.CurrentShields = 0;
-            CombatSystemSingleton.DamageReceiveEvents.OnShieldLost();
+            damageEvents.OnShieldDamage();
+            damageEvents.OnShieldLost();
             return true;
         }
 
@@ -67,16 +74,23 @@ namespace Stats
                 chucks of damage information that the player needs to process).
                 If there's enough shields, then shields it's the only thing the player will take on account;
                 If there's not enough shields but health, then health it's the only thing the player will take on account;
-                If there's nothing protecting but Mortality, then only mortality will be taken part on the calculations
-                
+                If there's nothing protecting but Mortality, then only mortality will be taken part on the calculations                
             */
+
             if (vitality.CurrentHealth <= 0) return false;
 
             vitality.CurrentHealth -= damage;
-            if(vitality.CurrentHealth > 0) return true;
+            var damageEvents = CombatSystemSingleton.DamageReceiveEvents;
+
+            if(vitality.CurrentHealth > 0)
+            {
+                damageEvents.OnHealthDamage();
+                return true;
+            }
 
             vitality.CurrentHealth = 0;
-            CombatSystemSingleton.DamageReceiveEvents.OnHealthLost();
+            damageEvents.OnHealthDamage();
+            damageEvents.OnHealthLost();
             return true;
         }
         // Doesn't have return (bool) because it's the last stats in the damage calculations and the returns (bool) were
@@ -84,10 +98,16 @@ namespace Stats
         public static void DoDamageToMortality(ICombatPercentStats<float> vitality, float damage)
         {
             vitality.CurrentMortality -= damage;
-            if(vitality.CurrentMortality > 0) return;
+            var damageEvents = CombatSystemSingleton.DamageReceiveEvents;
+            if(vitality.CurrentMortality > 0)
+            {
+                damageEvents.OnMortalityDamage();
+                return;
+            }
 
             vitality.CurrentMortality = 0;
-            CombatSystemSingleton.DamageReceiveEvents.OnMortalityLost();
+            damageEvents.OnMortalityDamage();
+            damageEvents.OnMortalityLost();
         }
 
 

@@ -56,5 +56,24 @@ namespace CombatSystem.Events
         {
 
         }
+
+        public void OnShieldDamage()
+        {
+            var events = CombatSystemSingleton.EventsHolder;
+            events.OnShieldDamage(_skillParameters, _receiver);
+
+        }
+
+        public void OnHealthDamage()
+        {
+            var events = CombatSystemSingleton.EventsHolder;
+            events.OnHealthDamage(_skillParameters, _receiver);
+        }
+
+        public void OnMortalityDamage()
+        {
+            var events = CombatSystemSingleton.EventsHolder;
+            events.OnMortalityDamage(_skillParameters, _receiver);
+        }
     }
 }

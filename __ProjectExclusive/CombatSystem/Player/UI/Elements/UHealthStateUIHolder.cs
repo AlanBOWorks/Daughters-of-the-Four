@@ -1,4 +1,5 @@
 using CombatEntity;
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using Stats;
 using TMPro;
@@ -36,10 +37,40 @@ namespace __ProjectExclusive.Player.UI
 
             float percentage = statsHealth / statsMaxHealth;
 
+            UpdateHealthBar(percentage);
+        }
+
+        private void UpdateHealthBar(float percentage)
+        {
             var barTransform = percentBar.rectTransform;
             Vector2 barPosition = barTransform.anchoredPosition;
             barPosition.x = Mathf.LerpUnclamped(100, 0, percentage); //Zero means the bar is out of canvas showing the color
             barTransform.anchoredPosition = barPosition;
+        }
+
+        public void DoDamageToHealth()
+        {
+            float statsHealth = _stats.CurrentHealth;
+            float statsMaxHealth = _stats.MaxHealth;
+            currentHealth.text = UtilsText.ConstructMaxFourDigit(statsHealth);
+            float percentage = statsHealth / statsMaxHealth;
+
+            UpdateHealthBar(percentage);
+
+            var healthTextTransform = currentHealth.transform;
+            healthTextTransform.DOKill();
+            healthTextTransform.DOPunchPosition(Vector3.right * 4, .2f, 3);
+        }
+
+        public void UpdateMaxHealth()
+        {
+            float statsHealth = _stats.CurrentHealth;
+            float statsMaxHealth = _stats.MaxHealth;
+            maxHealth.text = "/" + UtilsText.ConstructMaxFourDigit(statsMaxHealth);
+
+            float percentage = statsHealth / statsMaxHealth;
+
+            UpdateHealthBar(percentage);
         }
     }
 }
