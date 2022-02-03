@@ -5,6 +5,12 @@ namespace Utils
 {
     public static class UtilsAssets 
     {
+        public static void UpdateAssetNameWithID(ScriptableObject asset, string name)
+        {
+            name += " - " + asset.GetInstanceID();
+            UpdateAssetName(asset,name);
+        }
+
         public static void UpdateAssetName(ScriptableObject asset, string name)
         {
             asset.name = name;

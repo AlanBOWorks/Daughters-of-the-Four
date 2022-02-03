@@ -1,0 +1,17 @@
+{
+    "name": "ProjectCombatSystem",
+    "rootNamespace": "",
+    "references": [
+        "GUID:6fa701fd2d6cf254bbbc85e452e546a9",
+        "GUID:c9832f79af8c4c840920098fafddfa4b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
