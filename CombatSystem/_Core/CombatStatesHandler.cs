@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatSystem._Core
 {
-    public sealed class CombatStatesHandler : ICombatPreparationListener
+    public sealed class CombatStatesHandler : ICombatPreparationListener, ICombatStatesListener
     {
         public CombatStatesHandler(SystemCombatEventsHolder eventsHolder)
         {
@@ -32,6 +32,19 @@ namespace CombatSystem._Core
             DestroyAliveReference();
         }
 
+        public void OnCombatStart()
+        {
+        }
+
+        public void OnCombatFinish()
+        {
+            DestroyAliveReference();
+        }
+
+        public void OnCombatQuit()
+        {
+            DestroyAliveReference();
+        }
 
         private static void CreateAliveReference()
         {
@@ -61,6 +74,7 @@ namespace CombatSystem._Core
 
 
         }
+
     }
 
     public interface ICombatPreparationListener : ICombatEventListener

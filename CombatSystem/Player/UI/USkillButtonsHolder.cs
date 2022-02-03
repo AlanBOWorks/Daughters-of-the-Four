@@ -25,6 +25,7 @@ namespace CombatSystem.Player.UI
         {
             var buttonTransform = (RectTransform) clonableSkillButton.transform;
             _buttonSizes = buttonTransform.rect.size;
+            _buttonSizes.y = 0; // This is just to avoid the buttons moving upwards in ShowSkills
 
             _buttonsStack = new Stack<UCombatSkillButton>();
         }
@@ -49,6 +50,7 @@ namespace CombatSystem.Player.UI
 
         private const float DelayBetweenButtons = .12f;
         private const float AnimationDuration = .2f;
+        [Button,DisableInEditorMode]
         private void ShowSkillsAnimated()
         {
             CombatSystemSingleton.LinkCoroutineToMaster(_ShowAll());

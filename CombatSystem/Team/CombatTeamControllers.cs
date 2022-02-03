@@ -82,8 +82,6 @@ namespace CombatSystem.Team
                     yield return Timing.WaitForOneFrame;
                     var eventsHolder = CombatSystemSingleton.EventsHolder;
                     eventsHolder.OnSkillSubmit(in actingEntity, in usedSkill, in onTarget);
-                    yield return Timing.WaitForOneFrame;
-                    eventsHolder.OnSkillPerform(in actingEntity, in usedSkill, in onTarget);
                 }
             }
         }

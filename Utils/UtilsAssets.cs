@@ -23,12 +23,36 @@ namespace Utils
             AssetDatabase.RenameAsset(path, asset.name);
         }
 
+        /// <summary>
+        /// [.asset]
+        /// </summary>
         public const string AssetExtension = ".asset";
+
+        public static void CheckIfPathIsCorrect(string path, ScriptableObject asset)
+        {
+            Debug.Log("Manual Path: " + path);
+            string getPath = AssetDatabase.GetAssetPath(asset);
+            Debug.Log("Get Path: " + getPath);
+
+            bool isCorrect = (path == getPath);
+            string logText = $"Are Equals: {isCorrect}";
+
+            if (isCorrect)
+                Debug.Log(logText);
+            else
+                Debug.LogError(logText);
+        }
+
         public static string GetAssetFolder(ScriptableObject asset)
         {
             string path = AssetDatabase.GetAssetPath(asset);
             int removeAt = path.Length - asset.name.Length - AssetExtension.Length;
             return path.Remove(removeAt);
+        }
+        public static T GetAsset<T>(T asset) where T : ScriptableObject
+        {
+            var path = AssetDatabase.GetAssetPath(asset);
+            return AssetDatabase.LoadAssetAtPath<T>(path);
         }
     
         /// <param name="addIdToName">The instantiation ID</param>

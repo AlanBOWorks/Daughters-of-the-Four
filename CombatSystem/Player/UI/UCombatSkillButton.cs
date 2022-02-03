@@ -19,6 +19,7 @@ namespace CombatSystem.Player.UI
             CombatSystemSingleton.LinkCoroutineToMaster(_fadeHandle);
             IEnumerator<float> _FadeAlpha()
             {
+                canvasGroup.alpha = 0;
                 while (canvasGroup.alpha < .98f)
                 {
                     canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 1, Time.deltaTime * FadeSpeed);

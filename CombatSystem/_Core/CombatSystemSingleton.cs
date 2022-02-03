@@ -25,20 +25,23 @@ namespace CombatSystem._Core
             TeamControllers 
                 = new CombatTeamControllersHandler();
 
-            EventsHolder.Subscribe(TeamControllers);
+            EventsHolder.SubscribeListener(TeamControllers);
         }
         private CombatSystemSingleton() { }
         public static CombatSystemSingleton GetInstance() => Instance;
 
-        public static CombatStatesHandler CombatStatesHandler { get; }
 
-        [ShowInInspector,DisableInEditorMode,DisableInPlayMode]
+        [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
+        internal static GameObject CombatHolderNotDestroyReference;
+
+        [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
         public static GameObject AliveGameObjectReference { get; internal set; }
 
 
+        public static CombatStatesHandler CombatStatesHandler { get; }
         // ------- EVENTS ------
         [ShowInInspector]
-        public static CombatEventsHolder EventsHolder { get; private set; }
+        public static SystemCombatEventsHolder EventsHolder { get; private set; }
 
         // ------- TEAM ------
         public static IReadOnlyList<CombatEntity> AllMembers => AllMembersCollection;

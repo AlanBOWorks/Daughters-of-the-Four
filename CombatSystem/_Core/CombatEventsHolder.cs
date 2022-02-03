@@ -9,51 +9,129 @@ using UnityEngine;
 
 namespace CombatSystem._Core
 {
-    public sealed class SystemCombatEventsHolder : CombatEventsHolder
+    public sealed class SystemCombatEventsHolder 
+        //: IEventsHolder
     {
-        public SystemCombatEventsHolder() : base()
+        public SystemCombatEventsHolder() 
         {
-            _eventHandlers = new HashSet<CombatEventsHolder>();
-            _tempoTicker = new TempoTicker();
-
-            CombatSystemSingleton.TempoTicker = _tempoTicker;
-            Subscribe(_tempoTicker);
-            Subscribe(_tempoTicker.EntitiesTempoTicker);
-
-            var skillsUsageEventHandler = new CombatSkillEventHandler();
-            Subscribe(skillsUsageEventHandler);
+            _eventsHolder = new SystemEventsHolder();
+            var prefabInstantiations = new PrefabInstantiationHandler();
+            _eventsHolder.Subscribe(prefabInstantiations);
 
 #if UNITY_EDITOR
             var debugEvents = new DebugEvents();
 
-            Subscribe(debugEvents);
+            _eventsHolder.Subscribe(debugEvents);
 #endif
         }
 
-        [TitleGroup("Combat System Exclusive"), ShowInInspector]
-        private readonly TempoTicker _tempoTicker;
+        // Problem: PlayerEvents could be invoked before core events while it should always be invoked last
+        // so the data represented is the more consistent for the player;
+        // Solution: Manual invoke through code
+        private readonly SystemEventsHolder _eventsHolder;
+        private PlayerCombatEventsHolder _playerCombatEvents;
 
-        // Problem: can't subscribe in static constructor and subscribing each time the combat
-        // starts makes repeated subscriptions; 
-        // Solution: just keep track of the combatEventsHandlers;
-        [Title("Events Holder"), ShowInInspector, PropertyOrder(-10)]
-        private readonly HashSet<CombatEventsHolder> _eventHandlers;
-
-        public void SubscribeEventsHandler(CombatEventsHolder eventsHandler)
+        public void SubscribeEventsHandler(PlayerCombatEventsHolder eventsHandler)
         {
-            if (_eventHandlers.Contains(eventsHandler)) 
-                return;
+            _playerCombatEvents = eventsHandler;
+        }
 
-            _eventHandlers.Add(eventsHandler);
-            base.Subscribe(eventsHandler);
+        public void SubscribeListener(ICombatEventListener listener) => _eventsHolder.Subscribe(listener);
+
+
+
+        public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
+        {
+            _eventsHolder.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
+            _playerCombatEvents.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
+        }
+
+        public void OnCombatStart()
+        {
+            _eventsHolder.OnCombatStart();
+            _playerCombatEvents.OnCombatStart();
+        }
+
+        public void OnCombatFinish()
+        {
+            _eventsHolder.OnCombatFinish();
+            _playerCombatEvents.OnCombatFinish();
+        }
+
+        public void OnCombatQuit()
+        {
+            _eventsHolder.OnCombatQuit();
+            _playerCombatEvents.OnCombatQuit();
+        }
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            _eventsHolder.OnEntityRequestSequence(entity,canAct);
+            _playerCombatEvents.OnEntityRequestSequence(entity, canAct);
+        }
+
+        public void OnEntityRequestControl(CombatEntity entity)
+        {
+            _eventsHolder.OnEntityRequestControl(entity);
+            _playerCombatEvents.OnEntityRequestControl(entity);
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+            _eventsHolder.OnEntityFinishAction(entity);
+            _playerCombatEvents.OnEntityFinishAction(entity);
+        }
+
+        public void OnEntityFinishSequence(CombatEntity entity)
+        {
+            _eventsHolder.OnEntityFinishSequence(entity);
+            _playerCombatEvents.OnEntityFinishSequence(entity);
+        }
+
+        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        {
+            _eventsHolder.OnSkillSubmit(in performer, in usedSkill, in target);
+            _playerCombatEvents.OnSkillSubmit(in performer, in usedSkill, in target);
+
+            // Manual sequence Flow
+            OnSkillPerform(in performer,in usedSkill, in target);
+        }
+
+        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        {
+            _eventsHolder.OnSkillPerform(in performer, in usedSkill, in target);
+            _playerCombatEvents.OnSkillPerform(in performer, in usedSkill, in target);
+        }
+
+        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
+        {
+            _eventsHolder.OnEffectPerform(in performer,in usedSkill,in target, in effect);
+            _playerCombatEvents.OnEffectPerform(in performer,in usedSkill,in target, in effect);
         }
 
 
-        protected override void SubscribeTempo(ITempoTickListener tickListener)
+        private sealed class SystemEventsHolder : CombatEventsHolder
         {
-            _tempoTicker.Subscribe(tickListener);
-        }
+            public SystemEventsHolder()
+            {
+                _tempoTicker = new TempoTicker();
 
+                CombatSystemSingleton.TempoTicker = _tempoTicker;
+                Subscribe(_tempoTicker);
+                Subscribe(_tempoTicker.EntitiesTempoTicker);
+
+                var skillsUsageEventHandler = new CombatSkillEventHandler();
+                Subscribe(skillsUsageEventHandler);
+            }
+
+
+            [TitleGroup("Combat System Exclusive"), ShowInInspector]
+            private readonly TempoTicker _tempoTicker;
+            protected override void SubscribeTempo(ITempoTickListener tickListener)
+            {
+                _tempoTicker.Subscribe(tickListener);
+            }
+        }
 
 #if UNITY_EDITOR
         #region -- DEBUG --
@@ -111,22 +189,25 @@ namespace CombatSystem._Core
 
             public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
             {
-                
+
             }
 
             public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
             {
                 Debug.Log($"Effect performed  {performer.GetEntityName()} / On target: {target.GetEntityName()} ");
             }
-        } 
+        }
         #endregion
 #endif
     }
 
-    public abstract class CombatEventsHolder : 
-        ICombatPreparationListener,ICombatStatesListener, 
+    public interface IEventsHolder : ICombatPreparationListener, ICombatStatesListener,
         ITempoEntityStatesListener,
         ISkillUsageListener
+    { }
+
+    public abstract class CombatEventsHolder : IEventsHolder
+        
     {
         protected CombatEventsHolder()
         {
