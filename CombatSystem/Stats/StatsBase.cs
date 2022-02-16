@@ -85,26 +85,26 @@ namespace CombatSystem.Stats
         IOffensiveStats<T>, ISupportStats<T>, IVitalityStats<T>, IConcentrationStats<T>
     {
         [HorizontalGroup("Top")]
-        [SerializeField, BoxGroup("Top/Offensive")] private T attackType;
-        [SerializeField, BoxGroup("Top/Offensive")] private T overTimeType;
-        [SerializeField, BoxGroup("Top/Offensive")] private T deBuffType;
-        [SerializeField, BoxGroup("Top/Offensive")] private T followUpType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] private T attackType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] private T overTimeType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] private T deBuffType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] private T followUpType;
 
-        [SerializeField, BoxGroup("Top/Support")] private T healType;
-        [SerializeField, BoxGroup("Top/Support")] private T shieldingType;
-        [SerializeField, BoxGroup("Top/Support")] private T buffType;
-        [SerializeField, BoxGroup("Top/Support")] private T receiveBuffType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] private T healType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] private T shieldingType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] private T buffType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] private T receiveBuffType;
 
         [HorizontalGroup("Bottom")]
-        [SerializeField, BoxGroup("Bottom/Vitality")] private T healthType;
-        [SerializeField, BoxGroup("Bottom/Vitality")] private T mortalityType;
-        [SerializeField, BoxGroup("Bottom/Vitality")] private T damageReductionType;
-        [SerializeField, BoxGroup("Bottom/Vitality")] private T deBuffResistanceType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] private T healthType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] private T mortalityType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] private T damageReductionType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] private T deBuffResistanceType;
 
-        [SerializeField, BoxGroup("Bottom/Concentration")] private T actionsType;
-        [SerializeField, BoxGroup("Bottom/Concentration")] private T speedType;
-        [SerializeField, BoxGroup("Bottom/Concentration")] private T controlType;
-        [SerializeField, BoxGroup("Bottom/Concentration")] private T criticalType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] private T actionsType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] private T speedType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] private T controlType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] private T criticalType;
 
         public StatsBase(T defaultValue)
         {

@@ -88,7 +88,7 @@ namespace CombatSystem.Stats
         public float CurrentShields { get; set; }
 
         [ShowInInspector]
-        public float CurrentActions { get; set; }
+        public float UsedActions { get; set; }
         [ShowInInspector]
         public float CurrentInitiative { get; set; }
 

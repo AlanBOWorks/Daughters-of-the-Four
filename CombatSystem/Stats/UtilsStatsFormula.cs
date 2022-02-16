@@ -135,6 +135,18 @@ namespace CombatSystem.Stats
 
     public static class UtilsStatsEffects
     {
+
+        public static float CalculateOffensiveStatBuffed(in float buffPower, in float receivePower,
+            in float effectValue)
+        {
+            return effectValue * (buffPower + receivePower);
+        }
+        public static float CalculateSupportStatBuffed(in float buffPower, in float receivePower,
+            in float effectValue)
+        {
+            return effectValue * (buffPower + receivePower);
+        }
+
         public static void CalculateDamageFromAttackAttribute(in CombatStats stats, ref float baseDamage)
         {
             UtilsStatsFormula.CalculateValue(in stats, EnumStats.OffensiveStatType.Attack, ref baseDamage);
@@ -197,5 +209,20 @@ namespace CombatSystem.Stats
             addingShields = desiredShields - currentShields;
         }
 
+        public static float CalculateBuffPower(in CombatStats performerStats)
+        {
+            return performerStats.SupportType * (
+                performerStats.BaseStats.BuffType +
+                performerStats.BuffStats.BuffType)
+                * (performerStats.BurstType.BuffType);
+        }
+
+        public static float CalculateBuffReceivePower(in CombatStats targetStats)
+        {
+            return targetStats.SupportType * (
+                   targetStats.BaseStats.ReceiveBuffType +
+                   targetStats.BuffStats.ReceiveBuffType) 
+                    * (targetStats.BurstType.ReceiveBuffType);
+        }
     }
 }

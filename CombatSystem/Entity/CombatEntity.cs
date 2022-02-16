@@ -4,6 +4,7 @@ using CombatSystem.Skills;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace CombatSystem.Entity
 {
@@ -12,7 +13,7 @@ namespace CombatSystem.Entity
         public CombatEntity(ICombatEntityProvider preparationData)
         {
 
-            _provider = preparationData;
+            Provider = preparationData;
 
             var baseStats = preparationData.GetBaseStats();
             var areaData = preparationData.GetAreaData();
@@ -31,18 +32,16 @@ namespace CombatSystem.Entity
             InjectTeam(team);
         }
 
-        [ShowInInspector, InlineEditor()]
-        private readonly ICombatEntityProvider _provider;
-
-        public string GetEntityName() => _provider.GetEntityName();
+        [ShowInInspector, InlineEditor()] 
+        public readonly ICombatEntityProvider Provider;
+        public GameObject InstantiationReference;
 
         [ShowInInspector]
         public readonly CombatStats Stats;
 
         [ShowInInspector]
         private readonly SkillsHolder _skillsHolder;
-        public IFullStanceStructureRead<IReadOnlyCollection<CombatSkill>> StanceSkills => _skillsHolder;
-        public IReadOnlyCollection<CombatSkill> AllSkills => _skillsHolder;
+       
 
 
         [ShowInInspector]
@@ -54,6 +53,12 @@ namespace CombatSystem.Entity
         public CombatTeam Team { get; private set; }
 
         private IStanceDataRead _teamStanceRead;
+
+
+
+        public string GetEntityName() => Provider.GetEntityName();
+        public IFullStanceStructureRead<IReadOnlyCollection<CombatSkill>> StanceSkills => _skillsHolder;
+        public IReadOnlyCollection<CombatSkill> AllSkills => _skillsHolder;
         public EnumTeam.StanceFull CurrentStance => _teamStanceRead.CurrentStance;
 
         private void InjectTeam(CombatTeam team)
@@ -79,7 +84,7 @@ namespace CombatSystem.Entity
         // ----- CLASSES
         private sealed class SkillsHolder : IFullStanceStructureRead<List<CombatSkill>>, IReadOnlyCollection<CombatSkill>
         {
-            public SkillsHolder(IStanceStructureRead<IReadOnlyCollection<ISkill>> skills)
+            public SkillsHolder(IStanceStructureRead<IReadOnlyCollection<IFullSkill>> skills)
             {
                 DisruptionStance = new List<CombatSkill>();
                 AttackingStance = GenerateSkills(skills.AttackingStance);
@@ -98,7 +103,7 @@ namespace CombatSystem.Entity
                     }
                 }
 
-                List<CombatSkill> GenerateSkills(IReadOnlyCollection<ISkill> presetSkills)
+                List<CombatSkill> GenerateSkills(IReadOnlyCollection<IFullSkill> presetSkills)
                 {
                     List<CombatSkill> generatedSkills;
                     if (presetSkills == null)
@@ -148,8 +153,8 @@ namespace CombatSystem.Entity
 
     public interface ICombatEntityProvider : ICombatEntityPreparation, ICombatEntityInfoHolder
     {
-        
-        IStanceStructureRead<IReadOnlyCollection<ISkill>> GetPresetSkills();
+        GameObject GetVisualPrefab();
+        IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills();
     }
 
     public interface ICombatEntityPreparation

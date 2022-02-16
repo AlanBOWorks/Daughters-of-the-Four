@@ -174,7 +174,7 @@ namespace CombatSystem.Stats
         /// Determines if the [<see cref="CombatEntity"/>] has the requirements to be affected by first call
         /// of actions/Tempo.
         /// </summary>
-        public static bool CanStartActing(CombatEntity entity)
+        public static bool CanRequestActing(CombatEntity entity)
         {
             var stats = entity.Stats;
             float actionsAmount = stats.BaseStats.ActionsType;
@@ -186,9 +186,16 @@ namespace CombatSystem.Stats
             return entity.AllSkills.Count > 0;
         }
 
+        private const float MaxActionAmount = 12f;
+        public static bool CanActRequest(in CombatEntity entity) => CanActRequest(entity.Stats);
         public static bool CanActRequest(in CombatStats stats)
         {
-            return stats.CurrentActions >= 1; //Decimal actions (half action for example) is considered invalid 
+            float actionsLimit =
+                stats.BaseStats.ActionsType + stats.BuffStats.ActionsType + stats.BurstStats.ActionsType;
+            if (actionsLimit > MaxActionAmount) actionsLimit = MaxActionAmount;
+
+            Debug.Log($"CA: {actionsLimit} / {stats.UsedActions}");
+            return stats.UsedActions < actionsLimit;
         }
 
         public static bool IsAlive(in CombatEntity entity) => IsAlive(entity.Stats);
@@ -199,8 +206,7 @@ namespace CombatSystem.Stats
 
         public static void ReduceActions(in CombatStats stats, in CombatSkill usedSkill)
         {
-            stats.CurrentActions -= usedSkill.SkillCost;
-            if (stats.CurrentActions < 0) stats.CurrentActions = 0;
+            stats.UsedActions += usedSkill.SkillCost;
         }
     }
 }

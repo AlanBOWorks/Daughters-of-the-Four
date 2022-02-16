@@ -163,7 +163,7 @@ namespace CombatSystem.Stats
         new T CurrentHealth { get; set; }
         new T CurrentMortality { get; set; }
         new T CurrentShields { get; set; }
-        new T CurrentActions { get; set; }
+        new T UsedActions { get; set; }
         new T CurrentInitiative { get; set; }
     }
 
@@ -172,7 +172,7 @@ namespace CombatSystem.Stats
         T CurrentHealth { set; }
         T CurrentMortality { set; }
         T CurrentShields { set; }
-        T CurrentActions { set; }
+        T UsedActions { set; }
         T CurrentInitiative { set; }
     }
     public interface ICombatStatsRead<out T> 
@@ -180,7 +180,7 @@ namespace CombatSystem.Stats
         T CurrentHealth { get; }
         T CurrentMortality { get; }
         T CurrentShields { get; }
-        T CurrentActions { get; }
+        T UsedActions { get; }
         T CurrentInitiative { get; }
     }
 

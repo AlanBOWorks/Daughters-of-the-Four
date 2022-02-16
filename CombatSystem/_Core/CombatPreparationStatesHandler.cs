@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace CombatSystem._Core
 {
-    public sealed class CombatStatesHandler : ICombatPreparationListener, ICombatStatesListener
+    public sealed class CombatPreparationStatesHandler : ICombatPreparationListener, ICombatStatesListener
     {
-        public CombatStatesHandler(SystemCombatEventsHolder eventsHolder)
+        public CombatPreparationStatesHandler(SystemCombatEventsHolder eventsHolder)
         {
             _eventsHolder = eventsHolder;
         }

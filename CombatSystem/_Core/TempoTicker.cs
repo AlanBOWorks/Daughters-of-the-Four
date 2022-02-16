@@ -195,14 +195,14 @@ namespace CombatSystem._Core
                 CurrentActingEntity = _activeEntities.Dequeue();
                 _tickingTrackers.Remove(CurrentActingEntity);
 
-                bool canAct = UtilsCombatStats.CanStartActing(CurrentActingEntity);
+                bool canAct = UtilsCombatStats.CanRequestActing(CurrentActingEntity);
 
                 // ------  INVOKE EVENTS: OnEntityRequestSequence() ------
                 combatEvents.OnEntityRequestSequence(CurrentActingEntity, canAct);
                 if (canAct)
                 {
-                    yield return Timing.WaitForOneFrame;
                     combatEvents.OnEntityRequestControl(CurrentActingEntity);
+                    yield return Timing.WaitForOneFrame; //safe wait for setting the request
                     yield return Timing.WaitUntilTrue(_entityHasFinishHandler);
 
                     // ------  INVOKE EVENTS: OnEntityFinishSequence() ------
@@ -230,7 +230,7 @@ namespace CombatSystem._Core
             var stats = entity.Stats;
             float actionsAmount = UtilsStatsFormula.CalculateActionsAmount(stats);
 
-            stats.CurrentActions += actionsAmount;
+            stats.UsedActions = 0;
         }
 
         public void OnEntityRequestControl(CombatEntity entity)
@@ -264,7 +264,7 @@ namespace CombatSystem._Core
         /// </summary>
         void OnEntityRequestSequence(CombatEntity entity, bool canAct);
         /// <summary>
-        /// Invoked per [<seealso cref="CombatStats.CurrentActions"/>] left.<br></br>
+        /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left.<br></br>
         /// If there's no actions left [<see cref="OnEntityFinishSequence"/>] will be invoked instead.
         /// </summary>
         void OnEntityRequestControl(CombatEntity entity);
@@ -274,7 +274,7 @@ namespace CombatSystem._Core
         /// </summary>
         void OnEntityFinishAction(CombatEntity entity);
         /// <summary>
-        /// The very last event invoked when there's no [<seealso cref="CombatStats.CurrentActions"/>] left or when
+        /// The very last event invoked when there's no [<seealso cref="CombatStats.UsedActions"/>] left or when
         /// the [<see cref="CombatEntity"/>] passes its actions somehow. <br></br>
         /// </summary>
         /// <param name="entity"></param>

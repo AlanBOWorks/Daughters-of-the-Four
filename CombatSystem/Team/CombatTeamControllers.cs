@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
@@ -5,7 +6,7 @@ using CombatSystem.Skills;
 using CombatSystem.Stats;
 using MEC;
 using Sirenix.OdinInspector;
-using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace CombatSystem.Team
 {
@@ -40,7 +41,8 @@ namespace CombatSystem.Team
         [ShowInInspector,HorizontalGroup()]
         public ITeamController EnemyTeamType { get; set; }
 
-        public bool CurrentControllerHasFinish() => CurrentController.HasFinish();
+        private bool _hasFinishCurrentEntity;
+        public bool CurrentControllerHasFinish() => _hasFinishCurrentEntity;
 
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -49,7 +51,7 @@ namespace CombatSystem.Team
 
             var controller = UtilsTeam.GetElement(entity, this);
             CurrentController = controller;
-            CurrentController.Injection(entity);
+            CurrentController.InjectionOnRequestSequence(entity);
         }
 
         public void OnEntityRequestControl(CombatEntity entity)
@@ -59,30 +61,48 @@ namespace CombatSystem.Team
 
         public void OnEntityFinishAction(CombatEntity entity)
         {
-            DoRequest(entity);
         }
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
         }
 
+        private CoroutineHandle _controlHandle;
         private void DoRequest(CombatEntity actingEntity)
         {
+            if (_controlHandle.IsRunning)
+                throw new AccessViolationException("Requesting control while there's an active control already");
+
+
             var controller = CurrentController;
 
-            var controlCoroutine = Timing.RunCoroutine(_DoControl());
-            CombatSystemSingleton.LinkCoroutineToMaster(in controlCoroutine);
+            _controlHandle = Timing.RunCoroutine(_DoControl());
+            CombatSystemSingleton.LinkCoroutineToMaster(in _controlHandle);
 
             IEnumerator<float> _DoControl()
             {
-                while (!controller.HasFinish())
+                UpdateHasFinishCurrentEntity();
+                while (!_hasFinishCurrentEntity)
                 {
-                    yield return Timing.WaitUntilDone(controller._ReadyToRequest(actingEntity));
+                    yield return Timing.WaitUntilDone(
+                        controller._ReadyToRequest(actingEntity));
+
                     controller.RequestAction(actingEntity, out var usedSkill, out var onTarget);
                     yield return Timing.WaitForOneFrame;
+
                     var eventsHolder = CombatSystemSingleton.EventsHolder;
-                    eventsHolder.OnSkillSubmit(in actingEntity, in usedSkill, in onTarget);
+                    eventsHolder.OnSkillSubmit(in actingEntity, in usedSkill, onTarget);
+                    UpdateHasFinishCurrentEntity();
                 }
+
+                //_hasFinishCurrentEntity = true; this always happens because the while(!(_hastFinishCurrentEntity == true)) happens
+            }
+
+            void UpdateHasFinishCurrentEntity()
+            {
+                _hasFinishCurrentEntity = 
+                    !UtilsCombatStats.CanActRequest(actingEntity) 
+                    || controller.HasForcedFinishControlling();
             }
         }
 
@@ -92,7 +112,7 @@ namespace CombatSystem.Team
     {
         private CombatStats _controlling;
 
-        public void Injection(CombatEntity entity)
+        public void InjectionOnRequestSequence(CombatEntity entity)
         {
             _controlling = entity.Stats;
         }
@@ -124,7 +144,7 @@ namespace CombatSystem.Team
             target = possibleTargets[randomPick];
         }
 
-        public bool HasFinish()
+        public bool HasForcedFinishControlling()
         {
             return !UtilsCombatStats.CanActRequest(in _controlling);
         }

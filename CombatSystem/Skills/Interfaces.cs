@@ -1,12 +1,18 @@
 using System.Collections.Generic;
 using CombatSystem.Entity;
+using UnityEngine;
 
 namespace CombatSystem.Skills
 {
+    public interface IFullSkill : ISkill
+    {
+        string GetSkillName();
+        Sprite GetSkillIcon();
+    }
+
     public interface ISkill
     {
         int SkillCost { get; }
-
         EnumsSkill.Archetype Archetype { get; }
         EnumsSkill.TargetType TargetType { get; }
 
@@ -37,5 +43,7 @@ namespace CombatSystem.Skills
         /// For one call only use [<seealso cref="OnSkillPerform"/>] better;
         /// </summary>
         void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect);
+
+        void OnSkillFinish();
     }
 }

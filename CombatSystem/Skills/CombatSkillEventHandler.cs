@@ -14,11 +14,17 @@ namespace CombatSystem.Skills
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
             usedSkill.DoSkill(in performer, in target);
+            usedSkill.IncreaseCost();
         }
 
         public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
         {
 
+        }
+
+        public void OnSkillFinish()
+        {
+            
         }
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -36,9 +42,9 @@ namespace CombatSystem.Skills
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
-            foreach (CombatSkill currentSkill in entity.AllSkills)
+            foreach (CombatSkill skill in entity.AllSkills)
             {
-                currentSkill.ResetCost();
+                skill.ResetCost();
             }
         }
     }

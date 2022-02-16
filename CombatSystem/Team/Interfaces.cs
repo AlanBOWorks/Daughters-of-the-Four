@@ -54,9 +54,12 @@ namespace CombatSystem.Team
 
     public interface ITeamController
     {
-        void Injection(CombatEntity entity);
+        void InjectionOnRequestSequence(CombatEntity entity);
+        /// <summary>
+        /// Request if the controller is ready for [<seealso cref="RequestAction"/>]
+        /// </summary>
         IEnumerator<float> _ReadyToRequest(CombatEntity performer);
         void RequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target);
-        bool HasFinish();
+        bool HasForcedFinishControlling();
     }
 }

@@ -2,16 +2,22 @@ using System;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using Utils;
 
 namespace CombatSystem.Skills
 {
     [CreateAssetMenu(fileName = "N [Skill Preset]",
         menuName = "Combat/Skill/Single Preset")]
-    public class SSkillPreset : ScriptableObject, ISkill
+    public class SSkillPreset : ScriptableObject, IFullSkill
     {
         [SerializeField] 
         private string skillName = "NULL";
+
+        [SerializeField, PreviewField] 
+        private Sprite skillIcon;
+
         [SerializeField]
         private int skillCost;
 
@@ -30,6 +36,7 @@ namespace CombatSystem.Skills
 
 
         public string GetSkillName() => skillName;
+        public Sprite GetSkillIcon() => skillIcon;
         public int SkillCost => skillCost;
         public EnumsSkill.TargetType TargetType => targetType;
         public EnumsSkill.Archetype Archetype => archetype;
@@ -44,6 +51,7 @@ namespace CombatSystem.Skills
                 eventsHolder.OnEffectPerform(in performer, in holderReference, in target, effectWrapper);
             }
         }
+
 
         [Serializable]
         private sealed class EffectWrapper : IEffect
@@ -73,5 +81,14 @@ namespace CombatSystem.Skills
             }
         }
 
+        [Button]
+        private void UpdateAssetName()
+        {
+            string generatedName = skillName;
+            generatedName = archetype.ToString().ToUpper() + " - " + generatedName;
+            generatedName += " [SkillPreset]";
+
+            UtilsAssets.UpdateAssetNameWithID(this, generatedName);
+        }
     }
 }

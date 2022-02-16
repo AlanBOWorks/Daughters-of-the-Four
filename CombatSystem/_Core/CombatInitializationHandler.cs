@@ -19,6 +19,8 @@ namespace CombatSystem._Core
             PrepareTeams(
                 playerTeam.GetSelectedCharacters(),
                 enemyTeam.GetSelectedCharacters());
+
+            PrepareTeamControllers();
         }
 
 
@@ -41,10 +43,49 @@ namespace CombatSystem._Core
             CombatSystemSingleton.AllMembersCollection = allMembers;
 
 
-            var combatStatesHandler = CombatSystemSingleton.CombatStatesHandler;
+            var combatStatesHandler = CombatSystemSingleton.CombatPreparationStatesHandler;
             combatStatesHandler.OnCombatPrepares(allMembers, playerCombatTeam, enemyCombatTeam);
+            InstantiateModels();
+
+
+            void InstantiateModels()
+            {
+                var teamPositionHandler = CombatSystemSingleton.PositionHandler;
+                HandlePositions(playerCombatTeam, teamPositionHandler.PlayerTeamType);
+                HandlePositions(enemyCombatTeam, teamPositionHandler.EnemyTeamType);
+
+                void HandlePositions(CombatTeam team, ITeamPositionHandler handler)
+                {
+                    foreach (CombatEntity member in team)
+                    {
+                        var provider = member.Provider;
+                        handler.ProvideInstantiationPoint(in provider, out var position, out var rotation);
+
+                        GameObject instantiatedGameObject;
+                        GameObject copyReference = provider.GetVisualPrefab();
+                        if (copyReference == null)
+                            instantiatedGameObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                        else
+                            instantiatedGameObject = Object.Instantiate(copyReference);
+
+                        var instantiatedTransform = instantiatedGameObject.transform;
+                        instantiatedTransform.position = position;
+                        instantiatedTransform.rotation = rotation;
+                        instantiatedGameObject.name = provider.GetEntityName() + "(Clone)";
+
+                        member.InstantiationReference = instantiatedGameObject;
+                    }
+                }
+            }
         }
 
+        private static void PrepareTeamControllers()
+        {
+            var teamControllersHolder = CombatSystemSingleton.TeamControllers;
+            var playerController = PlayerCombatSingleton.PlayerTeamController;
+
+            teamControllersHolder.PlayerTeamType = playerController;
+        }
 
 
 

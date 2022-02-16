@@ -1,0 +1,142 @@
+using System;
+using System.Collections.Generic;
+using CombatSystem._Core;
+using CombatSystem.Entity;
+using CombatSystem.Player.Events;
+using CombatSystem.Skills;
+using Sirenix.OdinInspector;
+using UnityEngine;
+
+namespace CombatSystem.Player.UI
+{
+    public class UTargetButtonsHolder : MonoBehaviour, IUIHoverListener, ITempoEntityStatesListener, 
+        ISkillSelectionListener,
+        ITargetSelectionListener, ITargetPointerListener
+    {
+        [ShowInInspector,ReadOnly]
+        private Dictionary<CombatEntity, UTargetButton> _buttonsDictionary;
+
+        private void Awake()
+        {
+            _buttonsDictionary = new Dictionary<CombatEntity, UTargetButton>();
+            var playerEventsHolder = PlayerCombatSingleton.PlayerCombatEvents;
+
+            playerEventsHolder.DiscriminationEventsHolder.Subscribe(this);
+
+            // This is an invoker and not a listener of (ITargetSelectionListener && ITargetPointerListener), so
+            // when subscribing as a normal listener will subscribe to those events as well and call
+            // recursively those events; creating an infinite loop of calls
+            // To solve it: manual subscription of ISKillSelection because this is its listening behaviour
+            playerEventsHolder.ManualSubscribe(this as ISkillSelectionListener);
+        }
+
+        public void OnHoverEntityCreated(in UUIHoverEntityHolder hover, in CombatEntity entity)
+        {
+            var targetButton = hover.GetComponentInChildren<UTargetButton>();
+            _buttonsDictionary.Add(entity,targetButton);
+            targetButton.Inject(entity);
+            targetButton.Inject(this);
+            targetButton.HideInstantly();
+        }
+
+        public void ClearEntities()
+        {
+            _buttonsDictionary.Clear();
+        }
+
+        [ShowInInspector]
+        private CombatEntity _currentControl;
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            _currentControl = entity;
+        }
+
+        public void OnEntityRequestControl(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishSequence(CombatEntity entity)
+        {
+        }
+
+        private CombatSkill _currentSelectedSkill;
+        public void OnSkillSelect(in CombatSkill skill)
+        {
+            
+        }
+
+        public void OnSkillSwitch(in CombatSkill skill)
+        {
+            if (_currentSelectedSkill != skill || _currentSelectedSkill == null)
+            {
+                HideTargets();
+                ShowTargets(in skill);
+            }
+            _currentSelectedSkill = skill;
+        }
+
+        public void OnSkillCancel(in CombatSkill skill)
+        {
+            HideTargets();
+            _currentSelectedSkill = null;
+        }
+
+        public void OnSkillSubmit(in CombatSkill skill)
+        {
+            HideTargets();
+            _currentSelectedSkill = null;
+        }
+
+        private void ShowTargets(in CombatSkill skill)
+        {
+            var possibleTargets = UtilsTarget.GetPossibleTargets(skill, _currentControl);
+            foreach (var target in possibleTargets)
+            {
+                _buttonsDictionary[target].ShowButton();
+            }
+        }
+
+        private void HideTargets()
+        {
+            foreach (var button in _buttonsDictionary)
+            {
+                button.Value.HideInstantly();
+            }
+        }
+
+        public void OnTargetSelect(in CombatEntity target)
+        {
+            PlayerCombatSingleton.PlayerCombatEvents.
+                OnTargetSelect(in target);
+        }
+
+        public void OnTargetCancel(in CombatEntity target)
+        {
+            PlayerCombatSingleton.PlayerCombatEvents.
+                OnTargetCancel(in target);
+        }
+
+        public void OnTargetSubmit(in CombatEntity target)
+        {
+            PlayerCombatSingleton.PlayerCombatEvents.
+                OnTargetSubmit(in target);
+            HideTargets();
+        }
+
+        public void OnTargetButtonHover(in CombatEntity target)
+        {
+            PlayerCombatSingleton.PlayerCombatEvents.
+               OnTargetButtonHover(in target);
+        }
+
+        public void OnTargetButtonExit(in CombatEntity target)
+        {
+            PlayerCombatSingleton.PlayerCombatEvents.
+                OnTargetButtonExit(in target);
+        }
+    }
+}

@@ -20,8 +20,10 @@ namespace CombatSystem._Core
 
             EventsHolder 
                 = systemEventsHolder;
-            CombatStatesHandler 
-                = new CombatStatesHandler(systemEventsHolder);
+            PositionHandler 
+                = new SpawnEntityPositionHandler();
+            CombatPreparationStatesHandler 
+                = new CombatPreparationStatesHandler(systemEventsHolder);
             TeamControllers 
                 = new CombatTeamControllersHandler();
 
@@ -38,10 +40,13 @@ namespace CombatSystem._Core
         public static GameObject AliveGameObjectReference { get; internal set; }
 
 
-        public static CombatStatesHandler CombatStatesHandler { get; }
+        public static CombatPreparationStatesHandler CombatPreparationStatesHandler { get; }
         // ------- EVENTS ------
         [ShowInInspector]
         public static SystemCombatEventsHolder EventsHolder { get; private set; }
+
+        // ------- ESSENTIALS ------
+        internal static SpawnEntityPositionHandler PositionHandler { get; }
 
         // ------- TEAM ------
         public static IReadOnlyList<CombatEntity> AllMembers => AllMembersCollection;

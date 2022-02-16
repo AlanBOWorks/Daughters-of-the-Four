@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CombatSystem.AI;
 using CombatSystem.Entity;
 using CombatSystem.Player;
 using CombatSystem.Skills;
@@ -29,14 +30,31 @@ namespace CombatSystem._Core
         // so the data represented is the more consistent for the player;
         // Solution: Manual invoke through code
         private readonly SystemEventsHolder _eventsHolder;
-        private PlayerCombatEventsHolder _playerCombatEvents;
+        private ControllerCombatEventsHolder _playerCombatEvents;
+        private ControllerCombatEventsHolder _enemyCombatEvents;
+        private CombatEntityEventsHolder _currentDiscriminatedEntityEventsHolder;
 
         public void SubscribeEventsHandler(PlayerCombatEventsHolder eventsHandler)
         {
             _playerCombatEvents = eventsHandler;
         }
 
+        public void SubscribeEventsHandler(EnemyCombatEventsHolder eventsHandler)
+        {
+            _enemyCombatEvents = eventsHandler;
+        }
+
+
         public void SubscribeListener(ICombatEventListener listener) => _eventsHolder.Subscribe(listener);
+
+        private void HandleCurrentEntityEventsHolder(in CombatEntity entity)
+        {
+            bool isPlayerEntity = CombatSystemSingleton.PlayerTeam.Contains(entity);
+            _currentDiscriminatedEntityEventsHolder = isPlayerEntity 
+                ? _playerCombatEvents.DiscriminationEventsHolder 
+                : _enemyCombatEvents.DiscriminationEventsHolder;
+        }
+
 
 
 
@@ -68,30 +86,43 @@ namespace CombatSystem._Core
         {
             _eventsHolder.OnEntityRequestSequence(entity,canAct);
             _playerCombatEvents.OnEntityRequestSequence(entity, canAct);
+
+            HandleCurrentEntityEventsHolder(in entity);
+            _currentDiscriminatedEntityEventsHolder.OnEntityRequestSequence(entity,canAct);
         }
 
         public void OnEntityRequestControl(CombatEntity entity)
         {
             _eventsHolder.OnEntityRequestControl(entity);
             _playerCombatEvents.OnEntityRequestControl(entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnEntityRequestControl(entity);
         }
 
         public void OnEntityFinishAction(CombatEntity entity)
         {
             _eventsHolder.OnEntityFinishAction(entity);
             _playerCombatEvents.OnEntityFinishAction(entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnEntityFinishAction(entity);
         }
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
             _eventsHolder.OnEntityFinishSequence(entity);
             _playerCombatEvents.OnEntityFinishSequence(entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity);
         }
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, CombatEntity target)
         {
             _eventsHolder.OnSkillSubmit(in performer, in usedSkill, in target);
             _playerCombatEvents.OnSkillSubmit(in performer, in usedSkill, in target);
+
+            _currentDiscriminatedEntityEventsHolder.OnSkillSubmit(in performer, in usedSkill, target);
 
             // Manual sequence Flow
             OnSkillPerform(in performer,in usedSkill, in target);
@@ -101,12 +132,19 @@ namespace CombatSystem._Core
         {
             _eventsHolder.OnSkillPerform(in performer, in usedSkill, in target);
             _playerCombatEvents.OnSkillPerform(in performer, in usedSkill, in target);
+
+            _currentDiscriminatedEntityEventsHolder.OnSkillPerform(in performer, in usedSkill, in target);
+
+            //todo wait until skill ends (animation)
+            OnEntityFinishAction(performer);
         }
 
         public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
         {
             _eventsHolder.OnEffectPerform(in performer,in usedSkill,in target, in effect);
             _playerCombatEvents.OnEffectPerform(in performer,in usedSkill,in target, in effect);
+
+            _currentDiscriminatedEntityEventsHolder.OnEffectPerform(in performer, in usedSkill, target, effect);
         }
 
 
@@ -164,7 +202,6 @@ namespace CombatSystem._Core
 
             public void OnTick()
             {
-                Debug.Log("Tick");
             }
 
             public void OnRoundPassed()
@@ -184,7 +221,7 @@ namespace CombatSystem._Core
                           $"Random Controller: {performer.GetEntityName()} / " +
                           $"Used : {usedSkill.Preset} /" +
                           $"Target: {target.GetEntityName()}");
-                Debug.Log($"ACTIONS LEFT: {performer.Stats.CurrentActions}");
+                Debug.Log($"ACTIONS Used: {performer.Stats.UsedActions}");
             }
 
             public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
@@ -196,58 +233,105 @@ namespace CombatSystem._Core
             {
                 Debug.Log($"Effect performed  {performer.GetEntityName()} / On target: {target.GetEntityName()} ");
             }
+
+            public void OnSkillFinish()
+            {
+                Debug.Log("-------------- SKILL END --------------- ");
+            }
         }
         #endregion
 #endif
     }
 
-    public interface IEventsHolder : ICombatPreparationListener, ICombatStatesListener,
-        ITempoEntityStatesListener,
-        ISkillUsageListener
-    { }
 
-    public abstract class CombatEventsHolder : IEventsHolder
-        
+    public abstract class ControllerCombatEventsHolder : CombatEventsHolder
     {
-        protected CombatEventsHolder()
+        private protected ControllerCombatEventsHolder() : base()
         {
-            CombatPreparationListeners = new HashSet<ICombatPreparationListener>();
-            CombatStatesListeners = new HashSet<ICombatStatesListener>();
-            TempoEntityListeners = new HashSet<ITempoEntityStatesListener>();
-            SkillUsageListeners = new HashSet<ISkillUsageListener>();
+            _tempoTickListeners = new HashSet<ITempoTickListener>();
+
+            DiscriminationEventsHolder = new CombatEntityEventsHolder();
+        }
+
+        [ShowInInspector]
+        private readonly HashSet<ITempoTickListener> _tempoTickListeners;
+
+        public readonly CombatEntityEventsHolder DiscriminationEventsHolder;
+
+        protected override void SubscribeTempo(ITempoTickListener tickListener)
+        {
+            _tempoTickListeners.Add(tickListener);
+        }
+
+        public void OnStartTicking()
+        {
+            foreach (var listener in _tempoTickListeners)
+            {
+                listener.OnStartTicking();
+            }
+        }
+
+        public void OnTick()
+        {
+            foreach (var listener in _tempoTickListeners)
+            {
+                listener.OnTick();
+            }
+        }
+
+        public void OnRoundPassed()
+        {
+            foreach (var listener in _tempoTickListeners)
+            {
+                listener.OnRoundPassed();
+            }
+        }
+
+        public void OnStopTicking()
+        {
+            foreach (var listener in _tempoTickListeners)
+            {
+                listener.OnStopTicking();
+            }
+        }
+
+        public CombatEntityEventsHolder GetDiscriminationEventsHolder() => DiscriminationEventsHolder;
+    }
+
+    public abstract class CombatEventsHolder : CombatEntityEventsHolder,IEventsHolder, ICombatEntityExistenceListener
+
+    {
+        protected CombatEventsHolder() : base()
+        {
+            _combatPreparationListeners = new HashSet<ICombatPreparationListener>();
+            _combatStatesListeners = new HashSet<ICombatStatesListener>();
+            _entitiesExistenceListeners = new HashSet<ICombatEntityExistenceListener>();
         }
         
 
         [Title("Events")] 
         [ShowInInspector]
-        protected readonly ICollection<ICombatPreparationListener> CombatPreparationListeners;
-        [ShowInInspector]
-        protected readonly ICollection<ICombatStatesListener> CombatStatesListeners;
-        [ShowInInspector]
-        protected readonly ICollection<ITempoEntityStatesListener> TempoEntityListeners;
+        private readonly ICollection<ICombatPreparationListener> _combatPreparationListeners;
         [ShowInInspector] 
-        protected readonly ICollection<ISkillUsageListener> SkillUsageListeners;
+        private readonly ICollection<ICombatStatesListener> _combatStatesListeners;
+        [ShowInInspector] 
+        private readonly ICollection<ICombatEntityExistenceListener> _entitiesExistenceListeners;
 
 
-        public void Subscribe(ICombatEventListener listener)
+
+        public override void Subscribe(ICombatEventListener listener)
         {
-            if(listener == null)
-                throw new ArgumentNullException(nameof(listener), "Event listener can't be Null");
+            base.Subscribe(listener);
 
             if (listener is ICombatPreparationListener preparationListener)
-                CombatPreparationListeners.Add(preparationListener);
+                _combatPreparationListeners.Add(preparationListener);
 
             if(listener is ICombatStatesListener combatStatesListener)
-                CombatStatesListeners.Add(combatStatesListener);
+                _combatStatesListeners.Add(combatStatesListener);
 
             if (listener is ITempoTickListener tickListener)
                 SubscribeTempo(tickListener);
 
-            if (listener is ITempoEntityStatesListener tempoEntityListener)
-                TempoEntityListeners.Add(tempoEntityListener);
-
-            if(listener is ISkillUsageListener skillUsageListener)
-                SkillUsageListeners.Add(skillUsageListener);
         }
 
         protected abstract void SubscribeTempo(ITempoTickListener tickListener);
@@ -255,7 +339,7 @@ namespace CombatSystem._Core
 
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            foreach (var listener in CombatPreparationListeners)
+            foreach (var listener in _combatPreparationListeners)
             {
                 listener.OnCombatPrepares(allMembers, playerTeam, enemyTeam);
             }
@@ -263,7 +347,7 @@ namespace CombatSystem._Core
 
         public void OnCombatStart()
         {
-            foreach (var listener in CombatStatesListeners)
+            foreach (var listener in _combatStatesListeners)
             {
                 listener.OnCombatStart();
             }
@@ -271,7 +355,7 @@ namespace CombatSystem._Core
 
         public void OnCombatFinish()
         {
-            foreach (var listener in CombatStatesListeners)
+            foreach (var listener in _combatStatesListeners)
             {
                 listener.OnCombatFinish();
             }
@@ -279,15 +363,66 @@ namespace CombatSystem._Core
 
         public void OnCombatQuit()
         {
-            foreach (var listener in CombatStatesListeners)
+            foreach (var listener in _combatStatesListeners)
             {
                 listener.OnCombatQuit();
             }
         }
 
+        public void OnCreateEntity(in CombatEntity entity, in bool isPlayers)
+        {
+            foreach (var listener in _entitiesExistenceListeners)
+            {
+                listener.OnCreateEntity(in entity, in isPlayers);
+            }
+        }
+
+        public void OnDestroyEntity(in CombatEntity entity, in bool isPlayers)
+        {
+            foreach (var listener in _entitiesExistenceListeners)
+            {
+                listener.OnDestroyEntity(in entity, in isPlayers);
+            }
+        }
+    }
+
+    public class CombatEntityEventsHolder : ITempoEntityStatesListener, ISkillUsageListener
+    {
+        public CombatEntityEventsHolder()
+        {
+            _tempoEntityListeners = new HashSet<ITempoEntityStatesListener>();
+            _skillUsageListeners = new HashSet<ISkillUsageListener>();
+        }
+
+        [ShowInInspector] private readonly ICollection<ITempoEntityStatesListener> _tempoEntityListeners;
+        [ShowInInspector] private readonly ICollection<ISkillUsageListener> _skillUsageListeners;
+
+
+        public virtual void Subscribe(ICombatEventListener listener)
+        {
+            if (listener == null)
+                throw new ArgumentNullException(nameof(listener), "Event listener can't be Null");
+
+
+            if (listener is ITempoEntityStatesListener tempoEntityListener)
+                _tempoEntityListeners.Add(tempoEntityListener);
+
+            if (listener is ISkillUsageListener skillUsageListener)
+                _skillUsageListeners.Add(skillUsageListener);
+        }
+
+        public void ManualSubscribe(ITempoEntityStatesListener tempoEntityListener)
+        {
+            _tempoEntityListeners.Add(tempoEntityListener);
+        }
+        public void ManualSubscribe(ISkillUsageListener skillUsageListener)
+        {
+            _skillUsageListeners.Add(skillUsageListener);
+        }
+
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            foreach (var listener in TempoEntityListeners)
+            foreach (var listener in _tempoEntityListeners)
             {
                 listener.OnEntityRequestSequence(entity, canAct);
             }
@@ -295,7 +430,7 @@ namespace CombatSystem._Core
 
         public void OnEntityRequestControl(CombatEntity entity)
         {
-            foreach (var listener in TempoEntityListeners)
+            foreach (var listener in _tempoEntityListeners)
             {
                 listener.OnEntityRequestControl(entity);
             }
@@ -303,7 +438,7 @@ namespace CombatSystem._Core
 
         public void OnEntityFinishAction(CombatEntity entity)
         {
-            foreach (var listener in TempoEntityListeners)
+            foreach (var listener in _tempoEntityListeners)
             {
                 listener.OnEntityFinishAction(entity);
             }
@@ -311,7 +446,7 @@ namespace CombatSystem._Core
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
-            foreach (var listener in TempoEntityListeners)
+            foreach (var listener in _tempoEntityListeners)
             {
                 listener.OnEntityFinishSequence(entity);
             }
@@ -319,7 +454,7 @@ namespace CombatSystem._Core
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            foreach (var listener in SkillUsageListeners)
+            foreach (var listener in _skillUsageListeners)
             {
                 listener.OnSkillSubmit(in performer, in usedSkill, in target);
             }
@@ -327,7 +462,7 @@ namespace CombatSystem._Core
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            foreach (var listener in SkillUsageListeners)
+            foreach (var listener in _skillUsageListeners)
             {
                 listener.OnSkillPerform(in performer, in usedSkill, in target);
             }
@@ -335,15 +470,46 @@ namespace CombatSystem._Core
 
         public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
         {
-            foreach (var listener in SkillUsageListeners)
+            foreach (var listener in _skillUsageListeners)
             {
                 listener.OnEffectPerform(in performer, in usedSkill, in target, in effect);
             }
         }
+
+        public void OnSkillFinish()
+        {
+            foreach (var listener in _skillUsageListeners)
+            {
+                listener.OnSkillFinish();
+            }
+        }
+    }
+
+
+    public interface IEventsHolder : ICombatPreparationListener, ICombatStatesListener,
+        ICombatEntityExistenceListener,
+        ITempoEntityStatesListener,
+        ISkillUsageListener
+    { }
+
+
+    public interface ICombatEntityExistenceListener : ICombatEventListener
+    {
+        void OnCreateEntity(in CombatEntity entity, in bool isPlayers);
+        void OnDestroyEntity(in CombatEntity entity, in bool isPlayers);
     }
 
     /// <summary>
-    /// An eventListener interface to extend for (others eventListeners types should extend from this to
+    /// EventsHolder that will be summon if the associated [<see cref="CombatEntity"/>] belongs to them
+    /// </summary>
+    public interface IDiscriminationEventsHolder
+    {
+        CombatEntityEventsHolder GetDiscriminationEventsHolder();
+    }
+
+
+    /// <summary>
+    /// An eventListener interface to extend from (others eventListeners types should extend from this to
     /// be assorted correctly)
     /// </summary>
     public interface ICombatEventListener

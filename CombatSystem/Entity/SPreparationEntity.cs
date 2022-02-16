@@ -16,6 +16,8 @@ namespace CombatSystem.Entity
         [Title("Info")]
         [SerializeField] private string entityName = "NULL";
 
+        [SerializeField] private GameObject instantiationObject;
+
         [SerializeField]
         private PreparationEntity preparationData = new PreparationEntity();
         internal PreparationEntity GetPreparationEntity() => preparationData;
@@ -23,9 +25,11 @@ namespace CombatSystem.Entity
 
         public string GetEntityName() => entityName;
 
+        public GameObject GetVisualPrefab() => instantiationObject;
+
         public IStatsRead<float> GetBaseStats() => preparationData.GetBaseStats();
         public TeamAreaData GetAreaData() => preparationData.GetAreaData();
-        public IStanceStructureRead<IReadOnlyCollection<ISkill>> GetPresetSkills() => preparationData.GetPresetSkills();
+        public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => preparationData.GetPresetSkills();
 
         protected virtual string AssetPrefix() => AssetPrefixName;
         private const string AssetPrefixName = "[BASIC Preparation Entity]";
@@ -62,7 +66,7 @@ namespace CombatSystem.Entity
 
         public IStatsRead<float> GetBaseStats() => baseStats;
         public TeamAreaData GetAreaData() => Team.UtilsTeam.GenerateAreaData(role);
-        public IStanceStructureRead<IReadOnlyCollection<ISkill>> GetPresetSkills() => skills;
+        public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => skills;
 
 
         [Serializable]
@@ -74,16 +78,16 @@ namespace CombatSystem.Entity
             }
         }
         [Serializable]
-        private sealed class EntitySkills : IStanceStructureRead<IReadOnlyCollection<ISkill>>
+        private sealed class EntitySkills : IStanceStructureRead<IReadOnlyCollection<IFullSkill>>
         {
             [SerializeField] private SSkillPreset[] attackingSkills;
             [SerializeField] private SSkillPreset[] neutralSkills;
             [SerializeField] private SSkillPreset[] defendingSkills;
 
 
-            public IReadOnlyCollection<ISkill> AttackingStance => attackingSkills;
-            public IReadOnlyCollection<ISkill> NeutralStance => neutralSkills;
-            public IReadOnlyCollection<ISkill> DefendingStance => defendingSkills;
+            public IReadOnlyCollection<IFullSkill> AttackingStance => attackingSkills;
+            public IReadOnlyCollection<IFullSkill> NeutralStance => neutralSkills;
+            public IReadOnlyCollection<IFullSkill> DefendingStance => defendingSkills;
         }
     }
 }

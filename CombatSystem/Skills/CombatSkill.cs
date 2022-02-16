@@ -4,16 +4,19 @@ using UnityEngine;
 
 namespace CombatSystem.Skills
 {
-    public class CombatSkill : ISkill
+    public class CombatSkill : IFullSkill
     {
-        public CombatSkill(ISkill preset)
+        public CombatSkill(IFullSkill preset)
         {
             Preset = preset;
             SkillCost = preset.SkillCost;
         }
 
         [ShowInInspector,InlineEditor()]
-        public readonly ISkill Preset;
+        public readonly IFullSkill Preset;
+
+        public string GetSkillName() => Preset.GetSkillName();
+        public Sprite GetSkillIcon() => Preset.GetSkillIcon();
         [ShowInInspector]
         public int SkillCost { get; private set; }
         public EnumsSkill.Archetype Archetype => Preset.Archetype;
@@ -23,10 +26,15 @@ namespace CombatSystem.Skills
             Preset.DoSkill(in performer, in target, in holderReference);
         }
 
+
         public void DoSkill(in CombatEntity performer, in CombatEntity target) =>
             DoSkill(in performer, in target, this);
 
-
+        public void IncreaseCost()
+        {
+            if(SkillCost < 0) return;
+            SkillCost++;
+        }
         public void ResetCost()
         {
             SkillCost = Preset.SkillCost;

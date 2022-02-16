@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using CombatSystem._Core;
 using CombatSystem.Entity;
-using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -16,6 +14,16 @@ namespace CombatSystem.Player
         public PlayerCombatSingleton()
         {
             PlayerCombatEvents = new PlayerCombatEventsHolder();
+            PlayerTeamController = new PlayerTeamController();
+
+            var playerEvents = 
+                PlayerCombatEvents;
+            var discriminationEvents =
+                playerEvents.DiscriminationEventsHolder;
+
+            var teamController = PlayerTeamController;
+            discriminationEvents.Subscribe(teamController);
+            playerEvents.SubscribeAsPlayerEvent(teamController);
         }
 
         static PlayerCombatSingleton()
@@ -27,12 +35,16 @@ namespace CombatSystem.Player
 
         [ShowInInspector]
         public static PlayerCombatEventsHolder PlayerCombatEvents { get; private set; }
+        [ShowInInspector]
+        public static PlayerTeamController PlayerTeamController { get; private set; }
 
 
         [ShowInInspector]
         internal static readonly PlayerSelectedCharactersHolder SelectedCharactersHolder;
         public static IReadOnlyCollection<ICombatEntityProvider> SelectedCharacters => SelectedCharactersHolder;
 
+        [ShowInInspector]
+        public static Camera InterfaceCombatCamera { get; internal set; }
     }
 
     public sealed class PlayerCombatSingletonEditorWindow : OdinEditorWindow

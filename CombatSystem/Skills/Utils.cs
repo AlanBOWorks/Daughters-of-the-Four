@@ -50,7 +50,7 @@ namespace CombatSystem.Skills
                 case EnumsSkill.Archetype.Offensive:
                     return GetOffensiveTargets();
                 case EnumsSkill.Archetype.Support:
-                    return TargetingHelper;
+                    return GetTeamAsExcluded(in performer);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
