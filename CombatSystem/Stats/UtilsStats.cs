@@ -194,7 +194,6 @@ namespace CombatSystem.Stats
                 stats.BaseStats.ActionsType + stats.BuffStats.ActionsType + stats.BurstStats.ActionsType;
             if (actionsLimit > MaxActionAmount) actionsLimit = MaxActionAmount;
 
-            Debug.Log($"CA: {actionsLimit} / {stats.UsedActions}");
             return stats.UsedActions < actionsLimit;
         }
 
@@ -204,7 +203,7 @@ namespace CombatSystem.Stats
             return stats.CurrentMortality > 0 || stats.CurrentHealth > 0;
         }
 
-        public static void ReduceActions(in CombatStats stats, in CombatSkill usedSkill)
+        public static void TickActions(in CombatStats stats, in CombatSkill usedSkill)
         {
             stats.UsedActions += usedSkill.SkillCost;
         }

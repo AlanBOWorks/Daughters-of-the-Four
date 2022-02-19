@@ -41,10 +41,14 @@ namespace CombatSystem.Player
         private CombatSkill _selectedSkill;
         [ShowInInspector]
         private CombatEntity _skillOnTarget;
-        public void RequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target)
+        public void PerformRequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target)
         {
             usedSkill = _selectedSkill;
             target = _skillOnTarget;
+
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            playerEvents.OnSkillSubmit(in usedSkill);
+            playerEvents.OnTargetSubmit(in target);
         }
 
         internal bool IsFinishControlling;
@@ -55,12 +59,17 @@ namespace CombatSystem.Player
 
         public void OnSkillSelect(in CombatSkill skill)
         {
-            _selectedSkill = skill;
         }
 
-        public void OnSkillSwitch(in CombatSkill skill)
+        public void OnSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)
         {
-            
+            _selectedSkill = skill;
+
+        }
+
+        public void OnSkillDeselect(in CombatSkill skill)
+        {
+            _selectedSkill = null;
         }
 
         public void OnSkillCancel(in CombatSkill skill)
@@ -69,7 +78,6 @@ namespace CombatSystem.Player
 
         public void OnSkillSubmit(in CombatSkill skill)
         {
-            _selectedSkill = skill;
         }
 
         public void OnTargetSelect(in CombatEntity target)
@@ -83,7 +91,6 @@ namespace CombatSystem.Player
 
         public void OnTargetSubmit(in CombatEntity target)
         {
-            _skillOnTarget = target;
         }
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)

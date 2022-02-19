@@ -63,32 +63,30 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        private CombatSkill _currentSelectedSkill;
         public void OnSkillSelect(in CombatSkill skill)
         {
             
         }
 
-        public void OnSkillSwitch(in CombatSkill skill)
+        public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
         {
-            if (_currentSelectedSkill != skill || _currentSelectedSkill == null)
-            {
-                HideTargets();
-                ShowTargets(in skill);
-            }
-            _currentSelectedSkill = skill;
+            HideTargets();
+            ShowTargets(in skill);
+        }
+
+        public void OnSkillDeselect(in CombatSkill skill)
+        {
+            HideTargets();
         }
 
         public void OnSkillCancel(in CombatSkill skill)
         {
-            HideTargets();
-            _currentSelectedSkill = null;
+            
         }
 
         public void OnSkillSubmit(in CombatSkill skill)
         {
-            HideTargets();
-            _currentSelectedSkill = null;
+            
         }
 
         private void ShowTargets(in CombatSkill skill)
@@ -96,7 +94,9 @@ namespace CombatSystem.Player.UI
             var possibleTargets = UtilsTarget.GetPossibleTargets(skill, _currentControl);
             foreach (var target in possibleTargets)
             {
-                _buttonsDictionary[target].ShowButton();
+                var buttonHolder = _buttonsDictionary[target];
+                buttonHolder.enabled = true;
+                buttonHolder.ShowButton();
             }
         }
 
@@ -104,7 +104,9 @@ namespace CombatSystem.Player.UI
         {
             foreach (var button in _buttonsDictionary)
             {
-                button.Value.HideInstantly();
+                var buttonHolder = button.Value;
+                buttonHolder.enabled = false;
+                buttonHolder.Hide();
             }
         }
 
@@ -112,19 +114,16 @@ namespace CombatSystem.Player.UI
         {
             PlayerCombatSingleton.PlayerCombatEvents.
                 OnTargetSelect(in target);
+            HideTargets();
         }
 
         public void OnTargetCancel(in CombatEntity target)
         {
-            PlayerCombatSingleton.PlayerCombatEvents.
-                OnTargetCancel(in target);
+            
         }
 
         public void OnTargetSubmit(in CombatEntity target)
         {
-            PlayerCombatSingleton.PlayerCombatEvents.
-                OnTargetSubmit(in target);
-            HideTargets();
         }
 
         public void OnTargetButtonHover(in CombatEntity target)

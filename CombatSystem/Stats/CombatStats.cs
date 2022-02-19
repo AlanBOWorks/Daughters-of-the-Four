@@ -11,7 +11,7 @@ namespace CombatSystem.Stats
         {
             BaseStats = baseStats;
             BuffStats = new StatsBase<float>(0);
-            BurstStats = new StatsBase<float>(1);
+            BurstStats = new BurstStats();
 
             // --------------------- 
             // Master's assignation
@@ -21,17 +21,7 @@ namespace CombatSystem.Stats
             VitalityType = 1;
             ConcentrationType = 1;
             UtilsStats.DoCopyMaster(this, baseStats);
-
-
-
-            // Because how calculations are made and Burst in its constructor has all values at 1 the
-            // calculations are mistaken, for that just fix by assigning the necessary parts to the desired values
-            FixValuesBurstType(); void FixValuesBurstType()
-            {
-                UtilsStats.OverrideValuesVitality(BurstStats, 0);
-                UtilsStats.OverrideValuesConcentration(BurstStats, 0);
-            }
-
+            
 
             // --------------------- 
             // Special case's assignation
@@ -55,7 +45,7 @@ namespace CombatSystem.Stats
         // Base stats comes from predefined data structures that can't be altered, that's why it only readable
         public readonly IStatsRead<float> BaseStats;
         public readonly StatsBase<float> BuffStats;
-        public readonly StatsBase<float> BurstStats;
+        public readonly BurstStats BurstStats;
 
         /// <summary>
         /// It's just the [<see cref="IStatsTypesRead{T}"/>] implementation for [<see cref="BaseStats"/>]
@@ -110,8 +100,17 @@ namespace CombatSystem.Stats
 
         public bool IsAlive()
         {
-            return CurrentMortality > 0 || CurrentHealth > 0;
+            return CurrentHealth > 0 || CurrentMortality > 0;
         }
 
+
+        public void OnSequenceStart()
+        {
+            BurstStats.OnEntityStartSequence();
+        }
+        public void OnSequenceFinish()
+        {
+            BurstStats.OnEntityFinishSequence();
+        }
     }
 }

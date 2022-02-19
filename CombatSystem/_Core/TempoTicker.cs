@@ -228,8 +228,6 @@ namespace CombatSystem._Core
             if(!canAct) return;
 
             var stats = entity.Stats;
-            float actionsAmount = UtilsStatsFormula.CalculateActionsAmount(stats);
-
             stats.UsedActions = 0;
         }
 

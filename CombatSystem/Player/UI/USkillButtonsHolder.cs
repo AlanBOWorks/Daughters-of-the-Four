@@ -32,6 +32,9 @@ namespace CombatSystem.Player.UI
 
             _instantiationPool = new Stack<UCombatSkillButton>();
             _activeButtons = new Dictionary<CombatSkill, UCombatSkillButton>();
+
+            //Hide the reference (is used as a visual key for UI Design)
+            clonableSkillButton.gameObject.SetActive(false);
         }
 
         private void Start()
@@ -91,12 +94,11 @@ namespace CombatSystem.Player.UI
                     var buttonHolder = button.Value;
                     var buttonTransform = (RectTransform) buttonHolder.transform;
 
-
                     Vector2 targetPoint = index * (buttonsSeparations + _buttonSizes);
 
                     buttonTransform.localPosition = lastPoint;
                     buttonTransform.DOLocalMove(targetPoint, AnimationDuration);
-                    buttonHolder.ShowButton();
+                    EnableButton(in buttonHolder);
 
 
                     lastPoint = targetPoint;
@@ -105,17 +107,18 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        private void HideSkillInstant()
+        private static void EnableButton(in UCombatSkillButton buttonHolder)
         {
-            foreach (var button in _activeButtons)
-            {
-                var buttonHolder = button.Value;
-                buttonHolder.HideButton();
-                buttonHolder.ResetState();
-            }
+            buttonHolder.enabled = true;
+            buttonHolder.ShowButton();
         }
-
-
+        private static void DisableButton(in UCombatSkillButton buttonHolder)
+        {
+            buttonHolder.enabled = false;
+            buttonHolder.HideButton();
+            buttonHolder.ResetState();
+        }
+        
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
         }
@@ -134,17 +137,16 @@ namespace CombatSystem.Player.UI
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
-            ReturnSkillToStack();
+            ReturnSkillsToStack();
             _activeButtons.Clear();
         }
 
-        private void ReturnSkillToStack()
+        private void ReturnSkillsToStack()
         {
             foreach (var button in _activeButtons)
             {
                 var buttonHolder = button.Value;
-                buttonHolder.HideButton();
-                buttonHolder.ResetState();
+                DisableButton(in buttonHolder);
                 _instantiationPool.Push(buttonHolder);
             }
         }
@@ -154,37 +156,39 @@ namespace CombatSystem.Player.UI
         private CombatSkill _currentSelectedSkill;
         public void OnSkillSelect(in CombatSkill skill)
         {
-            OnSkillSwitch(in skill);
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillSelect(in skill);
+            OnSkillSwitch(in skill, in _currentSelectedSkill);
         }
 
-        public void OnSkillSwitch(in CombatSkill skill)
+        public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
         {
             if(skill == null) return; //this prevents null skills and (_currentSelectedSkill = null) == skill check
 
-            if (_currentSelectedSkill == skill)
+            if (previousSelection == skill)
             {
                 _currentSelectedSkill = null;
-                OnSkillCancel(in skill);
+                OnSkillDeselect(in skill);
             }
             else
             {
                 _currentSelectedSkill = skill;
                 _activeButtons[skill].SelectButton();
-                PlayerCombatSingleton.PlayerCombatEvents.OnSkillSwitch(in skill);
+                PlayerCombatSingleton.PlayerCombatEvents.OnSkillSwitch(in skill, previousSelection);
             }
         }
 
-        public void OnSkillCancel(in CombatSkill skill)
+        public void OnSkillDeselect(in CombatSkill skill)
         {
             _activeButtons[skill].DeSelectButton();
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillCancel(in skill);
+            PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(in skill);
+        }
+        public void OnSkillCancel(in CombatSkill skill)
+        {
         }
         public void OnSkillSubmit(in CombatSkill skill)
         {
             DeselectSkill(in _currentSelectedSkill);
             _currentSelectedSkill = null;
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillSubmit(in skill);
         }
 
         private void DeselectSkill(in CombatSkill skill)

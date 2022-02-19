@@ -110,9 +110,9 @@ namespace CombatSystem._Core
 
     public sealed class CombatInitializationEditorWindow : OdinEditorWindow
     {
-        [Title("Player"),HorizontalGroup()]
+        [Title("Player")]
         public SPlayerPresetTeam playerTesterTeam;
-        [Title("Adversary"), HorizontalGroup()]
+        [Title("Adversary")]
         public SPredefinedTeam oppositionTeam;
 
 

@@ -14,15 +14,26 @@ namespace CombatSystem.Skills.Effects
             var targetStats = target.Stats;
             float bufferPower = UtilsStatsEffects.CalculateBuffPower(in performerStats);
             float receivePower = UtilsStatsEffects.CalculateBuffReceivePower(in targetStats);
-            
-            var buffingStats = isBurst ? targetStats.BurstStats : targetStats.BuffStats;
+
+            IBasicStats<float> buffingStats;
+            if (isBurst)
+            {
+                var burstStats = targetStats.BurstStats;
+                buffingStats = performer == target 
+                    ? burstStats.SelfBuffs 
+                    : burstStats.AlliesBuffs;
+            }
+            else
+            {
+                buffingStats = targetStats.BuffStats;
+            }
 
             DoBuff(in bufferPower, in receivePower, in effectValue, in buffingStats);
         }
 
         protected abstract void DoBuff(in float performerBuffPower, in float targetBuffReceivePower,
             in float effectValue,
-            in StatsBase<float> buffingStats);
+            in IBasicStats<float> buffingStats);
 
         protected string GenerateAssetName(in string statTypeName)
         {

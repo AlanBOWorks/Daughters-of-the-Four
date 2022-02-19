@@ -11,10 +11,11 @@ namespace CombatSystem.Skills.Effects
     {
         [SerializeField] private EnumStats.SupportStatType type;
 
-        protected override void DoBuff(in float performerBuffPower, in float targetBuffReceivePower, in float effectValue,
-            in StatsBase<float> buffingStats)
+        protected override void DoBuff(in float performerBuffPower, in float targetBuffReceivePower,
+            in float effectValue,
+            in IBasicStats<float> buffingStats)
         {
-            float buffingValue = UtilsStatsEffects.CalculateSupportStatBuffed(
+            float buffingValue = UtilsStatsEffects.CalculateSupportStatBuffValue(
                 in performerBuffPower,
                 in targetBuffReceivePower,
                 in effectValue);

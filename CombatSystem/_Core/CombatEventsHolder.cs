@@ -29,6 +29,7 @@ namespace CombatSystem._Core
         // Problem: PlayerEvents could be invoked before core events while it should always be invoked last
         // so the data represented is the more consistent for the player;
         // Solution: Manual invoke through code
+        [ShowInInspector]
         private readonly SystemEventsHolder _eventsHolder;
         private ControllerCombatEventsHolder _playerCombatEvents;
         private ControllerCombatEventsHolder _enemyCombatEvents;
@@ -89,6 +90,10 @@ namespace CombatSystem._Core
 
             HandleCurrentEntityEventsHolder(in entity);
             _currentDiscriminatedEntityEventsHolder.OnEntityRequestSequence(entity,canAct);
+
+
+            // Resets
+            entity.Stats.OnSequenceStart();
         }
 
         public void OnEntityRequestControl(CombatEntity entity)
@@ -115,6 +120,9 @@ namespace CombatSystem._Core
             _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity);
 
             _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity);
+
+            // Resets
+            entity.Stats.OnSequenceFinish();
         }
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, CombatEntity target)

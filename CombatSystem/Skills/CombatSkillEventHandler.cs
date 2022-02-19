@@ -8,7 +8,7 @@ namespace CombatSystem.Skills
     {
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            UtilsCombatStats.ReduceActions(performer.Stats, in usedSkill);
+            UtilsCombatStats.TickActions(performer.Stats, in usedSkill);
         }
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)

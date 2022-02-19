@@ -9,16 +9,22 @@ namespace CombatSystem.Stats
         T BurstType { get; }
     }
 
-    public interface IStats<T> : IStatsRead<T>, IStatsInject<T>,
-        IMainStats<T>,
-        IOffensiveStats<T>, ISupportStats<T>,
-        IVitalityStats<T>, IConcentrationStats<T>
+    public interface IStats<T> : IBasicStats<T>,
+        IStatsRead<T>, IStatsInject<T>,
+        IMainStats<T>
     { }
 
     public interface IStatsInject<in T> : IMainStatsInject<T>, IBasicStatsInject<T>
     { }
     public interface IStatsRead<out T> : IMainStatsRead<T>, IBasicStatsRead<T>
     { }
+
+    public interface IBasicStats<T> : IBasicStatsInject<T>, IBasicStatsRead<T>, 
+        IOffensiveStats<T>, ISupportStats<T>,
+        IVitalityStats<T>, IConcentrationStats<T>
+    {
+
+    }
 
     public interface IBasicStatsRead<out T> : 
         IOffensiveStatsRead<T>, ISupportStatsRead<T>,

@@ -5,33 +5,32 @@ using UnityEngine;
 
 namespace CombatSystem.Skills.Effects
 {
-    [CreateAssetMenu(fileName = "N [Effect]", 
-        menuName = "Combat/Effect/Buff/Offensive")]
-    public class SBuffOffensiveEffect : SBuffEffect
+    [CreateAssetMenu(fileName = "N [Effect]",
+        menuName = "Combat/Effect/Buff/Concentration")]
+    public class SBuffConcentrationEffect : SBuffEffect
     {
-        [SerializeField] private EnumStats.OffensiveStatType type;
-
+        [SerializeField] private EnumStats.ConcentrationStatType type;
         protected override void DoBuff(in float performerBuffPower, in float targetBuffReceivePower,
             in float effectValue,
             in IBasicStats<float> buffingStats)
         {
-            float buffingValue = UtilsStatsEffects.CalculateOffensiveStatBuffValue(
+            float buffingValue = UtilsStatsEffects.CalculateConcentrationStatBuffValue(
                 in performerBuffPower,
                 in targetBuffReceivePower,
                 in effectValue);
             switch (type)
             {
-                case EnumStats.OffensiveStatType.Attack:
-                    buffingStats.AttackType += buffingValue;
+                case EnumStats.ConcentrationStatType.Actions:
+                    buffingStats.ActionsType += buffingValue;
                     break;
-                case EnumStats.OffensiveStatType.OverTime:
-                    buffingStats.OverTimeType += buffingValue;
+                case EnumStats.ConcentrationStatType.Speed:
+                    buffingStats.SpeedType += buffingValue;
                     break;
-                case EnumStats.OffensiveStatType.DeBuff:
-                    buffingStats.DeBuffType += buffingValue;
+                case EnumStats.ConcentrationStatType.Control:
+                    buffingStats.ControlType += buffingValue;
                     break;
-                case EnumStats.OffensiveStatType.FollowUp:
-                    buffingStats.FollowUpType += buffingValue;
+                case EnumStats.ConcentrationStatType.Critical:
+                    buffingStats.CriticalType += buffingValue;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

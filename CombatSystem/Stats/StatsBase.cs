@@ -81,8 +81,7 @@ namespace CombatSystem.Stats
 
 
     [Serializable]
-    public class StatsBase<T> : IBasicStatsRead<T>,
-        IOffensiveStats<T>, ISupportStats<T>, IVitalityStats<T>, IConcentrationStats<T>
+    public class StatsBase<T> : IBasicStats<T>
     {
         [HorizontalGroup("Top")]
         [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] private T attackType;
@@ -108,25 +107,30 @@ namespace CombatSystem.Stats
 
         public StatsBase(T defaultValue)
         {
-            attackType = defaultValue;
-            overTimeType = defaultValue;
-            deBuffType = defaultValue;
-            followUpType = defaultValue;
+            OverrideByValue(in defaultValue);
+        }
 
-            healType = defaultValue;
-            shieldingType = defaultValue;
-            buffType = defaultValue;
-            receiveBuffType = defaultValue;
+        public void OverrideByValue(in T value)
+        {
+            attackType = value;
+            overTimeType = value;
+            deBuffType = value;
+            followUpType = value;
 
-            healthType = defaultValue;
-            mortalityType = defaultValue;
-            damageReductionType = defaultValue;
-            deBuffResistanceType = defaultValue;
+            healType = value;
+            shieldingType = value;
+            buffType = value;
+            receiveBuffType = value;
 
-            actionsType = defaultValue;
-            speedType = defaultValue;
-            controlType = defaultValue;
-            criticalType = defaultValue;
+            healthType = value;
+            mortalityType = value;
+            damageReductionType = value;
+            deBuffResistanceType = value;
+
+            actionsType = value;
+            speedType = value;
+            controlType = value;
+            criticalType = value;
         }
 
         public T AttackType
@@ -218,7 +222,7 @@ namespace CombatSystem.Stats
     }
 
     [Serializable]
-    public class SerializableStatsBase<T> : IOffensiveStats<T>, ISupportStats<T>, IVitalityStats<T>, IConcentrationStats<T>
+    public class SerializableStatsBase<T> : IBasicStats<T>
         where T : new()
     {
         [Title("Offensive"), HorizontalGroup("Top")]

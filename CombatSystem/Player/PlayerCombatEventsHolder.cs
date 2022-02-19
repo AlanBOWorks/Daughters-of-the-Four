@@ -44,6 +44,13 @@ namespace CombatSystem.Player
             SubscribeAsPlayerEvent(listener);
         }
 
+        /// <summary>
+        /// Subscribe as a: 
+        /// <br></br>- <see cref="ISkillPointerListener"/>
+        /// <br></br>- <see cref="ISkillSelectionListener"/>
+        /// <br></br>- <see cref="ITargetPointerListener"/>
+        /// <br></br>- <see cref="ITargetSelectionListener"/>
+        /// </summary>
         public void SubscribeAsPlayerEvent(ICombatEventListener listener)
         {
 
@@ -102,11 +109,19 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnSkillSwitch(in CombatSkill skill)
+        public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
         {
             foreach (var listener in _skillSelectionListeners)
             {
-                listener.OnSkillSwitch(in skill);
+                listener.OnSkillSwitch(in skill, in previousSelection);
+            }
+        }
+
+        public void OnSkillDeselect(in CombatSkill skill)
+        {
+            foreach (var listener in _skillSelectionListeners)
+            {
+                listener.OnSkillDeselect(in skill);
             }
         }
 
@@ -187,9 +202,14 @@ namespace CombatSystem.Player
                 Debug.Log($"Skill Select: {skill.Preset}");
             }
 
-            public void OnSkillSwitch(in CombatSkill skill)
+            public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
             {
-                Debug.Log($"Skill SWITCH: {skill.Preset}");
+                Debug.Log($"Skill SWITCH: {skill.Preset} FROM {previousSelection.Preset}");
+            }
+
+            public void OnSkillDeselect(in CombatSkill skill)
+            {
+                Debug.Log($"Skill DESELECTED: {skill.Preset}");
             }
 
             public void OnSkillCancel(in CombatSkill skill)

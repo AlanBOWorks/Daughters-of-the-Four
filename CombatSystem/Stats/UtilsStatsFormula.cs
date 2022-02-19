@@ -136,16 +136,28 @@ namespace CombatSystem.Stats
     public static class UtilsStatsEffects
     {
 
-        public static float CalculateOffensiveStatBuffed(in float buffPower, in float receivePower,
+        public static float CalculateOffensiveStatBuffValue(in float buffPower, in float receivePower,
             in float effectValue)
         {
             return effectValue * (buffPower + receivePower);
         }
-        public static float CalculateSupportStatBuffed(in float buffPower, in float receivePower,
+        public static float CalculateSupportStatBuffValue(in float buffPower, in float receivePower,
             in float effectValue)
         {
             return effectValue * (buffPower + receivePower);
         }
+        public static float CalculateVitalityStatBuffValue(in float buffPower, in float receivePower,
+            in float effectValue)
+        {
+            return effectValue + (buffPower + receivePower);
+        }
+        public static float CalculateConcentrationStatBuffValue(in float buffPower, in float receivePower,
+            in float effectValue)
+        {
+            return effectValue + (buffPower + receivePower);
+        }
+
+
 
         public static void CalculateDamageFromAttackAttribute(in CombatStats stats, ref float baseDamage)
         {

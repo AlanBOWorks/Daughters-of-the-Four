@@ -23,6 +23,12 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(true);
         }
 
+        public void Hide()
+        {
+            // todo animate
+            gameObject.SetActive(false);
+        }
+
         public void HideInstantly()
         {
             gameObject.SetActive(false);
@@ -30,7 +36,7 @@ namespace CombatSystem.Player.UI
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _holder.OnTargetSubmit(in _user);
+            _holder.OnTargetSelect(in _user);
         }
 
         public void OnPointerEnter(PointerEventData eventData)

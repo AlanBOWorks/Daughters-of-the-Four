@@ -87,7 +87,7 @@ namespace CombatSystem.Team
                     yield return Timing.WaitUntilDone(
                         controller._ReadyToRequest(actingEntity));
 
-                    controller.RequestAction(actingEntity, out var usedSkill, out var onTarget);
+                    controller.PerformRequestAction(actingEntity, out var usedSkill, out var onTarget);
                     yield return Timing.WaitForOneFrame;
 
                     var eventsHolder = CombatSystemSingleton.EventsHolder;
@@ -123,7 +123,7 @@ namespace CombatSystem.Team
             yield return Timing.WaitForSeconds(10);
         }
 
-        public void RequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target)
+        public void PerformRequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target)
         {
             var currentSkills = performer.GetCurrentSkills();
             int skillsAmount;

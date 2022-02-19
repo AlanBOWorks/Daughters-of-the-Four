@@ -56,10 +56,10 @@ namespace CombatSystem.Team
     {
         void InjectionOnRequestSequence(CombatEntity entity);
         /// <summary>
-        /// Request if the controller is ready for [<seealso cref="RequestAction"/>]
+        /// Request if the controller is ready for [<seealso cref="PerformRequestAction"/>]
         /// </summary>
         IEnumerator<float> _ReadyToRequest(CombatEntity performer);
-        void RequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target);
+        void PerformRequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target);
         bool HasForcedFinishControlling();
     }
 }
