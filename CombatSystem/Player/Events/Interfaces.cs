@@ -71,4 +71,9 @@ namespace CombatSystem.Player.Events
         /// </summary>
         void OnTargetSubmit(in CombatEntity target);
     }
+
+    internal interface ICameraHolderListener : ICombatEventListener
+    {
+        void OnSwitchCamera(in Camera combatCamera);
+    }
 }

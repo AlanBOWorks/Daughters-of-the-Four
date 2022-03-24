@@ -47,9 +47,9 @@ namespace CombatSystem._Core
         }
     }
 
-    internal sealed class PrefabInstantiationHandler : ICombatPreparationListener
+    internal sealed class PrefabInstantiationHandler 
     {
-        public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
+        public void FirstInstantiation()
         {
             if(CombatSystemSingleton.CombatHolderNotDestroyReference) return;
 

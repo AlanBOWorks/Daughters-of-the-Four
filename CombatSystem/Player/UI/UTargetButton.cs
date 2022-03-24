@@ -8,12 +8,12 @@ namespace CombatSystem.Player.UI
         IPointerEnterHandler, IPointerExitHandler
     {
         private CombatEntity _user;
-        private UTargetButtonsHolder _holder;
+        private UFrontTargetButtonsHandler _holder;
         public void Inject(CombatEntity user)
         {
             _user = user;
         }
-        public void Inject(UTargetButtonsHolder holder)
+        public void Inject(UFrontTargetButtonsHandler holder)
         {
             _holder = holder;
         }

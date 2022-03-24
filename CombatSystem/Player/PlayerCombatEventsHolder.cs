@@ -11,7 +11,8 @@ namespace CombatSystem.Player
     public sealed class PlayerCombatEventsHolder : ControllerCombatEventsHolder, ITempoTickListener, IDiscriminationEventsHolder,
 
         ISkillPointerListener, ISkillSelectionListener,
-        ITargetPointerListener, ITargetSelectionListener
+        ITargetPointerListener, ITargetSelectionListener,
+        ICameraHolderListener
     {
         public PlayerCombatEventsHolder() : base()
         {
@@ -22,6 +23,8 @@ namespace CombatSystem.Player
             _skillSelectionListeners = new HashSet<ISkillSelectionListener>();
             _targetPointerListeners = new HashSet<ITargetPointerListener>();
             _targetSelectionListeners = new HashSet<ITargetSelectionListener>();
+
+            _cameraHolderListeners = new HashSet<ICameraHolderListener>();
 
 #if UNITY_EDITOR
             //Subscribe(new DebugPlayerEvents());
@@ -38,10 +41,28 @@ namespace CombatSystem.Player
         [ShowInInspector,HorizontalGroup("Target")]
         private readonly HashSet<ITargetSelectionListener> _targetSelectionListeners;
 
+        [ShowInInspector] 
+        private readonly HashSet<ICameraHolderListener> _cameraHolderListeners;
+
         public override void Subscribe(ICombatEventListener listener)
         {
             base.Subscribe(listener);
             SubscribeAsPlayerEvent(listener);
+        }
+
+        public override void UnSubscribe(ICombatEventListener listener)
+        {
+            base.UnSubscribe(listener);
+            if (listener is ISkillPointerListener skillPointerListener)
+                _skillPointerListeners.Remove(skillPointerListener);
+            if (listener is ISkillSelectionListener skillSelectionListener)
+                _skillSelectionListeners.Remove(skillSelectionListener);
+            if (listener is ITargetPointerListener targetPointerListener)
+                _targetPointerListeners.Remove(targetPointerListener);
+            if (listener is ITargetSelectionListener targetSelectionListener)
+                _targetSelectionListeners.Remove(targetSelectionListener);
+            if (listener is ICameraHolderListener cameraHolderListener)
+                _cameraHolderListeners.Remove(cameraHolderListener);
         }
 
         /// <summary>
@@ -62,6 +83,8 @@ namespace CombatSystem.Player
                 _targetPointerListeners.Add(targetPointerListener);
             if (listener is ITargetSelectionListener targetSelectionListener)
                 _targetSelectionListeners.Add(targetSelectionListener);
+            if (listener is ICameraHolderListener cameraHolderListener)
+                _cameraHolderListeners.Add(cameraHolderListener);
         }
 
         internal void ManualSubscribe(ISkillPointerListener skillPointerListener)
@@ -83,6 +106,15 @@ namespace CombatSystem.Player
             _targetSelectionListeners.Add(targetSelectionListener);
         }
 
+        internal void ManualSubscribe(ICameraHolderListener cameraHolderListener)
+        {
+            _cameraHolderListeners.Add(cameraHolderListener);
+        }
+
+        internal void ManualUnSubscribe(ICameraHolderListener cameraHolderListener)
+        {
+            _cameraHolderListeners.Remove(cameraHolderListener);
+        }
 
         // SKILL Events
         public void OnSkillButtonHover(in CombatSkill skill)
@@ -182,7 +214,13 @@ namespace CombatSystem.Player
                 listener.OnTargetSubmit(in target);
             }
         }
-
+        public void OnSwitchCamera(in Camera combatCamera)
+        {
+            foreach (var listener in _cameraHolderListeners)
+            {
+                listener.OnSwitchCamera(in combatCamera);
+            }
+        }
 #if UNITY_EDITOR
 
         private class DebugPlayerEvents :

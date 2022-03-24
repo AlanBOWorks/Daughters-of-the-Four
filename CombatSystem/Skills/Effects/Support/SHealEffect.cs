@@ -17,6 +17,10 @@ namespace CombatSystem.Skills.Effects
             UtilsStatsEffects.CalculateHealAmount(in performerStats, ref healAmount);
             UtilsStatsEffects.CalculateReceiveHealAmount(in targetStats, ref healAmount);
             DoHeal(in targetStats, in healAmount);
+
+            // EVENTS
+            performer.ProtectionDoneTracker.DoHealth(in target, in healAmount);
+            target.ProtectionReceiveTracker.DoHealth(in performer, in healAmount);
         }
 
         private static void DoHeal(in CombatStats target, in float healAmount)

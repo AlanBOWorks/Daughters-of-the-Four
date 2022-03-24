@@ -1,10 +1,12 @@
+using System.Collections;
+using System.Collections.Generic;
 using CombatSystem._Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Stats
 {
-    public class CombatStats : ICombatStats<float>, IMainStats<float>, IHealthStats<float>,
+    public class CombatStats : ICombatStats<float>, IMainStats<float>, 
         IStatsTypesRead<IBasicStatsRead<float>>
     {
         public CombatStats(IStatsRead<float> baseStats)
@@ -42,7 +44,10 @@ namespace CombatSystem.Stats
             }
         }
 
+
+
         // Base stats comes from predefined data structures that can't be altered, that's why it only readable
+        [ShowInInspector, InfoBox("This is a reference type; it could modify an SO values", InfoMessageType.Warning)]
         public readonly IStatsRead<float> BaseStats;
         public readonly StatsBase<float> BuffStats;
         public readonly BurstStats BurstStats;
@@ -91,12 +96,7 @@ namespace CombatSystem.Stats
         public float VitalityType { get; set; }
         [ShowInInspector]
         public float ConcentrationType { get; set; }
-
-
-        public float DamageReductionType => VitalityType * (BaseStats.DamageReductionType + 
-                                                            BuffStats.DamageReductionType +
-                                                            BurstStats.DamageReductionType);
-
+        
 
         public bool IsAlive()
         {

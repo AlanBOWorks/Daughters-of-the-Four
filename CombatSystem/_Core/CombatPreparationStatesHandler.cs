@@ -22,14 +22,25 @@ namespace CombatSystem._Core
             CreateAliveReference();
             _eventsHolder.OnCombatPrepares(allMembers, playerTeam, enemyTeam);
 
-            //todo animations for starting fight
+            Timing.RunCoroutine(_WaitForPreparesToFinish());
 
-            _eventsHolder.OnCombatStart();
+            IEnumerator<float> _WaitForPreparesToFinish()
+            {
+                yield return Timing.WaitForOneFrame; //todo true wait
+                OnCombatPreStarts();
+            }
         }
 
         public void OnCombatStops()
         {
             DestroyAliveReference();
+        }
+
+        public void OnCombatPreStarts()
+        {
+            _eventsHolder.OnCombatPreStarts();
+            //todo animations for starting fight && wait until is finish?
+            _eventsHolder.OnCombatStart();
         }
 
         public void OnCombatStart()
@@ -87,8 +98,25 @@ namespace CombatSystem._Core
 
     public interface ICombatStatesListener : ICombatEventListener
     {
+        /// <summary>
+        /// Is invoked after [<see cref="ICombatPreparationListener.OnCombatPrepares"/>]
+        /// and before [<seealso cref="OnCombatStart"/>].
+        /// <br></br>
+        /// Use this to prepare thing that requires the combat itself being prepared but before the combat as such
+        /// stats <example>(eg: repositions, initial animations, some text)</example>.
+        /// <br></br>____<br></br>
+        /// For necessary elements use [<see cref="ICombatPreparationListener.OnCombatPrepares"/>] preferably.
+        /// </summary>
+        void OnCombatPreStarts();
+
         void OnCombatStart();
+        /// <summary>
+        /// Invoked only if the combat is finish by natural conditions
+        /// </summary>
         void OnCombatFinish();
+        /// <summary>
+        /// Invoked only if the combat is ended by forced means (quitting the game, by an event...)
+        /// </summary>
         void OnCombatQuit();
     }
 }

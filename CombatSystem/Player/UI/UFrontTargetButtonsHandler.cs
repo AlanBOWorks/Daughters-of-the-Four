@@ -9,7 +9,8 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UTargetButtonsHolder : MonoBehaviour, IUIHoverListener, ITempoEntityStatesListener, 
+    public class UFrontTargetButtonsHandler : MonoBehaviour, IUIHoverListener, 
+        ITempoEntityStatesListener, 
         ISkillSelectionListener,
         ITargetSelectionListener, ITargetPointerListener
     {
@@ -30,9 +31,9 @@ namespace CombatSystem.Player.UI
             playerEventsHolder.ManualSubscribe(this as ISkillSelectionListener);
         }
 
-        public void OnHoverEntityCreated(in UUIHoverEntityHolder hover, in CombatEntity entity)
+        public void OnElementCreated(in UUIHoverEntityHolder element, in CombatEntity entity)
         {
-            var targetButton = hover.GetComponentInChildren<UTargetButton>();
+            var targetButton = element.GetTargetButton();
             _buttonsDictionary.Add(entity,targetButton);
             targetButton.Inject(entity);
             targetButton.Inject(this);
@@ -44,14 +45,14 @@ namespace CombatSystem.Player.UI
             _buttonsDictionary.Clear();
         }
 
-        [ShowInInspector]
+        [ShowInInspector, DisableInEditorMode]
         private CombatEntity _currentControl;
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             _currentControl = entity;
         }
 
-        public void OnEntityRequestControl(CombatEntity entity)
+        public void OnEntityRequestAction(CombatEntity entity)
         {
         }
 
@@ -124,6 +125,7 @@ namespace CombatSystem.Player.UI
 
         public void OnTargetSubmit(in CombatEntity target)
         {
+            _currentControl = null;
         }
 
         public void OnTargetButtonHover(in CombatEntity target)

@@ -1,14 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using CombatSystem.Luck;
 using CombatSystem.Skills;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using Localization.Characters;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Entity
 {
-    public sealed class CombatEntity : ITeamAreaDataRead, ICombatEntityInfoHolder, IStanceDataRead
+    public sealed class CombatEntity : ITeamAreaDataRead, ICombatEntityInfoHolder, ILocalizableCharacter
     {
         public CombatEntity(ICombatEntityProvider preparationData)
         {
@@ -20,11 +23,20 @@ namespace CombatSystem.Entity
             var skills = preparationData.GetPresetSkills();
 
             Stats = new CombatStats(baseStats);
-            _skillsHolder = new SkillsHolder(skills);
+            _skillsHolder = new SkillsHolder(this,skills);
+            DiceValuesHolder = new DiceValuesHolder(Stats);
 
             RoleType = areaData.RoleType;
             PositioningType = areaData.PositioningType;
 
+            DamageDoneTracker = new CombatEntityVitalityTracker();
+            DamageReceiveTracker = new CombatEntityVitalityTracker();
+            ProtectionDoneTracker = new CombatEntityVitalityTracker();
+            ProtectionReceiveTracker = new CombatEntityVitalityTracker();
+
+
+
+            DiceValuesHolder.RollDice();
         }
         public CombatEntity(ICombatEntityProvider preparationData, CombatTeam team) :
             this(preparationData)
@@ -35,43 +47,69 @@ namespace CombatSystem.Entity
         [ShowInInspector, InlineEditor()] 
         public readonly ICombatEntityProvider Provider;
         public GameObject InstantiationReference;
+        [ShowInInspector]
+        public ICombatEntityBody Body { get; internal set; }
 
         [ShowInInspector]
         public readonly CombatStats Stats;
 
         [ShowInInspector]
         private readonly SkillsHolder _skillsHolder;
-       
+
+        [ShowInInspector] 
+        public readonly DiceValuesHolder DiceValuesHolder;
+
 
 
         [ShowInInspector]
         public EnumTeam.Role RoleType { get; }
         [ShowInInspector]
-        public EnumTeam.Positioning PositioningType { get; }
+        public EnumTeam.Positioning PositioningType { get; private set; }
 
         [ShowInInspector]
         public CombatTeam Team { get; private set; }
-
-        private IStanceDataRead _teamStanceRead;
-
+        public PositionGroup PositionGroup { get; private set; }
 
 
+        [ShowInInspector,HorizontalGroup("Damage Tracker")]
+        public readonly CombatEntityVitalityTracker DamageDoneTracker;
+        [ShowInInspector,HorizontalGroup("Damage Tracker")]
+        public readonly CombatEntityVitalityTracker DamageReceiveTracker;
+
+        [ShowInInspector, HorizontalGroup("Heal Tracker")]
+        public readonly CombatEntityVitalityTracker ProtectionDoneTracker;
+        [ShowInInspector, HorizontalGroup("Heal Tracker")]
+        public readonly CombatEntityVitalityTracker ProtectionReceiveTracker;
+
+
+        public string GetLocalizableCharactersName() => Provider.GetLocalizableCharactersName();
         public string GetEntityName() => Provider.GetEntityName();
-        public IFullStanceStructureRead<IReadOnlyCollection<CombatSkill>> StanceSkills => _skillsHolder;
         public IReadOnlyCollection<CombatSkill> AllSkills => _skillsHolder;
-        public EnumTeam.StanceFull CurrentStance => _teamStanceRead.CurrentStance;
+
+        public EnumTeam.StanceFull GetCurrentStance()
+        {
+            if (IsDisrupted)
+                return EnumTeam.StanceFull.Disrupted;
+            return UtilsTeam.ParseStance(Team.DataValues.CurrentStance);
+        }
+        //Todo make forced disruptionStance
+        public bool IsDisrupted;
 
         private void InjectTeam(CombatTeam team)
         {
             Team = team;
-            _teamStanceRead = team;
-            _skillsHolder.StanceData = team;
         }
 
         public void SwitchTeam(CombatTeam team)
         {
             Team.Remove(this);
             InjectTeam(team);
+        }
+
+        public void SwitchPositioning(PositionGroup group)
+        {
+            PositionGroup = group;
+            PositioningType = group.GroupType;
         }
 
         /// <summary>
@@ -81,17 +119,47 @@ namespace CombatSystem.Entity
         public IReadOnlyList<CombatSkill> GetCurrentSkills() 
             => _skillsHolder.GetCurrentSkills();
 
+
+        // ----- Pseudo - EVENTS
+        public void OnActionStart()
+        {
+            DamageReceiveTracker.ResetOnActionValues(); //Reset last OnActionValues
+            DamageDoneTracker.ResetOnActionValues();
+
+            DiceValuesHolder.RollDice();
+        }
+        public void OnActionFinish()
+        {
+            
+        }
+
+        public void OnSequenceStart()
+        {
+            Stats.OnSequenceStart();
+            DamageReceiveTracker.ResetOnSequenceValues();
+            DamageDoneTracker.ResetOnSequenceValues();
+        }
+        public void OnSequenceFinish()
+        {
+            DamageReceiveTracker.ResetOnActionValues(); //Because on OnActionStart triggers no more
+            DamageDoneTracker.ResetOnActionValues();
+
+            Stats.OnSequenceFinish();
+        }
+
         // ----- CLASSES
         private sealed class SkillsHolder : IFullStanceStructureRead<List<CombatSkill>>, IReadOnlyCollection<CombatSkill>
         {
-            public SkillsHolder(IStanceStructureRead<IReadOnlyCollection<IFullSkill>> skills)
+            public SkillsHolder(CombatEntity user,
+                IStanceStructureRead<IReadOnlyCollection<IFullSkill>> skills)
             {
+                _user = user;
                 DisruptionStance = new List<CombatSkill>();
                 AttackingStance = GenerateSkills(skills.AttackingStance);
                 NeutralStance = GenerateSkills(skills.NeutralStance);
                 DefendingStance = GenerateSkills(skills.DefendingStance);
 
-                AllSkills = new HashSet<CombatSkill>(AttackingStance);
+                _allSkills = new HashSet<CombatSkill>(AttackingStance);
                 AddSkills(NeutralStance);
                 AddSkills(DefendingStance);
 
@@ -99,7 +167,7 @@ namespace CombatSystem.Entity
                 {
                     foreach (CombatSkill skill in stanceSkills)
                     {
-                        AllSkills.Add(skill);
+                        _allSkills.Add(skill);
                     }
                 }
 
@@ -125,9 +193,9 @@ namespace CombatSystem.Entity
                 }
             }
 
-            public IStanceDataRead StanceData { set; private get; }
 
-            private readonly HashSet<CombatSkill> AllSkills;
+            private readonly HashSet<CombatSkill> _allSkills;
+            public readonly CombatEntity _user;
 
             [ShowInInspector]
             public List<CombatSkill> AttackingStance { get; }
@@ -140,18 +208,19 @@ namespace CombatSystem.Entity
 
             public List<CombatSkill> GetCurrentSkills()
             {
-                return UtilsTeam.GetElement(StanceData, this);
+                return UtilsTeam.GetElement(_user.GetCurrentStance(), this);
             }
 
 
-            public IEnumerator<CombatSkill> GetEnumerator() => AllSkills.GetEnumerator();
+
+            public IEnumerator<CombatSkill> GetEnumerator() => _allSkills.GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-            public int Count => AllSkills.Count;
+            public int Count => _allSkills.Count;
         }
 
     }
 
-    public interface ICombatEntityProvider : ICombatEntityPreparation, ICombatEntityInfoHolder
+    public interface ICombatEntityProvider : ICombatEntityPreparation, ICombatEntityInfoHolder, ILocalizableCharacter
     {
         GameObject GetVisualPrefab();
         IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills();

@@ -15,19 +15,19 @@ namespace CombatSystem.Skills.Effects
 
             UtilsStatsEffects.CalculateDamageFromAttackAttribute(in performer.Stats, ref damage);
             UtilsStatsEffects.CalculateDamageReduction(in targetStats,ref damage);
-            DoDamage(targetStats, in damage);
-        }
 
 
-        private static void DoDamage(IHealthStats<float> target, in float damageAmount)
-        {
-            if (damageAmount <= 0)
+            if (damage <= 0)
             {
                 //todo call for DamageZeroEvent
             }
             else
-                UtilsEffect.DoDamageTo(target, in damageAmount);
+            {
+                UtilsEffect.DoDamageTo(in target, in performer, in damage);
+            }
         }
+
+
 
     }
 }

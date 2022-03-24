@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
@@ -10,7 +12,7 @@ namespace CombatSystem.Skills
 {
     [CreateAssetMenu(fileName = "N [Skill Preset]",
         menuName = "Combat/Skill/Single Preset")]
-    public class SSkillPreset : ScriptableObject, IFullSkill
+    public class SSkillPreset : ScriptableObject, IFullSkill, IEnumerator<IEffect>, IEnumerable<IEffect>
     {
         [SerializeField] 
         private string skillName = "NULL";
@@ -43,20 +45,29 @@ namespace CombatSystem.Skills
 
         public void DoSkill(in CombatEntity performer, in CombatEntity target, in CombatSkill holderReference)
         {
+            UtilsSkillEffect.DoEffectsOnTarget(this, performer, target, holderReference);
+        }
+
+
+        private void DoEffectsOnTargets(in EffectValues values, in CombatEntity performer,
+            in CombatEntity initialTarget, in CombatSkill holderReference)
+        {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            foreach (var effect in effects)
+            var effectTargets = UtilsTarget.GetEffectTargets(in performer, in initialTarget, values.targetType);
+            foreach (var target in effectTargets)
             {
-                effectWrapper.currentEffectValues = effect;
-                effect.DoEffect(in performer, in target);
+                effectWrapper.currentEffectValues = values;
                 eventsHolder.OnEffectPerform(in performer, in holderReference, in target, effectWrapper);
             }
         }
 
-
+        // This is a wrapper for avoiding boxing
         [Serializable]
         private sealed class EffectWrapper : IEffect
         {
             public EffectValues currentEffectValues;
+            public EnumsEffect.TargetType TargetType => currentEffectValues.targetType;
+
             public void DoEffect(in CombatEntity performer, in CombatEntity target)
             {
                 currentEffectValues.DoEffect(in performer, in target);
@@ -69,6 +80,7 @@ namespace CombatSystem.Skills
             public SEffect effect;
             public float effectValue;
             public EnumsEffect.TargetType targetType;
+            public EnumsEffect.TargetType TargetType => targetType;
 
             public void DoEffect(in CombatEntity performer, in CombatEntity target)
             {
@@ -89,6 +101,44 @@ namespace CombatSystem.Skills
             generatedName += " [SkillPreset]";
 
             UtilsAssets.UpdateAssetNameWithID(this, generatedName);
+        }
+
+
+        private int _effectIndex = -1;
+        public bool MoveNext()
+        {
+            _effectIndex++;
+            return _effectIndex < effects.Length;
+        }
+
+        public void Reset()
+        {
+            _effectIndex = -1;
+        }
+
+        public IEffect Current
+        {
+            get
+            {
+                effectWrapper.currentEffectValues = effects[_effectIndex];
+                return effectWrapper;
+            }
+        }
+
+        object IEnumerator.Current => Current;
+
+        public void Dispose()
+        {
+        }
+
+        public IEnumerator<IEffect> GetEnumerator()
+        {
+            return this;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

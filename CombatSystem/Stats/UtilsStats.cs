@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 using UnityEngine;
@@ -165,6 +166,20 @@ namespace CombatSystem.Stats
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
+
+        /// <summary>
+        /// Checks and returns the desired stats from [<see cref="BurstStats"/>]'s stats, depending if is self or other
+        /// </summary>
+        /// <param name="targetStats">The selection from do you want to extract the stats</param>
+        /// <param name="controlStats">A control reference to know if the [<paramref name="targetStats"/>] is self</param>
+        /// <returns></returns>
+        public static StatsBase<float> GetBurstStats(in CombatStats targetStats, in CombatStats controlStats = null)
+        {
+            var burstStats = targetStats.BurstStats;
+            return controlStats == targetStats
+                ? burstStats.SelfBuffs
+                : burstStats.AlliesBuffs;
+        }
     }
 
 
@@ -183,7 +198,8 @@ namespace CombatSystem.Stats
             // "time" nor "effects" related to tempo
             if (actionsAmount < 0) return false;
 
-            return entity.AllSkills.Count > 0;
+            int skillsCount = entity.GetCurrentSkills().Count;
+            return skillsCount > 0;
         }
 
         private const float MaxActionAmount = 12f;

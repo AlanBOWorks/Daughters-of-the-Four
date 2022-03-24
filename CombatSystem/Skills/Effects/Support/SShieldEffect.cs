@@ -18,9 +18,13 @@ namespace CombatSystem.Skills.Effects
             UtilsStatsEffects.ClampShieldsAmount(in targetStats, ref addingShields);
 
             DoShieldAddition(targetStats,in addingShields);
+
+            // EVENTS
+            performer.ProtectionDoneTracker.DoShields(in target, in addingShields);
+            target.ProtectionReceiveTracker.DoShields(in performer, in addingShields);
         }
 
-        private static void DoShieldAddition(IHealthStats<float> target, in float addingShields)
+        private static void DoShieldAddition(IDamageableStats<float> target, in float addingShields)
         {
             if (addingShields <= 0)
             {

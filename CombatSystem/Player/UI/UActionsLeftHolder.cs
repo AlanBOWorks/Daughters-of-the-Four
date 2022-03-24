@@ -89,9 +89,9 @@ namespace CombatSystem.Player.UI
             ShowUI();
         }
 
-        public void OnEntityRequestControl(CombatEntity entity)
+        public void OnEntityRequestAction(CombatEntity entity)
         {
-
+            
         }
 
         public void OnEntityFinishAction(CombatEntity entity)
@@ -116,6 +116,7 @@ namespace CombatSystem.Player.UI
         {
             _selectedSkill = skill;
             UpdateActionsToolTip(in skill);
+            ToggleActiveToolTip(true);
         }
 
         public void OnSkillDeselect(in CombatSkill skill)

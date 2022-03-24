@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 
@@ -47,10 +48,6 @@ namespace CombatSystem.Team
         EnumTeam.Positioning PositioningType { get; }
     }
 
-    public interface IStanceDataRead
-    {
-        EnumTeam.StanceFull CurrentStance { get; }
-    }
 
     public interface ITeamController
     {
@@ -61,5 +58,11 @@ namespace CombatSystem.Team
         IEnumerator<float> _ReadyToRequest(CombatEntity performer);
         void PerformRequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target);
         bool HasForcedFinishControlling();
+    }
+
+    public interface ITeamEventListener : ICombatEventListener
+    {
+        void OnStanceChange(in CombatTeam team, in EnumTeam.Stance switchedStance);
+        void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst);
     }
 }

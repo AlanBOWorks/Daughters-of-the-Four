@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using CombatSystem.AI;
 using CombatSystem.Entity;
 using CombatSystem.Player;
 using CombatSystem.Team;
@@ -12,10 +13,17 @@ namespace CombatSystem._Core
 {
     public static class CombatInitializationHandler
     {
+
+
         public static void StartCombat(
             ICombatTeamProvider playerTeam,
             ICombatTeamProvider enemyTeam)
         {
+            // This is just in case these weren't instantiated
+            PlayerCombatSingleton.GetInstance();
+            EnemyCombatSingleton.GetInstance();
+            CombatSystemSingleton.PrefabInstantiationHandler.FirstInstantiation();
+
             PrepareTeams(
                 playerTeam.GetSelectedCharacters(),
                 enemyTeam.GetSelectedCharacters());
@@ -29,23 +37,32 @@ namespace CombatSystem._Core
             IReadOnlyCollection<ICombatEntityProvider> playerTeam,
             IReadOnlyCollection<ICombatEntityProvider> enemyTeam)
         {
-            var playerCombatTeam = new CombatTeam(playerTeam);
-            var enemyCombatTeam = new CombatTeam(enemyTeam);
+            var systemEvents = CombatSystemSingleton.EventsHolder;
+
+            var playerCombatTeam = new CombatTeam(true,playerTeam);
+            var enemyCombatTeam = new CombatTeam(false,enemyTeam);
             var allMembers = new CombatMembersHolder(playerCombatTeam, enemyCombatTeam);
 
             playerCombatTeam.Injection(enemyCombatTeam);
             enemyCombatTeam.Injection(playerCombatTeam);
 
-            CombatSystemSingleton.PlayerTeam = playerCombatTeam;
-            CombatSystemSingleton.OppositionTeam = enemyCombatTeam;
+            var teamsHolder = CombatSystemSingleton.TeamsHolder;
+            teamsHolder.PlayerTeamType = playerCombatTeam;
+            teamsHolder.EnemyTeamType = enemyCombatTeam;
 
 
             CombatSystemSingleton.AllMembersCollection = allMembers;
 
+            InstantiateModels();
 
+            InvokeMainPositions(in playerCombatTeam);
+            InvokeMainPositions(in enemyCombatTeam);
+
+            // INVOCATION
             var combatStatesHandler = CombatSystemSingleton.CombatPreparationStatesHandler;
             combatStatesHandler.OnCombatPrepares(allMembers, playerCombatTeam, enemyCombatTeam);
-            InstantiateModels();
+
+
 
 
             void InstantiateModels()
@@ -74,8 +91,15 @@ namespace CombatSystem._Core
                         instantiatedGameObject.name = provider.GetEntityName() + "(Clone)";
 
                         member.InstantiationReference = instantiatedGameObject;
+                        member.Body = instantiatedGameObject.GetComponent<ICombatEntityBody>();
                     }
                 }
+            }
+
+            void InvokeMainPositions(in CombatTeam team)
+            {
+                team.GetMainPositioningMembers(out var frontLine, out var midLine, out var backLine);
+                systemEvents.OnFirstPositioningMembers(team,in frontLine, in midLine, in backLine);
             }
         }
 

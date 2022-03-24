@@ -164,37 +164,17 @@ namespace CombatSystem.Stats
         T CriticalType { set; }
     }
 
-    public interface ICombatStats<T> : ICombatStatsInject<T>, ICombatStatsRead<T>
+    public interface ICombatStats<T> :  IDamageableStats<T>
     {
-        new T CurrentHealth { get; set; }
-        new T CurrentMortality { get; set; }
-        new T CurrentShields { get; set; }
-        new T UsedActions { get; set; }
-        new T CurrentInitiative { get; set; }
+        T UsedActions { get; set; }
+        T CurrentInitiative { get; set; }
     }
 
-    public interface ICombatStatsInject<in T> 
-    {
-        T CurrentHealth { set; }
-        T CurrentMortality { set; }
-        T CurrentShields { set; }
-        T UsedActions { set; }
-        T CurrentInitiative { set; }
-    }
-    public interface ICombatStatsRead<out T> 
-    {
-        T CurrentHealth { get; }
-        T CurrentMortality { get; }
-        T CurrentShields { get; }
-        T UsedActions { get; }
-        T CurrentInitiative { get; }
-    }
-
-    public interface IHealthStats<T>
+  
+    public interface IDamageableStats<T>
     {
         T CurrentHealth { get; set; }
         T CurrentMortality { get; set; }
         T CurrentShields { get; set; }
-        T DamageReductionType { get; }
     }
 }

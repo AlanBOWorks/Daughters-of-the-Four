@@ -24,6 +24,7 @@ namespace CombatSystem.Entity
 
 
         public string GetEntityName() => entityName;
+        public string GetLocalizableCharactersName() => GetEntityName();
 
         public GameObject GetVisualPrefab() => instantiationObject;
 
@@ -44,6 +45,7 @@ namespace CombatSystem.Entity
 
             UtilsAssets.UpdateAssetNameWithID(this,finalName);
         }
+
     }
 
     [Serializable]
@@ -51,7 +53,7 @@ namespace CombatSystem.Entity
     {
         
 
-        [Title("Stats")]
+        [Title("Values")]
         [SerializeField]
         private BaseStats baseStats = new BaseStats();
 

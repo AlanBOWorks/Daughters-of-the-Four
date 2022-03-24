@@ -34,9 +34,17 @@ namespace CombatSystem._Core
             TickListeners.Add(tickListener);
         }
 
+        public void UnSubscribe(ITempoTickListener listener)
+            => TickListeners.Remove(listener);
+
 
         private CoroutineHandle _tickingHandle;
         private CoroutineHandle _entitiesTickHandle;
+        public void OnCombatPreStarts()
+        {
+            
+        }
+
         public void OnCombatStart()
         {
             _tickingHandle = Timing.RunCoroutine(_TickingLoop(), Segment.RealtimeUpdate);
@@ -52,7 +60,7 @@ namespace CombatSystem._Core
         }
 
 
-        private const float TickEachSeconds = .2f;
+        public const float TickPeriodSeconds = .2f;
         public const int LoopThreshold = 23;
         public const int LoopThresholdForPlayerInterface = LoopThreshold + 1;
 
@@ -66,7 +74,7 @@ namespace CombatSystem._Core
             }
             while (true)
             {
-                yield return Timing.WaitForSeconds(TickEachSeconds);
+                yield return Timing.WaitForSeconds(TickPeriodSeconds);
                 _roundTickCount++;
                 foreach (var listener in TickListeners)
                 {
@@ -101,10 +109,11 @@ namespace CombatSystem._Core
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            Timing.PauseCoroutines(_tickingHandle);
+            if(canAct)
+                Timing.PauseCoroutines(_tickingHandle);
         }
 
-        public void OnEntityRequestControl(CombatEntity entity)
+        public void OnEntityRequestAction(CombatEntity entity)
         {
             
         }
@@ -164,17 +173,27 @@ namespace CombatSystem._Core
 
         public void OnTick()
         {
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
             foreach (var entity in _tickingTrackers)
             {
-                HandleTickElement(entity);
+                HandleTickEntity(entity);
             }
 
 
-            void HandleTickElement(CombatEntity entity)
+            void HandleTickEntity(CombatEntity entity)
             {
                 CombatStats stats = entity.Stats;
-                stats.CurrentInitiative += UtilsStatsFormula.CalculateInitiativeSpeed(stats); 
-                if (stats.CurrentInitiative <= TempoTicker.LoopThreshold)
+                float initiativeIncrement = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
+                stats.CurrentInitiative += initiativeIncrement;
+
+
+                float entityInitiativeAmount = stats.CurrentInitiative;
+                const float initiativeThreshold = TempoTicker.LoopThreshold;
+                float initiativePercent = entityInitiativeAmount / initiativeThreshold;
+
+                eventsHolder.OnEntityTick(in entity, in entityInitiativeAmount, in initiativePercent);
+                //Acting Check
+                if (entityInitiativeAmount <= initiativeThreshold)
                     return;
 
                 _activeEntities.Enqueue(entity);
@@ -201,15 +220,18 @@ namespace CombatSystem._Core
                 combatEvents.OnEntityRequestSequence(CurrentActingEntity, canAct);
                 if (canAct)
                 {
-                    combatEvents.OnEntityRequestControl(CurrentActingEntity);
                     yield return Timing.WaitForOneFrame; //safe wait for setting the request
                     yield return Timing.WaitUntilTrue(_entityHasFinishHandler);
 
                     // ------  INVOKE EVENTS: OnEntityFinishSequence() ------
-                    combatEvents.OnEntityFinishSequence(CurrentActingEntity);
                 }
-               
+                else
+                {
+                    // todo skip sequence
+                }
 
+                // TODO Move finishSequence into If when SkipSequenceEvent is added
+                combatEvents.OnEntityFinishSequence(CurrentActingEntity);
                 yield return Timing.WaitForOneFrame;
                 _tickingTrackers.Add(CurrentActingEntity);
             }
@@ -231,7 +253,7 @@ namespace CombatSystem._Core
             stats.UsedActions = 0;
         }
 
-        public void OnEntityRequestControl(CombatEntity entity)
+        public void OnEntityRequestAction(CombatEntity entity)
         {
 
         }
@@ -258,17 +280,20 @@ namespace CombatSystem._Core
     {
         /// <summary>
         /// It's send once per sequence and the first time the entity's
-        /// [<seealso cref="CombatStats.CurrentInitiative"/>] triggers.
+        /// [<seealso cref="CombatStats.CurrentInitiative"/>] triggers. This is invoked even if the
+        /// entity can't act; To verify if can act use [<see cref="canAct"/>] or use
+        /// [<seealso cref="OnEntityRequestAction"/>] instead
         /// </summary>
         void OnEntityRequestSequence(CombatEntity entity, bool canAct);
         /// <summary>
         /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left.<br></br>
         /// If there's no actions left [<see cref="OnEntityFinishSequence"/>] will be invoked instead.
         /// </summary>
-        void OnEntityRequestControl(CombatEntity entity);
+        void OnEntityRequestAction(CombatEntity entity);
+
         /// <summary>
         /// Invoked after the action is finish; It's the very last call of the action (after animations) and
-        /// it's called before [<see cref="OnEntityRequestControl"/>] and [<see cref="OnEntityFinishSequence"/>].
+        /// it's called before [<see cref="OnEntityRequestAction"/>] and [<see cref="OnEntityFinishSequence"/>].
         /// </summary>
         void OnEntityFinishAction(CombatEntity entity);
         /// <summary>
@@ -277,5 +302,10 @@ namespace CombatSystem._Core
         /// </summary>
         /// <param name="entity"></param>
         void OnEntityFinishSequence(CombatEntity entity);
+    }
+
+    public interface ITempoEntityPercentListener : ICombatEventListener
+    {
+        void OnEntityTick(in CombatEntity entity, in float currentInitiative, in float percentInitiative);
     }
 }

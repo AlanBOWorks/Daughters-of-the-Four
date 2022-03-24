@@ -1,30 +1,93 @@
+using System.Collections.Generic;
+using CombatSystem._Core;
+using CombatSystem.Entity;
 using CombatSystem.Stats;
 using UnityEngine;
 
 namespace CombatSystem.Skills.Effects
 {
+    public static class UtilsSkillEffect
+    {
+        public static void DoEffectsOnTarget(
+            IEnumerator<IEffect> effects,
+            CombatEntity performer, CombatEntity target, 
+            CombatSkill skillReference)
+        {
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            // Problem: effects might be in a Scriptable and exceptions in execution during develop
+            // could make the IEnumerator<IEffect>'s index being wrong, so the iteration will be wrong
+            // Solution: reset before and after the iterator
+            effects.Reset();
+            while (effects.MoveNext())
+            {
+                var effect = effects.Current;
+                var targetType = effect.TargetType;
+                var targets = UtilsTarget.GetEffectTargets(in performer, in target, targetType);
+                DoEffectOnTargets(in effect, in targets);
+            }
+            effects.Reset(); 
+
+            void DoEffectOnTargets(in IEffect effect, in IReadOnlyList<CombatEntity> targets)
+            {
+                foreach (var effectTarget in targets)
+                {
+                    effect.DoEffect(in performer, in effectTarget);
+                    eventsHolder.OnEffectPerform(in performer, in skillReference, in effectTarget, in effect);
+                }
+            }
+        }
+    }
+
     public static class UtilsEffect
     {
-        public static void DoDamageTo(in IHealthStats<float> target, in float damage)
+        public static void DoDamageTo(in CombatEntity target, in CombatEntity performer, in float damage, bool eventCallback = true)
         {
-            DoDamageToShields(in target, in damage, out bool didDamageForBreakMethod);
-            if(didDamageForBreakMethod) 
-                return;
+            if( damage <= 0) return;
+
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            if(eventCallback)
+                eventsHolder.OnDamageDone(in target, in performer, in damage);
 
 
-            DoDamageToHealth(in target,in damage, out didDamageForBreakMethod, out var healthLost);
-            if(didDamageForBreakMethod)
+            IDamageableStats<float> healthStats = target.Stats;
+            DoDamageToShields(in healthStats, in damage, out bool didDamageForBreakMethod);
+
+
+            if (didDamageForBreakMethod)
             {
-                //todo healthLost EventCall
+                float shieldBreaks = 1;
+                target.DamageReceiveTracker.DoShields(in performer, in shieldBreaks); //by design shields are lost in ones
+                performer.DamageDoneTracker.DoShields(in target, in shieldBreaks);
+
+                if(eventCallback)
+                    eventsHolder.OnShieldLost(in target, in performer,in shieldBreaks);
+
                 return;
             }
 
 
-            DoDamageToMortality(in target, in damage, out var mortalityLost);
-            //todo mortalityLost EventCall
-        }
+            DoDamageToHealth(in healthStats, in damage, out didDamageForBreakMethod, out var healthLost);
+            if (didDamageForBreakMethod)
+            {
+                target.DamageReceiveTracker.DoHealth(in performer, in damage);
+                performer.DamageDoneTracker.DoHealth(in target, in damage);
 
-        public static void DoDamageToShields(in IHealthStats<float> target, in float damage, 
+                if(eventCallback)
+                    eventsHolder.OnHealthLost(in target, in performer, in damage);
+
+                return;
+            }
+
+
+            DoDamageToMortality(in healthStats, in damage, out var mortalityLost);
+            target.DamageReceiveTracker.DoMortality(in performer, in damage);
+            performer.DamageDoneTracker.DoMortality(in target, in damage);
+
+            if(eventCallback)
+                eventsHolder.OnMortalityLost(in target, in performer, in damage);
+        }
+        
+        public static void DoDamageToShields(in IDamageableStats<float> target, in float damage, 
             out bool shieldBreak)
         {
             float targetShields = target.CurrentShields;
@@ -38,7 +101,7 @@ namespace CombatSystem.Skills.Effects
             target.CurrentShields = targetShields;
         }
 
-        public static void DoDamageToHealth(in IHealthStats<float> target, in float damage, 
+        public static void DoDamageToHealth(in IDamageableStats<float> target, in float damage, 
             out bool healthDamage,
             out bool healthLost)
         {
@@ -66,7 +129,7 @@ namespace CombatSystem.Skills.Effects
             target.CurrentHealth = targetHealth;
         }
 
-        public static void DoDamageToMortality(in IHealthStats<float> target, in float damage,
+        public static void DoDamageToMortality(in IDamageableStats<float> target, in float damage,
             out bool mortalityLost)
         {
             if (damage <= 0) //damage check is just a safeCheck

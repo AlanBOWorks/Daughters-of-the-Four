@@ -10,19 +10,29 @@ namespace CombatSystem.Entity
     /// </summary>
     public sealed class SpawnEntityPositionHandler : IOppositionTeamStructureRead<ITeamPositionHandler>
     {
+
+        public UTeamPositionsHandler PositionsHandlerReference;
+        private readonly ITeamPositionHandler _playerTeamType;
+        private readonly ITeamPositionHandler _enemyTeamType;
+
         public SpawnEntityPositionHandler()
         {
-            PlayerTeamType = new PositionHandler(-1);
-            EnemyTeamType = new PositionHandler(1);
+            _playerTeamType = new BackUpPositionHandler(-1);
+            _enemyTeamType = new BackUpPositionHandler(1);
         }
 
 
-            public ITeamPositionHandler PlayerTeamType { get; }
-            public ITeamPositionHandler EnemyTeamType { get; }
+        public ITeamPositionHandler PlayerTeamType => PositionsHandlerReference != null 
+            ? PositionsHandlerReference.PlayerTeamType 
+            : _playerTeamType;
 
-            private sealed class PositionHandler : ITeamPositionHandler
+        public ITeamPositionHandler EnemyTeamType => PositionsHandlerReference != null
+            ? PositionsHandlerReference.EnemyTeamType
+            : _enemyTeamType;
+
+        private sealed class BackUpPositionHandler : ITeamPositionHandler
             {
-                public PositionHandler(float distanceModifier)
+                public BackUpPositionHandler(float distanceModifier)
                 {
                     _distanceModifier = distanceModifier;
                     _rotation = Quaternion.LookRotation(Vector3.right * distanceModifier);

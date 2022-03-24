@@ -6,50 +6,44 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UUIHoverEntityHolder : MonoBehaviour
+    public class UUIHoverEntityHolder : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityHolder>
     {
-        private CombatEntity _entity;
-        public void Injection(CombatEntity user)
+        [SerializeField] private UTargetButton targetButton;
+        [SerializeField] private UVitalityInfo healthInfo;
+
+        public UTargetButton GetTargetButton() => targetButton;
+        public UVitalityInfo GetHealthInfo() => healthInfo;
+       
+        public void EntityInjection(in CombatEntity entity, int index)
         {
-            _entity = user;
+            var entityBody = entity.Body;
+
+            _followReference = entityBody != null 
+                ? entityBody.GetUIHoverHolder() 
+                : entity.InstantiationReference.transform;
+        } 
+        public void OnPreStartCombat()
+        {
+            
         }
 
-        private CoroutineHandle _tickingHandle;
-        public void StartTicking()
+        private Camera _playerCamera;
+        private Transform _followReference;
+        private RectTransform _rectTransform;
+
+        private void Awake()
         {
-            _tickingHandle = Timing.RunCoroutine(_RepositionOverEntity());
-        }
-        public void StopTicking()
-        {
-            Timing.KillCoroutines(_tickingHandle);
-        }
-        private void OnDestroy()
-        {
-            StopTicking();
+            _rectTransform = (RectTransform) transform;
         }
         private void OnEnable()
         {
-            Timing.ResumeCoroutines(_tickingHandle);
-        }
-        private void OnDisable()
-        {
-            Timing.PauseCoroutines(_tickingHandle);
+            _playerCamera = PlayerCombatSingleton.InterfaceCombatCamera;
         }
 
-        private IEnumerator<float> _RepositionOverEntity()
+        private void LateUpdate()
         {
-            yield return Timing.WaitForOneFrame; //safe wait for instantiations
-
-            Camera playerCamera = PlayerCombatSingleton.InterfaceCombatCamera;
-            Transform followReference = _entity.InstantiationReference.transform;
-            RectTransform rectTransform = (RectTransform)transform;
-
-            while (followReference)
-            {
-                yield return Timing.WaitForOneFrame;
-                var targetPoint = playerCamera.WorldToScreenPoint(followReference.position);
-                rectTransform.position = targetPoint;
-            }
+            var targetPoint = _playerCamera.WorldToScreenPoint(_followReference.position);
+            _rectTransform.position = targetPoint;
         }
 
 
@@ -60,12 +54,13 @@ namespace CombatSystem.Player.UI
 
         public void Hide()
         {
-
+            HideInstant();
         }
 
         public void HideInstant()
         {
             gameObject.SetActive(false);
         }
+
     }
 }

@@ -4,6 +4,7 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
+using CombatSystem.Team;
 using DG.Tweening;
 using MEC;
 using Sirenix.OdinInspector;
@@ -11,7 +12,9 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class USkillButtonsHolder : MonoBehaviour, ITempoEntityStatesListener, ISkillButtonListener
+    public class UCombatSkillButtonsHolder : MonoBehaviour, 
+        ITempoEntityStatesListener, ITeamEventListener,
+        ISkillButtonListener, ISkillUsageListener
     {
         [Title("References")]
         [SerializeField] 
@@ -23,6 +26,9 @@ namespace CombatSystem.Player.UI
         [SerializeField]
         private Vector2 buttonsSeparations;
         private Vector2 _buttonSizes;
+
+        private CombatEntity _currentControlEntity;
+
 
         private void Awake()
         {
@@ -41,6 +47,8 @@ namespace CombatSystem.Player.UI
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.ManualSubscribe(this as ITempoEntityStatesListener);
+            playerEvents.ManualSubscribe(this as ISkillUsageListener);
+            playerEvents.ManualSubscribe(this as ITeamEventListener);
         }
 
         // Safe check
@@ -107,6 +115,14 @@ namespace CombatSystem.Player.UI
             }
         }
 
+        private void PoolEntitySkills(in CombatEntity entity)
+        {
+            var entitySkills = entity.GetCurrentSkills();
+            HandlePool(in entitySkills);
+
+            ShowSkillsAnimated();
+        }
+
         private static void EnableButton(in UCombatSkillButton buttonHolder)
         {
             buttonHolder.enabled = true;
@@ -121,14 +137,15 @@ namespace CombatSystem.Player.UI
         
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
+            if(!canAct) return;
+
+            _currentControlEntity = entity;
+            PoolEntitySkills(in entity);
         }
 
-        public void OnEntityRequestControl(CombatEntity entity)
+        public void OnEntityRequestAction(CombatEntity entity)
         {
-            var entitySkills = entity.GetCurrentSkills();
-            HandlePool(in entitySkills);
-
-            ShowSkillsAnimated();
+            _currentControlEntity = entity;
         }
 
         public void OnEntityFinishAction(CombatEntity entity)
@@ -137,9 +154,21 @@ namespace CombatSystem.Player.UI
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
+            if(entity != _currentControlEntity) return;
+
+            _currentControlEntity = null;
             ReturnSkillsToStack();
-            _activeButtons.Clear();
         }
+        public void OnStanceChange(in CombatTeam team, in EnumTeam.Stance switchedStance)
+        {
+            ReturnSkillsToStack();
+            PoolEntitySkills(in _currentControlEntity);
+        }
+
+        public void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst)
+        {
+        }
+
 
         private void ReturnSkillsToStack()
         {
@@ -149,6 +178,7 @@ namespace CombatSystem.Player.UI
                 DisableButton(in buttonHolder);
                 _instantiationPool.Push(buttonHolder);
             }
+            _activeButtons.Clear();
         }
 
 
@@ -184,16 +214,19 @@ namespace CombatSystem.Player.UI
         }
         public void OnSkillCancel(in CombatSkill skill)
         {
+            DeselectSkill(in skill);
         }
         public void OnSkillSubmit(in CombatSkill skill)
         {
-            DeselectSkill(in _currentSelectedSkill);
-            _currentSelectedSkill = null;
+            DeselectSkill(in skill);
         }
 
         private void DeselectSkill(in CombatSkill skill)
         {
             _activeButtons[skill].DeSelectButton();
+
+            if(skill == _currentSelectedSkill)
+                _currentSelectedSkill = null;
         }
 
 
@@ -206,5 +239,25 @@ namespace CombatSystem.Player.UI
         {
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonExit(in skill);
         }
+
+        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        {
+            _currentSelectedSkill = null;
+        }
+
+        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        {
+            if(_activeButtons.ContainsKey(usedSkill))
+                _activeButtons[usedSkill].UpdateCostReal();
+        }
+
+        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
+        {
+        }
+
+        public void OnSkillFinish()
+        {
+        }
+
     }
 }

@@ -23,22 +23,28 @@ namespace CombatSystem.Stats
         public readonly StatsBase<float> SelfBuffs;
 
 
-        public float AttackType => AlliesBuffs.AttackType + SelfBuffs.AttackType + 1;
-        public float OverTimeType => AlliesBuffs.OverTimeType + SelfBuffs.OverTimeType + 1;
-        public float DeBuffType => AlliesBuffs.DeBuffType + SelfBuffs.DeBuffType + 1;
-        public float FollowUpType => AlliesBuffs.FollowUpType + SelfBuffs.FollowUpType + 1;
-        public float HealType => AlliesBuffs.HealType + SelfBuffs.HealType + 1;
-        public float ShieldingType => AlliesBuffs.ShieldingType + SelfBuffs.ShieldingType + 1;
-        public float BuffType => AlliesBuffs.BuffType + SelfBuffs.BuffType + 1;
-        public float ReceiveBuffType => AlliesBuffs.ReceiveBuffType + SelfBuffs.ReceiveBuffType + 1;
-        public float HealthType => AlliesBuffs.HealthType + SelfBuffs.HealthType + 1;
-        public float MortalityType => AlliesBuffs.MortalityType + SelfBuffs.MortalityType + 1;
-        public float DamageReductionType => AlliesBuffs.DamageReductionType + SelfBuffs.DamageReductionType + 1;
-        public float DeBuffResistanceType => AlliesBuffs.DeBuffResistanceType + SelfBuffs.DeBuffResistanceType + 1;
-        public float ActionsType => AlliesBuffs.ActionsType + SelfBuffs.ActionsType + 1;
-        public float SpeedType => AlliesBuffs.SpeedType + SelfBuffs.SpeedType + 1;
-        public float ControlType => AlliesBuffs.ControlType + SelfBuffs.ControlType + 1;
-        public float CriticalType => AlliesBuffs.CriticalType + SelfBuffs.CriticalType + 1;
+        public float AttackType => AlliesBuffs.AttackType + SelfBuffs.AttackType;
+        public float OverTimeType => AlliesBuffs.OverTimeType + SelfBuffs.OverTimeType;
+        public float DeBuffType => AlliesBuffs.DeBuffType + SelfBuffs.DeBuffType;
+        public float FollowUpType => AlliesBuffs.FollowUpType + SelfBuffs.FollowUpType;
+
+
+        public float HealType => AlliesBuffs.HealType + SelfBuffs.HealType;
+        public float ShieldingType => AlliesBuffs.ShieldingType + SelfBuffs.ShieldingType;
+        public float BuffType => AlliesBuffs.BuffType + SelfBuffs.BuffType;
+        public float ReceiveBuffType => AlliesBuffs.ReceiveBuffType + SelfBuffs.ReceiveBuffType;
+
+
+        public float HealthType => AlliesBuffs.HealthType + SelfBuffs.HealthType;
+        public float MortalityType => AlliesBuffs.MortalityType + SelfBuffs.MortalityType;
+        public float DamageReductionType => AlliesBuffs.DamageReductionType + SelfBuffs.DamageReductionType;
+        public float DeBuffResistanceType => AlliesBuffs.DeBuffResistanceType + SelfBuffs.DeBuffResistanceType;
+
+
+        public float ActionsType => AlliesBuffs.ActionsType + SelfBuffs.ActionsType;
+        public float SpeedType => AlliesBuffs.SpeedType + SelfBuffs.SpeedType;
+        public float ControlType => AlliesBuffs.ControlType + SelfBuffs.ControlType;
+        public float CriticalType => AlliesBuffs.CriticalType + SelfBuffs.CriticalType;
 
         public void OnEntityStartSequence()
         {

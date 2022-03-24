@@ -52,11 +52,12 @@ namespace CombatSystem.Team
             var controller = UtilsTeam.GetElement(entity, this);
             CurrentController = controller;
             CurrentController.InjectionOnRequestSequence(entity);
+
+            DoRequest(entity);
         }
 
-        public void OnEntityRequestControl(CombatEntity entity)
+        public void OnEntityRequestAction(CombatEntity entity)
         {
-            DoRequest(entity);
         }
 
         public void OnEntityFinishAction(CombatEntity entity)
@@ -82,16 +83,19 @@ namespace CombatSystem.Team
             IEnumerator<float> _DoControl()
             {
                 UpdateHasFinishCurrentEntity();
+                var eventsHolder = CombatSystemSingleton.EventsHolder;
+
+                yield return Timing.WaitForOneFrame; //safe wait
                 while (!_hasFinishCurrentEntity)
                 {
+                    eventsHolder.OnEntityRequestAction(actingEntity);
                     yield return Timing.WaitUntilDone(
                         controller._ReadyToRequest(actingEntity));
 
                     controller.PerformRequestAction(actingEntity, out var usedSkill, out var onTarget);
                     yield return Timing.WaitForOneFrame;
 
-                    var eventsHolder = CombatSystemSingleton.EventsHolder;
-                    eventsHolder.OnSkillSubmit(in actingEntity, in usedSkill, onTarget);
+                    eventsHolder.OnSkillSubmit(in actingEntity, in usedSkill,in onTarget);
                     UpdateHasFinishCurrentEntity();
                 }
 

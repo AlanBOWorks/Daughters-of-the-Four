@@ -9,14 +9,13 @@ namespace CombatSystem.Player
 
         private void Awake()
         {
-            if (interfaceCombatCamera)
-            {
-                PlayerCombatSingleton.InterfaceCombatCamera = interfaceCombatCamera;
-            }
-            else
-            {
-                PlayerCombatSingleton.InterfaceCombatCamera = Camera.main;
-            }
+            Camera injectionCamera = interfaceCombatCamera 
+                ? interfaceCombatCamera 
+                : Camera.main;
+
+            PlayerCombatSingleton.InjectCombatCamera(in injectionCamera);
+
+            Destroy(this);
         }
     }
 }

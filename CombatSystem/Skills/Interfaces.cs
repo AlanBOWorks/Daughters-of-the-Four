@@ -21,6 +21,7 @@ namespace CombatSystem.Skills
 
     public interface IEffect
     {
+        EnumsEffect.TargetType TargetType { get; }
         void DoEffect(in CombatEntity performer, in CombatEntity target);
     }
 

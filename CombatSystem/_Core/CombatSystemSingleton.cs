@@ -24,14 +24,19 @@ namespace CombatSystem._Core
                 = new SpawnEntityPositionHandler();
             CombatPreparationStatesHandler 
                 = new CombatPreparationStatesHandler(systemEventsHolder);
+            TeamsHolder 
+                = new CombatTeamsHolder();
             TeamControllers 
                 = new CombatTeamControllersHandler();
 
-            EventsHolder.SubscribeListener(TeamControllers);
+            EventsHolder.Subscribe(TeamControllers);
+
+            PrefabInstantiationHandler = new PrefabInstantiationHandler();
         }
         private CombatSystemSingleton() { }
         public static CombatSystemSingleton GetInstance() => Instance;
 
+        internal static PrefabInstantiationHandler PrefabInstantiationHandler;
 
         [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
         internal static GameObject CombatHolderNotDestroyReference;
@@ -54,11 +59,13 @@ namespace CombatSystem._Core
         [ShowInInspector,DisableInEditorMode]
         internal static List<CombatEntity> AllMembersCollection { private get; set; }
 
+        public static CombatTeamsHolder TeamsHolder;
 
         [ShowInInspector, HorizontalGroup("Teams"), DisableInEditorMode]
-        public static CombatTeam PlayerTeam { get; internal set; }
+        public static CombatTeam PlayerTeam => TeamsHolder.PlayerTeamType;
         [ShowInInspector, HorizontalGroup("Teams"), DisableInEditorMode]
-        public static CombatTeam OppositionTeam { get; internal set; }
+        public static CombatTeam OppositionTeam => TeamsHolder.EnemyTeamType;
+
 
         [Title("Controllers")]
         [ShowInInspector]
@@ -96,6 +103,18 @@ namespace CombatSystem._Core
         private static void OpenWindow()
         {
             GetWindow<CombatSingletonEditorWindow>().Show();
+        }
+    }
+
+    public class CombatTeamDebugWindow : OdinEditorWindow
+    {
+        [ShowInInspector] 
+        private static CombatTeamsHolder Teams { get; set; } = CombatSystemSingleton.TeamsHolder;
+
+        [MenuItem("Combat/Debug/Teams [WINDOW]", priority = -1)]
+        private static void OpenWindow()
+        {
+            GetWindow<CombatTeamDebugWindow>().Show();
         }
     }
 }

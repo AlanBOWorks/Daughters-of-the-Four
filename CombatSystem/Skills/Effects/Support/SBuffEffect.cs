@@ -15,18 +15,9 @@ namespace CombatSystem.Skills.Effects
             float bufferPower = UtilsStatsEffects.CalculateBuffPower(in performerStats);
             float receivePower = UtilsStatsEffects.CalculateBuffReceivePower(in targetStats);
 
-            IBasicStats<float> buffingStats;
-            if (isBurst)
-            {
-                var burstStats = targetStats.BurstStats;
-                buffingStats = performer == target 
-                    ? burstStats.SelfBuffs 
-                    : burstStats.AlliesBuffs;
-            }
-            else
-            {
-                buffingStats = targetStats.BuffStats;
-            }
+            IBasicStats<float> buffingStats = isBurst 
+                ? UtilsStats.GetBurstStats(in targetStats, in performerStats) 
+                : targetStats.BuffStats;
 
             DoBuff(in bufferPower, in receivePower, in effectValue, in buffingStats);
         }

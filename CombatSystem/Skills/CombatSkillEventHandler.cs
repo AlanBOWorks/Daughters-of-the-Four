@@ -29,15 +29,18 @@ namespace CombatSystem.Skills
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
+            entity.OnSequenceStart();
         }
 
-        public void OnEntityRequestControl(CombatEntity entity)
+        public void OnEntityRequestAction(CombatEntity entity)
         {
+            entity.OnActionStart();
         }
+
 
         public void OnEntityFinishAction(CombatEntity entity)
         {
-
+            entity.OnActionFinish();
         }
 
         public void OnEntityFinishSequence(CombatEntity entity)
@@ -46,6 +49,8 @@ namespace CombatSystem.Skills
             {
                 skill.ResetCost();
             }
+
+            entity.OnSequenceFinish();
         }
     }
 }
