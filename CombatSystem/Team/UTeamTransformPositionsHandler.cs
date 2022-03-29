@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public class UTeamPositionsHandler : MonoBehaviour, 
+    public class UTeamTransformPositionsHandler : MonoBehaviour, 
         IOppositionTeamStructureRead<ITeamPositionHandler>
     {
         [SerializeField] 
@@ -27,16 +27,16 @@ namespace CombatSystem.Team
         {
             var spawnHandler = CombatSystemSingleton.PositionHandler;
 
-            var singletonReference = spawnHandler.PositionsHandlerReference;
+            var singletonReference = spawnHandler.TransformPositionsHandlerReference;
             if (singletonReference != null) 
                 Destroy(singletonReference);
 
-            spawnHandler.PositionsHandlerReference = this;
+            spawnHandler.TransformPositionsHandlerReference = this;
         }
         
 
         [Serializable]
-        private sealed class TeamPositionHandler : ITeamPositionStructureRead<Transform>, ITeamPositionHandler
+        private sealed class TeamPositionHandler : ITeamFullPositionStructureRead<Transform>, ITeamPositionHandler
         {
             [SerializeField]
             private Transform frontLineType;
@@ -44,11 +44,16 @@ namespace CombatSystem.Team
             private Transform midLineType;
             [SerializeField]
             private Transform backLineType;
+            [SerializeField]
+            private Transform flexLineType;
 
 
             public Transform FrontLineType => frontLineType;
             public Transform MidLineType => midLineType;
             public Transform BackLineType => backLineType;
+
+            public Transform FlexLineType => flexLineType;
+
 
             public void HandleTeamMembersPosition(in CombatTeam team)
             {
@@ -80,6 +85,7 @@ namespace CombatSystem.Team
                 position = targetReferencePoint.position;
                 rotation = targetReferencePoint.rotation;
             }
+
         }
     }
 }

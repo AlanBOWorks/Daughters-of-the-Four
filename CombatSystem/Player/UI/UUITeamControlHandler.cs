@@ -63,7 +63,7 @@ namespace CombatSystem.Player.UI
         }
         
 
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.Stance switchedStance)
+        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
         }
 

@@ -11,8 +11,8 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public sealed class CombatTeam : 
-        ITeamPositionStructureRead<IReadOnlyList<CombatEntity>>,
-        ITeamRoleStructureRead<CombatEntity>,
+        ITeamFullPositionStructureRead<CombatEntity>,
+        ITeamFullRoleStructureRead<CombatEntity>,
         IReadOnlyList<CombatEntity>
     {
         private CombatTeam(bool isPlayerTeam)
@@ -25,6 +25,8 @@ namespace CombatSystem.Team
 
             _positionWrapper = new PositionWrapper();
             _roleWrapper = new RoleWrapper();
+
+            AliveTargeting = new CombatTeamAliveTargeting(this);
         }
         
         public CombatTeam(bool isPlayerTeam,IReadOnlyCollection<ICombatEntityProvider> members) : this(isPlayerTeam)
@@ -68,21 +70,34 @@ namespace CombatSystem.Team
         [ShowInInspector, ShowIf("ShowMembers")]
         private readonly List<CombatEntity> _members;
 
-        public IReadOnlyList<CombatEntity> FrontLineType => _positionWrapper.FrontLineType;
-        public IReadOnlyList<CombatEntity> MidLineType => _positionWrapper.MidLineType;
-        public IReadOnlyList<CombatEntity> BackLineType => _positionWrapper.BackLineType;
+        public IReadOnlyList<CombatEntity> MainRoleMembers => _roleWrapper.Members;
+        public IReadOnlyList<CombatEntity> MainPositioningMembers => _positionWrapper.Members;
 
-        public void GetMainPositioningMembers(out CombatEntity frontLine, out CombatEntity midLine,
-            out CombatEntity backLine)
-        {
-            frontLine = GetEntity(FrontLineType);
-            midLine = GetEntity(MidLineType);
-            backLine = GetEntity(BackLineType);
-        }
-        private static CombatEntity GetEntity(IReadOnlyList<CombatEntity> group)
-        {
-            return group.Count == 0 ? null : group[0];
-        }
+        public CombatEntity FrontLineType => _positionWrapper.FrontLineType;
+        public CombatEntity MidLineType => _positionWrapper.MidLineType;
+        public CombatEntity BackLineType => _positionWrapper.BackLineType;
+        public CombatEntity FlexLineType => _positionWrapper.FlexLineType;
+
+
+        /// <summary>
+        /// Main Vanguard Role
+        /// </summary>
+        public CombatEntity VanguardType => _roleWrapper.VanguardType;
+
+        /// <summary>
+        /// Main Attacker Role
+        /// </summary>
+        public CombatEntity AttackerType => _roleWrapper.AttackerType;
+
+        /// <summary>
+        /// Main Support Role
+        /// </summary>
+        public CombatEntity SupportType => _roleWrapper.SupportType;
+        /// <summary>
+        /// Main Flex Role
+        /// </summary>
+        public CombatEntity FlexType => _roleWrapper.FlexType;
+
 
         [ShowInInspector, ShowIf("ShowPositions")]
         private readonly PositionWrapper _positionWrapper;
@@ -90,40 +105,7 @@ namespace CombatSystem.Team
         private readonly RoleWrapper _roleWrapper;
 
 
-        /// <summary>
-        /// Main Vanguard Role
-        /// </summary>
-        public CombatEntity VanguardType => _roleWrapper.VanguardType.GetMainMember();
-
-        /// <summary>
-        /// Main Attacker Role
-        /// </summary>
-        public CombatEntity AttackerType => _roleWrapper.AttackerType.GetMainMember();
-
-        /// <summary>
-        /// Main Support Role
-        /// </summary>
-        public CombatEntity SupportType => _roleWrapper.SupportType.GetMainMember();
-
-
-
-
-        public IReadOnlyList<CombatEntity> GetMemberGroup(in CombatEntity entity)
-        {
-            return Contains(entity) 
-                ? UtilsTeam.GetElement(entity.PositioningType, this) 
-                : null;
-        }
-        private PositionGroup GetPositionGroup(in CombatEntity entity)
-        {
-            return UtilsTeam.GetElement(entity.PositioningType, _positionWrapper);
-        }
-
-        private RoleGroup GetRoleGroup(in CombatEntity entity)
-        {
-            return UtilsTeam.GetElement(entity.RoleType, _roleWrapper);
-        }
-
+        public readonly CombatTeamAliveTargeting AliveTargeting;
 
         public void CreateMidCombat(ICombatEntityProvider provider)
         {
@@ -150,6 +132,8 @@ namespace CombatSystem.Team
             _positionWrapper.AddMember(in entity);
             _roleWrapper.AddMember(in entity);
             _members.Add(entity);
+
+            AliveTargeting.AddMember(in entity);
         }
 
         public void SwitchTeamMemberToThis(CombatEntity entity)
@@ -175,6 +159,9 @@ namespace CombatSystem.Team
             _positionWrapper.RemoveMember(in entity);
             _roleWrapper.RemoveMember(in entity);
             _members.Remove(entity);
+
+            AliveTargeting.RemoveMember(in entity);
+
             CombatSystemSingleton.EventsHolder.OnDestroyEntity(in entity, in IsPlayerTeam);
 
             return true;
@@ -185,8 +172,6 @@ namespace CombatSystem.Team
         public void Clear()
         {
             _members.Clear();
-            _positionWrapper.Clear();
-            _roleWrapper.Clear();
         }
 
         public bool Contains(CombatEntity item)
@@ -212,66 +197,31 @@ namespace CombatSystem.Team
         public int Count => _members.Count;
         public CombatEntity this[int index] => _members[index];
 
+        public bool IsMainRole(in CombatEntity entity)
+        {
+            for (var i = 0; i < MainRoleMembers.Count; i++)
+            {
+                var member = MainRoleMembers[i];
+                if (member == entity) return true;
+            }
 
-
+            return false;
+        }
 
         //This is just for ICollection (utility)
-        private sealed class PositionWrapper : ITeamPositionStructureRead<PositionGroup>
+        private sealed class PositionWrapper : FullPositionGroup<CombatEntity>
         {
-            public PositionWrapper()
-            {
-                FrontLineType = new PositionGroup(EnumTeam.Positioning.FrontLine);
-                MidLineType = new PositionGroup(EnumTeam.Positioning.MidLine);
-                BackLineType = new PositionGroup(EnumTeam.Positioning.BackLine);
-            }
-
-            [ShowInInspector]
-            public PositionGroup FrontLineType { get; private set; }
-            [ShowInInspector]
-            public PositionGroup MidLineType { get; private set; }
-            [ShowInInspector]
-            public PositionGroup BackLineType { get; private set; }
-
             public void AddMember(in CombatEntity member)
             {
-                EnumTeam.Positioning targetPosition = member.PositioningType;
-                AddMember(in targetPosition,in member);
+                var positioning = member.PositioningType;
+                AddMember(in positioning, in member);
             }
 
-            public void AddMember(in EnumTeam.Positioning targetPosition, in CombatEntity member)
+            private void AddMember(in EnumTeam.Positioning targetPosition, in CombatEntity member)
             {
-                switch (targetPosition)
-                {
-                    case EnumTeam.Positioning.FrontLine:
-                        AddToGroup(in member, FrontLineType, out bool isMainVanguard);
-                        if(isMainVanguard)
-                            CombatSystemSingleton.EventsHolder.OnMainFrontLineSwitch(in member);
-                        break;
-
-
-                    case EnumTeam.Positioning.MidLine:
-                        AddToGroup(in member,MidLineType, out bool isMainAttacker);
-                        if(isMainAttacker)
-                            CombatSystemSingleton.EventsHolder.OnMainMidLineSwitch(in member);
-                        break;
-
-
-                    case EnumTeam.Positioning.BackLine:
-                        AddToGroup(in member,BackLineType, out bool isMainSupport);
-                        if(isMainSupport)
-                            CombatSystemSingleton.EventsHolder.OnMainBackLineSwitch(in member);
-                        break;
-
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                void AddToGroup(in CombatEntity entity, PositionGroup group, out bool isMainMember)
-                {
-                    isMainMember = group.Count == 0;
-                    group.Add(in entity);
-                }
+                int positioningIndex = EnumTeam.GetPositioningIndex(in targetPosition);
+                bool isMainRole = Members[positioningIndex] == null;
+                if (isMainRole) Members[positioningIndex] = member;
             }
 
             public void RemoveMember(in CombatEntity member)
@@ -280,96 +230,28 @@ namespace CombatSystem.Team
                 RemoveMember(in position, in member);
             }
 
-            public void RemoveMember(in EnumTeam.Positioning targetPosition, in CombatEntity member)
+            private void RemoveMember(in EnumTeam.Positioning targetPosition, in CombatEntity member)
             {
-                switch (targetPosition)
-                {
-                    case EnumTeam.Positioning.FrontLine:
-                        RemoveFromGroup(in member, FrontLineType, out bool isMainVanguard);
-                        if (isMainVanguard)
-                        {
-                            var switchFrontLine = FrontLineType[0];
-                            CombatSystemSingleton.EventsHolder.OnMainFrontLineSwitch(in switchFrontLine);
-                        }
-                        break;
-
-
-                    case EnumTeam.Positioning.MidLine:
-                        RemoveFromGroup(in member, MidLineType, out bool isMainAttacker);
-                        if (isMainAttacker)
-                        {
-                            var switchMidLine = MidLineType[0];
-                            CombatSystemSingleton.EventsHolder.OnMainMidLineSwitch(in switchMidLine);
-                        }
-
-                        break;
-
-
-                    case EnumTeam.Positioning.BackLine:
-                        RemoveFromGroup(in member, BackLineType, out bool isMainSupport);
-                        if (isMainSupport)
-                        {
-                            var switchBackLine = BackLineType[0];
-                            CombatSystemSingleton.EventsHolder.OnMainBackLineSwitch(in switchBackLine);
-                        }
-
-                        break;
-
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                void RemoveFromGroup(in CombatEntity entity, PositionGroup group, out bool isMainMember)
-                {
-                    isMainMember = group.IsMainEntity(in entity);
-                    group.Remove(in entity);
-                }
-            }
-
-            public void Clear()
-            {
-                FrontLineType.Clear();
-                MidLineType.Clear();
-                BackLineType.Clear();
+                int positioningIndex = EnumTeam.GetPositioningIndex(in targetPosition);
+                bool isMainRole = Members[positioningIndex] == member;
+                if (isMainRole) Members[positioningIndex] = null;
             }
         }
 
-        private sealed class RoleWrapper : ITeamRoleStructureRead<RoleGroup>
+        private sealed class RoleWrapper : FullPositionGroup<CombatEntity>
         {
-            public RoleWrapper()
-            {
-                VanguardType = new RoleGroup(EnumTeam.Role.Vanguard);
-                AttackerType = new RoleGroup(EnumTeam.Role.Attacker);
-                SupportType = new RoleGroup(EnumTeam.Role.Support);
-            }
-            [ShowInInspector]
-            public RoleGroup VanguardType { get; }
-            [ShowInInspector]
-            public RoleGroup AttackerType { get; }
-            [ShowInInspector]
-            public RoleGroup SupportType { get; }
-
             public void AddMember(in CombatEntity entity)
             {
-                var roleType = entity.RoleType;
-                var targetGroup = UtilsTeam.GetElement(roleType, this);
-                targetGroup.Add(entity);
+                int roleIndex = EnumTeam.GetRoleIndex(entity.RoleType);
+                if (Members[roleIndex] == null) Members[roleIndex] = entity;
             }
 
             public void RemoveMember(in CombatEntity entity)
             {
-                var roleType = entity.RoleType;
-                var targetGroup = UtilsTeam.GetElement(roleType, this);
-                targetGroup.Remove(entity);
+                int roleIndex = EnumTeam.GetRoleIndex(entity.RoleType);
+                if (Members[roleIndex] == entity) Members[roleIndex] = null;
             }
 
-            public void Clear()
-            {
-                VanguardType.Clear();
-                AttackerType.Clear();
-                SupportType.Clear();
-            }
         }
     }
 

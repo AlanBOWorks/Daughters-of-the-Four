@@ -14,7 +14,7 @@ namespace CombatSystem.Player.UI
         public UTargetButton GetTargetButton() => targetButton;
         public UVitalityInfo GetHealthInfo() => healthInfo;
        
-        public void EntityInjection(in CombatEntity entity, int index)
+        public void EntityInjection(in CombatEntity entity)
         {
             var entityBody = entity.Body;
 

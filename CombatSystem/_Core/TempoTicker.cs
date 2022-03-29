@@ -40,7 +40,7 @@ namespace CombatSystem._Core
 
         private CoroutineHandle _tickingHandle;
         private CoroutineHandle _entitiesTickHandle;
-        public void OnCombatPreStarts()
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             
         }

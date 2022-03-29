@@ -48,20 +48,9 @@ namespace CombatSystem.Skills
             UtilsSkillEffect.DoEffectsOnTarget(this, performer, target, holderReference);
         }
 
-
-        private void DoEffectsOnTargets(in EffectValues values, in CombatEntity performer,
-            in CombatEntity initialTarget, in CombatSkill holderReference)
-        {
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-            var effectTargets = UtilsTarget.GetEffectTargets(in performer, in initialTarget, values.targetType);
-            foreach (var target in effectTargets)
-            {
-                effectWrapper.currentEffectValues = values;
-                eventsHolder.OnEffectPerform(in performer, in holderReference, in target, effectWrapper);
-            }
-        }
-
         // This is a wrapper for avoiding boxing
+        // During the iterator, the EffectValue.Current should be injected in this (currentEffectValues) and
+        // used as a IEffect by the it
         [Serializable]
         private sealed class EffectWrapper : IEffect
         {

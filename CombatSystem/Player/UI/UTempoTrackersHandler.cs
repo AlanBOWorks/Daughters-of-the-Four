@@ -12,5 +12,13 @@ namespace CombatSystem.Player.UI
         {
             ActiveElementsDictionary[entity].TickTempo(in currentInitiative, in percentInitiative);
         }
+
+        protected override UTempoTrackerHolder GenerateElement(in CombatEntity entity, in EntityElementSpawner spawner)
+        {
+            var generatedElement = base.GenerateElement(in entity, in spawner);
+            generatedElement.RepositionLocalHeight(spawner.ActiveCount);
+
+            return generatedElement;
+        }
     }
 }

@@ -25,19 +25,55 @@ namespace CombatSystem.Team
             return team == CombatSystemSingleton.PlayerTeam;
         }
 
+        public static bool IsPlayerTeam(in CombatEntity entity)
+        {
+            return IsPlayerTeam(entity.Team);
+        }
+
+        public static bool IsMainRole(in CombatEntity entity)
+        {
+            var entityTeam = entity.Team;
+            return entityTeam.IsMainRole(in entity);
+        }
+
         public static int GetRoleIndex(ICombatEntityProvider entity)
         {
             var entityRole = entity.GetAreaData().RoleType;
             return (int) entityRole;
         }
 
-        public static T GetElement<T>(EnumTeam.Positioning positioning, ITeamPositionStructureRead<T> structure)
+        public static bool IsTeamInStancePosition(in EnumTeam.Positioning targetPositioning, in EnumTeam.StanceFull stance)
+        {
+            switch (stance)
+            {
+                case EnumTeam.StanceFull.Neutral:
+                    return targetPositioning == EnumTeam.Positioning.BackLine;
+                case EnumTeam.StanceFull.Attacking:
+                    return targetPositioning == EnumTeam.Positioning.MidLine;
+                case EnumTeam.StanceFull.Defending:
+                    return targetPositioning == EnumTeam.Positioning.FrontLine;
+                default:
+                    return false;
+            }
+        }
+
+
+        public static T GetElement<T>(CombatEntity member, IOppositionTeamStructureRead<T> structure)
+        {
+            var playerTeam = CombatSystemSingleton.PlayerTeam;
+            return playerTeam.Contains(member)
+                ? structure.PlayerTeamType
+                : structure.EnemyTeamType;
+        }
+
+        public static T GetElement<T>(EnumTeam.Positioning positioning, ITeamFullPositionStructureRead<T> structure)
         {
             return positioning switch
             {
                 EnumTeam.Positioning.FrontLine => structure.FrontLineType,
                 EnumTeam.Positioning.MidLine => structure.MidLineType,
                 EnumTeam.Positioning.BackLine => structure.BackLineType,
+                EnumTeam.Positioning.FlexLine => structure.FlexLineType,
                 _ => throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null)
             };
         }
@@ -97,12 +133,25 @@ namespace CombatSystem.Team
             };
         }
 
-        public static T GetElement<T>(CombatEntity member, IOppositionTeamStructureRead<T> structure)
+
+        public static EnumTeam.ActiveRole GetActiveRole(in CombatEntity entity)
         {
-            var playerTeam = CombatSystemSingleton.PlayerTeam;
-            return playerTeam.Contains(member) 
-                ? structure.PlayerTeamType 
-                : structure.EnemyTeamType;
+            bool isMainRole = IsMainRole(in entity);
+            switch (entity.RoleType)
+            {
+                case EnumTeam.Role.InvalidRole:
+                    return EnumTeam.ActiveRole.InvalidRole;
+                case EnumTeam.Role.Vanguard:
+                    return (isMainRole) ? EnumTeam.ActiveRole.MainVanguard : EnumTeam.ActiveRole.SecondaryVanguard;
+                case EnumTeam.Role.Attacker:
+                    return (isMainRole) ? EnumTeam.ActiveRole.MainAttacker : EnumTeam.ActiveRole.SecondaryAttacker;
+                case EnumTeam.Role.Support:
+                    return (isMainRole) ? EnumTeam.ActiveRole.MainSupport : EnumTeam.ActiveRole.SecondarySupport;
+                case EnumTeam.Role.Flex:
+                    return (isMainRole) ? EnumTeam.ActiveRole.MainFlex : EnumTeam.ActiveRole.SecondaryFlex;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public static EnumTeam.StanceFull ParseStance(EnumTeam.Stance basicStance)
@@ -119,11 +168,18 @@ namespace CombatSystem.Team
                     return EnumTeam.StanceFull.Disrupted;
             }
         }
+
+
     }
 
     public static class UtilsCombatTeam
     {
         public static void SwitchStance(in CombatTeam team, in EnumTeam.Stance targetStance)
+        {
+            var fullStance = UtilsTeam.ParseStance(targetStance);
+            SwitchStance(in team, in fullStance);
+        }
+        public static void SwitchStance(in CombatTeam team, in EnumTeam.StanceFull targetStance)
         {
             team.DataValues.CurrentStance = targetStance;
             CombatSystemSingleton.EventsHolder.OnStanceChange(in team, in targetStance);

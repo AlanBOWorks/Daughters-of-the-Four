@@ -4,16 +4,12 @@ namespace Localization.Characters
 {
     public static class LocalizationPlayerCharacters 
     {
-        public static string LocalizeCharactersName(ILocalizableCharacter localizable)
+        public static string LocalizeCharactersName(string entityName)
         {
-            string localization = localizable.GetLocalizableCharactersName();
+            string localization = entityName;
             //todo make localization logic
             return localization;
         }
     }
 
-    public interface ILocalizableCharacter
-    {
-        string GetLocalizableCharactersName();
-    }
 }

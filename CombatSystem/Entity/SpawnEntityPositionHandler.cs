@@ -11,7 +11,7 @@ namespace CombatSystem.Entity
     public sealed class SpawnEntityPositionHandler : IOppositionTeamStructureRead<ITeamPositionHandler>
     {
 
-        public UTeamPositionsHandler PositionsHandlerReference;
+        public UTeamTransformPositionsHandler TransformPositionsHandlerReference;
         private readonly ITeamPositionHandler _playerTeamType;
         private readonly ITeamPositionHandler _enemyTeamType;
 
@@ -22,12 +22,12 @@ namespace CombatSystem.Entity
         }
 
 
-        public ITeamPositionHandler PlayerTeamType => PositionsHandlerReference != null 
-            ? PositionsHandlerReference.PlayerTeamType 
+        public ITeamPositionHandler PlayerTeamType => TransformPositionsHandlerReference != null 
+            ? TransformPositionsHandlerReference.PlayerTeamType 
             : _playerTeamType;
 
-        public ITeamPositionHandler EnemyTeamType => PositionsHandlerReference != null
-            ? PositionsHandlerReference.EnemyTeamType
+        public ITeamPositionHandler EnemyTeamType => TransformPositionsHandlerReference != null
+            ? TransformPositionsHandlerReference.EnemyTeamType
             : _enemyTeamType;
 
         private sealed class BackUpPositionHandler : ITeamPositionHandler

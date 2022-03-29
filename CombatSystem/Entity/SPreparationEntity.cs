@@ -23,8 +23,8 @@ namespace CombatSystem.Entity
         internal PreparationEntity GetPreparationEntity() => preparationData;
 
 
-        public string GetEntityName() => entityName;
-        public string GetLocalizableCharactersName() => GetEntityName();
+        public string GetProviderEntityName() => entityName;
+        public string GetLocalizableCharactersName() => GetProviderEntityName();
 
         public GameObject GetVisualPrefab() => instantiationObject;
 

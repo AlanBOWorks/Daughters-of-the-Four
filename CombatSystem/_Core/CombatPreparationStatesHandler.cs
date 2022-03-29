@@ -27,7 +27,7 @@ namespace CombatSystem._Core
             IEnumerator<float> _WaitForPreparesToFinish()
             {
                 yield return Timing.WaitForOneFrame; //todo true wait
-                OnCombatPreStarts();
+                OnCombatPreStarts(playerTeam, enemyTeam);
             }
         }
 
@@ -36,9 +36,9 @@ namespace CombatSystem._Core
             DestroyAliveReference();
         }
 
-        public void OnCombatPreStarts()
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            _eventsHolder.OnCombatPreStarts();
+            _eventsHolder.OnCombatPreStarts(playerTeam, enemyTeam);
             //todo animations for starting fight && wait until is finish?
             _eventsHolder.OnCombatStart();
         }
@@ -107,7 +107,9 @@ namespace CombatSystem._Core
         /// <br></br>____<br></br>
         /// For necessary elements use [<see cref="ICombatPreparationListener.OnCombatPrepares"/>] preferably.
         /// </summary>
-        void OnCombatPreStarts();
+        /// <param name="playerTeam"></param>
+        /// <param name="enemyTeam"></param>
+        void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam);
 
         void OnCombatStart();
         /// <summary>

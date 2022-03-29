@@ -14,7 +14,7 @@ namespace CombatSystem.Stats
         public float CalculateCurrentControl() => NaturalControl + BurstControl;
 
         [ShowInInspector]
-        public EnumTeam.Stance CurrentStance;
+        public EnumTeam.StanceFull CurrentStance;
 
         public void DoRoundReset()
         {

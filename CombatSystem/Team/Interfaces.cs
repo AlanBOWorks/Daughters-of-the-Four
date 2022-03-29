@@ -16,6 +16,16 @@ namespace CombatSystem.Team
         T EnemyTeamType { get; }
     }
 
+    public interface ITeamFullRoleStructureRead<out T> : ITeamRoleStructureRead<T>
+    {
+        T FlexType { get; }
+    }
+
+    public interface ITeamFullPositionStructureRead<out T> : ITeamPositionStructureRead<T>
+    {
+        T FlexLineType { get; }
+    }
+
     public interface ITeamRoleStructureRead<out T>
     {
         T VanguardType { get; }
@@ -62,7 +72,9 @@ namespace CombatSystem.Team
 
     public interface ITeamEventListener : ICombatEventListener
     {
-        void OnStanceChange(in CombatTeam team, in EnumTeam.Stance switchedStance);
+        void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance);
         void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst);
     }
+
+
 }

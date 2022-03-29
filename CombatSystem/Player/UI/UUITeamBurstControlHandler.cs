@@ -11,7 +11,7 @@ namespace CombatSystem.Player.UI
             element.UpdateControl();
         }
 
-        protected override void OnStanceChange(in UUITeamControlInfo element, in EnumTeam.Stance switchStance)
+        protected override void OnStanceChange(in UUITeamControlInfo element, in EnumTeam.StanceFull switchStance)
         {
         }
 

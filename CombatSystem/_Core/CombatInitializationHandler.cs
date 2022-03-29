@@ -55,9 +55,6 @@ namespace CombatSystem._Core
 
             InstantiateModels();
 
-            InvokeMainPositions(in playerCombatTeam);
-            InvokeMainPositions(in enemyCombatTeam);
-
             // INVOCATION
             var combatStatesHandler = CombatSystemSingleton.CombatPreparationStatesHandler;
             combatStatesHandler.OnCombatPrepares(allMembers, playerCombatTeam, enemyCombatTeam);
@@ -88,7 +85,7 @@ namespace CombatSystem._Core
                         var instantiatedTransform = instantiatedGameObject.transform;
                         instantiatedTransform.position = position;
                         instantiatedTransform.rotation = rotation;
-                        instantiatedGameObject.name = provider.GetEntityName() + "(Clone)";
+                        instantiatedGameObject.name = provider.GetProviderEntityName() + "(Clone) " +instantiatedGameObject.GetInstanceID();
 
                         member.InstantiationReference = instantiatedGameObject;
                         member.Body = instantiatedGameObject.GetComponent<ICombatEntityBody>();
@@ -96,11 +93,7 @@ namespace CombatSystem._Core
                 }
             }
 
-            void InvokeMainPositions(in CombatTeam team)
-            {
-                team.GetMainPositioningMembers(out var frontLine, out var midLine, out var backLine);
-                systemEvents.OnFirstPositioningMembers(team,in frontLine, in midLine, in backLine);
-            }
+           
         }
 
         private static void PrepareTeamControllers()

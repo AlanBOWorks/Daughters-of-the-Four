@@ -130,7 +130,7 @@ namespace CombatSystem.Stats
         {
             foreach (var pair in _dictionary)
             {
-               Debug.Log($"{pair.Key.GetEntityName()} > HD: {pair.Value.HealthValue} "); 
+               Debug.Log($"{pair.Key.GetProviderEntityName()} > HD: {pair.Value.HealthValue} "); 
             }
         }
 

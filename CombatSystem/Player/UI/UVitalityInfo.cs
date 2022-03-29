@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
 using TMPro;
@@ -13,6 +14,8 @@ namespace CombatSystem.Player.UI
         [SerializeField] private VitalityInfoHolder mortalityInfoHolder = new VitalityInfoHolder();
 
 
+        private const float ElementMarginTop = 8;
+
         private void Awake()
         {
             healthInfoHolder.Awake();
@@ -22,9 +25,20 @@ namespace CombatSystem.Player.UI
 
         private CombatStats _currentStats;
 
-        public void EntityInjection(in CombatEntity entity, int index)
+        public void EntityInjection(in CombatEntity entity)
         {
             Injection(entity.Stats);
+        }
+
+        public void RepositionByIndexHeight(int index)
+        {
+            var rectTransform = GetComponent<RectTransform>();
+            var position = rectTransform.localPosition;
+
+            float rectHeight = rectTransform.rect.height;
+            position.y = -(rectHeight + ElementMarginTop) * index;
+
+            rectTransform.localPosition = position;
         }
 
         public void OnPreStartCombat()
@@ -43,21 +57,21 @@ namespace CombatSystem.Player.UI
         {
             var stats = _currentStats;
             float shields = stats.CurrentShields;
+            UpdateShields(in shields);
 
             float currentHealth = stats.CurrentHealth;
             float maxHealth = UtilsStatsFormula.CalculateMaxHealth(stats);
+            UpdateHealth(in currentHealth, in maxHealth);
+
 
             float currentMortality = stats.CurrentMortality;
             float maxMortality = UtilsStatsFormula.CalculateMaxMortality(stats);
-
-            UpdateShields(in shields);
-            UpdateHealth(in currentHealth, in maxHealth);
             UpdateMortality(in currentMortality, in maxMortality);
         }
 
         public void UpdateShields(in float amount)
         {
-            shieldsText.text = amount.ToString("#");
+            shieldsText.text = amount.ToString(CultureInfo.InvariantCulture);
         }
 
         public void UpdateHealth(in float amount, in float max)
@@ -78,6 +92,8 @@ namespace CombatSystem.Player.UI
             [SerializeField] private RectTransform percentBar;
             private float _barMaxWidth;
 
+          
+
             public void Awake()
             {
                 _barMaxWidth = percentBar.sizeDelta.x;
@@ -87,12 +103,17 @@ namespace CombatSystem.Player.UI
             {
                 float percent = amount / max;
                 UpdatePercentBar(in percent);
-                currentValueText.text = amount.ToString("####");
-                maxValueText.text = max.ToString("####");
+
+                if(currentValueText)
+                    currentValueText.text = amount.ToString("####");
+                if(maxValueText)
+                    maxValueText.text = max.ToString("####");
 
             }
             private void UpdatePercentBar(in float percent)
             {
+                if(!percentBar) return;
+
                 var sizeDelta = percentBar.sizeDelta;
                 sizeDelta.x = _barMaxWidth * percent;
                 percentBar.sizeDelta = sizeDelta;

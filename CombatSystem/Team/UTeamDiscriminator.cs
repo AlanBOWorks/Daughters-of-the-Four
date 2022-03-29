@@ -38,14 +38,14 @@ namespace CombatSystem.Team
 
     public abstract class UTeamDiscriminatorListener<T> : UTeamDiscriminator<T>, ITeamEventListener where T : new()
     {
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.Stance switchedStance)
+        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
             var element = GetElement(in team);
             OnStanceChange(in element,in switchedStance);
 
         }
 
-        protected abstract void OnStanceChange(in T element, in EnumTeam.Stance switchStance);
+        protected abstract void OnStanceChange(in T element, in EnumTeam.StanceFull switchStance);
 
         public void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst)
         {
@@ -89,14 +89,14 @@ namespace CombatSystem.Team
     public abstract class UTeamMonoDiscriminatorListener<T> : UTeamMonoDiscriminator<T>, ITeamEventListener
         where T : MonoBehaviour
     {
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.Stance switchedStance)
+        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
             var element = GetElement(in team);
             OnStanceChange(in element, in switchedStance);
 
         }
 
-        protected abstract void OnStanceChange(in T element, in EnumTeam.Stance switchStance);
+        protected abstract void OnStanceChange(in T element, in EnumTeam.StanceFull switchStance);
 
         public void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst)
         {

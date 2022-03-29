@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using UnityEngine;
 
 namespace CombatSystem.Skills
 {
@@ -21,24 +23,24 @@ namespace CombatSystem.Skills
 
         private static IReadOnlyList<CombatEntity> GetSingleTargetGroup(in CombatEntity target)
         {
-            var team = GetTeam(target);
-            return team.GetMemberGroup(in target);
+            var team = GetTeam(in target);
+            return team.AliveTargeting.GetAlivePositionMembers(target.PositioningType);
         }
 
-        private static IReadOnlyList<CombatEntity> GetTeamAsExcluded(in CombatEntity target)
+        private static IReadOnlyList<CombatEntity> GetAliveTeamAsExcluded(in CombatEntity target)
         {
-            TargetingHelper.Clear();
-            foreach (var member in target.Team)
-            {
-                TargetingHelper.Add(member);
-            }
-
-            TargetingHelper.Remove(target);
-            return TargetingHelper;
+            var team = GetTeam(in target);
+            return team.AliveTargeting.GetAllAliveMembers(in target);
         }
 
-        private static CombatTeam GetTeam(in CombatEntity entity) => entity.Team;
-        private static CombatTeam GetEnemyTeam(in CombatEntity entity) => GetTeam(in entity).EnemyTeam;
+        private static CombatTeam GetTeam(in CombatEntity entity) 
+            => entity.Team;
+        private static CombatTeam GetEnemyTeam(in CombatEntity entity) 
+            => GetTeam(in entity).EnemyTeam;
+
+        private static IReadOnlyList<CombatEntity> GetAliveTeam(in CombatEntity entity)
+            => GetTeam(in entity).AliveTargeting.GetAllAliveMembers();
+
 
         public static IReadOnlyList<CombatEntity> GetPossibleTargets(ISkill skill, CombatEntity performer)
         {
@@ -50,7 +52,7 @@ namespace CombatSystem.Skills
                 case EnumsSkill.Archetype.Offensive:
                     return GetOffensiveTargets();
                 case EnumsSkill.Archetype.Support:
-                    return GetTeamAsExcluded(in performer);
+                    return GetAliveTeamAsExcluded(in performer);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -60,8 +62,8 @@ namespace CombatSystem.Skills
                 var targetType = skill.TargetType;
                 var enemyTeam = GetEnemyTeam(performer);
                 return targetType == EnumsSkill.TargetType.Area 
-                    ? enemyTeam.FrontLineType 
-                    : enemyTeam;
+                    ? enemyTeam.AliveTargeting.GetFrontMostAliveLineMembers()
+                    : enemyTeam.AliveTargeting.GetAllAliveMembers();
             }
         }
 
@@ -70,49 +72,45 @@ namespace CombatSystem.Skills
             in CombatEntity selectedTarget,
             in EnumsEffect.TargetType type)
         {
+            var aliveGroupReadOnly = HandleEffectTargets(in performer, in selectedTarget, in type);
+
+            // Problem: the collection is modified during the effects
+            // Solution: create a copy that will be used only for the effects purposes
+            return aliveGroupReadOnly.ToArray();
+        }
+
+
+        private static IReadOnlyList<CombatEntity> HandleEffectTargets(
+            in CombatEntity performer,
+            in CombatEntity selectedTarget,
+            in EnumsEffect.TargetType type)
+        {
             switch (type)
             {
                 case EnumsEffect.TargetType.Target:
                     return GetSingleTargetGroup(in selectedTarget);
-                case EnumsEffect.TargetType.TargetTeam:
-                    return GetTeam(in selectedTarget);
-                case EnumsEffect.TargetType.TargetTeamExcluded:
-                    return GetTeamAsExcluded(in selectedTarget);
                 case EnumsEffect.TargetType.Performer:
                     return GetSingleTargetGroup(in performer);
+
+
+
+                case EnumsEffect.TargetType.TargetTeam:
+                    return GetAliveTeam(in selectedTarget);
                 case EnumsEffect.TargetType.PerformerTeam:
-                    return GetTeam(in performer);
+                    return GetAliveTeam(in performer);
+
+
+
+                case EnumsEffect.TargetType.TargetTeamExcluded:
+                    return GetAliveTeamAsExcluded(in selectedTarget);
                 case EnumsEffect.TargetType.PerformerTeamExcluded:
-                    return GetTeam(in performer);
-                case EnumsEffect.TargetType.All:
-                    return CombatSystemSingleton.AllMembers;
+                    return GetAliveTeamAsExcluded(in performer);
+
+
+
                 default:
                     throw new NotImplementedException($"Effect Targeting for [{type}] not implemented");
             }
-        }
-
-
-        public static CombatEntity GetFrontMostMember(CombatTeam team)
-        {
-            foreach (var entity in team.FrontLineType)
-            {
-                if (UtilsCombatStats.IsAlive(in entity))
-                    return entity;
-            }
-
-            foreach (var entity in team.MidLineType)
-            {
-                if (UtilsCombatStats.IsAlive(in entity))
-                    return entity;
-            }
-
-            foreach (var entity in team.BackLineType)
-            {
-                if (UtilsCombatStats.IsAlive(in entity))
-                    return entity;
-            }
-
-            return null;
         }
     }
 }

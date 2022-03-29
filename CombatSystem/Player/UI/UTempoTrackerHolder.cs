@@ -29,14 +29,13 @@ namespace CombatSystem.Player.UI
         }
 
         private CombatEntity _user;
-        public void EntityInjection(in CombatEntity entity, int index)
+        public void EntityInjection(in CombatEntity entity)
         {
             if(!_percentBarTransform) AllocateBar();
 
             _user = entity;
 
             UpdateEntityName(in entity);
-            RepositionLocalHeight(in index);
             TickTempo(0,0);
 
             gameObject.SetActive(true);
@@ -44,9 +43,10 @@ namespace CombatSystem.Player.UI
 
         private void UpdateEntityName(in CombatEntity entity)
         {
-            entityName.text = LocalizationPlayerCharacters.LocalizeCharactersName(entity);
+            entityName.text = entity.CombatCharacterName;
         }
-        private void RepositionLocalHeight(in int index)
+
+        public void RepositionLocalHeight(int index)
         {
             var rectTransform = GetComponent<RectTransform>();
             const float transformHeight = HeightElementSeparation;

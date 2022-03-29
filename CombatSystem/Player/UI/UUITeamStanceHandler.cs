@@ -14,7 +14,7 @@ namespace CombatSystem.Player.UI
             element.UpdateStanceText(in stance);
         }
 
-        protected override void OnStanceChange(in StanceHandler element, in EnumTeam.Stance switchStance)
+        protected override void OnStanceChange(in StanceHandler element, in EnumTeam.StanceFull switchStance)
         {
             element.UpdateStanceText(in switchStance);
         }
@@ -29,7 +29,7 @@ namespace CombatSystem.Player.UI
         {
             [SerializeField] private TextMeshProUGUI stanceText;
 
-            public void UpdateStanceText(in EnumTeam.Stance stance)
+            public void UpdateStanceText(in EnumTeam.StanceFull stance)
             {
                 var stanceString = stance.ToString();
                 stanceString = CombatLocalizations.LocalizeStance(in stanceString);

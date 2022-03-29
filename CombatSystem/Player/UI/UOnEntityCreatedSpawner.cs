@@ -47,7 +47,7 @@ namespace CombatSystem.Player.UI
 
 
 
-        public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
+        public virtual void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             var playerSpawner = PlayerElementSpawner;
             var enemySpawner = EnemyElementSpawner;
@@ -58,17 +58,17 @@ namespace CombatSystem.Player.UI
             {
                 foreach (var member in team)
                 {
-                    OnCreateEntity(in member, in spawner);
+                    OnSpawnElementForEntity(in member, in spawner);
                 }
             }
         }
         public void OnCreateEntity(in CombatEntity entity, in bool isPlayers)
         {
             var elementSpawner = GetHandler(isPlayers);
-            OnCreateEntity(in entity, in elementSpawner);
+            OnSpawnElementForEntity(in entity, in elementSpawner);
         }
 
-        private void OnCreateEntity(in CombatEntity entity, in EntityElementSpawner spawner)
+        protected virtual void OnSpawnElementForEntity(in CombatEntity entity, in EntityElementSpawner spawner)
         {
             var element = GenerateElement(in entity, spawner);
             OnElementCreated(in element, in entity);
@@ -119,12 +119,12 @@ namespace CombatSystem.Player.UI
             public T GenerateElement(in CombatEntity entity)
             {
                 T element = Instantiate(elementEntityPrefab, instantiationParent);
-                element.EntityInjection(entity, ActiveCount);
+                element.EntityInjection(entity);
                 ActiveCount++;
 
 
 #if UNITY_EDITOR
-                element.name = entity.GetEntityName() + " - UI Hover [Group] (Clone)";
+                element.name = entity.GetProviderEntityName() + " - UI Hover [Group] (Clone)";
 #endif
 
                 return element;
@@ -137,7 +137,7 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        public void OnCombatPreStarts()
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             foreach (var element in ActiveElementsDictionary)
             {
@@ -190,7 +190,7 @@ namespace CombatSystem.Player.UI
 
     public interface IEntityExistenceElement<T> where T : UnityEngine.Object, IEntityExistenceElement<T>
     {
-        void EntityInjection(in CombatEntity entity, int index);
+        void EntityInjection(in CombatEntity entity);
         void OnPreStartCombat();
     }
 

@@ -159,7 +159,7 @@ namespace CombatSystem.Player.UI
             _currentControlEntity = null;
             ReturnSkillsToStack();
         }
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.Stance switchedStance)
+        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
             ReturnSkillsToStack();
             PoolEntitySkills(in _currentControlEntity);

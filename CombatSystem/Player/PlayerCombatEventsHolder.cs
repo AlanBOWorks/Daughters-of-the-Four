@@ -262,27 +262,27 @@ namespace CombatSystem.Player
 
             public void OnTargetButtonHover(in CombatEntity target)
             {
-                Debug.Log($"Target Hover: {target.GetEntityName()}");
+                Debug.Log($"Target Hover: {target.GetProviderEntityName()}");
             }
 
             public void OnTargetButtonExit(in CombatEntity target)
             {
-                Debug.Log($"Target Exit: {target.GetEntityName()}");
+                Debug.Log($"Target Exit: {target.GetProviderEntityName()}");
             }
 
             public void OnTargetSelect(in CombatEntity target)
             {
-                Debug.Log($"Target Hover: {target.GetEntityName()}");
+                Debug.Log($"Target Hover: {target.GetProviderEntityName()}");
             }
 
             public void OnTargetCancel(in CombatEntity target)
             {
-                Debug.Log($"Target Cancel: {target.GetEntityName()}");
+                Debug.Log($"Target Cancel: {target.GetProviderEntityName()}");
             }
 
             public void OnTargetSubmit(in CombatEntity target)
             {
-                Debug.Log($"xxxx - Target SUBMIT: {target.GetEntityName()}");
+                Debug.Log($"xxxx - Target SUBMIT: {target.GetProviderEntityName()}");
             }
         } 
 #endif

@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace CombatSystem.Entity
 {
-    public sealed class CombatEntity : ITeamAreaDataRead, ICombatEntityInfoHolder, ILocalizableCharacter
+    public sealed class CombatEntity : ITeamAreaDataRead, ICombatEntityInfoHolder
     {
         public CombatEntity(ICombatEntityProvider preparationData)
         {
@@ -35,6 +35,7 @@ namespace CombatSystem.Entity
             ProtectionReceiveTracker = new CombatEntityVitalityTracker();
 
 
+            CombatCharacterName = Provider.GetProviderEntityName();
 
             DiceValuesHolder.RollDice();
         }
@@ -43,6 +44,11 @@ namespace CombatSystem.Entity
         {
             InjectTeam(team);
         }
+
+        /// <summary>
+        /// Localized name
+        /// </summary>
+        public string CombatCharacterName;
 
         [ShowInInspector, InlineEditor()] 
         public readonly ICombatEntityProvider Provider;
@@ -63,12 +69,12 @@ namespace CombatSystem.Entity
 
         [ShowInInspector]
         public EnumTeam.Role RoleType { get; }
+
         [ShowInInspector]
         public EnumTeam.Positioning PositioningType { get; private set; }
 
         [ShowInInspector]
         public CombatTeam Team { get; private set; }
-        public PositionGroup PositionGroup { get; private set; }
 
 
         [ShowInInspector,HorizontalGroup("Damage Tracker")]
@@ -82,16 +88,16 @@ namespace CombatSystem.Entity
         public readonly CombatEntityVitalityTracker ProtectionReceiveTracker;
 
 
-        public string GetLocalizableCharactersName() => Provider.GetLocalizableCharactersName();
-        public string GetEntityName() => Provider.GetEntityName();
+        public string GetProviderEntityName() => Provider.GetProviderEntityName();
         public IReadOnlyCollection<CombatSkill> AllSkills => _skillsHolder;
 
-        public EnumTeam.StanceFull GetCurrentStance()
+        public bool CanBeTarget()
         {
-            if (IsDisrupted)
-                return EnumTeam.StanceFull.Disrupted;
-            return UtilsTeam.ParseStance(Team.DataValues.CurrentStance);
+            return Stats.IsAlive();
         }
+
+        public EnumTeam.StanceFull GetCurrentStance() => Team.DataValues.CurrentStance;
+
         //Todo make forced disruptionStance
         public bool IsDisrupted;
 
@@ -106,11 +112,6 @@ namespace CombatSystem.Entity
             InjectTeam(team);
         }
 
-        public void SwitchPositioning(PositionGroup group)
-        {
-            PositionGroup = group;
-            PositioningType = group.GroupType;
-        }
 
         /// <summary>
         /// ReadOnly StanceSkills in the current [<seealso cref="EnumTeam.StanceFull"/>];<br></br>
@@ -220,7 +221,7 @@ namespace CombatSystem.Entity
 
     }
 
-    public interface ICombatEntityProvider : ICombatEntityPreparation, ICombatEntityInfoHolder, ILocalizableCharacter
+    public interface ICombatEntityProvider : ICombatEntityPreparation, ICombatEntityInfoHolder
     {
         GameObject GetVisualPrefab();
         IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills();
@@ -235,6 +236,6 @@ namespace CombatSystem.Entity
 
     public interface ICombatEntityInfoHolder
     {
-        string GetEntityName();
+        string GetProviderEntityName();
     }
 }

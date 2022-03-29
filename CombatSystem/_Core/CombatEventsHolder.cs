@@ -77,11 +77,11 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
         }
 
-        public void OnCombatPreStarts()
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            _eventsHolder.OnCombatPreStarts();
-            _playerCombatEvents.OnCombatPreStarts();
-            _enemyCombatEvents.OnCombatPreStarts();
+            _eventsHolder.OnCombatPreStarts(playerTeam, enemyTeam);
+            _playerCombatEvents.OnCombatPreStarts(playerTeam, enemyTeam);
+            _enemyCombatEvents.OnCombatPreStarts(playerTeam, enemyTeam);
         }
 
         public void OnCombatStart()
@@ -211,36 +211,7 @@ namespace CombatSystem._Core
             _playerCombatEvents.OnDestroyEntity(in entity, in isPlayers);
             _enemyCombatEvents.OnDestroyEntity(in entity, in isPlayers);
         }
-
-        public void OnFirstPositioningMembers(CombatTeam membersTeam, in CombatEntity frontLine, in CombatEntity midLine,
-            in CombatEntity backLine)
-        {
-            _eventsHolder.OnFirstPositioningMembers(membersTeam, in frontLine, in midLine, in backLine);
-            _playerCombatEvents.OnFirstPositioningMembers(membersTeam, in frontLine, in midLine, in backLine);
-            _enemyCombatEvents.OnFirstPositioningMembers(membersTeam, in frontLine, in midLine, in backLine);
-        }
-
-        public void OnMainFrontLineSwitch(in CombatEntity entity)
-        {
-            _eventsHolder.OnMainFrontLineSwitch(in entity);
-            _playerCombatEvents.OnMainFrontLineSwitch(in entity);
-            _enemyCombatEvents.OnMainFrontLineSwitch(in entity);
-        }
-
-        public void OnMainMidLineSwitch(in CombatEntity entity)
-        {
-            _eventsHolder.OnMainMidLineSwitch(in entity);
-            _playerCombatEvents.OnMainMidLineSwitch(in entity);
-            _enemyCombatEvents.OnMainMidLineSwitch(in entity);
-        }
-
-        public void OnMainBackLineSwitch(in CombatEntity entity)
-        {
-            _eventsHolder.OnMainBackLineSwitch(in entity);
-            _playerCombatEvents.OnMainBackLineSwitch(in entity);
-            _enemyCombatEvents.OnMainBackLineSwitch(in entity);
-        }
-
+        
         public void OnDamageDone(in CombatEntity target, in CombatEntity performer, in float amount)
         {
             _eventsHolder.OnDamageDone(in target, in performer, in amount);
@@ -277,7 +248,7 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnKnockOut(in target, in performer);
         }
 
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.Stance switchedStance)
+        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
             _eventsHolder.OnStanceChange(in team, in switchedStance);
             _playerCombatEvents.OnStanceChange(in team, in switchedStance);
@@ -327,22 +298,22 @@ namespace CombatSystem._Core
         {
             public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
             {
-                Debug.Log($"> --- Entity Sequence: {entity.GetEntityName()}");
+                Debug.Log($"> --- Entity Sequence: {entity.GetProviderEntityName()}");
             }
 
             public void OnEntityRequestAction(CombatEntity entity)
             {
-                Debug.Log($"> --- Entity [Request ACTION]: {entity.GetEntityName()}");
+                Debug.Log($"> --- Entity [Request ACTION]: {entity.GetProviderEntityName()}");
             }
 
             public void OnEntityFinishAction(CombatEntity entity)
             {
-                Debug.Log($"> --- Entity [End ACTION]: {entity.GetEntityName()}");
+                Debug.Log($"> --- Entity [End ACTION]: {entity.GetProviderEntityName()}");
             }
 
             public void OnEntityFinishSequence(CombatEntity entity)
             {
-                Debug.Log($"> --- Entity [END] Sequence: {entity.GetEntityName()}");
+                Debug.Log($"> --- Entity [END] Sequence: {entity.GetProviderEntityName()}");
             }
 
             public void OnStartTicking()
@@ -368,9 +339,9 @@ namespace CombatSystem._Core
             {
 
                 Debug.Log($"----------------- SKILL --------------- \n" +
-                          $"Random Controller: {performer.GetEntityName()} / " +
+                          $"Random Controller: {performer.GetProviderEntityName()} / " +
                           $"Used : {usedSkill.Preset} /" +
-                          $"Target: {target.GetEntityName()}");
+                          $"Target: {target.GetProviderEntityName()}");
                 Debug.Log($"ACTIONS Used: {performer.Stats.UsedActions}");
             }
 
@@ -381,7 +352,7 @@ namespace CombatSystem._Core
 
             public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
             {
-                Debug.Log($"Effect performed  {performer.GetEntityName()} / On target: {target.GetEntityName()} ");
+                Debug.Log($"Effect performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
             }
 
             public void OnSkillFinish()
@@ -488,7 +459,6 @@ namespace CombatSystem._Core
             _combatPreparationListeners = new HashSet<ICombatPreparationListener>();
             _combatStatesListeners = new HashSet<ICombatStatesListener>();
             _entitiesExistenceListeners = new HashSet<ICombatEntityExistenceListener>();
-            _mainPositionListeners = new HashSet<ICombatMainPositionListener>();
             _damageDoneListeners = new HashSet<IDamageDoneListener>();
             _vitalityChangeListeners = new HashSet<IVitalityChangeListeners>();
         }
@@ -501,8 +471,6 @@ namespace CombatSystem._Core
         private readonly ICollection<ICombatStatesListener> _combatStatesListeners;
         [ShowInInspector] 
         private readonly ICollection<ICombatEntityExistenceListener> _entitiesExistenceListeners;
-        [ShowInInspector] 
-        private readonly ICollection<ICombatMainPositionListener> _mainPositionListeners;
         [ShowInInspector] 
         private readonly ICollection<IDamageDoneListener> _damageDoneListeners;
 
@@ -523,8 +491,6 @@ namespace CombatSystem._Core
 
             if (listener is ICombatEntityExistenceListener entityExistenceListener)
                 _entitiesExistenceListeners.Add(entityExistenceListener);
-            if(listener is ICombatMainPositionListener mainPositionListener)
-                _mainPositionListeners.Add(mainPositionListener);
 
             if(listener is IDamageDoneListener damageDoneListener)
                 _damageDoneListeners.Add(damageDoneListener);
@@ -548,8 +514,6 @@ namespace CombatSystem._Core
 
             if (listener is ICombatEntityExistenceListener entityExistenceListener)
                 _entitiesExistenceListeners.Remove(entityExistenceListener);
-            if (listener is ICombatMainPositionListener mainPositionListener)
-                _mainPositionListeners.Remove(mainPositionListener);
 
             if (listener is IDamageDoneListener damageDoneListener)
                 _damageDoneListeners.Remove(damageDoneListener);
@@ -570,11 +534,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatPreStarts()
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             foreach (var listener in _combatStatesListeners)
             {
-                listener.OnCombatPreStarts();
+                listener.OnCombatPreStarts(playerTeam, enemyTeam);
             }
         }
 
@@ -616,41 +580,6 @@ namespace CombatSystem._Core
             {
                 listener.OnDestroyEntity(in entity, in isPlayers);
             }
-        }
-
-        public void OnFirstPositioningMembers(CombatTeam membersTeam, in CombatEntity frontLine, in CombatEntity midLine,
-            in CombatEntity backLine)
-        {
-            foreach (var listener in _mainPositionListeners)
-            {
-                listener.OnFirstPositioningMembers(membersTeam,in frontLine, in midLine, in backLine);
-            }
-        }
-
-        public void OnMainFrontLineSwitch(in CombatEntity entity)
-        {
-            foreach (var listener in _mainPositionListeners)
-            {
-                listener.OnMainFrontLineSwitch(in entity);
-            }
-        }
-
-        public void OnMainMidLineSwitch(in CombatEntity entity)
-        {
-            foreach (var listener in _mainPositionListeners)
-            {
-                listener.OnMainMidLineSwitch(in entity);
-            }
-
-        }
-
-        public void OnMainBackLineSwitch(in CombatEntity entity)
-        {
-            foreach (var listener in _mainPositionListeners)
-            {
-                listener.OnMainBackLineSwitch(in entity);
-            }
-
         }
 
         public void OnDamageDone(in CombatEntity target, in CombatEntity performer, in float amount)
@@ -823,7 +752,7 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.Stance switchedStance)
+        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
             foreach (var listener in _teamEventListeners)
             {
@@ -844,7 +773,7 @@ namespace CombatSystem._Core
     public interface ICombatEventsHolder : ICombatPreparationListener, ICombatStatesListener,
         ITempoEntityStatesListener,
         ITeamEventListener,
-        ICombatEntityExistenceListener, ICombatMainPositionListener,
+        ICombatEntityExistenceListener, 
         ISkillUsageListener,
         IDamageDoneListener, IVitalityChangeListeners
     {
@@ -859,25 +788,6 @@ namespace CombatSystem._Core
         void OnDestroyEntity(in CombatEntity entity, in bool isPlayers);
     }
 
-    public interface ICombatMainPositionListener : ICombatEventListener
-    {
-
-        void OnFirstPositioningMembers(CombatTeam membersTeam, in CombatEntity frontLine, in CombatEntity midLine,
-            in CombatEntity backLine);
-
-        /// <summary>
-        /// Invoked when the main role position is added or switcher
-        /// </summary>
-        void OnMainFrontLineSwitch(in CombatEntity entity);
-        /// <summary>
-        /// <inheritdoc cref="OnMainFrontLineSwitch"/>
-        /// </summary>
-        void OnMainMidLineSwitch(in CombatEntity entity);
-        /// <summary>
-        /// <inheritdoc cref="OnMainFrontLineSwitch"/>
-        /// </summary>
-        void OnMainBackLineSwitch(in CombatEntity entity);
-    }
 
     /// <summary>
     /// EventsHolder that will be summon if the associated [<see cref="CombatEntity"/>] belongs to them
