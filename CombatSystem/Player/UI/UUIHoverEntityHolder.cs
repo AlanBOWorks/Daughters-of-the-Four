@@ -27,6 +27,16 @@ namespace CombatSystem.Player.UI
             
         }
 
+        public void ShowElement()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void HideElement()
+        {
+            gameObject.SetActive(false);
+        }
+
         private Camera _playerCamera;
         private Transform _followReference;
         private RectTransform _rectTransform;

@@ -15,14 +15,19 @@ namespace CombatSystem.Luck
 
         [ShowInInspector]
         public DiceValues Values { get; private set; }
+
+        /// <summary>
+        /// The Percent in Unit[0,1] based in the characters stats (warning: this value could go higher than 1); <br></br>
+        /// For a dice value, check [<seealso cref="Values"/>]
+        /// </summary>
         [ShowInInspector, SuffixLabel("%")]
-        public float PercentageRoll { get; private set; }
+        public float CombatPercentageRoll { get; private set; }
 
         public void RollDice()
         {
             Values = UtilsLuck.RolDice();
             float rolInUnit = Values.UnitValue;
-            PercentageRoll = UtilsLuck.CalculateLuckInUnit(in _calculationsReference, in rolInUnit);
+            CombatPercentageRoll = UtilsLuck.CalculateLuckInUnit(in _calculationsReference, in rolInUnit);
         }
 
        

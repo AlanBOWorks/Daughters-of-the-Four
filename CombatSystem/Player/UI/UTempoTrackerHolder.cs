@@ -4,6 +4,7 @@ using CombatSystem.Entity;
 using CombatSystem.Stats;
 using DG.Tweening;
 using Localization.Characters;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,30 +17,36 @@ namespace CombatSystem.Player.UI
         [SerializeField] private TextMeshProUGUI entityName;
         [SerializeField] private TextMeshProUGUI currentTick;
         [SerializeField] private TextMeshProUGUI entitySpeed;
-        [SerializeField] private Image percentBar;
-        private RectTransform _percentBarTransform;
+        [SerializeField] private RectTransform percentBarImage;
 
-        
+        [ShowInInspector]
+        private CombatEntity _user;
+
         public const float HeightElementSeparation = 16* 2 + 10;
         private float _barInitialWidth;
-        private void AllocateBar()
+        private void Awake()
         {
-            _percentBarTransform = percentBar.rectTransform;
-            _barInitialWidth = _percentBarTransform.rect.width;
+            _barInitialWidth = percentBarImage.rect.width;
         }
 
-        private CombatEntity _user;
+        public void ShowElement()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void HideElement()
+        {
+            gameObject.SetActive(false);
+        }
+
         public void EntityInjection(in CombatEntity entity)
         {
-            if(!_percentBarTransform) AllocateBar();
-
             _user = entity;
 
             UpdateEntityName(in entity);
             TickTempo(0,0);
-
-            gameObject.SetActive(true);
         }
+
 
         private void UpdateEntityName(in CombatEntity entity)
         {
@@ -76,23 +83,27 @@ namespace CombatSystem.Player.UI
         {
             DOTween.To(
                 () => barSize,
-                targetSize => _percentBarTransform.sizeDelta = targetSize,
+                targetSize => percentBarImage.sizeDelta = targetSize,
                 desiredSize,
                 AnimationDuration);
         }
 
         private void CalculateBarWidth(in float percentInitiative, out Vector2 barSize, out Vector2 desiredSize)
         {
-            float targetWidth = _barInitialWidth * (percentInitiative);
-            if (targetWidth > _barInitialWidth) targetWidth = _barInitialWidth;
-            else if (targetWidth < 0) targetWidth = 0;
+            float inversePercent =  1- percentInitiative;
+            float invertInitialWidth = -_barInitialWidth; // negative because negative sizeDelta means smaller
 
-            barSize = _percentBarTransform.sizeDelta;
+            float targetWidth = inversePercent * invertInitialWidth;
+            targetWidth = Mathf.Clamp(targetWidth,invertInitialWidth, 0); // Zero means full holder's rect.deltaSize
+
+            barSize = percentBarImage.sizeDelta;
             desiredSize = new Vector2(targetWidth, barSize.y);
         }
 
         private void UpdateSpeedText()
         {
+            if(_user == null) return;
+
             var userStats = _user.Stats;
             float initiativeSpeed = UtilsStatsFormula.CalculateInitiativeSpeed(in userStats);
             entitySpeed.text = "+" + initiativeSpeed.ToString("0");

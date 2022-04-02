@@ -35,8 +35,12 @@ namespace CombatSystem.Entity
             ProtectionReceiveTracker = new CombatEntityVitalityTracker();
 
 
-            CombatCharacterName = Provider.GetProviderEntityName();
+            // PLAYER's essentials
+            string providersName = Provider.GetProviderEntityName();
+            CombatCharacterName = LocalizationPlayerCharacters.LocalizeCharactersName(in providersName);
 
+
+            // COMBAT's others
             DiceValuesHolder.RollDice();
         }
         public CombatEntity(ICombatEntityProvider preparationData, CombatTeam team) :
@@ -87,7 +91,11 @@ namespace CombatSystem.Entity
         [ShowInInspector, HorizontalGroup("Heal Tracker")]
         public readonly CombatEntityVitalityTracker ProtectionReceiveTracker;
 
-
+        /// <summary>
+        /// The provider's name; this is for Dev purposes.<br></br>
+        /// For Player's info, use [<seealso cref="CombatCharacterName"/>] instead
+        /// </summary>
+        /// <returns></returns>
         public string GetProviderEntityName() => Provider.GetProviderEntityName();
         public IReadOnlyCollection<CombatSkill> AllSkills => _skillsHolder;
 
@@ -142,6 +150,8 @@ namespace CombatSystem.Entity
         }
         public void OnSequenceFinish()
         {
+            DiceValuesHolder.RollDice();
+
             DamageReceiveTracker.ResetOnActionValues(); //Because on OnActionStart triggers no more
             DamageDoneTracker.ResetOnActionValues();
 

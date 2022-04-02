@@ -27,7 +27,7 @@ namespace CombatSystem.Player.UI
             var healthInfo = element.GetHealthInfo();
             _infoDictionary.Add(entity,healthInfo);
 
-            healthInfo.Injection(entity.Stats);
+            healthInfo.EntityInjection(in entity);
         }
 
         public void ClearEntities()

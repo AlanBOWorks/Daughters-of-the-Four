@@ -13,7 +13,6 @@ namespace CombatSystem.Team
         [SerializeField] private Transform instantiationParent;
         [SerializeField] private T instantiationPrefab;
 
-        [SerializeField] private bool hidePrefabGameObject = true;
 
         public void InstantiateElements()
         {
@@ -21,10 +20,11 @@ namespace CombatSystem.Team
             AttackerType = UnityEngine.Object.Instantiate(instantiationPrefab, instantiationParent);
             SupportType = UnityEngine.Object.Instantiate(instantiationPrefab, instantiationParent);
             FlexType = UnityEngine.Object.Instantiate(instantiationPrefab, instantiationParent);
+        }
 
-            if(hidePrefabGameObject)
+        public void HidePrefab()
+        {
                 instantiationPrefab.gameObject.SetActive(false);
-
         }
     }
 }

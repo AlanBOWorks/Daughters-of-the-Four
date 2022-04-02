@@ -9,22 +9,26 @@ namespace CombatSystem.Player.UI
     {
         public void OnShieldLost(in CombatEntity target, in CombatEntity performer, in float amount)
         {
-            ActiveElementsDictionary[target].UpdateToCurrentStats();
+            if(ActiveElementsDictionary.ContainsKey(target))
+                ActiveElementsDictionary[target].UpdateToCurrentStats();
         }
 
         public void OnHealthLost(in CombatEntity target, in CombatEntity performer, in float amount)
         {
-            ActiveElementsDictionary[target].UpdateToCurrentStats();
+            if(ActiveElementsDictionary.ContainsKey(target))
+                ActiveElementsDictionary[target].UpdateToCurrentStats();
         }
 
         public void OnMortalityLost(in CombatEntity target, in CombatEntity performer, in float amount)
         {
-            ActiveElementsDictionary[target].UpdateToCurrentStats();
+            if(ActiveElementsDictionary.ContainsKey(target))
+                ActiveElementsDictionary[target].UpdateToCurrentStats();
         }
 
         public void OnKnockOut(in CombatEntity target, in CombatEntity performer)
         {
-            ActiveElementsDictionary[target].UpdateToCurrentStats();
+            if(ActiveElementsDictionary.ContainsKey(target))
+                ActiveElementsDictionary[target].UpdateToCurrentStats();
         }
 
         /* UOnEntityCreatedSpawner VARIATION
@@ -38,7 +42,7 @@ namespace CombatSystem.Player.UI
             return generatedElement;
         }*/
 
-        protected override void OnIterationCall(in UVitalityInfo element, in CombatEntity entity, int notNullIndex)
+        public override void OnIterationCall(in UVitalityInfo element, in CombatEntity entity, int notNullIndex)
         {
             var elementGameObject = element.gameObject;
             if(entity == null)
@@ -47,7 +51,7 @@ namespace CombatSystem.Player.UI
                 return;
             }
 
-            element.Injection(entity.Stats);
+            element.EntityInjection(in entity);
             element.RepositionByIndexHeight(notNullIndex);
             elementGameObject.SetActive(true);
         }

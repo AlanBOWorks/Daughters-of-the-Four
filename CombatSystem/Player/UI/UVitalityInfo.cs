@@ -9,6 +9,7 @@ namespace CombatSystem.Player.UI
 {
     public class UVitalityInfo : MonoBehaviour, IEntityExistenceElement<UVitalityInfo>
     {
+        [SerializeField] private TextMeshProUGUI entityNameText;
         [SerializeField] private TextMeshProUGUI shieldsText;
         [SerializeField] private VitalityInfoHolder healthInfoHolder = new VitalityInfoHolder();
         [SerializeField] private VitalityInfoHolder mortalityInfoHolder = new VitalityInfoHolder();
@@ -28,6 +29,8 @@ namespace CombatSystem.Player.UI
         public void EntityInjection(in CombatEntity entity)
         {
             Injection(entity.Stats);
+            var entityName = entity.CombatCharacterName;
+            UpdateCharacterName(in entityName);
         }
 
         public void RepositionByIndexHeight(int index)
@@ -46,11 +49,27 @@ namespace CombatSystem.Player.UI
             
         }
 
+        public void ShowElement()
+        {
+            gameObject.SetActive(true);
+        }
 
-        public void Injection(in CombatStats injection)
+        public void HideElement()
+        {
+            gameObject.SetActive(false);
+        }
+
+
+        private void Injection(in CombatStats injection)
         {
             _currentStats = injection;
             UpdateToCurrentStats();
+        }
+
+        private void UpdateCharacterName(in string entityName)
+        {
+            if (entityNameText)
+                entityNameText.text = entityName;
         }
 
         public void UpdateToCurrentStats()

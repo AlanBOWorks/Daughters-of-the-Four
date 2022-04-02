@@ -120,6 +120,7 @@ namespace CombatSystem.Player.UI
             {
                 T element = Instantiate(elementEntityPrefab, instantiationParent);
                 element.EntityInjection(entity);
+                element.ShowElement();
                 ActiveCount++;
 
 
@@ -192,6 +193,8 @@ namespace CombatSystem.Player.UI
     {
         void EntityInjection(in CombatEntity entity);
         void OnPreStartCombat();
+        void ShowElement();
+        void HideElement();
     }
 
 

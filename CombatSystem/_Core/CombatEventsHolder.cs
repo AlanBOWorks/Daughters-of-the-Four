@@ -409,6 +409,17 @@ namespace CombatSystem._Core
                 _tempoEntityPercentListeners.Remove(entityPercentListener);
         }
 
+        public void ManualSubscription(ITempoEntityPercentListener percentListener)
+        {
+            _tempoEntityPercentListeners.Add(percentListener);
+        }
+        public void ManualUnSubscription(ITempoEntityPercentListener percentListener)
+        {
+            _tempoEntityPercentListeners.Remove(percentListener);
+        }
+
+
+
         public void OnStartTicking()
         {
             foreach (var listener in _tempoTickListeners)
