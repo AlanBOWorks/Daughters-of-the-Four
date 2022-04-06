@@ -51,8 +51,6 @@ namespace CombatSystem.Entity
     [Serializable]
     internal sealed class PreparationEntity : ICombatEntityPreparation
     {
-        
-
         [Title("Values")]
         [SerializeField]
         private BaseStats baseStats = new BaseStats();

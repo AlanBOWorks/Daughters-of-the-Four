@@ -38,6 +38,34 @@ namespace CombatSystem.Team
             Flex = FlexIndex
         }
 
+        /// <summary>
+        /// Amount of OffRoleTypes = 2
+        /// </summary>
+        public const int OffRoleTypesLength = 2;
+        /// <summary>
+        /// The amount of OffRolesIndexes = 8
+        /// </summary>
+        public const int OffRoleIndexCount = ThirdFlexIndex +1;
+
+        /// <summary>
+        /// The index in an array for secondary Roles = 0;
+        /// </summary>
+        public const int SecondaryRoleInOffArrayIndex = 0;
+        /// <summary>
+        /// The index in an array for secondary Roles = 1
+        /// </summary>
+        public const int ThirdRoleInOffArrayIndex = SecondaryRoleInOffArrayIndex + 1;
+
+        public const int SecondaryVanguardIndex = 0;
+        public const int SecondaryAttackerIndex = SecondaryVanguardIndex + 1;
+        public const int SecondarySupportIndex = SecondaryAttackerIndex + 1;
+        public const int SecondaryFlexIndex = SecondarySupportIndex + 1;
+
+        public const int ThirdVanguardIndex = SecondaryFlexIndex + 1;
+        public const int ThirdAttackerIndex = ThirdVanguardIndex + 1;
+        public const int ThirdSupportIndex = ThirdAttackerIndex + 1;
+        public const int ThirdFlexIndex = ThirdSupportIndex + 1;
+
         public enum ActiveRole
         {
             InvalidRole = InvalidIndex,
@@ -45,10 +73,16 @@ namespace CombatSystem.Team
             MainAttacker = AttackerIndex,
             MainSupport = SupportIndex,
             MainFlex = FlexIndex,
-            SecondaryVanguard,
-            SecondaryAttacker,
-            SecondarySupport,
-            SecondaryFlex
+
+            SecondaryVanguard = SecondaryVanguardIndex,
+            SecondaryAttacker = SecondaryAttackerIndex,
+            SecondarySupport = SecondarySupportIndex,
+            SecondaryFlex = SecondaryFlexIndex,
+
+            ThirdVanguard = ThirdVanguardIndex,
+            ThirdAttacker = ThirdAttackerIndex,
+            ThirdSupport = ThirdSupportIndex,
+            ThirdFlex = ThirdFlexIndex
         }
 
 
@@ -116,5 +150,7 @@ namespace CombatSystem.Team
                     throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null);
             }
         }
+
+
     }
 }

@@ -62,7 +62,10 @@ namespace CombatSystem._Core
 
         public const float TickPeriodSeconds = .2f;
         public const int LoopThreshold = 23;
-        public const int LoopThresholdForPlayerInterface = LoopThreshold + 1;
+        /// <summary>
+        /// Instead being 23; it becomes 23+1 for more intuitive and persistent behaviors
+        /// </summary>
+        public const int LoopThresholdAsIntended = LoopThreshold + 1;
 
         private int _roundTickCount;
         public int GetCurrentRoundTicks() => _roundTickCount;
@@ -141,8 +144,11 @@ namespace CombatSystem._Core
 
         [ShowInInspector]
         private readonly HashSet<CombatEntity> _tickingTrackers;
-        [ShowInInspector]
+
+        
+        [ShowInInspector,HorizontalGroup()]
         private readonly Queue<CombatEntity> _activeEntities;
+
         [ShowInInspector]
         public CombatEntity CurrentActingEntity { get; private set; }
 
@@ -183,20 +189,21 @@ namespace CombatSystem._Core
             void HandleTickEntity(CombatEntity entity)
             {
                 CombatStats stats = entity.Stats;
-                float initiativeIncrement = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
-                stats.CurrentInitiative += initiativeIncrement;
 
-
-                float entityInitiativeAmount = stats.CurrentInitiative;
+                UtilsCombatStats.TickInitiative(stats, out var entityInitiativeAmount);
                 const float initiativeThreshold = TempoTicker.LoopThreshold;
                 float initiativePercent = entityInitiativeAmount / initiativeThreshold;
 
                 eventsHolder.OnEntityTick(in entity, in entityInitiativeAmount, in initiativePercent);
                 //Acting Check
-                if (entityInitiativeAmount <= initiativeThreshold)
+                if (entityInitiativeAmount < initiativeThreshold)
                     return;
 
-                _activeEntities.Enqueue(entity);
+                bool isTrinityRole = UtilsTeam.IsTrinityRole(in entity);
+                if (isTrinityRole)
+                    _activeEntities.Enqueue(entity);
+                else
+                    entity.Team.StandByMembers.PutOnStandBy(in entity);
             }
         }
 

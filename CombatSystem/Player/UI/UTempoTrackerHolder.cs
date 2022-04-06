@@ -13,7 +13,11 @@ namespace CombatSystem.Player.UI
 {
     public class UTempoTrackerHolder : MonoBehaviour, IEntityExistenceElement<UTempoTrackerHolder>
     {
+        [Title("Holder")]
+        [SerializeField] private CanvasGroup alphaGroup;
 
+
+        [Title("Elements")]
         [SerializeField] private TextMeshProUGUI entityName;
         [SerializeField] private TextMeshProUGUI currentTick;
         [SerializeField] private TextMeshProUGUI entitySpeed;
@@ -29,9 +33,17 @@ namespace CombatSystem.Player.UI
             _barInitialWidth = percentBarImage.rect.width;
         }
 
+        private const float DisableAlphaValue = .3f;
+
         public void ShowElement()
         {
             gameObject.SetActive(true);
+            alphaGroup.alpha = 1;
+        }
+
+        public void DisableElement()
+        {
+            alphaGroup.alpha = DisableAlphaValue;
         }
 
         public void HideElement()
@@ -39,19 +51,39 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
         }
 
+
+
         public void EntityInjection(in CombatEntity entity)
         {
             _user = entity;
+            if (entity == null)
+            {
+                UpdateInfoAsNull();
+            }
+            else
+            {
+                UpdateEntityName(in entity);
+            }
 
-            UpdateEntityName(in entity);
             TickTempo(0,0);
         }
 
+        private const string OnNullName = "-------";
+        private void UpdateInfoAsNull()
+        {
+            UpdateEntityName(OnNullName);
+        }
 
         private void UpdateEntityName(in CombatEntity entity)
         {
-            entityName.text = entity.CombatCharacterName;
+            UpdateEntityName(entity.CombatCharacterName);
         }
+
+        private void UpdateEntityName(string text)
+        {
+            entityName.text = text;
+        }
+
 
         public void RepositionLocalHeight(int index)
         {
@@ -106,7 +138,12 @@ namespace CombatSystem.Player.UI
 
             var userStats = _user.Stats;
             float initiativeSpeed = UtilsStatsFormula.CalculateInitiativeSpeed(in userStats);
-            entitySpeed.text = "+" + initiativeSpeed.ToString("0");
+            if(initiativeSpeed > 0)
+                entitySpeed.text = "+" + initiativeSpeed.ToString("0");
+            else
+            {
+                entitySpeed.text = null;
+            }
         }
 
         private void UpdateCurrentTick(in float currentInitiative)

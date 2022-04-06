@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
@@ -9,13 +10,17 @@ namespace CombatSystem.Player.UI
 {
     public class UVitalityInfo : MonoBehaviour, IEntityExistenceElement<UVitalityInfo>
     {
+
+        [Title("Holder")] 
+        [SerializeField] private CanvasGroup alphaGroup;
+
+        [Title("Elements")]
         [SerializeField] private TextMeshProUGUI entityNameText;
         [SerializeField] private TextMeshProUGUI shieldsText;
         [SerializeField] private VitalityInfoHolder healthInfoHolder = new VitalityInfoHolder();
         [SerializeField] private VitalityInfoHolder mortalityInfoHolder = new VitalityInfoHolder();
 
 
-        private const float ElementMarginTop = 8;
 
         private void Awake()
         {
@@ -28,20 +33,16 @@ namespace CombatSystem.Player.UI
 
         public void EntityInjection(in CombatEntity entity)
         {
+            if (entity == null)
+            {
+                UpdateInfoAsNull();
+                ResetDisplayedValues();
+                return;
+            }
+
             Injection(entity.Stats);
             var entityName = entity.CombatCharacterName;
             UpdateCharacterName(in entityName);
-        }
-
-        public void RepositionByIndexHeight(int index)
-        {
-            var rectTransform = GetComponent<RectTransform>();
-            var position = rectTransform.localPosition;
-
-            float rectHeight = rectTransform.rect.height;
-            position.y = -(rectHeight + ElementMarginTop) * index;
-
-            rectTransform.localPosition = position;
         }
 
         public void OnPreStartCombat()
@@ -49,9 +50,17 @@ namespace CombatSystem.Player.UI
             
         }
 
+
         public void ShowElement()
         {
             gameObject.SetActive(true);
+            alphaGroup.alpha = 1;
+        }
+
+        private const float DisableAlphaValue = .3f;
+        public void DisableElement()
+        {
+            alphaGroup.alpha = DisableAlphaValue;
         }
 
         public void HideElement()
@@ -66,6 +75,11 @@ namespace CombatSystem.Player.UI
             UpdateToCurrentStats();
         }
 
+        private const string OnNullName = "-------";
+        private void UpdateInfoAsNull()
+        {
+            UpdateCharacterName(OnNullName);
+        }
         private void UpdateCharacterName(in string entityName)
         {
             if (entityNameText)
@@ -86,6 +100,13 @@ namespace CombatSystem.Player.UI
             float currentMortality = stats.CurrentMortality;
             float maxMortality = UtilsStatsFormula.CalculateMaxMortality(stats);
             UpdateMortality(in currentMortality, in maxMortality);
+        }
+
+        public void ResetDisplayedValues()
+        {
+            UpdateShields(0);
+            UpdateHealth(0,0);
+            UpdateMortality(0,0);
         }
 
         public void UpdateShields(in float amount)

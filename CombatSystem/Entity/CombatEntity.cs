@@ -164,7 +164,7 @@ namespace CombatSystem.Entity
             public SkillsHolder(CombatEntity user,
                 IStanceStructureRead<IReadOnlyCollection<IFullSkill>> skills)
             {
-                _user = user;
+                User = user;
                 DisruptionStance = new List<CombatSkill>();
                 AttackingStance = GenerateSkills(skills.AttackingStance);
                 NeutralStance = GenerateSkills(skills.NeutralStance);
@@ -206,7 +206,7 @@ namespace CombatSystem.Entity
 
 
             private readonly HashSet<CombatSkill> _allSkills;
-            public readonly CombatEntity _user;
+            public readonly CombatEntity User;
 
             [ShowInInspector]
             public List<CombatSkill> AttackingStance { get; }
@@ -219,7 +219,7 @@ namespace CombatSystem.Entity
 
             public List<CombatSkill> GetCurrentSkills()
             {
-                return UtilsTeam.GetElement(_user.GetCurrentStance(), this);
+                return UtilsTeam.GetElement(User.GetCurrentStance(), this);
             }
 
 

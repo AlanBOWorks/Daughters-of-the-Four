@@ -34,14 +34,6 @@ namespace CombatSystem.Stats
 
             CurrentHealth = heathAmount;
             CurrentMortality = mortalityAmount;
-
-            HandleInitiative(); void HandleInitiative()
-            {
-
-                if (!CanModifyInitiative()) return;
-
-                CurrentInitiative = TempoTicker.LoopThreshold;
-            }
         }
 
 
@@ -71,6 +63,13 @@ namespace CombatSystem.Stats
             // Negative Speed Entities are inactive entities (obstacles for example)
             // Zero Speed are entities that can Act but requires giving initiative to them (by buff, punish skills, etc)
             return BaseStats.SpeedType > 0;
+        }
+
+        public void SetToFullInitiative()
+        {
+            if (!CanModifyInitiative()) return;
+
+            CurrentInitiative = TempoTicker.LoopThreshold;
         }
 
         [Title("Volatile")]

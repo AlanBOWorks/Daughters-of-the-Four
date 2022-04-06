@@ -30,11 +30,27 @@ namespace CombatSystem.Team
             return IsPlayerTeam(entity.Team);
         }
 
+        public static bool IsMainRole(in CombatEntity entity, in CombatTeam team)
+        {
+            return team.IsMainRole(in entity);
+
+        }
         public static bool IsMainRole(in CombatEntity entity)
         {
             var entityTeam = entity.Team;
-            return entityTeam.IsMainRole(in entity);
+            return IsMainRole(in entity, in entityTeam);
         }
+
+        public static bool IsTrinityRole(in CombatEntity entity, in CombatTeam team)
+        {
+            return team.IsTrinityRole(in entity);
+        }
+        public static bool IsTrinityRole(in CombatEntity entity)
+        {
+            var entityTeam = entity.Team;
+            return IsTrinityRole(in entity, in entityTeam);
+        }
+
 
         public static int GetRoleIndex(ICombatEntityProvider entity)
         {
@@ -95,6 +111,8 @@ namespace CombatSystem.Team
                     return EnumTeam.Positioning.MidLine;
                 case EnumTeam.Role.Support:
                     return EnumTeam.Positioning.BackLine;
+                case EnumTeam.Role.Flex:
+                    return EnumTeam.Positioning.FlexLine;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fromRole), fromRole, null);
             }
@@ -170,6 +188,37 @@ namespace CombatSystem.Team
         }
 
 
+        public static T GetElement<T>(EnumTeam.ActiveRole role, ITeamFullRoleStructureRead<T[]> structure)
+        {
+            return role switch
+            {
+                EnumTeam.ActiveRole.MainVanguard => structure.VanguardType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                EnumTeam.ActiveRole.MainAttacker => structure.AttackerType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                EnumTeam.ActiveRole.MainSupport => structure.SupportType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                EnumTeam.ActiveRole.MainFlex => structure.FlexType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                EnumTeam.ActiveRole.ThirdVanguard => structure.VanguardType[EnumTeam.ThirdRoleInOffArrayIndex],
+                EnumTeam.ActiveRole.ThirdAttacker => structure.AttackerType[EnumTeam.ThirdRoleInOffArrayIndex],
+                EnumTeam.ActiveRole.ThirdSupport => structure.SupportType[EnumTeam.ThirdRoleInOffArrayIndex],
+                EnumTeam.ActiveRole.ThirdFlex => structure.SupportType[EnumTeam.ThirdRoleInOffArrayIndex],
+                EnumTeam.ActiveRole.InvalidRole => throw new ArgumentOutOfRangeException(nameof(role), role, null),
+                _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
+            };
+        }
+        public static T GetElement<T>(int offRoleIndex, ITeamFullRoleStructureRead<T[]> structure)
+        {
+            return offRoleIndex switch
+            {
+                EnumTeam.SecondaryVanguardIndex => structure.VanguardType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                EnumTeam.SecondaryAttackerIndex => structure.AttackerType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                EnumTeam.SecondarySupportIndex => structure.SupportType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                EnumTeam.SecondaryFlexIndex => structure.FlexType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                EnumTeam.ThirdVanguardIndex => structure.VanguardType[EnumTeam.ThirdRoleInOffArrayIndex],
+                EnumTeam.ThirdAttackerIndex => structure.AttackerType[EnumTeam.ThirdRoleInOffArrayIndex],
+                EnumTeam.ThirdSupportIndex => structure.SupportType[EnumTeam.ThirdRoleInOffArrayIndex],
+                EnumTeam.ThirdFlexIndex => structure.FlexType[EnumTeam.ThirdRoleInOffArrayIndex],
+                _ => throw new ArgumentOutOfRangeException(nameof(offRoleIndex), offRoleIndex, null)
+            };
+        }
     }
 
     public static class UtilsCombatTeam

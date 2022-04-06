@@ -29,6 +29,7 @@ namespace CombatSystem._Core
                 enemyTeam.GetSelectedCharacters());
 
             PrepareTeamControllers();
+            //InitialStatsPreparations();
         }
 
 
@@ -104,6 +105,22 @@ namespace CombatSystem._Core
             teamControllersHolder.PlayerTeamType = playerController;
         }
 
+        public static void InitialStatsPreparations()
+        {
+            var playerTeam = CombatSystemSingleton.PlayerTeam;
+            var enemyTeam = CombatSystemSingleton.OppositionTeam;
+
+            InitialStatsPreparation(in playerTeam);
+            InitialStatsPreparation(in enemyTeam);
+
+            void InitialStatsPreparation(in CombatTeam team)
+            {
+                foreach (var member in team)
+                {
+                    member.Stats.SetToFullInitiative();
+                }
+            }
+        }
 
 
         private sealed class CombatMembersHolder : List<CombatEntity>

@@ -70,22 +70,38 @@ namespace CombatSystem.Team
                 HandleMemberPosition(in member, in targetReferencePoint);
             }
 
-            private void HandleMemberPosition(in CombatEntity member, in Transform referencePoint)
+            private void HandleMemberPosition(in CombatEntity member,in Transform referencePoint)
             {
                 Transform memberTransform = member.InstantiationReference.transform;
 
-                memberTransform.position = referencePoint.position;
-                memberTransform.rotation = referencePoint.rotation;
+                ProvideInstantiationPoint(in referencePoint, out var targetPosition, out var targetRotation);
+                memberTransform.position = targetPosition;
+                memberTransform.rotation = targetRotation;
+
+                
             }
 
             public void ProvideInstantiationPoint(in ICombatEntityProvider provider, out Vector3 position, out Quaternion rotation)
             {
                 var positioning = provider.GetAreaData().PositioningType;
                 Transform targetReferencePoint = UtilsTeam.GetElement(positioning, this);
-                position = targetReferencePoint.position;
-                rotation = targetReferencePoint.rotation;
+                ProvideInstantiationPoint(in targetReferencePoint, out position, out rotation);
             }
 
+
+            private static void ProvideInstantiationPoint(in Transform referencePoint, out Vector3 position, out Quaternion rotation)
+            {
+                if (referencePoint)
+                {
+                    position = referencePoint.position;
+                    rotation = referencePoint.rotation;
+                }
+                else
+                {
+                    position = Vector3.zero;
+                    rotation = Quaternion.identity;
+                }
+            }
         }
     }
 }

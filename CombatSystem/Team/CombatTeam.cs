@@ -23,10 +23,13 @@ namespace CombatSystem.Team
 
             _members = new List<CombatEntity>();
 
-            _positionWrapper = new PositionWrapper();
-            _roleWrapper = new RoleWrapper();
+            StandByMembers = new TeamStandByMembersHandler();
+            _mainPositionsWrapper = new MainPositionsWrapper();
+            _mainRoleWrapper = new MainRoleWrapper();
 
             AliveTargeting = new CombatTeamAliveTargeting(this);
+
+            _offRolesGroup = new TeamOffGroupStructure<CombatEntity>();
         }
         
         public CombatTeam(bool isPlayerTeam,IReadOnlyCollection<ICombatEntityProvider> members) : this(isPlayerTeam)
@@ -70,39 +73,51 @@ namespace CombatSystem.Team
         [ShowInInspector, ShowIf("ShowMembers")]
         private readonly List<CombatEntity> _members;
 
-        public IReadOnlyList<CombatEntity> MainRoleMembers => _roleWrapper.Members;
-        public IReadOnlyList<CombatEntity> MainPositioningMembers => _positionWrapper.Members;
+        [ShowInInspector]
+        public readonly TeamStandByMembersHandler StandByMembers;
 
-        public CombatEntity FrontLineType => _positionWrapper.FrontLineType;
-        public CombatEntity MidLineType => _positionWrapper.MidLineType;
-        public CombatEntity BackLineType => _positionWrapper.BackLineType;
-        public CombatEntity FlexLineType => _positionWrapper.FlexLineType;
+        
+        [ShowInInspector, ShowIf("ShowPositions")]
+        private readonly MainPositionsWrapper _mainPositionsWrapper;
+        [ShowInInspector, ShowIf("ShowRoles")]
+        private readonly MainRoleWrapper _mainRoleWrapper;
+
+        private readonly TeamOffGroupStructure<CombatEntity> _offRolesGroup;
+
+
+        public IReadOnlyList<CombatEntity> MainRoleMembers => _mainRoleWrapper.Members;
+        public IReadOnlyList<CombatEntity> MainPositioningMembers => _mainPositionsWrapper.Members;
+        public IEnumerator<CombatEntity> OffRoleMembers => _offRolesGroup;
+
+
+        public CombatEntity GetSecondaryMember(EnumTeam.ActiveRole role) =>
+            UtilsTeam.GetElement(role, _offRolesGroup);
+
+        public CombatEntity FrontLineType => _mainPositionsWrapper.FrontLineType;
+        public CombatEntity MidLineType => _mainPositionsWrapper.MidLineType;
+        public CombatEntity BackLineType => _mainPositionsWrapper.BackLineType;
+        public CombatEntity FlexLineType => _mainPositionsWrapper.FlexLineType;
 
 
         /// <summary>
         /// Main Vanguard Role
         /// </summary>
-        public CombatEntity VanguardType => _roleWrapper.VanguardType;
+        public CombatEntity VanguardType => _mainRoleWrapper.VanguardType;
 
         /// <summary>
         /// Main Attacker Role
         /// </summary>
-        public CombatEntity AttackerType => _roleWrapper.AttackerType;
+        public CombatEntity AttackerType => _mainRoleWrapper.AttackerType;
 
         /// <summary>
         /// Main Support Role
         /// </summary>
-        public CombatEntity SupportType => _roleWrapper.SupportType;
+        public CombatEntity SupportType => _mainRoleWrapper.SupportType;
         /// <summary>
         /// Main Flex Role
         /// </summary>
-        public CombatEntity FlexType => _roleWrapper.FlexType;
+        public CombatEntity FlexType => _mainRoleWrapper.FlexType;
 
-
-        [ShowInInspector, ShowIf("ShowPositions")]
-        private readonly PositionWrapper _positionWrapper;
-        [ShowInInspector, ShowIf("ShowRoles")]
-        private readonly RoleWrapper _roleWrapper;
 
 
         public readonly CombatTeamAliveTargeting AliveTargeting;
@@ -129,9 +144,10 @@ namespace CombatSystem.Team
                 throw new ArgumentNullException(nameof(entity), "Passed member in team is null");
             }
 
-            _positionWrapper.AddMember(in entity);
-            _roleWrapper.AddMember(in entity);
+            _mainPositionsWrapper.AddMember(in entity);
+            _mainRoleWrapper.AddMember(in entity);
             _members.Add(entity);
+
 
             AliveTargeting.AddMember(in entity);
         }
@@ -156,8 +172,8 @@ namespace CombatSystem.Team
             bool contains = _members.Contains(entity);
             if (!contains) return false;
 
-            _positionWrapper.RemoveMember(in entity);
-            _roleWrapper.RemoveMember(in entity);
+            _mainPositionsWrapper.RemoveMember(in entity);
+            _mainRoleWrapper.RemoveMember(in entity);
             _members.Remove(entity);
 
             AliveTargeting.RemoveMember(in entity);
@@ -197,19 +213,11 @@ namespace CombatSystem.Team
         public int Count => _members.Count;
         public CombatEntity this[int index] => _members[index];
 
-        public bool IsMainRole(in CombatEntity entity)
-        {
-            for (var i = 0; i < MainRoleMembers.Count; i++)
-            {
-                var member = MainRoleMembers[i];
-                if (member == entity) return true;
-            }
-
-            return false;
-        }
+        public bool IsMainRole(in CombatEntity entity) => _mainRoleWrapper.IsMainRole(in entity);
+        public bool IsTrinityRole(in CombatEntity entity) => _mainRoleWrapper.IsTrinityRole(in entity);
 
         //This is just for ICollection (utility)
-        private sealed class PositionWrapper : FullPositionGroup<CombatEntity>
+        private sealed class MainPositionsWrapper : FullPositionMainGroupStructure<CombatEntity>
         {
             public void AddMember(in CombatEntity member)
             {
@@ -238,7 +246,7 @@ namespace CombatSystem.Team
             }
         }
 
-        private sealed class RoleWrapper : FullPositionGroup<CombatEntity>
+        private sealed class MainRoleWrapper : FullPositionMainGroupStructure<CombatEntity>
         {
             public void AddMember(in CombatEntity entity)
             {
@@ -252,6 +260,26 @@ namespace CombatSystem.Team
                 if (Members[roleIndex] == entity) Members[roleIndex] = null;
             }
 
+
+            public bool IsMainRole(in CombatEntity member)
+            {
+                foreach (var entity in Members)
+                {
+                    if (member == entity) return true;
+                }
+
+                return false;
+            }
+
+            public bool IsTrinityRole(in CombatEntity member)
+            {
+                for (int i = 0; i < EnumTeam.BasicRolesAmount; i++)
+                {
+                    if (Members[i] == member) return true;
+                }
+
+                return false;
+            }
         }
     }
 

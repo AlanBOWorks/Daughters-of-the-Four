@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 using UnityEngine;
@@ -218,6 +219,33 @@ namespace CombatSystem.Stats
         {
             return stats.CurrentMortality > 0 || stats.CurrentHealth > 0;
         }
+
+        public static void TickInitiative(in CombatStats stats)
+        {
+            TickInitiative(in stats, out _);
+        }
+
+        public static void TickInitiative(in CombatStats stats,out float currentTickAmount)
+        {
+            float initiativeIncrement = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
+            if (initiativeIncrement <= 0)
+            {
+                currentTickAmount = stats.CurrentInitiative;
+                return;
+            }
+
+            currentTickAmount = initiativeIncrement + stats.CurrentInitiative;
+
+            const float loopThreshold = TempoTicker.LoopThresholdAsIntended;
+            if (currentTickAmount >= loopThreshold)
+            {
+                currentTickAmount = loopThreshold;
+            }
+
+            stats.CurrentInitiative = currentTickAmount;
+        }
+
+
 
         public static void TickActions(in CombatStats stats, in CombatSkill usedSkill)
         {

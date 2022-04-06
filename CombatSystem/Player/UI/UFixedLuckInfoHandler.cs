@@ -9,7 +9,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UFixedLuckInfoHandler : MonoBehaviour, 
-        IMainElementInstantiationListener<UVitalityInfo>, //This is because I want to use UFixedVitalityInfoHandler's events
+        IEntityElementInstantiationListener<UVitalityInfo>, //This is because I want to use UMainVitalityInfosHandler's events
         ITempoEntityStatesListener
     {
         [ShowInInspector,DisableInEditorMode]
@@ -35,7 +35,7 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        public void OnIterationCall(in UVitalityInfo element, in CombatEntity entity, int notNullIndex)
+        public void OnIterationCall(in UVitalityInfo element, in CombatEntity entity, in TeamStructureIterationValues values)
         {
             if(entity == null) return;
 

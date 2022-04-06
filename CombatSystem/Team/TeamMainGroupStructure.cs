@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public class TeamGroupStructure<T> : ITeamRoleStructureRead<T>, ITeamPositionStructureRead<T>, IEnumerable
+    public class TeamMainGroupStructure<T> : ITeamRoleStructureRead<T>, ITeamPositionStructureRead<T>, IEnumerable
     {
-        public TeamGroupStructure() : this(new T[EnumTeam.BasicPositioningAmount])
+        public TeamMainGroupStructure() : this(new T[EnumTeam.BasicPositioningAmount])
         { }
 
-        public TeamGroupStructure(T[] members)
+        public TeamMainGroupStructure(T[] members)
         {
             Members = members;
         }
@@ -61,9 +61,9 @@ namespace CombatSystem.Team
         }
     }
 
-    public class FullPositionGroup<T> : TeamGroupStructure<T>, ITeamFullRoleStructureRead<T>, ITeamFullPositionStructureRead<T>
+    public class FullPositionMainGroupStructure<T> : TeamMainGroupStructure<T>, ITeamFullRoleStructureRead<T>, ITeamFullPositionStructureRead<T>
     {
-        public FullPositionGroup() : base(new T[EnumTeam.PositioningAmount])
+        public FullPositionMainGroupStructure() : base(new T[EnumTeam.PositioningAmount])
         { }
         public T FlexType
         {
@@ -77,9 +77,9 @@ namespace CombatSystem.Team
         }
     }
 
-    public class FullPositionGroupClass<T> : FullPositionGroup<T> where T : new()
+    public class FullPositionMainGroupClass<T> : FullPositionMainGroupStructure<T> where T : new()
     {
-        public FullPositionGroupClass()
+        public FullPositionMainGroupClass()
         {
             FrontLineType = new T();
             MidLineType = new T();
