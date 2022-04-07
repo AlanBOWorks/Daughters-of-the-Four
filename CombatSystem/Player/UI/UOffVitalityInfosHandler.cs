@@ -34,18 +34,21 @@ namespace CombatSystem.Player.UI
 
         public override void OnIterationCall(in UVitalityInfo element, in CombatEntity entity, in TeamStructureIterationValues values)
         {
+            if(element == null) return;
+
             UtilsVitalityInfosHandler.HandleHandler(in element, in entity, in values, out var repositionIndex);
             RepositionElementByIndex(in element, in repositionIndex);
         }
 
-        private const float ElementMarginTop = 8;
+        private const float ElementMarginTop = 2;
         private static void RepositionElementByIndex(in UVitalityInfo element, in int index)
         {
             var rectTransform = element.GetComponent<RectTransform>();
             var position = rectTransform.localPosition;
+            int marginIndex = index;
 
             float rectHeight = rectTransform.rect.height;
-            position.y = -(rectHeight + ElementMarginTop) * index;
+            position.y = -(rectHeight + ElementMarginTop) * marginIndex; //negative means going down
 
             rectTransform.localPosition = position;
         }

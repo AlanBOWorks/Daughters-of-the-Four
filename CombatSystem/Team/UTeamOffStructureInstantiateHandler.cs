@@ -49,7 +49,6 @@ namespace CombatSystem.Team
 
             while (offMembers.MoveNext() && references.MoveNext())
             {
-                
                 var element = references.Current;
                 var member = offMembers.Current;
 

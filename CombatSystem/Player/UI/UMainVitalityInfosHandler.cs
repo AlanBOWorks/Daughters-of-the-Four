@@ -44,7 +44,8 @@ namespace CombatSystem.Player.UI
 
         public override void OnFinishPreStarts()
         {
-            RepositionElementByIndex(in offRolesParent, GetEnemyHandler().activeCount);
+            int offRolesIndex = GetEnemyHandler().activeCount +1; //Since the last position is already used > +1 for put this below
+            RepositionElementByIndex(in offRolesParent, offRolesIndex);
         }
 
         private const float ElementMarginTop = 8;
@@ -100,6 +101,8 @@ namespace CombatSystem.Player.UI
 
         private static void HandleActivePlayer(in UVitalityInfo element, in CombatEntity entity)
         {
+            if(element==null) return;
+
             if (entity == null)
             {
                 element.DisableElement();
@@ -113,6 +116,8 @@ namespace CombatSystem.Player.UI
 
         private static void HandleActiveEnemy(in UVitalityInfo element, in CombatEntity entity)
         {
+            if(element==null) return;
+
             if (entity == null)
             {
                 element.HideElement();

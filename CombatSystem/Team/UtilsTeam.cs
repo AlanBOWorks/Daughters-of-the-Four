@@ -196,10 +196,11 @@ namespace CombatSystem.Team
                 EnumTeam.ActiveRole.MainAttacker => structure.AttackerType[EnumTeam.SecondaryRoleInOffArrayIndex],
                 EnumTeam.ActiveRole.MainSupport => structure.SupportType[EnumTeam.SecondaryRoleInOffArrayIndex],
                 EnumTeam.ActiveRole.MainFlex => structure.FlexType[EnumTeam.SecondaryRoleInOffArrayIndex],
+
                 EnumTeam.ActiveRole.ThirdVanguard => structure.VanguardType[EnumTeam.ThirdRoleInOffArrayIndex],
                 EnumTeam.ActiveRole.ThirdAttacker => structure.AttackerType[EnumTeam.ThirdRoleInOffArrayIndex],
                 EnumTeam.ActiveRole.ThirdSupport => structure.SupportType[EnumTeam.ThirdRoleInOffArrayIndex],
-                EnumTeam.ActiveRole.ThirdFlex => structure.SupportType[EnumTeam.ThirdRoleInOffArrayIndex],
+                EnumTeam.ActiveRole.ThirdFlex => structure.FlexType[EnumTeam.ThirdRoleInOffArrayIndex],
                 EnumTeam.ActiveRole.InvalidRole => throw new ArgumentOutOfRangeException(nameof(role), role, null),
                 _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
             };
@@ -212,6 +213,7 @@ namespace CombatSystem.Team
                 EnumTeam.SecondaryAttackerIndex => structure.AttackerType[EnumTeam.SecondaryRoleInOffArrayIndex],
                 EnumTeam.SecondarySupportIndex => structure.SupportType[EnumTeam.SecondaryRoleInOffArrayIndex],
                 EnumTeam.SecondaryFlexIndex => structure.FlexType[EnumTeam.SecondaryRoleInOffArrayIndex],
+
                 EnumTeam.ThirdVanguardIndex => structure.VanguardType[EnumTeam.ThirdRoleInOffArrayIndex],
                 EnumTeam.ThirdAttackerIndex => structure.AttackerType[EnumTeam.ThirdRoleInOffArrayIndex],
                 EnumTeam.ThirdSupportIndex => structure.SupportType[EnumTeam.ThirdRoleInOffArrayIndex],

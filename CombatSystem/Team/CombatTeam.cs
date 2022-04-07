@@ -82,6 +82,7 @@ namespace CombatSystem.Team
         [ShowInInspector, ShowIf("ShowRoles")]
         private readonly MainRoleWrapper _mainRoleWrapper;
 
+        [ShowInInspector, ShowIf("ShowRoles")]
         private readonly TeamOffGroupStructure<CombatEntity> _offRolesGroup;
 
 
@@ -144,9 +145,14 @@ namespace CombatSystem.Team
                 throw new ArgumentNullException(nameof(entity), "Passed member in team is null");
             }
 
-            _mainPositionsWrapper.AddMember(in entity);
-            _mainRoleWrapper.AddMember(in entity);
+            var roleType = entity.RoleType;
+            var positioning = entity.PositioningType;
+
             _members.Add(entity);
+            _mainPositionsWrapper.AddMember(in positioning,in entity);
+            _mainRoleWrapper.AddMember(in entity, in roleType, out bool isMainAddition);
+
+            if(!isMainAddition) _offRolesGroup.AddMember(roleType, in entity);
 
 
             AliveTargeting.AddMember(in entity);
@@ -225,7 +231,7 @@ namespace CombatSystem.Team
                 AddMember(in positioning, in member);
             }
 
-            private void AddMember(in EnumTeam.Positioning targetPosition, in CombatEntity member)
+            public void AddMember(in EnumTeam.Positioning targetPosition, in CombatEntity member)
             {
                 int positioningIndex = EnumTeam.GetPositioningIndex(in targetPosition);
                 bool isMainRole = Members[positioningIndex] == null;
@@ -248,10 +254,16 @@ namespace CombatSystem.Team
 
         private sealed class MainRoleWrapper : FullPositionMainGroupStructure<CombatEntity>
         {
-            public void AddMember(in CombatEntity entity)
+            public void AddMember(in CombatEntity entity, in EnumTeam.Role role, out bool isMainEntity)
             {
-                int roleIndex = EnumTeam.GetRoleIndex(entity.RoleType);
-                if (Members[roleIndex] == null) Members[roleIndex] = entity;
+                int roleIndex = EnumTeam.GetRoleIndex(role);
+                isMainEntity = Members[roleIndex] == null;
+                if (isMainEntity) Members[roleIndex] = entity;
+            }
+
+            public void AddMember(in CombatEntity entity, out bool isMainEntity)
+            {
+                AddMember(in entity, entity.RoleType, out isMainEntity);
             }
 
             public void RemoveMember(in CombatEntity entity)
@@ -259,8 +271,7 @@ namespace CombatSystem.Team
                 int roleIndex = EnumTeam.GetRoleIndex(entity.RoleType);
                 if (Members[roleIndex] == entity) Members[roleIndex] = null;
             }
-
-
+            
             public bool IsMainRole(in CombatEntity member)
             {
                 foreach (var entity in Members)

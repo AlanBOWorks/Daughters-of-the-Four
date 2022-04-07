@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace CombatSystem.Team
 {
@@ -13,12 +15,18 @@ namespace CombatSystem.Team
             _midLineType = new T[EnumTeam.OffRoleTypesLength];
             _backLineType = new T[EnumTeam.OffRoleTypesLength];
             _flexLineType = new T[EnumTeam.OffRoleTypesLength];
+
+            _membersIndex = -1;
         }
 
         private int _membersIndex;
+        [ShowInInspector,HorizontalGroup("Front")]
         private readonly T[] _frontLineType;
+        [ShowInInspector,HorizontalGroup("Front")]
         private readonly T[] _midLineType;
+        [ShowInInspector,HorizontalGroup("Back")]
         private readonly T[] _backLineType;
+        [ShowInInspector,HorizontalGroup("Back")]
         private readonly T[] _flexLineType;
 
 
