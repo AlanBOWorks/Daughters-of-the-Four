@@ -11,8 +11,7 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public sealed class CombatTeam : 
-        ITeamFlexPositionStructureRead<CombatEntity>,
-        ITeamFlexRoleStructureRead<CombatEntity>,
+        ITeamFullRolesStructureRead<CombatEntity>,
         IReadOnlyList<CombatEntity>
     {
         private CombatTeam(bool isPlayerTeam)
@@ -116,6 +115,14 @@ namespace CombatSystem.Team
         /// </summary>
         public CombatEntity FlexType => _mainRoleWrapper.FlexType;
 
+        public CombatEntity SecondaryVanguardElement => _offRolesGroup.SecondaryVanguardElement;
+        public CombatEntity SecondaryAttackerElement => _offRolesGroup.SecondaryAttackerElement;
+        public CombatEntity SecondarySupportElement => _offRolesGroup.SecondarySupportElement;
+        public CombatEntity SecondaryFlexElement => _offRolesGroup.SecondaryFlexElement;
+        public CombatEntity ThirdVanguardElement => _offRolesGroup.ThirdVanguardElement;
+        public CombatEntity ThirdAttackerElement => _offRolesGroup.ThirdAttackerElement;
+        public CombatEntity ThirdSupportElement => _offRolesGroup.ThirdSupportElement;
+        public CombatEntity ThirdFlexElement => _offRolesGroup.ThirdFlexElement;
 
 
         public readonly CombatTeamAliveTargeting AliveTargeting;
@@ -289,6 +296,7 @@ namespace CombatSystem.Team
                 return false;
             }
         }
+
     }
 
     [Serializable]

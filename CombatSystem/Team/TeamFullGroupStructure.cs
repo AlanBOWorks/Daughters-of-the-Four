@@ -30,34 +30,33 @@ namespace CombatSystem.Team
     public abstract class UTeamFullGroupStructure<T> : MonoBehaviour,
         ITeamFullRolesStructureRead<T>,
         ITeamFlexPositionStructureRead<T[]>
-        where T : UnityEngine.Object
     {
-        [SerializeField, HorizontalGroup("FrontLiners")] private RoleAliment vanguardAliment = new RoleAliment();
-        [SerializeField, HorizontalGroup("FrontLiners")] private RoleAliment attackerAliment = new RoleAliment();
-        [SerializeField, HorizontalGroup("BackLiners")] private RoleAliment supportAliment = new RoleAliment();
+        [SerializeField, HorizontalGroup("FrontLiners")] private RoleAliment frontAliment = new RoleAliment();
+        [SerializeField, HorizontalGroup("FrontLiners")] private RoleAliment midAliment = new RoleAliment();
+        [SerializeField, HorizontalGroup("BackLiners")] private RoleAliment backAliment = new RoleAliment();
         [SerializeField, HorizontalGroup("BackLiners")] private RoleAliment flexAliment = new RoleAliment();
 
         private void Awake()
         {
-            vanguardAliment.OnAfterDeserialize();
-            attackerAliment.OnAfterDeserialize();
-            supportAliment.OnAfterDeserialize();
+            frontAliment.OnAfterDeserialize();
+            midAliment.OnAfterDeserialize();
+            backAliment.OnAfterDeserialize();
             flexAliment.OnAfterDeserialize();
         }
 
-        public T VanguardType => vanguardAliment.MainRole;
-        public T AttackerType => attackerAliment.MainRole;
-        public T SupportType => supportAliment.MainRole;
+        public T VanguardType => frontAliment.MainRole;
+        public T AttackerType => midAliment.MainRole;
+        public T SupportType => backAliment.MainRole;
         public T FlexType => flexAliment.MainRole;
 
-        public T SecondaryVanguardElement => vanguardAliment.SecondaryRole;
-        public T SecondaryAttackerElement => attackerAliment.SecondaryRole;
-        public T SecondarySupportElement => supportAliment.SecondaryRole;
+        public T SecondaryVanguardElement => frontAliment.SecondaryRole;
+        public T SecondaryAttackerElement => midAliment.SecondaryRole;
+        public T SecondarySupportElement => backAliment.SecondaryRole;
         public T SecondaryFlexElement => flexAliment.SecondaryRole;
 
-        public T ThirdVanguardElement => vanguardAliment.ThirdRole;
-        public T ThirdAttackerElement => attackerAliment.ThirdRole;
-        public T ThirdSupportElement => supportAliment.ThirdRole;
+        public T ThirdVanguardElement => frontAliment.ThirdRole;
+        public T ThirdAttackerElement => midAliment.ThirdRole;
+        public T ThirdSupportElement => backAliment.ThirdRole;
         public T ThirdFlexElement => flexAliment.ThirdRole;
 
         [Serializable]
@@ -88,9 +87,9 @@ namespace CombatSystem.Team
             }
         }
 
-        public T[] FrontLineType => vanguardAliment.Members;
-        public T[] MidLineType => attackerAliment.Members;
-        public T[] BackLineType => supportAliment.Members;
+        public T[] FrontLineType => frontAliment.Members;
+        public T[] MidLineType => midAliment.Members;
+        public T[] BackLineType => backAliment.Members;
         public T[] FlexLineType => flexAliment.Members;
     }
 }

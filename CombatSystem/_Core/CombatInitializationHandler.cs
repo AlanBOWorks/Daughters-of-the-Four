@@ -65,16 +65,25 @@ namespace CombatSystem._Core
 
             void InstantiateModels()
             {
-                var teamPositionHandler = CombatSystemSingleton.PositionHandler;
-                HandlePositions(playerCombatTeam, teamPositionHandler.PlayerTeamType);
-                HandlePositions(enemyCombatTeam, teamPositionHandler.EnemyTeamType);
+                var playerTransforms = CombatSystemSingleton.PlayerPositionTransformReferences;
+                InstantiatePhysicalTeam(playerCombatTeam, playerTransforms);
 
-                void HandlePositions(CombatTeam team, ITeamPositionHandler handler)
+                var enemyTransforms = CombatSystemSingleton.EnemyPositionTransformReferences;
+                InstantiatePhysicalTeam(enemyCombatTeam, enemyTransforms);
+
+                void InstantiatePhysicalTeam(CombatTeam team, ITeamFullRolesStructureRead<Transform> positions)
                 {
-                    foreach (CombatEntity member in team)
+                    var valuePairs = UtilsTeam.GetSafeUnityEnumerable(team, positions);
+                    foreach (var pair in valuePairs)
                     {
+                        var member = pair.Key;
+                        if(member == null) continue;
+
+                        var positionTransform = pair.Value;
                         var provider = member.Provider;
-                        handler.ProvideInstantiationPoint(in provider, out var position, out var rotation);
+
+                        var positionPoint = positionTransform.position;
+                        var rotationPoint = positionTransform.rotation;
 
                         GameObject instantiatedGameObject;
                         GameObject copyReference = provider.GetVisualPrefab();
@@ -84,8 +93,8 @@ namespace CombatSystem._Core
                             instantiatedGameObject = Object.Instantiate(copyReference);
 
                         var instantiatedTransform = instantiatedGameObject.transform;
-                        instantiatedTransform.position = position;
-                        instantiatedTransform.rotation = rotation;
+                        instantiatedTransform.position = positionPoint;
+                        instantiatedTransform.rotation = rotationPoint;
                         instantiatedGameObject.name = provider.GetProviderEntityName() + "(Clone) " +instantiatedGameObject.GetInstanceID();
 
                         member.InstantiationReference = instantiatedGameObject;

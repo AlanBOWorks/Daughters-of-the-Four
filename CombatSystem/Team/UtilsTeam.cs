@@ -298,6 +298,57 @@ namespace CombatSystem.Team
             yield return new KeyValuePair<TKey, TValue>(keys.ThirdSupportElement, values.ThirdSupportElement);
             yield return new KeyValuePair<TKey, TValue>(keys.ThirdFlexElement, values.ThirdFlexElement);
         }
+
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetSafeEnumerable<TKey, TValue>(
+            ITeamFullRolesStructureRead<TKey> keys, ITeamFullRolesStructureRead<TValue> values)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.VanguardType, values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.AttackerType, values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SupportType, values.SupportType);
+            yield return new KeyValuePair<TKey, TValue>(keys.FlexType, values.FlexType);
+
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryVanguardElement, values.SecondaryVanguardElement ?? values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryAttackerElement, values.SecondaryAttackerElement ?? values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondarySupportElement, values.SecondarySupportElement ?? values.SupportType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryFlexElement, values.SecondaryFlexElement ?? values.FlexType);
+
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdVanguardElement, values.ThirdVanguardElement ?? values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdAttackerElement, values.ThirdAttackerElement ?? values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdSupportElement, values.ThirdSupportElement ?? values.SupportType);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdFlexElement, values.ThirdFlexElement ?? values.FlexType);
+        }
+
+
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetSafeUnityEnumerable<TKey, TValue>(
+            ITeamFullRolesStructureRead<TKey> keys, ITeamFullRolesStructureRead<TValue> values)
+        where TValue : UnityEngine.Object
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.VanguardType, values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.AttackerType, values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SupportType, values.SupportType);
+            yield return new KeyValuePair<TKey, TValue>(keys.FlexType, values.FlexType);
+
+
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryVanguardElement,
+                values.SecondaryVanguardElement ? values.SecondaryVanguardElement : values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryAttackerElement,
+                values.SecondaryAttackerElement ? values.SecondaryAttackerElement : values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondarySupportElement,
+                values.SecondarySupportElement ? values.SecondarySupportElement : values.SupportType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryFlexElement,
+                values.SecondaryFlexElement ? values.SecondaryFlexElement : values.FlexType);
+
+
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdVanguardElement,
+                values.ThirdVanguardElement ? values.ThirdVanguardElement : values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdAttackerElement,
+                values.ThirdAttackerElement ? values.ThirdAttackerElement : values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdSupportElement,
+                values.ThirdSupportElement ? values.ThirdSupportElement : values.SupportType);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdFlexElement,
+                values.ThirdFlexElement ? values.ThirdFlexElement : values.FlexType);
+
+        }
     }
 
     public static class UtilsCombatTeam

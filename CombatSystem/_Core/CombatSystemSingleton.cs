@@ -20,8 +20,6 @@ namespace CombatSystem._Core
 
             EventsHolder 
                 = systemEventsHolder;
-            PositionHandler 
-                = new SpawnEntityPositionHandler();
             CombatPreparationStatesHandler 
                 = new CombatPreparationStatesHandler(systemEventsHolder);
             TeamsHolder 
@@ -51,7 +49,8 @@ namespace CombatSystem._Core
         public static SystemCombatEventsHolder EventsHolder { get; private set; }
 
         // ------- ESSENTIALS ------
-        internal static SpawnEntityPositionHandler PositionHandler { get; }
+        internal static UTeamFullGroupStructure<Transform> PlayerPositionTransformReferences { get; set; }
+        internal static UTeamFullGroupStructure<Transform> EnemyPositionTransformReferences { get; set; }
 
         // ------- TEAM ------
         public static IReadOnlyList<CombatEntity> AllMembers => AllMembersCollection;
