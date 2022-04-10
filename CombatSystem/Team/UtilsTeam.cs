@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
@@ -82,7 +83,7 @@ namespace CombatSystem.Team
                 : structure.EnemyTeamType;
         }
 
-        public static T GetElement<T>(EnumTeam.Positioning positioning, ITeamFullPositionStructureRead<T> structure)
+        public static T GetElement<T>(EnumTeam.Positioning positioning, ITeamFlexPositionStructureRead<T> structure)
         {
             return positioning switch
             {
@@ -103,28 +104,24 @@ namespace CombatSystem.Team
 
         public static EnumTeam.Positioning GetEquivalent(EnumTeam.Role fromRole)
         {
-            switch (fromRole)
+            return fromRole switch
             {
-                case EnumTeam.Role.Vanguard:
-                    return EnumTeam.Positioning.FrontLine;
-                case EnumTeam.Role.Attacker:
-                    return EnumTeam.Positioning.MidLine;
-                case EnumTeam.Role.Support:
-                    return EnumTeam.Positioning.BackLine;
-                case EnumTeam.Role.Flex:
-                    return EnumTeam.Positioning.FlexLine;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(fromRole), fromRole, null);
-            }
+                EnumTeam.Role.Vanguard => EnumTeam.Positioning.FrontLine,
+                EnumTeam.Role.Attacker => EnumTeam.Positioning.MidLine,
+                EnumTeam.Role.Support => EnumTeam.Positioning.BackLine,
+                EnumTeam.Role.Flex => EnumTeam.Positioning.FlexLine,
+                _ => throw new ArgumentOutOfRangeException(nameof(fromRole), fromRole, null)
+            };
         }
 
-        public static T GetElement<T>(EnumTeam.Role role, ITeamRoleStructureRead<T> structure)
+        public static T GetElement<T>(EnumTeam.Role role, ITeamFlexRoleStructureRead<T> structure)
         {
             return role switch
             {
                 EnumTeam.Role.Vanguard => structure.VanguardType,
                 EnumTeam.Role.Attacker => structure.AttackerType,
                 EnumTeam.Role.Support => structure.SupportType,
+                EnumTeam.Role.Flex => structure.FlexType,
                 _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
             };
         }
@@ -150,28 +147,7 @@ namespace CombatSystem.Team
                 _ => structure.DisruptionStance
             };
         }
-
-
-        public static EnumTeam.ActiveRole GetActiveRole(in CombatEntity entity)
-        {
-            bool isMainRole = IsMainRole(in entity);
-            switch (entity.RoleType)
-            {
-                case EnumTeam.Role.InvalidRole:
-                    return EnumTeam.ActiveRole.InvalidRole;
-                case EnumTeam.Role.Vanguard:
-                    return (isMainRole) ? EnumTeam.ActiveRole.MainVanguard : EnumTeam.ActiveRole.SecondaryVanguard;
-                case EnumTeam.Role.Attacker:
-                    return (isMainRole) ? EnumTeam.ActiveRole.MainAttacker : EnumTeam.ActiveRole.SecondaryAttacker;
-                case EnumTeam.Role.Support:
-                    return (isMainRole) ? EnumTeam.ActiveRole.MainSupport : EnumTeam.ActiveRole.SecondarySupport;
-                case EnumTeam.Role.Flex:
-                    return (isMainRole) ? EnumTeam.ActiveRole.MainFlex : EnumTeam.ActiveRole.SecondaryFlex;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
+        
         public static EnumTeam.StanceFull ParseStance(EnumTeam.Stance basicStance)
         {
             switch (basicStance)
@@ -188,38 +164,139 @@ namespace CombatSystem.Team
         }
 
 
-        public static T GetElement<T>(EnumTeam.ActiveRole role, ITeamFullRoleStructureRead<T[]> structure)
+        public static T GetElement<T>(EnumTeam.ActiveRole role, ITeamFullRolesStructureRead<T> structure)
         {
-            return role switch
+            switch (role)
             {
-                EnumTeam.ActiveRole.MainVanguard => structure.VanguardType[EnumTeam.SecondaryRoleInOffArrayIndex],
-                EnumTeam.ActiveRole.MainAttacker => structure.AttackerType[EnumTeam.SecondaryRoleInOffArrayIndex],
-                EnumTeam.ActiveRole.MainSupport => structure.SupportType[EnumTeam.SecondaryRoleInOffArrayIndex],
-                EnumTeam.ActiveRole.MainFlex => structure.FlexType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                case EnumTeam.ActiveRole.MainVanguard:
+                    return structure.VanguardType;
+                case EnumTeam.ActiveRole.MainAttacker:
+                    return structure.AttackerType;
+                case EnumTeam.ActiveRole.MainSupport:
+                    return structure.SupportType;
+                case EnumTeam.ActiveRole.MainFlex:
+                    return structure.FlexType;
+                case EnumTeam.ActiveRole.SecondaryVanguard:
+                    return structure.SecondaryVanguardElement;
+                case EnumTeam.ActiveRole.SecondaryAttacker:
+                    return structure.SecondaryVanguardElement;
+                case EnumTeam.ActiveRole.SecondarySupport:
+                    return structure.SecondarySupportElement;
+                case EnumTeam.ActiveRole.SecondaryFlex:
+                    return structure.SecondaryFlexElement;
 
-                EnumTeam.ActiveRole.ThirdVanguard => structure.VanguardType[EnumTeam.ThirdRoleInOffArrayIndex],
-                EnumTeam.ActiveRole.ThirdAttacker => structure.AttackerType[EnumTeam.ThirdRoleInOffArrayIndex],
-                EnumTeam.ActiveRole.ThirdSupport => structure.SupportType[EnumTeam.ThirdRoleInOffArrayIndex],
-                EnumTeam.ActiveRole.ThirdFlex => structure.FlexType[EnumTeam.ThirdRoleInOffArrayIndex],
-                EnumTeam.ActiveRole.InvalidRole => throw new ArgumentOutOfRangeException(nameof(role), role, null),
-                _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
+                case EnumTeam.ActiveRole.ThirdVanguard:
+                    return structure.ThirdVanguardElement;
+                case EnumTeam.ActiveRole.ThirdAttacker:
+                    return structure.ThirdAttackerElement;
+                case EnumTeam.ActiveRole.ThirdSupport:
+                    return structure.ThirdSupportElement;
+                case EnumTeam.ActiveRole.ThirdFlex:
+                    return structure.ThirdFlexElement;
+                
+                case EnumTeam.ActiveRole.InvalidRole:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(role), role, null);
+            }
+        }
+
+        public static T GetElement<T>(int index, ITeamFullRolesStructureRead<T> structure)
+        {
+            return index switch
+            {
+                EnumTeam.VanguardIndex => structure.VanguardType,
+                EnumTeam.AttackerIndex => structure.AttackerType,
+                EnumTeam.SupportIndex => structure.SupportType,
+                EnumTeam.FlexIndex => structure.FlexType,
+                EnumTeam.SecondaryVanguardIndex => structure.SecondaryVanguardElement,
+                EnumTeam.SecondaryAttackerIndex => structure.SecondaryAttackerElement,
+                EnumTeam.SecondarySupportIndex => structure.SecondarySupportElement,
+                EnumTeam.SecondaryFlexIndex => structure.SecondaryFlexElement,
+                EnumTeam.ThirdVanguardIndex => structure.ThirdVanguardElement,
+                EnumTeam.ThirdAttackerIndex => structure.ThirdAttackerElement,
+                EnumTeam.ThirdSupportIndex => structure.ThirdSupportElement,
+                EnumTeam.ThirdFlexIndex => structure.ThirdFlexElement,
+                _ => throw new ArgumentOutOfRangeException(nameof(index), index, null)
             };
         }
-        public static T GetElement<T>(int offRoleIndex, ITeamFullRoleStructureRead<T[]> structure)
+
+        public static T SafeGetElement<T>(int index, ITeamFullRolesStructureRead<T> structure)
         {
+            return index switch
+            {
+                EnumTeam.VanguardIndex => structure.VanguardType,
+                EnumTeam.AttackerIndex => structure.AttackerType,
+                EnumTeam.SupportIndex => structure.SupportType,
+                EnumTeam.FlexIndex => structure.FlexType,
+
+                EnumTeam.SecondaryVanguardIndex => structure.SecondaryVanguardElement ?? structure.VanguardType,
+                EnumTeam.SecondaryAttackerIndex => structure.SecondaryAttackerElement ?? structure.AttackerType,
+                EnumTeam.SecondarySupportIndex => structure.SecondarySupportElement ?? structure.SupportType,
+                EnumTeam.SecondaryFlexIndex => structure.SecondaryFlexElement ?? structure.FlexType,
+
+                EnumTeam.ThirdVanguardIndex => structure.ThirdVanguardElement ?? structure.VanguardType,
+                EnumTeam.ThirdAttackerIndex => structure.ThirdAttackerElement ?? structure.AttackerType,
+                EnumTeam.ThirdSupportIndex => structure.ThirdSupportElement ?? structure.SupportType,
+                EnumTeam.ThirdFlexIndex => structure.ThirdFlexElement ?? structure.FlexType,
+                _ => throw new ArgumentOutOfRangeException(nameof(index), index, null)
+            };
+        }
+
+
+        public static T GetElement<T>(int index, ITeamOffStructureRead<T> structure)
+        {
+            var offRoleIndex = ConvertIndexIntoOffRoleIndex();
             return offRoleIndex switch
             {
-                EnumTeam.SecondaryVanguardIndex => structure.VanguardType[EnumTeam.SecondaryRoleInOffArrayIndex],
-                EnumTeam.SecondaryAttackerIndex => structure.AttackerType[EnumTeam.SecondaryRoleInOffArrayIndex],
-                EnumTeam.SecondarySupportIndex => structure.SupportType[EnumTeam.SecondaryRoleInOffArrayIndex],
-                EnumTeam.SecondaryFlexIndex => structure.FlexType[EnumTeam.SecondaryRoleInOffArrayIndex],
+                EnumTeam.SecondaryVanguardIndex => structure.SecondaryVanguardElement,
+                EnumTeam.SecondaryAttackerIndex => structure.SecondaryAttackerElement,
+                EnumTeam.SecondarySupportIndex => structure.SecondarySupportElement,
+                EnumTeam.SecondaryFlexIndex => structure.SecondaryFlexElement,
 
-                EnumTeam.ThirdVanguardIndex => structure.VanguardType[EnumTeam.ThirdRoleInOffArrayIndex],
-                EnumTeam.ThirdAttackerIndex => structure.AttackerType[EnumTeam.ThirdRoleInOffArrayIndex],
-                EnumTeam.ThirdSupportIndex => structure.SupportType[EnumTeam.ThirdRoleInOffArrayIndex],
-                EnumTeam.ThirdFlexIndex => structure.FlexType[EnumTeam.ThirdRoleInOffArrayIndex],
+                EnumTeam.ThirdVanguardIndex => structure.ThirdVanguardElement,
+                EnumTeam.ThirdAttackerIndex => structure.ThirdAttackerElement,
+                EnumTeam.ThirdSupportIndex => structure.ThirdSupportElement,
+                EnumTeam.ThirdFlexIndex => structure.ThirdFlexElement,
                 _ => throw new ArgumentOutOfRangeException(nameof(offRoleIndex), offRoleIndex, null)
             };
+
+            int ConvertIndexIntoOffRoleIndex()
+            {
+                return index + EnumTeam.RoleTypesAmount;
+            }
+        }
+
+        public static IEnumerable<T> GetEnumerable<T>(ITeamFullRolesStructureRead<T> structure)
+        {
+            yield return structure.VanguardType;
+            yield return structure.AttackerType;
+            yield return structure.SupportType;
+            yield return structure.FlexType;
+            yield return structure.SecondaryVanguardElement;
+            yield return structure.SecondaryAttackerElement;
+            yield return structure.SecondarySupportElement;
+            yield return structure.SecondaryFlexElement;
+            yield return structure.ThirdVanguardElement;
+            yield return structure.ThirdAttackerElement;
+            yield return structure.ThirdSupportElement;
+            yield return structure.ThirdFlexElement;
+        }
+
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
+            ITeamFullRolesStructureRead<TKey> keys, ITeamFullRolesStructureRead<TValue> values)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.VanguardType, values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.AttackerType, values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SupportType, values.SupportType);
+            yield return new KeyValuePair<TKey, TValue>(keys.FlexType, values.FlexType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryVanguardElement, values.SecondaryVanguardElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryAttackerElement, values.SecondaryAttackerElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondarySupportElement, values.SecondarySupportElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryFlexElement, values.SecondaryFlexElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdVanguardElement, values.ThirdVanguardElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdAttackerElement, values.ThirdAttackerElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdSupportElement, values.ThirdSupportElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdFlexElement, values.ThirdFlexElement);
         }
     }
 

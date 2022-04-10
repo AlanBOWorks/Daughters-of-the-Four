@@ -11,8 +11,8 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public sealed class CombatTeam : 
-        ITeamFullPositionStructureRead<CombatEntity>,
-        ITeamFullRoleStructureRead<CombatEntity>,
+        ITeamFlexPositionStructureRead<CombatEntity>,
+        ITeamFlexRoleStructureRead<CombatEntity>,
         IReadOnlyList<CombatEntity>
     {
         private CombatTeam(bool isPlayerTeam)
@@ -90,9 +90,6 @@ namespace CombatSystem.Team
         public IReadOnlyList<CombatEntity> MainPositioningMembers => _mainPositionsWrapper.Members;
         public IEnumerator<CombatEntity> OffRoleMembers => _offRolesGroup;
 
-
-        public CombatEntity GetSecondaryMember(EnumTeam.ActiveRole role) =>
-            UtilsTeam.GetElement(role, _offRolesGroup);
 
         public CombatEntity FrontLineType => _mainPositionsWrapper.FrontLineType;
         public CombatEntity MidLineType => _mainPositionsWrapper.MidLineType;
@@ -223,7 +220,7 @@ namespace CombatSystem.Team
         public bool IsTrinityRole(in CombatEntity entity) => _mainRoleWrapper.IsTrinityRole(in entity);
 
         //This is just for ICollection (utility)
-        private sealed class MainPositionsWrapper : FullPositionMainGroupStructure<CombatEntity>
+        private sealed class MainPositionsWrapper : FlexPositionMainGroupStructure<CombatEntity>
         {
             public void AddMember(in CombatEntity member)
             {
@@ -252,7 +249,7 @@ namespace CombatSystem.Team
             }
         }
 
-        private sealed class MainRoleWrapper : FullPositionMainGroupStructure<CombatEntity>
+        private sealed class MainRoleWrapper : FlexPositionMainGroupStructure<CombatEntity>
         {
             public void AddMember(in CombatEntity entity, in EnumTeam.Role role, out bool isMainEntity)
             {

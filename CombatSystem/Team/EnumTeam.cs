@@ -23,12 +23,12 @@ namespace CombatSystem.Team
         /// <summary>
         /// Total of role, including up to [<seealso cref="FlexIndex"/>]
         /// </summary>
-        public const int RolesAmount = FlexIndex + 1;
+        public const int RoleTypesAmount = FlexIndex + 1;
 
         /// <summary>
-        /// Total of [<see cref="RolesAmount"/>]*2; this is for two teams Collection initializations 
+        /// Total of [<see cref="RoleTypesAmount"/>]*2; this is for two teams Collection initializations 
         /// </summary>
-        public const int OppositeTeamRolesAmount = RolesAmount * 2;
+        public const int OppositeTeamRolesAmount = RoleTypesAmount * 2;
         public enum Role
         {
             InvalidRole = InvalidIndex,
@@ -45,7 +45,7 @@ namespace CombatSystem.Team
         /// <summary>
         /// The amount of OffRolesIndexes = 8
         /// </summary>
-        public const int OffRoleIndexCount = ThirdFlexIndex +1;
+        public const int OffRoleIndexCount = RoleTypesAmount * 2;
 
         /// <summary>
         /// The index in an array for secondary Roles = 0;
@@ -55,8 +55,12 @@ namespace CombatSystem.Team
         /// The index in an array for secondary Roles = 1
         /// </summary>
         public const int ThirdRoleInOffArrayIndex = SecondaryRoleInOffArrayIndex + 1;
+        /// <summary>
+        /// The index in an array for FullTeam Roles = 2
+        /// </summary>
+        public const int MainRoleInFullTeamArrayIndex = ThirdRoleInOffArrayIndex + 1; //In full team comp, mains are placed in last
 
-        public const int SecondaryVanguardIndex = 0;
+        public const int SecondaryVanguardIndex = RoleTypesAmount;
         public const int SecondaryAttackerIndex = SecondaryVanguardIndex + 1;
         public const int SecondarySupportIndex = SecondaryAttackerIndex + 1;
         public const int SecondaryFlexIndex = SecondarySupportIndex + 1;
@@ -151,6 +155,14 @@ namespace CombatSystem.Team
             }
         }
 
-
+        public const int MainRolesIndexInFullTeamArray = 0;
+        /// <summary>
+        /// Amount of Roles for Main + Off entities = 1+2
+        /// </summary>
+        public const int TeamAlimentRolesLength = 1+OffRoleTypesLength;
+        /// <summary>
+        /// The total amount of indexes in a FullTeam Structure (Mains + Offs)
+        /// </summary>
+        public const int FullTeamIndexCount = RoleTypesAmount+OffRoleIndexCount;
     }
 }

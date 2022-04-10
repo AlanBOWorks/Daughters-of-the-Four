@@ -26,7 +26,6 @@ namespace CombatSystem.Player.UI
         [ShowInInspector]
         private CombatEntity _user;
 
-        public const float HeightElementSeparation = 16* 2 + 10;
         private float _barInitialWidth;
         private void Awake()
         {
@@ -84,16 +83,6 @@ namespace CombatSystem.Player.UI
             entityName.text = text;
         }
 
-
-        public void RepositionLocalHeight(int index)
-        {
-            var rectTransform = GetComponent<RectTransform>();
-            const float transformHeight = HeightElementSeparation;
-
-            Vector3 localPosition = rectTransform.localPosition;
-            localPosition.y = -transformHeight * index;
-            rectTransform.localPosition = localPosition;
-        }
 
         public void OnPreStartCombat()
         {

@@ -36,7 +36,7 @@ namespace CombatSystem.Team
         
 
         [Serializable]
-        private sealed class TeamPositionHandler : ITeamFullPositionStructureRead<Transform>, ITeamPositionHandler
+        private sealed class TeamPositionHandler : ITeamFlexPositionStructureRead<Transform>, ITeamPositionHandler
         {
             [SerializeField]
             private Transform frontLineType;

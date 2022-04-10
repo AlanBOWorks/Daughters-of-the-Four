@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public class TeamMainGroupStructure<T> : ITeamRoleStructureRead<T>, ITeamPositionStructureRead<T>, IEnumerable
+    public class TeamBasicGroupStructure<T> : ITeamRoleStructureRead<T>, ITeamPositionStructureRead<T>
     {
-        public TeamMainGroupStructure() : this(new T[EnumTeam.BasicPositioningAmount])
+        public TeamBasicGroupStructure() : this(new T[EnumTeam.BasicPositioningAmount])
         { }
 
-        public TeamMainGroupStructure(T[] members)
+        public TeamBasicGroupStructure(T[] members)
         {
             Members = members;
         }
@@ -61,10 +61,16 @@ namespace CombatSystem.Team
         }
     }
 
-    public class FullPositionMainGroupStructure<T> : TeamMainGroupStructure<T>, ITeamFullRoleStructureRead<T>, ITeamFullPositionStructureRead<T>
+    public class FlexPositionMainGroupStructure<T> : TeamBasicGroupStructure<T>, ITeamFlexRoleStructureRead<T>, ITeamFlexPositionStructureRead<T>
     {
-        public FullPositionMainGroupStructure() : base(new T[EnumTeam.PositioningAmount])
+        public FlexPositionMainGroupStructure() : base(new T[EnumTeam.PositioningAmount])
         { }
+
+        protected FlexPositionMainGroupStructure(T[] membersHolder) : base(membersHolder)
+        {
+            
+        }
+
         public T FlexType
         {
             get => Members[EnumTeam.FlexIndex];
@@ -77,9 +83,9 @@ namespace CombatSystem.Team
         }
     }
 
-    public class FullPositionMainGroupClass<T> : FullPositionMainGroupStructure<T> where T : new()
+    public class FlexPositionMainGroupClass<T> : FlexPositionMainGroupStructure<T> where T : new()
     {
-        public FullPositionMainGroupClass()
+        public FlexPositionMainGroupClass()
         {
             FrontLineType = new T();
             MidLineType = new T();

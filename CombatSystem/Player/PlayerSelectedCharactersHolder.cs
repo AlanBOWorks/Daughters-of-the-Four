@@ -13,7 +13,7 @@ namespace CombatSystem.Player
     {
         public PlayerSelectedCharactersHolder()
         {
-            int rolesAmount = EnumTeam.RolesAmount;
+            int rolesAmount = EnumTeam.RoleTypesAmount;
             _characters = new List<ICombatEntityProvider>(rolesAmount);
             for (int i = 0; i < rolesAmount; i++)
             {

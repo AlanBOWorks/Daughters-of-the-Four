@@ -14,7 +14,7 @@ namespace CombatSystem.Team
         [SerializeField] private string teamName;
 
         [SerializeField]
-        private SPreparationEntity[] characters = new SPreparationEntity[EnumTeam.RolesAmount];
+        private SPreparationEntity[] characters = new SPreparationEntity[EnumTeam.RoleTypesAmount];
 
         public IReadOnlyCollection<ICombatEntityProvider> GetSelectedCharacters() => characters;
 

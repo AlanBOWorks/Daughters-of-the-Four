@@ -16,12 +16,15 @@ namespace CombatSystem.Team
         T EnemyTeamType { get; }
     }
 
-    public interface ITeamFullRoleStructureRead<out T> : ITeamRoleStructureRead<T>
+    public interface ITeamFullRolesStructureRead<out T> : ITeamFlexRoleStructureRead<T>, ITeamOffStructureRead<T> 
+    { }
+
+    public interface ITeamFlexRoleStructureRead<out T> : ITeamRoleStructureRead<T>
     {
         T FlexType { get; }
     }
 
-    public interface ITeamFullPositionStructureRead<out T> : ITeamPositionStructureRead<T>
+    public interface ITeamFlexPositionStructureRead<out T> : ITeamPositionStructureRead<T>
     {
         T FlexLineType { get; }
     }
@@ -76,5 +79,10 @@ namespace CombatSystem.Team
         void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst);
     }
 
-
+    public interface IFullRoleAlimentRead<out T>
+    {
+        T MainRole { get; }
+        T SecondaryRole { get; }
+        T ThirdRole { get; }
+    }
 }

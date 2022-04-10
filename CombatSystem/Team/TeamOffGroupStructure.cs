@@ -7,27 +7,33 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public class TeamOffGroupStructure<T> : IEnumerator<T>, 
-        ITeamFullRoleStructureRead<T[]>, ITeamFullPositionStructureRead<T[]>
+        ITeamFlexRoleStructureRead<T[]>, ITeamFlexPositionStructureRead<T[]>, ITeamOffStructureRead<T>
     {
-        public TeamOffGroupStructure()
+        public TeamOffGroupStructure() : this(EnumTeam.OffRoleTypesLength)
         {
-            _frontLineType = new T[EnumTeam.OffRoleTypesLength];
-            _midLineType = new T[EnumTeam.OffRoleTypesLength];
-            _backLineType = new T[EnumTeam.OffRoleTypesLength];
-            _flexLineType = new T[EnumTeam.OffRoleTypesLength];
-
-            _membersIndex = -1;
+            
         }
 
-        private int _membersIndex;
+        protected TeamOffGroupStructure(int arrayLength)
+        {
+            VanguardFrontLine = new T[arrayLength];
+            AttackerMidLine = new T[arrayLength];
+            SupportBackLine = new T[arrayLength];
+            FlexFlexLine = new T[arrayLength];
+
+            MembersIndex = -1;
+        }
+
+
+        protected int MembersIndex;
         [ShowInInspector,HorizontalGroup("Front")]
-        private readonly T[] _frontLineType;
+        protected readonly T[] VanguardFrontLine;
         [ShowInInspector,HorizontalGroup("Front")]
-        private readonly T[] _midLineType;
+        protected readonly T[] AttackerMidLine;
         [ShowInInspector,HorizontalGroup("Back")]
-        private readonly T[] _backLineType;
+        protected readonly T[] SupportBackLine;
         [ShowInInspector,HorizontalGroup("Back")]
-        private readonly T[] _flexLineType;
+        protected readonly T[] FlexFlexLine;
 
 
         public void AddMember(EnumTeam.Positioning positioning, in T element)
@@ -52,21 +58,22 @@ namespace CombatSystem.Team
             }
         }
 
-        public T GetElement(in EnumTeam.ActiveRole role) => UtilsTeam.GetElement(role, this);
 
+        private const int IndexThreshold = EnumTeam.OffRoleIndexCount;
+        protected virtual int MoveNextThreshold() => IndexThreshold;
 
         public bool MoveNext()
         {
-            _membersIndex++;
-            return _membersIndex < EnumTeam.OffRoleIndexCount;
+            MembersIndex++;
+            return MembersIndex < MoveNextThreshold();
         }
 
         public void Reset()
         {
-            _membersIndex = -1;
+            MembersIndex = -1;
         }
 
-        public T Current => UtilsTeam.GetElement(_membersIndex, this);
+        public virtual T Current => UtilsTeam.GetElement(MembersIndex, this);
 
         object IEnumerator.Current => Current;
 
@@ -74,63 +81,76 @@ namespace CombatSystem.Team
         {
         }
 
-        public T[] VanguardType => _frontLineType;
-        public T[] AttackerType => _midLineType;
-        public T[] SupportType => _backLineType;
-        public T[] FlexType => _flexLineType;
+        public T[] VanguardType => VanguardFrontLine;
+        public T[] AttackerType => AttackerMidLine;
+        public T[] SupportType => SupportBackLine;
+        public T[] FlexType => FlexFlexLine;
 
-        public T[] FrontLineType => _frontLineType;
-        public T[] MidLineType => _midLineType;
-        public T[] BackLineType => _backLineType;
-        public T[] FlexLineType => _flexLineType;
+        public T[] FrontLineType => VanguardFrontLine;
+        public T[] MidLineType => AttackerMidLine;
+        public T[] BackLineType => SupportBackLine;
+        public T[] FlexLineType => FlexFlexLine;
 
 
         public T SecondaryVanguardElement
         {
-            get => _frontLineType[EnumTeam.SecondaryRoleInOffArrayIndex];
-            set => _frontLineType[EnumTeam.SecondaryRoleInOffArrayIndex] = value;
+            get => VanguardFrontLine[EnumTeam.SecondaryRoleInOffArrayIndex];
+            set => VanguardFrontLine[EnumTeam.SecondaryRoleInOffArrayIndex] = value;
         }
 
         public T SecondaryAttackerElement
         {
-            get => _midLineType[EnumTeam.SecondaryRoleInOffArrayIndex];
-            set => _midLineType[EnumTeam.SecondaryRoleInOffArrayIndex] = value;
+            get => AttackerMidLine[EnumTeam.SecondaryRoleInOffArrayIndex];
+            set => AttackerMidLine[EnumTeam.SecondaryRoleInOffArrayIndex] = value;
         }
 
         public T SecondarySupportElement
         {
-            get => _backLineType[EnumTeam.SecondaryRoleInOffArrayIndex];
-            set => _backLineType[EnumTeam.SecondaryRoleInOffArrayIndex] = value;
+            get => SupportBackLine[EnumTeam.SecondaryRoleInOffArrayIndex];
+            set => SupportBackLine[EnumTeam.SecondaryRoleInOffArrayIndex] = value;
         }
 
         public T SecondaryFlexElement
         {
-            get => _flexLineType[EnumTeam.SecondaryRoleInOffArrayIndex];
-            set => _flexLineType[EnumTeam.SecondaryRoleInOffArrayIndex] = value;
+            get => FlexFlexLine[EnumTeam.SecondaryRoleInOffArrayIndex];
+            set => FlexFlexLine[EnumTeam.SecondaryRoleInOffArrayIndex] = value;
         }
 
         public T ThirdVanguardElement
         {
-            get => _frontLineType[EnumTeam.ThirdRoleInOffArrayIndex];
-            set => _frontLineType[EnumTeam.ThirdRoleInOffArrayIndex] = value;
+            get => VanguardFrontLine[EnumTeam.ThirdRoleInOffArrayIndex];
+            set => VanguardFrontLine[EnumTeam.ThirdRoleInOffArrayIndex] = value;
         }
 
         public T ThirdAttackerElement
         {
-            get => _midLineType[EnumTeam.ThirdRoleInOffArrayIndex];
-            set => _midLineType[EnumTeam.ThirdRoleInOffArrayIndex] = value;
+            get => AttackerMidLine[EnumTeam.ThirdRoleInOffArrayIndex];
+            set => AttackerMidLine[EnumTeam.ThirdRoleInOffArrayIndex] = value;
         }
 
         public T ThirdSupportElement
         {
-            get => _backLineType[EnumTeam.ThirdRoleInOffArrayIndex];
-            set => _backLineType[EnumTeam.ThirdRoleInOffArrayIndex] = value;
+            get => SupportBackLine[EnumTeam.ThirdRoleInOffArrayIndex];
+            set => SupportBackLine[EnumTeam.ThirdRoleInOffArrayIndex] = value;
         }
 
         public T ThirdFlexElement
         {
-            get => _flexLineType[EnumTeam.ThirdRoleInOffArrayIndex];
-            set => _flexLineType[EnumTeam.ThirdRoleInOffArrayIndex] = value;
+            get => FlexFlexLine[EnumTeam.ThirdRoleInOffArrayIndex];
+            set => FlexFlexLine[EnumTeam.ThirdRoleInOffArrayIndex] = value;
         }
+    }
+
+    public interface ITeamOffStructureRead<out T>
+    {
+        T SecondaryVanguardElement { get; }
+        T SecondaryAttackerElement { get; }
+        T SecondarySupportElement { get; }
+        T SecondaryFlexElement { get; }
+
+        T ThirdVanguardElement { get; }
+        T ThirdAttackerElement { get; }
+        T ThirdSupportElement { get; }
+        T ThirdFlexElement { get; }
     }
 }

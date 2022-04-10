@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public sealed class CombatTeamAliveTargeting : FullPositionMainGroupClass<List<CombatEntity>>
+    public sealed class CombatTeamAliveTargeting : FlexPositionMainGroupClass<List<CombatEntity>>
     {
         public CombatTeamAliveTargeting(CombatTeam team) : base()
         {

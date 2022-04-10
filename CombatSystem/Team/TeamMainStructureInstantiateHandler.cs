@@ -9,7 +9,7 @@ namespace CombatSystem.Team
     /// on Awake
     /// </summary>
     [Serializable]
-    public class TeamMainStructureInstantiateHandler<T> : FullPositionMainGroupStructure<T> where T : MonoBehaviour
+    public class TeamMainStructureInstantiateHandler<T> : FlexPositionMainGroupStructure<T> where T : MonoBehaviour
     {
         [SerializeField] private Transform instantiationParent;
         [SerializeField] private T instantiationPrefab;

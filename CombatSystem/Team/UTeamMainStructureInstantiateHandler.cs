@@ -10,7 +10,7 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public abstract class UTeamMainStructureInstantiateHandler<T> : UTeamStructureInstantiateHandlerBase<T>,
-        IOppositionTeamStructureRead<ITeamFullRoleStructureRead<T>>
+        IOppositionTeamStructureRead<ITeamFlexRoleStructureRead<T>>
       
         where T : MonoBehaviour
     {
@@ -41,8 +41,8 @@ namespace CombatSystem.Team
         protected TeamMainStructureInstantiateHandler<T> GetPlayerHandler() => playerTeamType;
         protected TeamMainStructureInstantiateHandler<T> GetEnemyHandler() => enemyTeamType;
 
-        public ITeamFullRoleStructureRead<T> PlayerTeamType => playerTeamType;
-        public ITeamFullRoleStructureRead<T> EnemyTeamType => enemyTeamType;
+        public ITeamFlexRoleStructureRead<T> PlayerTeamType => playerTeamType;
+        public ITeamFlexRoleStructureRead<T> EnemyTeamType => enemyTeamType;
         
         protected override void IterationTeam(in CombatTeam team, bool isPlayerElement, in IEntityElementInstantiationListener<T>[] callListeners)
         {
