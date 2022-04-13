@@ -61,6 +61,10 @@ namespace CombatSystem.Player.UI
             UpdateLuckInfo(in entity);
         }
 
+        public void OnEntityWaitSequence(CombatEntity entity)
+        {
+        }
+
         private void UpdateLuckInfo(in CombatEntity entity)
         {
             var element = _elementsDictionary[entity];

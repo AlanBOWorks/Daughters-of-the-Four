@@ -21,6 +21,8 @@ namespace CombatSystem.Player.UI
         private UCombatSkillButton clonableSkillButton;
         private Stack<UCombatSkillButton> _instantiationPool;
         private Dictionary<CombatSkill,UCombatSkillButton> _activeButtons;
+        [SerializeField] 
+        private UCombatSkillButton waitIconReference;
 
         [Title("Parameters")]
         [SerializeField]
@@ -28,6 +30,12 @@ namespace CombatSystem.Player.UI
         private Vector2 _buttonSizes;
 
         private CombatEntity _currentControlEntity;
+
+
+        internal void AddToDictionary(in CombatSkill skill, in UCombatSkillButton button)
+        {
+            _activeButtons.Add(skill,button);
+        }
 
 
         private void Awake()
@@ -95,14 +103,27 @@ namespace CombatSystem.Player.UI
             {
                 int index = 0;
                 Vector2 lastPoint = Vector2.zero;
+
+                yield return Timing.WaitForOneFrame;
+
                 foreach (var button in _activeButtons)
                 {
+                    var buttonHolder = button.Value;
                     yield return Timing.WaitForSeconds(DelayBetweenButtons);
 
-                    var buttonHolder = button.Value;
-                    var buttonTransform = (RectTransform) buttonHolder.transform;
+                    ShowIcon(in buttonHolder);
+                    
+                    index++;
+                }
+                //yield return Timing.WaitForSeconds(DelayBetweenButtons);
+                //ShowIcon(in waitIconReference);
 
+
+                void ShowIcon(in UCombatSkillButton buttonHolder)
+                {
                     Vector2 targetPoint = index * (buttonsSeparations + _buttonSizes);
+
+                    var buttonTransform = (RectTransform)buttonHolder.transform;
 
                     buttonTransform.localPosition = lastPoint;
                     buttonTransform.DOLocalMove(targetPoint, AnimationDuration);
@@ -110,7 +131,6 @@ namespace CombatSystem.Player.UI
 
 
                     lastPoint = targetPoint;
-                    index++;
                 }
             }
         }
@@ -159,6 +179,12 @@ namespace CombatSystem.Player.UI
             _currentControlEntity = null;
             ReturnSkillsToStack();
         }
+
+        public void OnEntityWaitSequence(CombatEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
             ReturnSkillsToStack();

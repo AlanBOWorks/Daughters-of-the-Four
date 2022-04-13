@@ -52,5 +52,9 @@ namespace CombatSystem.Skills
 
             entity.OnSequenceFinish();
         }
+
+        public void OnEntityWaitSequence(CombatEntity entity)
+        {
+        }
     }
 }

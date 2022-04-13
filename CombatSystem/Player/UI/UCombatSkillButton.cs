@@ -46,7 +46,8 @@ namespace CombatSystem.Player.UI
 
             void UpdateIcon()
             {
-                iconHolder.sprite = preset.GetSkillIcon();
+                var icon = preset.GetSkillIcon();
+                if(icon) iconHolder.sprite = icon;
             }
             
         }

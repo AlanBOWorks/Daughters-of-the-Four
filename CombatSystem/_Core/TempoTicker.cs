@@ -129,6 +129,10 @@ namespace CombatSystem._Core
         {
             Timing.ResumeCoroutines(_tickingHandle);
         }
+
+        public void OnEntityWaitSequence(CombatEntity entity)
+        {
+        }
     }
 
     public sealed class CombatEntitiesTempoTicker : 
@@ -152,7 +156,7 @@ namespace CombatSystem._Core
         [ShowInInspector]
         public CombatEntity CurrentActingEntity { get; private set; }
 
-        private Func<bool> _entityHasFinishHandler;
+        private Func<bool> _controllerHasFinished;
 
 
         public void AddEntities(CombatTeam team)
@@ -228,7 +232,9 @@ namespace CombatSystem._Core
                 if (canAct)
                 {
                     yield return Timing.WaitForOneFrame; //safe wait for setting the request
-                    yield return Timing.WaitUntilTrue(_entityHasFinishHandler);
+                    yield return Timing.WaitUntilTrue(_controllerHasFinished);
+
+                    //todo make a loop for each action left
 
                     // ------  INVOKE EVENTS: OnEntityFinishSequence() ------
                 }
@@ -238,18 +244,20 @@ namespace CombatSystem._Core
                 }
 
                 // TODO Move finishSequence into If when SkipSequenceEvent is added
+                // TODO make this block of code in another handler (so it can distinguish between natural finish and waitFinish
                 combatEvents.OnEntityFinishSequence(CurrentActingEntity);
                 yield return Timing.WaitForOneFrame;
                 _tickingTrackers.Add(CurrentActingEntity);
             }
         }
 
+
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             AddEntities(playerTeam);
             AddEntities(enemyTeam);
 
-            _entityHasFinishHandler = CombatSystemSingleton.TeamControllers.CurrentControllerHasFinish;
+            _controllerHasFinished = CombatSystemSingleton.TeamControllers.CurrentControllerHasFinish;
         }
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -272,6 +280,11 @@ namespace CombatSystem._Core
         public void OnEntityFinishSequence(CombatEntity entity)
         {
             entity.Stats.CurrentInitiative = 0;
+        }
+
+        public void OnEntityWaitSequence(CombatEntity entity)
+        {
+            
         }
     }
 
@@ -309,6 +322,9 @@ namespace CombatSystem._Core
         /// </summary>
         /// <param name="entity"></param>
         void OnEntityFinishSequence(CombatEntity entity);
+
+
+        void OnEntityWaitSequence(CombatEntity entity);
     }
 
     public interface ITempoEntityPercentListener : ICombatEventListener

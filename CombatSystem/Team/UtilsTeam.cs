@@ -388,5 +388,14 @@ namespace CombatSystem.Team
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             eventsHolder.OnControlChange(in team, in controlVariation, true);
         }
+
+
+
+        public static void PutOnStandBy(in CombatEntity target)
+        {
+            target.Team.StandByMembers.PutOnStandBy(in target);
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            eventsHolder.OnEntityWaitSequence(target);
+        }
     }
 }

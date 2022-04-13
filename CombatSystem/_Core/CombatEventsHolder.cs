@@ -149,8 +149,15 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnEntityFinishSequence(entity);
 
             _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity);
+        }
 
-            _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity);
+        public void OnEntityWaitSequence(CombatEntity entity)
+        {
+            _eventsHolder.OnEntityWaitSequence(entity);
+            _playerCombatEvents.OnEntityWaitSequence(entity);
+            _enemyCombatEvents.OnEntityWaitSequence(entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnEntityWaitSequence(entity);
         }
 
 
@@ -314,6 +321,11 @@ namespace CombatSystem._Core
             public void OnEntityFinishSequence(CombatEntity entity)
             {
                 Debug.Log($"> --- Entity [END] Sequence: {entity.GetProviderEntityName()}");
+            }
+
+            public void OnEntityWaitSequence(CombatEntity entity)
+            {
+                Debug.Log($"> --- Entity [WAIT] Sequence: {entity.GetProviderEntityName()}");
             }
 
             public void OnStartTicking()
@@ -728,6 +740,14 @@ namespace CombatSystem._Core
             foreach (var listener in _tempoEntityListeners)
             {
                 listener.OnEntityFinishSequence(entity);
+            }
+        }
+
+        public void OnEntityWaitSequence(CombatEntity entity)
+        {
+            foreach (var listener in _tempoEntityListeners)
+            {
+                listener.OnEntityWaitSequence(entity);
             }
         }
 

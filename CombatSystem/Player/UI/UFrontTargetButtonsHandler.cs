@@ -64,6 +64,11 @@ namespace CombatSystem.Player.UI
         {
         }
 
+        public void OnEntityWaitSequence(CombatEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public void OnSkillSelect(in CombatSkill skill)
         {
             

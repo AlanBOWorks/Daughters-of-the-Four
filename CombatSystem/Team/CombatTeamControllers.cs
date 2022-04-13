@@ -68,6 +68,11 @@ namespace CombatSystem.Team
         {
         }
 
+        public void OnEntityWaitSequence(CombatEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
         private CoroutineHandle _controlHandle;
         private void DoRequest(CombatEntity actingEntity)
         {
@@ -82,7 +87,7 @@ namespace CombatSystem.Team
 
             IEnumerator<float> _DoControl()
             {
-                UpdateHasFinishCurrentEntity();
+                _hasFinishCurrentEntity = CheckHasFinishCurrentEntity();
                 var eventsHolder = CombatSystemSingleton.EventsHolder;
 
                 yield return Timing.WaitForOneFrame; //safe wait
@@ -96,17 +101,16 @@ namespace CombatSystem.Team
                     yield return Timing.WaitForOneFrame;
 
                     eventsHolder.OnSkillSubmit(in actingEntity, in usedSkill,in onTarget);
-                    UpdateHasFinishCurrentEntity();
+                    _hasFinishCurrentEntity = CheckHasFinishCurrentEntity();
                 }
 
                 //_hasFinishCurrentEntity = true; this always happens because the while(!(_hastFinishCurrentEntity == true)) happens
             }
 
-            void UpdateHasFinishCurrentEntity()
+            bool CheckHasFinishCurrentEntity()
             {
-                _hasFinishCurrentEntity = 
-                    !UtilsCombatStats.CanActRequest(actingEntity) 
-                    || controller.HasForcedFinishControlling();
+                return !UtilsCombatStats.CanActRequest(actingEntity) 
+                       || controller.HasForcedFinishControlling();
             }
         }
 
