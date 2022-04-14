@@ -47,7 +47,7 @@ namespace CombatSystem._Core
         {
         }
 
-        public void OnCombatFinish()
+        public void OnCombatFinish(bool isPlayerWin)
         {
             DestroyAliveReference();
         }
@@ -70,7 +70,7 @@ namespace CombatSystem._Core
                 {
                     yield return Timing.WaitForOneFrame;
                 }
-                CombatSystemSingleton.EventsHolder.OnCombatFinish();
+                CombatSystemSingleton.EventsHolder.OnCombatFinish(false);
             }
         }
 
@@ -112,10 +112,12 @@ namespace CombatSystem._Core
         void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam);
 
         void OnCombatStart();
+
         /// <summary>
         /// Invoked only if the combat is finish by natural conditions
         /// </summary>
-        void OnCombatFinish();
+        /// <param name="isPlayerWin"></param>
+        void OnCombatFinish(bool isPlayerWin);
         /// <summary>
         /// Invoked only if the combat is ended by forced means (quitting the game, by an event...)
         /// </summary>

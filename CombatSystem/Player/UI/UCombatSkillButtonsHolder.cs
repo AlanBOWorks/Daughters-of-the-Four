@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
+using CombatSystem.Player.Skills;
 using CombatSystem.Skills;
 using CombatSystem.Team;
 using DG.Tweening;
@@ -14,7 +15,7 @@ namespace CombatSystem.Player.UI
 {
     public class UCombatSkillButtonsHolder : MonoBehaviour, 
         ITempoEntityStatesListener, ITeamEventListener,
-        ISkillButtonListener, ISkillUsageListener
+        ISkillButtonListener, ISkillUsageListener, ICombatStatesListener
     {
         [Title("References")]
         [SerializeField] 
@@ -22,7 +23,7 @@ namespace CombatSystem.Player.UI
         private Stack<UCombatSkillButton> _instantiationPool;
         private Dictionary<CombatSkill,UCombatSkillButton> _activeButtons;
         [SerializeField] 
-        private UCombatSkillButton waitIconReference;
+        private UCombatWaitSkill waitSkill;
 
         [Title("Parameters")]
         [SerializeField]
@@ -34,6 +35,7 @@ namespace CombatSystem.Player.UI
 
         internal void AddToDictionary(in CombatSkill skill, in UCombatSkillButton button)
         {
+            if(_activeButtons.ContainsKey(skill)) return;
             _activeButtons.Add(skill,button);
         }
 
@@ -57,7 +59,27 @@ namespace CombatSystem.Player.UI
             playerEvents.ManualSubscribe(this as ITempoEntityStatesListener);
             playerEvents.ManualSubscribe(this as ISkillUsageListener);
             playerEvents.ManualSubscribe(this as ITeamEventListener);
+            playerEvents.ManualSubscribe(this as ICombatStatesListener);
         }
+
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
+        {
+        }
+
+        public void OnCombatStart()
+        {
+        }
+
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+            HideAll();
+        }
+
+        public void OnCombatQuit()
+        {
+            HideAll();
+        }
+
 
         // Safe check
         private const int MaxSkillAmount = 12;
@@ -115,9 +137,8 @@ namespace CombatSystem.Player.UI
                     
                     index++;
                 }
-                //yield return Timing.WaitForSeconds(DelayBetweenButtons);
-                //ShowIcon(in waitIconReference);
-
+                HandleWaitSkill();
+                yield return Timing.WaitForSeconds(DelayBetweenButtons);
 
                 void ShowIcon(in UCombatSkillButton buttonHolder)
                 {
@@ -131,6 +152,15 @@ namespace CombatSystem.Player.UI
 
 
                     lastPoint = targetPoint;
+                }
+
+                void HandleWaitSkill()
+                {
+                    var waitButton = waitSkill.GetButton();
+                    waitSkill.InjectIntoButton();
+                    waitSkill.ResetCost();
+                    ShowIcon(in waitButton);
+
                 }
             }
         }
@@ -175,14 +205,12 @@ namespace CombatSystem.Player.UI
         public void OnEntityFinishSequence(CombatEntity entity)
         {
             if(entity != _currentControlEntity) return;
-
-            _currentControlEntity = null;
-            ReturnSkillsToStack();
+            
+            HideAll();
         }
 
         public void OnEntityWaitSequence(CombatEntity entity)
         {
-            throw new NotImplementedException();
         }
 
         public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
@@ -207,6 +235,13 @@ namespace CombatSystem.Player.UI
             _activeButtons.Clear();
         }
 
+        private void HideAll()
+        {
+            _currentControlEntity = null;
+            ReturnSkillsToStack();
+            DisableButton(waitSkill.GetButton());
+        }
+
 
         [ShowInInspector]
         private CombatSkill _currentSelectedSkill;
@@ -214,6 +249,16 @@ namespace CombatSystem.Player.UI
         {
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillSelect(in skill);
             OnSkillSwitch(in skill, in _currentSelectedSkill);
+        }
+
+        private UCombatSkillButton GetButton(in CombatSkill skill)
+        {
+            if (_activeButtons.ContainsKey(skill)) return _activeButtons[skill];
+
+            var waitCombatSkill = waitSkill.GetSkill();
+            return skill == waitCombatSkill 
+                ? waitSkill.GetButton() 
+                : null;
         }
 
         public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
@@ -228,14 +273,16 @@ namespace CombatSystem.Player.UI
             else
             {
                 _currentSelectedSkill = skill;
-                _activeButtons[skill].SelectButton();
+                var button = GetButton(in skill);
+                button.SelectButton();
                 PlayerCombatSingleton.PlayerCombatEvents.OnSkillSwitch(in skill, previousSelection);
             }
         }
 
         public void OnSkillDeselect(in CombatSkill skill)
         {
-            _activeButtons[skill].DeSelectButton();
+            var button = GetButton(in skill);
+            button.DeSelectButton();
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(in skill);
         }
         public void OnSkillCancel(in CombatSkill skill)
@@ -249,7 +296,8 @@ namespace CombatSystem.Player.UI
 
         private void DeselectSkill(in CombatSkill skill)
         {
-            _activeButtons[skill].DeSelectButton();
+            var button = GetButton(in skill);
+            button.DeSelectButton();
 
             if(skill == _currentSelectedSkill)
                 _currentSelectedSkill = null;

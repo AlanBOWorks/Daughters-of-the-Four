@@ -91,11 +91,11 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnCombatStart();
         }
 
-        public void OnCombatFinish()
+        public void OnCombatFinish(bool isPlayerWin)
         {
-            _eventsHolder.OnCombatFinish();
-            _playerCombatEvents.OnCombatFinish();
-            _enemyCombatEvents.OnCombatFinish();
+            _eventsHolder.OnCombatFinish(isPlayerWin);
+            _playerCombatEvents.OnCombatFinish(isPlayerWin);
+            _enemyCombatEvents.OnCombatFinish(isPlayerWin);
         }
 
         public void OnCombatQuit()
@@ -549,6 +549,11 @@ namespace CombatSystem._Core
         protected abstract void UnSubscribeTempo(ITempoTickListener tickListener);
 
 
+        public void ManualSubscribe(ICombatStatesListener statesListener)
+        {
+            _combatStatesListeners.Add(statesListener);
+        }
+
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             foreach (var listener in _combatPreparationListeners)
@@ -573,11 +578,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatFinish()
+        public void OnCombatFinish(bool isPlayerWin)
         {
             foreach (var listener in _combatStatesListeners)
             {
-                listener.OnCombatFinish();
+                listener.OnCombatFinish(isPlayerWin);
             }
         }
 

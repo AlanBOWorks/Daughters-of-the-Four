@@ -20,14 +20,6 @@ namespace CombatSystem.Team
             DoInjection();
 
 
-            void HandleElement(ref UTeamFullGroupStructure<Transform> element)
-            {
-                var forDestruction = element;
-                element = this;
-
-                if(forDestruction) Destroy(forDestruction);
-            }
-
             void HandleExistingReference()
             {
                 var singletonReference = (isPlayer) 

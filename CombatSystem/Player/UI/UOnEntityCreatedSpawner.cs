@@ -108,12 +108,14 @@ namespace CombatSystem.Player.UI
         {
             [SerializeField] private Transform instantiationParent;
             [SerializeField] private T elementEntityPrefab;
+            [SerializeField] private bool hideElementOnStart = true;
             public int ActiveCount { get; private set; }
 
 
             public void Disable()
             {
-                elementEntityPrefab.gameObject.SetActive(false);
+                if(hideElementOnStart)
+                    elementEntityPrefab.gameObject.SetActive(false);
             }
 
             public T GenerateElement(in CombatEntity entity)
@@ -150,7 +152,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnCombatFinish()
+        public void OnCombatFinish(bool isPlayerWin)
         {
         }
 

@@ -159,12 +159,13 @@ namespace CombatSystem.Entity
         }
 
         // ----- CLASSES
-        private sealed class SkillsHolder : IFullStanceStructureRead<List<CombatSkill>>, IReadOnlyCollection<CombatSkill>
+        private sealed class SkillsHolder : IFullStanceStructureRead<List<CombatSkill>>, 
+            IReadOnlyCollection<CombatSkill>
         {
             public SkillsHolder(CombatEntity user,
                 IStanceStructureRead<IReadOnlyCollection<IFullSkill>> skills)
             {
-                User = user;
+                _user = user;
                 DisruptionStance = new List<CombatSkill>();
                 AttackingStance = GenerateSkills(skills.AttackingStance);
                 NeutralStance = GenerateSkills(skills.NeutralStance);
@@ -194,6 +195,13 @@ namespace CombatSystem.Entity
                         generatedSkills = new List<CombatSkill>(presetSkills.Count);
                         foreach (var preset in presetSkills)
                         {
+                            if (preset == null)
+                            {
+                                Debug.LogError("Preset skill was [NULL]");
+                                Debug.LogWarning($"Check Entity Skills: {user.Provider}");
+                                continue;
+                            }
+
                             CombatSkill skill = new CombatSkill(preset);
                             generatedSkills.Add(skill);
                         }
@@ -206,7 +214,7 @@ namespace CombatSystem.Entity
 
 
             private readonly HashSet<CombatSkill> _allSkills;
-            public readonly CombatEntity User;
+            private readonly CombatEntity _user;
 
             [ShowInInspector]
             public List<CombatSkill> AttackingStance { get; }
@@ -219,7 +227,7 @@ namespace CombatSystem.Entity
 
             public List<CombatSkill> GetCurrentSkills()
             {
-                return UtilsTeam.GetElement(User.GetCurrentStance(), this);
+                return UtilsTeam.GetElement(_user.GetCurrentStance(), this);
             }
 
 

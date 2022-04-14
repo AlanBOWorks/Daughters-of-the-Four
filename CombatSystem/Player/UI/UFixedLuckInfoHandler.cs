@@ -10,19 +10,25 @@ namespace CombatSystem.Player.UI
 {
     public class UFixedLuckInfoHandler : MonoBehaviour, 
         IEntityElementInstantiationListener<UVitalityInfo>, //This is because I want to use UMainVitalityInfosHandler's events
-        ITempoEntityStatesListener
+        ITempoEntityStatesListener,
+        ICombatStatesListener
     {
         [ShowInInspector,DisableInEditorMode]
         private Dictionary<CombatEntity, ULuckInfo> _elementsDictionary;
-        private void Awake()
+        private void Start()
         {
             _elementsDictionary = new Dictionary<CombatEntity, ULuckInfo>();
             CombatSystemSingleton.EventsHolder.Subscribe(this);
         }
 
-        public void OnCombatPreStarts()
+        private void ResetState()
         {
             _elementsDictionary.Clear();
+        }
+
+        public void OnCombatPreStarts()
+        {
+            ResetState();
         }
 
         public void OnFinishPreStarts()
@@ -67,6 +73,7 @@ namespace CombatSystem.Player.UI
 
         private void UpdateLuckInfo(in CombatEntity entity)
         {
+            Debug.Log(entity.CombatCharacterName);
             var element = _elementsDictionary[entity];
             UpdateLuckInfo(in element, in entity);
         }
@@ -78,5 +85,23 @@ namespace CombatSystem.Player.UI
 
         }
 
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
+        {
+            
+        }
+
+        public void OnCombatStart()
+        {
+        }
+
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+            ResetState();
+        }
+
+        public void OnCombatQuit()
+        {
+            ResetState();
+        }
     }
 }

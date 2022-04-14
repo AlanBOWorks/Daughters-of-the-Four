@@ -210,8 +210,9 @@ namespace CombatSystem.Stats
             float actionsLimit =
                 stats.BaseStats.ActionsType + stats.BuffStats.ActionsType + stats.BurstStats.ActionsType;
             if (actionsLimit > MaxActionAmount) actionsLimit = MaxActionAmount;
+            var usedActionsAmount = stats.UsedActions;
 
-            return stats.UsedActions < actionsLimit;
+            return usedActionsAmount < actionsLimit;
         }
 
         public static bool IsAlive(in CombatEntity entity) => IsAlive(entity.Stats);
@@ -250,6 +251,11 @@ namespace CombatSystem.Stats
         public static void TickActions(in CombatStats stats, in CombatSkill usedSkill)
         {
             stats.UsedActions += usedSkill.SkillCost;
+        }
+
+        public static void FullTickActions(in CombatStats stats)
+        {
+            stats.UsedActions = MaxActionAmount + 1;
         }
     }
 }

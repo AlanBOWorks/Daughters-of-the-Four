@@ -70,7 +70,8 @@ namespace CombatSystem.Team
 
         public void OnEntityWaitSequence(CombatEntity entity)
         {
-            throw new NotImplementedException();
+            Timing.KillCoroutines(_controlHandle);
+            _hasFinishCurrentEntity = true;
         }
 
         private CoroutineHandle _controlHandle;

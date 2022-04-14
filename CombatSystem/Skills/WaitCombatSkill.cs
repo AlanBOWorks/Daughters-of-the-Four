@@ -1,4 +1,6 @@
+using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -21,7 +23,8 @@ namespace CombatSystem.Skills
 
             public void DoSkill(in CombatEntity performer, in CombatEntity target, in CombatSkill holderReference)
             {
-                UtilsCombatTeam.PutOnStandBy(in target);
+                UtilsCombatStats.FullTickActions(target.Stats);
+                CombatSystemSingleton.EventsHolder.OnEntityWaitSequence(target);
             }
 
             private const string WaitSkillName = "Wait";

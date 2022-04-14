@@ -87,6 +87,7 @@ namespace CombatSystem.Player
                 _cameraHolderListeners.Add(cameraHolderListener);
         }
 
+
         internal void ManualSubscribe(ISkillPointerListener skillPointerListener)
         {
             _skillPointerListeners.Add(skillPointerListener);

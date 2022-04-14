@@ -66,7 +66,7 @@ namespace CombatSystem.Team
         public virtual void OnCombatStart()
         { }
 
-        public virtual void OnCombatFinish()
+        public virtual void OnCombatFinish(bool isPlayerWin)
         { }
 
         public virtual void OnCombatQuit()

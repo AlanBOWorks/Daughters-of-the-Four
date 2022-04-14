@@ -167,11 +167,18 @@ namespace CombatSystem._Core
 
         private bool InvalidSetup() => !playerTesterTeam || !oppositionTeam;
 
+
         [Button(ButtonSizes.Large), GUIColor(.3f,.7f,.8f), DisableIf("InvalidSetup"), DisableInEditorMode,
         InfoBox("Invalid setup (some teams are <b>NULL</b>)",InfoMessageType.Error, "InvalidSetup")]
         private void TestCombat()
         {
             TestStartCombat(playerTesterTeam, oppositionTeam);
+        }
+
+        [Button, DisableIf("InvalidSetup"), DisableInEditorMode]
+        private void FinishCombat(bool isWin = true)
+        {
+            CombatFinishHandler.FinishCombat(isWin);
         }
 
         private static void TestStartCombat(SPlayerPresetTeam playerTeam, SPredefinedTeam enemyTeam)

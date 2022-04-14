@@ -107,7 +107,6 @@ namespace CombatSystem.Player.UI
 
         public void OnEntityWaitSequence(CombatEntity entity)
         {
-            throw new NotImplementedException();
         }
 
         private CombatSkill _selectedSkill;

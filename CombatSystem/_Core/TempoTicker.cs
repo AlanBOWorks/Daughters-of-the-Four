@@ -21,7 +21,6 @@ namespace CombatSystem._Core
             TickListeners = new HashSet<ITempoTickListener>();
         }
 
-
         public void Subscribe(ITempoTickListener tickListener)
         {
             if (TickListeners.Contains(tickListener))
@@ -42,7 +41,6 @@ namespace CombatSystem._Core
         private CoroutineHandle _entitiesTickHandle;
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            
         }
 
         public void OnCombatStart()
@@ -51,12 +49,14 @@ namespace CombatSystem._Core
             CombatSystemSingleton.LinkCoroutineToMaster(in _tickingHandle);
         }
 
-        public void OnCombatFinish()
+        public void OnCombatFinish(bool isPlayerWin)
         {
+            EntitiesTempoTicker.ResetState();
         }
 
         public void OnCombatQuit()
         {
+            EntitiesTempoTicker.ResetState();
         }
 
 
@@ -158,6 +158,11 @@ namespace CombatSystem._Core
 
         private Func<bool> _controllerHasFinished;
 
+        public void ResetState()
+        {
+            _tickingTrackers.Clear();
+            _activeEntities.Clear();
+        }
 
         public void AddEntities(CombatTeam team)
         {
