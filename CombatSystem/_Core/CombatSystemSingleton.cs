@@ -30,11 +30,16 @@ namespace CombatSystem._Core
             EventsHolder.Subscribe(TeamControllers);
 
             PrefabInstantiationHandler = new PrefabInstantiationHandler();
+            EntityPrefabsPoolHandler = new EntityPrefabsPoolHandler();
+
+            systemEventsHolder.Subscribe(EntityPrefabsPoolHandler);
         }
         private CombatSystemSingleton() { }
         public static CombatSystemSingleton GetInstance() => Instance;
 
         internal static PrefabInstantiationHandler PrefabInstantiationHandler;
+        [ShowInInspector]
+        internal static EntityPrefabsPoolHandler EntityPrefabsPoolHandler;
 
         [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
         internal static GameObject CombatHolderNotDestroyReference;

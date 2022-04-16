@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
 using MEC;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
@@ -38,6 +39,7 @@ namespace CombatSystem.Player.UI
         }
 
         private Camera _playerCamera;
+        [ShowInInspector]
         private Transform _followReference;
         private RectTransform _rectTransform;
 

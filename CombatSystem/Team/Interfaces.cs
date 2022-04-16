@@ -19,6 +19,11 @@ namespace CombatSystem.Team
     public interface ITeamFullRolesStructureRead<out T> : ITeamFlexRoleStructureRead<T>, ITeamOffStructureRead<T> 
     { }
 
+    public interface ITeamFlexRoleStructureInject<in T> : ITeamRoleStructureInject<T>
+    {
+        T FlexType { set; }
+
+    }
     public interface ITeamFlexRoleStructureRead<out T> : ITeamRoleStructureRead<T>
     {
         T FlexType { get; }
@@ -34,6 +39,12 @@ namespace CombatSystem.Team
         T VanguardType { get; }
         T AttackerType { get; }
         T SupportType { get; }
+    }
+    public interface ITeamRoleStructureInject<in T>
+    {
+        T VanguardType { set; }
+        T AttackerType { set; }
+        T SupportType { set; }
     }
 
     public interface ITeamPositionStructureRead<out T>

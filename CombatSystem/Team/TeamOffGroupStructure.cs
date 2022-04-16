@@ -74,7 +74,6 @@ namespace CombatSystem.Team
         }
 
         public virtual T Current => UtilsTeam.GetElement(MembersIndex, this);
-
         object IEnumerator.Current => Current;
 
         public void Dispose()

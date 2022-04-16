@@ -239,7 +239,10 @@ namespace CombatSystem.Team
             {
                 int positioningIndex = EnumTeam.GetPositioningIndex(in targetPosition);
                 bool isMainRole = Members[positioningIndex] == null;
-                if (isMainRole) Members[positioningIndex] = member;
+                if (!isMainRole) return;
+
+                Members[positioningIndex] = member;
+                member.ActiveRole = EnumTeam.ParseMainActiveRole(in targetPosition);
             }
 
             public void RemoveMember(in CombatEntity member)

@@ -200,6 +200,8 @@ namespace CombatSystem.Team
             }
         }
 
+
+
         public static T GetElement<T>(int index, ITeamFullRolesStructureRead<T> structure)
         {
             return index switch
@@ -219,6 +221,52 @@ namespace CombatSystem.Team
                 _ => throw new ArgumentOutOfRangeException(nameof(index), index, null)
             };
         }
+
+        public static void SetElement<T>(int index, TeamFullGroupStructure<T> structure, T value)
+        {
+            switch (index)
+            {
+                case EnumTeam.VanguardIndex:
+                    structure.VanguardType = value;
+                    break;
+                case EnumTeam.AttackerIndex:
+                    structure.AttackerType = value;
+                    break;
+                case EnumTeam.SupportIndex:
+                    structure.SupportType = value;
+                    break;
+                case EnumTeam.FlexIndex:
+                    structure.FlexType = value;
+                    break;
+                case EnumTeam.SecondaryVanguardIndex:
+                    structure.SecondaryVanguardElement = value;
+                    break;
+                case EnumTeam.SecondaryAttackerIndex:
+                    structure.SecondaryAttackerElement = value;
+                    break;
+                case EnumTeam.SecondarySupportIndex:
+                    structure.SecondarySupportElement = value;
+                    break;
+                case EnumTeam.SecondaryFlexIndex:
+                    structure.SecondaryFlexElement = value;
+                    break;
+                case EnumTeam.ThirdVanguardIndex:
+                    structure.ThirdVanguardElement = value;
+                    break;
+                case EnumTeam.ThirdAttackerIndex:
+                    structure.ThirdAttackerElement = value;
+                    break;
+                case EnumTeam.ThirdSupportIndex:
+                    structure.ThirdSupportElement = value;
+                    break;
+                case EnumTeam.ThirdFlexIndex:
+                    structure.ThirdFlexElement = value;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(index), index, null);
+            }
+        }
+
 
         public static T SafeGetElement<T>(int index, ITeamFullRolesStructureRead<T> structure)
         {
@@ -259,6 +307,45 @@ namespace CombatSystem.Team
                 EnumTeam.ThirdFlexIndex => structure.ThirdFlexElement,
                 _ => throw new ArgumentOutOfRangeException(nameof(offRoleIndex), offRoleIndex, null)
             };
+
+            int ConvertIndexIntoOffRoleIndex()
+            {
+                return index + EnumTeam.RoleTypesAmount;
+            }
+        }
+
+        public static void SetElement<T>(int index, TeamOffGroupStructure<T> structure, T value)
+        {
+            var offRoleIndex = ConvertIndexIntoOffRoleIndex();
+            switch (offRoleIndex)
+            {
+                case EnumTeam.SecondaryVanguardIndex:
+                    structure.SecondaryVanguardElement = value;
+                    break;
+                case EnumTeam.SecondaryAttackerIndex:
+                    structure.SecondaryAttackerElement = value;
+                    break;
+                case EnumTeam.SecondarySupportIndex:
+                    structure.SecondarySupportElement = value;
+                    break;
+                case EnumTeam.SecondaryFlexIndex:
+                    structure.SecondaryFlexElement = value;
+                    break;
+                case EnumTeam.ThirdVanguardIndex:
+                    structure.ThirdVanguardElement = value;
+                    break;
+                case EnumTeam.ThirdAttackerIndex:
+                    structure.ThirdAttackerElement = value;
+                    break;
+                case EnumTeam.ThirdSupportIndex:
+                    structure.ThirdSupportElement = value;
+                    break;
+                case EnumTeam.ThirdFlexIndex:
+                    structure.ThirdFlexElement = value;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(offRoleIndex), offRoleIndex, null);
+            }
 
             int ConvertIndexIntoOffRoleIndex()
             {
@@ -348,6 +435,19 @@ namespace CombatSystem.Team
             yield return new KeyValuePair<TKey, TValue>(keys.ThirdFlexElement,
                 values.ThirdFlexElement ? values.ThirdFlexElement : values.FlexType);
 
+        }
+
+
+        public static void DoInjection<TRead, TInject>(TeamFullGroupStructure<TRead> structure,
+            TeamFullGroupStructure<TInject> injectInto, Func<TRead,TInject> parseFunc)
+        {
+            int index = 0;
+            while (structure.MoveNext())
+            {
+                var parsedCurrent = parseFunc(structure.Current);
+                SetElement(index,injectInto,parsedCurrent);
+            }
+            structure.Reset();
         }
     }
 

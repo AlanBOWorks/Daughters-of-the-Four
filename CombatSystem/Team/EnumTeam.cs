@@ -155,6 +155,19 @@ namespace CombatSystem.Team
             }
         }
 
+        public static ActiveRole ParseMainActiveRole(in Positioning positioning)
+        {
+            return positioning switch
+            {
+                Positioning.FrontLine => ActiveRole.MainVanguard,
+                Positioning.MidLine => ActiveRole.MainAttacker,
+                Positioning.BackLine => ActiveRole.MainSupport,
+                Positioning.FlexLine => ActiveRole.MainFlex,
+                _ => ActiveRole.InvalidRole
+            };
+        }
+
+
         public const int MainRolesIndexInFullTeamArray = 0;
         /// <summary>
         /// Amount of Roles for Main + Off entities = 1+2

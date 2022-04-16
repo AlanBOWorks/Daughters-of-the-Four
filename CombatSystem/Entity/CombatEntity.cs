@@ -75,6 +75,9 @@ namespace CombatSystem.Entity
         public EnumTeam.Role RoleType { get; }
 
         [ShowInInspector]
+        public EnumTeam.ActiveRole ActiveRole { get; internal set; }
+
+        [ShowInInspector]
         public EnumTeam.Positioning PositioningType { get; private set; }
 
         [ShowInInspector]

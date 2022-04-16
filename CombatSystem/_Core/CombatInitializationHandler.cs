@@ -65,42 +65,8 @@ namespace CombatSystem._Core
 
             void InstantiateModels()
             {
-                var playerTransforms = CombatSystemSingleton.PlayerPositionTransformReferences;
-                InstantiatePhysicalTeam(playerCombatTeam, playerTransforms);
-
-                var enemyTransforms = CombatSystemSingleton.EnemyPositionTransformReferences;
-                InstantiatePhysicalTeam(enemyCombatTeam, enemyTransforms);
-
-                void InstantiatePhysicalTeam(CombatTeam team, ITeamFullRolesStructureRead<Transform> positions)
-                {
-                    var valuePairs = UtilsTeam.GetSafeUnityEnumerable(team, positions);
-                    foreach (var pair in valuePairs)
-                    {
-                        var member = pair.Key;
-                        if(member == null) continue;
-
-                        var positionTransform = pair.Value;
-                        var provider = member.Provider;
-
-                        var positionPoint = positionTransform.position;
-                        var rotationPoint = positionTransform.rotation;
-
-                        GameObject instantiatedGameObject;
-                        GameObject copyReference = provider.GetVisualPrefab();
-                        if (copyReference == null)
-                            instantiatedGameObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                        else
-                            instantiatedGameObject = Object.Instantiate(copyReference);
-
-                        var instantiatedTransform = instantiatedGameObject.transform;
-                        instantiatedTransform.position = positionPoint;
-                        instantiatedTransform.rotation = rotationPoint;
-                        instantiatedGameObject.name = provider.GetProviderEntityName() + "(Clone) " +instantiatedGameObject.GetInstanceID();
-
-                        member.InstantiationReference = instantiatedGameObject;
-                        member.Body = instantiatedGameObject.GetComponent<ICombatEntityBody>();
-                    }
-                }
+                var combatEntitiesPrefabPool = CombatSystemSingleton.EntityPrefabsPoolHandler;
+                combatEntitiesPrefabPool.HandleTeams(playerCombatTeam, enemyCombatTeam);
             }
 
            

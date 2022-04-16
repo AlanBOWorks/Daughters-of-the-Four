@@ -25,7 +25,6 @@ namespace CombatSystem.Player.UI
         
         [ShowInInspector,HideInEditorMode]
         protected Dictionary<CombatEntity, T> ActiveElementsDictionary;
-        public IReadOnlyDictionary<CombatEntity, T> ElementsDictionary => ActiveElementsDictionary;
 
         protected virtual void Awake()
         {
@@ -135,7 +134,7 @@ namespace CombatSystem.Player.UI
 
             public void PushElement(in T element)
             {
-                Destroy(element);
+                Destroy(element.gameObject);
                 ActiveCount--;
             }
         }
@@ -148,16 +147,26 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        public void OnCombatStart()
+        public virtual void OnCombatStart()
         {
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public virtual void OnCombatFinish(bool isPlayerWin)
         {
+            OnCombatQuit();
         }
 
-        public void OnCombatQuit()
+        public virtual void OnCombatQuit()
         {
+            foreach (var pair in ActiveElementsDictionary)
+            {
+                var element = pair.Value;
+                var entity = pair.Key;
+                bool isPlayerElement = UtilsTeam.IsPlayerTeam(in entity);
+                var handler= GetHandler(in isPlayerElement);
+                handler.PushElement(in element);
+            }
+            ActiveElementsDictionary.Clear();
         }
     }
 

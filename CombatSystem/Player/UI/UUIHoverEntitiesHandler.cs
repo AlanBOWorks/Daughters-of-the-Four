@@ -20,6 +20,32 @@ namespace CombatSystem.Player.UI
             element.Show();
             base.OnElementCreated(in element, in entity);
         }
+
+        /*
+        public override void OnCombatStart()
+        {
+            Show();
+        }
+
+        public override void OnCombatQuit()
+        {
+            Hide();
+        }
+
+        public override void OnCombatFinish(bool isPlayerWin)
+        {
+            Hide();
+        }
+
+        private void Show()
+        {
+            gameObject.SetActive(true);
+        }
+
+        private void Hide()
+        {
+            gameObject.SetActive(false);
+        }*/
     }
 
     /// <summary>

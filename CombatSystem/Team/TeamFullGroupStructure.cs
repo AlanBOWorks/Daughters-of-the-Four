@@ -7,7 +7,8 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public class TeamFullGroupStructure<T> : TeamOffGroupStructure<T>,
-        ITeamFullRolesStructureRead<T>, ITeamFlexPositionStructureRead<T>
+        ITeamFullRolesStructureRead<T>, ITeamFlexPositionStructureRead<T>,
+        ITeamFlexRoleStructureInject<T>
     {
         public TeamFullGroupStructure() : base(EnumTeam.TeamAlimentRolesLength)
         { }
@@ -15,6 +16,7 @@ namespace CombatSystem.Team
         protected override int MoveNextThreshold() => EnumTeam.FullTeamIndexCount;
 
         T ITeamRoleStructureRead<T>.VanguardType => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+       
         T ITeamRoleStructureRead<T>.AttackerType => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
         T ITeamRoleStructureRead<T>.SupportType => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex];
         T ITeamFlexRoleStructureRead<T>.FlexType => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex];
@@ -23,6 +25,31 @@ namespace CombatSystem.Team
         T ITeamPositionStructureRead<T>.MidLineType => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
         T ITeamPositionStructureRead<T>.BackLineType => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex];
         T ITeamFlexPositionStructureRead<T>.FlexLineType => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+
+
+        public new T VanguardType
+        {
+            get => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+            set => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex] = value;
+        }
+
+        public new T AttackerType
+        {
+            get => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+            set => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex] = value;
+        }
+
+        public new T SupportType
+        {
+            get => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+            set => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex] = value;
+        }
+
+        public new T FlexType
+        {
+            get => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+            set => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex] = value;
+        }
     }
 
 
