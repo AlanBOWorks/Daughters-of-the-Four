@@ -24,7 +24,7 @@ namespace CombatSystem.Skills
             public void DoSkill(in CombatEntity performer, in CombatEntity target, in CombatSkill holderReference)
             {
                 UtilsCombatStats.FullTickActions(target.Stats);
-                CombatSystemSingleton.EventsHolder.OnEntityWaitSequence(target);
+                CombatSystemSingleton.EventsHolder.OnTempoFinishControl(target);
             }
 
             private const string WaitSkillName = "Wait";

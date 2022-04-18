@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
-using CombatSystem.Player.Skills;
 using CombatSystem.Skills;
 using CombatSystem.Team;
 using DG.Tweening;
@@ -185,7 +184,7 @@ namespace CombatSystem.Player.UI
             buttonHolder.ResetState();
         }
         
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             if(!canAct) return;
 
@@ -209,7 +208,7 @@ namespace CombatSystem.Player.UI
             HideAll();
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
         }
 

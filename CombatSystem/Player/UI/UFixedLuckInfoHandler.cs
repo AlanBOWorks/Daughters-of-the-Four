@@ -49,7 +49,7 @@ namespace CombatSystem.Player.UI
             _elementsDictionary.Add(entity, luckInfoHolder);
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
         }
 
@@ -67,7 +67,7 @@ namespace CombatSystem.Player.UI
             UpdateLuckInfo(in entity);
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
         }
 

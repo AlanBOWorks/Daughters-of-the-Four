@@ -110,7 +110,7 @@ namespace CombatSystem._Core
             EntitiesTempoTicker.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             if(canAct)
                 Timing.PauseCoroutines(_tickingHandle);
@@ -127,11 +127,11 @@ namespace CombatSystem._Core
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
-            Timing.ResumeCoroutines(_tickingHandle);
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
+            Timing.ResumeCoroutines(_tickingHandle);
         }
     }
 
@@ -232,8 +232,8 @@ namespace CombatSystem._Core
 
                 bool canAct = UtilsCombatStats.CanRequestActing(CurrentActingEntity);
 
-                // ------  INVOKE EVENTS: OnEntityRequestSequence() ------
-                combatEvents.OnEntityRequestSequence(CurrentActingEntity, canAct);
+                // ------  INVOKE EVENTS: OnMainEntityRequestSequence() ------
+                combatEvents.OnMainEntityRequestSequence(CurrentActingEntity, canAct);
                 if (canAct)
                 {
                     yield return Timing.WaitForOneFrame; //safe wait for setting the request
@@ -265,7 +265,7 @@ namespace CombatSystem._Core
             _controllerHasFinished = CombatSystemSingleton.TeamControllers.CurrentControllerHasFinish;
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             if(!canAct) return;
 
@@ -287,7 +287,7 @@ namespace CombatSystem._Core
             entity.Stats.CurrentInitiative = 0;
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
             
         }
@@ -309,7 +309,7 @@ namespace CombatSystem._Core
         /// entity can't act; To verify if can act use [<see cref="canAct"/>] or use
         /// [<seealso cref="OnEntityRequestAction"/>] instead
         /// </summary>
-        void OnEntityRequestSequence(CombatEntity entity, bool canAct);
+        void OnMainEntityRequestSequence(CombatEntity entity, bool canAct);
         /// <summary>
         /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left.<br></br>
         /// If there's no actions left [<see cref="OnEntityFinishSequence"/>] will be invoked instead.
@@ -325,11 +325,12 @@ namespace CombatSystem._Core
         /// The very last event invoked when there's no [<seealso cref="CombatStats.UsedActions"/>] left or when
         /// the [<see cref="CombatEntity"/>] passes its actions somehow. <br></br>
         /// </summary>
-        /// <param name="entity"></param>
         void OnEntityFinishSequence(CombatEntity entity);
 
-
-        void OnEntityWaitSequence(CombatEntity entity);
+        /// <summary>
+        /// Invoked when the Entity's Controller decides that there's no more actions to make
+        /// </summary>
+        void OnTempoFinishControl(CombatEntity mainEntity);
     }
 
     public interface ITempoEntityPercentListener : ICombatEventListener

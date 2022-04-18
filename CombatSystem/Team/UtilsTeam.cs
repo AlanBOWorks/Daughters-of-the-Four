@@ -495,7 +495,7 @@ namespace CombatSystem.Team
         {
             target.Team.StandByMembers.PutOnStandBy(in target);
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnEntityWaitSequence(target);
+            eventsHolder.OnTempoFinishControl(target);
         }
     }
 }

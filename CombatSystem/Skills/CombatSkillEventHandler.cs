@@ -27,7 +27,7 @@ namespace CombatSystem.Skills
             
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             entity.OnSequenceStart();
         }
@@ -53,7 +53,7 @@ namespace CombatSystem.Skills
             entity.OnSequenceFinish();
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
         }
     }

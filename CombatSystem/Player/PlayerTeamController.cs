@@ -29,6 +29,7 @@ namespace CombatSystem.Player
 
         public void InjectionOnRequestSequence(CombatEntity entity)
         {
+
         }
 
         private readonly Func<bool> _isReady;
@@ -51,11 +52,13 @@ namespace CombatSystem.Player
             playerEvents.OnTargetSubmit(in target);
         }
 
-        internal bool IsFinishControlling;
-        public bool HasForcedFinishControlling()
+        public bool IsControlFinish { get; set; }
+
+        internal void ForceFinishControl()
         {
-            return IsFinishControlling;
+            IsControlFinish = true;
         }
+
 
         public void OnSkillSelect(in CombatSkill skill)
         {

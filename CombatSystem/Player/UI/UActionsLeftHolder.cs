@@ -79,7 +79,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             _currentEntity = entity;
 
@@ -105,7 +105,7 @@ namespace CombatSystem.Player.UI
             HideUI();
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
         }
 

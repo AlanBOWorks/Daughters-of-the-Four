@@ -114,14 +114,14 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnEntityTick(in entity, in currentInitiative, in percentInitiative);
         }
         
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            _eventsHolder.OnEntityRequestSequence(entity,canAct);
-            _playerCombatEvents.OnEntityRequestSequence(entity, canAct);
-            _enemyCombatEvents.OnEntityRequestSequence(entity, canAct);
+            _eventsHolder.OnMainEntityRequestSequence(entity,canAct);
+            _playerCombatEvents.OnMainEntityRequestSequence(entity, canAct);
+            _enemyCombatEvents.OnMainEntityRequestSequence(entity, canAct);
 
             HandleCurrentEntityEventsHolder(in entity);
-            _currentDiscriminatedEntityEventsHolder.OnEntityRequestSequence(entity,canAct);
+            _currentDiscriminatedEntityEventsHolder.OnMainEntityRequestSequence(entity,canAct);
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -151,13 +151,13 @@ namespace CombatSystem._Core
             _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity);
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
-            _eventsHolder.OnEntityWaitSequence(entity);
-            _playerCombatEvents.OnEntityWaitSequence(entity);
-            _enemyCombatEvents.OnEntityWaitSequence(entity);
+            _eventsHolder.OnTempoFinishControl(mainEntity);
+            _playerCombatEvents.OnTempoFinishControl(mainEntity);
+            _enemyCombatEvents.OnTempoFinishControl(mainEntity);
 
-            _currentDiscriminatedEntityEventsHolder.OnEntityWaitSequence(entity);
+            _currentDiscriminatedEntityEventsHolder.OnTempoFinishControl(mainEntity);
         }
 
 
@@ -303,7 +303,7 @@ namespace CombatSystem._Core
         #region -- DEBUG --
         private sealed class DebugEvents : ITempoEntityStatesListener, ITempoTickListener, ISkillUsageListener
         {
-            public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+            public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
             {
                 Debug.Log($"> --- Entity Sequence: {entity.GetProviderEntityName()}");
             }
@@ -323,9 +323,9 @@ namespace CombatSystem._Core
                 Debug.Log($"> --- Entity [END] Sequence: {entity.GetProviderEntityName()}");
             }
 
-            public void OnEntityWaitSequence(CombatEntity entity)
+            public void OnTempoFinishControl(CombatEntity mainEntity)
             {
-                Debug.Log($"> --- Entity [WAIT] Sequence: {entity.GetProviderEntityName()}");
+                Debug.Log($"> --- Entity [WAIT] Sequence: {mainEntity.GetProviderEntityName()}");
             }
 
             public void OnStartTicking()
@@ -716,11 +716,11 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             foreach (var listener in _tempoEntityListeners)
             {
-                listener.OnEntityRequestSequence(entity, canAct);
+                listener.OnMainEntityRequestSequence(entity, canAct);
             }
         }
 
@@ -748,11 +748,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
             foreach (var listener in _tempoEntityListeners)
             {
-                listener.OnEntityWaitSequence(entity);
+                listener.OnTempoFinishControl(mainEntity);
             }
         }
 

@@ -7,7 +7,7 @@ using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace CombatSystem.Player.Skills
+namespace CombatSystem.Player
 {
     public class UCombatWaitSkill : MonoBehaviour
     {

@@ -45,7 +45,7 @@ namespace CombatSystem.Team
         public bool CurrentControllerHasFinish() => _hasFinishCurrentEntity;
 
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             if(!canAct) return;
 
@@ -68,7 +68,7 @@ namespace CombatSystem.Team
         {
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
             Timing.KillCoroutines(_controlHandle);
             _hasFinishCurrentEntity = true;
@@ -88,11 +88,11 @@ namespace CombatSystem.Team
 
             IEnumerator<float> _DoControl()
             {
-                _hasFinishCurrentEntity = CheckHasFinishCurrentEntity();
                 var eventsHolder = CombatSystemSingleton.EventsHolder;
 
                 yield return Timing.WaitForOneFrame; //safe wait
-                while (!_hasFinishCurrentEntity)
+                controller.IsControlFinish = false;
+                while (!controller.IsControlFinish)
                 {
                     eventsHolder.OnEntityRequestAction(actingEntity);
                     yield return Timing.WaitUntilDone(
@@ -102,16 +102,9 @@ namespace CombatSystem.Team
                     yield return Timing.WaitForOneFrame;
 
                     eventsHolder.OnSkillSubmit(in actingEntity, in usedSkill,in onTarget);
-                    _hasFinishCurrentEntity = CheckHasFinishCurrentEntity();
                 }
 
                 //_hasFinishCurrentEntity = true; this always happens because the while(!(_hastFinishCurrentEntity == true)) happens
-            }
-
-            bool CheckHasFinishCurrentEntity()
-            {
-                return !UtilsCombatStats.CanActRequest(actingEntity) 
-                       || controller.HasForcedFinishControlling();
             }
         }
 
@@ -153,9 +146,10 @@ namespace CombatSystem.Team
             target = possibleTargets[randomPick];
         }
 
-        public bool HasForcedFinishControlling()
+        public bool IsControlFinish
         {
-            return !UtilsCombatStats.CanActRequest(in _controlling);
+            get=> !UtilsCombatStats.CanActRequest(in _controlling);
+            set {}
         }
     }
 }

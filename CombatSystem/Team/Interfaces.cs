@@ -81,7 +81,7 @@ namespace CombatSystem.Team
         /// </summary>
         IEnumerator<float> _ReadyToRequest(CombatEntity performer);
         void PerformRequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target);
-        bool HasForcedFinishControlling();
+        bool IsControlFinish { get; set; }
     }
 
     public interface ITeamEventListener : ICombatEventListener

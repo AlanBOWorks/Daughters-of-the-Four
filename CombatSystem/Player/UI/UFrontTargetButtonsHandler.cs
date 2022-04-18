@@ -47,7 +47,7 @@ namespace CombatSystem.Player.UI
 
         [ShowInInspector, DisableInEditorMode]
         private CombatEntity _currentControl;
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             _currentControl = entity;
         }
@@ -64,7 +64,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnEntityWaitSequence(CombatEntity entity)
+        public void OnTempoFinishControl(CombatEntity mainEntity)
         {
         }
 
