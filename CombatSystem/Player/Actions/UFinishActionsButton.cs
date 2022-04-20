@@ -51,19 +51,20 @@ namespace CombatSystem.Player
 
         private static void PassTurn()
         {
-            PlayerCombatSingleton.PlayerTeamController.ForceFinishControl();
+            PlayerCombatSingleton.PlayerTeamController.ForceFinish();
             Debug.Log("Passing Turn [PLAYER]");
         }
 
 
         public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            if (canAct)
-            {
-                Show();
-            }
+            if (!canAct) return;
+
+            _currentEntity = entity;
+            Show();
         }
 
+        private CombatEntity _currentEntity;
         public void OnEntityRequestAction(CombatEntity entity)
         {
         }
@@ -74,7 +75,6 @@ namespace CombatSystem.Player
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
-            Hide();
         }
 
         public void OnTempoFinishControl(CombatEntity mainEntity)

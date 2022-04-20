@@ -1,48 +1,26 @@
-using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
-using CombatSystem.Skills;
 using CombatSystem.Stats;
-using MEC;
 using Sirenix.OdinInspector;
-using Random = UnityEngine.Random;
+using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public sealed class CombatTeamControllersHandler : IOppositionTeamStructureRead<ITeamController>,
-        ITempoEntityStatesListener
+    public sealed class CombatTeamControllersHandler : IOppositionTeamStructureRead<CombatTeamControllerBase>,
+        ITempoEntityStatesListener, ITempoTeamStatesListener
     {
 
-        private static readonly CombatTeamControllerRandom NullFallback;
+       
+        public CombatTeamControllerBase CurrentController { get; private set; }
 
-        static CombatTeamControllersHandler()
-        {
-            NullFallback = new CombatTeamControllerRandom();
-        }
+        [ShowInInspector, HorizontalGroup()]
+        public CombatTeamControllerBase PlayerTeamType { get; set; }
+        [ShowInInspector, HorizontalGroup()]
+        public CombatTeamControllerBase EnemyTeamType { get; set; }
 
-        public CombatTeamControllersHandler() : 
-            this(NullFallback, NullFallback)
-        { }
+        public bool CurrentControllerIsActive() => CurrentController != null;
 
-        public CombatTeamControllersHandler(ITeamController playerController) 
-        : this(playerController, NullFallback)
-        { }
-
-        public CombatTeamControllersHandler(ITeamController playerController, ITeamController enemyController)
-        {
-            PlayerTeamType = playerController;
-            EnemyTeamType = enemyController;
-        }
-        public ITeamController CurrentController { get; private set; }
-
-        [ShowInInspector,HorizontalGroup()]
-        public ITeamController PlayerTeamType { get; set; }
-        [ShowInInspector,HorizontalGroup()]
-        public ITeamController EnemyTeamType { get; set; }
-
-        private bool _hasFinishCurrentEntity;
-        public bool CurrentControllerHasFinish() => _hasFinishCurrentEntity;
 
 
         public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -50,10 +28,17 @@ namespace CombatSystem.Team
             if(!canAct) return;
 
             var controller = UtilsTeam.GetElement(entity, this);
-            CurrentController = controller;
-            CurrentController.InjectionOnRequestSequence(entity);
+            controller.InjectionOnRequestSequence(entity);
+            
+            if (CurrentController != null) return;
 
-            DoRequest(entity);
+            SwitchController(in controller);
+        }
+
+        private void SwitchController(in CombatTeamControllerBase controller)
+        {
+            CurrentController = controller;
+            CombatSystemSingleton.EventsHolder.OnTempoStartControl(in controller);
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -62,94 +47,85 @@ namespace CombatSystem.Team
 
         public void OnEntityFinishAction(CombatEntity entity)
         {
+            if(UtilsCombatStats.CanActRequest(entity)) return;
+
+            PlayerTeamType.SafeRemove(entity);
+            EnemyTeamType?.SafeRemove(entity);
         }
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
+            // PROBLEM: can't remove entity in this events since there's a foreach loop in the controllers
+            // thus making an InvalidOperationException
+            // SOLUTION: check and remove on FinishAction
         }
 
-        public void OnTempoFinishControl(CombatEntity mainEntity)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
-            Timing.KillCoroutines(_controlHandle);
-            _hasFinishCurrentEntity = true;
         }
 
-        private CoroutineHandle _controlHandle;
-        private void DoRequest(CombatEntity actingEntity)
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            if (_controlHandle.IsRunning)
-                throw new AccessViolationException("Requesting control while there's an active control already");
+            var oppositeControl = UtilsTeam.GetOppositeElement(CurrentController, this);
 
-
-            var controller = CurrentController;
-
-            _controlHandle = Timing.RunCoroutine(_DoControl());
-            CombatSystemSingleton.LinkCoroutineToMaster(in _controlHandle);
-
-            IEnumerator<float> _DoControl()
-            {
-                var eventsHolder = CombatSystemSingleton.EventsHolder;
-
-                yield return Timing.WaitForOneFrame; //safe wait
-                controller.IsControlFinish = false;
-                while (!controller.IsControlFinish)
-                {
-                    eventsHolder.OnEntityRequestAction(actingEntity);
-                    yield return Timing.WaitUntilDone(
-                        controller._ReadyToRequest(actingEntity));
-
-                    controller.PerformRequestAction(actingEntity, out var usedSkill, out var onTarget);
-                    yield return Timing.WaitForOneFrame;
-
-                    eventsHolder.OnSkillSubmit(in actingEntity, in usedSkill,in onTarget);
-                }
-
-                //_hasFinishCurrentEntity = true; this always happens because the while(!(_hastFinishCurrentEntity == true)) happens
-            }
+            if (oppositeControl == null || !oppositeControl.IsWaiting())
+                CurrentController = null;
+            else
+                SwitchController(in oppositeControl);
         }
-
     }
-
-    public sealed class CombatTeamControllerRandom : ITeamController
+    
+    public abstract class CombatTeamControllerBase 
     {
-        private CombatStats _controlling;
+        protected CombatTeamControllerBase()
+        {
+            ActiveControls = new List<CombatEntity>();
+        }
+        [ShowInInspector]
+        protected readonly List<CombatEntity> ActiveControls;
 
+        public IReadOnlyList<CombatEntity> GetActiveControllingEntities() => ActiveControls;
+
+        internal bool IsWaiting() => ActiveControls.Count > 0;
+
+        private CombatEntity _lastEntity;
         public void InjectionOnRequestSequence(CombatEntity entity)
         {
-            _controlling = entity.Stats;
+            ActiveControls.Add(entity);
+            _lastEntity = entity;
         }
 
-        public IEnumerator<float> _ReadyToRequest(CombatEntity performer)
+        public void Clear()
         {
-            //yield return Timing.WaitForOneFrame;
-            yield return Timing.WaitForSeconds(10);
+            ActiveControls.Clear();
         }
 
-        public void PerformRequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target)
+
+        public void SafeRemove(CombatEntity entity)
         {
-            var currentSkills = performer.GetCurrentSkills();
-            int skillsAmount;
-            if (currentSkills == null || (skillsAmount = currentSkills.Count) <= 0)
+            if (!ActiveControls.Contains(entity))  return;
+            OnRemoveMember(in entity);
+        }
+
+
+        private void OnRemoveMember(in CombatEntity entity)
+        {
+            ActiveControls.Remove(entity);
+            if(_lastEntity == entity && ActiveControls.Count > 0)
+                _lastEntity = ActiveControls[ActiveControls.Count - 1];
+        }
+
+        public void ForceFinish()
+        {
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            eventsHolder.OnTempoFinishControl(this);
+            
+            foreach (var entity in ActiveControls)
             {
-                usedSkill = null;
-                target = null;
-                return;
+                eventsHolder.OnEntityFinishSequence(entity);
             }
 
-            var randomPick = Random.Range(0, skillsAmount -1);
-
-            usedSkill = currentSkills[randomPick];
-
-            var possibleTargets = UtilsTarget.GetPossibleTargets(usedSkill, performer);
-
-            randomPick = Random.Range(0, possibleTargets.Count - 1);
-            target = possibleTargets[randomPick];
-        }
-
-        public bool IsControlFinish
-        {
-            get=> !UtilsCombatStats.CanActRequest(in _controlling);
-            set {}
+            ActiveControls.Clear();
         }
     }
 }

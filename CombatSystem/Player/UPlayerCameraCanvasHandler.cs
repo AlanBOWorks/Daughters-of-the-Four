@@ -20,7 +20,7 @@ namespace CombatSystem.Player
 
         private void OnDestroy()
         {
-            PlayerCombatSingleton.PlayerCombatEvents.ManualUnSubscribe(this);
+            PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
         }
 
         public void OnSwitchCamera(in Camera combatCamera)

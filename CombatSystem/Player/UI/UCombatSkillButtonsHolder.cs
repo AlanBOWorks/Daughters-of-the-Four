@@ -13,7 +13,8 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillButtonsHolder : MonoBehaviour, 
-        ITempoEntityStatesListener, ITeamEventListener,
+        ITempoEntityStatesListener, ITempoTeamStatesListener,
+        ITeamEventListener,
         ISkillButtonListener, ISkillUsageListener, ICombatStatesListener
     {
         [Title("References")]
@@ -21,15 +22,13 @@ namespace CombatSystem.Player.UI
         private UCombatSkillButton clonableSkillButton;
         private Stack<UCombatSkillButton> _instantiationPool;
         private Dictionary<CombatSkill,UCombatSkillButton> _activeButtons;
-        [SerializeField] 
-        private UCombatWaitSkill waitSkill;
+      
 
         [Title("Parameters")]
         [SerializeField]
         private Vector2 buttonsSeparations;
         private Vector2 _buttonSizes;
 
-        private CombatEntity _currentControlEntity;
 
 
         internal void AddToDictionary(in CombatSkill skill, in UCombatSkillButton button)
@@ -59,10 +58,17 @@ namespace CombatSystem.Player.UI
             playerEvents.ManualSubscribe(this as ISkillUsageListener);
             playerEvents.ManualSubscribe(this as ITeamEventListener);
             playerEvents.ManualSubscribe(this as ICombatStatesListener);
+            playerEvents.ManualSubscribe(this as ITempoTeamStatesListener);
+        }
+
+        private void OnDestroy()
+        {
+            PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
         }
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
+            _activeEntities = PlayerCombatSingleton.PlayerTeamController.GetActiveControllingEntities();
         }
 
         public void OnCombatStart()
@@ -136,8 +142,7 @@ namespace CombatSystem.Player.UI
                     
                     index++;
                 }
-                HandleWaitSkill();
-                yield return Timing.WaitForSeconds(DelayBetweenButtons);
+               
 
                 void ShowIcon(in UCombatSkillButton buttonHolder)
                 {
@@ -153,14 +158,6 @@ namespace CombatSystem.Player.UI
                     lastPoint = targetPoint;
                 }
 
-                void HandleWaitSkill()
-                {
-                    var waitButton = waitSkill.GetButton();
-                    waitSkill.InjectIntoButton();
-                    waitSkill.ResetCost();
-                    ShowIcon(in waitButton);
-
-                }
             }
         }
 
@@ -186,15 +183,11 @@ namespace CombatSystem.Player.UI
         
         public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            if(!canAct) return;
 
-            _currentControlEntity = entity;
-            PoolEntitySkills(in entity);
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
         {
-            _currentControlEntity = entity;
         }
 
         public void OnEntityFinishAction(CombatEntity entity)
@@ -203,19 +196,28 @@ namespace CombatSystem.Player.UI
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
-            if(entity != _currentControlEntity) return;
             
-            HideAll();
         }
 
-        public void OnTempoFinishControl(CombatEntity mainEntity)
+        private CombatEntity _currentControlEntity;
+        private IReadOnlyList<CombatEntity> _activeEntities;
+
+
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
+            var entity = _activeEntities[_activeEntities.Count -1];
+            SwitchControllingEntity(in entity);
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            HideAll();
         }
 
         public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
-            ReturnSkillsToStack();
-            PoolEntitySkills(in _currentControlEntity);
+            ResetPoolSkillsToCurrent();
         }
 
         public void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst)
@@ -238,7 +240,18 @@ namespace CombatSystem.Player.UI
         {
             _currentControlEntity = null;
             ReturnSkillsToStack();
-            DisableButton(waitSkill.GetButton());
+        }
+
+        public void SwitchControllingEntity(in CombatEntity targetEntity)
+        {
+            _currentControlEntity = targetEntity;
+            ResetPoolSkillsToCurrent();
+        }
+
+        private void ResetPoolSkillsToCurrent()
+        {
+            ReturnSkillsToStack();
+            PoolEntitySkills(in _currentControlEntity);
         }
 
 
@@ -252,11 +265,8 @@ namespace CombatSystem.Player.UI
 
         private UCombatSkillButton GetButton(in CombatSkill skill)
         {
-            if (_activeButtons.ContainsKey(skill)) return _activeButtons[skill];
-
-            var waitCombatSkill = waitSkill.GetSkill();
-            return skill == waitCombatSkill 
-                ? waitSkill.GetButton() 
+            return _activeButtons.ContainsKey(skill) 
+                ? _activeButtons[skill] 
                 : null;
         }
 
@@ -331,6 +341,5 @@ namespace CombatSystem.Player.UI
         public void OnSkillFinish()
         {
         }
-
     }
 }

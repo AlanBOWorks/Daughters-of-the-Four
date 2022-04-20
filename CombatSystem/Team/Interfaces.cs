@@ -71,19 +71,7 @@ namespace CombatSystem.Team
         EnumTeam.Role RoleType { get; }
         EnumTeam.Positioning PositioningType { get; }
     }
-
-
-    public interface ITeamController
-    {
-        void InjectionOnRequestSequence(CombatEntity entity);
-        /// <summary>
-        /// Request if the controller is ready for [<seealso cref="PerformRequestAction"/>]
-        /// </summary>
-        IEnumerator<float> _ReadyToRequest(CombatEntity performer);
-        void PerformRequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target);
-        bool IsControlFinish { get; set; }
-    }
-
+    
     public interface ITeamEventListener : ICombatEventListener
     {
         void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance);

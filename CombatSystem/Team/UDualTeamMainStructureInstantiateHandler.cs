@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public abstract class UTeamMainStructureInstantiateHandler<T> : UTeamStructureInstantiateHandlerBase<T>,
+    public abstract class UDualTeamMainStructureInstantiateHandler<T> : UDualTeamStructureInstantiateHandlerBase<T>,
         IOppositionTeamStructureRead<ITeamFlexRoleStructureRead<T>>
       
         where T : MonoBehaviour

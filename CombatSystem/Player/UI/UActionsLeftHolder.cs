@@ -101,12 +101,13 @@ namespace CombatSystem.Player.UI
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
-            _currentEntity = null;
-            HideUI();
+            
         }
 
         public void OnTempoFinishControl(CombatEntity mainEntity)
         {
+            _currentEntity = null;
+            HideUI();
         }
 
         private CombatSkill _selectedSkill;

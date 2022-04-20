@@ -38,7 +38,6 @@ namespace CombatSystem._Core
 
 
         private CoroutineHandle _tickingHandle;
-        private CoroutineHandle _entitiesTickHandle;
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
         }
@@ -71,6 +70,7 @@ namespace CombatSystem._Core
         public int GetCurrentRoundTicks() => _roundTickCount;
         private IEnumerator<float> _TickingLoop()
         {
+            var controllers = CombatSystemSingleton.TeamControllers;
             foreach (var listener in TickListeners)
             {
                 listener.OnStartTicking();
@@ -84,13 +84,15 @@ namespace CombatSystem._Core
                     listener.OnTick();
                 }
 
-                if (EntitiesTempoTicker.HasActingEntities())
+                do
                 {
-                    _entitiesTickHandle = CombatSystemSingleton.LinkCoroutineToMaster(
-                        EntitiesTempoTicker._DoActingEntities());
+                    yield return Timing.WaitForOneFrame;
+                } while (controllers.CurrentControllerIsActive());
 
-                    yield return Timing.WaitUntilDone(_entitiesTickHandle);
-                }
+                //Safe wait
+                yield return Timing.WaitForOneFrame;
+
+
 
                 if (_roundTickCount < LoopThreshold) continue;
                 {
@@ -112,8 +114,6 @@ namespace CombatSystem._Core
 
         public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            if(canAct)
-                Timing.PauseCoroutines(_tickingHandle);
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -129,10 +129,6 @@ namespace CombatSystem._Core
         {
         }
 
-        public void OnTempoFinishControl(CombatEntity mainEntity)
-        {
-            Timing.ResumeCoroutines(_tickingHandle);
-        }
     }
 
     public sealed class CombatEntitiesTempoTicker : 
@@ -143,25 +139,17 @@ namespace CombatSystem._Core
         public CombatEntitiesTempoTicker()
         {
             _tickingTrackers = new HashSet<CombatEntity>();
-            _activeEntities = new Queue<CombatEntity>();
         }
 
         [ShowInInspector]
         private readonly HashSet<CombatEntity> _tickingTrackers;
 
-        
-        [ShowInInspector,HorizontalGroup()]
-        private readonly Queue<CombatEntity> _activeEntities;
 
-        [ShowInInspector]
-        public CombatEntity CurrentActingEntity { get; private set; }
 
-        private Func<bool> _controllerHasFinished;
 
         public void ResetState()
         {
             _tickingTrackers.Clear();
-            _activeEntities.Clear();
         }
 
         public void AddEntities(CombatTeam team)
@@ -177,7 +165,6 @@ namespace CombatSystem._Core
             _tickingTrackers.Add(entity);
         }
 
-        internal bool HasActingEntities() => _activeEntities.Count > 0;
 
 
 
@@ -210,10 +197,18 @@ namespace CombatSystem._Core
 
                 bool isTrinityRole = UtilsTeam.IsTrinityRole(in entity);
                 if (isTrinityRole)
-                    _activeEntities.Enqueue(entity);
+                    HandleMainRole();
                 else
                     entity.Team.StandByMembers.PutOnStandBy(in entity);
+
+
+                void HandleMainRole()
+                {
+                    bool canAct = UtilsCombatStats.CanRequestActing(entity);
+                    eventsHolder.OnMainEntityRequestSequence(entity, canAct);
+                }
             }
+
         }
 
 
@@ -221,48 +216,10 @@ namespace CombatSystem._Core
         {
         }
 
-        internal IEnumerator<float> _DoActingEntities()
-        {
-            var combatEvents = CombatSystemSingleton.EventsHolder;
-
-            while (HasActingEntities())
-            {
-                CurrentActingEntity = _activeEntities.Dequeue();
-                _tickingTrackers.Remove(CurrentActingEntity);
-
-                bool canAct = UtilsCombatStats.CanRequestActing(CurrentActingEntity);
-
-                // ------  INVOKE EVENTS: OnMainEntityRequestSequence() ------
-                combatEvents.OnMainEntityRequestSequence(CurrentActingEntity, canAct);
-                if (canAct)
-                {
-                    yield return Timing.WaitForOneFrame; //safe wait for setting the request
-                    yield return Timing.WaitUntilTrue(_controllerHasFinished);
-
-                    //todo make a loop for each action left
-
-                    // ------  INVOKE EVENTS: OnEntityFinishSequence() ------
-                }
-                else
-                {
-                    // todo skip sequence
-                }
-
-                // TODO Move finishSequence into If when SkipSequenceEvent is added
-                // TODO make this block of code in another handler (so it can distinguish between natural finish and waitFinish
-                combatEvents.OnEntityFinishSequence(CurrentActingEntity);
-                yield return Timing.WaitForOneFrame;
-                _tickingTrackers.Add(CurrentActingEntity);
-            }
-        }
-
-
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             AddEntities(playerTeam);
             AddEntities(enemyTeam);
-
-            _controllerHasFinished = CombatSystemSingleton.TeamControllers.CurrentControllerHasFinish;
         }
 
         public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -280,16 +237,14 @@ namespace CombatSystem._Core
 
         public void OnEntityFinishAction(CombatEntity entity)
         {
+                bool canAct = UtilsCombatStats.CanActRequest(entity);
+                if(!canAct)
+                    CombatSystemSingleton.EventsHolder.OnEntityFinishSequence(entity);
         }
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
             entity.Stats.CurrentInitiative = 0;
-        }
-
-        public void OnTempoFinishControl(CombatEntity mainEntity)
-        {
-            
         }
     }
 
@@ -327,10 +282,16 @@ namespace CombatSystem._Core
         /// </summary>
         void OnEntityFinishSequence(CombatEntity entity);
 
+        
+    }
+
+    public interface ITempoTeamStatesListener : ICombatEventListener
+    {
+        void OnTempoStartControl(in CombatTeamControllerBase controller);
         /// <summary>
         /// Invoked when the Entity's Controller decides that there's no more actions to make
         /// </summary>
-        void OnTempoFinishControl(CombatEntity mainEntity);
+        void OnTempoFinishControl(in CombatTeamControllerBase controller);
     }
 
     public interface ITempoEntityPercentListener : ICombatEventListener

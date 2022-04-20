@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UOffVitalityInfosHandler : UTeamOffStructureInstantiateHandler<UVitalityInfo>, IDamageDoneListener
+    public class UDualOffVitalityInfosHandler : UDualTeamOffStructureInstantiateHandler<UVitalityInfo>, IDamageDoneListener
     {
         public void OnShieldLost(in CombatEntity target, in CombatEntity performer, in float amount)
         {

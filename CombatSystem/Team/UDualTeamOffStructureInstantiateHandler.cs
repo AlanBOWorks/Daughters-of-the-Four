@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public abstract class UTeamOffStructureInstantiateHandler<T> : UTeamStructureInstantiateHandlerBase<T>,
+    public abstract class UDualTeamOffStructureInstantiateHandler<T> : UDualTeamStructureInstantiateHandlerBase<T>,
         IOppositionTeamStructureRead<IEnumerator<T>>
 
         where T : MonoBehaviour

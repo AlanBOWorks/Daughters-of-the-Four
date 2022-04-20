@@ -11,33 +11,11 @@ using UnityEngine;
 
 namespace CombatSystem.Player
 {
-    public sealed class PlayerTeamController :
-        ITeamController, ISkillUsageListener,
+    public sealed class PlayerTeamController : CombatTeamControllerBase,
+        ISkillUsageListener,
         ISkillSelectionListener,
         ITargetSelectionListener
     {
-        public PlayerTeamController()
-        {
-            _isReady = IsReadyCheck;
-
-
-            bool IsReadyCheck()
-            {
-                return _selectedSkill != null && _skillOnTarget != null;
-            }
-        }
-
-        public void InjectionOnRequestSequence(CombatEntity entity)
-        {
-
-        }
-
-        private readonly Func<bool> _isReady;
-        public IEnumerator<float> _ReadyToRequest(CombatEntity performer)
-        {
-            yield return Timing.WaitUntilTrue(_isReady);
-        }
-
         [ShowInInspector]
         private CombatSkill _selectedSkill;
         [ShowInInspector]
@@ -51,14 +29,6 @@ namespace CombatSystem.Player
             playerEvents.OnSkillSubmit(in usedSkill);
             playerEvents.OnTargetSubmit(in target);
         }
-
-        public bool IsControlFinish { get; set; }
-
-        internal void ForceFinishControl()
-        {
-            IsControlFinish = true;
-        }
-
 
         public void OnSkillSelect(in CombatSkill skill)
         {

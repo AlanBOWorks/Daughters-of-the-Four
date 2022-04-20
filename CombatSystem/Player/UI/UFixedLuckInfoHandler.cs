@@ -9,7 +9,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UFixedLuckInfoHandler : MonoBehaviour, 
-        IEntityElementInstantiationListener<UVitalityInfo>, //This is because I want to use UMainVitalityInfosHandler's events
+        IEntityElementInstantiationListener<UVitalityInfo>, //This is because I want to use UDualMainVitalityInfosHandler's events
         ITempoEntityStatesListener,
         ICombatStatesListener
     {
@@ -69,6 +69,7 @@ namespace CombatSystem.Player.UI
 
         public void OnTempoFinishControl(CombatEntity mainEntity)
         {
+            UpdateLuckInfo(in mainEntity);
         }
 
         private void UpdateLuckInfo(in CombatEntity entity)

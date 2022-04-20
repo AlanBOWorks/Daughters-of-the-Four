@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UMainVitalityInfosHandler : UTeamMainStructureInstantiateHandler<UVitalityInfo>, IDamageDoneListener
+    public class UDualMainVitalityInfosHandler : UDualTeamMainStructureInstantiateHandler<UVitalityInfo>, IDamageDoneListener
     {
         [Title("OffRole - References")]
         [SerializeField] private RectTransform offRolesParent;

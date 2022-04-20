@@ -112,11 +112,6 @@ namespace CombatSystem.Player
             _cameraHolderListeners.Add(cameraHolderListener);
         }
 
-        internal void ManualUnSubscribe(ICameraHolderListener cameraHolderListener)
-        {
-            _cameraHolderListeners.Remove(cameraHolderListener);
-        }
-
         // SKILL Events
         public void OnSkillButtonHover(in CombatSkill skill)
         {

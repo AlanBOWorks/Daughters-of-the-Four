@@ -70,4 +70,30 @@ namespace CombatSystem.Team
         }
     }
 
+    [Serializable]
+    public class TeamBasicStructureInstantiateHandler<T> : TeamBasicGroupStructure<T> where T : MonoBehaviour
+    {
+        [SerializeField] private Transform instantiationParent;
+        [SerializeField] private T instantiationPrefab;
+
+        [ReadOnly]
+        public int activeCount;
+
+        public void InstantiateElements()
+        {
+            if (!instantiationParent || !instantiationPrefab) return;
+
+            VanguardType = Instantiate();
+            AttackerType = Instantiate();
+            SupportType = Instantiate();
+
+            T Instantiate() => UnityEngine.Object.Instantiate(instantiationPrefab, instantiationParent);
+        }
+
+        public void HidePrefab()
+        {
+            if (!instantiationPrefab) return;
+            instantiationPrefab.gameObject.SetActive(false);
+        }
+    }
 }

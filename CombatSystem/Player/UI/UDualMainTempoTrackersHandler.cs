@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UMainTempoTrackersHandler : UTeamMainStructureInstantiateHandler<UTempoTrackerHolder>,
+    public class UDualMainTempoTrackersHandler : UDualTeamMainStructureInstantiateHandler<UTempoTrackerHolder>,
         ITempoEntityPercentListener
     {
         [Title("OffRole - References")]

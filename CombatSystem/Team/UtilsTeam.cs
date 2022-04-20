@@ -83,6 +83,26 @@ namespace CombatSystem.Team
                 : structure.EnemyTeamType;
         }
 
+        /// <summary>
+        /// Checks if the [<paramref name="compareElement"/>] is the [<paramref name="structure"/>].Player; if is true returns the
+        /// enemy one, else the player
+        ///<br></br><br></br>
+        /// (WARNING: you can compare an [<typeparamref name="T"/>] element which is not in the
+        /// [<paramref name="structure"/>] and it will return the player element as a result)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="compareElement"></param>
+        /// <param name="structure"></param>
+        /// <returns></returns>
+        public static T GetOppositeElement<T>(T compareElement, IOppositionTeamStructureRead<T> structure)
+        where T : class
+        {
+            var playerElement = structure.PlayerTeamType;
+            return playerElement == compareElement 
+                ? structure.EnemyTeamType 
+                : playerElement;
+        }
+
         public static T GetElement<T>(EnumTeam.Positioning positioning, ITeamFlexPositionStructureRead<T> structure)
         {
             return positioning switch
@@ -494,8 +514,6 @@ namespace CombatSystem.Team
         public static void PutOnStandBy(in CombatEntity target)
         {
             target.Team.StandByMembers.PutOnStandBy(in target);
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnTempoFinishControl(target);
         }
     }
 }

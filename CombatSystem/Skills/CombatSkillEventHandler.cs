@@ -55,6 +55,7 @@ namespace CombatSystem.Skills
 
         public void OnTempoFinishControl(CombatEntity mainEntity)
         {
+            OnEntityFinishSequence(mainEntity);
         }
     }
 }

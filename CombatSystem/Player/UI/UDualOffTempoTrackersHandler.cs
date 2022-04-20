@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UOffTempoTrackersHandler : UTeamOffStructureInstantiateHandler<UTempoTrackerHolder>, ITempoEntityPercentListener
+    public class UDualOffTempoTrackersHandler : UDualTeamOffStructureInstantiateHandler<UTempoTrackerHolder>, ITempoEntityPercentListener
     {
         public void OnEntityTick(in CombatEntity entity, in float currentInitiative, in float percentInitiative)
         {

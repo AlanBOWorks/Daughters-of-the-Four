@@ -151,13 +151,18 @@ namespace CombatSystem._Core
             _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity);
         }
 
-        public void OnTempoFinishControl(CombatEntity mainEntity)
-        {
-            _eventsHolder.OnTempoFinishControl(mainEntity);
-            _playerCombatEvents.OnTempoFinishControl(mainEntity);
-            _enemyCombatEvents.OnTempoFinishControl(mainEntity);
 
-            _currentDiscriminatedEntityEventsHolder.OnTempoFinishControl(mainEntity);
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        {
+            _eventsHolder.OnTempoStartControl(in controller);
+            _playerCombatEvents.OnTempoStartControl(in controller);
+            _enemyCombatEvents.OnTempoStartControl(in controller);
+        }
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            _eventsHolder.OnTempoFinishControl(in controller);
+            _playerCombatEvents.OnTempoFinishControl(in controller);
+            _enemyCombatEvents.OnTempoFinishControl(in controller);
         }
 
 
@@ -474,7 +479,7 @@ namespace CombatSystem._Core
         public CombatEntityEventsHolder GetDiscriminationEventsHolder() => DiscriminationEventsHolder;
     }
 
-    public abstract class CombatEventsHolder : CombatEntityEventsHolder,ICombatEventsHolder
+    public abstract class CombatEventsHolder : CombatEntityEventsHolder, ICombatEventsHolder
 
     {
         protected CombatEventsHolder() : base()
@@ -484,10 +489,14 @@ namespace CombatSystem._Core
             _entitiesExistenceListeners = new HashSet<ICombatEntityExistenceListener>();
             _damageDoneListeners = new HashSet<IDamageDoneListener>();
             _vitalityChangeListeners = new HashSet<IVitalityChangeListeners>();
+            _tempoTeamListeners = new HashSet<ITempoTeamStatesListener>();
         }
         
 
-        [Title("Events")] 
+        [Title("Events")]
+        [ShowInInspector] 
+        private readonly ICollection<ITempoTeamStatesListener> _tempoTeamListeners;
+
         [ShowInInspector]
         private readonly ICollection<ICombatPreparationListener> _combatPreparationListeners;
         [ShowInInspector] 
@@ -503,6 +512,9 @@ namespace CombatSystem._Core
         public override void Subscribe(ICombatEventListener listener)
         {
             base.Subscribe(listener);
+
+            if (listener is ITempoTeamStatesListener tempoTeamStatesListener)
+                _tempoTeamListeners.Add(tempoTeamStatesListener);
 
             if (listener is ICombatPreparationListener preparationListener)
                 _combatPreparationListeners.Add(preparationListener);
@@ -525,6 +537,9 @@ namespace CombatSystem._Core
         public override void UnSubscribe(ICombatEventListener listener)
         {
             base.UnSubscribe(listener);
+
+            if (listener is ITempoTeamStatesListener tempoTeamStatesListener)
+                _tempoTeamListeners.Remove(tempoTeamStatesListener);
 
             if (listener is ICombatPreparationListener preparationListener)
                 _combatPreparationListeners.Remove(preparationListener);
@@ -549,9 +564,31 @@ namespace CombatSystem._Core
         protected abstract void UnSubscribeTempo(ITempoTickListener tickListener);
 
 
+        public void ManualSubscribe(ITempoTeamStatesListener teamStatesListener)
+        {
+            _tempoTeamListeners.Add(teamStatesListener);
+        }
         public void ManualSubscribe(ICombatStatesListener statesListener)
         {
             _combatStatesListeners.Add(statesListener);
+        }
+
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        {
+            foreach (var listener in _tempoTeamListeners)
+            {
+                listener.OnTempoStartControl(in controller);
+            }
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            foreach (var listener in _tempoTeamListeners)
+            {
+                listener.OnTempoFinishControl(in controller);
+            }
+
         }
 
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
@@ -656,13 +693,14 @@ namespace CombatSystem._Core
 
     }
 
-    public class CombatEntityEventsHolder : ITempoEntityStatesListener, ISkillUsageListener, ITeamEventListener
+    public class CombatEntityEventsHolder : ITempoEntityStatesListener,
+        ISkillUsageListener, ITeamEventListener
     {
         public CombatEntityEventsHolder()
         {
             _tempoEntityListeners = new HashSet<ITempoEntityStatesListener>();
             _skillUsageListeners = new HashSet<ISkillUsageListener>();
-            _teamEventListeners = new List<ITeamEventListener>();
+            _teamEventListeners = new HashSet<ITeamEventListener>();
         }
 
         [ShowInInspector] private readonly ICollection<ITempoEntityStatesListener> _tempoEntityListeners;
@@ -679,6 +717,7 @@ namespace CombatSystem._Core
             if (listener is ITempoEntityStatesListener tempoEntityListener)
                 _tempoEntityListeners.Add(tempoEntityListener);
 
+
             if (listener is ISkillUsageListener skillUsageListener)
                 _skillUsageListeners.Add(skillUsageListener);
 
@@ -691,6 +730,7 @@ namespace CombatSystem._Core
         {
             if (listener is ITempoEntityStatesListener tempoEntityListener)
                 _tempoEntityListeners.Remove(tempoEntityListener);
+
 
             if (listener is ISkillUsageListener skillUsageListener)
                 _skillUsageListeners.Remove(skillUsageListener);
@@ -748,13 +788,6 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnTempoFinishControl(CombatEntity mainEntity)
-        {
-            foreach (var listener in _tempoEntityListeners)
-            {
-                listener.OnTempoFinishControl(mainEntity);
-            }
-        }
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
@@ -803,11 +836,12 @@ namespace CombatSystem._Core
                 listener.OnControlChange(in team, in phasedControl, in isBurst);
             }
         }
+
     }
 
 
     public interface ICombatEventsHolder : ICombatPreparationListener, ICombatStatesListener,
-        ITempoEntityStatesListener,
+        ITempoEntityStatesListener, ITempoTeamStatesListener,
         ITeamEventListener,
         ICombatEntityExistenceListener, 
         ISkillUsageListener,
