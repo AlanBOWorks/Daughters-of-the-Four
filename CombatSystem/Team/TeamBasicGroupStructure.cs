@@ -61,6 +61,17 @@ namespace CombatSystem.Team
         }
     }
 
+    public class TeamBasicGroupDictionary<TKey, TValue> : TeamBasicGroupStructure<TValue>
+    {
+        public TeamBasicGroupDictionary() : base()
+        {
+            Dictionary = new Dictionary<TKey, TValue>(Members.Length);
+        }
+
+        public readonly Dictionary<TKey, TValue> Dictionary;
+    }
+
+
     public class FlexPositionMainGroupStructure<T> : TeamBasicGroupStructure<T>, ITeamFlexRoleStructureRead<T>, ITeamFlexPositionStructureRead<T>
     {
         public FlexPositionMainGroupStructure() : base(new T[EnumTeam.PositioningAmount])

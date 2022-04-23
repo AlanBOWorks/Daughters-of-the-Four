@@ -60,11 +60,13 @@ namespace CombatSystem.Player
         {
             if (!canAct) return;
 
-            _currentEntity = entity;
             Show();
         }
 
-        private CombatEntity _currentEntity;
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+        }
+
         public void OnEntityRequestAction(CombatEntity entity)
         {
         }

@@ -12,10 +12,13 @@ using UnityEngine;
 namespace CombatSystem.Player
 {
     public sealed class PlayerTeamController : CombatTeamControllerBase,
+        IPlayerEntityListener,
         ISkillUsageListener,
         ISkillSelectionListener,
         ITargetSelectionListener
     {
+        [ShowInInspector] 
+        private CombatEntity _selectedPerformer;
         [ShowInInspector]
         private CombatSkill _selectedSkill;
         [ShowInInspector]
@@ -51,6 +54,16 @@ namespace CombatSystem.Player
 
         public void OnSkillSubmit(in CombatSkill skill)
         {
+        }
+
+        public void OnPerformerSwitch(in CombatEntity performer)
+        {
+            _selectedPerformer = performer;
+        }
+
+        public void OnFlexEntitySequenceReach(in CombatEntity flexEntity)
+        {
+            
         }
 
         public void OnTargetSelect(in CombatEntity target)

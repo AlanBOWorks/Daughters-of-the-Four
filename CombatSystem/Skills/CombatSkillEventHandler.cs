@@ -1,10 +1,11 @@
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
+using CombatSystem.Team;
 
 namespace CombatSystem.Skills
 {
-    public sealed class CombatSkillEventHandler : ISkillUsageListener, ITempoEntityStatesListener
+    public sealed class CombatSkillEventHandler : ISkillUsageListener, ITempoEntityStatesListener, ITempoTeamStatesListener
     {
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
@@ -28,6 +29,11 @@ namespace CombatSystem.Skills
         }
 
         public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            entity.OnSequenceStart();
+        }
+
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             entity.OnSequenceStart();
         }
@@ -56,6 +62,20 @@ namespace CombatSystem.Skills
         public void OnTempoFinishControl(CombatEntity mainEntity)
         {
             OnEntityFinishSequence(mainEntity);
+        }
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        {
+            
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            var currentEntities = controller.Dictionary;
+            foreach (var pair in currentEntities)
+            {
+                OnEntityFinishSequence(pair.Key);
+            }
         }
     }
 }

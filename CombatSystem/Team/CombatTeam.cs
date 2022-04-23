@@ -87,6 +87,8 @@ namespace CombatSystem.Team
 
         public IReadOnlyList<CombatEntity> MainRoleMembers => _mainRoleWrapper.Members;
         public IReadOnlyList<CombatEntity> MainPositioningMembers => _mainPositionsWrapper.Members;
+        public FlexPositionMainGroupStructure<CombatEntity> GetMainMembers() => _mainRoleWrapper;
+
         public IEnumerator<CombatEntity> OffRoleMembers => _offRolesGroup;
 
 

@@ -10,7 +10,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UFrontTargetButtonsHandler : MonoBehaviour, IUIHoverListener, 
-        ITempoEntityStatesListener, 
+        IPlayerEntityListener,
         ISkillSelectionListener,
         ITargetSelectionListener, ITargetPointerListener
     {
@@ -47,32 +47,18 @@ namespace CombatSystem.Player.UI
 
         [ShowInInspector, DisableInEditorMode]
         private CombatEntity _currentControl;
-        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
+
+
+        public void OnPerformerSwitch(in CombatEntity performer)
         {
-            _currentControl = entity;
+            _currentControl = performer;
         }
 
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity)
-        {
-        }
-
-        public void OnTempoFinishControl(CombatEntity mainEntity)
-        {
-        }
 
         public void OnSkillSelect(in CombatSkill skill)
         {
-            
-        }
 
+        }
         public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
         {
             HideTargets();

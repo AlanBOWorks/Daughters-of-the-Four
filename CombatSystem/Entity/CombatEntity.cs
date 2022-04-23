@@ -200,8 +200,8 @@ namespace CombatSystem.Entity
                         {
                             if (preset == null)
                             {
-                                Debug.LogError("Preset skill was [NULL]");
-                                Debug.LogWarning($"Check Entity Skills: {user.Provider}");
+                                Debug.LogWarning("Preset skill was [NULL]\n"
+                                                 + $"Check Entity Skills: {user.Provider}");
                                 continue;
                             }
 

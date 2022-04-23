@@ -57,6 +57,7 @@ namespace CombatSystem.Player.Events
 
     internal interface ITargetSelectionListener : ICombatEventListener
     {
+
         /// <summary>
         /// Virtually this is the same than [<see cref="OnTargetSubmit"/>]; but this is invoked first
         /// </summary>
@@ -70,6 +71,11 @@ namespace CombatSystem.Player.Events
         /// <br></br><br></br>
         /// </summary>
         void OnTargetSubmit(in CombatEntity target);
+    }
+
+    internal interface IPlayerEntityListener : ICombatEventListener
+    {
+        void OnPerformerSwitch(in CombatEntity performer);
     }
 
     internal interface ICameraHolderListener : ICombatEventListener

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CombatSystem._Core
 {
-    public sealed class TempoTicker : ICombatStatesListener, ICombatPreparationListener, ITempoEntityStatesListener
+    public sealed class TempoTicker : ICombatStatesListener, ICombatPreparationListener
     {
         [ShowInInspector] 
         internal readonly HashSet<ITempoTickListener> TickListeners;
@@ -111,24 +111,6 @@ namespace CombatSystem._Core
         {
             EntitiesTempoTicker.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
         }
-
-        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-        }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-            
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity)
-        {
-        }
-
     }
 
     public sealed class CombatEntitiesTempoTicker : 
@@ -139,12 +121,14 @@ namespace CombatSystem._Core
         public CombatEntitiesTempoTicker()
         {
             _tickingTrackers = new HashSet<CombatEntity>();
+            _mainEntitiesActingQueue = new Queue<KeyValuePair<CombatEntity, bool>>();
         }
 
         [ShowInInspector]
         private readonly HashSet<CombatEntity> _tickingTrackers;
 
-
+        [ShowInInspector] 
+        private readonly Queue<KeyValuePair<CombatEntity,bool>> _mainEntitiesActingQueue;
 
 
         public void ResetState()
@@ -181,6 +165,11 @@ namespace CombatSystem._Core
                 HandleTickEntity(entity);
             }
 
+            while (_mainEntitiesActingQueue.Count > 0)
+            {
+                var valuePair = _mainEntitiesActingQueue.Dequeue();
+                eventsHolder.OnMainEntityRequestSequence(valuePair.Key,valuePair.Value);
+            }
 
             void HandleTickEntity(CombatEntity entity)
             {
@@ -196,20 +185,29 @@ namespace CombatSystem._Core
                     return;
 
                 bool isTrinityRole = UtilsTeam.IsTrinityRole(in entity);
+                bool canAct = UtilsCombatStats.CanRequestActing(entity);
+
                 if (isTrinityRole)
                     HandleMainRole();
                 else
-                    entity.Team.StandByMembers.PutOnStandBy(in entity);
+                    HandleOffRole();
 
 
                 void HandleMainRole()
                 {
-                    bool canAct = UtilsCombatStats.CanRequestActing(entity);
-                    eventsHolder.OnMainEntityRequestSequence(entity, canAct);
+                    var mainValue = new KeyValuePair<CombatEntity,bool>(entity,canAct);
+                    _mainEntitiesActingQueue.Enqueue(mainValue);
+                }
+
+                void HandleOffRole()
+                {
+                    entity.Team.StandByMembers.PutOnStandBy(in entity);
+                    eventsHolder.OnOffEntityRequestSequence(entity,canAct);
                 }
             }
-
         }
+
+
 
 
         public void OnRoundPassed()
@@ -224,11 +222,22 @@ namespace CombatSystem._Core
 
         public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            if(!canAct) return;
+            OnEntityRequestSequence(in entity, in canAct);
+        }
+
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            OnEntityRequestSequence(in entity, in canAct);
+        }
+
+        private static void OnEntityRequestSequence(in CombatEntity entity, in bool canAct)
+        {
+            if (!canAct) return;
 
             var stats = entity.Stats;
             stats.UsedActions = 0;
         }
+
 
         public void OnEntityRequestAction(CombatEntity entity)
         {
@@ -265,6 +274,11 @@ namespace CombatSystem._Core
         /// [<seealso cref="OnEntityRequestAction"/>] instead
         /// </summary>
         void OnMainEntityRequestSequence(CombatEntity entity, bool canAct);
+        /// <summary>
+        /// <inheritdoc cref="OnMainEntityRequestSequence"/>
+        /// </summary>
+        void OnOffEntityRequestSequence(CombatEntity entity, bool canAct);
+
         /// <summary>
         /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left.<br></br>
         /// If there's no actions left [<see cref="OnEntityFinishSequence"/>] will be invoked instead.

@@ -53,6 +53,10 @@ namespace CombatSystem.Player.UI
         {
         }
 
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+        }
+
         public void OnEntityRequestAction(CombatEntity entity)
         {
             UpdateLuckInfo(in entity);
@@ -65,11 +69,6 @@ namespace CombatSystem.Player.UI
         public void OnEntityFinishSequence(CombatEntity entity)
         {
             UpdateLuckInfo(in entity);
-        }
-
-        public void OnTempoFinishControl(CombatEntity mainEntity)
-        {
-            UpdateLuckInfo(in mainEntity);
         }
 
         private void UpdateLuckInfo(in CombatEntity entity)

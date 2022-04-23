@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
@@ -28,11 +29,19 @@ namespace CombatSystem.Team
             if(!canAct) return;
 
             var controller = UtilsTeam.GetElement(entity, this);
-            controller.InjectionOnRequestSequence(entity);
+            controller.InjectionOnRequestMainSequence(in entity);
             
             if (CurrentController != null) return;
 
             SwitchController(in controller);
+        }
+
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            if (!canAct) return;
+
+            var controller = UtilsTeam.GetElement(entity, this);
+            controller.InjectionOnRequestOffSequence(in entity);
         }
 
         private void SwitchController(in CombatTeamControllerBase controller)
@@ -75,57 +84,70 @@ namespace CombatSystem.Team
         }
     }
     
-    public abstract class CombatTeamControllerBase 
+    public abstract class CombatTeamControllerBase : TeamBasicGroupDictionary<CombatEntity,bool>
     {
-        protected CombatTeamControllerBase()
+        protected CombatTeamControllerBase() : base()
         {
-            ActiveControls = new List<CombatEntity>();
+            OffMembers = new HashSet<CombatEntity>();
         }
-        [ShowInInspector]
-        protected readonly List<CombatEntity> ActiveControls;
 
-        public IReadOnlyList<CombatEntity> GetActiveControllingEntities() => ActiveControls;
+        internal bool IsWaiting() => Dictionary.Count > 0;
+        public CombatEntity GetActiveEntity() => _activeEntity;
 
-        internal bool IsWaiting() => ActiveControls.Count > 0;
+        public readonly HashSet<CombatEntity> OffMembers; 
 
-        private CombatEntity _lastEntity;
-        public void InjectionOnRequestSequence(CombatEntity entity)
+
+        private CombatEntity _activeEntity;
+        public void InjectionOnRequestMainSequence(in CombatEntity entity)
         {
-            ActiveControls.Add(entity);
-            _lastEntity = entity;
+            _activeEntity = entity;
+            Dictionary.Add(entity,true);
+        }
+
+        public void InjectionOnRequestOffSequence(in CombatEntity entity)
+        {
+            OffMembers.Add(entity);
         }
 
         public void Clear()
         {
-            ActiveControls.Clear();
+            VanguardType = false;
+            AttackerType = false;
+            SupportType = false;
+            Dictionary.Clear();
+            OffMembers.Clear();
         }
 
 
         public void SafeRemove(CombatEntity entity)
         {
-            if (!ActiveControls.Contains(entity))  return;
-            OnRemoveMember(in entity);
+            if (Dictionary.ContainsKey(entity))
+            {
+                OnRemoveMemberDictionary(in entity);
+                return;
+            }
+            if (OffMembers.Contains(entity))
+                OffMembers.Remove(entity);
         }
 
 
-        private void OnRemoveMember(in CombatEntity entity)
+        private void OnRemoveMemberDictionary(in CombatEntity entity)
         {
-            ActiveControls.Remove(entity);
-            if(_lastEntity == entity && ActiveControls.Count > 0)
-                _lastEntity = ActiveControls[ActiveControls.Count - 1];
+            Dictionary.Remove(entity);
+            _activeEntity = Dictionary.Keys.First();
         }
 
         public void ForceFinish()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             eventsHolder.OnTempoFinishControl(this);
-            
-            foreach (var entity in ActiveControls)
-            {
-                eventsHolder.OnEntityFinishSequence(entity);
-            }
 
-            ActiveControls.Clear();
+
+            foreach (var pair in Dictionary)
+            {
+                eventsHolder.OnEntityFinishSequence(pair.Key);
+            }
+            Clear();
         }
     }
 }

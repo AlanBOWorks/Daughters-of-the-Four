@@ -22,14 +22,15 @@ namespace CombatSystem.Player.UI
         private UCombatSkillButton clonableSkillButton;
         private Stack<UCombatSkillButton> _instantiationPool;
         private Dictionary<CombatSkill,UCombatSkillButton> _activeButtons;
-      
 
-        [Title("Parameters")]
+
+        [Title("Parameters")] 
+        [SerializeField] private bool subscribeToEvents = true;
         [SerializeField]
         private Vector2 buttonsSeparations;
         private Vector2 _buttonSizes;
 
-
+        private CanvasGroup _alphaGroup;
 
         internal void AddToDictionary(in CombatSkill skill, in UCombatSkillButton button)
         {
@@ -47,12 +48,16 @@ namespace CombatSystem.Player.UI
             _instantiationPool = new Stack<UCombatSkillButton>();
             _activeButtons = new Dictionary<CombatSkill, UCombatSkillButton>();
 
+            _alphaGroup = GetComponent<CanvasGroup>();
+
             //Hide the reference (is used as a visual key for UI Design)
             clonableSkillButton.gameObject.SetActive(false);
         }
 
         private void Start()
         {
+            if(!subscribeToEvents) return;
+
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.ManualSubscribe(this as ITempoEntityStatesListener);
             playerEvents.ManualSubscribe(this as ISkillUsageListener);
@@ -68,7 +73,6 @@ namespace CombatSystem.Player.UI
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            _activeEntities = PlayerCombatSingleton.PlayerTeamController.GetActiveControllingEntities();
         }
 
         public void OnCombatStart()
@@ -186,6 +190,10 @@ namespace CombatSystem.Player.UI
 
         }
 
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+        }
+
         public void OnEntityRequestAction(CombatEntity entity)
         {
         }
@@ -196,17 +204,41 @@ namespace CombatSystem.Player.UI
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
-            
+            if (entity != _currentControlEntity) return;
+
+
+            bool hasNextActor = _playerController.IsWaiting();
+            if (hasNextActor)
+            {
+                var nextActor = _playerController.GetActiveEntity();
+                SwitchControllingEntity(in nextActor);
+                return;
+            }
+
+            DisableHolder();
         }
 
-        private CombatEntity _currentControlEntity;
-        private IReadOnlyList<CombatEntity> _activeEntities;
+        private const float OnDisableAlpha = .4f;
+        private void EnableHolder()
+        {
+            _alphaGroup.alpha = 1;
+            enabled = true;
+        }
+
+        private void DisableHolder()
+        {
+            _alphaGroup.alpha = OnDisableAlpha;
+            _currentControlEntity = null;
+            enabled = false;
+        }
 
 
-
+        private CombatTeamControllerBase _playerController;
         public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
-            var entity = _activeEntities[_activeEntities.Count -1];
+            EnableHolder();
+            _playerController = controller;
+            var entity = controller.GetActiveEntity();
             SwitchControllingEntity(in entity);
         }
 
@@ -223,8 +255,6 @@ namespace CombatSystem.Player.UI
         public void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst)
         {
         }
-
-
         private void ReturnSkillsToStack()
         {
             foreach (var button in _activeButtons)
@@ -236,11 +266,22 @@ namespace CombatSystem.Player.UI
             _activeButtons.Clear();
         }
 
-        private void HideAll()
+        public void HideAll()
         {
             _currentControlEntity = null;
             ReturnSkillsToStack();
         }
+        private void ResetPoolSkillsToCurrent()
+        {
+            ReturnSkillsToStack();
+            PoolEntitySkills(in _currentControlEntity);
+        }
+        
+
+
+        private CombatEntity _currentControlEntity;
+        public void InjectControlEntity(in CombatEntity targetEntity)
+            => _currentControlEntity = targetEntity;
 
         public void SwitchControllingEntity(in CombatEntity targetEntity)
         {
@@ -248,18 +289,13 @@ namespace CombatSystem.Player.UI
             ResetPoolSkillsToCurrent();
         }
 
-        private void ResetPoolSkillsToCurrent()
-        {
-            ReturnSkillsToStack();
-            PoolEntitySkills(in _currentControlEntity);
-        }
-
-
         [ShowInInspector]
         private CombatSkill _currentSelectedSkill;
         public void OnSkillSelect(in CombatSkill skill)
         {
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillSelect(in skill);
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            playerEvents.OnPerformerSwitch(in _currentControlEntity);
+            playerEvents.OnSkillSelect(in skill);
             OnSkillSwitch(in skill, in _currentSelectedSkill);
         }
 
@@ -272,7 +308,7 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
         {
-            if(skill == null) return; //this prevents null skills and (_currentSelectedSkill = null) == skill check
+            if(!enabled || skill == null) return; //this prevents null skills and (_currentSelectedSkill = null) == skill check
 
             if (previousSelection == skill)
             {

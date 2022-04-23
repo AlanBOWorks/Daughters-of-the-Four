@@ -89,6 +89,11 @@ namespace CombatSystem.Player.UI
             ShowUI();
         }
 
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            //Todo
+        }
+
         public void OnEntityRequestAction(CombatEntity entity)
         {
             

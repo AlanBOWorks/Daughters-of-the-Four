@@ -9,7 +9,7 @@ using UnityEngine;
 namespace CombatSystem.Player
 {
     public sealed class PlayerCombatEventsHolder : ControllerCombatEventsHolder, ITempoTickListener, IDiscriminationEventsHolder,
-
+        IPlayerEntityListener,
         ISkillPointerListener, ISkillSelectionListener,
         ITargetPointerListener, ITargetSelectionListener,
         ICameraHolderListener
@@ -19,6 +19,7 @@ namespace CombatSystem.Player
             var combatEventsHolder = CombatSystemSingleton.EventsHolder;
             combatEventsHolder.SubscribeEventsHandler(this);
 
+            _playerEntityListeners = new HashSet<IPlayerEntityListener>();
             _skillPointerListeners = new HashSet<ISkillPointerListener>();
             _skillSelectionListeners = new HashSet<ISkillSelectionListener>();
             _targetPointerListeners = new HashSet<ITargetPointerListener>();
@@ -31,6 +32,9 @@ namespace CombatSystem.Player
 #endif
 
         }
+
+        [ShowInInspector] 
+        private readonly HashSet<IPlayerEntityListener> _playerEntityListeners;
 
         [ShowInInspector,HorizontalGroup("Skills")]
         private readonly HashSet<ISkillPointerListener> _skillPointerListeners;
@@ -53,6 +57,9 @@ namespace CombatSystem.Player
         public override void UnSubscribe(ICombatEventListener listener)
         {
             base.UnSubscribe(listener);
+
+            if (listener is IPlayerEntityListener playerEntityListener)
+                _playerEntityListeners.Remove(playerEntityListener);
             if (listener is ISkillPointerListener skillPointerListener)
                 _skillPointerListeners.Remove(skillPointerListener);
             if (listener is ISkillSelectionListener skillSelectionListener)
@@ -66,15 +73,19 @@ namespace CombatSystem.Player
         }
 
         /// <summary>
-        /// Subscribe as a: 
+        /// Check and subscribe as a: 
+        /// <br></br>- <see cref="IPlayerEntityListener"/>
         /// <br></br>- <see cref="ISkillPointerListener"/>
         /// <br></br>- <see cref="ISkillSelectionListener"/>
         /// <br></br>- <see cref="ITargetPointerListener"/>
         /// <br></br>- <see cref="ITargetSelectionListener"/>
+        /// <br></br>- <see cref="ICameraHolderListener"/>
         /// </summary>
         public void SubscribeAsPlayerEvent(ICombatEventListener listener)
         {
 
+            if (listener is IPlayerEntityListener playerEntityListener)
+                _playerEntityListeners.Add(playerEntityListener);
             if (listener is ISkillPointerListener skillPointerListener)
                 _skillPointerListeners.Add(skillPointerListener);
             if (listener is ISkillSelectionListener skillSelectionListener)
@@ -88,6 +99,10 @@ namespace CombatSystem.Player
         }
 
 
+        internal void ManualSubscribe(IPlayerEntityListener playerEntityListener)
+        {
+            _playerEntityListeners.Add(playerEntityListener);
+        }
         internal void ManualSubscribe(ISkillPointerListener skillPointerListener)
         {
             _skillPointerListeners.Add(skillPointerListener);
@@ -187,6 +202,14 @@ namespace CombatSystem.Player
             }
         }
 
+        public void OnPerformerSwitch(in CombatEntity performer)
+        {
+            foreach (var listener in _playerEntityListeners)
+            {
+                listener.OnPerformerSwitch(in performer);
+            }
+        }
+
         public void OnTargetSelect(in CombatEntity target)
         {
             foreach (var listener in _targetSelectionListeners)
@@ -279,6 +302,10 @@ namespace CombatSystem.Player
             public void OnTargetSubmit(in CombatEntity target)
             {
                 Debug.Log($"xxxx - Target SUBMIT: {target.GetProviderEntityName()}");
+            }
+            public void OnPerformerSwitch(in CombatEntity performer)
+            {
+                Debug.Log($"xxxx - PERFORMER: {performer.GetProviderEntityName()}");
             }
         } 
 #endif
