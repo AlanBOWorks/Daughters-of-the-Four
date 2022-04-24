@@ -12,7 +12,8 @@ namespace CombatSystem.Team
 {
     public sealed class CombatTeam : 
         ITeamFullRolesStructureRead<CombatEntity>,
-        IReadOnlyList<CombatEntity>
+        IReadOnlyList<CombatEntity>,
+        ITempoDedicatedEntityStatesListener
     {
         private CombatTeam(bool isPlayerTeam)
         {
@@ -22,13 +23,14 @@ namespace CombatSystem.Team
 
             _members = new List<CombatEntity>();
 
+            AliveTargeting = new CombatTeamAliveTargeting(this);
             StandByMembers = new TeamStandByMembersHandler();
+
             _mainPositionsWrapper = new MainPositionsWrapper();
             _mainRoleWrapper = new MainRoleWrapper();
-
-            AliveTargeting = new CombatTeamAliveTargeting(this);
-
             _offRolesGroup = new TeamOffGroupStructure<CombatEntity>();
+
+            _activeMembers = new CombatTeamActiveMembers();
         }
         
         public CombatTeam(bool isPlayerTeam,IReadOnlyCollection<ICombatEntityProvider> members) : this(isPlayerTeam)
@@ -83,11 +85,17 @@ namespace CombatSystem.Team
 
         [ShowInInspector, ShowIf("ShowRoles")]
         private readonly TeamOffGroupStructure<CombatEntity> _offRolesGroup;
+        [ShowInInspector]
+        private readonly CombatTeamActiveMembers _activeMembers;
+        public readonly CombatTeamAliveTargeting AliveTargeting;
 
 
         public IReadOnlyList<CombatEntity> MainRoleMembers => _mainRoleWrapper.Members;
         public IReadOnlyList<CombatEntity> MainPositioningMembers => _mainPositionsWrapper.Members;
         public FlexPositionMainGroupStructure<CombatEntity> GetMainMembers() => _mainRoleWrapper;
+
+        public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _activeMembers.GetTrinityMembers();
+        public IReadOnlyList<CombatEntity> GetOffMembersActiveMembers() => _activeMembers.GetOffMembers();
 
         public IEnumerator<CombatEntity> OffRoleMembers => _offRolesGroup;
 
@@ -127,7 +135,6 @@ namespace CombatSystem.Team
         public CombatEntity ThirdFlexElement => _offRolesGroup.ThirdFlexElement;
 
 
-        public readonly CombatTeamAliveTargeting AliveTargeting;
 
         public void CreateMidCombat(ICombatEntityProvider provider)
         {
@@ -302,6 +309,25 @@ namespace CombatSystem.Team
             }
         }
 
+        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            _activeMembers.OnTrinityEntityRequestSequence(entity,canAct);
+        }
+
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            _activeMembers.OnOffEntityRequestSequence(entity,canAct);
+        }
+
+        public void OnTrinityEntityFinishSequence(CombatEntity entity)
+        {
+            _activeMembers.OnTrinityEntityFinishSequence(entity);
+        }
+
+        public void OnOffEntityFinishSequence(CombatEntity entity)
+        {
+            _activeMembers.OnOffEntityFinishSequence(entity);
+        }
     }
 
     [Serializable]

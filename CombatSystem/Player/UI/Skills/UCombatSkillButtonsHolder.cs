@@ -13,7 +13,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillButtonsHolder : MonoBehaviour, 
-        ITempoEntityStatesListener, ITempoTeamStatesListener,
+        ITempoTeamStatesListener,
         ITeamEventListener,
         ISkillButtonListener, ISkillUsageListener, ICombatStatesListener
     {
@@ -32,6 +32,8 @@ namespace CombatSystem.Player.UI
 
         private CanvasGroup _alphaGroup;
 
+        private CombatEntity _currentControlEntity;
+        public CombatEntity GetCurrentEntity() => _currentControlEntity;
 
         internal void AddToDictionary(in CombatSkill skill, in UCombatSkillButton button)
         {
@@ -60,7 +62,6 @@ namespace CombatSystem.Player.UI
             if(!subscribeToEvents) return;
 
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.ManualSubscribe(this as ITempoEntityStatesListener);
             playerEvents.ManualSubscribe(this as ISkillUsageListener);
             playerEvents.ManualSubscribe(this as ITeamEventListener);
             playerEvents.ManualSubscribe(this as ICombatStatesListener);
@@ -89,13 +90,21 @@ namespace CombatSystem.Player.UI
         {
             HideAll();
         }
-        private void DisableHolder()
+
+
+        public void DisableHolder()
         {
             _alphaGroup.alpha = OnDisableAlpha;
             _currentControlEntity = null;
             enabled = false;
         }
 
+        private const float OnDisableAlpha = .4f;
+        private void EnableHolder()
+        {
+            _alphaGroup.alpha = 1;
+            enabled = true;
+        }
 
 
         // Safe check
@@ -192,60 +201,14 @@ namespace CombatSystem.Player.UI
             buttonHolder.HideButton();
             buttonHolder.ResetState();
         }
-        
-        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-
-        }
-
-        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-        }
-
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-        }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity)
-        {
-            if (entity != _currentControlEntity) return;
-
-
-            bool hasNextActor = _playerController.IsWaiting();
-            if (hasNextActor)
-            {
-                var nextActor = _playerController.GetActiveEntity();
-                SwitchControllingEntity(in nextActor);
-                return;
-            }
-
-            DisableHolder();
-        }
-
-        private const float OnDisableAlpha = .4f;
-        private void EnableHolder()
-        {
-            _alphaGroup.alpha = 1;
-            enabled = true;
-        }
 
 
 
-        private CombatTeamControllerBase _playerController;
+
+
         public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
             EnableHolder();
-            _playerController = controller;
-            var entity = controller.GetActiveEntity();
-            SwitchControllingEntity(in entity);
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
@@ -272,7 +235,7 @@ namespace CombatSystem.Player.UI
             _activeButtons.Clear();
         }
 
-        public void HideAll()
+        private void HideAll()
         {
             _currentControlEntity = null;
             ReturnSkillsToStack();
@@ -285,7 +248,6 @@ namespace CombatSystem.Player.UI
         
 
 
-        private CombatEntity _currentControlEntity;
         public void SwitchControllingEntity(in CombatEntity targetEntity)
         {
             _currentControlEntity = targetEntity;

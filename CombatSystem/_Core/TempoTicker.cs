@@ -115,8 +115,7 @@ namespace CombatSystem._Core
 
     public sealed class CombatEntitiesTempoTicker : 
         ICombatPreparationListener,
-        ITempoTickListener,
-        ITempoEntityStatesListener
+        ITempoTickListener
     {
         public CombatEntitiesTempoTicker()
         {
@@ -226,37 +225,6 @@ namespace CombatSystem._Core
         {
             AddEntities(playerTeam);
             AddEntities(enemyTeam);
-        }
-
-        private static void OnEntityRequestSequence(in CombatEntity entity, in bool canAct)
-        {
-            if (!canAct) return;
-
-            var stats = entity.Stats;
-            stats.UsedActions = 0;
-        }
-
-
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            OnEntityRequestSequence(in entity, in canAct);
-        }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-                bool canAct = UtilsCombatStats.CanActRequest(entity);
-                if(!canAct)
-                    CombatSystemSingleton.EventsHolder.OnEntityFinishSequence(entity);
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity)
-        {
-            entity.Stats.CurrentInitiative = 0;
         }
     }
 

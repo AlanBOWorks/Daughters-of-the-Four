@@ -19,6 +19,9 @@ namespace CombatSystem._Core
             _eventsHolder = new SystemEventsHolder();
             _sequenceStepper = new TempoSequenceStepper();
 
+            var entityTempoStepper = new EntityTempoStepper();
+            _eventsHolder.Subscribe(entityTempoStepper);
+
 #if UNITY_EDITOR
             var debugEvents = new DebugEvents();
 
@@ -364,7 +367,8 @@ namespace CombatSystem._Core
 
 #if UNITY_EDITOR
         #region -- DEBUG --
-        private sealed class DebugEvents : ITempoEntityStatesListener, ITempoTickListener, ISkillUsageListener
+        private sealed class DebugEvents : ITempoDedicatedEntityStatesListener,
+            ITempoTickListener, ISkillUsageListener
         {
           
 
@@ -385,7 +389,6 @@ namespace CombatSystem._Core
 
             public void OnEntityFinishSequence(CombatEntity entity)
             {
-                Debug.Log($"> --- Entity [END] Sequence: {entity.GetProviderEntityName()}");
             }
 
             public void OnTempoFinishControl(CombatEntity mainEntity)
@@ -435,6 +438,26 @@ namespace CombatSystem._Core
             public void OnSkillFinish()
             {
                 Debug.Log("-------------- SKILL END --------------- ");
+            }
+
+            public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
+            {
+                Debug.Log($"> --- TRINITY Entity [START] Sequence: {entity.GetProviderEntityName()}");
+            }
+
+            public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+            {
+                Debug.Log($"> --- OFF Entity [START] Sequence: {entity.GetProviderEntityName()}");
+            }
+
+            public void OnTrinityEntityFinishSequence(CombatEntity entity)
+            {
+                Debug.Log($"> --- TRINITY Entity [END] Sequence: {entity.GetProviderEntityName()}");
+            }
+
+            public void OnOffEntityFinishSequence(CombatEntity entity)
+            {
+                Debug.Log($"> --- OFF Entity [END] Sequence: {entity.GetProviderEntityName()}");
             }
         }
         #endregion

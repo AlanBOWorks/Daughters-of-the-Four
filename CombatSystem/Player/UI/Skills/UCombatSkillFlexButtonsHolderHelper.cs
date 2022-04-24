@@ -60,7 +60,7 @@ namespace CombatSystem.Player.UI
             if (entity != _flexEntity) return;
 
             _flexIsActive = false;
-            flexButtonsHolder.HideAll();
+            flexButtonsHolder.DisableHolder();
         }
 
 
@@ -74,7 +74,6 @@ namespace CombatSystem.Player.UI
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            flexButtonsHolder.HideAll();
         }
     }
 }

@@ -132,10 +132,6 @@ namespace CombatSystem.Player.UI
        {
        }
 
-       public void OnEntityFinishSequence(CombatEntity entity)
-       {
-           
-       }
 
         public void DoSwitchEntity(in CombatEntity entity)
         {
