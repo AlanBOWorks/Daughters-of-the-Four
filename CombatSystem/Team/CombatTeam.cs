@@ -96,6 +96,7 @@ namespace CombatSystem.Team
 
         public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _activeMembers.GetTrinityMembers();
         public IReadOnlyList<CombatEntity> GetOffMembersActiveMembers() => _activeMembers.GetOffMembers();
+        public IReadOnlyList<CombatEntity> GetActiveMembers() => _activeMembers;
 
         public IEnumerator<CombatEntity> OffRoleMembers => _offRolesGroup;
 

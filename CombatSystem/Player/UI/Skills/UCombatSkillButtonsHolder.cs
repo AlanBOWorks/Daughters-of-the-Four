@@ -25,7 +25,6 @@ namespace CombatSystem.Player.UI
 
 
         [Title("Parameters")] 
-        [SerializeField] private bool subscribeToEvents = true;
         [SerializeField]
         private Vector2 buttonsSeparations;
         private Vector2 _buttonSizes;
@@ -59,8 +58,6 @@ namespace CombatSystem.Player.UI
 
         private void Start()
         {
-            if(!subscribeToEvents) return;
-
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.ManualSubscribe(this as ISkillUsageListener);
             playerEvents.ManualSubscribe(this as ITeamEventListener);

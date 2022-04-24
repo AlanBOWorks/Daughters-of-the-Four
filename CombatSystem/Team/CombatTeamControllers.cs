@@ -149,13 +149,11 @@ namespace CombatSystem.Team
         public void ForceFinish()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnTempoFinishControl(this);
-
-
             foreach (var pair in Dictionary)
             {
                 eventsHolder.OnEntityFinishSequence(pair.Key);
             }
+            eventsHolder.OnTempoFinishControl(this);
             Clear();
         }
     }

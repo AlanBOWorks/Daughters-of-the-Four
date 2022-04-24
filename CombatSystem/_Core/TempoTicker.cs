@@ -114,21 +114,17 @@ namespace CombatSystem._Core
     }
 
     public sealed class CombatEntitiesTempoTicker : 
-        ICombatPreparationListener,
+        ICombatPreparationListener, ITempoEntityStatesListener,
         ITempoTickListener
     {
         public CombatEntitiesTempoTicker()
         {
-            _tickingTrackers = new HashSet<CombatEntity>();
+            _tickingTrackers = new List<CombatEntity>();
             _mainEntitiesActingQueue = new Queue<KeyValuePair<CombatEntity, bool>>();
         }
 
-        [ShowInInspector]
-        private readonly HashSet<CombatEntity> _tickingTrackers;
-
-        [ShowInInspector] 
-        private readonly Queue<KeyValuePair<CombatEntity,bool>> _mainEntitiesActingQueue;
-
+        [ShowInInspector] private readonly List<CombatEntity> _tickingTrackers;
+        [ShowInInspector] private readonly Queue<KeyValuePair<CombatEntity,bool>> _mainEntitiesActingQueue;
 
         public void ResetState()
         {
@@ -159,8 +155,10 @@ namespace CombatSystem._Core
         public void OnTick()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            foreach (var entity in _tickingTrackers)
+            int tickingEntitiesIndex = 0;
+            for (; tickingEntitiesIndex < _tickingTrackers.Count; tickingEntitiesIndex++)
             {
+                var entity = _tickingTrackers[tickingEntitiesIndex];
                 HandleTickEntity(entity);
             }
 
@@ -199,18 +197,23 @@ namespace CombatSystem._Core
                 else
                     HandleOffRole();
 
-
                 void HandleMainRole()
                 {
                     var mainValue = new KeyValuePair<CombatEntity,bool>(entity,canAct);
                     _mainEntitiesActingQueue.Enqueue(mainValue);
                 }
-
                 void HandleOffRole()
                 {
                     entity.Team.StandByMembers.PutOnStandBy(in entity);
                     eventsHolder.OnOffEntityRequestSequence(entity,canAct);
                 }
+
+
+
+                if (!canAct) return;
+
+                _tickingTrackers.RemoveAt(tickingEntitiesIndex);
+                tickingEntitiesIndex--;
             }
         }
 
@@ -225,6 +228,23 @@ namespace CombatSystem._Core
         {
             AddEntities(playerTeam);
             AddEntities(enemyTeam);
+        }
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+        }
+
+        public void OnEntityRequestAction(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishSequence(CombatEntity entity)
+        {
+            _tickingTrackers.Add(entity);
         }
     }
 
