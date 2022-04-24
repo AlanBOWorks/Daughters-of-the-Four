@@ -285,7 +285,7 @@ namespace CombatSystem._Core
 
     public interface ITempoTeamStatesListener : ICombatEventListener
     {
-        void OnTempoStartControl(in CombatTeamControllerBase controller);
+        void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity);
         /// <summary>
         /// Invoked when the Entity's Controller decides that there's no more actions to make
         /// </summary>

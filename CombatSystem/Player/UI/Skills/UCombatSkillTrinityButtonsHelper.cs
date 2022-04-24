@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Team;
@@ -7,7 +8,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillTrinityButtonsHelper : MonoBehaviour,
-        ICombatStatesListener,
+        ICombatStatesListener, ITempoTeamStatesListener,
         ITempoDedicatedEntityStatesListener
     {
         [SerializeField] private UCombatSkillButtonsHolder holder;
@@ -21,10 +22,7 @@ namespace CombatSystem.Player.UI
 
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            Debug.Log("TRIN");
-            if(!canAct) return;
-
-            holder.SwitchControllingEntity(in entity);
+            
         }
 
         public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -33,15 +31,28 @@ namespace CombatSystem.Player.UI
 
         public void OnTrinityEntityFinishSequence(CombatEntity entity)
         {
+            if (_activeMembers.Count > 0)
+            {
+                SwitchToFirstMember();
+                return;
+            }
+            holder.DisableHolder();
 
+            void SwitchToFirstMember()
+            {
+                var firstActive = _activeMembers[0];
+                holder.SwitchControllingEntity(in firstActive);
+            }
         }
 
         public void OnOffEntityFinishSequence(CombatEntity entity)
         {
         }
 
+        private IReadOnlyList<CombatEntity> _activeMembers;
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
+            _activeMembers = playerTeam.GetTrinityActiveMembers();
         }
 
         public void OnCombatStart()
@@ -55,5 +66,15 @@ namespace CombatSystem.Player.UI
         public void OnCombatQuit()
         {
         }
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
+        {
+            holder.SwitchControllingEntity(in firstEntity);
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+        }
+
     }
 }

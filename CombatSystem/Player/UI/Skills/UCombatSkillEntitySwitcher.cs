@@ -14,6 +14,7 @@ namespace CombatSystem.Player.UI
         private TeamReferences references = new TeamReferences();
 
         [SerializeField] private UCombatSkillButtonsHolder skillsHolder;
+        [SerializeField] private UCombatSkillButtonsHolder flexRoleSkills;
 
         public TeamBasicGroupStructure<UCombatSkillEntitySwitchButton> GetButtons() => references;
 
@@ -99,10 +100,8 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
         }
 
-        private CombatTeamControllerBase _playerControl;
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
-            _playerControl = controller;
            ShowAll();
         }
 
@@ -136,6 +135,7 @@ namespace CombatSystem.Player.UI
         public void DoSwitchEntity(in CombatEntity entity)
         {
             skillsHolder.SwitchControllingEntity(in entity);
+            flexRoleSkills.ResetStateIfSelectedIsActive();
         }
 
 

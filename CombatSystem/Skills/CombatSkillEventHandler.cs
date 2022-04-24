@@ -54,7 +54,7 @@ namespace CombatSystem.Skills
             entity.OnSequenceFinish();
         }
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
             
         }

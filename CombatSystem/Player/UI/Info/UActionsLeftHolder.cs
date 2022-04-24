@@ -4,21 +4,24 @@ using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
 using CombatSystem.Stats;
+using CombatSystem.Team;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UActionsLeftHolder : MonoBehaviour, ITempoDedicatedEntityStatesListener,
+    public class UActionsLeftHolder : MonoBehaviour, ITempoEntityStatesListener,
+        IPlayerEntityListener,
+        ITempoTeamStatesListener,
         ISkillSelectionListener, ISkillPointerListener
     {
         [SerializeField] private TextMeshProUGUI actionsLimitText;
         [SerializeField] private TextMeshProUGUI actionsUsedText;
         [SerializeField] private TextMeshProUGUI actionsTooltipText;
 
+        [ShowInInspector]
         private CombatEntity _currentEntity;
-        private float _actionsLimitValue;
-        private int _virtualUsedActionsValue;
         private void Awake()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
@@ -43,21 +46,31 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
         }
 
-        private void UpdateLimitText(in CombatEntity entity)
+        private void SwitchUser(in CombatEntity entity)
         {
-            _actionsLimitValue = UtilsStatsFormula.CalculateActionsAmount(entity.Stats);
-            actionsLimitText.text = _actionsLimitValue.ToString("00");
+            _currentEntity = entity;
+            UpdateInfoToCurrent();
         }
 
-        private void VariateUsedActionsText(in int increment)
+        private void UpdateInfoToCurrent()
         {
-            _virtualUsedActionsValue += increment;
+            if(_currentEntity == null) return;
+
+            UpdateLimitText();
             UpdateUsedActionsText();
         }
 
+        private void UpdateLimitText()
+        {
+            var actionsLimitValue = UtilsStatsFormula.CalculateActionsAmount(_currentEntity.Stats);
+            actionsLimitText.text = actionsLimitValue.ToString("00");
+        }
+
+
         private void UpdateUsedActionsText()
         {
-            actionsUsedText.text = _virtualUsedActionsValue.ToString("00");
+            var usedActions = _currentEntity.Stats.UsedActions;
+            actionsUsedText.text = usedActions.ToString("00");
         }
 
         private void ToggleActiveToolTip(bool enabledGO)
@@ -76,35 +89,6 @@ namespace CombatSystem.Player.UI
                 costText = "+" + cost;
 
             actionsTooltipText.text = costText;
-        }
-
-
-        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            _currentEntity = entity;
-
-            _virtualUsedActionsValue = 0;
-            UpdateUsedActionsText();
-            UpdateLimitText(in entity);
-            ShowUI();
-        }
-
-        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-        }
-
-        public void OnTrinityEntityFinishSequence(CombatEntity entity)
-        {
-        }
-
-        public void OnOffEntityFinishSequence(CombatEntity entity)
-        {
-        }
-
-        public void OnTempoFinishControl(CombatEntity mainEntity)
-        {
-            _currentEntity = null;
-            HideUI();
         }
 
         private CombatSkill _selectedSkill;
@@ -137,8 +121,7 @@ namespace CombatSystem.Player.UI
             _selectedSkill = null;
             ToggleActiveToolTip(false);
 
-            int cost = skill.SkillCost;
-            VariateUsedActionsText(in cost);
+            UpdateUsedActionsText();
         }
 
         public void OnSkillButtonHover(in CombatSkill skill)
@@ -154,5 +137,40 @@ namespace CombatSystem.Player.UI
             ToggleActiveToolTip(false);
         }
 
+        public void OnPerformerSwitch(in CombatEntity performer)
+        {
+            SwitchUser(in performer);
+        }
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
+        {
+            SwitchUser(in firstEntity);
+            ShowUI();
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            _currentEntity = null;
+            HideUI();
+        }
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+        }
+
+        public void OnEntityRequestAction(CombatEntity entity)
+        {
+
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+            UpdateInfoToCurrent();
+        }
+
+        public void OnEntityFinishSequence(CombatEntity entity)
+        {
+            UpdateInfoToCurrent();
+        }
     }
 }

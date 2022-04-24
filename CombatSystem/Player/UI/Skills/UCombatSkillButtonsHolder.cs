@@ -13,8 +13,8 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillButtonsHolder : MonoBehaviour, 
-        ITempoTeamStatesListener,
-        ITeamEventListener,
+        ITempoTeamStatesListener, ITeamEventListener,
+        IPlayerEntityListener,
         ISkillButtonListener, ISkillUsageListener, ICombatStatesListener
     {
         [Title("References")]
@@ -30,8 +30,10 @@ namespace CombatSystem.Player.UI
         private Vector2 buttonsSeparations;
         private Vector2 _buttonSizes;
 
-        private CanvasGroup _alphaGroup;
 
+        [ShowInInspector]
+        private CombatSkill _currentSelectedSkill;
+        [ShowInInspector]
         private CombatEntity _currentControlEntity;
         public CombatEntity GetCurrentEntity() => _currentControlEntity;
 
@@ -51,8 +53,6 @@ namespace CombatSystem.Player.UI
             _instantiationPool = new Stack<UCombatSkillButton>();
             _activeButtons = new Dictionary<CombatSkill, UCombatSkillButton>();
 
-            _alphaGroup = GetComponent<CanvasGroup>();
-
             //Hide the reference (is used as a visual key for UI Design)
             clonableSkillButton.gameObject.SetActive(false);
         }
@@ -66,12 +66,14 @@ namespace CombatSystem.Player.UI
             playerEvents.ManualSubscribe(this as ITeamEventListener);
             playerEvents.ManualSubscribe(this as ICombatStatesListener);
             playerEvents.ManualSubscribe(this as ITempoTeamStatesListener);
+            playerEvents.ManualSubscribe(this as IPlayerEntityListener);
         }
 
         private void OnDestroy()
         {
             PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
         }
+
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
@@ -94,18 +96,24 @@ namespace CombatSystem.Player.UI
 
         public void DisableHolder()
         {
-            _alphaGroup.alpha = OnDisableAlpha;
+            DisableActiveButtons();
+            _currentSelectedSkill = null;
             _currentControlEntity = null;
             enabled = false;
         }
 
-        private const float OnDisableAlpha = .4f;
         private void EnableHolder()
         {
-            _alphaGroup.alpha = 1;
             enabled = true;
         }
 
+        private void DisableActiveButtons()
+        {
+            foreach (var activeButton in _activeButtons)
+            {
+                activeButton.Value.DisableButton();
+            }
+        }
 
         // Safe check
         private const int MaxSkillAmount = 12;
@@ -206,7 +214,7 @@ namespace CombatSystem.Player.UI
 
 
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
             EnableHolder();
         }
@@ -250,12 +258,16 @@ namespace CombatSystem.Player.UI
 
         public void SwitchControllingEntity(in CombatEntity targetEntity)
         {
+            if (_currentSelectedSkill != null)
+            {
+                OnSkillDeselect(in _currentSelectedSkill);
+                _currentSelectedSkill = null;
+            }
+
             _currentControlEntity = targetEntity;
             ResetPoolSkillsToCurrent();
         }
 
-        [ShowInInspector]
-        private CombatSkill _currentSelectedSkill;
         public void OnSkillSelect(in CombatSkill skill)
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
@@ -341,6 +353,17 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillFinish()
         {
+        }
+
+        public void OnPerformerSwitch(in CombatEntity performer)
+        {
+            ResetStateIfSelectedIsActive();
+        }
+
+        public void ResetStateIfSelectedIsActive()
+        {
+            if (_currentSelectedSkill == null) return;
+            OnSkillDeselect(in _currentSelectedSkill);
         }
     }
 }

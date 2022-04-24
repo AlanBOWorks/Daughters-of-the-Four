@@ -64,7 +64,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
             if (_flexIsActive)
             {

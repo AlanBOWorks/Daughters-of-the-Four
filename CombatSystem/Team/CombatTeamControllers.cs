@@ -77,7 +77,7 @@ namespace CombatSystem.Team
         {
         }
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
         }
 
@@ -97,8 +97,8 @@ namespace CombatSystem.Team
         public void InvokeControlEvent()
         {
             if(CurrentController == null) return; //Safe check (it should be false always)
-
-            CombatSystemSingleton.EventsHolder.OnTempoStartControl(CurrentController);
+            var firstEntity = CurrentController.ControllingTeam.GetTrinityActiveMembers()[0];
+            CombatSystemSingleton.EventsHolder.OnTempoStartControl(CurrentController, in firstEntity);
         }
     }
     
@@ -110,15 +110,13 @@ namespace CombatSystem.Team
         }
 
         internal bool IsWaiting() => Dictionary.Count > 0;
-        public CombatEntity GetActiveEntity() => _activeEntity;
 
         public readonly HashSet<CombatEntity> OffMembers; 
+        public CombatTeam ControllingTeam { get; private set; }
+        internal void Injection(CombatTeam team) => ControllingTeam = team;
 
-        [ShowInInspector]
-        private CombatEntity _activeEntity;
         public void InjectionOnRequestMainSequence(in CombatEntity entity)
         {
-            _activeEntity = entity;
             Dictionary.Add(entity,true);
         }
 
@@ -141,31 +139,13 @@ namespace CombatSystem.Team
         {
             if (Dictionary.ContainsKey(entity))
             {
-                OnRemoveTrinityMember(in entity);
+                Dictionary.Remove(entity);
                 return;
             }
             if (OffMembers.Contains(entity))
                 OffMembers.Remove(entity);
         }
-
-
-        private void OnRemoveTrinityMember(in CombatEntity entity)
-        {
-            Dictionary.Remove(entity);
-            if (Dictionary.Count == 0)
-            {
-                _activeEntity = null;
-                return;
-            }
-
-            foreach (var pair in Dictionary)
-            {
-                var nextEntity = pair.Key;
-                _activeEntity = nextEntity;
-                break;
-            }
-        }
-
+        
         public void ForceFinish()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;

@@ -81,6 +81,7 @@ namespace CombatSystem.Player.UI
         internal void ShowButton()
         {
             gameObject.SetActive(true);
+            enabled = true;
 
             _fadeHandle = Timing.RunCoroutine(_FadeAlpha());
             IEnumerator<float> _FadeAlpha()
@@ -103,6 +104,15 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
             canvasGroup.alpha = 0;
         }
+
+        private const float DisableAlpha = .3f;
+        internal void DisableButton()
+        {
+            Timing.KillCoroutines(_fadeHandle);
+            enabled = false;
+            canvasGroup.alpha = DisableAlpha;
+        }
+
 
         public void SelectButton()
         {

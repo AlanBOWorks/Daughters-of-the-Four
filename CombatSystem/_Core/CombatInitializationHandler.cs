@@ -78,7 +78,18 @@ namespace CombatSystem._Core
             var playerController = PlayerCombatSingleton.PlayerTeamController;
 
             teamControllersHolder.PlayerTeamType = playerController;
+
+
+
+            var playerTeam = CombatSystemSingleton.PlayerTeam;
+
+            InjectTeam(playerController, in playerTeam);
         }
+        private static void InjectTeam(CombatTeamControllerBase controller, in CombatTeam team)
+        {
+            controller?.Injection(team);
+        }
+
 
         public static void InitialStatsPreparations()
         {

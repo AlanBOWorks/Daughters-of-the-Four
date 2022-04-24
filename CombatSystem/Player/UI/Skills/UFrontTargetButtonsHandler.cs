@@ -132,7 +132,7 @@ namespace CombatSystem.Player.UI
                 OnTargetButtonExit(in target);
         }
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
         }
 
