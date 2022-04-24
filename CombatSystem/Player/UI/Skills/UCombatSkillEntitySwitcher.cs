@@ -8,7 +8,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillEntitySwitcher : MonoBehaviour, ICombatStatesListener,
-        ITempoTeamStatesListener, ITempoEntityStatesListener
+        ITempoTeamStatesListener, ITempoDedicatedEntityStatesListener
     {
         [SerializeField]
         private TeamReferences references = new TeamReferences();
@@ -99,8 +99,10 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
         }
 
+        private CombatTeamControllerBase _playerControl;
         public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
+            _playerControl = controller;
            ShowAll();
         }
 
@@ -109,7 +111,7 @@ namespace CombatSystem.Player.UI
            HideAll();
        }
 
-       public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
+       public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
        {
            _buttonsDictionary[entity].DoEnable(canAct);
        }
@@ -119,20 +121,21 @@ namespace CombatSystem.Player.UI
            
        }
 
-       public void OnEntityRequestAction(CombatEntity entity)
+       public void OnTrinityEntityFinishSequence(CombatEntity entity)
        {
-       }
+           if (!_buttonsDictionary.ContainsKey(entity)) return;
 
-       public void OnEntityFinishAction(CombatEntity entity)
+           _buttonsDictionary[entity].DoEnable(false);
+        }
+
+       public void OnOffEntityFinishSequence(CombatEntity entity)
        {
        }
 
        public void OnEntityFinishSequence(CombatEntity entity)
        {
-           if(_buttonsDictionary.ContainsKey(entity))
-                _buttonsDictionary[entity].DoEnable(false);
+           
        }
-
 
         public void DoSwitchEntity(in CombatEntity entity)
         {

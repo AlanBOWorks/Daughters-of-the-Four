@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Player;
 using CombatSystem.Stats;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -9,7 +10,8 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public sealed class CombatTeamControllersHandler : IOppositionTeamStructureRead<CombatTeamControllerBase>,
-        ITempoEntityStatesListener, ITempoTeamStatesListener
+        ITempoEntityStatesListener, ITempoTeamStatesListener,
+        ITempoDedicatedEntityStatesListener
     {
 
        
@@ -24,7 +26,7 @@ namespace CombatSystem.Team
 
 
 
-        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             if(!canAct) return;
 
@@ -33,7 +35,7 @@ namespace CombatSystem.Team
             
             if (CurrentController != null) return;
 
-            SwitchController(in controller);
+            CurrentController = controller;
         }
 
         public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -44,10 +46,10 @@ namespace CombatSystem.Team
             controller.InjectionOnRequestOffSequence(in entity);
         }
 
-        private void SwitchController(in CombatTeamControllerBase controller)
+      
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            CurrentController = controller;
-            CombatSystemSingleton.EventsHolder.OnTempoStartControl(in controller);
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -68,6 +70,12 @@ namespace CombatSystem.Team
             // thus making an InvalidOperationException
             // SOLUTION: check and remove on FinishAction
         }
+        public void OnTrinityEntityFinishSequence(CombatEntity entity)
+        {
+        }
+        public void OnOffEntityFinishSequence(CombatEntity entity)
+        {
+        }
 
         public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
@@ -80,7 +88,17 @@ namespace CombatSystem.Team
             if (oppositeControl == null || !oppositeControl.IsWaiting())
                 CurrentController = null;
             else
-                SwitchController(in oppositeControl);
+            {
+                CurrentController = oppositeControl;
+                InvokeControlEvent();
+            }
+        }
+
+        public void InvokeControlEvent()
+        {
+            if(CurrentController == null) return; //Safe check (it should be false always)
+
+            CombatSystemSingleton.EventsHolder.OnTempoStartControl(CurrentController);
         }
     }
     
@@ -96,7 +114,7 @@ namespace CombatSystem.Team
 
         public readonly HashSet<CombatEntity> OffMembers; 
 
-
+        [ShowInInspector]
         private CombatEntity _activeEntity;
         public void InjectionOnRequestMainSequence(in CombatEntity entity)
         {
@@ -123,7 +141,7 @@ namespace CombatSystem.Team
         {
             if (Dictionary.ContainsKey(entity))
             {
-                OnRemoveMemberDictionary(in entity);
+                OnRemoveTrinityMember(in entity);
                 return;
             }
             if (OffMembers.Contains(entity))
@@ -131,10 +149,21 @@ namespace CombatSystem.Team
         }
 
 
-        private void OnRemoveMemberDictionary(in CombatEntity entity)
+        private void OnRemoveTrinityMember(in CombatEntity entity)
         {
             Dictionary.Remove(entity);
-            _activeEntity = Dictionary.Keys.First();
+            if (Dictionary.Count == 0)
+            {
+                _activeEntity = null;
+                return;
+            }
+
+            foreach (var pair in Dictionary)
+            {
+                var nextEntity = pair.Key;
+                _activeEntity = nextEntity;
+                break;
+            }
         }
 
         public void ForceFinish()

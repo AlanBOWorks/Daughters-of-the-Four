@@ -8,14 +8,15 @@ namespace CombatSystem.Player.UI
 {
     public class UCombatSkillFlexButtonsHolderHelper : MonoBehaviour, 
         ICombatStatesListener,
-        ITempoEntityStatesListener, ITempoTeamStatesListener
+        ITempoDedicatedEntityStatesListener, 
+        ITempoTeamStatesListener
     {
         [SerializeField] private UCombatSkillButtonsHolder flexButtonsHolder;
 
         private void Awake()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.DiscriminationEventsHolder.ManualSubscribe(this as ITempoEntityStatesListener);
+            playerEvents.DiscriminationEventsHolder.ManualSubscribe(this as ITempoDedicatedEntityStatesListener);
             playerEvents.DiscriminationEventsHolder.ManualSubscribe(this as ITempoTeamStatesListener);
             playerEvents.ManualSubscribe(this as ICombatStatesListener);
         }
@@ -40,7 +41,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
            
         }
@@ -50,21 +51,18 @@ namespace CombatSystem.Player.UI
             _flexIsActive = canAct;
         }
 
-        public void OnEntityRequestAction(CombatEntity entity)
+        public void OnTrinityEntityFinishSequence(CombatEntity entity)
         {
         }
 
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnOffEntityFinishSequence(CombatEntity entity)
         {
             if (entity != _flexEntity) return;
 
             _flexIsActive = false;
             flexButtonsHolder.HideAll();
         }
+
 
         public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {

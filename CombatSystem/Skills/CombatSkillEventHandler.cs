@@ -28,12 +28,7 @@ namespace CombatSystem.Skills
             
         }
 
-        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            entity.OnSequenceStart();
-        }
-
-        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             entity.OnSequenceStart();
         }
@@ -57,11 +52,6 @@ namespace CombatSystem.Skills
             }
 
             entity.OnSequenceFinish();
-        }
-
-        public void OnTempoFinishControl(CombatEntity mainEntity)
-        {
-            OnEntityFinishSequence(mainEntity);
         }
 
         public void OnTempoStartControl(in CombatTeamControllerBase controller)

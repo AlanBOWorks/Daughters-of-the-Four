@@ -9,14 +9,6 @@ using UnityEngine;
 
 namespace CombatSystem.Skills
 {
-    public static class UtilsSkill
-    {
-        public static void DoSubmitSkill(in CombatSkill skill, in CombatEntity performer, in CombatEntity mainTarget)
-        {
-
-        }
-    }
-
     public static class UtilsTarget
     {
         private static readonly List<CombatEntity> TargetingHelper = new List<CombatEntity>();

@@ -165,10 +165,16 @@ namespace CombatSystem._Core
                 HandleTickEntity(entity);
             }
 
+            bool controllerCanBeInvoked = _mainEntitiesActingQueue.Count > 0;
             while (_mainEntitiesActingQueue.Count > 0)
             {
                 var valuePair = _mainEntitiesActingQueue.Dequeue();
-                eventsHolder.OnMainEntityRequestSequence(valuePair.Key,valuePair.Value);
+                eventsHolder.OnTrinityEntityRequestSequence(valuePair.Key,valuePair.Value);
+            }
+
+            if (controllerCanBeInvoked)
+            {
+                CombatSystemSingleton.TeamControllers.InvokeControlEvent();
             }
 
             void HandleTickEntity(CombatEntity entity)
@@ -187,6 +193,8 @@ namespace CombatSystem._Core
                 bool isTrinityRole = UtilsTeam.IsTrinityRole(in entity);
                 bool canAct = UtilsCombatStats.CanRequestActing(entity);
 
+
+                eventsHolder.OnEntityRequestSequence(entity,canAct);
                 if (isTrinityRole)
                     HandleMainRole();
                 else
@@ -220,16 +228,6 @@ namespace CombatSystem._Core
             AddEntities(enemyTeam);
         }
 
-        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            OnEntityRequestSequence(in entity, in canAct);
-        }
-
-        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            OnEntityRequestSequence(in entity, in canAct);
-        }
-
         private static void OnEntityRequestSequence(in CombatEntity entity, in bool canAct)
         {
             if (!canAct) return;
@@ -238,6 +236,11 @@ namespace CombatSystem._Core
             stats.UsedActions = 0;
         }
 
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            OnEntityRequestSequence(in entity, in canAct);
+        }
 
         public void OnEntityRequestAction(CombatEntity entity)
         {
@@ -271,13 +274,9 @@ namespace CombatSystem._Core
         /// It's send once per sequence and the first time the entity's
         /// [<seealso cref="CombatStats.CurrentInitiative"/>] triggers. This is invoked even if the
         /// entity can't act; To verify if can act use [<see cref="canAct"/>] or use
-        /// [<seealso cref="OnEntityRequestAction"/>] instead
+        /// [<seealso />] instead
         /// </summary>
-        void OnMainEntityRequestSequence(CombatEntity entity, bool canAct);
-        /// <summary>
-        /// <inheritdoc cref="OnMainEntityRequestSequence"/>
-        /// </summary>
-        void OnOffEntityRequestSequence(CombatEntity entity, bool canAct);
+        void OnEntityRequestSequence(CombatEntity entity, bool canAct);
 
         /// <summary>
         /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left.<br></br>
@@ -295,8 +294,25 @@ namespace CombatSystem._Core
         /// the [<see cref="CombatEntity"/>] passes its actions somehow. <br></br>
         /// </summary>
         void OnEntityFinishSequence(CombatEntity entity);
+    }
 
-        
+    public interface ITempoDedicatedEntityStatesListener : ICombatEventListener
+    {
+        /// <summary>
+        /// <inheritdoc cref="OnOffEntityRequestSequence"/> and
+        /// [<seealso cref="OnOffEntityRequestSequence"/>]
+        /// </summary>
+        void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct);
+        /// <summary>
+        /// <inheritdoc cref="ITempoEntityStatesListener.OnEntityRequestSequence"/><br></br><br></br>
+        /// This is invoked after [<seealso cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>
+        /// </summary>
+        void OnOffEntityRequestSequence(CombatEntity entity, bool canAct);
+
+
+        void OnTrinityEntityFinishSequence(CombatEntity entity);
+        void OnOffEntityFinishSequence(CombatEntity entity);
+
     }
 
     public interface ITempoTeamStatesListener : ICombatEventListener

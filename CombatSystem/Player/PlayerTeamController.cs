@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
 using CombatSystem.Team;
-using MEC;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace CombatSystem.Player
 {
@@ -22,15 +18,14 @@ namespace CombatSystem.Player
         [ShowInInspector]
         private CombatSkill _selectedSkill;
         [ShowInInspector]
-        private CombatEntity _skillOnTarget;
-        public void PerformRequestAction(CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target)
+        private CombatEntity _selectedTarget;
+        public void PerformRequestAction()
         {
-            usedSkill = _selectedSkill;
-            target = _skillOnTarget;
-
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.OnSkillSubmit(in usedSkill);
-            playerEvents.OnTargetSubmit(in target);
+            playerEvents.OnSkillSubmit(in _selectedSkill);
+            playerEvents.OnTargetSubmit(in _selectedTarget);
+
+            CombatSystemSingleton.EventsHolder.OnSkillSubmit(in _selectedPerformer,in _selectedSkill,in _selectedTarget);
         }
 
         public void OnSkillSelect(in CombatSkill skill)
@@ -61,14 +56,11 @@ namespace CombatSystem.Player
             _selectedPerformer = performer;
         }
 
-        public void OnFlexEntitySequenceReach(in CombatEntity flexEntity)
-        {
-            
-        }
 
         public void OnTargetSelect(in CombatEntity target)
         {
-            _skillOnTarget = target;
+            _selectedTarget = target;
+            PerformRequestAction();
         }
 
         public void OnTargetCancel(in CombatEntity target)
@@ -81,11 +73,11 @@ namespace CombatSystem.Player
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            OnSkillFinish();
         }
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
+            OnSkillFinish();
         }
 
         public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
@@ -94,7 +86,7 @@ namespace CombatSystem.Player
 
         public void OnSkillFinish()
         {
-            _skillOnTarget = null;
+            _selectedTarget = null;
             _selectedSkill = null;
         }
 

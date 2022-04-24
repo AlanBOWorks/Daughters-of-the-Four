@@ -11,7 +11,7 @@ namespace CombatSystem.Player
 {
     public class UFinishActionsButton : MonoBehaviour, 
         IPointerDownHandler, IPointerUpHandler,
-        ITempoEntityStatesListener
+        ITempoDedicatedEntityStatesListener
     {
         [SerializeField, Range(0,3), SuffixLabel("seg")] private float holdAmount = .4f;
 
@@ -52,11 +52,10 @@ namespace CombatSystem.Player
         private static void PassTurn()
         {
             PlayerCombatSingleton.PlayerTeamController.ForceFinish();
-            Debug.Log("Passing Turn [PLAYER]");
         }
 
 
-        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             if (!canAct) return;
 
@@ -67,21 +66,12 @@ namespace CombatSystem.Player
         {
         }
 
-        public void OnEntityRequestAction(CombatEntity entity)
+        public void OnTrinityEntityFinishSequence(CombatEntity entity)
         {
         }
 
-        public void OnEntityFinishAction(CombatEntity entity)
+        public void OnOffEntityFinishSequence(CombatEntity entity)
         {
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity)
-        {
-        }
-
-        public void OnTempoFinishControl(CombatEntity mainEntity)
-        {
-            Hide();
         }
 
         private void Show()

@@ -32,6 +32,7 @@ namespace CombatSystem.Player.UI
 
         private CanvasGroup _alphaGroup;
 
+
         internal void AddToDictionary(in CombatSkill skill, in UCombatSkillButton button)
         {
             if(_activeButtons.ContainsKey(skill)) return;
@@ -88,6 +89,13 @@ namespace CombatSystem.Player.UI
         {
             HideAll();
         }
+        private void DisableHolder()
+        {
+            _alphaGroup.alpha = OnDisableAlpha;
+            _currentControlEntity = null;
+            enabled = false;
+        }
+
 
 
         // Safe check
@@ -194,6 +202,10 @@ namespace CombatSystem.Player.UI
         {
         }
 
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+        }
+
         public void OnEntityRequestAction(CombatEntity entity)
         {
         }
@@ -225,12 +237,6 @@ namespace CombatSystem.Player.UI
             enabled = true;
         }
 
-        private void DisableHolder()
-        {
-            _alphaGroup.alpha = OnDisableAlpha;
-            _currentControlEntity = null;
-            enabled = false;
-        }
 
 
         private CombatTeamControllerBase _playerController;
@@ -280,9 +286,6 @@ namespace CombatSystem.Player.UI
 
 
         private CombatEntity _currentControlEntity;
-        public void InjectControlEntity(in CombatEntity targetEntity)
-            => _currentControlEntity = targetEntity;
-
         public void SwitchControllingEntity(in CombatEntity targetEntity)
         {
             _currentControlEntity = targetEntity;

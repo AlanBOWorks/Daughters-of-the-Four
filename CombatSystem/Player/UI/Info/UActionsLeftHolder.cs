@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UActionsLeftHolder : MonoBehaviour, ITempoEntityStatesListener,
+    public class UActionsLeftHolder : MonoBehaviour, ITempoDedicatedEntityStatesListener,
         ISkillSelectionListener, ISkillPointerListener
     {
         [SerializeField] private TextMeshProUGUI actionsLimitText;
@@ -79,7 +79,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnMainEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             _currentEntity = entity;
 
@@ -91,22 +91,14 @@ namespace CombatSystem.Player.UI
 
         public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            //Todo
         }
 
-        public void OnEntityRequestAction(CombatEntity entity)
+        public void OnTrinityEntityFinishSequence(CombatEntity entity)
         {
-            
         }
 
-        public void OnEntityFinishAction(CombatEntity entity)
+        public void OnOffEntityFinishSequence(CombatEntity entity)
         {
-            
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity)
-        {
-            
         }
 
         public void OnTempoFinishControl(CombatEntity mainEntity)

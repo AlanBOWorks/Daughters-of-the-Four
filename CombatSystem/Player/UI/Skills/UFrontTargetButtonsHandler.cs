@@ -4,13 +4,14 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
+using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
     public class UFrontTargetButtonsHandler : MonoBehaviour, IUIHoverListener, 
-        IPlayerEntityListener,
+        IPlayerEntityListener,ITempoTeamStatesListener,
         ISkillSelectionListener,
         ITargetSelectionListener, ITargetPointerListener
     {
@@ -29,6 +30,7 @@ namespace CombatSystem.Player.UI
             // recursively those events; creating an infinite loop of calls
             // To solve it: manual subscription of ISKillSelection because this is its listening behaviour
             playerEventsHolder.ManualSubscribe(this as ISkillSelectionListener);
+            playerEventsHolder.ManualSubscribe(this as IPlayerEntityListener);
         }
 
         public void OnElementCreated(in UUIHoverEntityHolder element, in CombatEntity entity)
@@ -128,6 +130,15 @@ namespace CombatSystem.Player.UI
         {
             PlayerCombatSingleton.PlayerCombatEvents.
                 OnTargetButtonExit(in target);
+        }
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        {
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            HideTargets();
         }
     }
 }
