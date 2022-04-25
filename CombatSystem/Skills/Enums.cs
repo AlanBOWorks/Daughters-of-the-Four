@@ -37,6 +37,12 @@ namespace CombatSystem.Skills
             /// Same as [<see cref="PerformerTeam"/>] but [<see cref="Performer"/>] is ignored
             /// </summary>
             PerformerTeamExcluded,
+
+
+            TargetLine,
+            TargetLineExcluded,
+            PerformerLine,
+
             All
         }
     }

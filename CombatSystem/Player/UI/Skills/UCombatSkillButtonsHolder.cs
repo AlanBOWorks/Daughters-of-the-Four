@@ -15,7 +15,9 @@ namespace CombatSystem.Player.UI
     public class UCombatSkillButtonsHolder : MonoBehaviour, 
         ITempoTeamStatesListener, ITeamEventListener,
         IPlayerEntityListener,
-        ISkillButtonListener, ISkillUsageListener, ICombatStatesListener
+        ISkillUsageListener, ICombatStatesListener,
+
+        ISkillButtonListener
     {
         [Title("References")]
         [SerializeField] 
@@ -257,8 +259,7 @@ namespace CombatSystem.Player.UI
         {
             if (_currentSelectedSkill != null)
             {
-                OnSkillDeselect(in _currentSelectedSkill);
-                _currentSelectedSkill = null;
+                DeselectCurrentSkill();
             }
 
             _currentControlEntity = targetEntity;
@@ -286,7 +287,6 @@ namespace CombatSystem.Player.UI
 
             if (previousSelection == skill)
             {
-                _currentSelectedSkill = null;
                 OnSkillDeselect(in skill);
             }
             else
@@ -300,8 +300,7 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillDeselect(in CombatSkill skill)
         {
-            var button = GetButton(in skill);
-            button.DeSelectButton();
+            DeselectSkill(in _currentSelectedSkill);
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(in skill);
         }
         public void OnSkillCancel(in CombatSkill skill)
@@ -315,13 +314,18 @@ namespace CombatSystem.Player.UI
 
         private void DeselectSkill(in CombatSkill skill)
         {
-            var button = GetButton(in skill);
-            button.DeSelectButton();
+            if (skill != _currentSelectedSkill) return;
 
-            if(skill == _currentSelectedSkill)
-                _currentSelectedSkill = null;
+            DeselectCurrentSkill();
         }
 
+        private void DeselectCurrentSkill()
+        {
+            var button = GetButton(in _currentSelectedSkill);
+            button.DeSelectButton();
+
+            _currentSelectedSkill = null;
+        }
 
         public void OnSkillButtonHover(in CombatSkill skill)
         {

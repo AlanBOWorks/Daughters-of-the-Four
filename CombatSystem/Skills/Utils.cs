@@ -13,6 +13,9 @@ namespace CombatSystem.Skills
     {
         private static readonly List<CombatEntity> TargetingHelper = new List<CombatEntity>();
 
+        /// <summary>
+        /// Individual single target
+        /// </summary>
         private static IReadOnlyList<CombatEntity> GetOnlyTargetAsCollection(in CombatEntity target)
         {
             TargetingHelper.Clear();
@@ -21,12 +24,24 @@ namespace CombatSystem.Skills
             return TargetingHelper;
         }
 
+        /// <summary>
+        /// Are effect of single targets
+        /// </summary>
         private static IReadOnlyList<CombatEntity> GetSingleTargetGroup(in CombatEntity target)
         {
             var team = GetTeam(in target);
             return team.AliveTargeting.GetAlivePositionMembers(target.PositioningType);
         }
 
+        /// <summary>
+        /// Targets all team
+        /// </summary>
+        private static IReadOnlyList<CombatEntity> GetAliveTeam(in CombatEntity entity)
+            => GetTeam(in entity).AliveTargeting.GetAllAliveMembers();
+
+        /// <summary>
+        /// <inheritdoc cref="GetAliveTeam"/>; but excludes target
+        /// </summary>
         private static IReadOnlyList<CombatEntity> GetAliveTeamAsExcluded(in CombatEntity target)
         {
             var team = GetTeam(in target);
@@ -38,8 +53,19 @@ namespace CombatSystem.Skills
         private static CombatTeam GetEnemyTeam(in CombatEntity entity) 
             => GetTeam(in entity).EnemyTeam;
 
-        private static IReadOnlyList<CombatEntity> GetAliveTeam(in CombatEntity entity)
-            => GetTeam(in entity).AliveTargeting.GetAllAliveMembers();
+        public static IReadOnlyList<CombatEntity> GetLineTargets(in CombatEntity target)
+        {
+            var team = GetTeam(in target);
+            var positioning = target.PositioningType;
+            return team.AliveTargeting.GetAliveLineMembers(positioning);
+        }
+
+        public static IReadOnlyList<CombatEntity> GetLineTargetsExcluded(in CombatEntity target)
+        {
+            var team = GetTeam(in target);
+            var positioning = target.PositioningType;
+            return team.AliveTargeting.GetAliveLineMembers(positioning);
+        }
 
 
         public static IReadOnlyList<CombatEntity> GetPossibleTargets(ISkill skill, CombatEntity performer)
@@ -80,7 +106,7 @@ namespace CombatSystem.Skills
         }
 
 
-        private static IReadOnlyList<CombatEntity> HandleEffectTargets(
+        private static IEnumerable<CombatEntity> HandleEffectTargets(
             in CombatEntity performer,
             in CombatEntity selectedTarget,
             in EnumsEffect.TargetType type)
@@ -89,24 +115,28 @@ namespace CombatSystem.Skills
             {
                 case EnumsEffect.TargetType.Target:
                     return GetSingleTargetGroup(in selectedTarget);
-                case EnumsEffect.TargetType.Performer:
-                    return GetSingleTargetGroup(in performer);
-
-
-
                 case EnumsEffect.TargetType.TargetTeam:
                     return GetAliveTeam(in selectedTarget);
-                case EnumsEffect.TargetType.PerformerTeam:
-                    return GetAliveTeam(in performer);
-
-
-
                 case EnumsEffect.TargetType.TargetTeamExcluded:
                     return GetAliveTeamAsExcluded(in selectedTarget);
+
+
+
+                case EnumsEffect.TargetType.Performer:
+                    return GetSingleTargetGroup(in performer);
+                case EnumsEffect.TargetType.PerformerTeam:
+                    return GetAliveTeam(in performer);
                 case EnumsEffect.TargetType.PerformerTeamExcluded:
                     return GetAliveTeamAsExcluded(in performer);
 
 
+
+                case EnumsEffect.TargetType.TargetLine:
+                    return GetLineTargets(in selectedTarget);
+                case EnumsEffect.TargetType.TargetLineExcluded:
+                    return GetLineTargetsExcluded(in selectedTarget);
+                case EnumsEffect.TargetType.PerformerLine:
+                    return GetLineTargets(in performer);
 
                 default:
                     throw new NotImplementedException($"Effect Targeting for [{type}] not implemented");

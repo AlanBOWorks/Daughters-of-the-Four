@@ -39,7 +39,7 @@ namespace CombatSystem.Team
             _handlingMembers.Clear();
 
             var mainGroup = UtilsTeam.GetElement(targetPositioning, this);
-            AddOnlyFirstAlive(mainGroup);
+            AddOnlyAlive(mainGroup);
 
 
             return _handlingMembers;
@@ -52,17 +52,17 @@ namespace CombatSystem.Team
             switch (targetPositioning)
             {
                 case EnumTeam.Positioning.FrontLine:
-                    AddOnlyFirstAlive(FrontLineType);
+                    AddOnlyAlive(FrontLineType);
                     break;
                 case EnumTeam.Positioning.MidLine:
-                    AddOnlyFirstAlive(MidLineType);
-                    AddOnlyFirstAlive(FlexLineType); //Flex is in Mid Position
+                    AddOnlyAlive(MidLineType);
+                    AddOnlyAlive(FlexLineType); //Flex is in Mid Position
                     break;
                 case EnumTeam.Positioning.BackLine:
-                    AddOnlyFirstAlive(BackLineType);
+                    AddOnlyAlive(BackLineType);
                     break;
                 case EnumTeam.Positioning.FlexLine:
-                    AddOnlyFirstAlive(FlexLineType);
+                    AddOnlyAlive(FlexLineType);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(targetPositioning), targetPositioning, null);
@@ -74,16 +74,16 @@ namespace CombatSystem.Team
         public IReadOnlyList<CombatEntity> GetFrontMostAliveLineMembers()
         {
             _handlingMembers.Clear();
-            AddOnlyFirstAlive(FrontLineType);
+            AddOnlyAlive(FrontLineType);
 
             if(_handlingMembers.Count <= 0)
             {
-                AddOnlyFirstAlive(MidLineType);
-                AddOnlyFirstAlive(FlexLineType); //Flex is in Mid Position
+                AddOnlyAlive(MidLineType);
+                AddOnlyAlive(FlexLineType); //Flex is in Mid Position
             }
 
             if(_handlingMembers.Count <= 0)
-                AddOnlyFirstAlive(BackLineType);
+                AddOnlyAlive(BackLineType);
 
 
             return _handlingMembers;
@@ -93,16 +93,16 @@ namespace CombatSystem.Team
         {
             _handlingMembers.Clear();
 
-            AddBreakOnlyFirstAlive(FrontLineType);
-            AddBreakOnlyFirstAlive(MidLineType);
-            AddBreakOnlyFirstAlive(BackLineType);
+            AddOnlyFirstAlive(FrontLineType);
+            AddOnlyFirstAlive(MidLineType);
+            AddOnlyFirstAlive(BackLineType);
             return _handlingMembers;
         }
 
         public IReadOnlyList<CombatEntity> GetAllAliveMembers()
         {
             _handlingMembers.Clear();
-            AddOnlyFirstAlive(_team);
+            AddOnlyAlive(_team);
 
             return _handlingMembers;
         }
@@ -110,13 +110,13 @@ namespace CombatSystem.Team
         public IReadOnlyList<CombatEntity> GetAllAliveMembers(in CombatEntity excludeMember)
         {
             _handlingMembers.Clear();
-            AddOnlyFirstAlive(_team);
+            AddOnlyAlive(_team);
             if (_handlingMembers.Contains(excludeMember)) _handlingMembers.Remove(excludeMember);
 
             return _handlingMembers;
         }
 
-        private void AddBreakOnlyFirstAlive(IEnumerable<CombatEntity> members)
+        private void AddOnlyFirstAlive(IEnumerable<CombatEntity> members)
         {
             foreach (var member in members)
             {
@@ -127,7 +127,7 @@ namespace CombatSystem.Team
                 }
             }
         }
-        private void AddOnlyFirstAlive(IEnumerable<CombatEntity> members)
+        private void AddOnlyAlive(IEnumerable<CombatEntity> members)
         {
             foreach (var member in members)
             {
