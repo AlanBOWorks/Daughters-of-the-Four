@@ -8,6 +8,9 @@ namespace CombatSystem.Entity
     {
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
+            var entityTeam = entity.Team;
+            entityTeam.OnEntityRequestSequence(entity, canAct);
+
             if (!canAct) return;
 
             var stats = entity.Stats;
@@ -32,7 +35,8 @@ namespace CombatSystem.Entity
 
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            entity.Team.OnTrinityEntityRequestSequence(entity,canAct);
+            var entityTeam = entity.Team;
+            entityTeam.OnTrinityEntityRequestSequence(entity,canAct);
         }
 
         public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)

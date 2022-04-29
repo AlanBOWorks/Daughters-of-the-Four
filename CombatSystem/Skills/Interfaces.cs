@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Skills.Effects;
 using UnityEngine;
 
 namespace CombatSystem.Skills
@@ -32,8 +33,9 @@ namespace CombatSystem.Skills
 
     public interface IEffect
     {
+        SEffect GetPreset();
         EnumsEffect.TargetType TargetType { get; }
-        void DoEffect(in CombatEntity performer, in CombatEntity exclusion);
+        void DoEffect(in CombatEntity performer);
     }
 
     public interface ISkillUsageListener : ICombatEventListener

@@ -432,7 +432,7 @@ namespace CombatSystem._Core
 
             public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
             {
-                Debug.Log($"Effect performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
+                Debug.Log($"Effect[{effect.GetPreset()} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
             }
 
             public void OnSkillFinish()

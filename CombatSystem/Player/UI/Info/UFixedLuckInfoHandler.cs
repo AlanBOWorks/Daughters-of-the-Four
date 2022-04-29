@@ -68,7 +68,6 @@ namespace CombatSystem.Player.UI
 
         private void UpdateLuckInfo(in CombatEntity entity)
         {
-            Debug.Log(entity.CombatCharacterName);
             var element = _elementsDictionary[entity];
             UpdateLuckInfo(in element, in entity);
         }

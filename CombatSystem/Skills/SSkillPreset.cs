@@ -50,7 +50,7 @@ namespace CombatSystem.Skills
 
         public void DoSkill(in CombatEntity performer, in CombatEntity target, in CombatSkill holderReference)
         {
-            var exclusion = (ignoreSelf) ? null : performer;
+            var exclusion = (IgnoreSelf()) ? performer : null;
             UtilsSkillEffect.DoEffectsOnTarget(this, performer, exclusion, holderReference);
         }
 
@@ -64,13 +64,13 @@ namespace CombatSystem.Skills
         private sealed class EffectWrapper : IEffect
         {
             public EffectValues currentEffectValues;
-            public bool CanTargetSelf() => currentEffectValues.canTargetSelf;
+            public SEffect GetPreset() => currentEffectValues.GetPreset();
 
             public EnumsEffect.TargetType TargetType => currentEffectValues.targetType;
 
-            public void DoEffect(in CombatEntity performer, in CombatEntity target)
+            public void DoEffect(in CombatEntity performer)
             {
-                currentEffectValues.DoEffect(in performer, in target);
+                currentEffectValues.DoEffect(in performer);
             }
         }
 
@@ -81,12 +81,12 @@ namespace CombatSystem.Skills
             public SEffect effect;
             public float effectValue;
             public EnumsEffect.TargetType targetType;
-            public bool canTargetSelf;
-            public bool CanTargetSelf() => canTargetSelf;
+
+            public SEffect GetPreset() => effect;
 
             public EnumsEffect.TargetType TargetType => targetType;
 
-            public void DoEffect(in CombatEntity performer, in CombatEntity target)
+            public void DoEffect(in CombatEntity performer)
             {
                 var effectTargets =
                     UtilsTarget.GetEffectTargets(targetType);

@@ -25,7 +25,6 @@ namespace CombatSystem.Skills
                 case EnumsSkill.Archetype.Self:
                     return GetSingleTarget(currentControl);
                 case EnumsSkill.Archetype.Offensive:
-                    // todo if team isFrontGuard
                     return GetOffensiveMembers();
                 case EnumsSkill.Archetype.Support:
                     return GetSupportMembers();
@@ -35,11 +34,23 @@ namespace CombatSystem.Skills
 
             IEnumerable<CombatEntity> GetOffensiveMembers()
             {
-                var members = currentControl.Team.EnemyTeam;
+                var enemyTeam = currentControl.Team.EnemyTeam;
+                var enemyGuarding = enemyTeam.GuardHandler;
+                var members = 
+                    enemyGuarding.CanGuard() 
+                        ? GetGuarderLine()
+                        : enemyTeam;
+
                 foreach (var member in members)
                 {
                     if (CanBeTargeted(in member))
                         yield return member;
+                }
+
+                IEnumerable<CombatEntity> GetGuarderLine()
+                {
+                    var guarder = enemyGuarding.GetCurrentGuarder();
+                    return UtilsTeam.GetMemberLine(in guarder);
                 }
             }
 
@@ -49,8 +60,10 @@ namespace CombatSystem.Skills
                 bool ignoreSelf = skill.IgnoreSelf();
                 foreach (var member in team)
                 {
-                    if (!ignoreSelf || member != currentControl)
-                        yield return member;
+                    if (ignoreSelf && member == currentControl)
+                        continue;
+
+                    yield return member;
                 }
             }
         }

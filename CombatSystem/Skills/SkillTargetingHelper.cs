@@ -4,6 +4,7 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace CombatSystem.Skills
 {
@@ -48,8 +49,9 @@ namespace CombatSystem.Skills
                 : UtilsTarget.GetOffensiveLine(target);
             foreach (var member in targetLine)
             {
-                if (UtilsTarget.CanBeTargeted(in member)) 
-                    _aliveLine.Add(member);
+                if (!UtilsTarget.CanBeTargeted(in member)) continue;
+                
+                _aliveLine.Add(member);
             }
         }
 

@@ -53,6 +53,13 @@ namespace CombatSystem.Team
         }
 
 
+        public static IEnumerable<CombatEntity> GetMemberLine(in CombatEntity target)
+        {
+            var targetTeam = target.Team;
+            var targetPositioning = target.PositioningType;
+            return GetElement(targetPositioning,targetTeam);
+        }
+
         public static int GetRoleIndex(ICombatEntityProvider entity)
         {
             var entityRole = entity.GetAreaData().RoleType;

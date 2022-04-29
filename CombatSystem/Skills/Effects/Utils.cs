@@ -27,13 +27,16 @@ namespace CombatSystem.Skills.Effects
 
             void DoEffectOnTargets(in IEffect effect, in IEnumerable<CombatEntity> targets)
             {
+                int i = 0;
                 foreach (var effectTarget in targets)
                 {
                     if(effectTarget == exclusion) continue;
 
-                    effect.DoEffect(in performer, in effectTarget);
+                    effect.DoEffect(in performer);
                     eventsHolder.OnEffectPerform(in performer, in skillReference, in effectTarget, in effect);
+                    i++;
                 }
+                Debug.Log($"Iteration: {i}");
             }
         }
     }

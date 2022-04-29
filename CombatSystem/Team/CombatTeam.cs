@@ -13,14 +13,16 @@ namespace CombatSystem.Team
     public sealed class CombatTeam : 
         ITeamFullRolesStructureRead<CombatEntity>,
         ITeamFlexPositionStructureRead<IEnumerable<CombatEntity>>,
-        IReadOnlyList<CombatEntity>,
-        ITempoDedicatedEntityStatesListener
+        IEnumerable<CombatEntity>,
+        ITempoDedicatedEntityStatesListener, 
+        ITempoEntityStatesListener
     {
         private CombatTeam(bool isPlayerTeam)
         {
             IsPlayerTeam = isPlayerTeam;
 
             DataValues = new TeamDataValues();
+            GuardHandler = new TeamLineGuardHandler();
 
             _members = new List<CombatEntity>();
 
@@ -51,6 +53,7 @@ namespace CombatSystem.Team
 
         // ------------ DATA ------------ 
         public readonly TeamDataValues DataValues;
+        public readonly TeamLineGuardHandler GuardHandler;
 
 #if UNITY_EDITOR
         [Title("Members")]
@@ -227,18 +230,8 @@ namespace CombatSystem.Team
         public CombatTeam EnemyTeam { get; private set; }
 
         public void Injection(CombatTeam enemyTeam) => EnemyTeam = enemyTeam;
-        public IEnumerator<CombatEntity> GetEnumerator()
-        {
-            return _members.GetEnumerator();
-        }
+        
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public int Count => _members.Count;
-        public CombatEntity this[int index] => _members[index];
 
         public bool IsMainRole(in CombatEntity entity) => _mainRoleWrapper.IsMainRole(in entity);
         public bool IsTrinityRole(in CombatEntity entity) => _mainRoleWrapper.IsTrinityRole(in entity);
@@ -337,6 +330,32 @@ namespace CombatSystem.Team
             _activeMembers.OnOffEntityFinishSequence(entity);
         }
 
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            GuardHandler.OnEntityRequestSequence(in entity);
+        }
+
+        public void OnEntityRequestAction(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishSequence(CombatEntity entity)
+        {
+        }
+
+        public IEnumerator<CombatEntity> GetEnumerator()
+        {
+            return _members.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 
     [Serializable]
