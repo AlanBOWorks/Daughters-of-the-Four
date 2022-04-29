@@ -12,6 +12,7 @@ namespace CombatSystem.Team
 {
     public sealed class CombatTeam : 
         ITeamFullRolesStructureRead<CombatEntity>,
+        ITeamFlexPositionStructureRead<IEnumerable<CombatEntity>>,
         IReadOnlyList<CombatEntity>,
         ITempoDedicatedEntityStatesListener
     {
@@ -23,7 +24,6 @@ namespace CombatSystem.Team
 
             _members = new List<CombatEntity>();
 
-            AliveTargeting = new CombatTeamAliveTargeting(this);
             StandByMembers = new TeamStandByMembersHandler();
 
             _mainPositionsWrapper = new MainPositionsWrapper();
@@ -87,7 +87,6 @@ namespace CombatSystem.Team
         private readonly TeamOffGroupStructure<CombatEntity> _offRolesGroup;
         [ShowInInspector]
         private readonly CombatTeamActiveMembers _activeMembers;
-        public readonly CombatTeamAliveTargeting AliveTargeting;
 
 
         public IReadOnlyList<CombatEntity> MainRoleMembers => _mainRoleWrapper.Members;
@@ -101,11 +100,24 @@ namespace CombatSystem.Team
         public IEnumerator<CombatEntity> OffRoleMembers => _offRolesGroup;
 
 
-        public CombatEntity FrontLineType => _mainPositionsWrapper.FrontLineType;
-        public CombatEntity MidLineType => _mainPositionsWrapper.MidLineType;
-        public CombatEntity BackLineType => _mainPositionsWrapper.BackLineType;
-        public CombatEntity FlexLineType => _mainPositionsWrapper.FlexLineType;
+        public IEnumerable<CombatEntity> FrontLineType =>
+            GetEnumerable(_mainPositionsWrapper.FrontLineType, _offRolesGroup.FrontLineType);
+        public IEnumerable<CombatEntity> MidLineType =>
+            GetEnumerable(_mainPositionsWrapper.MidLineType, _offRolesGroup.MidLineType);
+        public IEnumerable<CombatEntity> BackLineType =>
+            GetEnumerable(_mainPositionsWrapper.BackLineType, _offRolesGroup.BackLineType);
+        public IEnumerable<CombatEntity> FlexLineType =>
+            GetEnumerable(_mainPositionsWrapper.FlexLineType, _offRolesGroup.FlexLineType);
 
+        private static IEnumerable<CombatEntity> GetEnumerable(CombatEntity mainMember,
+            IEnumerable<CombatEntity> offMembers)
+        {
+            yield return mainMember;
+            foreach (var member in offMembers)
+            {
+                yield return member;
+            }
+        }
 
         /// <summary>
         /// Main Vanguard Role
@@ -167,9 +179,6 @@ namespace CombatSystem.Team
             _mainRoleWrapper.AddMember(in entity, in roleType, out bool isMainAddition);
 
             if(!isMainAddition) _offRolesGroup.AddMember(roleType, in entity);
-
-
-            AliveTargeting.AddMember(in entity);
         }
 
         public void SwitchTeamMemberToThis(CombatEntity entity)
@@ -195,8 +204,6 @@ namespace CombatSystem.Team
             _mainPositionsWrapper.RemoveMember(in entity);
             _mainRoleWrapper.RemoveMember(in entity);
             _members.Remove(entity);
-
-            AliveTargeting.RemoveMember(in entity);
 
             CombatSystemSingleton.EventsHolder.OnDestroyEntity(in entity, in IsPlayerTeam);
 
@@ -329,6 +336,7 @@ namespace CombatSystem.Team
         {
             _activeMembers.OnOffEntityFinishSequence(entity);
         }
+
     }
 
     [Serializable]

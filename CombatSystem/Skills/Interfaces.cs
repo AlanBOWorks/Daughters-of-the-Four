@@ -1,9 +1,18 @@
 using System.Collections.Generic;
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using UnityEngine;
 
 namespace CombatSystem.Skills
 {
+    public interface ISkillInteractionStructureRead<out T>
+    {
+        T SingleType { get; }
+        T TargetLine { get; }
+        T TargetTeam { get; }
+    }
+
+
     public interface IFullSkill : ISkill
     {
         string GetSkillName();
@@ -17,15 +26,17 @@ namespace CombatSystem.Skills
         EnumsSkill.TargetType TargetType { get; }
 
         void DoSkill(in CombatEntity performer, in CombatEntity target, in CombatSkill holderReference);
+
+        bool IgnoreSelf();
     }
 
     public interface IEffect
     {
         EnumsEffect.TargetType TargetType { get; }
-        void DoEffect(in CombatEntity performer, in CombatEntity target);
+        void DoEffect(in CombatEntity performer, in CombatEntity exclusion);
     }
 
-    public interface ISkillUsageListener
+    public interface ISkillUsageListener : ICombatEventListener
     {
         /// <summary>
         /// Tells what [<see cref="CombatSkill"/>] is used, but before acting out the [<seealso cref="IEffect"/>]s  it has.

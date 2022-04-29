@@ -12,17 +12,23 @@ namespace CombatSystem.Skills
 {
     [CreateAssetMenu(fileName = "N [Skill Preset]",
         menuName = "Combat/Skill/Single Preset")]
-    public class SSkillPreset : ScriptableObject, IFullSkill, IEnumerator<IEffect>, IEnumerable<IEffect>
+    public class SSkillPreset : ScriptableObject, IFullSkill, IEnumerable<IEffect>
     {
-        [SerializeField] 
+        private static readonly EffectWrapper EffectWrapperHelper = new EffectWrapper();
+
+        [Title("ToolTips")]
+        [SerializeField]
         private string skillName = "NULL";
 
         [SerializeField, PreviewField] 
         private Sprite skillIcon;
 
+        [Title("Values")]
         [SerializeField]
         private int skillCost;
 
+        [Title("Targeting")]
+        [SerializeField] private bool ignoreSelf;
         [SerializeField] 
         private EnumsSkill.Archetype archetype 
             = EnumsSkill.Archetype.Offensive;
@@ -30,11 +36,10 @@ namespace CombatSystem.Skills
         [SerializeField] private EnumsSkill.TargetType targetType 
             = EnumsSkill.TargetType.Direct;
 
+        [Title("Effects")]
         [SerializeField]
         private EffectValues[] effects = new EffectValues[0];
 
-        [SerializeField,HideInInspector]
-        private EffectWrapper effectWrapper = new EffectWrapper();
 
 
         public string GetSkillName() => skillName;
@@ -45,8 +50,12 @@ namespace CombatSystem.Skills
 
         public void DoSkill(in CombatEntity performer, in CombatEntity target, in CombatSkill holderReference)
         {
-            UtilsSkillEffect.DoEffectsOnTarget(this, performer, target, holderReference);
+            var exclusion = (ignoreSelf) ? null : performer;
+            UtilsSkillEffect.DoEffectsOnTarget(this, performer, exclusion, holderReference);
         }
+
+        public bool IgnoreSelf() => ignoreSelf && archetype != EnumsSkill.Archetype.Self;
+
 
         // This is a wrapper for avoiding boxing
         // During the iterator, the EffectValue.Current should be injected in this (currentEffectValues) and
@@ -55,6 +64,8 @@ namespace CombatSystem.Skills
         private sealed class EffectWrapper : IEffect
         {
             public EffectValues currentEffectValues;
+            public bool CanTargetSelf() => currentEffectValues.canTargetSelf;
+
             public EnumsEffect.TargetType TargetType => currentEffectValues.targetType;
 
             public void DoEffect(in CombatEntity performer, in CombatEntity target)
@@ -66,15 +77,19 @@ namespace CombatSystem.Skills
         [Serializable]
         private struct EffectValues : IEffect
         {
+
             public SEffect effect;
             public float effectValue;
             public EnumsEffect.TargetType targetType;
+            public bool canTargetSelf;
+            public bool CanTargetSelf() => canTargetSelf;
+
             public EnumsEffect.TargetType TargetType => targetType;
 
             public void DoEffect(in CombatEntity performer, in CombatEntity target)
             {
                 var effectTargets =
-                    UtilsTarget.GetEffectTargets(in performer, in target, targetType);
+                    UtilsTarget.GetEffectTargets(targetType);
                 foreach (var effectTarget in effectTargets)
                 {
                     effect.DoEffect(in performer, in effectTarget, in effectValue);
@@ -92,37 +107,13 @@ namespace CombatSystem.Skills
             UtilsAssets.UpdateAssetNameWithID(this, generatedName);
         }
 
-
-        private int _effectIndex = -1;
-        public bool MoveNext()
-        {
-            _effectIndex++;
-            return _effectIndex < effects.Length;
-        }
-
-        public void Reset()
-        {
-            _effectIndex = -1;
-        }
-
-        public IEffect Current
-        {
-            get
-            {
-                effectWrapper.currentEffectValues = effects[_effectIndex];
-                return effectWrapper;
-            }
-        }
-
-        object IEnumerator.Current => Current;
-
-        public void Dispose()
-        {
-        }
-
         public IEnumerator<IEffect> GetEnumerator()
         {
-            return this;
+            foreach (var effect in effects)
+            {
+                EffectWrapperHelper.currentEffectValues = effect;
+                yield return EffectWrapperHelper;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -130,4 +121,6 @@ namespace CombatSystem.Skills
             return GetEnumerator();
         }
     }
+
+
 }

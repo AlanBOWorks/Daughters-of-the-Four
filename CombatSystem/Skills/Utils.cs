@@ -9,138 +9,128 @@ using UnityEngine;
 
 namespace CombatSystem.Skills
 {
+
     public static class UtilsTarget
     {
-        private static readonly List<CombatEntity> TargetingHelper = new List<CombatEntity>();
-
-        /// <summary>
-        /// Individual single target
-        /// </summary>
-        private static IReadOnlyList<CombatEntity> GetOnlyTargetAsCollection(in CombatEntity target)
+        public static bool CanBeTargeted(in CombatEntity target)
         {
-            TargetingHelper.Clear();
-            TargetingHelper.Add(target);
-
-            return TargetingHelper;
+            return target != null && target.CanBeTarget();
         }
 
-        /// <summary>
-        /// Are effect of single targets
-        /// </summary>
-        private static IReadOnlyList<CombatEntity> GetSingleTargetGroup(in CombatEntity target)
+        public static IEnumerable<CombatEntity> GetPossibleTargets(CombatSkill skill, CombatEntity currentControl)
         {
-            var team = GetTeam(in target);
-            return team.AliveTargeting.GetAlivePositionMembers(target.PositioningType);
-        }
-
-        /// <summary>
-        /// Targets all team
-        /// </summary>
-        private static IReadOnlyList<CombatEntity> GetAliveTeam(in CombatEntity entity)
-            => GetTeam(in entity).AliveTargeting.GetAllAliveMembers();
-
-        /// <summary>
-        /// <inheritdoc cref="GetAliveTeam"/>; but excludes target
-        /// </summary>
-        private static IReadOnlyList<CombatEntity> GetAliveTeamAsExcluded(in CombatEntity target)
-        {
-            var team = GetTeam(in target);
-            return team.AliveTargeting.GetAllAliveMembers(in target);
-        }
-
-        private static CombatTeam GetTeam(in CombatEntity entity) 
-            => entity.Team;
-        private static CombatTeam GetEnemyTeam(in CombatEntity entity) 
-            => GetTeam(in entity).EnemyTeam;
-
-        public static IReadOnlyList<CombatEntity> GetLineTargets(in CombatEntity target)
-        {
-            var team = GetTeam(in target);
-            var positioning = target.PositioningType;
-            return team.AliveTargeting.GetAliveLineMembers(positioning);
-        }
-
-        public static IReadOnlyList<CombatEntity> GetLineTargetsExcluded(in CombatEntity target)
-        {
-            var team = GetTeam(in target);
-            var positioning = target.PositioningType;
-            return team.AliveTargeting.GetAliveLineMembers(positioning);
-        }
-
-
-        public static IReadOnlyList<CombatEntity> GetPossibleTargets(ISkill skill, CombatEntity performer)
-        {
-            var archetype = skill.Archetype;
-            switch (archetype)
+            var type = skill.Archetype;
+            switch (type)
             {
                 case EnumsSkill.Archetype.Self:
-                    return GetOnlyTargetAsCollection(in performer);
+                    return GetSingleTarget(currentControl);
                 case EnumsSkill.Archetype.Offensive:
-                    return GetOffensiveTargets();
+                    // todo if team isFrontGuard
+                    return GetOffensiveMembers();
                 case EnumsSkill.Archetype.Support:
-                    return GetAliveTeamAsExcluded(in performer);
+                    return GetSupportMembers();
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            IReadOnlyList<CombatEntity> GetOffensiveTargets()
+            IEnumerable<CombatEntity> GetOffensiveMembers()
             {
-                var targetType = skill.TargetType;
-                var enemyTeam = GetEnemyTeam(performer);
-                return targetType == EnumsSkill.TargetType.Area 
-                    ? enemyTeam.AliveTargeting.GetFrontMostAliveLineMembers()
-                    : enemyTeam.AliveTargeting.GetAllAliveMembers();
+                var members = currentControl.Team.EnemyTeam;
+                foreach (var member in members)
+                {
+                    if (CanBeTargeted(in member))
+                        yield return member;
+                }
+            }
+
+            IEnumerable<CombatEntity> GetSupportMembers()
+            {
+                var team = currentControl.Team;
+                bool ignoreSelf = skill.IgnoreSelf();
+                foreach (var member in team)
+                {
+                    if (!ignoreSelf || member != currentControl)
+                        yield return member;
+                }
             }
         }
 
-        public static IReadOnlyList<CombatEntity> GetEffectTargets(
-            in CombatEntity performer,
-            in CombatEntity selectedTarget,
-            in EnumsEffect.TargetType type)
-        {
-            var aliveGroupReadOnly = HandleEffectTargets(in performer, in selectedTarget, in type);
 
-            // Problem: the collection is modified during the effects
-            // Solution: create a copy that will be used only for the effects purposes
-            return aliveGroupReadOnly.ToArray();
+        private static IEnumerable<CombatEntity> GetSingleTarget(CombatEntity target)
+        {
+            yield return target;
         }
 
-
-        private static IEnumerable<CombatEntity> HandleEffectTargets(
-            in CombatEntity performer,
-            in CombatEntity selectedTarget,
-            in EnumsEffect.TargetType type)
+        public static IEnumerable<CombatEntity> GetEffectTargets(EnumsEffect.TargetType targetType)
         {
-            switch (type)
+            var targetingHandler = CombatSystemSingleton.SkillTargetingHandler;
+            switch (targetType)
             {
                 case EnumsEffect.TargetType.Target:
-                    return GetSingleTargetGroup(in selectedTarget);
+                    return targetingHandler.TargetType.SingleType;
+                case EnumsEffect.TargetType.TargetLine:
+                    return targetingHandler.TargetType.TargetLine;
                 case EnumsEffect.TargetType.TargetTeam:
-                    return GetAliveTeam(in selectedTarget);
-                case EnumsEffect.TargetType.TargetTeamExcluded:
-                    return GetAliveTeamAsExcluded(in selectedTarget);
-
-
+                    return targetingHandler.TargetType.TargetTeam;
 
                 case EnumsEffect.TargetType.Performer:
-                    return GetSingleTargetGroup(in performer);
-                case EnumsEffect.TargetType.PerformerTeam:
-                    return GetAliveTeam(in performer);
-                case EnumsEffect.TargetType.PerformerTeamExcluded:
-                    return GetAliveTeamAsExcluded(in performer);
-
-
-
-                case EnumsEffect.TargetType.TargetLine:
-                    return GetLineTargets(in selectedTarget);
-                case EnumsEffect.TargetType.TargetLineExcluded:
-                    return GetLineTargetsExcluded(in selectedTarget);
+                    return targetingHandler.PerformerType.SingleType;
                 case EnumsEffect.TargetType.PerformerLine:
-                    return GetLineTargets(in performer);
+                    return targetingHandler.PerformerType.TargetLine;
+                case EnumsEffect.TargetType.PerformerTeam:
+                    return targetingHandler.PerformerType.TargetTeam;
 
+
+                case EnumsEffect.TargetType.All:
+                    return targetingHandler.AllType;
                 default:
-                    throw new NotImplementedException($"Effect Targeting for [{type}] not implemented");
+                    throw new ArgumentOutOfRangeException(nameof(targetType), targetType, null);
             }
+        }
+
+        internal static IEnumerable<CombatEntity> GetOffensiveLine(CombatEntity targetEntity)
+        {
+            ExtractTargetEffectsValues(in targetEntity,out var targetTeam, out var positioning);
+            switch (positioning)
+            {
+                case EnumTeam.Positioning.FrontLine:
+                    return targetTeam.FrontLineType;
+                case EnumTeam.Positioning.MidLine:
+                    return targetTeam.MidLineType.Concat(targetTeam.FlexLineType);
+                case EnumTeam.Positioning.BackLine:
+                    return targetTeam.BackLineType;
+                case EnumTeam.Positioning.FlexLine:
+                    return targetTeam.FlexLineType;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null);
+            }
+        }
+
+        internal static IEnumerable<CombatEntity> GetSupportLine(CombatEntity targetEntity)
+        {
+            ExtractTargetEffectsValues(in targetEntity,out var targetTeam, out var positioning);
+            switch (positioning)
+            {
+                case EnumTeam.Positioning.FrontLine:
+                    return ConcatLineToFlex(targetTeam.FrontLineType);
+                case EnumTeam.Positioning.MidLine:
+                    return ConcatLineToFlex(targetTeam.MidLineType);
+                case EnumTeam.Positioning.BackLine:
+                    return ConcatLineToFlex(targetTeam.BackLineType);
+                case EnumTeam.Positioning.FlexLine:
+                    return targetTeam.FlexLineType;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null);
+            }
+
+            IEnumerable<CombatEntity> ConcatLineToFlex(IEnumerable<CombatEntity> line) =>
+                line.Concat(targetTeam.FlexLineType);
+        }
+
+        private static void ExtractTargetEffectsValues(in CombatEntity targetEntity,out CombatTeam targetTeam, out EnumTeam.Positioning positioning)
+        {
+            targetTeam = targetEntity.Team;
+            positioning = targetEntity.PositioningType;
         }
     }
 }

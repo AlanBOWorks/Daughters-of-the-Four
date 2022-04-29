@@ -26,6 +26,8 @@ namespace CombatSystem.Skills
             Preset.DoSkill(in performer, in target, in holderReference);
         }
 
+        public bool IgnoreSelf() => Preset.IgnoreSelf();
+
 
         public void DoSkill(in CombatEntity performer, in CombatEntity target) =>
             DoSkill(in performer, in target, this);

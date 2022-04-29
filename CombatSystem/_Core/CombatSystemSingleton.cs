@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using CombatSystem.Entity;
+using CombatSystem.Skills;
 using CombatSystem.Team;
 using MEC;
 using Sirenix.OdinInspector;
@@ -26,7 +27,10 @@ namespace CombatSystem._Core
                 = new CombatTeamsHolder();
             TeamControllers 
                 = new CombatTeamControllersHandler();
+            SkillTargetingHandler 
+                = new SkillTargetingHandler();
 
+            EventsHolder.Subscribe(SkillTargetingHandler);
             EventsHolder.Subscribe(TeamControllers);
 
             PrefabInstantiationHandler = new PrefabInstantiationHandler();
@@ -74,6 +78,11 @@ namespace CombatSystem._Core
         [Title("Controllers")]
         [ShowInInspector]
         public static CombatTeamControllersHandler TeamControllers { get; private set; }
+
+        // ------- TARGETING ------
+        [Title("Targeting")]
+        [ShowInInspector]
+        public static readonly SkillTargetingHandler SkillTargetingHandler;
 
 
         // ------- TEMPO ------

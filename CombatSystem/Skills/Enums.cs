@@ -27,20 +27,11 @@ namespace CombatSystem.Skills
         {
             Target,
             TargetTeam,
-            /// <summary>
-            /// Same as [<see cref="TargetTeam"/>] but [<see cref="Target"/>] is ignored
-            /// </summary>
-            TargetTeamExcluded,
+            
             Performer,
             PerformerTeam,
-            /// <summary>
-            /// Same as [<see cref="PerformerTeam"/>] but [<see cref="Performer"/>] is ignored
-            /// </summary>
-            PerformerTeamExcluded,
-
 
             TargetLine,
-            TargetLineExcluded,
             PerformerLine,
 
             All

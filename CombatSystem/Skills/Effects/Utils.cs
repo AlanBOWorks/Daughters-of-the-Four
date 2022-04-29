@@ -9,28 +9,28 @@ namespace CombatSystem.Skills.Effects
     public static class UtilsSkillEffect
     {
         public static void DoEffectsOnTarget(
-            IEnumerator<IEffect> effects,
-            CombatEntity performer, CombatEntity target, 
+            IEnumerable<IEffect> effects,
+            CombatEntity performer, CombatEntity exclusion, 
             CombatSkill skillReference)
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             // Problem: effects might be in a Scriptable and exceptions in execution during develop
             // could make the IEnumerator<IEffect>'s index being wrong, so the iteration will be wrong
             // Solution: reset before and after the iterator
-            effects.Reset();
-            while (effects.MoveNext())
+            foreach (var effect in effects)
             {
-                var effect = effects.Current;
                 var targetType = effect.TargetType;
-                var targets = UtilsTarget.GetEffectTargets(in performer, in target, targetType);
+                var targets = UtilsTarget.GetEffectTargets(targetType);
                 DoEffectOnTargets(in effect, in targets);
             }
-            effects.Reset(); 
 
-            void DoEffectOnTargets(in IEffect effect, in IReadOnlyList<CombatEntity> targets)
+
+            void DoEffectOnTargets(in IEffect effect, in IEnumerable<CombatEntity> targets)
             {
                 foreach (var effectTarget in targets)
                 {
+                    if(effectTarget == exclusion) continue;
+
                     effect.DoEffect(in performer, in effectTarget);
                     eventsHolder.OnEffectPerform(in performer, in skillReference, in effectTarget, in effect);
                 }
