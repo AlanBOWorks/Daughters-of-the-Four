@@ -36,7 +36,6 @@ namespace CombatSystem.Skills.Effects
                     eventsHolder.OnEffectPerform(in performer, in skillReference, in effectTarget, in effect);
                     i++;
                 }
-                Debug.Log($"Iteration: {i}");
             }
         }
     }

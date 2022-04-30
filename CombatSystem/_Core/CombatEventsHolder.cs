@@ -23,7 +23,7 @@ namespace CombatSystem._Core
             _eventsHolder.Subscribe(entityTempoStepper);
 
 #if UNITY_EDITOR
-            var debugEvents = new DebugEvents();
+            var debugEvents = CombatDebuggerSingleton.CombatEventsLogs;
 
             _eventsHolder.Subscribe(debugEvents);
 #endif
@@ -339,6 +339,7 @@ namespace CombatSystem._Core
 
         private sealed class SystemEventsHolder : CombatEventsHolder
         {
+
             public SystemEventsHolder()
             {
                 _tempoTicker = new TempoTicker();
@@ -365,103 +366,6 @@ namespace CombatSystem._Core
             }
         }
 
-#if UNITY_EDITOR
-        #region -- DEBUG --
-        private sealed class DebugEvents : ITempoDedicatedEntityStatesListener,
-            ITempoTickListener, ISkillUsageListener
-        {
-          
-
-            public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
-            {
-                Debug.Log($"> --- Entity [SEQUENCE]: {entity.GetProviderEntityName()}");
-            }
-
-            public void OnEntityRequestAction(CombatEntity entity)
-            {
-                Debug.Log($"> --- Entity [Request ACTION]: {entity.GetProviderEntityName()}");
-            }
-
-            public void OnEntityFinishAction(CombatEntity entity)
-            {
-                Debug.Log($"> --- Entity [End ACTION]: {entity.GetProviderEntityName()}");
-            }
-
-            public void OnEntityFinishSequence(CombatEntity entity)
-            {
-            }
-
-            public void OnTempoFinishControl(CombatEntity mainEntity)
-            {
-                Debug.Log($"> --- Entity [WAIT] Sequence: {mainEntity.GetProviderEntityName()}");
-            }
-
-            public void OnStartTicking()
-            {
-                Debug.Log("xx - START Ticking");
-            }
-
-            public void OnTick()
-            {
-            }
-
-            public void OnRoundPassed()
-            {
-                Debug.Log("xx - Round Passed");
-            }
-
-            public void OnStopTicking()
-            {
-                Debug.Log("xx - STOP Ticking");
-            }
-
-            public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
-            {
-
-                Debug.Log($"----------------- SKILL --------------- \n" +
-                          $"Random Controller: {performer.GetProviderEntityName()} / " +
-                          $"Used : {usedSkill.Preset} /" +
-                          $"Target: {target.GetProviderEntityName()}");
-                Debug.Log($"ACTIONS Used: {performer.Stats.UsedActions}");
-            }
-
-            public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
-            {
-                Debug.Log($"Performing ----- > {usedSkill.GetSkillName()}");
-            }
-
-            public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
-            {
-                Debug.Log($"Effect[{effect.GetPreset()} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
-            }
-
-            public void OnSkillFinish()
-            {
-                Debug.Log("-------------- SKILL END --------------- ");
-            }
-
-            public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
-            {
-                Debug.Log($"> --- TRINITY Entity [START] Sequence: {entity.GetProviderEntityName()}");
-            }
-
-            public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
-            {
-                Debug.Log($"> --- OFF Entity [START] Sequence: {entity.GetProviderEntityName()}");
-            }
-
-            public void OnTrinityEntityFinishSequence(CombatEntity entity)
-            {
-                Debug.Log($"> --- TRINITY Entity [END] Sequence: {entity.GetProviderEntityName()}");
-            }
-
-            public void OnOffEntityFinishSequence(CombatEntity entity)
-            {
-                Debug.Log($"> --- OFF Entity [END] Sequence: {entity.GetProviderEntityName()}");
-            }
-        }
-        #endregion
-#endif
 
     }
 

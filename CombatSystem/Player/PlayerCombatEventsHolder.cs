@@ -28,7 +28,7 @@ namespace CombatSystem.Player
             _cameraHolderListeners = new HashSet<ICameraHolderListener>();
 
 #if UNITY_EDITOR
-            //Subscribe(new DebugPlayerEvents());
+            Subscribe(CombatDebuggerSingleton.CombatPlayerEventsLogs);
 #endif
 
         }
@@ -240,74 +240,6 @@ namespace CombatSystem.Player
                 listener.OnSwitchCamera(in combatCamera);
             }
         }
-#if UNITY_EDITOR
 
-        private class DebugPlayerEvents :
-            ISkillPointerListener, ISkillSelectionListener,
-            ITargetPointerListener, ITargetSelectionListener
-        {
-            public void OnSkillButtonHover(in CombatSkill skill)
-            {
-            }
-
-            public void OnSkillButtonExit(in CombatSkill skill)
-            {
-            }
-
-            public void OnSkillSelect(in CombatSkill skill)
-            {
-                Debug.Log($"Skill Select: {skill.Preset}");
-            }
-
-            public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
-            {
-                Debug.Log($"Skill SWITCH: {skill.Preset} FROM {previousSelection.Preset}");
-            }
-
-            public void OnSkillDeselect(in CombatSkill skill)
-            {
-                Debug.Log($"Skill DESELECTED: {skill.Preset}");
-            }
-
-            public void OnSkillCancel(in CombatSkill skill)
-            {
-                Debug.Log($"Skill CANCEL: {skill.Preset}");
-            }
-
-            public void OnSkillSubmit(in CombatSkill skill)
-            {
-                Debug.Log($"xxxx - Skill Submit: {skill.Preset}");
-            }
-
-            public void OnTargetButtonHover(in CombatEntity target)
-            {
-                Debug.Log($"Target Hover: {target.GetProviderEntityName()}");
-            }
-
-            public void OnTargetButtonExit(in CombatEntity target)
-            {
-                Debug.Log($"Target Exit: {target.GetProviderEntityName()}");
-            }
-
-            public void OnTargetSelect(in CombatEntity target)
-            {
-                Debug.Log($"Target Hover: {target.GetProviderEntityName()}");
-            }
-
-            public void OnTargetCancel(in CombatEntity target)
-            {
-                Debug.Log($"Target Cancel: {target.GetProviderEntityName()}");
-            }
-
-            public void OnTargetSubmit(in CombatEntity target)
-            {
-                Debug.Log($"xxxx - Target SUBMIT: {target.GetProviderEntityName()}");
-            }
-            public void OnPerformerSwitch(in CombatEntity performer)
-            {
-                Debug.Log($"xxxx - PERFORMER: {performer.GetProviderEntityName()}");
-            }
-        } 
-#endif
     }
 }
