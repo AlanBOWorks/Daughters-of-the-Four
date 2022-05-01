@@ -46,11 +46,6 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
         }
 
-        private void SwitchUser(in CombatEntity entity)
-        {
-            _currentEntity = entity;
-            UpdateInfoToCurrent();
-        }
 
         private void UpdateInfoToCurrent()
         {
@@ -89,9 +84,15 @@ namespace CombatSystem.Player.UI
                 costText = "+" + cost;
 
             actionsTooltipText.text = costText;
+        } public void OnPerformerSwitch(in CombatEntity performer)
+        {
+            Debug.Log("ACTIONS Update");
+            _currentEntity = performer;
+            UpdateInfoToCurrent();
         }
-
         private CombatSkill _selectedSkill;
+
+
 
         public void OnSkillSelect(in CombatSkill skill)
         {
@@ -137,15 +138,14 @@ namespace CombatSystem.Player.UI
             ToggleActiveToolTip(false);
         }
 
-        public void OnPerformerSwitch(in CombatEntity performer)
-        {
-            SwitchUser(in performer);
-        }
 
         public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
-            SwitchUser(in firstEntity);
             ShowUI();
+        }
+
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)

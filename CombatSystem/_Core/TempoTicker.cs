@@ -279,9 +279,26 @@ namespace CombatSystem._Core
         void OnEntityFinishAction(CombatEntity entity);
         /// <summary>
         /// The very last event invoked when there's no [<seealso cref="CombatStats.UsedActions"/>] left or when
-        /// the [<see cref="CombatEntity"/>] passes its actions somehow. <br></br>
+        /// the [<see cref="CombatEntity"/>] passes its actions somehow. <br></br><br></br>
+        /// Note:<br></br>
+        /// In this events, the entity is not removed from [<seealso cref="CombatTeam._activeMembers"/>].<br></br>
+        /// For that subscribe to [<seealso cref="ITempoEntityStatesExtraListener.OnAfterEntitySequenceFinish"/>]
         /// </summary>
         void OnEntityFinishSequence(CombatEntity entity);
+    }
+
+    public interface ITempoEntityStatesExtraListener : ICombatEventListener
+    {
+        /// <summary>
+        /// Invoked after [<seealso cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>] and
+        /// only it can act;
+        /// </summary>
+        void OnAfterEntityRequestSequence(in CombatEntity entity);
+        /// <summary>
+        /// Invoked after [<seealso cref="ITempoEntityStatesListener.OnEntityFinishSequence"/>]; <br></br>
+        /// This events is called after removing the entity from the [<seealso cref="CombatTeam._activeMembers"/>].<br></br>
+        /// </summary>
+        void OnAfterEntitySequenceFinish(in CombatEntity entity);
     }
 
     public interface ITempoDedicatedEntityStatesListener : ICombatEventListener
@@ -306,6 +323,8 @@ namespace CombatSystem._Core
     public interface ITempoTeamStatesListener : ICombatEventListener
     {
         void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity);
+
+        void OnControlFinishAllActors(in CombatEntity lastActor);
         /// <summary>
         /// Invoked when the Entity's Controller decides that there's no more actions to make
         /// </summary>

@@ -2,23 +2,24 @@ using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Player.Events;
 using CombatSystem.Team;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillEntitySwitcher : MonoBehaviour, ICombatStatesListener,
-        ITempoTeamStatesListener, ITempoEntityStatesListener
+        ITempoTeamStatesListener, ITempoEntityStatesListener,
+        IPlayerEntityListener
     {
         [SerializeField]
         private TeamReferences references = new TeamReferences();
 
         [SerializeField] private UCombatSkillButtonsHolder skillsHolder;
-        [SerializeField] private UCombatSkillButtonsHolder flexRoleSkills;
 
         public FlexPositionMainGroupStructure<UCombatSkillEntitySwitchButton> GetButtons() => references;
 
-        private void Awake()
+        private void Start()
         {
             references.InstantiateElements();
             references.activeCount = references.Members.Length;
@@ -29,17 +30,30 @@ namespace CombatSystem.Player.UI
 
             var playerCombatEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerCombatEvents.ManualSubscribe(this as ICombatStatesListener);
+            playerCombatEvents.ManualSubscribe(this as IPlayerEntityListener);
             playerCombatEvents.DiscriminationEventsHolder.Subscribe(this);
+        }
+
+        private void OnDestroy()
+        {
+            var playerCombatEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            playerCombatEvents.UnSubscribe(this);
+            playerCombatEvents.DiscriminationEventsHolder.UnSubscribe(this);
+
         }
 
         private const float IterationHeight = 70 + 6;
         private void OnInstantiation()
         {
-            var enumerable = UtilsTeam.GetEnumerable(references);
+            var feedBacks = PlayerCombatUserInterfaceSingleton.CombatTeemFeedBacks.PlayerTeamType;
+            var enumerable = UtilsTeam.GetEnumerable(references, feedBacks);
             int i = references.activeCount;
-            foreach (var button in enumerable)
+            foreach (var pair in enumerable)
             {
+                var button = pair.Key;
+                var icon = pair.Value.GetIcon();
                 OnInstantiateButton(in button);
+                button.Injection(in icon);
                 i--;
             }
 
@@ -59,7 +73,8 @@ namespace CombatSystem.Player.UI
         {
             _buttonsDictionary.Clear();
 
-            var enumerable = UtilsTeam.GetEnumerable(playerTeam.GetMainMembers(), references);
+            ITeamFlexPositionStructureRead<CombatEntity> members = playerTeam.GetMainMembers();
+            var enumerable = UtilsTeam.GetEnumerable(members, references);
             foreach (var pair in enumerable)
             {
                 var entity = pair.Key;
@@ -103,9 +118,15 @@ namespace CombatSystem.Player.UI
         public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
            ShowAll();
+           DoSwitchEntity(in firstEntity);
         }
 
-       public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
        {
            HideAll();
        }
@@ -132,15 +153,22 @@ namespace CombatSystem.Player.UI
            _buttonsDictionary[entity].DoEnable(false);
        }
 
-
+       private CombatEntity _currentPerformer;
         public void DoSwitchEntity(in CombatEntity entity)
         {
+            if(entity == _currentPerformer) return;
+
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            playerEvents.OnPerformerSwitch(in entity);
+
             skillsHolder.SwitchControllingEntity(in entity);
-            flexRoleSkills.ResetStateIfSelectedIsActive();
+        }
+        public void OnPerformerSwitch(in CombatEntity performer)
+        {
+            _currentPerformer = performer;
         }
 
-
-       [Serializable]
+        [Serializable]
        private sealed class TeamReferences : TeamMainStructureInstantiateHandler<UCombatSkillEntitySwitchButton>
        {
 

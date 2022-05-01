@@ -135,6 +135,8 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnEntityRequestSequence(entity, canAct);
 
             _currentDiscriminatedEntityEventsHolder.OnEntityRequestSequence(entity, canAct);
+
+            _sequenceStepper.OnEntityRequestSequence(entity,canAct);
         }
 
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -205,6 +207,27 @@ namespace CombatSystem._Core
             _sequenceStepper.OnEntityFinishSequence(entity);
         }
 
+        public void OnAfterEntityRequestSequence(in CombatEntity entity)
+        {
+            _eventsHolder.OnAfterEntityRequestSequence(in entity);
+            _playerCombatEvents.OnAfterEntityRequestSequence(in entity);
+            _enemyCombatEvents.OnAfterEntityRequestSequence(in entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnAfterEntityRequestSequence(in entity);
+        }
+
+        public void OnAfterEntitySequenceFinish(in CombatEntity entity)
+        {
+            _eventsHolder.OnAfterEntitySequenceFinish(in entity);
+            _playerCombatEvents.OnAfterEntitySequenceFinish(in entity);
+            _enemyCombatEvents.OnAfterEntitySequenceFinish(in entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnAfterEntitySequenceFinish(in entity);
+
+            _sequenceStepper.OnAfterEntitySequenceFinish(in entity);
+        }
+
+
 
         public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
@@ -217,6 +240,16 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnTempoStartControl(in controller, firstEntity);
         }
+
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+            _eventsHolder.OnControlFinishAllActors(in lastActor);
+            _playerCombatEvents.OnControlFinishAllActors(in lastActor);
+            _enemyCombatEvents.OnControlFinishAllActors(in lastActor);
+
+            _currentDiscriminatedEntityEventsHolder.OnControlFinishAllActors(in lastActor);
+        }
+
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
             _eventsHolder.OnTempoFinishControl(in controller);
@@ -541,6 +574,11 @@ namespace CombatSystem._Core
         protected abstract void UnSubscribeTempo(ITempoTickListener tickListener);
 
 
+        public void ManualSubscribe(ICombatPreparationListener preparationListener)
+        {
+            _combatPreparationListeners.Add(preparationListener);
+        }
+
         public void ManualSubscribe(ICombatStatesListener statesListener)
         {
             _combatStatesListeners.Add(statesListener);
@@ -650,7 +688,8 @@ namespace CombatSystem._Core
 
     }
 
-    public class CombatEntityEventsHolder : ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener,
+    public class CombatEntityEventsHolder : 
+        ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
         ITempoTeamStatesListener,
         ISkillUsageListener, ITeamEventListener
     {
@@ -658,6 +697,8 @@ namespace CombatSystem._Core
         {
             _tempoEntityListeners = new HashSet<ITempoEntityStatesListener>();
             _tempoDedicatedEntitiesListeners = new HashSet<ITempoDedicatedEntityStatesListener>();
+            _tempoEntityExtraListeners = new HashSet<ITempoEntityStatesExtraListener>();
+
             _tempoTeamListeners = new HashSet<ITempoTeamStatesListener>();
 
             _skillUsageListeners = new HashSet<ISkillUsageListener>();
@@ -668,6 +709,8 @@ namespace CombatSystem._Core
         private readonly ICollection<ITempoEntityStatesListener> _tempoEntityListeners;
         [ShowInInspector, HorizontalGroup("Entities")]
         private readonly ICollection<ITempoDedicatedEntityStatesListener> _tempoDedicatedEntitiesListeners;
+        [ShowInInspector, HorizontalGroup("Entities")]
+        private readonly ICollection<ITempoEntityStatesExtraListener> _tempoEntityExtraListeners;
 
         [ShowInInspector]
         private readonly ICollection<ITempoTeamStatesListener> _tempoTeamListeners;
@@ -686,6 +729,9 @@ namespace CombatSystem._Core
                 _tempoEntityListeners.Add(tempoEntityListener);
             if(listener is ITempoDedicatedEntityStatesListener tempoDedicatedEntityListener)
                 _tempoDedicatedEntitiesListeners.Add(tempoDedicatedEntityListener);
+            if(listener is ITempoEntityStatesExtraListener tempoExtraListener)
+                _tempoEntityExtraListeners.Add(tempoExtraListener);
+
             if (listener is ITempoTeamStatesListener tempoTeamStatesListener)
                 _tempoTeamListeners.Add(tempoTeamStatesListener);
 
@@ -704,6 +750,9 @@ namespace CombatSystem._Core
                 _tempoEntityListeners.Remove(tempoEntityListener);
             if (listener is ITempoDedicatedEntityStatesListener tempoDedicatedEntityListener)
                 _tempoDedicatedEntitiesListeners.Remove(tempoDedicatedEntityListener);
+            if (listener is ITempoEntityStatesExtraListener tempoExtraListener)
+                _tempoEntityExtraListeners.Remove(tempoExtraListener);
+
             if (listener is ITempoTeamStatesListener tempoTeamStatesListener)
                 _tempoTeamListeners.Remove(tempoTeamStatesListener);
 
@@ -812,6 +861,14 @@ namespace CombatSystem._Core
             }
         }
 
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+            foreach (var listener in _tempoTeamListeners)
+            {
+                listener.OnControlFinishAllActors(in lastActor);
+            }
+        }
+
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
             foreach (var listener in _tempoTeamListeners)
@@ -869,11 +926,26 @@ namespace CombatSystem._Core
             }
         }
 
+        public void OnAfterEntityRequestSequence(in CombatEntity entity)
+        {
+            foreach (var listener in _tempoEntityExtraListeners)
+            {
+                listener.OnAfterEntityRequestSequence(in entity);
+            }
+        }
+
+        public void OnAfterEntitySequenceFinish(in CombatEntity entity)
+        {
+            foreach (var listener in _tempoEntityExtraListeners)
+            {
+                listener.OnAfterEntitySequenceFinish(in entity);
+            }
+        }
     }
 
 
     public interface ICombatEventsHolder : ICombatPreparationListener, ICombatStatesListener,
-        ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener,
+        ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
         ITempoTeamStatesListener,
         ITeamEventListener,
         ICombatEntityExistenceListener, 

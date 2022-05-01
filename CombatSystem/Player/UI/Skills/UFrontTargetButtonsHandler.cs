@@ -136,6 +136,11 @@ namespace CombatSystem.Player.UI
         {
         }
 
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+            HideTargets();
+        }
+
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
             HideTargets();

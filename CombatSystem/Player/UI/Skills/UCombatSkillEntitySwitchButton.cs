@@ -3,6 +3,7 @@ using CombatSystem.Entity;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI
 {
@@ -10,11 +11,18 @@ namespace CombatSystem.Player.UI
     {
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private UCombatSkillEntitySwitcher switcherHandler;
+        [SerializeField] private Image iconHolder;
         [ShowInInspector]
         private CombatEntity _user;
 
 
-        public void Injection(in CombatEntity entity) => _user = entity; 
+        public void Injection(in CombatEntity entity) => _user = entity;
+
+        public void Injection(in Sprite icon)
+        {
+            iconHolder.sprite = icon;
+        }
+
 
         private const float OnDisableAlpha = .3f;
         private const float OnNullAlpha = .1f;

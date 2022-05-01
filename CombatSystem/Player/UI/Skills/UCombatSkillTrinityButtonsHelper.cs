@@ -72,6 +72,10 @@ namespace CombatSystem.Player.UI
             holder.SwitchControllingEntity(in firstEntity);
         }
 
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+        }
+
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
         }

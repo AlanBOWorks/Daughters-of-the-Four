@@ -61,6 +61,9 @@ namespace CombatSystem.Player.UI
         private void Start()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+
+            // PROBLEM: stackOverFlow in hoverSkill;
+            // SOLUTION: manual subscriptions
             playerEvents.ManualSubscribe(this as ISkillUsageListener);
             playerEvents.ManualSubscribe(this as ITeamEventListener);
             playerEvents.ManualSubscribe(this as ICombatStatesListener);
@@ -220,6 +223,11 @@ namespace CombatSystem.Player.UI
             EnableHolder();
         }
 
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+            DisableHolder();
+        }
+
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
             HideAll();
@@ -261,7 +269,7 @@ namespace CombatSystem.Player.UI
         {
             if (_currentSelectedSkill != null)
             {
-                DeselectCurrentSkill();
+                DeselectSkill(in _currentSelectedSkill);
             }
 
             _currentControlEntity = targetEntity;
@@ -271,7 +279,6 @@ namespace CombatSystem.Player.UI
         public void OnSkillSelect(in CombatSkill skill)
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.OnPerformerSwitch(in _currentControlEntity);
             playerEvents.OnSkillSelect(in skill);
             OnSkillSwitch(in skill, in _currentSelectedSkill);
         }
@@ -289,7 +296,7 @@ namespace CombatSystem.Player.UI
 
             if (previousSelection == skill)
             {
-                OnSkillDeselect(in skill);
+                DeselectSkill(in skill);
             }
             else
             {
@@ -302,8 +309,7 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillDeselect(in CombatSkill skill)
         {
-            DeselectSkill(in _currentSelectedSkill);
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(in skill);
+            DeselectSkill(in skill);
         }
         public void OnSkillCancel(in CombatSkill skill)
         {
@@ -318,16 +324,14 @@ namespace CombatSystem.Player.UI
         {
             if (skill != _currentSelectedSkill) return;
 
-            DeselectCurrentSkill();
-        }
-
-        private void DeselectCurrentSkill()
-        {
             var button = GetButton(in _currentSelectedSkill);
             button.DeSelectButton();
 
+            PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(in _currentSelectedSkill);
+
             _currentSelectedSkill = null;
         }
+
 
         public void OnSkillButtonHover(in CombatSkill skill)
         {
@@ -360,13 +364,8 @@ namespace CombatSystem.Player.UI
 
         public void OnPerformerSwitch(in CombatEntity performer)
         {
-            ResetStateIfSelectedIsActive();
+            SwitchControllingEntity(in performer);
         }
 
-        public void ResetStateIfSelectedIsActive()
-        {
-            if (_currentSelectedSkill == null) return;
-            OnSkillDeselect(in _currentSelectedSkill);
-        }
     }
 }

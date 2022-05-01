@@ -81,6 +81,10 @@ namespace CombatSystem.Team
         {
         }
 
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+        }
+
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
             var oppositeControl = UtilsTeam.GetOppositeElement(CurrentController, this);
