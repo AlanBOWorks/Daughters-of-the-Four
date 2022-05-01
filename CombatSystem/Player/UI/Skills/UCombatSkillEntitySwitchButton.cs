@@ -1,5 +1,6 @@
 using System;
 using CombatSystem.Entity;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,6 +10,7 @@ namespace CombatSystem.Player.UI
     {
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private UCombatSkillEntitySwitcher switcherHandler;
+        [ShowInInspector]
         private CombatEntity _user;
 
 

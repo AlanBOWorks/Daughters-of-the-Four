@@ -396,6 +396,23 @@ namespace CombatSystem.Team
             yield return new KeyValuePair<TKey, TValue>(keys.BackLineType,values.BackLineType);
         }
 
+        public static IEnumerable<T> GetEnumerable<T>(FlexPositionMainGroupStructure<T> structure)
+        {
+            yield return structure.FrontLineType;
+            yield return structure.MidLineType;
+            yield return structure.BackLineType;
+            yield return structure.FlexType;
+        }
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
+            FlexPositionMainGroupStructure<TKey> keys, FlexPositionMainGroupStructure<TValue> values)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.FrontLineType, values.FrontLineType);
+            yield return new KeyValuePair<TKey, TValue>(keys.MidLineType, values.MidLineType);
+            yield return new KeyValuePair<TKey, TValue>(keys.BackLineType, values.BackLineType);
+            yield return new KeyValuePair<TKey, TValue>(keys.FlexLineType, values.FlexLineType);
+        }
+
+
         public static IEnumerable<T> GetEnumerable<T>(ITeamFullRolesStructureRead<T> structure)
         {
             yield return structure.VanguardType;

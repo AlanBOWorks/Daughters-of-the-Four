@@ -8,7 +8,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillEntitySwitcher : MonoBehaviour, ICombatStatesListener,
-        ITempoTeamStatesListener, ITempoDedicatedEntityStatesListener
+        ITempoTeamStatesListener, ITempoEntityStatesListener
     {
         [SerializeField]
         private TeamReferences references = new TeamReferences();
@@ -16,7 +16,7 @@ namespace CombatSystem.Player.UI
         [SerializeField] private UCombatSkillButtonsHolder skillsHolder;
         [SerializeField] private UCombatSkillButtonsHolder flexRoleSkills;
 
-        public TeamBasicGroupStructure<UCombatSkillEntitySwitchButton> GetButtons() => references;
+        public FlexPositionMainGroupStructure<UCombatSkillEntitySwitchButton> GetButtons() => references;
 
         private void Awake()
         {
@@ -110,25 +110,26 @@ namespace CombatSystem.Player.UI
            HideAll();
        }
 
-       public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
+       public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
        {
+           if (!_buttonsDictionary.ContainsKey(entity)) return;
+
            _buttonsDictionary[entity].DoEnable(canAct);
        }
 
-       public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+       public void OnEntityRequestAction(CombatEntity entity)
        {
-           
        }
 
-       public void OnTrinityEntityFinishSequence(CombatEntity entity)
+       public void OnEntityFinishAction(CombatEntity entity)
+       {
+       }
+
+       public void OnEntityFinishSequence(CombatEntity entity)
        {
            if (!_buttonsDictionary.ContainsKey(entity)) return;
 
            _buttonsDictionary[entity].DoEnable(false);
-        }
-
-       public void OnOffEntityFinishSequence(CombatEntity entity)
-       {
        }
 
 
@@ -140,7 +141,7 @@ namespace CombatSystem.Player.UI
 
 
        [Serializable]
-       private sealed class TeamReferences : TeamBasicStructureInstantiateHandler<UCombatSkillEntitySwitchButton>
+       private sealed class TeamReferences : TeamMainStructureInstantiateHandler<UCombatSkillEntitySwitchButton>
        {
 
        }

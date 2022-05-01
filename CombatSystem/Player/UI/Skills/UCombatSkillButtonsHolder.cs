@@ -147,13 +147,15 @@ namespace CombatSystem.Player.UI
             return button;
         }
 
-
+        private CoroutineHandle _animationHandle;
         private const float DelayBetweenButtons = .12f;
         private const float AnimationDuration = .2f;
         [Button,DisableInEditorMode]
         private void ShowSkillsAnimated()
         {
-            CombatSystemSingleton.LinkCoroutineToMaster(_ShowAll());
+            Timing.KillCoroutines(_animationHandle);
+            _animationHandle = Timing.RunCoroutine(_ShowAll());
+            CombatSystemSingleton.LinkCoroutineToMaster(_animationHandle);
             IEnumerator<float> _ShowAll()
             {
                 int index = 0;

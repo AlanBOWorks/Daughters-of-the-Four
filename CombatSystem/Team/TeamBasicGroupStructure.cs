@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CombatSystem.Entity;
@@ -94,14 +95,22 @@ namespace CombatSystem.Team
         }
     }
 
-    public class FlexPositionMainGroupClass<T> : FlexPositionMainGroupStructure<T> where T : new()
+    [Serializable]
+    public class FlexPositionMainGroupClass<T> : ITeamFlexRoleStructureRead<T>, ITeamFlexPositionStructureRead<T> where T : new()
     {
-        public FlexPositionMainGroupClass()
-        {
-            FrontLineType = new T();
-            MidLineType = new T();
-            BackLineType = new T();
-            FlexLineType = new T();
-        }
+        [SerializeField] private T frontLineType = new T();
+        [SerializeField] private T midLineType = new T();
+        [SerializeField] private T backLineType = new T();
+        [SerializeField] private T flexLineType = new T();
+
+        public T VanguardType => frontLineType;
+        public T AttackerType => midLineType;
+        public T SupportType => backLineType;
+        public T FlexType => flexLineType;
+
+        public T FrontLineType => frontLineType;
+        public T MidLineType => midLineType;
+        public T BackLineType => backLineType;
+        public T FlexLineType => flexLineType;
     }
 }
