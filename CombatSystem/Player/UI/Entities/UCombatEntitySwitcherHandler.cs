@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UCombatSkillEntitySwitcher : MonoBehaviour, ICombatStatesListener,
+    public class UCombatEntitySwitcherHandler : MonoBehaviour, ICombatStatesListener,
         ITempoTeamStatesListener, ITempoEntityStatesListener,
         IPlayerEntityListener
     {
@@ -16,8 +16,10 @@ namespace CombatSystem.Player.UI
         private TeamReferences references = new TeamReferences();
 
         [SerializeField] private UCombatSkillButtonsHolder skillsHolder;
+        private Dictionary<CombatEntity, UCombatEntitySwitchButton> _buttonsDictionary;
 
-        public FlexPositionMainGroupStructure<UCombatSkillEntitySwitchButton> GetButtons() => references;
+        public FlexPositionMainGroupStructure<UCombatEntitySwitchButton> GetButtons() => references;
+        public IReadOnlyDictionary<CombatEntity, UCombatEntitySwitchButton> GetDictionary() => _buttonsDictionary;
 
         private void Start()
         {
@@ -26,7 +28,7 @@ namespace CombatSystem.Player.UI
             references.HidePrefab();
             OnInstantiation();
 
-            _buttonsDictionary = new Dictionary<CombatEntity, UCombatSkillEntitySwitchButton>();
+            _buttonsDictionary = new Dictionary<CombatEntity, UCombatEntitySwitchButton>();
 
             var playerCombatEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerCombatEvents.ManualSubscribe(this as ICombatStatesListener);
@@ -57,7 +59,7 @@ namespace CombatSystem.Player.UI
                 i--;
             }
 
-            void OnInstantiateButton(in UCombatSkillEntitySwitchButton button)
+            void OnInstantiateButton(in UCombatEntitySwitchButton button)
             {
                 var buttonTransform = button.transform;
                 var position =
@@ -68,7 +70,6 @@ namespace CombatSystem.Player.UI
         }
 
 
-        private Dictionary<CombatEntity, UCombatSkillEntitySwitchButton> _buttonsDictionary;
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             _buttonsDictionary.Clear();
@@ -169,7 +170,7 @@ namespace CombatSystem.Player.UI
         }
 
         [Serializable]
-       private sealed class TeamReferences : TeamMainStructureInstantiateHandler<UCombatSkillEntitySwitchButton>
+       private sealed class TeamReferences : TeamMainStructureInstantiateHandler<UCombatEntitySwitchButton>
        {
 
        }

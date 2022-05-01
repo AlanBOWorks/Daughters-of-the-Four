@@ -18,6 +18,8 @@ namespace CombatSystem.Player.UI
         [ShowInInspector,ReadOnly]
         private Dictionary<CombatEntity, UTargetButton> _buttonsDictionary;
 
+        public IReadOnlyDictionary<CombatEntity, UTargetButton> GetDictionary() => _buttonsDictionary;
+
         private void Awake()
         {
             _buttonsDictionary = new Dictionary<CombatEntity, UTargetButton>();

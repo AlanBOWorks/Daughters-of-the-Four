@@ -61,11 +61,11 @@ namespace CombatSystem.Player.UI
             actionsLimitText.text = actionsLimitValue.ToString("00");
         }
 
-
+        private float _usedActions;
         private void UpdateUsedActionsText()
         {
-            var usedActions = _currentEntity.Stats.UsedActions;
-            actionsUsedText.text = usedActions.ToString("00");
+            _usedActions = _currentEntity.Stats.UsedActions;
+            actionsUsedText.text = _usedActions.ToString("00");
         }
 
         private void ToggleActiveToolTip(bool enabledGO)
@@ -74,19 +74,17 @@ namespace CombatSystem.Player.UI
             parent.gameObject.SetActive(enabledGO);
         }
 
+        private const string OverflowText = "XX";
         private void UpdateActionsToolTip(in CombatSkill skill)
         {
-            int cost = skill.SkillCost;
-            string costText;
-            if (cost > 9)
-                costText = cost.ToString();
-            else
-                costText = "+" + cost;
+            float cost = skill.SkillCost + _usedActions;
+            var costText = cost > 99 
+                ? OverflowText 
+                : cost.ToString("00");
 
             actionsTooltipText.text = costText;
         } public void OnPerformerSwitch(in CombatEntity performer)
         {
-            Debug.Log("ACTIONS Update");
             _currentEntity = performer;
             UpdateInfoToCurrent();
         }

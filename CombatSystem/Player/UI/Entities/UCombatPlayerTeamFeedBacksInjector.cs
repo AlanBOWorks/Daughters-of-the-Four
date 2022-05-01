@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UCombatPlayerTeamFeedBacks : MonoBehaviour
+    public class UCombatPlayerTeamFeedBacksInjector : MonoBehaviour
     {
         [SerializeField] private SCombatPlayerTeamFeedBacks defaultAsset;
 

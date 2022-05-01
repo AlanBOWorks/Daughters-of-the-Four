@@ -7,10 +7,10 @@ using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI
 {
-    public class UCombatSkillEntitySwitchButton : MonoBehaviour, IPointerClickHandler
+    public class UCombatEntitySwitchButton : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private CanvasGroup canvasGroup;
-        [SerializeField] private UCombatSkillEntitySwitcher switcherHandler;
+        [SerializeField] private UCombatEntitySwitcherHandler switcherHandler;
         [SerializeField] private Image iconHolder;
         [ShowInInspector]
         private CombatEntity _user;

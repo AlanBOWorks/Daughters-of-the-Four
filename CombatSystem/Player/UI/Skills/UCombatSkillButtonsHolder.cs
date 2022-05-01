@@ -22,6 +22,8 @@ namespace CombatSystem.Player.UI
         [Title("References")]
         [SerializeField] 
         private UCombatSkillButton clonableSkillButton;
+        [SerializeField] private Transform onParent;
+
         private Stack<UCombatSkillButton> _instantiationPool;
         private Dictionary<CombatSkill,UCombatSkillButton> _activeButtons;
 
@@ -36,14 +38,9 @@ namespace CombatSystem.Player.UI
         private CombatSkill _currentSelectedSkill;
         [ShowInInspector]
         private CombatEntity _currentControlEntity;
-        public CombatEntity GetCurrentEntity() => _currentControlEntity;
 
-        internal void AddToDictionary(in CombatSkill skill, in UCombatSkillButton button)
-        {
-            if(_activeButtons.ContainsKey(skill)) return;
-            _activeButtons.Add(skill,button);
-        }
 
+        public IReadOnlyDictionary<CombatSkill, UCombatSkillButton> GetDictionary() => _activeButtons;
 
         private void Awake()
         {
@@ -144,7 +141,7 @@ namespace CombatSystem.Player.UI
 
         private UCombatSkillButton InstantiateButton()
         {
-            var button = Instantiate(clonableSkillButton, transform);
+            var button = Instantiate(clonableSkillButton, onParent);
             button.Injection(this);
 
             return button;
