@@ -62,14 +62,15 @@ namespace CombatSystem.Team
         }
     }
 
-    public class TeamBasicGroupDictionary<TKey, TValue> : TeamBasicGroupStructure<TValue>
+    public class TeamBasicGroupHashSet<TKey> : TeamBasicGroupStructure<TKey>
     {
-        public TeamBasicGroupDictionary() : base()
+        public TeamBasicGroupHashSet() : base()
         {
-            Dictionary = new Dictionary<TKey, TValue>(Members.Length);
+            HashSet = new HashSet<TKey>();
         }
 
-        public readonly Dictionary<TKey, TValue> Dictionary;
+        protected readonly HashSet<TKey> HashSet;
+        public IReadOnlyCollection<TKey> GetHashSet() => HashSet;
     }
 
 

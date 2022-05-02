@@ -65,10 +65,10 @@ namespace CombatSystem.Skills
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            var currentEntities = controller.Dictionary;
-            foreach (var pair in currentEntities)
+            var currentEntities = controller.GetHashSet();
+            foreach (var entity in currentEntities)
             {
-                OnEntityFinishSequence(pair.Key);
+                OnEntityFinishSequence(entity);
             }
         }
     }

@@ -31,7 +31,7 @@ namespace CombatSystem.Team
             if(!canAct) return;
 
             var controller = UtilsTeam.GetElement(entity, this);
-            controller.InjectionOnRequestMainSequence(in entity);
+            controller.InjectionOnRequestTrinitySequence(in entity);
             
             if (CurrentController != null) return;
 
@@ -106,22 +106,28 @@ namespace CombatSystem.Team
         }
     }
     
-    public abstract class CombatTeamControllerBase : TeamBasicGroupDictionary<CombatEntity,bool>
+    public abstract class CombatTeamControllerBase : TeamBasicGroupHashSet<CombatEntity>
     {
         protected CombatTeamControllerBase() : base()
         {
             OffMembers = new HashSet<CombatEntity>();
         }
 
-        internal bool IsWaiting() => Dictionary.Count > 0;
+        internal bool IsWaiting() => HashSet.Count > 0;
 
-        public readonly HashSet<CombatEntity> OffMembers; 
+        protected readonly HashSet<CombatEntity> OffMembers;
+        public IReadOnlyCollection<CombatEntity> GetOffMembers() => OffMembers;
+
         public CombatTeam ControllingTeam { get; private set; }
         internal void Injection(CombatTeam team) => ControllingTeam = team;
 
-        public void InjectionOnRequestMainSequence(in CombatEntity entity)
+
+
+        public void InjectionOnRequestTrinitySequence(in CombatEntity entity)
         {
-            Dictionary.Add(entity,true);
+            int index = UtilsTeam.GetRoleIndex(entity);
+            Members[index] = entity;
+            HashSet.Add(entity);
         }
 
         public void InjectionOnRequestOffSequence(in CombatEntity entity)
@@ -131,19 +137,22 @@ namespace CombatSystem.Team
 
         public void Clear()
         {
-            VanguardType = false;
-            AttackerType = false;
-            SupportType = false;
-            Dictionary.Clear();
+            VanguardType = null;
+            AttackerType = null;
+            SupportType = null;
             OffMembers.Clear();
+            HashSet.Clear();
         }
 
 
         public void SafeRemove(CombatEntity entity)
         {
-            if (Dictionary.ContainsKey(entity))
+            for (int i = 0; i < Members.Length; i++)
             {
-                Dictionary.Remove(entity);
+                if (Members[i] != entity) continue;
+
+                Members[i] = null;
+                HashSet.Remove(entity);
                 return;
             }
             if (OffMembers.Contains(entity))
@@ -153,9 +162,9 @@ namespace CombatSystem.Team
         public void ForceFinish()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            foreach (var pair in Dictionary)
+            foreach (var entity in HashSet)
             {
-                eventsHolder.OnEntityFinishSequence(pair.Key);
+                eventsHolder.OnEntityFinishSequence(entity);
             }
             eventsHolder.OnTempoFinishControl(this);
             Clear();

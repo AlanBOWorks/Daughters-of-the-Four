@@ -66,6 +66,12 @@ namespace CombatSystem.Team
             return (int) entityRole;
         }
 
+        public static int GetRoleIndex(in CombatEntity entity)
+        {
+            return (int) entity.PositioningType;
+        }
+
+
         public static bool IsTeamInStancePosition(in EnumTeam.Positioning targetPositioning, in EnumTeam.StanceFull stance)
         {
             switch (stance)
