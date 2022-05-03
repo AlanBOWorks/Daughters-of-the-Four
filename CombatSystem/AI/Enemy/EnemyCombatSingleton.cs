@@ -7,7 +7,7 @@ namespace CombatSystem.AI
 {
     public sealed class EnemyCombatSingleton 
     {
-        private static readonly EnemyCombatSingleton Instance = new EnemyCombatSingleton();
+        public static readonly EnemyCombatSingleton Instance = new EnemyCombatSingleton();
 
         static EnemyCombatSingleton()
         {
@@ -17,7 +17,6 @@ namespace CombatSystem.AI
         [ShowInInspector]
         public static EnemyCombatEventsHolder EnemyEventsHolder { get; private set; }
 
-        public static EnemyCombatSingleton GetInstance() => Instance;
 
 
 
@@ -25,7 +24,7 @@ namespace CombatSystem.AI
         // ----- EDITOR WINDOW -----
         private sealed class EnemyCombatSingletonEditorWindow : OdinEditorWindow
         {
-            [ShowInInspector] private EnemyCombatSingleton _singleton = GetInstance();
+            [ShowInInspector] private EnemyCombatSingleton _singleton = Instance;
 
 
             [MenuItem("Combat/Debug/Enemy Singleton", priority = -4)]

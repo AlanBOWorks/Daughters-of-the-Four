@@ -180,7 +180,7 @@ namespace CombatSystem._Core
 
                 UtilsCombatStats.TickInitiative(stats, out var entityInitiativeAmount);
                 const float initiativeThreshold = TempoTicker.LoopThreshold;
-                float initiativePercent = entityInitiativeAmount / initiativeThreshold;
+                UtilsCombatStats.CalculateTempoPercent(in entityInitiativeAmount,out var initiativePercent);
 
                 eventsHolder.OnEntityTick(in entity, in entityInitiativeAmount, in initiativePercent);
                 //Acting Check
@@ -333,6 +333,6 @@ namespace CombatSystem._Core
 
     public interface ITempoEntityPercentListener : ICombatEventListener
     {
-        void OnEntityTick(in CombatEntity entity, in float currentInitiative, in float percentInitiative);
+        void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative);
     }
 }

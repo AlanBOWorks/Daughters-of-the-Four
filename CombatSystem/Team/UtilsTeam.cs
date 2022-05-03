@@ -419,6 +419,31 @@ namespace CombatSystem.Team
         }
 
 
+        public static IEnumerable<T> GetEnumerable<T>(ITeamOffStructureRead<T> structure)
+        {
+            yield return structure.SecondaryVanguardElement;
+            yield return structure.SecondaryAttackerElement;
+            yield return structure.SecondarySupportElement;
+            yield return structure.SecondaryFlexElement;
+            yield return structure.ThirdVanguardElement;
+            yield return structure.ThirdAttackerElement;
+            yield return structure.ThirdSupportElement;
+            yield return structure.ThirdFlexElement;
+        }
+
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey,TValue>(
+            ITeamOffStructureRead<TKey> keys, ITeamOffStructureRead<TValue> values)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryVanguardElement, values.SecondaryVanguardElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryAttackerElement, values.SecondaryAttackerElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondarySupportElement, values.SecondarySupportElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryFlexElement, values.SecondaryFlexElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdVanguardElement, values.ThirdVanguardElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdAttackerElement, values.ThirdAttackerElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdSupportElement, values.ThirdSupportElement);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdFlexElement, values.ThirdFlexElement);
+        }
+
         public static IEnumerable<T> GetEnumerable<T>(ITeamFullRolesStructureRead<T> structure)
         {
             yield return structure.VanguardType;
@@ -434,7 +459,6 @@ namespace CombatSystem.Team
             yield return structure.ThirdSupportElement;
             yield return structure.ThirdFlexElement;
         }
-
         public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
             ITeamFullRolesStructureRead<TKey> keys, ITeamFullRolesStructureRead<TValue> values)
         {
@@ -504,17 +528,6 @@ namespace CombatSystem.Team
         }
 
 
-        public static void DoInjection<TRead, TInject>(TeamFullGroupStructure<TRead> structure,
-            TeamFullGroupStructure<TInject> injectInto, Func<TRead,TInject> parseFunc)
-        {
-            int index = 0;
-            while (structure.MoveNext())
-            {
-                var parsedCurrent = parseFunc(structure.Current);
-                SetElement(index,injectInto,parsedCurrent);
-            }
-            structure.Reset();
-        }
     }
 
     public static class UtilsCombatTeam

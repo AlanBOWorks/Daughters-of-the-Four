@@ -204,10 +204,12 @@ namespace CombatSystem.Stats
         }
 
         private const float MaxActionAmount = 12f;
+
         /// <summary>
         /// Checks if the entity has enough Actions points
         /// </summary>
         public static bool CanActRequest(in CombatEntity entity) => CanActRequest(entity.Stats);
+
         /// <summary>
         /// Checks if the entity has enough Actions points
         /// </summary>
@@ -222,6 +224,7 @@ namespace CombatSystem.Stats
         }
 
         public static bool IsAlive(in CombatEntity entity) => IsAlive(entity.Stats);
+
         public static bool IsAlive(in CombatStats stats)
         {
             return stats.CurrentMortality > 0 || stats.CurrentHealth > 0;
@@ -232,7 +235,7 @@ namespace CombatSystem.Stats
             TickInitiative(in stats, out _);
         }
 
-        public static void TickInitiative(in CombatStats stats,out float currentTickAmount)
+        public static void TickInitiative(in CombatStats stats, out float currentTickAmount)
         {
             float initiativeIncrement = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
             if (initiativeIncrement <= 0)
@@ -262,6 +265,20 @@ namespace CombatSystem.Stats
         public static void FullTickActions(in CombatStats stats)
         {
             stats.UsedActions = MaxActionAmount + 1;
+        }
+
+        public static void CalculateTempoPercent(in CombatStats entity, out float currentTickAmount,
+            out float initiativePercent)
+        {
+            currentTickAmount = entity.CurrentInitiative;
+            CalculateTempoPercent(in currentTickAmount, out initiativePercent);
+        }
+
+        public static void CalculateTempoPercent(in float currentTickAmount,
+            out float initiativePercent)
+        {
+            const float initiativeThreshold = TempoTicker.LoopThreshold;
+            initiativePercent = currentTickAmount / initiativeThreshold;
         }
     }
 }

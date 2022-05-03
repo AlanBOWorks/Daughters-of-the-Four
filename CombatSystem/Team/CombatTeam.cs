@@ -100,8 +100,8 @@ namespace CombatSystem.Team
         public IReadOnlyList<CombatEntity> GetOffMembersActiveMembers() => _activeMembers.GetOffMembers();
         public IReadOnlyList<CombatEntity> GetActiveMembers() => _activeMembers;
 
-        public IEnumerator<CombatEntity> OffRoleMembers => _offRolesGroup;
-
+        public IEnumerable<CombatEntity> OffRoleMembers => _offRolesGroup;
+        public TeamOffGroupStructure<CombatEntity> GetOffMembersStructure() => _offRolesGroup;
 
         public IEnumerable<CombatEntity> FrontLineType =>
             GetEnumerable(_mainPositionsWrapper.FrontLineType, _offRolesGroup.FrontLineType);

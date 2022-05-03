@@ -68,7 +68,7 @@ namespace CombatSystem.Team
         {
             HashSet = new HashSet<TKey>();
         }
-
+        [ShowInInspector]
         protected readonly HashSet<TKey> HashSet;
         public IReadOnlyCollection<TKey> GetHashSet() => HashSet;
     }

@@ -11,7 +11,8 @@ namespace CombatSystem.Team
 {
     public sealed class CombatTeamControllersHandler : IOppositionTeamStructureRead<CombatTeamControllerBase>,
         ITempoEntityStatesListener, ITempoTeamStatesListener,
-        ITempoDedicatedEntityStatesListener
+        ITempoDedicatedEntityStatesListener,
+        ICombatStatesListener
     {
 
        
@@ -104,6 +105,33 @@ namespace CombatSystem.Team
             var firstEntity = CurrentController.ControllingTeam.GetTrinityActiveMembers()[0];
             CombatSystemSingleton.EventsHolder.OnTempoStartControl(CurrentController, in firstEntity);
         }
+
+
+
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
+        {
+            Clear(); //safe clear
+        }
+
+        public void OnCombatStart()
+        {
+        }
+
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+            Clear();
+        }
+
+        public void OnCombatQuit()
+        {
+            Clear();
+        }
+
+        private void Clear()
+        {
+            PlayerTeamType.Clear();
+            EnemyTeamType?.Clear();
+        }
     }
     
     public abstract class CombatTeamControllerBase : TeamBasicGroupHashSet<CombatEntity>
@@ -111,12 +139,16 @@ namespace CombatSystem.Team
         protected CombatTeamControllerBase() : base()
         {
             OffMembers = new HashSet<CombatEntity>();
+            AllActiveMembers = new HashSet<CombatEntity>();
         }
 
         internal bool IsWaiting() => HashSet.Count > 0;
-
+        [ShowInInspector]
         protected readonly HashSet<CombatEntity> OffMembers;
         public IReadOnlyCollection<CombatEntity> GetOffMembers() => OffMembers;
+
+        protected readonly HashSet<CombatEntity> AllActiveMembers;
+        public IReadOnlyCollection<CombatEntity> GetAllActiveMembers() => AllActiveMembers;
 
         public CombatTeam ControllingTeam { get; private set; }
         internal void Injection(CombatTeam team) => ControllingTeam = team;
@@ -128,11 +160,13 @@ namespace CombatSystem.Team
             int index = UtilsTeam.GetRoleIndex(entity);
             Members[index] = entity;
             HashSet.Add(entity);
+            AllActiveMembers.Add(entity);
         }
 
         public void InjectionOnRequestOffSequence(in CombatEntity entity)
         {
             OffMembers.Add(entity);
+            AllActiveMembers.Add(entity);
         }
 
         public void Clear()
@@ -142,11 +176,15 @@ namespace CombatSystem.Team
             SupportType = null;
             OffMembers.Clear();
             HashSet.Clear();
+            AllActiveMembers.Clear();
         }
 
 
         public void SafeRemove(CombatEntity entity)
         {
+            if(!AllActiveMembers.Contains(entity)) return;
+            AllActiveMembers.Remove(entity);
+
             for (int i = 0; i < Members.Length; i++)
             {
                 if (Members[i] != entity) continue;

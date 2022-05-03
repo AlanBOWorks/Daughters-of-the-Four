@@ -35,31 +35,31 @@ namespace CombatSystem.Team
         }
 
 
-        public IEnumerator<T> PlayerTeamType => playerTeamType;
-        public IEnumerator<T> EnemyTeamType => enemyTeamType;
+        public IEnumerator<T> PlayerTeamType => playerTeamType.GetEnumerator();
+        public IEnumerator<T> EnemyTeamType => enemyTeamType.GetEnumerator();
 
         protected override void IterationTeam(in CombatTeam team, bool isPlayerElement, in IEntityElementInstantiationListener<T>[] callListeners)
         {
-            var offMembers = GetStructureMembers(in team);
             IterationValues.IsPlayerElement = isPlayerElement;
             var references = (isPlayerElement) ? playerTeamType : enemyTeamType;
+            ITeamOffStructureRead<CombatEntity> offMembers = team.GetOffMembersStructure();
 
+            var enumerable = UtilsTeam.GetEnumerable(offMembers, references);
             int notNullIndex = 0;
             int iterationIndex = 0;
 
-            while (offMembers.MoveNext() && references.MoveNext())
+            foreach (var pair in enumerable)
             {
-                var element = references.Current;
-                var member = offMembers.Current;
-
+                var member = pair.Key;
+                var element = pair.Value;
                 IterationValues.NotNullIndex = notNullIndex;
                 IterationValues.IterationIndex = iterationIndex;
-
 
                 foreach (var listener in callListeners)
                 {
                     listener.OnIterationCall(in element, in member, in IterationValues);
                 }
+
 
                 iterationIndex++;
                 if (member == null) continue;
@@ -68,17 +68,11 @@ namespace CombatSystem.Team
                 ActiveElementsDictionary.Add(member, element);
             }
 
+
             references.activeCount = notNullIndex;
-
-            offMembers.Reset();
-            references.Reset();
         }
 
 
-        private IEnumerator<CombatEntity> GetStructureMembers(in CombatTeam team)
-        {
-            return team.OffRoleMembers;
-        }
 
         [Serializable]
         private sealed class TeamStructureReferences : TeamOffStructureInstantiateHandler<T>

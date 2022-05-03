@@ -91,9 +91,9 @@ namespace CombatSystem.Player.UI
 
         private const float AnimationTimeOffset = .02f;
         private const float AnimationDuration = TempoTicker.TickPeriodSeconds - AnimationTimeOffset;
-        public void TickTempo(in float currentInitiative, in float percentInitiative)
+        public void TickTempo(in float currentTickInitiative, in float percentInitiative)
         {
-            UpdateCurrentTick(in currentInitiative);
+            UpdateCurrentTick(in currentTickInitiative);
             UpdateSpeedText();
 
             CalculateBarWidth(percentInitiative, out Vector2 barSize, out Vector2 desiredSize);

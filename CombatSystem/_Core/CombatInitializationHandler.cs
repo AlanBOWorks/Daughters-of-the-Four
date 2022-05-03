@@ -20,8 +20,8 @@ namespace CombatSystem._Core
             ICombatTeamProvider enemyTeam)
         {
             // This is just in case these weren't instantiated
-            PlayerCombatSingleton.GetInstance();
-            EnemyCombatSingleton.GetInstance();
+            var playerSingleton = PlayerCombatSingleton.Instance;
+            var enemySingleton = EnemyCombatSingleton.Instance;
             CombatSystemSingleton.PrefabInstantiationHandler.FirstInstantiation();
 
             PrepareTeams(

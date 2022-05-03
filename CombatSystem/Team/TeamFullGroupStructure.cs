@@ -13,8 +13,6 @@ namespace CombatSystem.Team
         public TeamFullGroupStructure() : base(EnumTeam.TeamAlimentRolesLength)
         { }
 
-        protected override int MoveNextThreshold() => EnumTeam.FullTeamIndexCount;
-
         T ITeamRoleStructureRead<T>.VanguardType => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex];
        
         T ITeamRoleStructureRead<T>.AttackerType => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
@@ -49,6 +47,24 @@ namespace CombatSystem.Team
         {
             get => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex];
             set => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex] = value;
+        }
+
+        public new IEnumerator<T> GetEnumerator()
+        {
+            yield return VanguardType;
+            yield return AttackerType;
+            yield return SupportType;
+            yield return FlexType;
+
+            yield return SecondaryVanguardElement;
+            yield return SecondaryAttackerElement;
+            yield return SecondarySupportElement;
+            yield return SecondaryFlexElement;
+
+            yield return ThirdVanguardElement;
+            yield return ThirdAttackerElement;
+            yield return ThirdSupportElement;
+            yield return ThirdFlexElement;
         }
     }
 

@@ -5,12 +5,13 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UDualOffTempoTrackersHandler : UDualTeamOffStructureInstantiateHandler<UTempoTrackerHolder>, ITempoEntityPercentListener
+    public class UDualOffTempoTrackersHandler : UDualTeamOffStructureInstantiateHandler<UTempoTrackerHolder>, 
+        ITempoEntityPercentListener, ITempoDedicatedEntityStatesListener
     {
-        public void OnEntityTick(in CombatEntity entity, in float currentInitiative, in float percentInitiative)
+        public void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative)
         {
             if (GetActiveElementsDictionary().ContainsKey(entity))
-                GetActiveElementsDictionary()[entity].TickTempo(in currentInitiative, in percentInitiative);
+                GetActiveElementsDictionary()[entity].TickTempo(in currentTick, in percentInitiative);
         }
         public override void OnIterationCall(in UTempoTrackerHolder element, in CombatEntity entity,
             in TeamStructureIterationValues values)
@@ -34,6 +35,25 @@ namespace CombatSystem.Player.UI
             position.y = -(rectHeight + ElementMarginTop) * marginIndex; //negative means going down
 
             rectTransform.localPosition = position;
+        }
+
+        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            
+        }
+
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            //todo make activeAnimation 
+        }
+
+        public void OnTrinityEntityFinishSequence(CombatEntity entity)
+        {
+        }
+
+        public void OnOffEntityFinishSequence(CombatEntity entity)
+        {
+            UtilsTempoInfosHandler.HandleOnFinishSequence(this, in entity);
         }
     }
 }

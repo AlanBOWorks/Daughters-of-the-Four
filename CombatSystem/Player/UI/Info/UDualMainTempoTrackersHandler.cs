@@ -10,15 +10,15 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UDualMainTempoTrackersHandler : UDualTeamMainStructureInstantiateHandler<UTempoTrackerHolder>,
-        ITempoEntityPercentListener
+        ITempoEntityPercentListener, ITempoDedicatedEntityStatesListener
     {
         [Title("OffRole - References")]
         [SerializeField] private RectTransform offRolesParent;
 
-        public void OnEntityTick(in CombatEntity entity, in float currentInitiative, in float percentInitiative)
+        public void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative)
         {
             if (GetActiveElementsDictionary().ContainsKey(entity))
-                GetActiveElementsDictionary()[entity].TickTempo(in currentInitiative, in percentInitiative);
+                GetActiveElementsDictionary()[entity].TickTempo(in currentTick, in percentInitiative);
         }
 
         public override void OnIterationCall(in UTempoTrackerHolder element, in CombatEntity entity,
@@ -49,6 +49,25 @@ namespace CombatSystem.Player.UI
             rectTransform.localPosition = localPosition;
         }
 
+
+        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+            //todo make activeAnimation 
+        }
+
+        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+        }
+
+        public void OnTrinityEntityFinishSequence(CombatEntity entity)
+        {
+            UtilsTempoInfosHandler.HandleOnFinishSequence(this, in entity);
+        }
+
+        public void OnOffEntityFinishSequence(CombatEntity entity)
+        {
+            
+        }
     }
 
     public static class UtilsTempoInfosHandler
@@ -67,21 +86,6 @@ namespace CombatSystem.Player.UI
             else
             {
                 repositionIndex = values.NotNullIndex;
-                HandleActiveEnemy(in element, in entity);
-            }
-        }
-
-        public static void HandleHandler(in UTempoTrackerHolder element, in CombatEntity entity,
-            in TeamStructureIterationValues values)
-        {
-            bool isPlayerElement = values.IsPlayerElement;
-
-            if (isPlayerElement)
-            {
-                HandleActivePlayer(in element, in entity);
-            }
-            else
-            {
                 HandleActiveEnemy(in element, in entity);
             }
         }
@@ -114,6 +118,12 @@ namespace CombatSystem.Player.UI
 
             element.ShowElement();
             element.EntityInjection(in entity);
+        }
+
+        public static void HandleOnFinishSequence(ITempoEntityPercentListener listener,in CombatEntity entity)
+        {
+            UtilsCombatStats.CalculateTempoPercent(entity.Stats, out var currentTick, out var initiativePercent);
+            listener.OnEntityTick(in entity, in currentTick, in initiativePercent);
         }
     }
 }

@@ -119,10 +119,10 @@ namespace CombatSystem._Core
 
         // ------ TEMPO ----- 
 
-        public void OnEntityTick(in CombatEntity entity, in float currentInitiative, in float percentInitiative)
+        public void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative)
         {
-            _playerCombatEvents.OnEntityTick(in entity, in currentInitiative, in percentInitiative);
-            _enemyCombatEvents.OnEntityTick(in entity, in currentInitiative, in percentInitiative);
+            _playerCombatEvents.OnEntityTick(in entity, in currentTick, in percentInitiative);
+            _enemyCombatEvents.OnEntityTick(in entity, in currentTick, in percentInitiative);
         }
 
 
@@ -488,11 +488,11 @@ namespace CombatSystem._Core
                 listener.OnStopTicking();
             }
         }
-        public void OnEntityTick(in CombatEntity entity, in float currentInitiative, in float percentInitiative)
+        public void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative)
         {
             foreach (var listener in _tempoEntityPercentListeners)
             {
-                listener.OnEntityTick(in entity, in currentInitiative, in percentInitiative);
+                listener.OnEntityTick(in entity, in currentTick, in percentInitiative);
             }
         }
 

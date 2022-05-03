@@ -13,7 +13,7 @@ namespace CombatSystem.Player
 {
     public sealed class PlayerCombatSingleton 
     {
-        private static readonly PlayerCombatSingleton Instance = new PlayerCombatSingleton();
+        public static readonly PlayerCombatSingleton Instance = new PlayerCombatSingleton();
 
         static PlayerCombatSingleton()
         {
@@ -37,7 +37,6 @@ namespace CombatSystem.Player
             discriminationEvents.Subscribe(performerSwitcherHandler);
         }
 
-        public static PlayerCombatSingleton GetInstance() => Instance;
 
         [Title("Events")]
         [ShowInInspector]
@@ -87,7 +86,7 @@ namespace CombatSystem.Player
             [Button("Refresh References")]
             private void LoadReferences()
             {
-                _singleton = GetInstance();
+                _singleton = Instance;
                 _feedBacks = PlayerCombatUserInterfaceSingleton.CombatTeemFeedBacks;
             }
         }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public class TeamOffGroupStructure<T> : IEnumerator<T>, 
+    public class TeamOffGroupStructure<T> : IEnumerable<T>, 
         ITeamFlexRoleStructureRead<T[]>, ITeamFlexPositionStructureRead<T[]>, ITeamOffStructureRead<T>
     {
         public TeamOffGroupStructure() : this(EnumTeam.OffRoleTypesLength)
@@ -20,12 +20,9 @@ namespace CombatSystem.Team
             AttackerMidLine = new T[arrayLength];
             SupportBackLine = new T[arrayLength];
             FlexFlexLine = new T[arrayLength];
-
-            MembersIndex = -1;
         }
 
 
-        protected int MembersIndex;
         [ShowInInspector,HorizontalGroup("Front")]
         protected readonly T[] VanguardFrontLine;
         [ShowInInspector,HorizontalGroup("Front")]
@@ -59,26 +56,7 @@ namespace CombatSystem.Team
         }
 
 
-        private const int IndexThreshold = EnumTeam.OffRoleIndexCount;
-        protected virtual int MoveNextThreshold() => IndexThreshold;
 
-        public bool MoveNext()
-        {
-            MembersIndex++;
-            return MembersIndex < MoveNextThreshold();
-        }
-
-        public void Reset()
-        {
-            MembersIndex = -1;
-        }
-
-        public virtual T Current => UtilsTeam.GetElement(MembersIndex, this);
-        object IEnumerator.Current => Current;
-
-        public void Dispose()
-        {
-        }
 
         public T[] VanguardType => VanguardFrontLine;
         public T[] AttackerType => AttackerMidLine;
@@ -137,6 +115,24 @@ namespace CombatSystem.Team
         {
             get => FlexFlexLine[EnumTeam.ThirdRoleInOffArrayIndex];
             set => FlexFlexLine[EnumTeam.ThirdRoleInOffArrayIndex] = value;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            yield return SecondaryVanguardElement;
+            yield return SecondaryAttackerElement;
+            yield return SecondarySupportElement;
+            yield return SecondaryFlexElement;
+
+            yield return ThirdVanguardElement;
+            yield return ThirdAttackerElement;
+            yield return ThirdSupportElement;
+            yield return ThirdFlexElement;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 
