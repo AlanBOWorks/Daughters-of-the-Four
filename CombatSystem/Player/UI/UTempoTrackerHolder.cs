@@ -128,7 +128,7 @@ namespace CombatSystem.Player.UI
             var userStats = _user.Stats;
             float initiativeSpeed = UtilsStatsFormula.CalculateInitiativeSpeed(in userStats);
             if(initiativeSpeed > 0)
-                entitySpeed.text = "+" + initiativeSpeed.ToString("0");
+                entitySpeed.text = "+" + initiativeSpeed.ToString("F1");
             else
             {
                 entitySpeed.text = null;

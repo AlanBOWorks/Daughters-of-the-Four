@@ -1,6 +1,7 @@
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
+using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -51,15 +52,50 @@ namespace CombatSystem._Core
     }
 
 
-    internal sealed class CombatEventsLogs : ITempoDedicatedEntityStatesListener,
+    internal sealed class CombatEventsLogs : ITempoTeamStatesListener,
+        ITempoDedicatedEntityStatesListener, ITempoEntityStatesListener,
         ITempoTickListener, ISkillUsageListener
     {
+        [Title("Teams")] 
+        public bool ShowTeamLogs = false;
+
+        private sealed class TeamLogs
+        {
+            public bool OnStartControl = true;
+            public bool OnFinishActors = true;
+            public bool OnFinishControl = true;
+        }
+        [ShowInInspector]
+        private TeamLogs _teamLogs = new TeamLogs();
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
+        {
+            if(!ShowTeamLogs || !_teamLogs.OnStartControl) return;
+            Debug.Log($"Start Control: {controller} | First: {firstEntity.CombatCharacterName}");
+        }
+
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+            if (!ShowTeamLogs || !_teamLogs.OnFinishActors) return;
+            Debug.Log($"Finish all Actors: {lastActor.CombatCharacterName}");
+
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            if(!ShowTeamLogs || !_teamLogs.OnFinishControl) return;
+            Debug.Log($"Finish Control: {controller}");
+        }
+
+
         [Title("Entity Sequence")]
         public bool ShowEntitySequenceLogs = false;
         private class EntitySequenceLogs
         {
-            public bool OnStart = true;
-            public bool OnFinish = true;
+            public bool OnSequence = true;
+            public bool OnAction = true;
+            public bool OnFinishAction = true;
+            public bool OnFinishSequence = true;
         }
 
         [ShowInInspector]
@@ -67,27 +103,49 @@ namespace CombatSystem._Core
 
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnStart) return;
+            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnSequence) return;
             Debug.Log($"> --- TRINITY Entity [START] Sequence: {entity.GetProviderEntityName()}");
         }
 
         public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnStart) return;
+            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnSequence) return;
             Debug.Log($"> --- OFF Entity [START] Sequence: {entity.GetProviderEntityName()}");
         }
 
         public void OnTrinityEntityFinishSequence(CombatEntity entity)
         {
-            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnFinish) return;
+            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnFinishSequence) return;
             Debug.Log($"> --- TRINITY Entity [END] Sequence: {entity.GetProviderEntityName()}");
         }
 
         public void OnOffEntityFinishSequence(CombatEntity entity)
         {
-            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnFinish) return;
+            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnFinishSequence) return;
             Debug.Log($"> --- OFF Entity [END] Sequence: {entity.GetProviderEntityName()}");
         }
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        {
+        }
+
+        public void OnEntityRequestAction(CombatEntity entity)
+        {
+            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnAction) return;
+            Debug.Log($"> --- Entity [START] Action: {entity.GetProviderEntityName()}");
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnFinishAction) return;
+            Debug.Log($"> --- Entity [END] Action: {entity.GetProviderEntityName()}");
+        }
+
+        public void OnEntityFinishSequence(CombatEntity entity)
+        {
+        }
+
+
 
         [Title("Tempo")]
         public bool ShowTempoLogs = false;
@@ -167,7 +225,6 @@ namespace CombatSystem._Core
             if (!ShowSkillLogs || !_skillsLogs.OnFinish) return;
             Debug.Log("-------------- SKILL END --------------- ");
         }
-
     }
 
 

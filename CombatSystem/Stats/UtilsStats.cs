@@ -197,7 +197,7 @@ namespace CombatSystem.Stats
             // A zero actions is equivalent to a passive Entity (and can be affected on start sequence events/effects)
             // while a negative actions type are in-mobile entities (obstacles like entities) than can't be affected by
             // "time" nor "effects" related to tempo
-            if (actionsAmount < 0) return false;
+            if (actionsAmount <= 0) return false;
 
             int skillsCount = entity.GetCurrentSkills().Count;
             return skillsCount > 0;

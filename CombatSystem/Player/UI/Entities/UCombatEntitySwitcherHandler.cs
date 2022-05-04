@@ -124,7 +124,7 @@ namespace CombatSystem.Player.UI
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
-
+            _currentPerformer = null;
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
@@ -161,8 +161,6 @@ namespace CombatSystem.Player.UI
 
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.OnPerformerSwitch(in entity);
-
-            skillsHolder.SwitchControllingEntity(in entity);
         }
         public void OnPerformerSwitch(in CombatEntity performer)
         {

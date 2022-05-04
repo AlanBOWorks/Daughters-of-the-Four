@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace CombatSystem.Team
 {
@@ -36,12 +37,29 @@ namespace CombatSystem.Team
 
         public void OnTrinityEntityFinishSequence(CombatEntity entity)
         {
-            _trinityMembers.Remove(entity);
         }
 
         public void OnOffEntityFinishSequence(CombatEntity entity)
         {
+        }
+
+        public void SafeRemove(in CombatEntity entity)
+        {
+            if (_trinityMembers.Contains(entity))
+            {
+                _trinityMembers.Remove(entity);
+                return;
+            }
+            if(!_offMembers.Contains(entity)) return;
+
             _offMembers.Remove(entity);
+        }
+
+
+        public void Clear()
+        {
+            _trinityMembers.Clear();
+            _offMembers.Clear();
         }
 
         public IEnumerator<CombatEntity> GetEnumerator()

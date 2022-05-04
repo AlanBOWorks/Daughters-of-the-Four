@@ -14,6 +14,8 @@ namespace CombatSystem.Team
         ITeamFullRolesStructureRead<CombatEntity>,
         ITeamFlexPositionStructureRead<IEnumerable<CombatEntity>>,
         IEnumerable<CombatEntity>,
+
+        ITempoTeamStatesListener,
         ITempoDedicatedEntityStatesListener, 
         ITempoEntityStatesListener
     {
@@ -310,6 +312,10 @@ namespace CombatSystem.Team
             }
         }
 
+        /// <summary>
+        /// Shows if the team had al least one [<see cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>] as true 
+        /// </summary>
+        public bool IsControlActive { get; private set; }
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             _activeMembers.OnTrinityEntityRequestSequence(entity,canAct);
@@ -322,12 +328,10 @@ namespace CombatSystem.Team
 
         public void OnTrinityEntityFinishSequence(CombatEntity entity)
         {
-            _activeMembers.OnTrinityEntityFinishSequence(entity);
         }
 
         public void OnOffEntityFinishSequence(CombatEntity entity)
         {
-            _activeMembers.OnOffEntityFinishSequence(entity);
         }
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -345,7 +349,23 @@ namespace CombatSystem.Team
 
         public void OnEntityFinishSequence(CombatEntity entity)
         {
+            _activeMembers.SafeRemove(in entity);
         }
+        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
+        {
+            IsControlActive = true;
+        }
+
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+            IsControlActive = false;
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+        }
+
+
 
         public IEnumerator<CombatEntity> GetEnumerator()
         {
@@ -356,6 +376,7 @@ namespace CombatSystem.Team
         {
             return GetEnumerator();
         }
+
     }
 
     [Serializable]

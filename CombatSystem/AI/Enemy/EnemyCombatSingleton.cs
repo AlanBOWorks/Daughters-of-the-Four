@@ -12,12 +12,17 @@ namespace CombatSystem.AI
         static EnemyCombatSingleton()
         {
             EnemyEventsHolder = new EnemyCombatEventsHolder();
+
+            TeamController = new EnemyTeamControllerRandom();
+
+
+            EnemyEventsHolder.DiscriminationEventsHolder.Subscribe(TeamController);
         }
 
         [ShowInInspector]
         public static EnemyCombatEventsHolder EnemyEventsHolder { get; private set; }
 
-
+        public static readonly EnemyTeamControllerRandom TeamController;
 
 
 

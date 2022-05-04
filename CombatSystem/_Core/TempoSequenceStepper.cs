@@ -8,9 +8,15 @@ namespace CombatSystem._Core
     {
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            if(!canAct) return;
             var eventsHolder = CombatSystemSingleton.EventsHolder;
+            if(!canAct)
+            {
+                eventsHolder.OnNoActionsForcedFinish(in entity);
+                return;
+            }
             eventsHolder.OnAfterEntityRequestSequence(in entity);
+
+            eventsHolder.OnEntityRequestAction(entity);
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -23,8 +29,11 @@ namespace CombatSystem._Core
         public void OnEntityFinishAction(CombatEntity entity)
         {
             bool canAct = UtilsCombatStats.CanActRequest(entity);
+            var eventHolder = CombatSystemSingleton.EventsHolder;
             if (!canAct)
-                CombatSystemSingleton.EventsHolder.OnEntityFinishSequence(entity);
+                eventHolder.OnEntityFinishSequence(entity);
+            else
+                eventHolder.OnEntityRequestAction(entity);
         }
 
         /// <summary>
@@ -48,13 +57,18 @@ namespace CombatSystem._Core
 
         public void OnAfterEntitySequenceFinish(in CombatEntity entity)
         {
-            var activeMembers = entity.Team.GetActiveMembers();
+            var entityTeam = entity.Team;
+            if(!entityTeam.IsControlActive) return;
+
+            var activeMembers = entityTeam.GetActiveMembers();
             if (activeMembers.Count > 0) return;
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             eventsHolder.OnControlFinishAllActors(in entity);
         }
 
-
+        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        {
+        }
     }
 }

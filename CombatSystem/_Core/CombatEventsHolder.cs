@@ -227,6 +227,16 @@ namespace CombatSystem._Core
             _sequenceStepper.OnAfterEntitySequenceFinish(in entity);
         }
 
+        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        {
+            _eventsHolder.OnNoActionsForcedFinish(in entity);
+            _playerCombatEvents.OnNoActionsForcedFinish(in entity);
+            _enemyCombatEvents.OnNoActionsForcedFinish(in entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnNoActionsForcedFinish(in entity);
+
+            _sequenceStepper.OnNoActionsForcedFinish(in entity);
+        }
 
 
         public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
@@ -939,6 +949,14 @@ namespace CombatSystem._Core
             foreach (var listener in _tempoEntityExtraListeners)
             {
                 listener.OnAfterEntitySequenceFinish(in entity);
+            }
+        }
+
+        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        {
+            foreach (var listener in _tempoEntityExtraListeners)
+            {
+                listener.OnNoActionsForcedFinish(in entity);
             }
         }
     }

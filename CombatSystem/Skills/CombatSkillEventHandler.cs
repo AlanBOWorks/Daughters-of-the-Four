@@ -65,7 +65,7 @@ namespace CombatSystem.Skills
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            var currentEntities = controller.GetHashSet();
+            var currentEntities = controller.GetAllActiveMembers();
             foreach (var entity in currentEntities)
             {
                 OnEntityFinishSequence(entity);

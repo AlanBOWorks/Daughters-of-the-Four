@@ -260,14 +260,12 @@ namespace CombatSystem._Core
     {
         /// <summary>
         /// It's send once per sequence and the first time the entity's
-        /// [<seealso cref="CombatStats.CurrentInitiative"/>] triggers. This is invoked even if the
-        /// entity can't act; To verify if can act use [<see cref="canAct"/>] or use
-        /// [<seealso />] instead
+        /// [<seealso cref="CombatStats.CurrentInitiative"/>] triggers. 
         /// </summary>
         void OnEntityRequestSequence(CombatEntity entity, bool canAct);
 
         /// <summary>
-        /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left.<br></br>
+        /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left and if it can act.<br></br>
         /// If there's no actions left [<see cref="OnEntityFinishSequence"/>] will be invoked instead.
         /// </summary>
         void OnEntityRequestAction(CombatEntity entity);
@@ -299,6 +297,11 @@ namespace CombatSystem._Core
         /// This events is called after removing the entity from the [<seealso cref="CombatTeam._activeMembers"/>].<br></br>
         /// </summary>
         void OnAfterEntitySequenceFinish(in CombatEntity entity);
+
+        /// <summary>
+        /// Invoked after the entity reaches initiation but doesn't have enough actions
+        /// </summary>
+        void OnNoActionsForcedFinish(in CombatEntity entity);
     }
 
     public interface ITempoDedicatedEntityStatesListener : ICombatEventListener
@@ -323,7 +326,9 @@ namespace CombatSystem._Core
     public interface ITempoTeamStatesListener : ICombatEventListener
     {
         void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity);
-
+        /// <summary>
+        /// Event send after all members had finished; this is invoked before [<seealso cref="OnTempoFinishControl"/>]
+        /// </summary>
         void OnControlFinishAllActors(in CombatEntity lastActor);
         /// <summary>
         /// Invoked when the Entity's Controller decides that there's no more actions to make

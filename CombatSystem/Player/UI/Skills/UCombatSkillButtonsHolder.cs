@@ -151,52 +151,54 @@ namespace CombatSystem.Player.UI
         private const float DelayBetweenButtons = .12f;
         private const float AnimationDuration = .2f;
         [Button,DisableInEditorMode]
-        private void ShowSkillsAnimated()
-        {
-            Timing.KillCoroutines(_animationHandle);
-            _animationHandle = Timing.RunCoroutine(_ShowAll());
-            CombatSystemSingleton.LinkCoroutineToMaster(_animationHandle);
-            IEnumerator<float> _ShowAll()
-            {
-                int index = 0;
-                Vector2 lastPoint = Vector2.zero;
-
-                yield return Timing.WaitForOneFrame;
-
-                foreach (var button in _activeButtons)
-                {
-                    var buttonHolder = button.Value;
-                    yield return Timing.WaitForSeconds(DelayBetweenButtons);
-
-                    ShowIcon(in buttonHolder);
-                    
-                    index++;
-                }
-               
-
-                void ShowIcon(in UCombatSkillButton buttonHolder)
-                {
-                    Vector2 targetPoint = index * (buttonsSeparations + _buttonSizes);
-
-                    var buttonTransform = (RectTransform)buttonHolder.transform;
-
-                    buttonTransform.localPosition = lastPoint;
-                    buttonTransform.DOLocalMove(targetPoint, AnimationDuration);
-                    EnableButton(in buttonHolder);
-
-
-                    lastPoint = targetPoint;
-                }
-
-            }
-        }
 
         private void PoolEntitySkills(in CombatEntity entity)
         {
+            if(entity == null) return;
             var entitySkills = entity.GetCurrentSkills();
             HandlePool(in entitySkills);
 
             ShowSkillsAnimated();
+
+            void ShowSkillsAnimated()
+            {
+                Timing.KillCoroutines(_animationHandle);
+                _animationHandle = Timing.RunCoroutine(_ShowAll());
+                CombatSystemSingleton.LinkCoroutineToMaster(_animationHandle);
+                IEnumerator<float> _ShowAll()
+                {
+                    int index = 0;
+                    Vector2 lastPoint = Vector2.zero;
+
+                    yield return Timing.WaitForOneFrame;
+
+                    foreach (var button in _activeButtons)
+                    {
+                        var buttonHolder = button.Value;
+                        yield return Timing.WaitForSeconds(DelayBetweenButtons);
+
+                        ShowIcon(in buttonHolder);
+
+                        index++;
+                    }
+
+
+                    void ShowIcon(in UCombatSkillButton buttonHolder)
+                    {
+                        Vector2 targetPoint = index * (buttonsSeparations + _buttonSizes);
+
+                        var buttonTransform = (RectTransform)buttonHolder.transform;
+
+                        buttonTransform.localPosition = lastPoint;
+                        buttonTransform.DOLocalMove(targetPoint, AnimationDuration);
+                        EnableButton(in buttonHolder);
+
+
+                        lastPoint = targetPoint;
+                    }
+
+                }
+            }
         }
 
         private static void EnableButton(in UCombatSkillButton buttonHolder)

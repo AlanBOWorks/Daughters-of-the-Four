@@ -71,13 +71,18 @@ namespace CombatSystem.Stats
             modifyValue = (modifyValue + baseStats + buffStats + burstStats);
         }
 
-
+        private const float ZeroSpeedInitiativeAmount = .5f;
         public static float CalculateInitiativeSpeed(in CombatStats stats)
         {
             float speedAmount = stats.BaseStats.SpeedType
                                 + stats.BuffStats.SpeedType
                                 + stats.BurstStats.SpeedType;
             speedAmount *= stats.ConcentrationType;
+
+            // by design, 0 speed will be set by an skill > forcing the enemy reaching this stats.
+            // the problem: the entity never will reach 100% initiative, so this should be fixed with small increments
+            // NOTE: inmovil entities are the ones with speedAmount < 0
+            if (speedAmount == 0) return ZeroSpeedInitiativeAmount; 
 
             return Mathf.Round(speedAmount);
         }

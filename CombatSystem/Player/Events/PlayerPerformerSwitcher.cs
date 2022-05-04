@@ -26,5 +26,9 @@ namespace CombatSystem.Player.Events
             var nextCall = _activeEntities[0];
             PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(in nextCall);
         }
+
+        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        {
+        }
     }
 }
