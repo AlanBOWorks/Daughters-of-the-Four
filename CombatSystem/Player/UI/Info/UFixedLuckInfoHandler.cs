@@ -90,14 +90,17 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatEnd()
         {
             ResetState();
         }
 
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+        }
+
         public void OnCombatQuit()
         {
-            ResetState();
         }
     }
 }

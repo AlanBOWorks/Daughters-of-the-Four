@@ -1,5 +1,7 @@
 
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using CombatSystem.AI;
 using CombatSystem.Entity;
 using CombatSystem.Player;
@@ -101,22 +103,47 @@ namespace CombatSystem._Core
         }
 
 
-        private sealed class CombatMembersHolder : List<CombatEntity>
+        private sealed class CombatMembersHolder : IReadOnlyList<CombatEntity>
         {
             public CombatMembersHolder(CombatTeam playerTeam, CombatTeam enemyTeam)
             {
-                AddMembers(in playerTeam);
-                AddMembers(in enemyTeam);
+                _playerTeam = playerTeam;
+                _enemyTeam = enemyTeam;
+            }
 
-                void AddMembers(in CombatTeam team)
+            private readonly CombatTeam _playerTeam;
+            private readonly CombatTeam _enemyTeam;
+
+            public IEnumerator<CombatEntity> GetEnumerator()
+            {
+                foreach (var member in _playerTeam)
                 {
-                    foreach (var member in team)
-                    {
-                        Add(member);
-                    }
+                    yield return member;
+                }
+
+                foreach (var member in _enemyTeam)
+                {
+                    yield return member;
                 }
             }
 
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            public int Count => _playerTeam.Count + _enemyTeam.Count;
+
+            public CombatEntity this[int index]
+            {
+                get
+                {
+                    int playerCount = _playerTeam.Count;
+                    return index < playerCount 
+                        ? _playerTeam[index] 
+                        : _enemyTeam[index - playerCount];
+                }
+            }
         }
     }
 

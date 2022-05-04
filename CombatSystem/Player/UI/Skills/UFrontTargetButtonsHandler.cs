@@ -147,10 +147,5 @@ namespace CombatSystem.Player.UI
         {
             HideTargets();
         }
-
-        public void OnTempoForceFinish(in CombatTeamControllerBase controller, in IReadOnlyList<CombatEntity> remainingMembers)
-        {
-            
-        }
     }
 }

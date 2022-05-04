@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CombatSystem._Core
 {
-    public sealed class TempoTicker : ICombatStatesListener, ICombatPreparationListener
+    public sealed class TempoTicker : ICombatStatesListener
     {
         [ShowInInspector] 
         internal readonly HashSet<ITempoTickListener> TickListeners;
@@ -44,18 +44,23 @@ namespace CombatSystem._Core
 
         public void OnCombatStart()
         {
+            Timing.KillCoroutines(_tickingHandle); //safe kill
+
             _tickingHandle = Timing.RunCoroutine(_TickingLoop(), Segment.RealtimeUpdate);
             CombatSystemSingleton.LinkCoroutineToMaster(in _tickingHandle);
         }
 
+        public void OnCombatEnd()
+        {
+            Timing.KillCoroutines(_tickingHandle);
+        }
+
         public void OnCombatFinish(bool isPlayerWin)
         {
-            EntitiesTempoTicker.ResetState();
         }
 
         public void OnCombatQuit()
         {
-            EntitiesTempoTicker.ResetState();
         }
 
 
@@ -106,15 +111,10 @@ namespace CombatSystem._Core
             }
         }
 
-
-        public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
-        {
-            EntitiesTempoTicker.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
-        }
     }
 
     public sealed class CombatEntitiesTempoTicker : 
-        ICombatPreparationListener, ITempoEntityStatesListener,
+        ICombatStatesListener, ITempoEntityStatesListener,
         ITempoTickListener
     {
         public CombatEntitiesTempoTicker()
@@ -129,6 +129,7 @@ namespace CombatSystem._Core
         public void ResetState()
         {
             _tickingTrackers.Clear();
+            _mainEntitiesActingQueue.Clear();
         }
 
         public void AddEntities(CombatTeam team)
@@ -224,12 +225,6 @@ namespace CombatSystem._Core
         {
         }
 
-        public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
-        {
-            AddEntities(playerTeam);
-            AddEntities(enemyTeam);
-        }
-
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
         }
@@ -245,6 +240,31 @@ namespace CombatSystem._Core
         public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
             _tickingTrackers.Add(entity);
+        }
+
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
+        {
+            ResetState();//safe clear
+
+            AddEntities(playerTeam);
+            AddEntities(enemyTeam);
+        }
+
+        public void OnCombatStart()
+        {
+        }
+
+        public void OnCombatEnd()
+        {
+            ResetState();
+        }
+
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+        }
+
+        public void OnCombatQuit()
+        {
         }
     }
 

@@ -151,22 +151,26 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public virtual void OnCombatFinish(bool isPlayerWin)
-        {
-            OnCombatQuit();
-        }
-
-        public virtual void OnCombatQuit()
+        public void OnCombatEnd()
         {
             foreach (var pair in ActiveElementsDictionary)
             {
                 var element = pair.Value;
                 var entity = pair.Key;
                 bool isPlayerElement = UtilsTeam.IsPlayerTeam(in entity);
-                var handler= GetHandler(in isPlayerElement);
+                var handler = GetHandler(in isPlayerElement);
                 handler.PushElement(in element);
             }
             ActiveElementsDictionary.Clear();
+        }
+
+        public virtual void OnCombatFinish(bool isPlayerWin)
+        {
+        }
+
+        public virtual void OnCombatQuit()
+        {
+            
         }
     }
 
@@ -196,6 +200,14 @@ namespace CombatSystem.Player.UI
             foreach (var listener in _listeners)
             {
                 listener.OnElementCreated(in element, in entity);
+            }
+        }
+
+        public void Clear()
+        {
+            foreach (var listener in _listeners)
+            {
+                listener.ClearEntities();
             }
         }
     }

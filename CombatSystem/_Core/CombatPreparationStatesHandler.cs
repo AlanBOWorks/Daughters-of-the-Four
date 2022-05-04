@@ -47,14 +47,17 @@ namespace CombatSystem._Core
         {
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatEnd()
         {
             DestroyAliveReference();
         }
 
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+        }
+
         public void OnCombatQuit()
         {
-            DestroyAliveReference();
         }
 
         private static void CreateAliveReference()
@@ -112,6 +115,12 @@ namespace CombatSystem._Core
         void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam);
 
         void OnCombatStart();
+
+        /// <summary>
+        /// First event invoked for ending the Combat; is triggers for both [<see cref="OnCombatFinish"/>] and
+        /// [<see cref="OnCombatQuit"/>]
+        /// </summary>
+        void OnCombatEnd();
 
         /// <summary>
         /// Invoked only if the combat is finish by natural conditions

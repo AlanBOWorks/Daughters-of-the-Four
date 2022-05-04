@@ -96,14 +96,17 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatEnd()
         {
             _buttonsDictionary.Clear();
         }
 
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+        }
+
         public void OnCombatQuit()
         {
-            _buttonsDictionary.Clear();
         }
 
         public void ShowAll()

@@ -82,14 +82,17 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatEnd()
         {
             HideAll();
         }
 
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+        }
+
         public void OnCombatQuit()
         {
-            HideAll();
         }
 
 

@@ -102,8 +102,17 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnCombatStart();
         }
 
+        public void OnCombatEnd()
+        {
+            _eventsHolder.OnCombatEnd();
+            _playerCombatEvents.OnCombatEnd();
+            _enemyCombatEvents.OnCombatEnd();
+        }
+
         public void OnCombatFinish(bool isPlayerWin)
         {
+            OnCombatEnd();
+
             _eventsHolder.OnCombatFinish(isPlayerWin);
             _playerCombatEvents.OnCombatFinish(isPlayerWin);
             _enemyCombatEvents.OnCombatFinish(isPlayerWin);
@@ -111,6 +120,8 @@ namespace CombatSystem._Core
 
         public void OnCombatQuit()
         {
+            OnCombatEnd();
+
             _eventsHolder.OnCombatQuit();
             _playerCombatEvents.OnCombatQuit();
             _enemyCombatEvents.OnCombatQuit();
@@ -620,6 +631,14 @@ namespace CombatSystem._Core
             foreach (var listener in _combatStatesListeners)
             {
                 listener.OnCombatStart();
+            }
+        }
+
+        public void OnCombatEnd()
+        {
+            foreach (var listener in _combatStatesListeners)
+            {
+                listener.OnCombatEnd();
             }
         }
 

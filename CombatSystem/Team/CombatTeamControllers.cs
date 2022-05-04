@@ -113,21 +113,26 @@ namespace CombatSystem.Team
         {
         }
 
+        public void OnCombatEnd()
+        {
+            CurrentController = null;
+            PlayerTeamType.Clear();
+            EnemyTeamType.Clear();
+        }
+
         public void OnCombatFinish(bool isPlayerWin)
         {
-            OnCombatQuit();
         }
 
         public void OnCombatQuit()
         {
-            PlayerTeamType.Clear();
-            EnemyTeamType.Clear();
+            
         }
     }
     
     public abstract class CombatTeamControllerBase
     {
-        internal bool IsWaiting() => ControllingTeam.IsControlActive;
+        internal bool IsWaiting() => ControllingTeam != null && ControllingTeam.IsControlActive;
 
         public IReadOnlyCollection<CombatEntity> GetTrinityMembers() => ControllingTeam.GetTrinityActiveMembers();
         public IReadOnlyCollection<CombatEntity> GetOffMembers() => ControllingTeam.GetOffMembersActiveMembers();

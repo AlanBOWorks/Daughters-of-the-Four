@@ -13,7 +13,7 @@ namespace CombatSystem.Team
     public sealed class CombatTeam : 
         ITeamFullRolesStructureRead<CombatEntity>,
         ITeamFlexPositionStructureRead<IEnumerable<CombatEntity>>,
-        IEnumerable<CombatEntity>,
+        IReadOnlyList<CombatEntity>,
 
         ITempoTeamStatesListener,
         ITempoDedicatedEntityStatesListener, 
@@ -92,6 +92,8 @@ namespace CombatSystem.Team
         private readonly TeamOffGroupStructure<CombatEntity> _offRolesGroup;
         [ShowInInspector]
         private readonly CombatTeamActiveMembers _activeMembers;
+
+        public int Count => _members.Count;
 
 
         public IReadOnlyList<CombatEntity> MainRoleMembers => _mainRoleWrapper.Members;
@@ -386,6 +388,7 @@ namespace CombatSystem.Team
             return GetEnumerator();
         }
 
+        public CombatEntity this[int index] => _members[index];
     }
 
     [Serializable]

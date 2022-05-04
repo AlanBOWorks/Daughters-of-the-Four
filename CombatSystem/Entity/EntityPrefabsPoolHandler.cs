@@ -144,15 +144,19 @@ namespace CombatSystem.Entity
         {
         }
 
+        public void OnCombatEnd()
+        {
+            _playerTeamType.OnFinishCombat();
+            _enemyTeamType.OnFinishCombat();
+        }
+
         public void OnCombatFinish(bool isPlayerWin)
         {
-            OnCombatQuit();
         }
 
         public void OnCombatQuit()
         {
-            _playerTeamType.OnFinishCombat();
-            _enemyTeamType.OnFinishCombat();
+            
         }
     }
 }

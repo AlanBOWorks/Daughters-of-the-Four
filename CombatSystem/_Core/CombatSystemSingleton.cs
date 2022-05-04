@@ -62,10 +62,9 @@ namespace CombatSystem._Core
         internal static UTeamFullGroupStructure<Transform> EnemyPositionTransformReferences { get; set; }
 
         // ------- TEAM ------
-        public static IReadOnlyList<CombatEntity> AllMembers => AllMembersCollection;
         [Title("Team")]
         [ShowInInspector,DisableInEditorMode]
-        internal static List<CombatEntity> AllMembersCollection { private get; set; }
+        internal static IReadOnlyList<CombatEntity> AllMembersCollection { private get; set; }
 
         public static CombatTeamsHolder TeamsHolder;
 
@@ -102,6 +101,12 @@ namespace CombatSystem._Core
         public static void LinkCoroutineToMaster(in CoroutineHandle handle)
         {
             Timing.LinkCoroutines(MasterCoroutineHandle, handle);
+        }
+
+
+        public static void Clear()
+        {
+
         }
 
     }
