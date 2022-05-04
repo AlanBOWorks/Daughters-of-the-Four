@@ -61,8 +61,10 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
+            if(isForcedByController) return;
+
             UpdateLuckInfo(in entity);
         }
 

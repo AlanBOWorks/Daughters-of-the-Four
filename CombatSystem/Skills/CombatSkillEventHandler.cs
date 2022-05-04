@@ -2,10 +2,11 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using UnityEngine;
 
 namespace CombatSystem.Skills
 {
-    public sealed class CombatSkillEventHandler : ISkillUsageListener, ITempoEntityStatesListener, ITempoTeamStatesListener
+    public sealed class CombatSkillEventHandler : ISkillUsageListener, ITempoEntityStatesListener
     {
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
@@ -44,7 +45,7 @@ namespace CombatSystem.Skills
             entity.OnActionFinish();
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)
         {
             foreach (CombatSkill skill in entity.AllSkills)
             {
@@ -52,24 +53,6 @@ namespace CombatSystem.Skills
             }
 
             entity.OnSequenceFinish();
-        }
-
-        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
-        {
-            
-        }
-
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
-        {
-        }
-
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
-        {
-            var currentEntities = controller.GetAllActiveMembers();
-            foreach (var entity in currentEntities)
-            {
-                OnEntityFinishSequence(entity);
-            }
         }
     }
 }

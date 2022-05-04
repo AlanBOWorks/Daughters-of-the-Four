@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
@@ -141,8 +142,10 @@ namespace CombatSystem._Core
             Debug.Log($"> --- Entity [END] Action: {entity.GetProviderEntityName()}");
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
+            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnFinishSequence) return;
+            Debug.Log($"Finished as Forced: {isForcedByController}");
         }
 
 

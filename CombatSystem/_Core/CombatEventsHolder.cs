@@ -196,15 +196,15 @@ namespace CombatSystem._Core
             _sequenceStepper.OnEntityFinishAction(entity);
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
-            _eventsHolder.OnEntityFinishSequence(entity);
-            _playerCombatEvents.OnEntityFinishSequence(entity);
-            _enemyCombatEvents.OnEntityFinishSequence(entity);
+            _eventsHolder.OnEntityFinishSequence(entity,in isForcedByController);
+            _playerCombatEvents.OnEntityFinishSequence(entity,in isForcedByController);
+            _enemyCombatEvents.OnEntityFinishSequence(entity,in isForcedByController);
 
-            _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity);
+            _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity,in isForcedByController);
 
-            _sequenceStepper.OnEntityFinishSequence(entity);
+            _sequenceStepper.OnEntityFinishSequence(entity,in isForcedByController);
         }
 
         public void OnAfterEntityRequestSequence(in CombatEntity entity)
@@ -267,7 +267,10 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnTempoFinishControl(in controller);
 
             _currentDiscriminatedEntityEventsHolder.OnTempoFinishControl(in controller);
+
+            _sequenceStepper.OnTempoFinishControl(in controller);
         }
+
 
 
         // ------ SKILLS ----- 
@@ -781,6 +784,11 @@ namespace CombatSystem._Core
             _tempoEntityListeners.Add(tempoEntityListener);
         }
 
+        public void ManualSubscribe(ITempoEntityStatesExtraListener tempoEntityExtraListener)
+        {
+            _tempoEntityExtraListeners.Add(tempoEntityExtraListener);
+        }
+
         public void ManualSubscribe(ITempoDedicatedEntityStatesListener tempoEntityListener)
         {
             _tempoDedicatedEntitiesListeners.Add(tempoEntityListener);
@@ -855,11 +863,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)
         {
             foreach (var listener in _tempoEntityListeners)
             {
-                listener.OnEntityFinishSequence(entity);
+                listener.OnEntityFinishSequence(entity,in isForcedByController);
             }
         }
 
@@ -887,6 +895,7 @@ namespace CombatSystem._Core
             }
 
         }
+
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {

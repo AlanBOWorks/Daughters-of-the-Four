@@ -8,7 +8,7 @@ using Sirenix.OdinInspector;
 namespace CombatSystem.Player
 {
     public sealed class PlayerTeamController : CombatTeamControllerBase,
-        IPlayerEntityListener,
+        IPlayerEntityListener, ITempoTeamStatesListener,
         ISkillUsageListener,
         ISkillSelectionListener,
         ITargetSelectionListener
@@ -45,6 +45,7 @@ namespace CombatSystem.Player
 
         public void OnSkillCancel(in CombatSkill skill)
         {
+            if (_selectedSkill == skill) _selectedSkill = null;
         }
 
         public void OnSkillSubmit(in CombatSkill skill)
@@ -54,6 +55,7 @@ namespace CombatSystem.Player
         public void OnPerformerSwitch(in CombatEntity performer)
         {
             _selectedPerformer = performer;
+            HandleSkillCancel();
         }
 
 
@@ -90,6 +92,36 @@ namespace CombatSystem.Player
             _selectedSkill = null;
         }
 
+        private void OnControlFinish()
+        {
+            _selectedTarget = null;
+            _selectedPerformer = null;
+            HandleSkillCancel();
+        }
+
+        private void HandleSkillCancel()
+        {
+            if (_selectedSkill == null) return;
+
+            PlayerCombatSingleton.PlayerCombatEvents.OnSkillCancel(in _selectedSkill);
+            _selectedSkill = null;
+        }
+
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
+        {
+            _selectedPerformer = firstEntity;
+        }
+
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+            OnControlFinish();
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            OnControlFinish();
+        }
     }
 
 }

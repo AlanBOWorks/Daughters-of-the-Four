@@ -242,7 +242,7 @@ namespace CombatSystem._Core
         {
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
             _tickingTrackers.Add(entity);
         }
@@ -282,7 +282,7 @@ namespace CombatSystem._Core
         /// In this events, the entity is not removed from [<seealso cref="CombatTeam._activeMembers"/>].<br></br>
         /// For that subscribe to [<seealso cref="ITempoEntityStatesExtraListener.OnAfterEntitySequenceFinish"/>]
         /// </summary>
-        void OnEntityFinishSequence(CombatEntity entity);
+        void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController);
     }
 
     public interface ITempoEntityStatesExtraListener : ICombatEventListener

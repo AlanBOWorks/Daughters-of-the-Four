@@ -100,7 +100,7 @@ namespace CombatSystem.Team
 
         public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _activeMembers.GetTrinityMembers();
         public IReadOnlyList<CombatEntity> GetOffMembersActiveMembers() => _activeMembers.GetOffMembers();
-        public IReadOnlyList<CombatEntity> GetActiveMembers() => _activeMembers;
+        public IReadOnlyList<CombatEntity> GetActiveMembers() => _activeMembers.GetAllMembers();
 
         public IEnumerable<CombatEntity> OffRoleMembers => _offRolesGroup;
         public TeamOffGroupStructure<CombatEntity> GetOffMembersStructure() => _offRolesGroup;
@@ -347,8 +347,10 @@ namespace CombatSystem.Team
         {
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)
         {
+            if(isForcedByController) return;
+            //This will be removed with Clear OnTempoForceFinish
             _activeMembers.SafeRemove(in entity);
         }
         public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
@@ -363,8 +365,15 @@ namespace CombatSystem.Team
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
+            IsControlActive = false;
         }
 
+        public void OnTempoForceFinish(in CombatTeamControllerBase controller,
+            in IReadOnlyList<CombatEntity> remainingMembers)
+        {
+            _activeMembers.Clear();
+            IsControlActive = false;
+        }
 
 
         public IEnumerator<CombatEntity> GetEnumerator()

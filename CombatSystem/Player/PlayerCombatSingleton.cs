@@ -32,9 +32,10 @@ namespace CombatSystem.Player
             discriminationEvents.Subscribe(teamController);
             playerEvents.SubscribeAsPlayerEvent(teamController);
 
-            var performerSwitcherHandler = new PlayerPerformerSwitcher();
-            playerEvents.ManualSubscribe(performerSwitcherHandler);
-            discriminationEvents.Subscribe(performerSwitcherHandler);
+            PerformerSwitcher = new PlayerPerformerSwitcher();
+            playerEvents.ManualSubscribe((ICombatPreparationListener) PerformerSwitcher);
+            playerEvents.ManualSubscribe((ITempoTeamStatesListener)PerformerSwitcher);
+            discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesExtraListener);
         }
 
 
@@ -45,6 +46,7 @@ namespace CombatSystem.Player
         [ShowInInspector]
         public static PlayerTeamController PlayerTeamController { get; private set; }
 
+        public static readonly PlayerPerformerSwitcher PerformerSwitcher;
 
         [Title("Characters")]
         [ShowInInspector]

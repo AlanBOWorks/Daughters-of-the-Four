@@ -59,7 +59,7 @@ namespace CombatSystem.Team
             
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)
         {
             // PROBLEM: can't remove entity in this events since there's a foreach loop in the controllers
             // thus making an InvalidOperationException

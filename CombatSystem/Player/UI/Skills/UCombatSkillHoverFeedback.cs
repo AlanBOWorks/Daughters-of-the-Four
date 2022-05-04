@@ -67,6 +67,7 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillSelect(in CombatSkill skill)
         {
+
         }
 
         public void OnSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)

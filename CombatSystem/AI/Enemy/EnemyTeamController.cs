@@ -23,6 +23,13 @@ namespace CombatSystem.AI
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
         }
+
+        public void OnTempoForceFinish(in CombatTeamControllerBase controller,
+            in IReadOnlyList<CombatEntity> remainingMembers)
+        {
+            
+        }
+
         public void OnAfterEntityRequestSequence(in CombatEntity entity)
         {
         }

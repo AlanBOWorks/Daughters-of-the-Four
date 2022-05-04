@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using CombatSystem._Core;
 using CombatSystem.Stats;
@@ -30,10 +31,10 @@ namespace CombatSystem.Entity
             
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)
         {
             entity.Stats.CurrentInitiative = 0;
-            entity.Team.OnEntityFinishSequence(entity);
+            entity.Team.OnEntityFinishSequence(entity,in isForcedByController);
         }
 
         public void OnAfterEntityRequestSequence(in CombatEntity entity)
@@ -46,7 +47,7 @@ namespace CombatSystem.Entity
 
         public void OnNoActionsForcedFinish(in CombatEntity entity)
         {
-            OnEntityFinishSequence(entity);
+            OnEntityFinishSequence(entity, false);
         }
 
 
@@ -86,14 +87,12 @@ namespace CombatSystem.Entity
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            var team = controller.ControllingTeam;
-            var allActives = team.GetActiveMembers().ToArray();
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-            foreach (var entity in allActives)
-            {
-                eventsHolder.OnEntityFinishSequence(entity);
-            }
+            
         }
 
+        public void OnTempoForceFinish(in CombatTeamControllerBase controller,
+            in IReadOnlyList<CombatEntity> remainingMembers)
+        {
+        }
     }
 }

@@ -124,15 +124,16 @@ namespace CombatSystem.Player.UI
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
-            _currentPerformer = null;
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
        {
+            _currentPerformer = null;
            HideAll();
        }
 
-       public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
        {
            if (!_buttonsDictionary.ContainsKey(entity)) return;
 
@@ -147,7 +148,7 @@ namespace CombatSystem.Player.UI
        {
        }
 
-       public void OnEntityFinishSequence(CombatEntity entity)
+       public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
        {
            if (!_buttonsDictionary.ContainsKey(entity)) return;
 

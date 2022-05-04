@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
@@ -57,10 +58,14 @@ namespace CombatSystem.Player.UI
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
-            Hide();
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            Hide();
+        }
+
+        public void OnTempoForceFinish(in CombatTeamControllerBase controller, in IReadOnlyList<CombatEntity> remainingMembers)
         {
         }
 

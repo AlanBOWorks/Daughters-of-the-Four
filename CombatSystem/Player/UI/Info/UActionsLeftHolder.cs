@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
@@ -152,6 +153,10 @@ namespace CombatSystem.Player.UI
             HideUI();
         }
 
+        public void OnTempoForceFinish(in CombatTeamControllerBase controller, in IReadOnlyList<CombatEntity> remainingMembers)
+        {
+        }
+
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
         }
@@ -166,8 +171,10 @@ namespace CombatSystem.Player.UI
             UpdateInfoToCurrent();
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity)
+        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
+            if(isForcedByController) return;
+
             UpdateInfoToCurrent();
         }
     }

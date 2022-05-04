@@ -253,8 +253,8 @@ namespace CombatSystem.Player.UI
 
         private void HideAll()
         {
-            _currentControlEntity = null;
             ReturnSkillsToStack();
+            _currentControlEntity = null;
         }
         private void ResetPoolSkillsToCurrent()
         {
@@ -321,9 +321,11 @@ namespace CombatSystem.Player.UI
 
         private void DeselectSkill(in CombatSkill skill)
         {
-            if (skill != _currentSelectedSkill) return;
+            if (skill == null || skill != _currentSelectedSkill) return;
 
             var button = GetButton(in _currentSelectedSkill);
+            if(button == null) return;
+
             button.DeSelectButton();
 
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(in _currentSelectedSkill);
