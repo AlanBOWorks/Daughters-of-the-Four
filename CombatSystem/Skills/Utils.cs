@@ -12,13 +12,17 @@ namespace CombatSystem.Skills
 
     public static class UtilsTarget
     {
+        private static readonly List<CombatEntity> TargetsHelper = new List<CombatEntity>();
+
         public static bool CanBeTargeted(in CombatEntity target)
         {
             return target != null && target.CanBeTarget();
         }
 
-        public static IEnumerable<CombatEntity> GetPossibleTargets(CombatSkill skill, CombatEntity currentControl)
+        public static IReadOnlyList<CombatEntity> GetPossibleTargets(CombatSkill skill, CombatEntity currentControl)
         {
+            TargetsHelper.Clear();
+
             var type = skill.Archetype;
             switch (type)
             {
@@ -32,7 +36,13 @@ namespace CombatSystem.Skills
                     throw new ArgumentOutOfRangeException();
             }
 
-            IEnumerable<CombatEntity> GetOffensiveMembers()
+            IReadOnlyList<CombatEntity> GetSingleTarget(CombatEntity target)
+            {
+                TargetsHelper.Add(target);
+                return TargetsHelper;
+            }
+
+            IReadOnlyList<CombatEntity> GetOffensiveMembers()
             {
                 var enemyTeam = currentControl.Team.EnemyTeam;
                 var enemyGuarding = enemyTeam.GuardHandler;
@@ -44,7 +54,7 @@ namespace CombatSystem.Skills
                 foreach (var member in members)
                 {
                     if (CanBeTargeted(in member))
-                        yield return member;
+                        TargetsHelper.Add(member);
                 }
 
                 IEnumerable<CombatEntity> GetGuarderLine()
@@ -52,9 +62,11 @@ namespace CombatSystem.Skills
                     var guarder = enemyGuarding.GetCurrentGuarder();
                     return UtilsTeam.GetMemberLine(in guarder);
                 }
+
+                return TargetsHelper;
             }
 
-            IEnumerable<CombatEntity> GetSupportMembers()
+            IReadOnlyList<CombatEntity> GetSupportMembers()
             {
                 var team = currentControl.Team;
                 bool ignoreSelf = skill.IgnoreSelf();
@@ -63,15 +75,11 @@ namespace CombatSystem.Skills
                     if (ignoreSelf && member == currentControl)
                         continue;
 
-                    yield return member;
+                    TargetsHelper.Add(member);
                 }
+
+                return TargetsHelper;
             }
-        }
-
-
-        private static IEnumerable<CombatEntity> GetSingleTarget(CombatEntity target)
-        {
-            yield return target;
         }
 
         public static IEnumerable<CombatEntity> GetEffectTargets(EnumsEffect.TargetType targetType)
