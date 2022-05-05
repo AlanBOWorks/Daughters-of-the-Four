@@ -45,15 +45,14 @@ namespace CombatSystem.AI
         {
         }
 
-
+        private CombatEntity _currentControl;
         private void HandleControl(in CombatEntity onEntity)
         {
+            _currentControl = onEntity;
             var entitySkills = onEntity.GetCurrentSkills();
-        }
-
-        private void HandleEntity(in CombatEntity entity)
-        {
 
         }
+
+
     }
 }

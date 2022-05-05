@@ -1,3 +1,4 @@
+using CombatSystem._Core;
 using UnityEngine;
 
 namespace CombatSystem.Entity
@@ -30,6 +31,14 @@ namespace CombatSystem.Entity
             var entityBody = instantiatedGameObject.GetComponent<ICombatEntityBody>();
             entity.Body = entityBody;
             entity.InstantiationReference = instantiatedGameObject;
+        }
+    }
+
+    public sealed class UtilsCombatEntity
+    {
+        public static void DoSequenceFinish(in CombatEntity onEntity)
+        {
+            CombatSystemSingleton.EventsHolder.OnEntityFinishSequence(onEntity, false);
         }
     }
 }

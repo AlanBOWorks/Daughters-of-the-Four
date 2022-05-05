@@ -66,7 +66,7 @@ namespace CombatSystem.Player.UI
 
         public void OnOffEntityFinishSequence(CombatEntity entity)
         {
-            
+            UtilsTempoInfosHandler.HandleOnFinishSequence(this, in entity);
         }
     }
 

@@ -99,7 +99,50 @@ namespace CombatSystem.Player.UI
             ? PlayerElementSpawner
             : EnemyElementSpawner;
 
-        
+
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
+        {
+            foreach (var element in ActiveElementsDictionary)
+            {
+                element.Value.OnPreStartCombat();
+            }
+        }
+
+        public virtual void OnCombatStart()
+        {
+        }
+
+        public virtual void OnCombatEnd()
+        {
+            foreach (var pair in ActiveElementsDictionary)
+            {
+                var element = pair.Value;
+                var entity = pair.Key;
+                bool isPlayerElement = UtilsTeam.IsPlayerTeam(in entity);
+                var handler = GetHandler(in isPlayerElement);
+                handler.PushElement(in element);
+            }
+            ActiveElementsDictionary.Clear();
+            DisableSpawner(in playerElementSpawner);
+            DisableSpawner(in enemyElementSpawner);
+
+            
+        }
+        private static void DisableSpawner(in EntityElementSpawner spawner)
+        {
+            spawner.Disable();
+        }
+
+
+        public virtual void OnCombatFinish(bool isPlayerWin)
+        {
+        }
+
+        public virtual void OnCombatQuit()
+        {
+            
+        }
+
 
 
         [Serializable]
@@ -113,7 +156,7 @@ namespace CombatSystem.Player.UI
 
             public void Disable()
             {
-                if(hideElementOnStart)
+                if (hideElementOnStart)
                     elementEntityPrefab.gameObject.SetActive(false);
             }
 
@@ -137,40 +180,6 @@ namespace CombatSystem.Player.UI
                 Destroy(element.gameObject);
                 ActiveCount--;
             }
-        }
-
-        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
-        {
-            foreach (var element in ActiveElementsDictionary)
-            {
-                element.Value.OnPreStartCombat();
-            }
-        }
-
-        public virtual void OnCombatStart()
-        {
-        }
-
-        public void OnCombatEnd()
-        {
-            foreach (var pair in ActiveElementsDictionary)
-            {
-                var element = pair.Value;
-                var entity = pair.Key;
-                bool isPlayerElement = UtilsTeam.IsPlayerTeam(in entity);
-                var handler = GetHandler(in isPlayerElement);
-                handler.PushElement(in element);
-            }
-            ActiveElementsDictionary.Clear();
-        }
-
-        public virtual void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public virtual void OnCombatQuit()
-        {
-            
         }
     }
 
@@ -203,6 +212,13 @@ namespace CombatSystem.Player.UI
             }
         }
 
+        public override void OnCombatEnd()
+        {
+            base.OnCombatEnd();
+            Clear();
+        }
+
+
         public void Clear()
         {
             foreach (var listener in _listeners)
@@ -210,6 +226,8 @@ namespace CombatSystem.Player.UI
                 listener.ClearEntities();
             }
         }
+
+
     }
 
     public interface IEntityExistenceElement<T> where T : UnityEngine.Object, IEntityExistenceElement<T>

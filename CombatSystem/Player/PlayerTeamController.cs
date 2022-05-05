@@ -122,6 +122,12 @@ namespace CombatSystem.Player
         {
             OnControlFinish();
         }
+
+        public void FinishCurrentPerformer()
+        {
+            if(_selectedPerformer == null) return;
+            UtilsCombatEntity.DoSequenceFinish(in _selectedPerformer);
+        }
     }
 
 }

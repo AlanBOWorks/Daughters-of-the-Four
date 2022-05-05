@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Team;
 using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -9,11 +9,11 @@ using UnityEngine.EventSystems;
 
 namespace CombatSystem.Player
 {
-    public class UFinishActionsButton : MonoBehaviour, 
+    public abstract class UHoldButton : MonoBehaviour,
         IPointerDownHandler, IPointerUpHandler,
-        ITempoDedicatedEntityStatesListener
+        ITempoTeamStatesListener
     {
-        [SerializeField, Range(0,3), SuffixLabel("seg")] private float holdAmount = .4f;
+        [SerializeField, Range(0, 3), SuffixLabel("seg")] private float holdAmount = .4f;
 
         private void Awake()
         {
@@ -40,7 +40,7 @@ namespace CombatSystem.Player
             IEnumerator<float> _HoldClick()
             {
                 yield return Timing.WaitForSeconds(holdAmount);
-                PassTurn();
+                DoAction();
             }
         }
 
@@ -49,39 +49,32 @@ namespace CombatSystem.Player
             Timing.KillCoroutines(_pointerHandle);
         }
 
-        private static void PassTurn()
-        {
-            PlayerCombatSingleton.PlayerTeamController.ForceFinish();
-        }
+        protected abstract void DoAction();
 
 
-        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            if (!canAct) return;
-
-            Show();
-        }
-
-        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-        }
-
-        public void OnTrinityEntityFinishSequence(CombatEntity entity)
-        {
-        }
-
-        public void OnOffEntityFinishSequence(CombatEntity entity)
-        {
-        }
-
-        private void Show()
+        protected void Show()
         {
             gameObject.SetActive(true);
         }
 
-        private void Hide()
+        protected void Hide()
         {
             gameObject.SetActive(false);
+        }
+
+
+        public virtual void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
+        {
+            Show();
+        }
+
+        public virtual void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+        }
+
+        public virtual void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            Hide();
         }
     }
 }
