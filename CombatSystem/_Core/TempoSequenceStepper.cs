@@ -3,6 +3,7 @@ using System.Linq;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using UnityEngine;
 
 namespace CombatSystem._Core
 {
@@ -88,6 +89,10 @@ namespace CombatSystem._Core
             if(remainingEntities.Count == 0) return;
             
             OnTempoForceFinish(in controller, in remainingEntities);
+        }
+
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
         }
 
         public void OnTempoForceFinish(in CombatTeamControllerBase controller,

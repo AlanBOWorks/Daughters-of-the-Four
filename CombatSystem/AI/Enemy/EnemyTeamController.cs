@@ -9,43 +9,39 @@ using UnityEngine;
 
 namespace CombatSystem.AI
 {
-    public class EnemyTeamControllerRandom : CombatTeamControllerBase, ITempoTeamStatesListener,
-        ITempoEntityStatesExtraListener
+    public class EnemyTeamControllerRandom : CombatTeamControllerBase, ITempoTeamStatesListener
     {
-        private IReadOnlyList<CombatEntity> _activeEntities;
         public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
         {
-            _activeEntities = controller.GetAllActiveMembers();
-            HandleControl(in firstEntity);
+            var activeEntities = GetAllActiveMembers();
+            HandleEntities(in activeEntities);
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
-            ForceFinish();
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
         }
 
-
-        public void OnAfterEntityRequestSequence(in CombatEntity entity)
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
         }
-        public void OnAfterEntitySequenceFinish(in CombatEntity entity)
-        {
-            if (_activeEntities.Count <= 0) return;
 
-            var nextEntity = _activeEntities[0];
-            HandleControl(in nextEntity);
+        private void HandleEntities(in IReadOnlyList<CombatEntity> members)
+        {
+            while (members.Count > 0)
+            {
+                var actor = members[0];
+                HandleEntity(in actor);
+            }
+            ForceFinish();
         }
 
-        public void OnNoActionsForcedFinish(in CombatEntity entity)
-        {
-        }
 
         private CombatEntity _currentControl;
-        private void HandleControl(in CombatEntity onEntity)
+        private void HandleEntity(in CombatEntity onEntity)
         {
             _currentControl = onEntity;
             var entitySkills = onEntity.GetCurrentSkills();
@@ -54,10 +50,11 @@ namespace CombatSystem.AI
 
         private void HandleSkills(in IReadOnlyList<CombatSkill> skills)
         {
-            if(!UtilsCombatStats.CanActRequest(_currentControl)) return;
-
-            var selectedSkill = SelectSkill(in skills);
-            HandleSkill(in selectedSkill);
+            while (UtilsCombatStats.CanActRequest(_currentControl))
+            {
+                var selectedSkill = SelectSkill(in skills);
+                HandleSkill(in selectedSkill);
+            }
         }
 
         private static CombatSkill SelectSkill(in IReadOnlyList<CombatSkill> skills)

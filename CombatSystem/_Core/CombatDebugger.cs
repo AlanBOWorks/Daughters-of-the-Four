@@ -88,6 +88,11 @@ namespace CombatSystem._Core
             Debug.Log($"Finish Control: {controller}");
         }
 
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+            
+        }
+
 
         [Title("Entity Sequence")]
         public bool ShowEntitySequenceLogs = false;

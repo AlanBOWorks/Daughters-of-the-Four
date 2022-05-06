@@ -11,67 +11,30 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public sealed class CombatTeamControllersHandler : IOppositionTeamStructureRead<CombatTeamControllerBase>,
-        ITempoEntityStatesListener, ITempoTeamStatesListener,
-        ITempoDedicatedEntityStatesListener,
+        ITempoTeamStatesListener,
         ICombatStatesListener
     {
-
-        [ShowInInspector]
-        public CombatTeamControllerBase CurrentController { get; private set; }
-
         [ShowInInspector, HorizontalGroup()]
-        public CombatTeamControllerBase PlayerTeamType { get; set; }
+        private CombatTeamControllerBase _playerTeamType;
         [ShowInInspector, HorizontalGroup()]
-        public CombatTeamControllerBase EnemyTeamType { get; set; }
-
-        public bool CurrentControllerIsActive() => CurrentController != null;
+        private CombatTeamControllerBase _enemyTeamType;
 
 
-
-        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
+        public CombatTeamControllerBase PlayerTeamType
         {
-            if(!canAct) return;
-
-            var controller = UtilsTeam.GetElement(entity, this);
-            
-            if (CurrentController != null) return;
-
-            CurrentController = controller;
+            get => _playerTeamType;
+            set => _playerTeamType = value;
         }
 
-        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
+        public CombatTeamControllerBase EnemyTeamType
         {
-           
+            get => _enemyTeamType;
+            set => _enemyTeamType = value;
         }
 
-      
+        public bool CurrentControllerIsActive() => PlayerTeamType.CanControl() || EnemyTeamType.CanControl();
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-        }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-            
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)
-        {
-            // PROBLEM: can't remove entity in this events since there's a foreach loop in the controllers
-            // thus making an InvalidOperationException
-            // SOLUTION: check and remove on FinishAction
-        }
-        public void OnTrinityEntityFinishSequence(CombatEntity entity)
-        {
-        }
-        public void OnOffEntityFinishSequence(CombatEntity entity)
-        {
-        }
-
+       
         public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
         {
         }
@@ -82,24 +45,27 @@ namespace CombatSystem.Team
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            var oppositeControl = UtilsTeam.GetOppositeElement(CurrentController, this);
-
-            if (oppositeControl == null || !oppositeControl.IsWaiting())
-            {
-                CurrentController = null;
-            }
-            else
-            {
-                CurrentController = oppositeControl;
-                InvokeControlEvent();
-            }
         }
 
-        public void InvokeControlEvent()
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            if(CurrentController == null) return; //Safe check (it should be false always)
-            var firstEntity = CurrentController.ControllingTeam.GetTrinityActiveMembers()[0];
-            CombatSystemSingleton.EventsHolder.OnTempoStartControl(CurrentController, in firstEntity);
+            InvokeControls();
+        }
+
+        public void InvokeControls()
+        {
+            if(_playerTeamType.CanControl())
+                InvokeControlEvent(in _playerTeamType);
+            else if(_enemyTeamType.CanControl())
+                InvokeControlEvent(in _enemyTeamType);
+        }
+
+
+        private static void InvokeControlEvent(in CombatTeamControllerBase controller)
+        {
+            if(controller == null) return; 
+            var firstEntity = controller.ControllingTeam.GetTrinityActiveMembers()[0];
+            CombatSystemSingleton.EventsHolder.OnTempoStartControl(controller, in firstEntity);
         }
 
 
@@ -115,7 +81,6 @@ namespace CombatSystem.Team
 
         public void OnCombatEnd()
         {
-            CurrentController = null;
             PlayerTeamType.Clear();
             EnemyTeamType.Clear();
         }
@@ -132,7 +97,8 @@ namespace CombatSystem.Team
     
     public abstract class CombatTeamControllerBase
     {
-        internal bool IsWaiting() => ControllingTeam != null && ControllingTeam.IsControlActive;
+        [ShowInInspector]
+        internal bool CanControl() => ControllingTeam != null && ControllingTeam.IsControlActive;
 
         public IReadOnlyCollection<CombatEntity> GetTrinityMembers() => ControllingTeam.GetTrinityActiveMembers();
         public IReadOnlyCollection<CombatEntity> GetOffMembers() => ControllingTeam.GetOffMembersActiveMembers();

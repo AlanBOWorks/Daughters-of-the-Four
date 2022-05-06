@@ -90,6 +90,11 @@ namespace CombatSystem.Entity
             
         }
 
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+            
+        }
+
         public void OnTempoForceFinish(in CombatTeamControllerBase controller,
             in IReadOnlyList<CombatEntity> remainingMembers)
         {

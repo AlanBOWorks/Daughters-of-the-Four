@@ -76,5 +76,9 @@ namespace CombatSystem.Player
         {
             Hide();
         }
+
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+        }
     }
 }

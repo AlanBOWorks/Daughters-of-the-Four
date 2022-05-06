@@ -317,7 +317,8 @@ namespace CombatSystem.Team
         /// <summary>
         /// Shows if the team had al least one [<see cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>] as true 
         /// </summary>
-        public bool IsControlActive { get; private set; }
+        [ShowInInspector]
+        public bool IsControlActive => _activeMembers.IsActive();
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             _activeMembers.OnTrinityEntityRequestSequence(entity,canAct);
@@ -357,24 +358,24 @@ namespace CombatSystem.Team
         }
         public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
         {
-            IsControlActive = true;
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
-            IsControlActive = false;
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            IsControlActive = false;
+        }
+
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
         }
 
         public void OnTempoForceFinish(in CombatTeamControllerBase controller,
             in IReadOnlyList<CombatEntity> remainingMembers)
         {
             _activeMembers.Clear();
-            IsControlActive = false;
         }
 
 

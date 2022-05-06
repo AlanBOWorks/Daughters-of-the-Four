@@ -49,6 +49,10 @@ namespace CombatSystem.Player.Events
             ResetState();
         }
 
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+        }
+
         private void ResetState()
         {
             _isActive = false;

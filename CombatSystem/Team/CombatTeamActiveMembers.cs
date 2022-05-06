@@ -28,6 +28,8 @@ namespace CombatSystem.Team
         public IReadOnlyList<CombatEntity> GetOffMembers() => _offMembers;
 
 
+        public bool IsActive() => _allEntities.Count > 0;
+
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             if(!canAct) return;

@@ -135,6 +135,10 @@ namespace CombatSystem.Player.UI
            HideAll();
        }
 
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+        }
+
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
        {

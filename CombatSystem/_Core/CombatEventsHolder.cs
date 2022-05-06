@@ -280,8 +280,18 @@ namespace CombatSystem._Core
             _currentDiscriminatedEntityEventsHolder.OnTempoFinishControl(in controller);
 
             _sequenceStepper.OnTempoFinishControl(in controller);
+
+            OnTempoFinishLastCall(in controller);
         }
 
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+            _eventsHolder.OnTempoFinishLastCall(in controller);
+            _playerCombatEvents.OnTempoFinishLastCall(in controller);
+            _enemyCombatEvents.OnTempoFinishLastCall(in controller);
+
+            _currentDiscriminatedEntityEventsHolder.OnTempoFinishLastCall(in controller);
+        }
 
 
         // ------ SKILLS ----- 
@@ -913,6 +923,14 @@ namespace CombatSystem._Core
                 listener.OnTempoFinishControl(in controller);
             }
 
+        }
+
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+            foreach (var listener in _tempoTeamListeners)
+            {
+                listener.OnTempoFinishLastCall(in controller);
+            }
         }
 
 

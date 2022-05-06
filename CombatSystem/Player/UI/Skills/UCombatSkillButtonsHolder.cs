@@ -235,6 +235,11 @@ namespace CombatSystem.Player.UI
             HideAll();
         }
 
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+            
+        }
+
         public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
             ResetPoolSkillsToCurrent();

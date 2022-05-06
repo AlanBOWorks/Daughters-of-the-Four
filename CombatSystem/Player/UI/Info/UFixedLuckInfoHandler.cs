@@ -70,6 +70,8 @@ namespace CombatSystem.Player.UI
 
         private void UpdateLuckInfo(in CombatEntity entity)
         {
+            if(!_elementsDictionary.ContainsKey(entity)) return;
+
             var element = _elementsDictionary[entity];
             UpdateLuckInfo(in element, in entity);
         }

@@ -84,7 +84,7 @@ namespace CombatSystem.Stats
             // NOTE: inmovil entities are the ones with speedAmount < 0
             if (speedAmount == 0) return ZeroSpeedInitiativeAmount; 
 
-            return Mathf.Round(speedAmount);
+            return Mathf.Round(speedAmount * 10) * .1f;
         }
 
         public static float CalculateLuckAmount(in CombatStats stats)

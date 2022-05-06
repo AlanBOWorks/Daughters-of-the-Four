@@ -123,6 +123,11 @@ namespace CombatSystem.Player
             OnControlFinish();
         }
 
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+            
+        }
+
         public void FinishCurrentPerformer()
         {
             if(_selectedPerformer == null) return;

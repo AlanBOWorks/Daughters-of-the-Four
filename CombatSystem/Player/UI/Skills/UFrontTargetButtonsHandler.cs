@@ -147,5 +147,10 @@ namespace CombatSystem.Player.UI
         {
             HideTargets();
         }
+
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+            
+        }
     }
 }

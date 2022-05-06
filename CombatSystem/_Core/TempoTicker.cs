@@ -89,6 +89,8 @@ namespace CombatSystem._Core
                     listener.OnTick();
                 }
 
+                yield return Timing.WaitForOneFrame;
+
                 do
                 {
                     yield return Timing.WaitForOneFrame;
@@ -108,6 +110,8 @@ namespace CombatSystem._Core
 
                     _roundTickCount = 0;
                 }
+
+                yield return Timing.WaitForOneFrame;
             }
         }
 
@@ -172,7 +176,7 @@ namespace CombatSystem._Core
 
             if (controllerCanBeInvoked)
             {
-                CombatSystemSingleton.TeamControllers.InvokeControlEvent();
+                CombatSystemSingleton.TeamControllers.InvokeControls();
             }
 
             void HandleTickEntity(CombatEntity entity)
@@ -180,7 +184,7 @@ namespace CombatSystem._Core
                 CombatStats stats = entity.Stats;
 
                 UtilsCombatStats.TickInitiative(stats, out var entityInitiativeAmount);
-                const float initiativeThreshold = TempoTicker.LoopThreshold;
+                const float initiativeThreshold = TempoTicker.LoopThresholdAsIntended;
                 UtilsCombatStats.CalculateTempoPercent(in entityInitiativeAmount,out var initiativePercent);
 
                 eventsHolder.OnEntityTick(in entity, in entityInitiativeAmount, in initiativePercent);
@@ -354,6 +358,11 @@ namespace CombatSystem._Core
         /// Invoked when the Entity's Controller decides that there's no more actions to make
         /// </summary>
         void OnTempoFinishControl(in CombatTeamControllerBase controller);
+
+        /// <summary>
+        /// The very last call of this events; when everything was removed and invoked
+        /// </summary>
+        void OnTempoFinishLastCall(in CombatTeamControllerBase controller);
     }
 
     public interface ITempoEntityPercentListener : ICombatEventListener
