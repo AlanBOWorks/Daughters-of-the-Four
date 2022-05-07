@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
@@ -26,12 +27,17 @@ namespace CombatSystem.Player
             PlayerCombatSingleton.PlayerCombatEvents.DiscriminationEventsHolder.UnSubscribe(this);
         }
 
+        private void OnDisable()
+        {
+            Timing.KillCoroutines(_pointerHandle);
+        }
+
         private CoroutineHandle _pointerHandle;
         public void OnPointerDown(PointerEventData eventData)
         {
             if (holdAmount <= 0)
             {
-                //todo invoke
+                DoAction();
                 return;
             }
             if (_pointerHandle.IsRunning) return;
@@ -63,7 +69,7 @@ namespace CombatSystem.Player
         }
 
 
-        public virtual void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
+        public virtual void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
             Show();
         }

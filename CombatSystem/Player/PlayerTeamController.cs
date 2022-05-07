@@ -19,6 +19,12 @@ namespace CombatSystem.Player
         private CombatSkill _selectedSkill;
         [ShowInInspector]
         private CombatEntity _selectedTarget;
+
+
+        public override void InvokeStartControl()
+        {
+        }
+
         public void PerformRequestAction()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
@@ -108,24 +114,21 @@ namespace CombatSystem.Player
         }
 
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
-            _selectedPerformer = firstEntity;
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
-            OnControlFinish();
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            OnControlFinish();
         }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            
+            OnControlFinish();
         }
 
         public void FinishCurrentPerformer()
@@ -133,6 +136,7 @@ namespace CombatSystem.Player
             if(_selectedPerformer == null) return;
             UtilsCombatEntity.DoSequenceFinish(in _selectedPerformer);
         }
+
     }
 
 }

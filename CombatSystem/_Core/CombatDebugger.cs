@@ -63,7 +63,8 @@ namespace CombatSystem._Core
 
     internal sealed class CombatEventsLogs : ITempoTeamStatesListener,
         ITempoDedicatedEntityStatesListener, ITempoEntityStatesListener,
-        ITempoTickListener, ISkillUsageListener
+        ITempoTickListener, ISkillUsageListener,
+        ITempoEntityStatesExtraListener
     {
         [Title("Teams")] 
         public bool ShowTeamLogs = false;
@@ -77,10 +78,10 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private TeamLogs _teamLogs = new TeamLogs();
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
             if(!ShowTeamLogs || !_teamLogs.OnStartControl) return;
-            Debug.Log($"Start Control: {controller} | First: {firstEntity.CombatCharacterName}");
+            Debug.Log($"Start Control: {controller} | Controlling {controller.ControllingTeam.GetControllingMembers().Count}");
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
@@ -98,7 +99,9 @@ namespace CombatSystem._Core
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            
+            if(!ShowTeamLogs || !_teamLogs.OnFinishControl) return;
+            Debug.Log($"------------------------XXX LAST CONTROL XXX-------------------------------");
+
         }
 
 
@@ -141,6 +144,8 @@ namespace CombatSystem._Core
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
+            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnSequence) return;
+            Debug.Log("--------- -------- -------- SEQUENCE -------- -------- --------");
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -158,7 +163,36 @@ namespace CombatSystem._Core
         public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
             if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnFinishSequence) return;
-            Debug.Log($"Finished as Forced: {isForcedByController}");
+            Debug.Log($"Sequence Finished | Forced: {isForcedByController}");
+        }
+
+        [Title("Entity Extra")]
+        public bool ShoEntitySequenceExtraLogs = false;
+        private sealed class EntitySequenceExtraLogs
+        {
+            public bool OnRequest = true;
+            public bool OnFinish = true;
+            public bool OnNoActions = true;
+        }
+        [ShowInInspector]
+        private EntitySequenceExtraLogs _entitySequenceExtraLogs = new EntitySequenceExtraLogs();
+
+        public void OnAfterEntityRequestSequence(in CombatEntity entity)
+        {
+            if (!ShoEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnRequest) return;
+            Debug.Log("After Request Sequence");
+        }
+
+        public void OnAfterEntitySequenceFinish(in CombatEntity entity)
+        {
+            if (!ShoEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnFinish) return;
+            Debug.Log("--------- -------- END SEQUENCE -------- -------- --------");
+        }
+
+        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        {
+            if (!ShoEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnNoActions) return;
+            Debug.Log($"Request Sequence - NO ACTIONS: {entity.CombatCharacterName}");
         }
 
 
@@ -199,6 +233,8 @@ namespace CombatSystem._Core
             if (!ShowTempoLogs || !_tempoLogs.OnStopTick) return;
             Debug.Log("xx - STOP Ticking");
         }
+
+
 
         [Title("Skills")]
         public bool ShowSkillLogs = false;
@@ -241,6 +277,8 @@ namespace CombatSystem._Core
             if (!ShowSkillLogs || !_skillsLogs.OnFinish) return;
             Debug.Log("-------------- SKILL END --------------- ");
         }
+
+
     }
 
 

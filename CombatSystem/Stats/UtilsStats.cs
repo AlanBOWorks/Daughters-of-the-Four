@@ -208,12 +208,12 @@ namespace CombatSystem.Stats
         /// <summary>
         /// Checks if the entity has enough Actions points
         /// </summary>
-        public static bool CanActRequest(in CombatEntity entity) => CanActRequest(entity.Stats);
+        public static bool CanControlRequest(in CombatEntity entity) => CanControlRequest(entity.Stats);
 
         /// <summary>
         /// Checks if the entity has enough Actions points
         /// </summary>
-        public static bool CanActRequest(in CombatStats stats)
+        public static bool CanControlRequest(in CombatStats stats)
         {
             float actionsLimit =
                 stats.BaseStats.ActionsType + stats.BuffStats.ActionsType + stats.BurstStats.ActionsType;

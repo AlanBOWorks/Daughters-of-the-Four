@@ -15,8 +15,6 @@ namespace CombatSystem.Team
         ITeamFlexPositionStructureRead<IEnumerable<CombatEntity>>,
         IReadOnlyList<CombatEntity>,
 
-        ITempoTeamStatesListener,
-        ITempoDedicatedEntityStatesListener, 
         ITempoEntityStatesListener
     {
         private CombatTeam(bool isPlayerTeam)
@@ -34,7 +32,7 @@ namespace CombatSystem.Team
             _mainRoleWrapper = new MainRoleWrapper();
             _offRolesGroup = new TeamOffGroupStructure<CombatEntity>();
 
-            _activeMembers = new CombatTeamActiveMembers();
+            _controlMembers = new CombatTeamControlMembers();
         }
         
         public CombatTeam(bool isPlayerTeam,IReadOnlyCollection<ICombatEntityProvider> members) : this(isPlayerTeam)
@@ -91,18 +89,21 @@ namespace CombatSystem.Team
         [ShowInInspector, ShowIf("ShowRoles")]
         private readonly TeamOffGroupStructure<CombatEntity> _offRolesGroup;
         [ShowInInspector]
-        private readonly CombatTeamActiveMembers _activeMembers;
+        private readonly CombatTeamControlMembers _controlMembers;
 
         public int Count => _members.Count;
 
+        public bool IsActive() => _controlMembers.IsActive();
+        public bool CanControl() => _controlMembers.CanControl();
 
         public IReadOnlyList<CombatEntity> MainRoleMembers => _mainRoleWrapper.Members;
         public IReadOnlyList<CombatEntity> MainPositioningMembers => _mainPositionsWrapper.Members;
         public FlexPositionMainGroupStructure<CombatEntity> GetMainMembers() => _mainRoleWrapper;
 
-        public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _activeMembers.GetTrinityMembers();
-        public IReadOnlyList<CombatEntity> GetOffMembersActiveMembers() => _activeMembers.GetOffMembers();
-        public IReadOnlyList<CombatEntity> GetActiveMembers() => _activeMembers.GetAllMembers();
+        public IReadOnlyDictionary<CombatEntity, bool> GetActiveMembers() => _controlMembers.GetActiveMembers();
+        public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _controlMembers.GetTrinityMembers();
+        public IReadOnlyList<CombatEntity> GetOffMembersActiveMembers() => _controlMembers.GetOffMembers();
+        public IReadOnlyList<CombatEntity> GetControllingMembers() => _controlMembers.GetAllMembers();
 
         public IEnumerable<CombatEntity> OffRoleMembers => _offRolesGroup;
         public TeamOffGroupStructure<CombatEntity> GetOffMembersStructure() => _offRolesGroup;
@@ -314,32 +315,18 @@ namespace CombatSystem.Team
             }
         }
 
-        /// <summary>
-        /// Shows if the team had al least one [<see cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>] as true 
-        /// </summary>
-        [ShowInInspector]
-        public bool IsControlActive => _activeMembers.IsActive();
-        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void AddActiveEntity(in CombatEntity entity, in bool canControl)
         {
-            _activeMembers.OnTrinityEntityRequestSequence(entity,canAct);
-        }
-
-        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            _activeMembers.OnOffEntityRequestSequence(entity,canAct);
-        }
-
-        public void OnTrinityEntityFinishSequence(CombatEntity entity)
-        {
-        }
-
-        public void OnOffEntityFinishSequence(CombatEntity entity)
-        {
+            _controlMembers.AddActiveEntity(in entity, in canControl);
         }
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             GuardHandler.OnEntityRequestSequence(in entity);
+            if (!canAct)
+            {
+                _controlMembers.SafeRemoveActive(in entity);
+            }
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -354,28 +341,13 @@ namespace CombatSystem.Team
         {
             if(isForcedByController) return;
             //This will be removed with Clear OnTempoForceFinish
-            _activeMembers.SafeRemove(in entity);
-        }
-        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
-        {
-        }
-
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
-        {
-        }
-
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
-        {
-        }
-
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
-        {
+            _controlMembers.SafeRemoveControlling(in entity);
         }
 
         public void OnTempoForceFinish(in CombatTeamControllerBase controller,
             in IReadOnlyList<CombatEntity> remainingMembers)
         {
-            _activeMembers.Clear();
+            _controlMembers.Clear();
         }
 
 
@@ -390,6 +362,7 @@ namespace CombatSystem.Team
         }
 
         public CombatEntity this[int index] => _members[index];
+
     }
 
     [Serializable]

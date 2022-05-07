@@ -84,6 +84,7 @@ namespace CombatSystem._Core
             {
                 yield return Timing.WaitForSeconds(TickPeriodSeconds);
                 _roundTickCount++;
+                EntitiesTempoTicker.TickEntities();
                 foreach (var listener in TickListeners)
                 {
                     listener.OnTick();
@@ -91,10 +92,11 @@ namespace CombatSystem._Core
 
                 yield return Timing.WaitForOneFrame;
 
+                controllers.TickControllers();
                 do
                 {
                     yield return Timing.WaitForOneFrame;
-                } while (controllers.CurrentControllerIsActive());
+                } while (controllers.IsControlling());
 
                 //Safe wait
                 yield return Timing.WaitForOneFrame;
@@ -117,161 +119,6 @@ namespace CombatSystem._Core
 
     }
 
-    public sealed class CombatEntitiesTempoTicker : 
-        ICombatStatesListener, ITempoEntityStatesListener,
-        ITempoTickListener
-    {
-        public CombatEntitiesTempoTicker()
-        {
-            _tickingTrackers = new List<CombatEntity>();
-            _mainEntitiesActingQueue = new Queue<KeyValuePair<CombatEntity, bool>>();
-        }
-
-        [ShowInInspector] private readonly List<CombatEntity> _tickingTrackers;
-        [ShowInInspector] private readonly Queue<KeyValuePair<CombatEntity,bool>> _mainEntitiesActingQueue;
-
-        public void ResetState()
-        {
-            _tickingTrackers.Clear();
-            _mainEntitiesActingQueue.Clear();
-        }
-
-        public void AddEntities(CombatTeam team)
-        {
-            foreach (var member in team)
-            {
-                AddEntity(member);
-            }
-        }
-
-        private void AddEntity(CombatEntity entity)
-        {
-            _tickingTrackers.Add(entity);
-        }
-
-
-
-
-        public void OnStartTicking()
-        { }
-        public void OnStopTicking()
-        { }
-
-        public void OnTick()
-        {
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-            int tickingEntitiesIndex = 0;
-            for (; tickingEntitiesIndex < _tickingTrackers.Count; tickingEntitiesIndex++)
-            {
-                var entity = _tickingTrackers[tickingEntitiesIndex];
-                HandleTickEntity(entity);
-            }
-
-            bool controllerCanBeInvoked = _mainEntitiesActingQueue.Count > 0;
-            while (_mainEntitiesActingQueue.Count > 0)
-            {
-                var valuePair = _mainEntitiesActingQueue.Dequeue();
-                eventsHolder.OnTrinityEntityRequestSequence(valuePair.Key,valuePair.Value);
-            }
-
-            if (controllerCanBeInvoked)
-            {
-                CombatSystemSingleton.TeamControllers.InvokeControls();
-            }
-
-            void HandleTickEntity(CombatEntity entity)
-            {
-                CombatStats stats = entity.Stats;
-
-                UtilsCombatStats.TickInitiative(stats, out var entityInitiativeAmount);
-                UtilsCombatStats.CalculateTempoPercent(in entityInitiativeAmount,out var initiativePercent);
-
-                eventsHolder.OnEntityTick(in entity, in entityInitiativeAmount, in initiativePercent);
-                //Acting Check
-                const float initiativeThreshold = TempoTicker.LoopThreshold;
-                if (entityInitiativeAmount < initiativeThreshold)
-                    return;
-
-
-                bool isTrinityRole = UtilsTeam.IsTrinityRole(in entity);
-                bool canAct = UtilsCombatStats.CanRequestActing(entity);
-
-
-                eventsHolder.OnEntityRequestSequence(entity,canAct);
-                if (isTrinityRole)
-                    HandleMainRole();
-                else
-                    HandleOffRole();
-
-                void HandleMainRole()
-                {
-                    var mainValue = new KeyValuePair<CombatEntity,bool>(entity,canAct);
-                    _mainEntitiesActingQueue.Enqueue(mainValue);
-                }
-                void HandleOffRole()
-                {
-                    entity.Team.StandByMembers.PutOnStandBy(in entity);
-                    eventsHolder.OnOffEntityRequestSequence(entity,canAct);
-                }
-
-
-
-                if (!canAct) return;
-
-                _tickingTrackers.RemoveAt(tickingEntitiesIndex);
-                tickingEntitiesIndex--;
-            }
-        }
-
-
-
-
-        public void OnRoundPassed()
-        {
-        }
-
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-        }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
-        {
-            _tickingTrackers.Add(entity);
-        }
-
-        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
-        {
-            ResetState();//safe clear
-
-            AddEntities(playerTeam);
-            AddEntities(enemyTeam);
-        }
-
-        public void OnCombatStart()
-        {
-        }
-
-        public void OnCombatEnd()
-        {
-            ResetState();
-        }
-
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-        }
-    }
 
     public interface ITempoTickListener : ICombatEventListener
     {
@@ -304,7 +151,7 @@ namespace CombatSystem._Core
         /// The very last event invoked when there's no [<seealso cref="CombatStats.UsedActions"/>] left or when
         /// the [<see cref="CombatEntity"/>] passes its actions somehow. <br></br><br></br>
         /// Note:<br></br>
-        /// In this events, the entity is not removed from [<seealso cref="CombatTeam._activeMembers"/>].<br></br>
+        /// In this events, the entity is not removed from [<seealso cref="CombatTeam._controlMembers"/>].<br></br>
         /// For that subscribe to [<seealso cref="ITempoEntityStatesExtraListener.OnAfterEntitySequenceFinish"/>]
         /// </summary>
         void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController);
@@ -319,7 +166,7 @@ namespace CombatSystem._Core
         void OnAfterEntityRequestSequence(in CombatEntity entity);
         /// <summary>
         /// Invoked after [<seealso cref="ITempoEntityStatesListener.OnEntityFinishSequence"/>]; <br></br>
-        /// This events is called after removing the entity from the [<seealso cref="CombatTeam._activeMembers"/>].<br></br>
+        /// This events is called after removing the entity from the [<seealso cref="CombatTeam._controlMembers"/>].<br></br>
         /// </summary>
         void OnAfterEntitySequenceFinish(in CombatEntity entity);
 
@@ -350,7 +197,13 @@ namespace CombatSystem._Core
 
     public interface ITempoTeamStatesListener : ICombatEventListener
     {
-        void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity);
+        /// <summary>
+        /// First call;
+        /// </summary>
+        /// <param name="controller"></param>
+        void OnTempoStartControl(in CombatTeamControllerBase controller);
+
+
         /// <summary>
         /// Event send after all members had finished; this is invoked before [<seealso cref="OnTempoFinishControl"/>]
         /// </summary>
@@ -369,5 +222,15 @@ namespace CombatSystem._Core
     public interface ITempoEntityPercentListener : ICombatEventListener
     {
         void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative);
+    }
+
+    public static class UtilsTempo
+    {
+        public static bool IsInitiativeTrigger(in CombatEntity entity)
+        {
+            var entityInitiativeAmount = entity.Stats.CurrentInitiative;
+            const float initiativeThreshold = TempoTicker.LoopThreshold;
+            return entityInitiativeAmount >= initiativeThreshold;
+        }
     }
 }

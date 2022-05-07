@@ -41,6 +41,7 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private CombatEntityEventsHolder _currentDiscriminatedEntityEventsHolder;
 
+
         private readonly TempoSequenceStepper _sequenceStepper;
 
 
@@ -225,6 +226,8 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnAfterEntityRequestSequence(in entity);
 
             _currentDiscriminatedEntityEventsHolder.OnAfterEntityRequestSequence(in entity);
+
+            _sequenceStepper.OnAfterEntityRequestSequence(in entity);
         }
 
         public void OnAfterEntitySequenceFinish(in CombatEntity entity)
@@ -250,16 +253,16 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
             HandleCurrentEntityEventsHolder(in controller);
 
 
-            _eventsHolder.OnTempoStartControl(in controller, firstEntity);
-            _playerCombatEvents.OnTempoStartControl(in controller, firstEntity);
-            _enemyCombatEvents.OnTempoStartControl(in controller, firstEntity);
+            _eventsHolder.OnTempoStartControl(in controller);
+            _playerCombatEvents.OnTempoStartControl(in controller);
+            _enemyCombatEvents.OnTempoStartControl(in controller);
 
-            _currentDiscriminatedEntityEventsHolder.OnTempoStartControl(in controller, firstEntity);
+            _currentDiscriminatedEntityEventsHolder.OnTempoStartControl(in controller);
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
@@ -335,6 +338,8 @@ namespace CombatSystem._Core
             _eventsHolder.OnSkillFinish();
             _playerCombatEvents.OnSkillFinish();
             _enemyCombatEvents.OnSkillFinish();
+
+            _currentDiscriminatedEntityEventsHolder.OnSkillFinish();
         }
 
 
@@ -900,11 +905,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
             foreach (var listener in _tempoTeamListeners)
             {
-                listener.OnTempoStartControl(in controller,in firstEntity);
+                listener.OnTempoStartControl(in controller);
             }
         }
 

@@ -19,6 +19,9 @@ namespace CombatSystem.Team
         [ShowInInspector, HorizontalGroup()]
         private CombatTeamControllerBase _enemyTeamType;
 
+        [ShowInInspector]
+        private CombatTeamControllerBase _currentControl;
+
 
         public CombatTeamControllerBase PlayerTeamType
         {
@@ -32,10 +35,21 @@ namespace CombatSystem.Team
             set => _enemyTeamType = value;
         }
 
-        public bool CurrentControllerIsActive() => PlayerTeamType.CanControl() || EnemyTeamType.CanControl();
+        [ShowInInspector]
+        public bool IsControlling() => _currentControl != null;
 
-       
-        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
+
+        public void TickControllers()
+        {
+            TryInvokeControl(in _playerTeamType, out bool playerWasInvoked);
+
+            if (!playerWasInvoked)
+            {
+                TryInvokeControl(in _enemyTeamType, out _);
+            }
+        }
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
         }
 
@@ -45,30 +59,62 @@ namespace CombatSystem.Team
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            controller.AllowControl = false;
         }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            InvokeControls();
+            var oppositeTeam = UtilsTeam.GetOppositeElement(controller, this);
+
+            TryInvokeControl(in oppositeTeam, out _);
+            _currentControl = null;
         }
 
-        public void InvokeControls()
+
+     
+
+        private void TryInvokeControl(in CombatTeamControllerBase controller, out bool controlWasInvoked)
         {
-            if(_playerTeamType.CanInvoke())
-                InvokeControlEvent(in _playerTeamType);
-            else if(_enemyTeamType.CanInvoke())
-                InvokeControlEvent(in _enemyTeamType);
-        }
+            
+            var team = controller.ControllingTeam;
+            bool isActive = team.IsActive();
+            bool canControl = team.CanControl();
+            controlWasInvoked = isActive;
+
+            if (!isActive) return;
 
 
-        private static void InvokeControlEvent(in CombatTeamControllerBase controller)
-        {
-            if(controller == null) return;
-            controller.AllowControl = true;
-            var firstEntity = controller.ControllingTeam.GetTrinityActiveMembers()[0];
-            CombatSystemSingleton.EventsHolder.OnTempoStartControl(controller, in firstEntity);
+
+
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+
+            if (canControl)
+            {
+                eventsHolder.OnTempoStartControl(in controller);
+            }
+
+            var activeMembers = team.GetActiveMembers();
+            foreach (var pair in activeMembers)
+            {
+                var member = pair.Key;
+                var canControlMember = pair.Value;
+                HandleMember(in member, in canControlMember);
+            }
+
+            void HandleMember(in CombatEntity member, in bool canControlMember)
+            {
+                bool isTrinity = UtilsTeam.IsTrinityRole(in member);
+                eventsHolder.OnEntityRequestSequence(member, canControlMember);
+                if (isTrinity)
+                    eventsHolder.OnTrinityEntityRequestSequence(member, canControlMember);
+                else
+                    eventsHolder.OnOffEntityRequestSequence(member, canControlMember);
+            }
+
+
+            controller.InvokeStartControl();
+            _currentControl = controller;
         }
+
 
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
@@ -83,6 +129,7 @@ namespace CombatSystem.Team
 
         public void OnCombatEnd()
         {
+            _currentControl = null;
             PlayerTeamType.Clear();
             EnemyTeamType.Clear();
         }
@@ -93,28 +140,23 @@ namespace CombatSystem.Team
 
         public void OnCombatQuit()
         {
-            
         }
     }
     
     public abstract class CombatTeamControllerBase
     {
-        internal bool CanInvoke() => ControllingTeam != null && ControllingTeam.IsControlActive;
+        
 
-        [ShowInInspector]
-        internal bool CanControl() => AllowControl && CanInvoke();
-
-        internal bool AllowControl;
-
-        public IReadOnlyCollection<CombatEntity> GetTrinityMembers() => ControllingTeam.GetTrinityActiveMembers();
-        public IReadOnlyCollection<CombatEntity> GetOffMembers() => ControllingTeam.GetOffMembersActiveMembers();
-        public IReadOnlyList<CombatEntity> GetAllActiveMembers() => ControllingTeam.GetActiveMembers();
-
-        [ShowInInspector]
         public CombatTeam ControllingTeam { get; private set; }
         internal void Injection(CombatTeam team) => ControllingTeam = team;
-        
-        
+
+
+        public IReadOnlyList<CombatEntity> GetAllControllingMembers() => ControllingTeam.GetControllingMembers();
+
+
+
+        public abstract void InvokeStartControl();
+
         public void ForceFinish()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;

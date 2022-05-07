@@ -7,9 +7,8 @@ using UnityEngine;
 
 namespace CombatSystem.Entity
 {
-    public sealed class EntityTempoStepper : ITempoTeamStatesListener,
-        ITempoEntityStatesListener,ITempoDedicatedEntityStatesListener,
-        ITempoEntityStatesExtraListener
+    public sealed class EntityTempoStepper :
+        ITempoEntityStatesListener, ITempoEntityStatesExtraListener
     {
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
@@ -48,56 +47,6 @@ namespace CombatSystem.Entity
         public void OnNoActionsForcedFinish(in CombatEntity entity)
         {
             OnEntityFinishSequence(entity, false);
-        }
-
-
-
-        public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            var entityTeam = entity.Team;
-            entityTeam.OnTrinityEntityRequestSequence(entity,canAct);
-        }
-
-        public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            entity.Team.OnOffEntityRequestSequence(entity,canAct);
-        }
-
-
-
-        public void OnTrinityEntityFinishSequence(CombatEntity entity)
-        {
-            entity.Team.OnTrinityEntityFinishSequence(entity);
-        }
-
-        public void OnOffEntityFinishSequence(CombatEntity entity)
-        {
-            entity.Team.OnOffEntityFinishSequence(entity);
-        }
-
-        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
-        {
-            firstEntity.Team.OnTempoStartControl(in controller,in firstEntity);
-        }
-
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
-        {
-            lastActor.Team.OnControlFinishAllActors(in lastActor);
-        }
-
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
-        {
-            
-        }
-
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
-        {
-            
-        }
-
-        public void OnTempoForceFinish(in CombatTeamControllerBase controller,
-            in IReadOnlyList<CombatEntity> remainingMembers)
-        {
         }
     }
 }

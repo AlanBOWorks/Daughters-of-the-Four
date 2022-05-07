@@ -220,7 +220,7 @@ namespace CombatSystem.Player.UI
 
 
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
             EnableHolder();
         }

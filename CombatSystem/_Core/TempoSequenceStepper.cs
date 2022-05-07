@@ -7,8 +7,52 @@ using UnityEngine;
 
 namespace CombatSystem._Core
 {
-    internal sealed class TempoSequenceStepper : ITempoEntityStatesListener, ITempoEntityStatesExtraListener, ITempoTeamStatesListener
+    internal sealed class TempoSequenceStepper : 
+        ITempoEntityStatesListener, ITempoEntityStatesExtraListener, ITempoTeamStatesListener
     {
+
+
+        // TEAM
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        {
+
+        }
+
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
+
+        }
+
+        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        {
+            var remainingEntities = controller.ControllingTeam.GetControllingMembers();
+            if (remainingEntities.Count == 0) return;
+
+            OnTempoForceFinish(in controller, in remainingEntities);
+        }
+
+        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        {
+        }
+
+        public void OnTempoForceFinish(in CombatTeamControllerBase controller,
+            in IReadOnlyList<CombatEntity> remainingMembers)
+        {
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+
+            var allActives = remainingMembers;
+            const bool isForced = true;
+            foreach (var entity in allActives)
+            {
+                eventsHolder.OnEntityFinishSequence(entity, isForced);
+            }
+
+            controller.ControllingTeam.OnTempoForceFinish(in controller, in remainingMembers);
+        }
+
+
+        // ENTITY
+
         public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
@@ -18,8 +62,6 @@ namespace CombatSystem._Core
                 return;
             }
             eventsHolder.OnAfterEntityRequestSequence(in entity);
-
-            eventsHolder.OnEntityRequestAction(entity);
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -31,7 +73,7 @@ namespace CombatSystem._Core
         /// /// </summary>
         public void OnEntityFinishAction(CombatEntity entity)
         {
-            bool canAct = UtilsCombatStats.CanActRequest(entity);
+            bool canAct = UtilsCombatStats.CanControlRequest(entity);
             var eventHolder = CombatSystemSingleton.EventsHolder;
             if (!canAct)
                 eventHolder.OnEntityFinishSequence(entity, false);
@@ -56,58 +98,27 @@ namespace CombatSystem._Core
 
         public void OnAfterEntityRequestSequence(in CombatEntity entity)
         {
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            eventsHolder.OnEntityRequestAction(entity);
         }
 
         public void OnAfterEntitySequenceFinish(in CombatEntity entity)
         {
             var entityTeam = entity.Team;
-            if(!entityTeam.IsControlActive) return;
+            bool hasMoreEntitiesToControl = entityTeam.CanControl();
+            if(hasMoreEntitiesToControl) return;
 
-            var activeMembers = entityTeam.GetActiveMembers();
-            if (activeMembers.Count > 0) return;
+
+            var controllingMembers = entityTeam.GetControllingMembers();
+            if (controllingMembers.Count > 0) return;
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             eventsHolder.OnControlFinishAllActors(in entity);
         }
-
+        
         public void OnNoActionsForcedFinish(in CombatEntity entity)
         {
         }
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
-        {
-        }
-
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
-        {
-            
-        }
-
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
-        {
-            var remainingEntities = controller.ControllingTeam.GetActiveMembers();
-            if(remainingEntities.Count == 0) return;
-            
-            OnTempoForceFinish(in controller, in remainingEntities);
-        }
-
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
-        {
-        }
-
-        public void OnTempoForceFinish(in CombatTeamControllerBase controller,
-            in IReadOnlyList<CombatEntity> remainingMembers)
-        {
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-
-            var allActives = remainingMembers;
-            const bool isForced = true;
-            foreach (var entity in allActives)
-            {
-                eventsHolder.OnEntityFinishSequence(entity, isForced);
-            }
-
-            controller.ControllingTeam.OnTempoForceFinish(in controller,in remainingMembers);
-        }
     }
 }

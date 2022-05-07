@@ -119,10 +119,9 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
         }
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller,in CombatEntity firstEntity)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
            ShowAll();
-           DoSwitchEntity(in firstEntity);
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)

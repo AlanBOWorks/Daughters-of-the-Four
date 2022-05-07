@@ -15,7 +15,7 @@ namespace CombatSystem.Player.Events
         private IReadOnlyList<CombatEntity> _activeEntities;
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            _activeEntities = playerTeam.GetActiveMembers();
+            _activeEntities = playerTeam.GetControllingMembers();
         }
 
         public void OnAfterEntityRequestSequence(in CombatEntity entity)
@@ -35,9 +35,11 @@ namespace CombatSystem.Player.Events
         }
 
         private bool _isActive;
-        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
             _isActive = true;
+            var firstEntity = _activeEntities[0];
+            OnPerformerSwitch(in firstEntity);
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)

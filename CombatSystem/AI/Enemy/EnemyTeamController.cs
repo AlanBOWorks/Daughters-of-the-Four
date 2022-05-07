@@ -9,16 +9,20 @@ using UnityEngine;
 
 namespace CombatSystem.AI
 {
-    public class EnemyTeamControllerRandom : CombatTeamControllerBase, ITempoTeamStatesListener, ITempoEntityStatesListener
+    public class EnemyTeamControllerRandom : CombatTeamControllerBase, ITempoTeamStatesListener, ISkillUsageListener
     {
-        public void OnTempoStartControl(in CombatTeamControllerBase controller, in CombatEntity firstEntity)
+        public override void InvokeStartControl()
         {
-            DoControl();  
-            ForceFinish();
+            StartControl();
+        }
+
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        {
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
+            ForceFinish();
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
@@ -27,33 +31,42 @@ namespace CombatSystem.AI
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            Reset();
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-
-        }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-            
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
+        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
         }
 
+        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
+        {
+        }
+
+        public void OnSkillFinish()
+        {
+            Step();
+        }
+
+
+        private void StartControl()
+        {
+            DoControl();
+        }
+
+        private void Step()
+        {
+            DoControl();
+        }
 
         private void DoControl()
         {
-            var entities = GetAllActiveMembers();
+            var entities = GetAllControllingMembers();
             var pick = PickEntity(in entities);
             HandleEntity(in pick);
+
         }
 
 
@@ -77,7 +90,7 @@ namespace CombatSystem.AI
 
         private void HandleSkills(in IReadOnlyList<CombatSkill> skills)
         {
-            if (!UtilsCombatStats.CanActRequest(_currentControl)) return;
+            if (!UtilsCombatStats.CanControlRequest(_currentControl)) return;
 
             var selectedSkill = SelectSkill(in skills);
             HandleSkill(in selectedSkill);
@@ -96,9 +109,9 @@ namespace CombatSystem.AI
             eventsHolder.OnControlSkillSelect(in skill);
 
             var target = SelectTarget(in skill);
-            CombatSystemSingleton.EventsHolder.OnSkillSubmit(in _currentControl,in skill,in target);
 
             eventsHolder.OnTargetSelect(in target);
+            CombatSystemSingleton.EventsHolder.OnSkillSubmit(in _currentControl, in skill, in target);
         }
 
         private CombatEntity SelectTarget(in CombatSkill skill)
@@ -109,9 +122,5 @@ namespace CombatSystem.AI
             return possibleTargets[randomPick];
         }
 
-        private void Reset()
-        {
-            _currentControl = null;
-        }
     }
 }
