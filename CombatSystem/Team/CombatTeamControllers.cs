@@ -45,6 +45,7 @@ namespace CombatSystem.Team
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
+            controller.AllowControl = false;
         }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
@@ -54,16 +55,17 @@ namespace CombatSystem.Team
 
         public void InvokeControls()
         {
-            if(_playerTeamType.CanControl())
+            if(_playerTeamType.CanInvoke())
                 InvokeControlEvent(in _playerTeamType);
-            else if(_enemyTeamType.CanControl())
+            else if(_enemyTeamType.CanInvoke())
                 InvokeControlEvent(in _enemyTeamType);
         }
 
 
         private static void InvokeControlEvent(in CombatTeamControllerBase controller)
         {
-            if(controller == null) return; 
+            if(controller == null) return;
+            controller.AllowControl = true;
             var firstEntity = controller.ControllingTeam.GetTrinityActiveMembers()[0];
             CombatSystemSingleton.EventsHolder.OnTempoStartControl(controller, in firstEntity);
         }
@@ -97,8 +99,12 @@ namespace CombatSystem.Team
     
     public abstract class CombatTeamControllerBase
     {
+        internal bool CanInvoke() => ControllingTeam != null && ControllingTeam.IsControlActive;
+
         [ShowInInspector]
-        internal bool CanControl() => ControllingTeam != null && ControllingTeam.IsControlActive;
+        internal bool CanControl() => AllowControl && CanInvoke();
+
+        internal bool AllowControl;
 
         public IReadOnlyCollection<CombatEntity> GetTrinityMembers() => ControllingTeam.GetTrinityActiveMembers();
         public IReadOnlyCollection<CombatEntity> GetOffMembers() => ControllingTeam.GetOffMembersActiveMembers();

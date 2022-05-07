@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CombatSystem.AI.Enemy;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
@@ -20,10 +21,12 @@ namespace CombatSystem._Core
         {
             CombatEventsLogs = new CombatEventsLogs();
             CombatPlayerEventsLogs = new CombatPlayerEventsLogs();
+            CombatEnemyLogs = new CombatEnemyLogs();
         }
 
         public static readonly CombatEventsLogs CombatEventsLogs;
         public static readonly CombatPlayerEventsLogs CombatPlayerEventsLogs;
+        public static readonly CombatEnemyLogs CombatEnemyLogs;
 
 
         private sealed class CombatDebuggerWindow : OdinEditorWindow
@@ -34,12 +37,17 @@ namespace CombatSystem._Core
             [ShowInInspector, TabGroup("Player Events")]
             private CombatPlayerEventsLogs _playerLogs;
 
+            [ShowInInspector, TabGroup("Enemy Events")]
+            private CombatEnemyLogs _enemyLogs;
+
+
             [Button]
             private static void Refresh()
             {
                 var window = GetWindow<CombatDebuggerWindow>();
                 window._eventsLogs = CombatEventsLogs;
                 window._playerLogs = CombatPlayerEventsLogs;
+                window._enemyLogs = CombatEnemyLogs;
             }
 
 

@@ -184,13 +184,14 @@ namespace CombatSystem._Core
                 CombatStats stats = entity.Stats;
 
                 UtilsCombatStats.TickInitiative(stats, out var entityInitiativeAmount);
-                const float initiativeThreshold = TempoTicker.LoopThresholdAsIntended;
                 UtilsCombatStats.CalculateTempoPercent(in entityInitiativeAmount,out var initiativePercent);
 
                 eventsHolder.OnEntityTick(in entity, in entityInitiativeAmount, in initiativePercent);
                 //Acting Check
+                const float initiativeThreshold = TempoTicker.LoopThreshold;
                 if (entityInitiativeAmount < initiativeThreshold)
                     return;
+
 
                 bool isTrinityRole = UtilsTeam.IsTrinityRole(in entity);
                 bool canAct = UtilsCombatStats.CanRequestActing(entity);
