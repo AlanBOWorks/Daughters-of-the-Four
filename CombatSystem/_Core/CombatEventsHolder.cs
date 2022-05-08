@@ -253,18 +253,18 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
             HandleCurrentEntityEventsHolder(in controller);
 
 
-            _eventsHolder.OnTempoStartControl(in controller);
-            _playerCombatEvents.OnTempoStartControl(in controller);
-            _enemyCombatEvents.OnTempoStartControl(in controller);
+            _eventsHolder.OnTempoPreStartControl(in controller);
+            _playerCombatEvents.OnTempoPreStartControl(in controller);
+            _enemyCombatEvents.OnTempoPreStartControl(in controller);
 
-            _currentDiscriminatedEntityEventsHolder.OnTempoStartControl(in controller);
+            _currentDiscriminatedEntityEventsHolder.OnTempoPreStartControl(in controller);
 
-            _sequenceStepper.OnTempoStartControl(in controller);
+            _sequenceStepper.OnTempoPreStartControl(in controller);
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
@@ -907,11 +907,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
             foreach (var listener in _tempoTeamListeners)
             {
-                listener.OnTempoStartControl(in controller);
+                listener.OnTempoPreStartControl(in controller);
             }
         }
 

@@ -114,7 +114,7 @@ namespace CombatSystem.Player
         }
 
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
         }
 

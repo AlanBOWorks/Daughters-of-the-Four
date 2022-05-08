@@ -16,19 +16,17 @@ namespace CombatSystem.AI
             StartControl();
         }
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
-            Debug.Log("INVOKED");
             ForceFinish();
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            Debug.Log("?¿?¿?¿?");
         }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)

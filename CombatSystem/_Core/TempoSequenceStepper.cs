@@ -13,7 +13,7 @@ namespace CombatSystem._Core
 
 
         // TEAM
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
         }
 

@@ -69,7 +69,7 @@ namespace CombatSystem.Player
         }
 
 
-        public virtual void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public virtual void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
             Show();
         }

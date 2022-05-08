@@ -587,7 +587,7 @@ namespace CombatSystem.Team
 
             if (canControl)
             {
-                eventsHolder.OnTempoStartControl(in controller);
+                eventsHolder.OnTempoPreStartControl(in controller);
             }
 
             var nonControllingMembers = team.GetNonControllingMembers();
@@ -598,7 +598,10 @@ namespace CombatSystem.Team
 
 
             team.ClearNonControllingMembers();
-            controller.InvokeStartControl();
+
+
+            if(canControl)
+                controller.InvokeStartControl();
 
             void HandleMembers(in IEnumerable<CombatEntity> members, bool canControlMember)
             {

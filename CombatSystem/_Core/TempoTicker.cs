@@ -227,8 +227,7 @@ namespace CombatSystem._Core
         /// <summary>
         /// First call; It's before [<seealso cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>]
         /// </summary>
-        /// <param name="controller"></param>
-        void OnTempoStartControl(in CombatTeamControllerBase controller);
+        void OnTempoPreStartControl(in CombatTeamControllerBase controller);
 
 
         /// <summary>

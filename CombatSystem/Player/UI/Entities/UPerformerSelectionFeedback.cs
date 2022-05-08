@@ -51,7 +51,7 @@ namespace CombatSystem.Player.UI
             focusIcon.DORotateQuaternion(Quaternion.identity, AnimationDuration);
         }
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
             Show();
         }

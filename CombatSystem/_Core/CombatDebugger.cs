@@ -78,7 +78,7 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private TeamLogs _teamLogs = new TeamLogs();
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
             if(!ShowTeamLogs || !_teamLogs.OnStartControl) return;
             Debug.Log($"Start Control: {controller} | Controlling {controller.ControllingTeam.GetControllingMembers().Count}");

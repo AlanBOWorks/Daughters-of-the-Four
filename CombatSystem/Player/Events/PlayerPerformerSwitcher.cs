@@ -35,7 +35,7 @@ namespace CombatSystem.Player.Events
         }
 
         private bool _isActive;
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
             _isActive = true;
             var firstEntity = _activeEntities[0];

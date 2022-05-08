@@ -54,8 +54,9 @@ namespace CombatSystem.Team
         }
 
 
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
+            _currentControl = controller;
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
@@ -82,7 +83,6 @@ namespace CombatSystem.Team
             if (!isActive) return;
             
             UtilsTeamMembers.HandleActiveMembers(controller, team);
-            _currentControl = controller;
         }
 
 

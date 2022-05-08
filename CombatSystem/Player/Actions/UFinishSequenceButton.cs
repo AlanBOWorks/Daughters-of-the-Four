@@ -19,9 +19,9 @@ namespace CombatSystem.Player.Actions
             PlayerCombatSingleton.PlayerTeamController.FinishCurrentPerformer();
         }
 
-        public override void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public override void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
-            base.OnTempoStartControl(in controller);
+            base.OnTempoPreStartControl(in controller);
 
             bool isSingleActor = controller.GetAllControllingMembers().Count <= 1;
             if(isSingleActor) return;
