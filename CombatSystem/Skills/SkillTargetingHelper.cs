@@ -107,7 +107,7 @@ namespace CombatSystem.Skills
         {
         }
 
-        public void OnSkillFinish()
+        public void OnSkillFinish(in CombatEntity performer)
         {
             _performerHelper.Clear();
             _targetHelper.Clear();

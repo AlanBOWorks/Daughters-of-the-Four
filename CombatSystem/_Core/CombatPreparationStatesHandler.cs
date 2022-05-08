@@ -99,7 +99,7 @@ namespace CombatSystem._Core
             CombatTeam enemyTeam);
     }
 
-    public interface ICombatStatesListener : ICombatEventListener
+    public interface ICombatStatesListener : ICombatTerminationListener
     {
         /// <summary>
         /// Is invoked after [<see cref="ICombatPreparationListener.OnCombatPrepares"/>]
@@ -116,6 +116,11 @@ namespace CombatSystem._Core
 
         void OnCombatStart();
 
+        
+    }
+
+    public interface ICombatTerminationListener : ICombatEventListener
+    {
         /// <summary>
         /// First event invoked for ending the Combat; is triggers for both [<see cref="OnCombatFinish"/>] and
         /// [<see cref="OnCombatQuit"/>]

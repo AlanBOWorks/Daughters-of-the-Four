@@ -308,9 +308,6 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnSkillSubmit(in performer, in usedSkill, in target);
 
             _currentDiscriminatedEntityEventsHolder.OnSkillSubmit(in performer, in usedSkill, target);
-
-            // Manual sequence Flow
-            OnSkillPerform(in performer,in usedSkill, in target);
         }
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
@@ -321,9 +318,7 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnSkillPerform(in performer, in usedSkill, in target);
 
-            //todo wait until skill ends (animation)
-            OnSkillFinish();
-            OnEntityFinishAction(performer);
+            OnSkillFinish(in performer);
         }
 
         public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
@@ -335,13 +330,15 @@ namespace CombatSystem._Core
             _currentDiscriminatedEntityEventsHolder.OnEffectPerform(in performer, in usedSkill, target, effect);
         }
 
-        public void OnSkillFinish()
+        public void OnSkillFinish(in CombatEntity performer)
         {
-            _eventsHolder.OnSkillFinish();
-            _playerCombatEvents.OnSkillFinish();
-            _enemyCombatEvents.OnSkillFinish();
+            _eventsHolder.OnSkillFinish(in performer);
+            _playerCombatEvents.OnSkillFinish(in performer);
+            _enemyCombatEvents.OnSkillFinish(in performer);
 
-            _currentDiscriminatedEntityEventsHolder.OnSkillFinish();
+            _currentDiscriminatedEntityEventsHolder.OnSkillFinish(in performer);
+
+            OnEntityFinishAction(performer);
         }
 
 
@@ -546,6 +543,7 @@ namespace CombatSystem._Core
         protected CombatEventsHolder() : base()
         {
             _combatPreparationListeners = new HashSet<ICombatPreparationListener>();
+            _combatTerminationListeners = new HashSet<ICombatTerminationListener>();
             _combatStatesListeners = new HashSet<ICombatStatesListener>();
             _entitiesExistenceListeners = new HashSet<ICombatEntityExistenceListener>();
             _damageDoneListeners = new HashSet<IDamageDoneListener>();
@@ -557,6 +555,9 @@ namespace CombatSystem._Core
         [Title("Events")]
         [ShowInInspector]
         private readonly ICollection<ICombatPreparationListener> _combatPreparationListeners;
+
+        [ShowInInspector] 
+        private readonly ICollection<ICombatTerminationListener> _combatTerminationListeners;
         [ShowInInspector] 
         private readonly ICollection<ICombatStatesListener> _combatStatesListeners;
         [ShowInInspector] 
@@ -572,8 +573,16 @@ namespace CombatSystem._Core
             base.Subscribe(listener);
             if (listener is ICombatPreparationListener preparationListener)
                 _combatPreparationListeners.Add(preparationListener);
-            if(listener is ICombatStatesListener combatStatesListener)
-                _combatStatesListeners.Add(combatStatesListener);
+
+            if (listener is ICombatTerminationListener terminationListener)
+            {
+                _combatTerminationListeners.Add(terminationListener);
+                if (listener is ICombatStatesListener combatStatesListener)
+                    _combatStatesListeners.Add(combatStatesListener);
+            }
+           
+
+
 
             if (listener is ITempoTickListener tickListener)
                 SubscribeTempo(tickListener);
@@ -594,8 +603,12 @@ namespace CombatSystem._Core
 
             if (listener is ICombatPreparationListener preparationListener)
                 _combatPreparationListeners.Remove(preparationListener);
-            if (listener is ICombatStatesListener combatStatesListener)
-                _combatStatesListeners.Remove(combatStatesListener);
+            if (listener is ICombatTerminationListener terminationListener)
+            {
+                _combatTerminationListeners.Remove(terminationListener);
+                if (listener is ICombatStatesListener combatStatesListener)
+                    _combatStatesListeners.Remove(combatStatesListener);
+            }
 
             if (listener is ITempoTickListener tickListener)
                 UnSubscribeTempo(tickListener);
@@ -653,7 +666,7 @@ namespace CombatSystem._Core
 
         public void OnCombatEnd()
         {
-            foreach (var listener in _combatStatesListeners)
+            foreach (var listener in _combatTerminationListeners)
             {
                 listener.OnCombatEnd();
             }
@@ -661,7 +674,7 @@ namespace CombatSystem._Core
 
         public void OnCombatFinish(bool isPlayerWin)
         {
-            foreach (var listener in _combatStatesListeners)
+            foreach (var listener in _combatTerminationListeners)
             {
                 listener.OnCombatFinish(isPlayerWin);
             }
@@ -669,7 +682,7 @@ namespace CombatSystem._Core
 
         public void OnCombatQuit()
         {
-            foreach (var listener in _combatStatesListeners)
+            foreach (var listener in _combatTerminationListeners)
             {
                 listener.OnCombatQuit();
             }
@@ -965,11 +978,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnSkillFinish()
+        public void OnSkillFinish(in CombatEntity performer)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnSkillFinish();
+                listener.OnSkillFinish(in performer);
             }
         }
 

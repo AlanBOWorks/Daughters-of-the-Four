@@ -58,6 +58,6 @@ namespace CombatSystem.Skills
         /// </summary>
         void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect);
 
-        void OnSkillFinish();
+        void OnSkillFinish(in CombatEntity performer);
     }
 }

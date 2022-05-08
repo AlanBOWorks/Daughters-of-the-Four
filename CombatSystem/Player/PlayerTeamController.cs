@@ -85,18 +85,24 @@ namespace CombatSystem.Player
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            OnSkillFinish();
+            SkillFinish();
         }
 
         public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
         {
         }
 
-        public void OnSkillFinish()
+        public void OnSkillFinish(in CombatEntity performer)
+        {
+           SkillFinish();
+        }
+
+        private void SkillFinish()
         {
             _selectedTarget = null;
             _selectedSkill = null;
         }
+
 
         private void OnControlFinish()
         {

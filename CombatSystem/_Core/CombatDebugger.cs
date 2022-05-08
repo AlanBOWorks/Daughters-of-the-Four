@@ -257,7 +257,7 @@ namespace CombatSystem._Core
                       $"Random Controller: {performer.GetProviderEntityName()} / " +
                       $"Used : {usedSkill.Preset} /" +
                       $"Target: {target.GetProviderEntityName()}");
-            Debug.Log($"ACTIONS Used: {performer.Stats.UsedActions}");
+            Debug.Log($"Performer ACTIONS: {performer.Stats.UsedActions}");
         }
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
@@ -272,9 +272,10 @@ namespace CombatSystem._Core
             Debug.Log($"Effect[{effect.GetPreset()} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
         }
 
-        public void OnSkillFinish()
+        public void OnSkillFinish(in CombatEntity performer)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnFinish) return;
+            Debug.Log($"Performer ACTIONS: {performer.Stats.UsedActions}");
             Debug.Log("-------------- SKILL END --------------- ");
         }
 

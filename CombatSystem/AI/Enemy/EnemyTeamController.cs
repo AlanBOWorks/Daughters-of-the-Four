@@ -45,7 +45,7 @@ namespace CombatSystem.AI
         {
         }
 
-        public void OnSkillFinish()
+        public void OnSkillFinish(in CombatEntity performer)
         {
             Step();
         }

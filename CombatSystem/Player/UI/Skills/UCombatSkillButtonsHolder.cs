@@ -367,7 +367,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnSkillFinish()
+        public void OnSkillFinish(in CombatEntity performer)
         {
         }
 

@@ -30,6 +30,10 @@ namespace CombatSystem._Core
             SkillTargetingHandler 
                 = new SkillTargetingHandler();
 
+            var skillsQueue = new SkillQueuePerformer();
+
+
+            EventsHolder.Subscribe(skillsQueue);
             EventsHolder.Subscribe(SkillTargetingHandler);
             EventsHolder.Subscribe(TeamControllers);
 

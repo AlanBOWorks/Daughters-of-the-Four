@@ -10,11 +10,11 @@ namespace CombatSystem.Skills
     {
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            UtilsCombatStats.TickActions(performer.Stats, in usedSkill);
         }
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
+            UtilsCombatStats.TickActions(performer.Stats, in usedSkill);
             usedSkill.DoSkill(in performer, in target);
             usedSkill.IncreaseCost();
         }
@@ -24,7 +24,7 @@ namespace CombatSystem.Skills
 
         }
 
-        public void OnSkillFinish()
+        public void OnSkillFinish(in CombatEntity performer)
         {
             
         }
