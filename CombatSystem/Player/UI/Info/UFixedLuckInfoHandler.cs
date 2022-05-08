@@ -48,7 +48,7 @@ namespace CombatSystem.Player.UI
             var luckInfoHolder = element.GetComponent<ULuckInfo>();
             _elementsDictionary.Add(entity, luckInfoHolder);
         }
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
         }
 

@@ -35,19 +35,24 @@ namespace CombatSystem.Team
             set => _enemyTeamType = value;
         }
 
+        // - PROBLEM: using CombatTeam.CanControl is automatic and will return true once all entities has ended their sequence;
+        // meanwhile it should be called by the controller itself.
+        // - SOLUTION: keep track of the current controller and check if null (this should be set to null once the controller
+        // had being invoked)
         [ShowInInspector]
         public bool IsControlling() => _currentControl != null;
 
 
-        public void TickControllers()
+        public void TickPlayerController()
         {
-            TryInvokeControl(in _playerTeamType, out bool playerWasInvoked);
-
-            if (!playerWasInvoked)
-            {
-                TryInvokeControl(in _enemyTeamType, out _);
-            }
+            TryInvokeControl(in _playerTeamType);
         }
+
+        public void TickEnemyController()
+        {
+            TryInvokeControl(in _enemyTeamType);
+        }
+
 
         public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
@@ -63,55 +68,20 @@ namespace CombatSystem.Team
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            var oppositeTeam = UtilsTeam.GetOppositeElement(controller, this);
-
-            TryInvokeControl(in oppositeTeam, out _);
             _currentControl = null;
         }
 
 
      
 
-        private void TryInvokeControl(in CombatTeamControllerBase controller, out bool controlWasInvoked)
+        private void TryInvokeControl(in CombatTeamControllerBase controller)
         {
-            
             var team = controller.ControllingTeam;
             bool isActive = team.IsActive();
-            bool canControl = team.CanControl();
-            controlWasInvoked = isActive;
-
+            
             if (!isActive) return;
-
-
-
-
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-
-            if (canControl)
-            {
-                eventsHolder.OnTempoStartControl(in controller);
-            }
-
-            var activeMembers = team.GetActiveMembers();
-            foreach (var pair in activeMembers)
-            {
-                var member = pair.Key;
-                var canControlMember = pair.Value;
-                HandleMember(in member, in canControlMember);
-            }
-
-            void HandleMember(in CombatEntity member, in bool canControlMember)
-            {
-                bool isTrinity = UtilsTeam.IsTrinityRole(in member);
-                eventsHolder.OnEntityRequestSequence(member, canControlMember);
-                if (isTrinity)
-                    eventsHolder.OnTrinityEntityRequestSequence(member, canControlMember);
-                else
-                    eventsHolder.OnOffEntityRequestSequence(member, canControlMember);
-            }
-
-
-            controller.InvokeStartControl();
+            
+            UtilsTeamMembers.HandleActiveMembers(controller, team);
             _currentControl = controller;
         }
 

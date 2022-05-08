@@ -73,6 +73,13 @@ namespace CombatSystem._Core
 
         private int _roundTickCount;
         public int GetCurrentRoundTicks() => _roundTickCount;
+
+        [Button,HideIf("_pauseTicking")]
+        private void PauseNextTick() => _pauseTicking = true;
+        [Button,ShowIf("_pauseTicking")]
+        private void ResumeNextTick() => _pauseTicking = false;
+
+        private bool _pauseTicking = false;
         private IEnumerator<float> _TickingLoop()
         {
             var controllers = CombatSystemSingleton.TeamControllers;
@@ -84,7 +91,17 @@ namespace CombatSystem._Core
             {
                 yield return Timing.WaitForSeconds(TickPeriodSeconds);
                 _roundTickCount++;
+
+                while (_pauseTicking)
+                {
+                    yield return Timing.WaitForOneFrame;
+                }
+
+
+
                 EntitiesTempoTicker.TickEntities();
+                yield return Timing.WaitForOneFrame;
+
                 foreach (var listener in TickListeners)
                 {
                     listener.OnTick();
@@ -92,14 +109,24 @@ namespace CombatSystem._Core
 
                 yield return Timing.WaitForOneFrame;
 
-                controllers.TickControllers();
+
+                // ------ CONTROLLERS
+                controllers.TickPlayerController();
                 do
                 {
                     yield return Timing.WaitForOneFrame;
                 } while (controllers.IsControlling());
 
-                //Safe wait
                 yield return Timing.WaitForOneFrame;
+
+                controllers.TickEnemyController();
+                do
+                {
+                    yield return Timing.WaitForOneFrame;
+                } while (controllers.IsControlling());
+                // ------ CONTROLLERS
+
+
 
 
 
@@ -134,7 +161,7 @@ namespace CombatSystem._Core
         /// It's send once per sequence and the first time the entity's
         /// [<seealso cref="CombatStats.CurrentInitiative"/>] triggers. 
         /// </summary>
-        void OnEntityRequestSequence(CombatEntity entity, bool canAct);
+        void OnEntityRequestSequence(CombatEntity entity, bool canControl);
 
         /// <summary>
         /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left and if it can act.<br></br>
@@ -198,7 +225,7 @@ namespace CombatSystem._Core
     public interface ITempoTeamStatesListener : ICombatEventListener
     {
         /// <summary>
-        /// First call;
+        /// First call; It's before [<seealso cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>]
         /// </summary>
         /// <param name="controller"></param>
         void OnTempoStartControl(in CombatTeamControllerBase controller);

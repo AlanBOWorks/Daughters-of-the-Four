@@ -100,10 +100,10 @@ namespace CombatSystem.Team
         public IReadOnlyList<CombatEntity> MainPositioningMembers => _mainPositionsWrapper.Members;
         public FlexPositionMainGroupStructure<CombatEntity> GetMainMembers() => _mainRoleWrapper;
 
-        public IReadOnlyDictionary<CombatEntity, bool> GetActiveMembers() => _controlMembers.GetActiveMembers();
-        public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _controlMembers.GetTrinityMembers();
-        public IReadOnlyList<CombatEntity> GetOffMembersActiveMembers() => _controlMembers.GetOffMembers();
-        public IReadOnlyList<CombatEntity> GetControllingMembers() => _controlMembers.GetAllMembers();
+        public IEnumerable<CombatEntity> GetNonControllingMembers() => _controlMembers.GetNonControllingMembers();
+        public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _controlMembers.GetControllingTrinityMembers();
+        public IReadOnlyList<CombatEntity> GetOffMembersActiveMembers() => _controlMembers.GetControllingOffMembers();
+        public IReadOnlyList<CombatEntity> GetControllingMembers() => _controlMembers.GetAllControllingMembers();
 
         public IEnumerable<CombatEntity> OffRoleMembers => _offRolesGroup;
         public TeamOffGroupStructure<CombatEntity> GetOffMembersStructure() => _offRolesGroup;
@@ -217,7 +217,59 @@ namespace CombatSystem.Team
 
             return true;
         }
-        
+
+        public void ClearNonControllingMembers()
+        {
+            _controlMembers.ClearNotControllingMembers();
+        }
+
+        public void ClearControllingMembers()
+        {
+            _controlMembers.Clear();
+        }
+
+        public void AddActiveEntity(in CombatEntity entity, in bool canControl)
+        {
+            _controlMembers.AddActiveEntity(in entity, in canControl);
+        }
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
+        {
+            GuardHandler.OnEntityRequestSequence(in entity);
+        }
+
+        public void OnEntityRequestAction(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        {
+            if (isForcedByController) return;
+            //This will be removed with Clear OnTempoForceFinish
+            _controlMembers.SafeRemoveControlling(in entity);
+        }
+
+        public void OnTempoForceFinish()
+        {
+            _controlMembers.Clear();
+        }
+
+
+        public IEnumerator<CombatEntity> GetEnumerator()
+        {
+            return _members.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public CombatEntity this[int index] => _members[index];
 
 
         public void Clear()
@@ -314,55 +366,6 @@ namespace CombatSystem.Team
                 return false;
             }
         }
-
-        public void AddActiveEntity(in CombatEntity entity, in bool canControl)
-        {
-            _controlMembers.AddActiveEntity(in entity, in canControl);
-        }
-
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
-        {
-            GuardHandler.OnEntityRequestSequence(in entity);
-            if (!canAct)
-            {
-                _controlMembers.SafeRemoveActive(in entity);
-            }
-        }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)
-        {
-            if(isForcedByController) return;
-            //This will be removed with Clear OnTempoForceFinish
-            _controlMembers.SafeRemoveControlling(in entity);
-        }
-
-        public void OnTempoForceFinish(in CombatTeamControllerBase controller,
-            in IReadOnlyList<CombatEntity> remainingMembers)
-        {
-            _controlMembers.Clear();
-        }
-
-
-        public IEnumerator<CombatEntity> GetEnumerator()
-        {
-            return _members.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public CombatEntity this[int index] => _members[index];
-
     }
 
     [Serializable]

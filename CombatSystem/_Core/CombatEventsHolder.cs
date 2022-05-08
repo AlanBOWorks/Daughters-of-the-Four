@@ -138,17 +138,17 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
             HandleCurrentEntityEventsHolder(in entity);
 
-            _eventsHolder.OnEntityRequestSequence(entity, canAct);
-            _playerCombatEvents.OnEntityRequestSequence(entity, canAct);
-            _enemyCombatEvents.OnEntityRequestSequence(entity, canAct);
+            _eventsHolder.OnEntityRequestSequence(entity, canControl);
+            _playerCombatEvents.OnEntityRequestSequence(entity, canControl);
+            _enemyCombatEvents.OnEntityRequestSequence(entity, canControl);
 
-            _currentDiscriminatedEntityEventsHolder.OnEntityRequestSequence(entity, canAct);
+            _currentDiscriminatedEntityEventsHolder.OnEntityRequestSequence(entity, canControl);
 
-            _sequenceStepper.OnEntityRequestSequence(entity,canAct);
+            _sequenceStepper.OnEntityRequestSequence(entity,canControl);
         }
 
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -263,6 +263,8 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnTempoStartControl(in controller);
 
             _currentDiscriminatedEntityEventsHolder.OnTempoStartControl(in controller);
+
+            _sequenceStepper.OnTempoStartControl(in controller);
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
@@ -842,11 +844,11 @@ namespace CombatSystem._Core
             _teamEventListeners.Add(teamEventListener);
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
             foreach (var listener in _tempoEntityListeners)
             {
-                listener.OnEntityRequestSequence(entity,canAct);
+                listener.OnEntityRequestSequence(entity,canControl);
             }
         }
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)

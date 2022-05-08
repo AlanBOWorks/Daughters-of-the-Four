@@ -34,7 +34,7 @@ namespace CombatSystem.Player
 
             PerformerSwitcher = new PlayerPerformerSwitcher();
             playerEvents.ManualSubscribe((ICombatPreparationListener) PerformerSwitcher);
-            playerEvents.ManualSubscribe((ITempoTeamStatesListener)PerformerSwitcher);
+            discriminationEvents.ManualSubscribe((ITempoTeamStatesListener)PerformerSwitcher);
             discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesExtraListener);
         }
 

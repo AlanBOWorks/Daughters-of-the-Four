@@ -15,7 +15,6 @@ namespace CombatSystem._Core
         // TEAM
         public void OnTempoStartControl(in CombatTeamControllerBase controller)
         {
-
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
@@ -33,6 +32,7 @@ namespace CombatSystem._Core
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
+            controller.ControllingTeam.ClearControllingMembers();
         }
 
         public void OnTempoForceFinish(in CombatTeamControllerBase controller,
@@ -47,16 +47,16 @@ namespace CombatSystem._Core
                 eventsHolder.OnEntityFinishSequence(entity, isForced);
             }
 
-            controller.ControllingTeam.OnTempoForceFinish(in controller, in remainingMembers);
+            controller.ControllingTeam.OnTempoForceFinish();
         }
 
 
         // ENTITY
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            if(!canAct)
+            if(!canControl)
             {
                 eventsHolder.OnNoActionsForcedFinish(in entity);
                 return;

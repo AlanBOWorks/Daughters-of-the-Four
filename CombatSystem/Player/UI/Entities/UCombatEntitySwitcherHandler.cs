@@ -139,11 +139,11 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
        {
            if (!_buttonsDictionary.ContainsKey(entity)) return;
 
-           _buttonsDictionary[entity].DoEnable(canAct);
+           _buttonsDictionary[entity].DoEnable(canControl);
        }
 
        public void OnEntityRequestAction(CombatEntity entity)

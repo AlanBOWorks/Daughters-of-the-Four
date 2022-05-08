@@ -65,9 +65,9 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
-            if (!canAct) return;
+            if (!canControl) return;
 
             _tickingTrackers.Remove(entity);
         }

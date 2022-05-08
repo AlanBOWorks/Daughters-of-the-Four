@@ -575,4 +575,48 @@ namespace CombatSystem.Team
             target.Team.StandByMembers.PutOnStandBy(in target);
         }
     }
+
+    public static class UtilsTeamMembers
+    {
+        public static void HandleActiveMembers(CombatTeamControllerBase controller, CombatTeam team)
+        {
+            bool canControl = team.CanControl();
+
+
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+
+            if (canControl)
+            {
+                eventsHolder.OnTempoStartControl(in controller);
+            }
+
+            var nonControllingMembers = team.GetNonControllingMembers();
+            HandleMembers(in nonControllingMembers, false);
+
+            IEnumerable<CombatEntity> controllingMembers = team.GetControllingMembers();
+            HandleMembers(in controllingMembers, true);
+
+
+            team.ClearNonControllingMembers();
+            controller.InvokeStartControl();
+
+            void HandleMembers(in IEnumerable<CombatEntity> members, bool canControlMember)
+            {
+                foreach (var member in members)
+                {
+                    HandleMember(in member, in canControlMember);
+                }
+            }
+
+            void HandleMember(in CombatEntity member, in bool canControlMember)
+            {
+                bool isTrinity = UtilsTeam.IsTrinityRole(in member);
+                eventsHolder.OnEntityRequestSequence(member, canControlMember);
+                if (isTrinity)
+                    eventsHolder.OnTrinityEntityRequestSequence(member, canControlMember);
+                else
+                    eventsHolder.OnOffEntityRequestSequence(member, canControlMember);
+            }
+        }
+    }
 }

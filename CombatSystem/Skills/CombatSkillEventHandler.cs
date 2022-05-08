@@ -29,7 +29,7 @@ namespace CombatSystem.Skills
             
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
             entity.OnSequenceStart();
         }

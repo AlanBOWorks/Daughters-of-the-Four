@@ -22,11 +22,13 @@ namespace CombatSystem.AI
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
+            Debug.Log("INVOKED");
             ForceFinish();
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
+            Debug.Log("?¿?¿?¿?");
         }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)

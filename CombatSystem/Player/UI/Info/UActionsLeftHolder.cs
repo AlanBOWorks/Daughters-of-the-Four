@@ -162,7 +162,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
         }
 

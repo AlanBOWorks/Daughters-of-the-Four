@@ -142,7 +142,7 @@ namespace CombatSystem._Core
             Debug.Log($"> --- OFF Entity [END] Sequence: {entity.GetProviderEntityName()}");
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canAct)
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
             if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnSequence) return;
             Debug.Log("--------- -------- -------- SEQUENCE -------- -------- --------");

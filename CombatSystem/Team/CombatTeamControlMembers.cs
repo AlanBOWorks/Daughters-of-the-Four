@@ -11,13 +11,14 @@ namespace CombatSystem.Team
     {
         public CombatTeamControlMembers()
         {
-            _activeMembers = new Dictionary<CombatEntity, bool>();
+            _nonControllingMembers = new HashSet<CombatEntity>();
             _allControllingMembers = new List<CombatEntity>();
             _trinityControllingMembers = new List<CombatEntity>();
             _offControllingMembers = new List<CombatEntity>();
         }
 
-        private readonly Dictionary<CombatEntity, bool> _activeMembers;
+        [ShowInInspector, HorizontalGroup()] 
+        private readonly HashSet<CombatEntity> _nonControllingMembers;
 
         [ShowInInspector, HorizontalGroup()] 
         private readonly List<CombatEntity> _allControllingMembers;
@@ -26,15 +27,15 @@ namespace CombatSystem.Team
         [ShowInInspector,HorizontalGroup()]
         private readonly List<CombatEntity> _offControllingMembers;
 
-        public IReadOnlyDictionary<CombatEntity, bool> GetActiveMembers() => _activeMembers;
-        public IReadOnlyList<CombatEntity> GetAllMembers() => _allControllingMembers;
-        public IReadOnlyList<CombatEntity> GetTrinityMembers() => _trinityControllingMembers;
-        public IReadOnlyList<CombatEntity> GetOffMembers() => _offControllingMembers;
+        public IEnumerable<CombatEntity> GetNonControllingMembers() => _nonControllingMembers;
+        public IReadOnlyList<CombatEntity> GetAllControllingMembers() => _allControllingMembers;
+        public IReadOnlyList<CombatEntity> GetControllingTrinityMembers() => _trinityControllingMembers;
+        public IReadOnlyList<CombatEntity> GetControllingOffMembers() => _offControllingMembers;
 
         /// <summary>
         /// Check if it has entities that reach the initiative threshold (but not if can act)
         /// </summary>
-        public bool IsActive() => _activeMembers.Count > 0;
+        public bool IsActive() => _allControllingMembers.Count > 0 || _nonControllingMembers.Count > 0;
         /// <summary>
         /// If has entities than can act
         /// </summary>
@@ -43,8 +44,11 @@ namespace CombatSystem.Team
 
         public void AddActiveEntity(in CombatEntity entity, in bool canControl)
         {
-            _activeMembers.Add(entity,canControl);
-            if(!canControl) return;
+            if(!canControl)
+            {
+                _nonControllingMembers.Add(entity);
+                return;
+            }
 
             _allControllingMembers.Add(entity);
             bool isTrinity = UtilsTeam.IsTrinityRole(in entity);
@@ -54,11 +58,6 @@ namespace CombatSystem.Team
                 _offControllingMembers.Add(entity);
         }
 
-        public void SafeRemoveActive(in CombatEntity entity)
-        {
-            if (!_activeMembers.ContainsKey(entity)) return;
-            _activeMembers.Remove(entity);
-        }
 
         public void SafeRemoveControlling(in CombatEntity entity)
         {
@@ -77,9 +76,14 @@ namespace CombatSystem.Team
         }
 
 
+        public void ClearNotControllingMembers()
+        {
+            _nonControllingMembers.Clear();
+        }
+
         public void Clear()
         {
-            _activeMembers.Clear();
+            _nonControllingMembers.Clear();
             _allControllingMembers.Clear();
             _trinityControllingMembers.Clear();
             _offControllingMembers.Clear();
