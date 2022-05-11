@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
+using CombatSystem.Player.UI;
 using CombatSystem.Skills;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -9,8 +10,11 @@ using UnityEngine;
 namespace CombatSystem.Player
 {
     public sealed class PlayerCombatEventsHolder : ControllerCombatEventsHolder, ITempoTickListener, IDiscriminationEventsHolder,
+        
         IPlayerEntityListener,
+
         ISkillPointerListener, ISkillSelectionListener,
+
         ITargetPointerListener, ITargetSelectionListener,
         ICameraHolderListener
     {
@@ -20,8 +24,10 @@ namespace CombatSystem.Player
             combatEventsHolder.SubscribeEventsHandler(this);
 
             _playerEntityListeners = new HashSet<IPlayerEntityListener>();
+
             _skillPointerListeners = new HashSet<ISkillPointerListener>();
             _skillSelectionListeners = new HashSet<ISkillSelectionListener>();
+
             _targetPointerListeners = new HashSet<ITargetPointerListener>();
             _targetSelectionListeners = new HashSet<ITargetSelectionListener>();
 
@@ -44,6 +50,7 @@ namespace CombatSystem.Player
         private readonly HashSet<ITargetPointerListener> _targetPointerListeners;
         [ShowInInspector,HorizontalGroup("Target")]
         private readonly HashSet<ITargetSelectionListener> _targetSelectionListeners;
+
 
         [ShowInInspector] 
         private readonly HashSet<ICameraHolderListener> _cameraHolderListeners;
@@ -79,6 +86,7 @@ namespace CombatSystem.Player
         /// <br></br>- <see cref="ISkillSelectionListener"/>
         /// <br></br>- <see cref="ITargetPointerListener"/>
         /// <br></br>- <see cref="ITargetSelectionListener"/>
+        /// <br></br>- <see cref="ITargetSelectionFeedBackListener"/>
         /// <br></br>- <see cref="ICameraHolderListener"/>
         /// </summary>
         public void SubscribeAsPlayerEvent(ICombatEventListener listener)
@@ -240,6 +248,5 @@ namespace CombatSystem.Player
                 listener.OnSwitchCamera(in combatCamera);
             }
         }
-
     }
 }

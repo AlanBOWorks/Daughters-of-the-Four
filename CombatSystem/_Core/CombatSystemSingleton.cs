@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using CombatSystem.Animations;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 using CombatSystem.Team;
@@ -32,14 +33,18 @@ namespace CombatSystem._Core
 
             var skillsQueue = new SkillQueuePerformer();
 
+            CombatAnimationHandler = new CombatAnimationHandler();
 
-            EventsHolder.Subscribe(skillsQueue);
-            EventsHolder.Subscribe(SkillTargetingHandler);
-            EventsHolder.Subscribe(TeamControllers);
 
             PrefabInstantiationHandler = new PrefabInstantiationHandler();
             EntityPrefabsPoolHandler = new EntityPrefabsPoolHandler();
 
+
+
+            systemEventsHolder.Subscribe(skillsQueue);
+            systemEventsHolder.Subscribe(SkillTargetingHandler);
+            systemEventsHolder.Subscribe(CombatAnimationHandler);
+            systemEventsHolder.Subscribe(TeamControllers);
             systemEventsHolder.Subscribe(EntityPrefabsPoolHandler);
         }
         private CombatSystemSingleton() { }
@@ -93,8 +98,15 @@ namespace CombatSystem._Core
         [ShowInInspector, DisableInEditorMode]
         public static TempoTicker TempoTicker { get; internal set; }
 
-        public static CoroutineHandle MasterCoroutineHandle;
 
+        // ------- ANIMATIONS ------
+        [Title("Animator")] 
+        public static readonly CombatAnimationHandler CombatAnimationHandler;
+
+
+
+
+        public static CoroutineHandle MasterCoroutineHandle;
         public static CoroutineHandle LinkCoroutineToMaster(
             in IEnumerator<float> coroutineIterator, in MEC.Segment tickSegment = Segment.RealtimeUpdate)
         {

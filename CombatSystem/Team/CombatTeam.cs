@@ -22,7 +22,7 @@ namespace CombatSystem.Team
             IsPlayerTeam = isPlayerTeam;
 
             DataValues = new TeamDataValues();
-            GuardHandler = new TeamLineGuardHandler();
+            GuardHandler = new TeamLineBlockerHandler();
 
             _members = new List<CombatEntity>();
 
@@ -53,7 +53,7 @@ namespace CombatSystem.Team
 
         // ------------ DATA ------------ 
         public readonly TeamDataValues DataValues;
-        public readonly TeamLineGuardHandler GuardHandler;
+        public readonly TeamLineBlockerHandler GuardHandler;
 
 #if UNITY_EDITOR
         [Title("Members")]

@@ -20,6 +20,9 @@ namespace CombatSystem.Player
         [ShowInInspector]
         private CombatEntity _selectedTarget;
 
+        internal CombatEntity GetPerformer() => _selectedPerformer;
+        internal CombatSkill GetSkill() => _selectedSkill;
+
 
         public override void InvokeStartControl()
         {
@@ -81,11 +84,12 @@ namespace CombatSystem.Player
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
+            _selectedTarget = null;
+            _selectedSkill = null;
         }
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            SkillFinish();
         }
 
         public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
@@ -94,13 +98,6 @@ namespace CombatSystem.Player
 
         public void OnSkillFinish(in CombatEntity performer)
         {
-           SkillFinish();
-        }
-
-        private void SkillFinish()
-        {
-            _selectedTarget = null;
-            _selectedSkill = null;
         }
 
 

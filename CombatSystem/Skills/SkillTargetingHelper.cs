@@ -42,28 +42,14 @@ namespace CombatSystem.Skills
 
         private void HandleLine(in CombatEntity target, in bool isAlly)
         {
-            _aliveLine.Clear(); //safe clear
-
-            var targetLine = isAlly 
-                ? UtilsTarget.GetSupportLine(target) 
-                : UtilsTarget.GetOffensiveLine(target);
-            foreach (var member in targetLine)
-            {
-                if (!UtilsTarget.CanBeTargeted(in member)) continue;
-                
-                _aliveLine.Add(member);
-            }
+            ICollection<CombatEntity> aliveLine = _aliveLine;
+            UtilsTargetsCollection.HandleLine(in aliveLine,in target, in isAlly);
         }
 
         private void HandleTeam(in CombatEntity target)
         {
-            _aliveTeam.Clear(); //safe clear
-
-            foreach (var member in target.Team)
-            {
-                if (UtilsTarget.CanBeTargeted(in member))
-                    _aliveTeam.Add(member);
-            }
+            ICollection<CombatEntity> aliveTeam = _aliveTeam;
+            UtilsTargetsCollection.HandleTeam(in aliveTeam, in target);
         }
 
         public void Clear()
@@ -74,29 +60,29 @@ namespace CombatSystem.Skills
         }
     }
 
-    public sealed class SkillTargetingHandler : ISkillUsageListener
+    public class SkillTargetingHandler : ISkillUsageListener
     {
         public SkillTargetingHandler()
         {
-            _performerHelper = new SkillTargetingHelper();
-            _targetHelper = new SkillTargetingHelper();
+            PerformerHelper = new SkillTargetingHelper();
+            TargetHelper = new SkillTargetingHelper();
             ;
         }
-        [ShowInInspector,HorizontalGroup()]
-        private readonly SkillTargetingHelper _performerHelper;
-        [ShowInInspector,HorizontalGroup()]
-        private readonly SkillTargetingHelper _targetHelper;
+        [ShowInInspector,HorizontalGroup()] 
+        protected readonly SkillTargetingHelper PerformerHelper;
+        [ShowInInspector,HorizontalGroup()] 
+        protected readonly SkillTargetingHelper TargetHelper;
 
-        public ISkillInteractionStructureRead<IEnumerable<CombatEntity>> PerformerType => _performerHelper;
-        public ISkillInteractionStructureRead<IEnumerable<CombatEntity>> TargetType => _targetHelper;
+        public ISkillInteractionStructureRead<IEnumerable<CombatEntity>> PerformerType => PerformerHelper;
+        public ISkillInteractionStructureRead<IEnumerable<CombatEntity>> TargetType => TargetHelper;
         public IEnumerable<CombatEntity> AllType => PerformerType.TargetTeam.Concat(TargetType.TargetTeam);
 
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
             bool isAlly = performer.Team.Contains(target);
-            _performerHelper.HandleAlive(in performer, in isAlly);
-            _targetHelper.HandleAlive(in target,in isAlly);
+            PerformerHelper.HandleAlive(in performer, in isAlly);
+            TargetHelper.HandleAlive(in target,in isAlly);
         }
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
@@ -109,8 +95,8 @@ namespace CombatSystem.Skills
 
         public void OnSkillFinish(in CombatEntity performer)
         {
-            _performerHelper.Clear();
-            _targetHelper.Clear();
+            PerformerHelper.Clear();
+            TargetHelper.Clear();
         }
     }
 }

@@ -18,7 +18,10 @@ namespace CombatSystem.Entity
         {
             GameObject copyReference = provider.GetVisualPrefab();
             if (copyReference == null)
+            {
                 instantiatedGameObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                var body = instantiatedGameObject.AddComponent<UCombatEntityBody>();
+            }
             else
                 instantiatedGameObject = Object.Instantiate(copyReference);
 

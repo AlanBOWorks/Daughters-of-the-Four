@@ -1,25 +1,47 @@
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 using UnityEngine;
 
 namespace CombatSystem.Animations
 {
-    public sealed class CombatAnimationHandler : ISkillUsageListener 
+    public sealed class CombatAnimationHandler : ITempoEntityStatesListener
     {
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        private static ICombatEntityAnimator GetAnimator(in CombatEntity entity) => entity.Body.GetAnimator();
+
+        public void PerformActionAnimation(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
+            var animator = GetAnimator(in performer);
+            animator.PerformActionAnimation(in usedSkill, in target);
         }
 
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void PerformReceiveAnimation(in CombatEntity target, in CombatSkill usedSkill, in CombatEntity performer)
         {
+            var targetAnimator = GetAnimator(in target);
+            targetAnimator.ReceiveActionAnimation(in usedSkill, in performer);
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
+            var animator = GetAnimator(in entity);
+            animator.OnRequestSequenceAnimation();
         }
 
-        public void OnSkillFinish(in CombatEntity performer)
+        public void OnEntityRequestAction(CombatEntity entity)
         {
+            
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+           
+        }
+
+        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        {
+            var animator = GetAnimator(in entity);
+            animator.OnEndSequenceAnimation();
         }
     }
 }

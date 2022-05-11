@@ -19,42 +19,54 @@ namespace CombatSystem.Skills
             return target != null && target.CanBeTarget();
         }
 
-        public static IReadOnlyList<CombatEntity> GetPossibleTargets(CombatSkill skill, CombatEntity currentControl)
+        public static void HandlePossibleTargets(ICollection<CombatEntity> targetsHelper,
+            CombatEntity performer,
+            CombatSkill skill)
         {
-            TargetsHelper.Clear();
+            bool ignoreSelf = skill.IgnoreSelf();
+            HandlePossibleTargets(targetsHelper, performer, skill.Archetype, ignoreSelf);
+        }
 
-            var type = skill.Archetype;
+
+        public static void HandlePossibleTargets(ICollection<CombatEntity> targetsHelper,
+            CombatEntity performer,
+            EnumsSkill.Archetype type, bool ignoreSelf)
+        {
+            targetsHelper.Clear();
+
             switch (type)
             {
                 case EnumsSkill.Archetype.Self:
-                    return GetSingleTarget(currentControl);
+                    HandleSingleTarget(performer);
+                    break;
                 case EnumsSkill.Archetype.Offensive:
-                    return GetOffensiveMembers();
+                    HandleOffensiveMembers();
+                    break;
                 case EnumsSkill.Archetype.Support:
-                    return GetSupportMembers();
+                    HandleSupportMembers();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            IReadOnlyList<CombatEntity> GetSingleTarget(CombatEntity target)
+            void HandleSingleTarget(CombatEntity target)
             {
-                TargetsHelper.Add(target);
-                return TargetsHelper;
+                targetsHelper.Add(target);
             }
 
-            IReadOnlyList<CombatEntity> GetOffensiveMembers()
+            void HandleOffensiveMembers()
             {
-                var enemyTeam = currentControl.Team.EnemyTeam;
+                var enemyTeam = performer.Team.EnemyTeam;
                 var enemyGuarding = enemyTeam.GuardHandler;
-                var members = 
-                    enemyGuarding.CanGuard() 
+                var members =
+                    enemyGuarding.CanGuard()
                         ? GetGuarderLine()
                         : enemyTeam;
 
                 foreach (var member in members)
                 {
                     if (CanBeTargeted(in member))
-                        TargetsHelper.Add(member);
+                        targetsHelper.Add(member);
                 }
 
                 IEnumerable<CombatEntity> GetGuarderLine()
@@ -62,24 +74,25 @@ namespace CombatSystem.Skills
                     var guarder = enemyGuarding.GetCurrentGuarder();
                     return UtilsTeam.GetMemberLine(in guarder);
                 }
-
-                return TargetsHelper;
-            }
-
-            IReadOnlyList<CombatEntity> GetSupportMembers()
-            {
-                var team = currentControl.Team;
-                bool ignoreSelf = skill.IgnoreSelf();
-                foreach (var member in team)
-                {
-                    if (ignoreSelf && member == currentControl)
-                        continue;
-
-                    TargetsHelper.Add(member);
                 }
 
-                return TargetsHelper;
+            void HandleSupportMembers()
+            {
+                var team = performer.Team;
+                foreach (var member in team)
+                {
+                    if (ignoreSelf && member == performer)
+                        continue;
+
+                    targetsHelper.Add(member);
+                }
+
             }
+        }
+        public static IReadOnlyList<CombatEntity> GetPossibleTargets(CombatEntity performer, CombatSkill skill)
+        {
+            HandlePossibleTargets(TargetsHelper, performer, skill);
+            return TargetsHelper;
         }
 
         public static IEnumerable<CombatEntity> GetEffectTargets(EnumsEffect.TargetType targetType)
@@ -153,5 +166,35 @@ namespace CombatSystem.Skills
             targetTeam = targetEntity.Team;
             positioning = targetEntity.PositioningType;
         }
+    }
+
+    public static class UtilsTargetsCollection
+    {
+        public static void HandleLine(in ICollection<CombatEntity> aliveLine, in CombatEntity target, in bool isAlly)
+        {
+            aliveLine.Clear(); //safe clear
+
+            var targetLine = isAlly
+                ? UtilsTarget.GetSupportLine(target)
+                : UtilsTarget.GetOffensiveLine(target);
+            foreach (var member in targetLine)
+            {
+                if (!UtilsTarget.CanBeTargeted(in member)) continue;
+
+                aliveLine.Add(member);
+            }
+        }
+
+        public static void HandleTeam(in ICollection<CombatEntity> aliveTeam, in CombatEntity target)
+        {
+            aliveTeam.Clear(); //safe clear
+
+            foreach (var member in target.Team)
+            {
+                if (UtilsTarget.CanBeTargeted(in member))
+                    aliveTeam.Add(member);
+            }
+        }
+
     }
 }

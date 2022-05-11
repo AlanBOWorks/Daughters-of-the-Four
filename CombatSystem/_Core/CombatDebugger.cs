@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using CombatSystem.AI.Enemy;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
+using CombatSystem.Player.UI;
 using CombatSystem.Skills;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -286,7 +287,7 @@ namespace CombatSystem._Core
 
     public sealed class CombatPlayerEventsLogs :
         ISkillPointerListener, ISkillSelectionListener,
-        ITargetPointerListener, ITargetSelectionListener,
+        ITargetPointerListener, ITargetSelectionListener, 
         IPlayerEntityListener
     {
         [Title("Skill Buttons")]
@@ -404,6 +405,33 @@ namespace CombatSystem._Core
             Debug.Log($"xxxx - Target SUBMIT: {target.GetProviderEntityName()}");
         }
 
+
+
+        [Title("Target Hover")]
+        public bool ShowTargetFeedbackLogs = false;
+        private sealed class TargetFeedbackLogs
+        {
+            public bool OnPossibleTargets = true;
+            public bool OnHideTargets = true;
+        }
+
+        [ShowInInspector]
+        private TargetFeedbackLogs _targetFeedbackLogs = new TargetFeedbackLogs();
+
+        public void OnHoverPossibleTargets(in CombatEntity possibleTarget)
+        {
+            if (!ShowTargetFeedbackLogs || !_targetFeedbackLogs.OnPossibleTargets) return;
+            Debug.Log($"Possible Target: {possibleTarget.CombatCharacterName}");
+           
+        }
+
+        public void HidePossibleTargets()
+        {
+            if (!ShowTargetFeedbackLogs || !_targetFeedbackLogs.OnHideTargets) return;
+            Debug.Log($"Hiding Possible Targets");
+        }
+
+
         [Title("Performer Switch")]
         public bool ShowPerformerSwitchLog = false;
         public void OnPerformerSwitch(in CombatEntity performer)
@@ -411,6 +439,8 @@ namespace CombatSystem._Core
             if(!ShowPerformerSwitchLog) return;
             Debug.Log($"xxxx - PERFORMER: {performer.GetProviderEntityName()}");
         }
+
+
     }
 
 #endif

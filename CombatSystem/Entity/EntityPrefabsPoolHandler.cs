@@ -56,6 +56,7 @@ namespace CombatSystem.Entity
                     UtilsEntity.HandleInjections(in entity, in entityGO);
                     entityGO.SetActive(true);
 
+                    entity.Body.InjectPositionReference(in entityTransform);
                 }
             }
 
@@ -104,6 +105,7 @@ namespace CombatSystem.Entity
 
                     entityTransform.position = positionTransform.position;
                     entityTransform.rotation = positionTransform.rotation;
+                    entity.Body.InjectPositionReference(in entityTransform);
 
                     UtilsTeam.SetElement(i,this, entityTransform);
                 }

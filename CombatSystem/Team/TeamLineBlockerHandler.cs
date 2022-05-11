@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public sealed class TeamLineGuardHandler 
+    public sealed class TeamLineBlockerHandler 
     {
         [ShowInInspector]
         private CombatEntity _currentGuarder;

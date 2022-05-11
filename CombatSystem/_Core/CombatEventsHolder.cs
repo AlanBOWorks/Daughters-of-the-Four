@@ -318,7 +318,6 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnSkillPerform(in performer, in usedSkill, in target);
 
-            OnSkillFinish(in performer);
         }
 
         public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)

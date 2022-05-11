@@ -12,7 +12,7 @@ namespace CombatSystem.Player.UI
 {
     public class UFrontTargetButtonsHandler : MonoBehaviour, IUIHoverListener, 
         IPlayerEntityListener,ITempoTeamStatesListener,
-        ISkillSelectionListener,
+        ISkillSelectionListener, ISkillPointerListener,
         ITargetSelectionListener, ITargetPointerListener
     {
         [ShowInInspector,ReadOnly]
@@ -33,6 +33,7 @@ namespace CombatSystem.Player.UI
             // To solve it: manual subscription of ISKillSelection because this is its listening behaviour
             playerEventsHolder.ManualSubscribe(this as ISkillSelectionListener);
             playerEventsHolder.ManualSubscribe(this as IPlayerEntityListener);
+            playerEventsHolder.ManualSubscribe(this as ISkillPointerListener);
         }
 
         public void OnElementCreated(in UUIHoverEntityHolder element, in CombatEntity entity)
@@ -52,6 +53,9 @@ namespace CombatSystem.Player.UI
         [ShowInInspector, DisableInEditorMode]
         private CombatEntity _currentControl;
 
+        [ShowInInspector, DisableInEditorMode] 
+        private CombatSkill _currentSkill;
+
 
         public void OnPerformerSwitch(in CombatEntity performer)
         {
@@ -65,18 +69,23 @@ namespace CombatSystem.Player.UI
         }
         public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
         {
+            _currentSkill = skill;
             HideTargets();
             ShowTargets(in skill);
         }
 
         public void OnSkillDeselect(in CombatSkill skill)
         {
+            if(_currentSkill == skill)
+            {
+                _currentSkill = null;
+            }
+
             HideTargets();
         }
 
         public void OnSkillCancel(in CombatSkill skill)
         {
-            
         }
 
         public void OnSkillSubmit(in CombatSkill skill)
@@ -86,7 +95,7 @@ namespace CombatSystem.Player.UI
 
         private void ShowTargets(in CombatSkill skill)
         {
-            var possibleTargets = UtilsTarget.GetPossibleTargets(skill, _currentControl);
+            var possibleTargets = UtilsTarget.GetPossibleTargets(_currentControl, skill);
             foreach (var target in possibleTargets)
             {
                 var buttonHolder = _buttonsDictionary[target];
@@ -120,6 +129,7 @@ namespace CombatSystem.Player.UI
         public void OnTargetSubmit(in CombatEntity target)
         {
             _currentControl = null;
+            _currentSkill = null;
         }
 
         public void OnTargetButtonHover(in CombatEntity target)
@@ -151,6 +161,21 @@ namespace CombatSystem.Player.UI
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
             
+        }
+
+        public void OnSkillButtonHover(in CombatSkill skill)
+        {
+            if(_currentSkill != null)
+                HideTargets();
+            ShowTargets(in skill);
+        }
+
+        public void OnSkillButtonExit(in CombatSkill skill)
+        {
+            HideTargets();
+            if (_currentSkill != null)
+                ShowTargets(in _currentSkill);
+
         }
     }
 }

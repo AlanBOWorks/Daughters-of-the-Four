@@ -61,7 +61,7 @@ namespace CombatSystem.Skills
        
 
         [ShowInInspector] 
-        public float DebugTimingOffset = .2f;
+        public float DebugTimingOffset = .02f;
 
         private const float SkillAppliesAfter = .7f;
         private const float AnimationOffsetDuration = .3f;
@@ -69,19 +69,23 @@ namespace CombatSystem.Skills
         private IEnumerator<float> _DoQueue()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
+            var animator = CombatSystemSingleton.CombatAnimationHandler;
             while (_usedSkillsQueue.Count > 0)
             {
 #if UNITY_EDITOR
                 yield return Timing.WaitForSeconds(DebugTimingOffset);
 #endif
-                yield return Timing.WaitForSeconds(SkillAppliesAfter);
                 var queueValues = _usedSkillsQueue.Dequeue();
                 queueValues.Extract(out var performer, out var usedSkill, out var target);
                 eventsHolder.OnSkillPerform(in performer, in usedSkill, in target);
 
 
-
+                animator.PerformActionAnimation(in performer,in usedSkill, in target);
+                yield return Timing.WaitForSeconds(SkillAppliesAfter);
+                animator.PerformReceiveAnimation(in target, in usedSkill, in performer);
                 yield return Timing.WaitForSeconds(AnimationOffsetDuration);
+              
+                eventsHolder.OnSkillFinish(in performer);
                 yield return Timing.WaitForOneFrame; //safeWait
             }
         }

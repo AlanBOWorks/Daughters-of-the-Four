@@ -32,10 +32,13 @@ namespace CombatSystem.Player
             discriminationEvents.Subscribe(teamController);
             playerEvents.SubscribeAsPlayerEvent(teamController);
 
+
             PerformerSwitcher = new PlayerPerformerSwitcher();
             playerEvents.ManualSubscribe((ICombatPreparationListener) PerformerSwitcher);
             discriminationEvents.ManualSubscribe((ITempoTeamStatesListener)PerformerSwitcher);
             discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesExtraListener);
+
+
         }
 
 
