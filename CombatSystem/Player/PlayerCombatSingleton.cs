@@ -24,8 +24,6 @@ namespace CombatSystem.Player
 
             SelectedCharactersHolder = new PlayerSelectedCharactersHolder();
 
-            HoverTargetingHelper = new HoverSkillTargetingHandler();
-
             var playerEvents =
                 PlayerCombatEvents;
             var discriminationEvents =
@@ -42,7 +40,6 @@ namespace CombatSystem.Player
             discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesExtraListener);
             
 
-            playerEvents.SubscribeAsPlayerEvent(HoverTargetingHelper);
         }
 
 
@@ -56,7 +53,7 @@ namespace CombatSystem.Player
         public static readonly PlayerPerformerSwitcher PerformerSwitcher;
 
         [ShowInInspector]
-        public static readonly HoverSkillTargetingHandler HoverTargetingHelper;
+        public static readonly UHoverSkillTargetingHandler HoverTargetingHelper;
 
         [Title("Characters")]
         [ShowInInspector]

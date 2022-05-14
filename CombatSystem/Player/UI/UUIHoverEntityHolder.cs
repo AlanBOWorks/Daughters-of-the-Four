@@ -9,11 +9,14 @@ namespace CombatSystem.Player.UI
 {
     public class UUIHoverEntityHolder : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityHolder>
     {
+        [Title("Refecences")]
         [SerializeField] private UTargetButton targetButton;
         [SerializeField] private UVitalityInfo healthInfo;
+        [SerializeField] private GameObject hoverFeedbackHolder;
 
         public UTargetButton GetTargetButton() => targetButton;
         public UVitalityInfo GetHealthInfo() => healthInfo;
+        public GameObject GetHoverFeedbackHolder() => hoverFeedbackHolder;
        
         public void EntityInjection(in CombatEntity entity)
         {
@@ -39,7 +42,8 @@ namespace CombatSystem.Player.UI
         }
 
         private Camera _playerCamera;
-        [ShowInInspector]
+        [Title("RunTime")]
+        [ShowInInspector,HideInEditorMode]
         private Transform _followReference;
         private RectTransform _rectTransform;
 

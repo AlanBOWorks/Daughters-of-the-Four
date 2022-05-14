@@ -287,7 +287,7 @@ namespace CombatSystem._Core
 
     public sealed class CombatPlayerEventsLogs :
         ISkillPointerListener, ISkillSelectionListener,
-        ITargetPointerListener, ITargetSelectionListener, 
+        ITargetPointerListener, ITargetSelectionListener, IHoverInteractionTargetsListener,
         IPlayerEntityListener
     {
         [Title("Skill Buttons")]
@@ -418,14 +418,14 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private TargetFeedbackLogs _targetFeedbackLogs = new TargetFeedbackLogs();
 
-        public void OnHoverPossibleTargets(in CombatEntity possibleTarget)
+        public void OnHoverTargetInteraction(in CombatEntity target)
         {
             if (!ShowTargetFeedbackLogs || !_targetFeedbackLogs.OnPossibleTargets) return;
-            Debug.Log($"Possible Target: {possibleTarget.CombatCharacterName}");
+            Debug.Log($"Possible Target: {target.CombatCharacterName}");
            
         }
 
-        public void HidePossibleTargets()
+        public void OnHoverTargetExit()
         {
             if (!ShowTargetFeedbackLogs || !_targetFeedbackLogs.OnHideTargets) return;
             Debug.Log($"Hiding Possible Targets");
@@ -439,8 +439,6 @@ namespace CombatSystem._Core
             if(!ShowPerformerSwitchLog) return;
             Debug.Log($"xxxx - PERFORMER: {performer.GetProviderEntityName()}");
         }
-
-
     }
 
 #endif

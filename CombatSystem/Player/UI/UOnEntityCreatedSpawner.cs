@@ -26,6 +26,8 @@ namespace CombatSystem.Player.UI
         [ShowInInspector,HideInEditorMode]
         protected Dictionary<CombatEntity, T> ActiveElementsDictionary;
 
+        public IReadOnlyDictionary<CombatEntity, T> GetDictionary() => ActiveElementsDictionary;
+
         protected virtual void Awake()
         {
             ActiveElementsDictionary = new Dictionary<CombatEntity, T>();
