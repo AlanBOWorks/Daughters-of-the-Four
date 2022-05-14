@@ -15,7 +15,7 @@ namespace CombatSystem.Player
 
         ISkillPointerListener, ISkillSelectionListener,
 
-        ITargetPointerListener, ITargetSelectionListener,
+        ITargetPointerListener, ITargetSelectionListener, IHoverInteractionTargetsListener,
         ICameraHolderListener
     {
         public PlayerCombatEventsHolder() : base()
@@ -30,6 +30,7 @@ namespace CombatSystem.Player
 
             _targetPointerListeners = new HashSet<ITargetPointerListener>();
             _targetSelectionListeners = new HashSet<ITargetSelectionListener>();
+            _hoverTargetsListeners = new HashSet<IHoverInteractionTargetsListener>();
 
             _cameraHolderListeners = new HashSet<ICameraHolderListener>();
 
@@ -50,7 +51,8 @@ namespace CombatSystem.Player
         private readonly HashSet<ITargetPointerListener> _targetPointerListeners;
         [ShowInInspector,HorizontalGroup("Target")]
         private readonly HashSet<ITargetSelectionListener> _targetSelectionListeners;
-
+        [ShowInInspector, HorizontalGroup("Target")]
+        private readonly HashSet<IHoverInteractionTargetsListener> _hoverTargetsListeners;
 
         [ShowInInspector] 
         private readonly HashSet<ICameraHolderListener> _cameraHolderListeners;
@@ -60,25 +62,7 @@ namespace CombatSystem.Player
             base.Subscribe(listener);
             SubscribeAsPlayerEvent(listener);
         }
-
-        public override void UnSubscribe(ICombatEventListener listener)
-        {
-            base.UnSubscribe(listener);
-
-            if (listener is IPlayerEntityListener playerEntityListener)
-                _playerEntityListeners.Remove(playerEntityListener);
-            if (listener is ISkillPointerListener skillPointerListener)
-                _skillPointerListeners.Remove(skillPointerListener);
-            if (listener is ISkillSelectionListener skillSelectionListener)
-                _skillSelectionListeners.Remove(skillSelectionListener);
-            if (listener is ITargetPointerListener targetPointerListener)
-                _targetPointerListeners.Remove(targetPointerListener);
-            if (listener is ITargetSelectionListener targetSelectionListener)
-                _targetSelectionListeners.Remove(targetSelectionListener);
-            if (listener is ICameraHolderListener cameraHolderListener)
-                _cameraHolderListeners.Remove(cameraHolderListener);
-        }
-
+        
         /// <summary>
         /// Check and subscribe as a: 
         /// <br></br>- <see cref="IPlayerEntityListener"/>
@@ -86,7 +70,7 @@ namespace CombatSystem.Player
         /// <br></br>- <see cref="ISkillSelectionListener"/>
         /// <br></br>- <see cref="ITargetPointerListener"/>
         /// <br></br>- <see cref="ITargetSelectionListener"/>
-        /// <br></br>- <see cref="ITargetSelectionFeedBackListener"/>
+        /// <br></br>- <see cref="IHoverInteractionTargetsListener"/>
         /// <br></br>- <see cref="ICameraHolderListener"/>
         /// </summary>
         public void SubscribeAsPlayerEvent(ICombatEventListener listener)
@@ -94,16 +78,44 @@ namespace CombatSystem.Player
 
             if (listener is IPlayerEntityListener playerEntityListener)
                 _playerEntityListeners.Add(playerEntityListener);
+
             if (listener is ISkillPointerListener skillPointerListener)
                 _skillPointerListeners.Add(skillPointerListener);
             if (listener is ISkillSelectionListener skillSelectionListener)
                 _skillSelectionListeners.Add(skillSelectionListener);
+
             if (listener is ITargetPointerListener targetPointerListener)
                 _targetPointerListeners.Add(targetPointerListener);
             if (listener is ITargetSelectionListener targetSelectionListener)
                 _targetSelectionListeners.Add(targetSelectionListener);
+            if (listener is IHoverInteractionTargetsListener hoverTargetsListener)
+                _hoverTargetsListeners.Add(hoverTargetsListener);
+
+
             if (listener is ICameraHolderListener cameraHolderListener)
                 _cameraHolderListeners.Add(cameraHolderListener);
+        }
+        public override void UnSubscribe(ICombatEventListener listener)
+        {
+            base.UnSubscribe(listener);
+
+            if (listener is IPlayerEntityListener playerEntityListener)
+                _playerEntityListeners.Remove(playerEntityListener);
+
+            if (listener is ISkillPointerListener skillPointerListener)
+                _skillPointerListeners.Remove(skillPointerListener);
+            if (listener is ISkillSelectionListener skillSelectionListener)
+                _skillSelectionListeners.Remove(skillSelectionListener);
+
+            if (listener is ITargetPointerListener targetPointerListener)
+                _targetPointerListeners.Remove(targetPointerListener);
+            if (listener is ITargetSelectionListener targetSelectionListener)
+                _targetSelectionListeners.Remove(targetSelectionListener);
+            if (listener is IHoverInteractionTargetsListener hoverTargetsListener)
+                _hoverTargetsListeners.Remove(hoverTargetsListener);
+
+            if (listener is ICameraHolderListener cameraHolderListener)
+                _cameraHolderListeners.Remove(cameraHolderListener);
         }
 
 
@@ -134,6 +146,22 @@ namespace CombatSystem.Player
         {
             _cameraHolderListeners.Add(cameraHolderListener);
         }
+
+        public void OnSwitchCamera(in Camera combatCamera)
+        {
+            foreach (var listener in _cameraHolderListeners)
+            {
+                listener.OnSwitchCamera(in combatCamera);
+            }
+        }
+        public void OnPerformerSwitch(in CombatEntity performer)
+        {
+            foreach (var listener in _playerEntityListeners)
+            {
+                listener.OnPerformerSwitch(in performer);
+            }
+        }
+
 
         // SKILL Events
         public void OnSkillButtonHover(in CombatSkill skill)
@@ -190,6 +218,8 @@ namespace CombatSystem.Player
             {
                 listener.OnSkillSubmit(in skill);
             }
+
+            OnHoverTargetExit();
         }
 
 
@@ -208,15 +238,9 @@ namespace CombatSystem.Player
             {
                 listener.OnTargetButtonExit(in target);
             }
+            OnHoverTargetExit();
         }
 
-        public void OnPerformerSwitch(in CombatEntity performer)
-        {
-            foreach (var listener in _playerEntityListeners)
-            {
-                listener.OnPerformerSwitch(in performer);
-            }
-        }
 
         public void OnTargetSelect(in CombatEntity target)
         {
@@ -241,11 +265,20 @@ namespace CombatSystem.Player
                 listener.OnTargetSubmit(in target);
             }
         }
-        public void OnSwitchCamera(in Camera combatCamera)
+
+        public void OnHoverTargetInteraction(in CombatEntity target)
         {
-            foreach (var listener in _cameraHolderListeners)
+            foreach (var listener in _hoverTargetsListeners)
             {
-                listener.OnSwitchCamera(in combatCamera);
+                listener.OnHoverTargetInteraction(in target);
+            }
+        }
+
+        public void OnHoverTargetExit()
+        {
+            foreach (var listener in _hoverTargetsListeners)
+            {
+                listener.OnHoverTargetExit();
             }
         }
     }

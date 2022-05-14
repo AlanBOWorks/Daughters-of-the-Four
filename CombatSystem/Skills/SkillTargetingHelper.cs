@@ -32,6 +32,8 @@ namespace CombatSystem.Skills
 
         public void HandleAlive(in CombatEntity entity,in bool isAlly)
         {
+            Clear();
+
             HandleSingleTarget(in entity);
             HandleLine(in entity,in isAlly);
             HandleTeam(in entity);
@@ -71,11 +73,14 @@ namespace CombatSystem.Skills
             TargetHelper = new SkillTargetingHelper();
             InteractionsEntities = new HashSet<CombatEntity>();
         }
+        [Title("Helpers")]
         [ShowInInspector,HorizontalGroup()] 
         protected readonly SkillTargetingHelper PerformerHelper;
         [ShowInInspector,HorizontalGroup()] 
         protected readonly SkillTargetingHelper TargetHelper;
 
+        [Title("Interactions")]
+        [ShowInInspector]
         protected readonly HashSet<CombatEntity> InteractionsEntities;
 
         public ISkillInteractionStructureRead<IEnumerable<CombatEntity>> PerformerType => PerformerHelper;
@@ -86,15 +91,12 @@ namespace CombatSystem.Skills
 
         protected void HandleSkill(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            TargetHelper.Clear();
-            PerformerHelper.Clear();
-            InteractionsEntities.Clear();
 
             bool isAlly = performer.Team.Contains(target);
             TargetHelper.HandleAlive(in target, in isAlly);
             PerformerHelper.HandleAlive(in performer, in isAlly);
 
-            HandleInteractions(in usedSkill);
+            HandleInteractions(in usedSkill, in target);
         }
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
@@ -113,8 +115,11 @@ namespace CombatSystem.Skills
             
         }
 
-        private void HandleInteractions(in CombatSkill usedSkill)
+        private void HandleInteractions(in CombatSkill usedSkill, in CombatEntity target)
         {
+            InteractionsEntities.Clear();
+
+            AddInteractionEntity(in target);
             IEnumerable<IEffect> effects = usedSkill.GetEffects();
             IEnumerable<CombatEntity> performerGroup = null;
             IEnumerable<CombatEntity> targetGroup = null;
@@ -178,9 +183,14 @@ namespace CombatSystem.Skills
             if(group == null) return;
             foreach (var entity in group)
             {
-                if(InteractionsEntities.Contains(entity)) continue;
-                InteractionsEntities.Add(entity);
+                AddInteractionEntity(in entity);
             }
+        }
+
+        protected virtual void AddInteractionEntity(in CombatEntity entity)
+        {
+            if (InteractionsEntities.Contains(entity)) return;
+            InteractionsEntities.Add(entity);
         }
     }
 
