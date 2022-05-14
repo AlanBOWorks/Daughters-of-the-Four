@@ -24,9 +24,13 @@ namespace CombatSystem.Skills
         [ShowInInspector]
         private readonly HashSet<CombatEntity> _aliveTeam;
 
+        [ShowInInspector]
+        private IEnumerable<CombatEntity> _interactionMembers;
+
         public IEnumerable<CombatEntity> SingleType => _singleTarget;
         public IEnumerable<CombatEntity> TargetLine => _aliveLine;
         public IEnumerable<CombatEntity> TargetTeam => _aliveTeam;
+        public IEnumerable<CombatEntity> GetSkillInteractions() => _interactionMembers;
 
         public void HandleAlive(in CombatEntity entity,in bool isAlly)
         {
@@ -50,6 +54,34 @@ namespace CombatSystem.Skills
         {
             ICollection<CombatEntity> aliveTeam = _aliveTeam;
             UtilsTargetsCollection.HandleTeam(in aliveTeam, in target);
+        }
+
+        public void HandleInteractions(in CombatSkill skill)
+        {
+            var effects = skill.GetEffects();
+            EnumsEffect.TargetType interactionType = EnumsEffect.TargetType.Target;
+            foreach (var effect in effects)
+            {
+                var effectType = effect.TargetType;
+                switch (effectType)
+                {
+                    case EnumsEffect.TargetType.PerformerTeam:
+                    case EnumsEffect.TargetType.TargetTeam:
+                    case EnumsEffect.TargetType.All:
+                        _interactionMembers = _aliveTeam;
+                        return;
+                    case EnumsEffect.TargetType.PerformerLine:
+                    case EnumsEffect.TargetType.TargetLine:
+                        interactionType = EnumsEffect.TargetType.TargetLine;
+                        break;
+                }
+            }
+
+            if (interactionType == EnumsEffect.TargetType.TargetLine)
+                _interactionMembers = _aliveLine;
+            else
+                _interactionMembers = _singleTarget;
+
         }
 
         public void Clear()
@@ -77,12 +109,20 @@ namespace CombatSystem.Skills
         public ISkillInteractionStructureRead<IEnumerable<CombatEntity>> TargetType => TargetHelper;
         public IEnumerable<CombatEntity> AllType => PerformerType.TargetTeam.Concat(TargetType.TargetTeam);
 
+        public IEnumerable<CombatEntity> GetInteractions() =>
+            PerformerHelper.GetSkillInteractions().Concat(TargetHelper.GetSkillInteractions());
 
         public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
+            PerformerHelper.Clear();
+            TargetHelper.Clear();
+
             bool isAlly = performer.Team.Contains(target);
             PerformerHelper.HandleAlive(in performer, in isAlly);
             TargetHelper.HandleAlive(in target,in isAlly);
+
+            PerformerHelper.HandleInteractions(in usedSkill);
+            TargetHelper.HandleInteractions(in usedSkill);
         }
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
@@ -95,8 +135,8 @@ namespace CombatSystem.Skills
 
         public void OnSkillFinish(in CombatEntity performer)
         {
-            PerformerHelper.Clear();
-            TargetHelper.Clear();
+            
         }
     }
+
 }

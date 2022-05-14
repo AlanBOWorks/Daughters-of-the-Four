@@ -56,7 +56,9 @@ namespace CombatSystem.Entity
                     UtilsEntity.HandleInjections(in entity, in entityGO);
                     entityGO.SetActive(true);
 
-                    entity.Body.InjectPositionReference(in entityTransform);
+                    var body = entity.Body;
+                    body.Injection(in entity);
+                    body.InjectPositionReference(in entityTransform);
                 }
             }
 

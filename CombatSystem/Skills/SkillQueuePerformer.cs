@@ -82,7 +82,7 @@ namespace CombatSystem.Skills
 
                 animator.PerformActionAnimation(in performer,in usedSkill, in target);
                 yield return Timing.WaitForSeconds(SkillAppliesAfter);
-                animator.PerformReceiveAnimation(in target, in usedSkill, in performer);
+                animator.PerformReceiveAnimations(in usedSkill, in performer);
                 yield return Timing.WaitForSeconds(AnimationOffsetDuration);
               
                 eventsHolder.OnSkillFinish(in performer);

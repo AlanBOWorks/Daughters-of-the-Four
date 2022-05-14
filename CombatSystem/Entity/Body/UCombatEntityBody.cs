@@ -1,4 +1,5 @@
 using System;
+using CombatSystem.Animations;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -33,11 +34,20 @@ namespace CombatSystem.Entity
         public ICombatEntityAnimator GetAnimator() => _animator;
 
         public Transform GetPointReference() => _pointReference;
-        
+
+
+
+
+        public void Injection(in CombatEntity user)
+        {
+            _animator.Injection(in user);
+        }
+
         public void InjectPositionReference(in Transform reference)
         {
             _pointReference = reference;
         }
+
     }
 
 
@@ -45,6 +55,7 @@ namespace CombatSystem.Entity
     {
         Transform GetUIHoverHolder();
         ICombatEntityAnimator GetAnimator();
+        void Injection(in CombatEntity user);
         void InjectPositionReference(in Transform reference);
     }
 

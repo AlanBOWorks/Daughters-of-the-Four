@@ -55,6 +55,14 @@ namespace CombatSystem.Skills
         }
 
         public bool IgnoreSelf() => ignoreSelf && archetype != EnumsSkill.Archetype.Self;
+        public IEnumerable<IEffect> GetEffects()
+        {
+            foreach (var effect in effects)
+            {
+                EffectWrapperHelper.currentEffectValues = effect;
+                yield return EffectWrapperHelper;
+            }
+        }
 
 
         // This is a wrapper for avoiding boxing
@@ -74,28 +82,6 @@ namespace CombatSystem.Skills
             }
         }
 
-        [Serializable]
-        private struct EffectValues : IEffect
-        {
-
-            public SEffect effect;
-            public float effectValue;
-            public EnumsEffect.TargetType targetType;
-
-            public SEffect GetPreset() => effect;
-
-            public EnumsEffect.TargetType TargetType => targetType;
-
-            public void DoEffect(in CombatEntity performer)
-            {
-                var effectTargets =
-                    UtilsTarget.GetEffectTargets(targetType);
-                foreach (var effectTarget in effectTargets)
-                {
-                    effect.DoEffect(in performer, in effectTarget, in effectValue);
-                }
-            }
-        }
 
         [Button]
         private void UpdateAssetName()
@@ -123,4 +109,25 @@ namespace CombatSystem.Skills
     }
 
 
+    [Serializable]
+    internal struct EffectValues : IEffect
+    {
+        public SEffect effect;
+        public float effectValue;
+        public EnumsEffect.TargetType targetType;
+
+        public SEffect GetPreset() => effect;
+
+        public EnumsEffect.TargetType TargetType => targetType;
+
+        public void DoEffect(in CombatEntity performer)
+        {
+            var effectTargets =
+                UtilsTarget.GetEffectTargets(targetType);
+            foreach (var effectTarget in effectTargets)
+            {
+                effect.DoEffect(in performer, in effectTarget, in effectValue);
+            }
+        }
+    }
 }

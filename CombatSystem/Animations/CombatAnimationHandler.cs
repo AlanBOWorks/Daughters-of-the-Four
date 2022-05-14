@@ -15,7 +15,16 @@ namespace CombatSystem.Animations
             animator.PerformActionAnimation(in usedSkill, in target);
         }
 
-        public void PerformReceiveAnimation(in CombatEntity target, in CombatSkill usedSkill, in CombatEntity performer)
+
+        public void PerformReceiveAnimations(in CombatSkill usedSkill, in CombatEntity performer)
+        {
+            var interactions = CombatSystemSingleton.SkillTargetingHandler.GetInteractions();
+            foreach (var entity in interactions)
+            {
+                PerformReceiveAnimation(in entity, in usedSkill, in performer);
+            }
+        }
+        private void PerformReceiveAnimation(in CombatEntity target, in CombatSkill usedSkill, in CombatEntity performer)
         {
             var targetAnimator = GetAnimator(in target);
             targetAnimator.ReceiveActionAnimation(in usedSkill, in performer);

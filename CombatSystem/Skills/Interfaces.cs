@@ -13,6 +13,13 @@ namespace CombatSystem.Skills
         T TargetTeam { get; }
     }
 
+    public interface ISkillArchetypeStructureRead<out T>
+    {
+        T SelfType { get; }
+        T OffensiveType { get; }
+        T SupportType { get; }
+    }
+
 
     public interface IFullSkill : ISkill
     {
@@ -29,6 +36,7 @@ namespace CombatSystem.Skills
         void DoSkill(in CombatEntity performer, in CombatEntity target, in CombatSkill holderReference);
 
         bool IgnoreSelf();
+        IEnumerable<IEffect> GetEffects();
     }
 
     public interface IEffect

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatSystem.Entity;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -27,6 +28,7 @@ namespace CombatSystem.Skills
         }
 
         public bool IgnoreSelf() => Preset.IgnoreSelf();
+        public IEnumerable<IEffect> GetEffects() => Preset.GetEffects();
 
 
         public void DoSkill(in CombatEntity performer, in CombatEntity target) =>

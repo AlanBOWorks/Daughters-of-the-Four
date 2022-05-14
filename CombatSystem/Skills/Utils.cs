@@ -9,10 +9,42 @@ using UnityEngine;
 
 namespace CombatSystem.Skills
 {
+    public static class UtilsSkill
+    {
+        public static T GetElement<T>(EnumsSkill.Archetype type, ISkillArchetypeStructureRead<T> structure)
+        {
+            switch (type)
+            {
+                case EnumsSkill.Archetype.Self:
+                    return structure.SelfType;
+                case EnumsSkill.Archetype.Offensive:
+                    return structure.OffensiveType;
+                case EnumsSkill.Archetype.Support:
+                    return structure.SupportType;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+    }
+
 
     public static class UtilsTarget
     {
         private static readonly List<CombatEntity> TargetsHelper = new List<CombatEntity>();
+
+
+        public static EnumsSkill.Archetype GetReceiveSkillType(in CombatSkill skill, in CombatEntity performer,
+            in CombatEntity target)
+        {
+            var type = skill.Archetype;
+            if (performer == target) return EnumsSkill.Archetype.Self;
+            if (type != EnumsSkill.Archetype.Self) return type;
+
+            // if the performer acts as a self but effect are for groups then:
+            bool isAlly = UtilsTeam.IsAllyEntity(in performer, in target);
+            if (isAlly) return EnumsSkill.Archetype.Support;
+            return EnumsSkill.Archetype.Offensive;
+        }
 
         public static bool CanBeTargeted(in CombatEntity target)
         {

@@ -16,7 +16,8 @@ namespace CombatSystem.Entity
         [Title("Info")]
         [SerializeField] private string entityName = "NULL";
 
-        [SerializeField] private GameObject instantiationObject;
+        [SerializeField, AssetsOnly,AssetSelector(Paths = "Assets/Prefabs/Characters")] 
+        private GameObject instantiationObject;
 
         [SerializeField]
         private PreparationEntity preparationData = new PreparationEntity();
