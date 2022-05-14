@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CombatSystem._Core;
@@ -24,13 +25,10 @@ namespace CombatSystem.Skills
         [ShowInInspector]
         private readonly HashSet<CombatEntity> _aliveTeam;
 
-        [ShowInInspector]
-        private IEnumerable<CombatEntity> _interactionMembers;
 
         public IEnumerable<CombatEntity> SingleType => _singleTarget;
         public IEnumerable<CombatEntity> TargetLine => _aliveLine;
         public IEnumerable<CombatEntity> TargetTeam => _aliveTeam;
-        public IEnumerable<CombatEntity> GetSkillInteractions() => _interactionMembers;
 
         public void HandleAlive(in CombatEntity entity,in bool isAlly)
         {
@@ -56,33 +54,6 @@ namespace CombatSystem.Skills
             UtilsTargetsCollection.HandleTeam(in aliveTeam, in target);
         }
 
-        public void HandleInteractions(in CombatSkill skill)
-        {
-            var effects = skill.GetEffects();
-            EnumsEffect.TargetType interactionType = EnumsEffect.TargetType.Target;
-            foreach (var effect in effects)
-            {
-                var effectType = effect.TargetType;
-                switch (effectType)
-                {
-                    case EnumsEffect.TargetType.PerformerTeam:
-                    case EnumsEffect.TargetType.TargetTeam:
-                    case EnumsEffect.TargetType.All:
-                        _interactionMembers = _aliveTeam;
-                        return;
-                    case EnumsEffect.TargetType.PerformerLine:
-                    case EnumsEffect.TargetType.TargetLine:
-                        interactionType = EnumsEffect.TargetType.TargetLine;
-                        break;
-                }
-            }
-
-            if (interactionType == EnumsEffect.TargetType.TargetLine)
-                _interactionMembers = _aliveLine;
-            else
-                _interactionMembers = _singleTarget;
-
-        }
 
         public void Clear()
         {
@@ -98,32 +69,36 @@ namespace CombatSystem.Skills
         {
             PerformerHelper = new SkillTargetingHelper();
             TargetHelper = new SkillTargetingHelper();
-            ;
+            InteractionsEntities = new HashSet<CombatEntity>();
         }
         [ShowInInspector,HorizontalGroup()] 
         protected readonly SkillTargetingHelper PerformerHelper;
         [ShowInInspector,HorizontalGroup()] 
         protected readonly SkillTargetingHelper TargetHelper;
 
+        protected readonly HashSet<CombatEntity> InteractionsEntities;
+
         public ISkillInteractionStructureRead<IEnumerable<CombatEntity>> PerformerType => PerformerHelper;
         public ISkillInteractionStructureRead<IEnumerable<CombatEntity>> TargetType => TargetHelper;
         public IEnumerable<CombatEntity> AllType => PerformerType.TargetTeam.Concat(TargetType.TargetTeam);
 
-        public IEnumerable<CombatEntity> GetInteractions() =>
-            PerformerHelper.GetSkillInteractions().Concat(TargetHelper.GetSkillInteractions());
+        public IEnumerable<CombatEntity> GetInteractions() => InteractionsEntities;
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        protected void HandleSkill(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            PerformerHelper.Clear();
             TargetHelper.Clear();
+            PerformerHelper.Clear();
+            InteractionsEntities.Clear();
 
             bool isAlly = performer.Team.Contains(target);
+            TargetHelper.HandleAlive(in target, in isAlly);
             PerformerHelper.HandleAlive(in performer, in isAlly);
-            TargetHelper.HandleAlive(in target,in isAlly);
 
-            PerformerHelper.HandleInteractions(in usedSkill);
-            TargetHelper.HandleInteractions(in usedSkill);
+            HandleInteractions(in usedSkill);
         }
+
+        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+            => HandleSkill(in performer, in usedSkill, in target);
 
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
@@ -136,6 +111,76 @@ namespace CombatSystem.Skills
         public void OnSkillFinish(in CombatEntity performer)
         {
             
+        }
+
+        private void HandleInteractions(in CombatSkill usedSkill)
+        {
+            IEnumerable<IEffect> effects = usedSkill.GetEffects();
+            IEnumerable<CombatEntity> performerGroup = null;
+            IEnumerable<CombatEntity> targetGroup = null;
+            HandleEffects(effects, ref performerGroup, ref targetGroup,
+                out bool setPerformer, out bool setTarget);
+
+            if (performerGroup == null && setPerformer) performerGroup = PerformerHelper.SingleType;
+            if (targetGroup == null && setTarget) targetGroup = TargetHelper.SingleType;
+
+            HandleInteractionsGroup(in performerGroup);
+            HandleInteractionsGroup(in targetGroup);
+        }
+
+        private void HandleEffects(IEnumerable<IEffect> effects, 
+            ref IEnumerable<CombatEntity> performerGroup, 
+            ref IEnumerable<CombatEntity> targetGroup,
+            out bool performerSingleTarget,
+            out bool targetSingleTarget)
+        {
+            performerSingleTarget = false;
+            targetSingleTarget = false;
+            foreach (var effect in effects)
+            {
+                var effectType = effect.TargetType;
+                switch (effectType)
+                {
+                    case EnumsEffect.TargetType.Target:
+                        targetSingleTarget = true;
+                        break;
+                    case EnumsEffect.TargetType.Performer:
+                        performerSingleTarget = true;
+                        break;
+
+                    case EnumsEffect.TargetType.TargetLine:
+                        if (targetGroup == null)
+                            targetGroup = TargetHelper.TargetLine;
+                        break;
+                    case EnumsEffect.TargetType.TargetTeam:
+                        targetGroup = TargetHelper.TargetTeam;
+                        break;
+
+                    case EnumsEffect.TargetType.PerformerLine:
+                        if (performerGroup == null)
+                            performerGroup = PerformerHelper.TargetLine;
+                        break;
+                    case EnumsEffect.TargetType.PerformerTeam:
+                        performerGroup = PerformerHelper.TargetTeam;
+                        break;
+
+                    case EnumsEffect.TargetType.All:
+                        performerGroup = PerformerType.TargetTeam;
+                        targetGroup = TargetHelper.TargetTeam;
+                        return;
+                }
+
+            }
+        }
+
+        private void HandleInteractionsGroup(in IEnumerable<CombatEntity> group)
+        {
+            if(group == null) return;
+            foreach (var entity in group)
+            {
+                if(InteractionsEntities.Contains(entity)) continue;
+                InteractionsEntities.Add(entity);
+            }
         }
     }
 

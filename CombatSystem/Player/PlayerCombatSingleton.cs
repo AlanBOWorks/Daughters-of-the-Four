@@ -3,6 +3,7 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Player.UI;
+using CombatSystem.Skills;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -23,6 +24,8 @@ namespace CombatSystem.Player
 
             SelectedCharactersHolder = new PlayerSelectedCharactersHolder();
 
+            HoverTargetingHelper = new HoverSkillTargetingHandler();
+
             var playerEvents =
                 PlayerCombatEvents;
             var discriminationEvents =
@@ -37,8 +40,9 @@ namespace CombatSystem.Player
             playerEvents.ManualSubscribe((ICombatPreparationListener) PerformerSwitcher);
             discriminationEvents.ManualSubscribe((ITempoTeamStatesListener)PerformerSwitcher);
             discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesExtraListener);
+            
 
-
+            playerEvents.SubscribeAsPlayerEvent(HoverTargetingHelper);
         }
 
 
@@ -50,6 +54,9 @@ namespace CombatSystem.Player
         public static PlayerTeamController PlayerTeamController { get; private set; }
 
         public static readonly PlayerPerformerSwitcher PerformerSwitcher;
+
+        [ShowInInspector]
+        public static readonly HoverSkillTargetingHandler HoverTargetingHelper;
 
         [Title("Characters")]
         [ShowInInspector]
