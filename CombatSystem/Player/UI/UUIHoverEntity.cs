@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UUIHoverEntityHolder : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityHolder>
+    public class UUIHoverEntity : MonoBehaviour, IEntityExistenceElement<UUIHoverEntity>
     {
         [Title("Refecences")]
         [SerializeField] private UTargetButton targetButton;

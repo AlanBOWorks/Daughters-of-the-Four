@@ -13,7 +13,7 @@ namespace CombatSystem.Player.UI
         IHoverInteractionTargetsListener
     {
         private HoverSkillTargetingHandler _hoverTargetingHelper;
-        private IReadOnlyDictionary<CombatEntity, UUIHoverEntityHolder> _dictionary;
+        private IReadOnlyDictionary<CombatEntity, UUIHoverEntity> _dictionary;
 
         private void Awake()
         {

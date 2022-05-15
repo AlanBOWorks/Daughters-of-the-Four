@@ -64,12 +64,19 @@ namespace CombatSystem.Player
         [ShowInInspector]
         public static Camera InterfaceCombatCamera { get; private set; }
 
+
+        [Title("Elements")]
+        public static IReadOnlyDictionary<CombatEntity,UUIHoverEntity> HoverEntityElements { get; private set; }
+
+
         public static void InjectCombatCamera(in Camera camera)
         {
             InterfaceCombatCamera = camera;
             PlayerCombatEvents.OnSwitchCamera(in camera);
         }
 
+        public static void Injection(IReadOnlyDictionary<CombatEntity, UUIHoverEntity> dictionary)
+            => HoverEntityElements = dictionary;
 
 
 

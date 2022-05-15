@@ -22,7 +22,7 @@ namespace CombatSystem.Player.UI
             _infoDictionary = new Dictionary<CombatEntity, UVitalityInfo>();
         }
 
-        public void OnElementCreated(in UUIHoverEntityHolder element, in CombatEntity entity)
+        public void OnElementCreated(in UUIHoverEntity element, in CombatEntity entity)
         {
             var healthInfo = element.GetHealthInfo();
             _infoDictionary.Add(entity,healthInfo);

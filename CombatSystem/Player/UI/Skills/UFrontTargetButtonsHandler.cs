@@ -36,7 +36,7 @@ namespace CombatSystem.Player.UI
             playerEventsHolder.ManualSubscribe(this as ISkillPointerListener);
         }
 
-        public void OnElementCreated(in UUIHoverEntityHolder element, in CombatEntity entity)
+        public void OnElementCreated(in UUIHoverEntity element, in CombatEntity entity)
         {
             var targetButton = element.GetTargetButton();
             _buttonsDictionary.Add(entity,targetButton);
