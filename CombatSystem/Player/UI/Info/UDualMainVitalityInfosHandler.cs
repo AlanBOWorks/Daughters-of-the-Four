@@ -11,31 +11,32 @@ namespace CombatSystem.Player.UI
         [Title("OffRole - References")]
         [SerializeField] private RectTransform offRolesParent;
 
-        public void OnShieldLost(in CombatEntity target, in CombatEntity performer, in float amount)
+        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        { }
+
+        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        { }
+
+        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        { }
+
+        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
         {
-            if(GetActiveElementsDictionary().ContainsKey(target))
+            UpdateTarget(in target);
+        }
+
+        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
+        {
+            UpdateTarget(in target);
+        }
+
+        private void UpdateTarget(in CombatEntity target)
+        {
+            if (GetActiveElementsDictionary().ContainsKey(target))
                 GetActiveElementsDictionary()[target].UpdateToCurrentStats();
         }
 
-        public void OnHealthLost(in CombatEntity target, in CombatEntity performer, in float amount)
-        {
-            if(GetActiveElementsDictionary().ContainsKey(target))
-                GetActiveElementsDictionary()[target].UpdateToCurrentStats();
-        }
 
-        public void OnMortalityLost(in CombatEntity target, in CombatEntity performer, in float amount)
-        {
-            if(GetActiveElementsDictionary().ContainsKey(target))
-                GetActiveElementsDictionary()[target].UpdateToCurrentStats();
-        }
-
-        public void OnKnockOut(in CombatEntity target, in CombatEntity performer)
-        {
-            if(GetActiveElementsDictionary().ContainsKey(target))
-                GetActiveElementsDictionary()[target].UpdateToCurrentStats();
-        }
-
-        
         public override void OnIterationCall(in UVitalityInfo element, in CombatEntity entity, in TeamStructureIterationValues values)
         {
             UtilsVitalityInfosHandler.HandleHandler(in element, in entity, in values, out var repositionIndex);

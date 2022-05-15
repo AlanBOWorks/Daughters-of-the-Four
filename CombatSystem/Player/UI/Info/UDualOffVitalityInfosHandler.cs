@@ -7,25 +7,32 @@ namespace CombatSystem.Player.UI
 {
     public class UDualOffVitalityInfosHandler : UDualTeamOffStructureInstantiateHandler<UVitalityInfo>, IDamageDoneListener
     {
-        public void OnShieldLost(in CombatEntity target, in CombatEntity performer, in float amount)
+        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            if (GetActiveElementsDictionary().ContainsKey(target))
-                GetActiveElementsDictionary()[target].UpdateToCurrentStats();
+           
         }
 
-        public void OnHealthLost(in CombatEntity target, in CombatEntity performer, in float amount)
+        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            if (GetActiveElementsDictionary().ContainsKey(target))
-                GetActiveElementsDictionary()[target].UpdateToCurrentStats();
+            
         }
 
-        public void OnMortalityLost(in CombatEntity target, in CombatEntity performer, in float amount)
+        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            if (GetActiveElementsDictionary().ContainsKey(target))
-                GetActiveElementsDictionary()[target].UpdateToCurrentStats();
+            
         }
 
-        public void OnKnockOut(in CombatEntity target, in CombatEntity performer)
+        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
+        {
+            UpdateTarget(in target);
+        }
+
+        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
+        {
+            UpdateTarget(in target);
+        }
+
+        private void UpdateTarget(in CombatEntity target)
         {
             if (GetActiveElementsDictionary().ContainsKey(target))
                 GetActiveElementsDictionary()[target].UpdateToCurrentStats();

@@ -8,7 +8,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UHoverVitalityInfoHandler : UCombatEventsSubscriber, IUIHoverListener,
-         IDamageDoneListener, IVitalityChangeListeners
+         IDamageDoneListener, IVitalityChangeListener
     {
         private Dictionary<CombatEntity, UVitalityInfo> _infoDictionary;
 
@@ -35,25 +35,30 @@ namespace CombatSystem.Player.UI
             _infoDictionary.Clear();
         }
 
-        public void OnShieldLost(in CombatEntity target, in CombatEntity performer, in float amount)
+        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
         }
 
-        public void OnHealthLost(in CombatEntity target, in CombatEntity performer, in float amount)
+        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
         }
 
-        public void OnMortalityLost(in CombatEntity target, in CombatEntity performer, in float amount)
+        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
         }
 
-        public void OnKnockOut(in CombatEntity target, in CombatEntity performer)
-        {
-        }
-
-        public void OnDamageDone(in CombatEntity target, in CombatEntity performer, in float amount)
+        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
         {
             _infoDictionary[target].UpdateToCurrentStats();
+        }
+
+        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
+        {
+            _infoDictionary[target].UpdateToCurrentStats();
+        }
+
+        public void OnDamageDone(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
         }
 
         public void OnTotalDamage(in CombatEntity target, in CombatEntity performer, in float amount)

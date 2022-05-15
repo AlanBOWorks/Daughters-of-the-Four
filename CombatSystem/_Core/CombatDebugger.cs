@@ -4,6 +4,7 @@ using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Player.UI;
 using CombatSystem.Skills;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -65,7 +66,8 @@ namespace CombatSystem._Core
     internal sealed class CombatEventsLogs : ITempoTeamStatesListener,
         ITempoDedicatedEntityStatesListener, ITempoEntityStatesListener,
         ITempoTickListener, ISkillUsageListener,
-        ITempoEntityStatesExtraListener
+        ITempoEntityStatesExtraListener,
+        IDamageDoneListener
     {
         [Title("Teams")] 
         public bool ShowTeamLogs = false;
@@ -280,7 +282,48 @@ namespace CombatSystem._Core
             Debug.Log("-------------- SKILL END --------------- ");
         }
 
+        [Title("Damage")] 
+        public bool ShowDamageLogs = false;
+        private class DamageLogs
+        {
+            public bool OnShieldLost = true;
+            public bool OnHealthLost = true;
+            public bool OnMortalityLost = true;
+            public bool OnKnockOut = true;
+        }
+        [ShowInInspector]
+        private DamageLogs _damageLogs = new DamageLogs();
 
+        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+            if(!ShowDamageLogs || !_damageLogs.OnShieldLost) return;
+            Debug.Log($"SHIELDS - P[{performer.CombatCharacterName}] > T[{target}] : {amount}");
+        }
+
+        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+            if (!ShowDamageLogs || !_damageLogs.OnHealthLost) return;
+            Debug.Log($"HEALTH - P[{performer.CombatCharacterName}] > T[{target}] : {amount}");
+
+        }
+
+        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+            if (!ShowDamageLogs || !_damageLogs.OnMortalityLost) return;
+            Debug.Log($"MORTALITY - P[{performer.CombatCharacterName}] > T[{target}] : {amount}");
+
+        }
+
+        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
+        {
+        }
+
+        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
+        {
+            if (!ShowDamageLogs || !_damageLogs.OnKnockOut) return;
+            Debug.Log($"KNOCKOUT - P[{performer.CombatCharacterName}] > T[{target}");
+
+        }
     }
 
 

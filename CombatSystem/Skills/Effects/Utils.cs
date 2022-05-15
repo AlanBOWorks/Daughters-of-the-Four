@@ -77,9 +77,16 @@ namespace CombatSystem.Skills
         {
             if( damage <= 0) return;
 
+            PerformDamage(target, performer, damage, eventCallback);
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            if(eventCallback)
-                eventsHolder.OnDamageDone(in target, in performer, in damage);
+            eventsHolder.OnDamageReceive(in performer, in target);
+        }
+
+        private static void PerformDamage(CombatEntity target, CombatEntity performer, float damage, bool eventCallback)
+        {
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            if (eventCallback)
+                eventsHolder.OnDamageDone(in performer, in target, in damage);
 
 
             IDamageableStats<float> healthStats = target.Stats;
@@ -92,8 +99,8 @@ namespace CombatSystem.Skills
                 target.DamageReceiveTracker.DoShields(in performer, in shieldBreaks); //by design shields are lost in ones
                 performer.DamageDoneTracker.DoShields(in target, in shieldBreaks);
 
-                if(eventCallback)
-                    eventsHolder.OnShieldLost(in target, in performer,in shieldBreaks);
+                if (eventCallback)
+                    eventsHolder.OnShieldLost(in performer, in target, in shieldBreaks);
 
                 return;
             }
@@ -105,8 +112,8 @@ namespace CombatSystem.Skills
                 target.DamageReceiveTracker.DoHealth(in performer, in damage);
                 performer.DamageDoneTracker.DoHealth(in target, in damage);
 
-                if(eventCallback)
-                    eventsHolder.OnHealthLost(in target, in performer, in damage);
+                if (eventCallback)
+                    eventsHolder.OnHealthLost(in performer, in target, in damage);
 
                 return;
             }
@@ -116,10 +123,10 @@ namespace CombatSystem.Skills
             target.DamageReceiveTracker.DoMortality(in performer, in damage);
             performer.DamageDoneTracker.DoMortality(in target, in damage);
 
-            if(eventCallback)
-                eventsHolder.OnMortalityLost(in target, in performer, in damage);
+            if (eventCallback)
+                eventsHolder.OnMortalityLost(in performer, in target, in damage);
         }
-        
+
         public static void DoDamageToShields(in IDamageableStats<float> target, in float damage, 
             out bool shieldBreak)
         {
