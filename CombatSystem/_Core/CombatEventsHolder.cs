@@ -320,13 +320,13 @@ namespace CombatSystem._Core
 
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
+        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
-            _eventsHolder.OnEffectPerform(in performer,in usedSkill,in target, in effect);
-            _playerCombatEvents.OnEffectPerform(in performer,in usedSkill,in target, in effect);
-            _enemyCombatEvents.OnEffectPerform(in performer,in usedSkill,in target, in effect);
+            _eventsHolder.OnEffectPerform(in performer,in target, in values);
+            _playerCombatEvents.OnEffectPerform(in performer,in target, in values);
+            _enemyCombatEvents.OnEffectPerform(in performer,in target, in values);
 
-            _currentDiscriminatedEntityEventsHolder.OnEffectPerform(in performer, in usedSkill, target, effect);
+            _currentDiscriminatedEntityEventsHolder.OnEffectPerform(in performer, target, values);
         }
 
         public void OnSkillFinish(in CombatEntity performer)
@@ -969,11 +969,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
+        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnEffectPerform(in performer, in usedSkill, in target, in effect);
+                listener.OnEffectPerform(in performer, in target, in values);
             }
         }
 

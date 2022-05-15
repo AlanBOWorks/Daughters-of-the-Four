@@ -42,7 +42,6 @@ namespace CombatSystem._Core
 
 
             systemEventsHolder.Subscribe(skillsQueue);
-            systemEventsHolder.Subscribe(SkillTargetingHandler);
             systemEventsHolder.Subscribe(CombatAnimationHandler);
             systemEventsHolder.Subscribe(TeamControllers);
             systemEventsHolder.Subscribe(EntityPrefabsPoolHandler);

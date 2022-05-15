@@ -267,10 +267,10 @@ namespace CombatSystem._Core
             Debug.Log($"Performing ----- > {usedSkill.GetSkillName()}");
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
+        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnEffect) return;
-            Debug.Log($"Effect[{effect.GetPreset()} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
+            Debug.Log($"Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
         }
 
         public void OnSkillFinish(in CombatEntity performer)

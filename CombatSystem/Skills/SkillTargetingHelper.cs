@@ -65,7 +65,7 @@ namespace CombatSystem.Skills
         }
     }
 
-    public class SkillTargetingHandler : ISkillUsageListener
+    public class SkillTargetingHandler
     {
         public SkillTargetingHandler()
         {
@@ -89,7 +89,7 @@ namespace CombatSystem.Skills
 
         public IEnumerable<CombatEntity> GetInteractions() => InteractionsEntities;
 
-        protected void HandleSkill(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void HandleSkill(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
 
             bool isAlly = performer.Team.Contains(target);
@@ -99,28 +99,13 @@ namespace CombatSystem.Skills
             HandleInteractions(in usedSkill, in target);
         }
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
-            => HandleSkill(in performer, in usedSkill, in target);
-
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
-        {
-        }
-
-        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
-        {
-        }
-
-        public void OnSkillFinish(in CombatEntity performer)
-        {
-            
-        }
 
         private void HandleInteractions(in CombatSkill usedSkill, in CombatEntity target)
         {
             InteractionsEntities.Clear();
 
             AddInteractionEntity(in target);
-            IEnumerable<IEffect> effects = usedSkill.GetEffects();
+            IEnumerable<IEffectHolder> effects = UtilsEffect.ExtractEffects(in usedSkill);
             IEnumerable<CombatEntity> performerGroup = null;
             IEnumerable<CombatEntity> targetGroup = null;
             HandleEffects(effects, ref performerGroup, ref targetGroup,
@@ -133,7 +118,7 @@ namespace CombatSystem.Skills
             HandleInteractionsGroup(in targetGroup);
         }
 
-        private void HandleEffects(IEnumerable<IEffect> effects, 
+        private void HandleEffects(IEnumerable<IEffectHolder> effects, 
             ref IEnumerable<CombatEntity> performerGroup, 
             ref IEnumerable<CombatEntity> targetGroup,
             out bool performerSingleTarget,

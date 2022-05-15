@@ -12,9 +12,8 @@ namespace CombatSystem.Skills
 {
     [CreateAssetMenu(fileName = "N [Skill Preset]",
         menuName = "Combat/Skill/Single Preset")]
-    public class SSkillPreset : ScriptableObject, IFullSkill, IEnumerable<IEffect>
+    public class SSkillPreset : ScriptableObject, IFullSkill
     {
-        private static readonly EffectWrapper EffectWrapperHelper = new EffectWrapper();
 
         [Title("ToolTips")]
         [SerializeField]
@@ -38,7 +37,7 @@ namespace CombatSystem.Skills
 
         [Title("Effects")]
         [SerializeField]
-        private EffectValues[] effects = new EffectValues[0];
+        private PresetEffectValues[] effects = new PresetEffectValues[0];
 
 
 
@@ -47,40 +46,11 @@ namespace CombatSystem.Skills
         public int SkillCost => skillCost;
         public EnumsSkill.TargetType TargetType => targetType;
         public EnumsSkill.Archetype Archetype => archetype;
-
-        public void DoSkill(in CombatEntity performer, in CombatEntity target, in CombatSkill holderReference)
-        {
-            var exclusion = (IgnoreSelf()) ? performer : null;
-            UtilsSkillEffect.DoEffectsOnTarget(this, performer, exclusion, holderReference);
-        }
+        internal PresetEffectValues[] GetEffectValues() => effects;
 
         public bool IgnoreSelf() => ignoreSelf && archetype != EnumsSkill.Archetype.Self;
-        public IEnumerable<IEffect> GetEffects()
-        {
-            foreach (var effect in effects)
-            {
-                EffectWrapperHelper.currentEffectValues = effect;
-                yield return EffectWrapperHelper;
-            }
-        }
+        
 
-
-        // This is a wrapper for avoiding boxing
-        // During the iterator, the EffectValue.Current should be injected in this (currentEffectValues) and
-        // used as a IEffect by the it
-        [Serializable]
-        private sealed class EffectWrapper : IEffect
-        {
-            public EffectValues currentEffectValues;
-            public SEffect GetPreset() => currentEffectValues.GetPreset();
-
-            public EnumsEffect.TargetType TargetType => currentEffectValues.targetType;
-
-            public void DoEffect(in CombatEntity performer)
-            {
-                currentEffectValues.DoEffect(in performer);
-            }
-        }
 
 
         [Button]
@@ -93,41 +63,25 @@ namespace CombatSystem.Skills
             UtilsAssets.UpdateAssetNameWithID(this, generatedName);
         }
 
-        public IEnumerator<IEffect> GetEnumerator()
+
+
+        [Serializable]
+        internal struct PresetEffectValues : IEffectHolder
         {
-            foreach (var effect in effects)
-            {
-                EffectWrapperHelper.currentEffectValues = effect;
-                yield return EffectWrapperHelper;
-            }
-        }
+            [SerializeField]
+            private SEffect effect;
+            [SerializeField]
+            private float effectValue;
+            [SerializeField]
+            private EnumsEffect.TargetType targetType;
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
+            public IEffect GetPreset() => effect;
+            public EnumsEffect.TargetType TargetType => targetType;
+            public float GetValue() => effectValue;
 
-
-    [Serializable]
-    internal struct EffectValues : IEffect
-    {
-        public SEffect effect;
-        public float effectValue;
-        public EnumsEffect.TargetType targetType;
-
-        public SEffect GetPreset() => effect;
-
-        public EnumsEffect.TargetType TargetType => targetType;
-
-        public void DoEffect(in CombatEntity performer)
-        {
-            var effectTargets =
-                UtilsTarget.GetEffectTargets(targetType);
-            foreach (var effectTarget in effectTargets)
-            {
-                effect.DoEffect(in performer, in effectTarget, in effectValue);
-            }
+            public PerformEffectValues GenerateValues() => new PerformEffectValues(effect,in effectValue,in targetType);
         }
     }
+
+
 }

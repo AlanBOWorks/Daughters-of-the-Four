@@ -15,11 +15,11 @@ namespace CombatSystem.Skills
         public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
             UtilsCombatStats.TickActions(performer.Stats, in usedSkill);
-            usedSkill.DoSkill(in performer, in target);
+            UtilsCombatSkill.DoSkillOnTarget(in usedSkill,in performer, in target);
             usedSkill.IncreaseCost();
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
+        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
 
         }

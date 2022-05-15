@@ -4,44 +4,75 @@ using CombatSystem.Entity;
 using CombatSystem.Stats;
 using UnityEngine;
 
-namespace CombatSystem.Skills.Effects
+namespace CombatSystem.Skills
 {
-    public static class UtilsSkillEffect
+    public static class UtilsCombatSkill
     {
-        public static void DoEffectsOnTarget(
-            IEnumerable<IEffect> effects,
-            CombatEntity performer, CombatEntity exclusion, 
-            CombatSkill skillReference)
+        public static void DoSkillOnTarget(in CombatSkill skill, in CombatEntity performer, in CombatEntity onTarget)
         {
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-            // Problem: effects might be in a Scriptable and exceptions in execution during develop
-            // could make the IEnumerator<IEffect>'s index being wrong, so the iteration will be wrong
-            // Solution: reset before and after the iterator
+            CombatSystemSingleton.SkillTargetingHandler.HandleSkill(in performer, in skill, in onTarget);
+
+
+
+            var preset = skill.Preset;
+            CombatEntity exclusion = skill.IgnoreSelf() ? performer : null;
+
+            if(preset is SSkillPreset assetSkill)
+                DoSkillOnTarget(in assetSkill, in performer, in exclusion);
+        }
+
+        private static void DoSkillOnTarget(in SSkillPreset preset, in CombatEntity performer, in CombatEntity exclusion)
+        {
+            var effects = preset.GetEffectValues();
             foreach (var effect in effects)
             {
-                var targetType = effect.TargetType;
-                var targets = UtilsTarget.GetEffectTargets(targetType);
-                DoEffectOnTargets(in effect, in targets);
+                PerformEffectValues values = effect.GenerateValues();
+                DoEffect(in performer, in exclusion, in values);
             }
+        }
 
+        private static void DoEffect(in CombatEntity performer, in CombatEntity exclusion, in PerformEffectValues values)
+        {
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            var targets = UtilsTarget.GetEffectTargets(values.TargetType);
+            var preset = values.Effect;
+            var effectValue = values.EffectValue;
 
-            void DoEffectOnTargets(in IEffect effect, in IEnumerable<CombatEntity> targets)
+            int i = 0;
+            foreach (var effectTarget in targets)
             {
-                int i = 0;
-                foreach (var effectTarget in targets)
-                {
-                    if(effectTarget == exclusion) continue;
+                if (effectTarget == exclusion) continue;
+                preset.DoEffect(in performer,in effectTarget,in effectValue);
 
-                    effect.DoEffect(in performer);
-                    eventsHolder.OnEffectPerform(in performer, in skillReference, in effectTarget, in effect);
-                    i++;
-                }
+                eventsHolder.OnEffectPerform(in performer, in effectTarget, in values);
+
+                i++;
             }
         }
     }
 
     public static class UtilsEffect
     {
+        public static IEnumerable<IEffectHolder> ExtractEffects(in CombatSkill skill)
+        {
+            var skillPreset = skill.Preset;
+            if (skillPreset is SSkillPreset assetSkill)
+            {
+                return ExtractEffects(assetSkill);
+            }
+
+            return null;
+        }
+
+        public static IEnumerable<IEffectHolder> ExtractEffects(SSkillPreset preset)
+        {
+            foreach (var value in preset.GetEffectValues())
+            {
+                yield return value;
+            }
+        }
+
+
         public static void DoDamageTo(in CombatEntity target, in CombatEntity performer, in float damage, bool eventCallback = true)
         {
             if( damage <= 0) return;

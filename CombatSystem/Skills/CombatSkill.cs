@@ -22,17 +22,11 @@ namespace CombatSystem.Skills
         public int SkillCost { get; private set; }
         public EnumsSkill.Archetype Archetype => Preset.Archetype;
         public EnumsSkill.TargetType TargetType => Preset.TargetType;
-        public void DoSkill(in CombatEntity performer, in CombatEntity target, in CombatSkill holderReference)
-        {
-            Preset.DoSkill(in performer, in target, in holderReference);
-        }
+        
 
         public bool IgnoreSelf() => Preset.IgnoreSelf();
-        public IEnumerable<IEffect> GetEffects() => Preset.GetEffects();
 
 
-        public void DoSkill(in CombatEntity performer, in CombatEntity target) =>
-            DoSkill(in performer, in target, this);
 
         public void IncreaseCost()
         {

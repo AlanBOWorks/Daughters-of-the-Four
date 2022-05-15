@@ -363,7 +363,7 @@ namespace CombatSystem.Player.UI
                 _activeButtons[usedSkill].UpdateCostReal();
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target, in IEffect effect)
+        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
         }
 
