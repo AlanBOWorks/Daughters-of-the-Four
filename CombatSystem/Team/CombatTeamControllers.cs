@@ -59,17 +59,21 @@ namespace CombatSystem.Team
             _currentControl = controller;
         }
 
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+        }
+
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
+            _currentControl = null;
         }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            _currentControl = null;
         }
 
 

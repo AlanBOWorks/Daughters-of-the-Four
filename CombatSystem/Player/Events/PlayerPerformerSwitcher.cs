@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Skills;
 using CombatSystem.Team;
 using UnityEngine;
 
@@ -10,7 +11,8 @@ namespace CombatSystem.Player.Events
         ITempoEntityStatesExtraListener, 
         ITempoTeamStatesListener,
 
-        IPlayerEntityListener
+        ISkillUsageListener
+
     {
         private IReadOnlyList<CombatEntity> _activeEntities;
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
@@ -42,9 +44,13 @@ namespace CombatSystem.Player.Events
             OnPerformerSwitch(in firstEntity);
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
         {
             ResetState();
+        }
+
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
         }
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
@@ -62,9 +68,36 @@ namespace CombatSystem.Player.Events
 
         public void OnPerformerSwitch(in CombatEntity performer)
         {
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            playerEvents.OnPerformerSwitch(in performer);
+        }
+
+        public void OnAllPlayerEntitiesFinish()
+        {
+
+        }
+
+
+        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        {
             if(!_isActive) return;
 
-            PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(in performer);
+            CombatEntity nextControl = null;
+            if (_activeEntities.Count > 0) nextControl = _activeEntities[0];
+
+            OnPerformerSwitch(in nextControl);
+        }
+
+        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        {
+        }
+
+        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        {
+        }
+
+        public void OnCombatSkillFinish(in CombatEntity performer)
+        {
         }
     }
 }

@@ -60,6 +60,7 @@ namespace CombatSystem.Player.UI
         public void OnPerformerSwitch(in CombatEntity performer)
         {
             _currentControl = performer;
+            _currentSkill = null;
         }
 
 
@@ -128,8 +129,6 @@ namespace CombatSystem.Player.UI
 
         public void OnTargetSubmit(in CombatEntity target)
         {
-            _currentControl = null;
-            _currentSkill = null;
         }
 
         public void OnTargetButtonHover(in CombatEntity target)
@@ -146,6 +145,11 @@ namespace CombatSystem.Player.UI
 
         public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
+        }
+
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+            HideTargets();
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)

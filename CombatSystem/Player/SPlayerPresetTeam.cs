@@ -17,7 +17,10 @@ namespace CombatSystem.Player
         [SerializeField]
         private SPlayerPreparationEntity[] characters = new SPlayerPreparationEntity[EnumTeam.RoleTypesAmount];
 
+        internal SPlayerPreparationEntity[] GetPresetCharacters() => characters;
+
         public IReadOnlyCollection<ICombatEntityProvider> GetSelectedCharacters() => characters;
+
 
         [Button]
         private void UpdateWithID()

@@ -105,7 +105,7 @@ namespace CombatSystem.Skills
             InteractionsEntities.Clear();
 
             AddInteractionEntity(in target);
-            IEnumerable<IEffectHolder> effects = UtilsEffect.ExtractEffects(in usedSkill);
+            IEnumerable<IEffectPreset> effects = UtilsEffect.ExtractEffects(in usedSkill);
             IEnumerable<CombatEntity> performerGroup = null;
             IEnumerable<CombatEntity> targetGroup = null;
             HandleEffects(effects, ref performerGroup, ref targetGroup,
@@ -118,7 +118,7 @@ namespace CombatSystem.Skills
             HandleInteractionsGroup(in targetGroup);
         }
 
-        private void HandleEffects(IEnumerable<IEffectHolder> effects, 
+        private void HandleEffects(IEnumerable<IEffectPreset> effects, 
             ref IEnumerable<CombatEntity> performerGroup, 
             ref IEnumerable<CombatEntity> targetGroup,
             out bool performerSingleTarget,

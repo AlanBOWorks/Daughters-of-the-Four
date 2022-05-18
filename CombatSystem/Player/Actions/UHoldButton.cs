@@ -74,6 +74,11 @@ namespace CombatSystem.Player
             Show();
         }
 
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+            
+        }
+
         public virtual void OnControlFinishAllActors(in CombatEntity lastActor)
         {
         }

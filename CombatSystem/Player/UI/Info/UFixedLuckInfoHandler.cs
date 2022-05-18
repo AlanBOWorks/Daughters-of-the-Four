@@ -57,6 +57,10 @@ namespace CombatSystem.Player.UI
             UpdateLuckInfo(in entity);
         }
 
+        public void OnEntityBeforeSkill(CombatEntity entity)
+        {
+        }
+
         public void OnEntityFinishAction(CombatEntity entity)
         {
         }

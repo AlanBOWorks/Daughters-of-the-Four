@@ -13,9 +13,7 @@ namespace CombatSystem.Team
     public sealed class CombatTeam : 
         ITeamFullRolesStructureRead<CombatEntity>,
         ITeamFlexPositionStructureRead<IEnumerable<CombatEntity>>,
-        IReadOnlyList<CombatEntity>,
-
-        ITempoEntityStatesListener
+        IReadOnlyList<CombatEntity>
     {
         private CombatTeam(bool isPlayerTeam)
         {
@@ -33,6 +31,8 @@ namespace CombatSystem.Team
             _offRolesGroup = new TeamOffGroupStructure<CombatEntity>();
 
             _controlMembers = new CombatTeamControlMembers();
+
+            _teamSkills = new List<CombatTeamSkill>();
         }
         
         public CombatTeam(bool isPlayerTeam,IReadOnlyCollection<ICombatEntityProvider> members) : this(isPlayerTeam)
@@ -54,6 +54,20 @@ namespace CombatSystem.Team
         // ------------ DATA ------------ 
         public readonly TeamDataValues DataValues;
         public readonly TeamLineBlockerHandler GuardHandler;
+        private readonly List<CombatTeamSkill> _teamSkills;
+
+        public IReadOnlyList<CombatTeamSkill> GetTeamSkills() => _teamSkills;
+
+        public void InstantiationSkill(IEnumerable<ITeamSkillPreset> skills)
+        {
+            _teamSkills.Clear();
+            foreach (var preset in skills)
+            {
+                CombatTeamSkill skill = new CombatTeamSkill(preset);
+                _teamSkills.Add(skill);
+            }
+        }
+
 
 #if UNITY_EDITOR
         [Title("Members")]
@@ -233,20 +247,11 @@ namespace CombatSystem.Team
             _controlMembers.AddActiveEntity(in entity, in canControl);
         }
 
-        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
+        public void OnEntityRequestSequence(CombatEntity entity)
         {
             GuardHandler.OnEntityRequestSequence(in entity);
         }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        public void RemoveFromControllingEntities(CombatEntity entity, in bool isForcedByController)
         {
             if (isForcedByController) return;
             //This will be removed with Clear OnTempoForceFinish

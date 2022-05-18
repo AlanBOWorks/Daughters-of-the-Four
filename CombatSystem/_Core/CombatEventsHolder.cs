@@ -18,9 +18,12 @@ namespace CombatSystem._Core
         {
             _eventsHolder = new SystemEventsHolder();
             _sequenceStepper = new TempoSequenceStepper();
+            _entityEventHandler = new CombatEntityEventHandler();
 
             var entityTempoStepper = new EntityTempoStepper();
             _eventsHolder.Subscribe(entityTempoStepper);
+
+
 
 #if UNITY_EDITOR
             var debugEvents = CombatDebuggerSingleton.CombatEventsLogs;
@@ -41,7 +44,7 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private CombatEntityEventsHolder _currentDiscriminatedEntityEventsHolder;
 
-
+        private readonly CombatEntityEventHandler _entityEventHandler;
         private readonly TempoSequenceStepper _sequenceStepper;
 
 
@@ -140,6 +143,8 @@ namespace CombatSystem._Core
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
+            _entityEventHandler.OnEntityRequestSequence(entity,canControl);
+
             HandleCurrentEntityEventsHolder(in entity);
 
             _eventsHolder.OnEntityRequestSequence(entity, canControl);
@@ -148,7 +153,7 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnEntityRequestSequence(entity, canControl);
 
-            _sequenceStepper.OnEntityRequestSequence(entity,canControl);
+            _entityEventHandler.OnEntityRequestSequence(entity,canControl);
         }
 
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
@@ -190,6 +195,8 @@ namespace CombatSystem._Core
 
         public void OnEntityRequestAction(CombatEntity entity)
         {
+            _entityEventHandler.OnEntityRequestAction(entity);
+
             _eventsHolder.OnEntityRequestAction(entity);
             _playerCombatEvents.OnEntityRequestAction(entity);
             _enemyCombatEvents.OnEntityRequestAction(entity);
@@ -197,26 +204,40 @@ namespace CombatSystem._Core
             _currentDiscriminatedEntityEventsHolder.OnEntityRequestAction(entity);
         }
 
+        public void OnEntityBeforeSkill(CombatEntity entity)
+        {
+            _eventsHolder.OnEntityBeforeSkill(entity);
+            _playerCombatEvents.OnEntityBeforeSkill(entity);
+            _enemyCombatEvents.OnEntityBeforeSkill(entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnEntityBeforeSkill(entity);
+        }
+
         public void OnEntityFinishAction(CombatEntity entity)
         {
+            _entityEventHandler.OnEntityFinishAction(entity);
+
             _eventsHolder.OnEntityFinishAction(entity);
             _playerCombatEvents.OnEntityFinishAction(entity);
             _enemyCombatEvents.OnEntityFinishAction(entity);
 
             _currentDiscriminatedEntityEventsHolder.OnEntityFinishAction(entity);
 
-            _sequenceStepper.OnEntityFinishAction(entity);
+            _entityEventHandler.OnEntityAfterFinishAction(in entity);
+
         }
 
         public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
+            _entityEventHandler.OnEntityFinishSequence(entity,in isForcedByController);
+
             _eventsHolder.OnEntityFinishSequence(entity,in isForcedByController);
             _playerCombatEvents.OnEntityFinishSequence(entity,in isForcedByController);
             _enemyCombatEvents.OnEntityFinishSequence(entity,in isForcedByController);
 
             _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity,in isForcedByController);
 
-            _sequenceStepper.OnEntityFinishSequence(entity,in isForcedByController);
+            _entityEventHandler.OnEntityFinishSequence(entity, in isForcedByController);
         }
 
         public void OnAfterEntityRequestSequence(in CombatEntity entity)
@@ -227,7 +248,7 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnAfterEntityRequestSequence(in entity);
 
-            _sequenceStepper.OnAfterEntityRequestSequence(in entity);
+            _entityEventHandler.RequestEntityAction(in entity);
         }
 
         public void OnAfterEntitySequenceFinish(in CombatEntity entity)
@@ -238,7 +259,7 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnAfterEntitySequenceFinish(in entity);
 
-            _sequenceStepper.OnAfterEntitySequenceFinish(in entity);
+            _entityEventHandler.TryCallOnFinishAllActors(in entity);
         }
 
         public void OnNoActionsForcedFinish(in CombatEntity entity)
@@ -248,8 +269,6 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnNoActionsForcedFinish(in entity);
 
             _currentDiscriminatedEntityEventsHolder.OnNoActionsForcedFinish(in entity);
-
-            _sequenceStepper.OnNoActionsForcedFinish(in entity);
         }
 
 
@@ -264,7 +283,15 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnTempoPreStartControl(in controller);
 
-            _sequenceStepper.OnTempoPreStartControl(in controller);
+        }
+
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+            _eventsHolder.OnAllActorsNoActions(in lastActor);
+            _playerCombatEvents.OnAllActorsNoActions(in lastActor);
+            _enemyCombatEvents.OnAllActorsNoActions(in lastActor);
+
+            _currentDiscriminatedEntityEventsHolder.OnAllActorsNoActions(in lastActor);
         }
 
         public void OnControlFinishAllActors(in CombatEntity lastActor)
@@ -291,6 +318,8 @@ namespace CombatSystem._Core
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
+            _sequenceStepper.OnTempoFinishLastCall(in controller);
+
             _eventsHolder.OnTempoFinishLastCall(in controller);
             _playerCombatEvents.OnTempoFinishLastCall(in controller);
             _enemyCombatEvents.OnTempoFinishLastCall(in controller);
@@ -301,41 +330,48 @@ namespace CombatSystem._Core
 
         // ------ SKILLS ----- 
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill,in CombatEntity target)
+        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill,in CombatEntity target)
         {
-            _eventsHolder.OnSkillSubmit(in performer, in usedSkill, in target);
-            _playerCombatEvents.OnSkillSubmit(in performer, in usedSkill, in target);
-            _enemyCombatEvents.OnSkillSubmit(in performer, in usedSkill, in target);
 
-            _currentDiscriminatedEntityEventsHolder.OnSkillSubmit(in performer, in usedSkill, target);
-        }
+            _eventsHolder.OnCombatSkillSubmit(in performer, in usedSkill, in target);
+            _playerCombatEvents.OnCombatSkillSubmit(in performer, in usedSkill, in target);
+            _enemyCombatEvents.OnCombatSkillSubmit(in performer, in usedSkill, in target);
 
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
-        {
-            _eventsHolder.OnSkillPerform(in performer, in usedSkill, in target);
-            _playerCombatEvents.OnSkillPerform(in performer, in usedSkill, in target);
-            _enemyCombatEvents.OnSkillPerform(in performer, in usedSkill, in target);
+            _currentDiscriminatedEntityEventsHolder.OnCombatSkillSubmit(in performer, in usedSkill,in target);
 
-            _currentDiscriminatedEntityEventsHolder.OnSkillPerform(in performer, in usedSkill, in target);
+
+            _entityEventHandler.OnCombatSkillSubmit(in performer, in usedSkill);
 
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            _eventsHolder.OnEffectPerform(in performer,in target, in values);
-            _playerCombatEvents.OnEffectPerform(in performer,in target, in values);
-            _enemyCombatEvents.OnEffectPerform(in performer,in target, in values);
+            _entityEventHandler.OnCombatSkillPerform(in performer, in usedSkill, in target);
 
-            _currentDiscriminatedEntityEventsHolder.OnEffectPerform(in performer, target, values);
+            _eventsHolder.OnCombatSkillPerform(in performer, in usedSkill, in target);
+            _playerCombatEvents.OnCombatSkillPerform(in performer, in usedSkill, in target);
+            _enemyCombatEvents.OnCombatSkillPerform(in performer, in usedSkill, in target);
+
+            _currentDiscriminatedEntityEventsHolder.OnCombatSkillPerform(in performer, in usedSkill, in target);
+
         }
 
-        public void OnSkillFinish(in CombatEntity performer)
+        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
-            _eventsHolder.OnSkillFinish(in performer);
-            _playerCombatEvents.OnSkillFinish(in performer);
-            _enemyCombatEvents.OnSkillFinish(in performer);
+            _eventsHolder.OnCombatEffectPerform(in performer,in target, in values);
+            _playerCombatEvents.OnCombatEffectPerform(in performer,in target, in values);
+            _enemyCombatEvents.OnCombatEffectPerform(in performer,in target, in values);
 
-            _currentDiscriminatedEntityEventsHolder.OnSkillFinish(in performer);
+            _currentDiscriminatedEntityEventsHolder.OnCombatEffectPerform(in performer, target, values);
+        }
+
+        public void OnCombatSkillFinish(in CombatEntity performer)
+        {
+            _eventsHolder.OnCombatSkillFinish(in performer);
+            _playerCombatEvents.OnCombatSkillFinish(in performer);
+            _enemyCombatEvents.OnCombatSkillFinish(in performer);
+
+            _currentDiscriminatedEntityEventsHolder.OnCombatSkillFinish(in performer);
 
             OnEntityFinishAction(performer);
         }
@@ -424,9 +460,6 @@ namespace CombatSystem._Core
                 CombatSystemSingleton.TempoTicker = _tempoTicker;
                 Subscribe(_tempoTicker);
                 Subscribe(_tempoTicker.EntitiesTempoTicker);
-
-                var skillsUsageEventHandler = new CombatSkillEventHandler();
-                Subscribe(skillsUsageEventHandler);
             }
 
 
@@ -918,6 +951,14 @@ namespace CombatSystem._Core
             }
         }
 
+        public void OnEntityBeforeSkill(CombatEntity entity)
+        {
+            foreach (var listener in _tempoEntityListeners)
+            {
+                listener.OnEntityBeforeSkill(entity);
+            }
+        }
+
         public void OnEntityFinishAction(CombatEntity entity)
         {
             foreach (var listener in _tempoEntityListeners)
@@ -939,6 +980,14 @@ namespace CombatSystem._Core
             foreach (var listener in _tempoTeamListeners)
             {
                 listener.OnTempoPreStartControl(in controller);
+            }
+        }
+
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+            foreach (var listener in _tempoTeamListeners)
+            {
+                listener.OnAllActorsNoActions(in lastActor);
             }
         }
 
@@ -968,35 +1017,35 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnSkillSubmit(in performer, in usedSkill, in target);
+                listener.OnCombatSkillSubmit(in performer, in usedSkill, in target);
             }
         }
 
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnSkillPerform(in performer, in usedSkill, in target);
+                listener.OnCombatSkillPerform(in performer, in usedSkill, in target);
             }
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnEffectPerform(in performer, in target, in values);
+                listener.OnCombatEffectPerform(in performer, in target, in values);
             }
         }
 
-        public void OnSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(in CombatEntity performer)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnSkillFinish(in performer);
+                listener.OnCombatSkillFinish(in performer);
             }
         }
 

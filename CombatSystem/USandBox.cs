@@ -1,24 +1,18 @@
-using System;
-using CombatSystem.Luck;
-using CombatSystem.Stats;
-using CombatSystem.Team;
+using CombatSystem.Entity;
+using CombatSystem.Player;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Utils
 {
-    public class USandBox : UTeamFullGroupStructure<Transform>
+    public class USandBox : MonoBehaviour
     {
+        [SerializeReference] private SPlayerPreparationEntity[] serializedReference;
+
         [Button]
-        private void DebugEnum()
+        private void TrySerialize(SPlayerPresetTeam preset)
         {
-            var structure = new TeamFullGroupStructure<float>();
-            var enumerable = UtilsTeam.GetEnumerable(structure, this);
-            foreach (var keyValuePair in enumerable)
-            {
-                string log = (keyValuePair.Value) ? keyValuePair.Value.name : "NULL";
-                Debug.Log(keyValuePair.Key + " / " + log);
-            }
+            serializedReference = preset.GetPresetCharacters();
         }
     }
 

@@ -13,7 +13,7 @@ namespace CombatSystem.Entity
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
             var entityTeam = entity.Team;
-            entityTeam.OnEntityRequestSequence(entity, canControl);
+            entityTeam.OnEntityRequestSequence(entity);
 
             if (!canControl) return;
 
@@ -25,6 +25,11 @@ namespace CombatSystem.Entity
         {
         }
 
+        public void OnEntityBeforeSkill(CombatEntity entity)
+        {
+            
+        }
+
         public void OnEntityFinishAction(CombatEntity entity)
         {
             
@@ -34,7 +39,6 @@ namespace CombatSystem.Entity
         {
             var stats = entity.Stats;
             stats.CurrentInitiative = 0;
-            entity.Team.OnEntityFinishSequence(entity,in isForcedByController);
         }
 
         public void OnAfterEntityRequestSequence(in CombatEntity entity)

@@ -89,6 +89,7 @@ namespace CombatSystem.Player.UI
             _currentEntity = performer;
             UpdateInfoToCurrent();
         }
+
         private CombatSkill _selectedSkill;
 
 
@@ -121,6 +122,7 @@ namespace CombatSystem.Player.UI
             _selectedSkill = null;
             ToggleActiveToolTip(false);
 
+            if(_currentEntity == null) return;
             UpdateUsedActionsText();
         }
 
@@ -143,23 +145,24 @@ namespace CombatSystem.Player.UI
             ShowUI();
         }
 
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+            _currentEntity = null;
+        }
+
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
+           
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            _currentEntity = null;
             HideUI();
         }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
             
-        }
-
-        public void OnTempoForceFinish(in CombatTeamControllerBase controller, in IReadOnlyList<CombatEntity> remainingMembers)
-        {
         }
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
@@ -171,9 +174,13 @@ namespace CombatSystem.Player.UI
 
         }
 
-        public void OnEntityFinishAction(CombatEntity entity)
+        public void OnEntityBeforeSkill(CombatEntity entity)
         {
             UpdateInfoToCurrent();
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
         }
 
         public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)

@@ -20,6 +20,10 @@ namespace CombatSystem.AI
         {
         }
 
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+        }
+
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
             ForceFinish();
@@ -33,19 +37,19 @@ namespace CombatSystem.AI
         {
         }
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
         }
 
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
         }
 
-        public void OnSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(in CombatEntity performer)
         {
             Step();
         }
@@ -111,7 +115,7 @@ namespace CombatSystem.AI
             var target = SelectTarget(in skill);
 
             eventsHolder.OnTargetSelect(in target);
-            CombatSystemSingleton.EventsHolder.OnSkillSubmit(in _currentControl, in skill, in target);
+            CombatSystemSingleton.EventsHolder.OnCombatSkillSubmit(in _currentControl, in skill, in target);
         }
 
         private CombatEntity SelectTarget(in CombatSkill skill)

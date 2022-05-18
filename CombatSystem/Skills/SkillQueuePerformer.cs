@@ -35,7 +35,7 @@ namespace CombatSystem.Skills
 
 
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in CombatEntity performer,in CombatSkill usedSkill,in CombatEntity target)
         {
             QueueValues submit = new QueueValues(in performer, in usedSkill, in target);
             _usedSkillsQueue.Enqueue(submit);
@@ -44,15 +44,15 @@ namespace CombatSystem.Skills
             _queueHandle = Timing.RunCoroutine(_DoQueue());
         }
 
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
         }
 
-        public void OnSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(in CombatEntity performer)
         {
             
         }
@@ -77,7 +77,7 @@ namespace CombatSystem.Skills
 #endif
                 var queueValues = _usedSkillsQueue.Dequeue();
                 queueValues.Extract(out var performer, out var usedSkill, out var target);
-                eventsHolder.OnSkillPerform(in performer, in usedSkill, in target);
+                eventsHolder.OnCombatSkillPerform(in performer, in usedSkill, in target);
 
 
                 animator.PerformActionAnimation(in performer,in usedSkill, in target);
@@ -85,7 +85,7 @@ namespace CombatSystem.Skills
                 animator.PerformReceiveAnimations(in usedSkill, in performer);
                 yield return Timing.WaitForSeconds(AnimationOffsetDuration);
               
-                eventsHolder.OnSkillFinish(in performer);
+                eventsHolder.OnCombatSkillFinish(in performer);
                 yield return Timing.WaitForOneFrame; //safeWait
             }
         }

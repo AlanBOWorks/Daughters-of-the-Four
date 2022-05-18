@@ -76,6 +76,11 @@ namespace CombatSystem._Core
         {
         }
 
+        public void OnEntityBeforeSkill(CombatEntity entity)
+        {
+            
+        }
+
         public void OnEntityFinishAction(CombatEntity entity)
         {
         }

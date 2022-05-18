@@ -44,7 +44,7 @@ namespace CombatSystem.Skills
                 if (effectTarget == exclusion) continue;
                 preset.DoEffect(in performer,in effectTarget,in effectValue);
 
-                eventsHolder.OnEffectPerform(in performer, in effectTarget, in values);
+                eventsHolder.OnCombatEffectPerform(in performer, in effectTarget, in values);
 
                 i++;
             }
@@ -53,7 +53,7 @@ namespace CombatSystem.Skills
 
     public static class UtilsEffect
     {
-        public static IEnumerable<IEffectHolder> ExtractEffects(in CombatSkill skill)
+        public static IEnumerable<IEffectPreset> ExtractEffects(in CombatSkill skill)
         {
             var skillPreset = skill.Preset;
             if (skillPreset is SSkillPreset assetSkill)
@@ -64,7 +64,7 @@ namespace CombatSystem.Skills
             return null;
         }
 
-        public static IEnumerable<IEffectHolder> ExtractEffects(SSkillPreset preset)
+        public static IEnumerable<IEffectPreset> ExtractEffects(SSkillPreset preset)
         {
             foreach (var value in preset.GetEffectValues())
             {

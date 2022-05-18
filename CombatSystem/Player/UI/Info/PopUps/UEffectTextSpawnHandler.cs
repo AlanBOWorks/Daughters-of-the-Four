@@ -43,22 +43,22 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill,in CombatEntity target)
         {
         }
 
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
             EnQueue(in target, values);
             if (_loopHandle.IsRunning) return;
             _loopHandle = Timing.RunCoroutine(_StartSpawningPopUps(), Segment.RealtimeUpdate);
         }
 
-        public void OnSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(in CombatEntity performer)
         {
             
         }

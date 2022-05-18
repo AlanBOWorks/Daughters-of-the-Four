@@ -34,7 +34,7 @@ namespace CombatSystem.Player.UI
             var targetButton = buttons[performer];
             SwitchFocus(in targetButton);
         }
-
+        
         private void SwitchFocus(in UCombatEntitySwitchButton targetButton)
         {
             focusIcon.position = targetButton.transform.position;
@@ -56,13 +56,17 @@ namespace CombatSystem.Player.UI
             Show();
         }
 
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+            Hide();
+        }
+
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            Hide();
         }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
@@ -70,9 +74,6 @@ namespace CombatSystem.Player.UI
             
         }
 
-        public void OnTempoForceFinish(in CombatTeamControllerBase controller, in IReadOnlyList<CombatEntity> remainingMembers)
-        {
-        }
 
         private void Show()
         {

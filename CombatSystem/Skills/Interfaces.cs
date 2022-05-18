@@ -37,7 +37,7 @@ namespace CombatSystem.Skills
         bool IgnoreSelf();
     }
 
-    public interface IEffectHolder
+    public interface IEffectPreset
     {
         IEffect GetPreset();
         EnumsEffect.TargetType TargetType { get; }
@@ -53,37 +53,24 @@ namespace CombatSystem.Skills
     public interface ISkillUsageListener : ICombatEventListener
     {
         /// <summary>
-        /// Tells what [<see cref="CombatSkill"/>] is used, but before acting out the [<seealso cref="IEffectHolder"/>]s  it has.
+        /// Tells what [<see cref="CombatSkill"/>] is used, but before acting out the [<seealso cref="IEffectPreset"/>]s  it has.
         /// Recommendable using this for preparing/modifying the values of the skills or entities (reducing Actions, increasing
         /// cost, react to skills before effects, etc); <br></br>
-        /// After [<seealso cref="OnEffectPerform"/>] will be invoked and [<seealso cref="IEffectHolder"/>] will be invoked.
+        /// After [<seealso cref="OnCombatEffectPerform"/>] will be invoked and [<seealso cref="IEffectPreset"/>] will be invoked.
         /// </summary>
-        void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target);
+        void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target);
         /// <summary>
-        /// Invoked before any [<seealso cref="IEffectHolder"/>] and after all preparations were done;
+        /// Invoked before any [<seealso cref="IEffectPreset"/>] and after all preparations were done;
         /// Its more reliable to read data from here.
         /// </summary>
-        void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target);
+        void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target);
         /// <summary>
-        /// Will be invoked for each [<see cref="IEffectHolder"/>] that the [<see cref="CombatSkill"/>] has;<br></br>
-        /// For one call only use [<seealso cref="OnSkillPerform"/>] better;
+        /// Will be invoked for each [<see cref="IEffectPreset"/>] that the [<see cref="CombatSkill"/>] has;<br></br>
+        /// For one call only use [<seealso cref="OnCombatSkillPerform"/>] better;
         /// </summary>
-        void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values);
+        void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values);
 
-        void OnSkillFinish(in CombatEntity performer);
+        void OnCombatSkillFinish(in CombatEntity performer);
     }
 
-    public struct PerformEffectValues
-    {
-        public PerformEffectValues(in IEffect effect,in float effectValue,in EnumsEffect.TargetType targetType)
-        {
-            Effect = effect;
-            EffectValue = effectValue;
-            TargetType = targetType;
-        }
-
-        public readonly IEffect Effect;
-        public readonly float EffectValue;
-        public readonly EnumsEffect.TargetType TargetType;
-    }
 }

@@ -31,10 +31,10 @@ namespace CombatSystem.Player
         public void PerformRequestAction()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            CombatSystemSingleton.EventsHolder.OnCombatSkillSubmit(in _selectedPerformer,in _selectedSkill,in _selectedTarget);
             playerEvents.OnSkillSubmit(in _selectedSkill);
             playerEvents.OnTargetSubmit(in _selectedTarget);
 
-            CombatSystemSingleton.EventsHolder.OnSkillSubmit(in _selectedPerformer,in _selectedSkill,in _selectedTarget);
         }
 
         public void OnSkillSelect(in CombatSkill skill)
@@ -82,22 +82,23 @@ namespace CombatSystem.Player
         {
         }
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        {
+           
+        }
+
+        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        {
+        }
+
+        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        {
+        }
+
+        public void OnCombatSkillFinish(in CombatEntity performer)
         {
             _selectedTarget = null;
             _selectedSkill = null;
-        }
-
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
-        {
-        }
-
-        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
-        {
-        }
-
-        public void OnSkillFinish(in CombatEntity performer)
-        {
         }
 
 
@@ -121,6 +122,11 @@ namespace CombatSystem.Player
         {
         }
 
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+            OnControlFinish();
+        }
+
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
         }
@@ -131,7 +137,6 @@ namespace CombatSystem.Player
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            OnControlFinish();
         }
 
         public void FinishCurrentPerformer()

@@ -169,6 +169,8 @@ namespace CombatSystem._Core
         /// </summary>
         void OnEntityRequestAction(CombatEntity entity);
 
+        void OnEntityBeforeSkill(CombatEntity entity);
+
         /// <summary>
         /// Invoked after the action is finish; It's the very last call of the action (after animations) and
         /// it's called before [<see cref="OnEntityRequestAction"/>] and [<see cref="OnEntityFinishSequence"/>].
@@ -229,6 +231,11 @@ namespace CombatSystem._Core
         /// </summary>
         void OnTempoPreStartControl(in CombatTeamControllerBase controller);
 
+        /// <summary>
+        /// Similar to [<seealso cref="OnControlFinishAllActors"/>] but before the skills performing
+        /// </summary>
+        /// <param name="lastActor"></param>
+        void OnAllActorsNoActions(in CombatEntity lastActor);
 
         /// <summary>
         /// Event send after all members had finished; this is invoked before [<seealso cref="OnTempoFinishControl"/>]

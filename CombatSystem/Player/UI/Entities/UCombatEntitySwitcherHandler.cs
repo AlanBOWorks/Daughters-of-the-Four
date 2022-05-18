@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using UnityEngine;
 
@@ -124,15 +125,20 @@ namespace CombatSystem.Player.UI
            ShowAll();
         }
 
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+        }
+
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
+            
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
        {
-            _currentPerformer = null;
+           _currentPerformer = null;
            HideAll();
-       }
+        }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
@@ -150,18 +156,28 @@ namespace CombatSystem.Player.UI
        {
        }
 
+       public void OnEntityBeforeSkill(CombatEntity entity)
+       {
+           bool canControl = UtilsCombatStats.CanControlRequest(entity);
+           if(canControl) return;
+           DisableButton(in entity);
+       }
+
        public void OnEntityFinishAction(CombatEntity entity)
        {
        }
 
        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
        {
+       }
+       private void DisableButton(in CombatEntity entity)
+       {
            if (!_buttonsDictionary.ContainsKey(entity)) return;
 
            _buttonsDictionary[entity].DoEnable(false);
        }
 
-       private CombatEntity _currentPerformer;
+        private CombatEntity _currentPerformer;
         public void DoSwitchEntity(in CombatEntity entity)
         {
             if(entity == _currentPerformer) return;

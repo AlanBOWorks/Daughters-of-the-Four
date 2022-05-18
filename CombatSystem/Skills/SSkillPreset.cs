@@ -66,7 +66,7 @@ namespace CombatSystem.Skills
 
 
         [Serializable]
-        internal struct PresetEffectValues : IEffectHolder
+        internal struct PresetEffectValues : IEffectPreset
         {
             [SerializeField]
             private SEffect effect;

@@ -95,6 +95,10 @@ namespace CombatSystem.Player.UI
         {
         }
 
+        private void EnableHolder()
+        {
+            enabled = true;
+        }
 
         public void DisableHolder()
         {
@@ -104,10 +108,6 @@ namespace CombatSystem.Player.UI
             enabled = false;
         }
 
-        private void EnableHolder()
-        {
-            enabled = true;
-        }
 
         private void DisableActiveButtons()
         {
@@ -225,9 +225,13 @@ namespace CombatSystem.Player.UI
             EnableHolder();
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
         {
             DisableHolder();
+        }
+
+        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        {
         }
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
@@ -352,22 +356,22 @@ namespace CombatSystem.Player.UI
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonExit(in skill);
         }
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            _currentSelectedSkill = null;
-        }
-
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
-        {
-            if(_activeButtons.ContainsKey(usedSkill))
+            if (_activeButtons.ContainsKey(usedSkill))
                 _activeButtons[usedSkill].UpdateCostReal();
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        {
+            
+        }
+
+        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
         }
 
-        public void OnSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(in CombatEntity performer)
         {
         }
 

@@ -87,6 +87,12 @@ namespace CombatSystem._Core
             Debug.Log($"Start Control: {controller} | Controlling {controller.ControllingTeam.GetControllingMembers().Count}");
         }
 
+        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        {
+            if (!ShowTeamLogs || !_teamLogs.OnFinishActors) return;
+            Debug.Log($"Pre-Finish all Actors: {lastActor.CombatCharacterName}");
+        }
+
         public void OnControlFinishAllActors(in CombatEntity lastActor)
         {
             if (!ShowTeamLogs || !_teamLogs.OnFinishActors) return;
@@ -155,6 +161,10 @@ namespace CombatSystem._Core
         {
             if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnAction) return;
             Debug.Log($"> --- Entity [START] Action: {entity.GetProviderEntityName()}");
+        }
+
+        public void OnEntityBeforeSkill(CombatEntity entity)
+        {
         }
 
         public void OnEntityFinishAction(CombatEntity entity)
@@ -252,7 +262,7 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private SkillsSubmitLogs _skillsLogs = new SkillsSubmitLogs();
 
-        public void OnSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnSubmit) return;
 
@@ -263,19 +273,19 @@ namespace CombatSystem._Core
             Debug.Log($"Performer ACTIONS: {performer.Stats.UsedActions}");
         }
 
-        public void OnSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnPerform) return;
             Debug.Log($"Performing ----- > {usedSkill.GetSkillName()}");
         }
 
-        public void OnEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnEffect) return;
             Debug.Log($"Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
         }
 
-        public void OnSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(in CombatEntity performer)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnFinish) return;
             Debug.Log($"Performer ACTIONS: {performer.Stats.UsedActions}");
@@ -476,12 +486,21 @@ namespace CombatSystem._Core
 
 
         [Title("Performer Switch")]
-        public bool ShowPerformerSwitchLog = false;
+        public bool ShowEntitiesLog = false;
+
+        private sealed class EntitiesLogs
+        {
+            public bool OnPerformerSwitch = true;
+        }
+        [ShowInInspector]
+        private EntitiesLogs _entitiesLogs = new EntitiesLogs();
+
         public void OnPerformerSwitch(in CombatEntity performer)
         {
-            if(!ShowPerformerSwitchLog) return;
+            if(!ShowEntitiesLog || !_entitiesLogs.OnPerformerSwitch) return;
             Debug.Log($"xxxx - PERFORMER: {performer.GetProviderEntityName()}");
         }
+
     }
 
 #endif

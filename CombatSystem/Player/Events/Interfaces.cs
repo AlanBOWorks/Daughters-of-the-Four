@@ -41,7 +41,7 @@ namespace CombatSystem.Player.Events
         /// <br></br><br></br>
         /// Note:<br></br>
         /// Is not guaranteed to tick at 'Perform'
-        /// [<seealso cref="ISkillUsageListener.OnSkillPerform"/>].
+        /// [<seealso cref="ISkillUsageListener.OnCombatSkillPerform"/>].
         /// <br></br>
         /// Normally it will happens at the same time unless there's
         /// a lot of skills in the Queue to be performed, in which case the submit > perform will be out of sync
@@ -80,6 +80,7 @@ namespace CombatSystem.Player.Events
         /// It's invoked once per switch 
         /// </summary>
         void OnPerformerSwitch(in CombatEntity performer);
+
     }
 
     internal interface ICameraHolderListener : ICombatEventListener
