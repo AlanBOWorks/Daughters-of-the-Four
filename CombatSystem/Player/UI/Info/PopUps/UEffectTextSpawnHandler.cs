@@ -43,11 +43,11 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill,in CombatEntity target)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
         }
 
-        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
         }
 

@@ -31,7 +31,8 @@ namespace CombatSystem.Player
         public void PerformRequestAction()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            CombatSystemSingleton.EventsHolder.OnCombatSkillSubmit(in _selectedPerformer,in _selectedSkill,in _selectedTarget);
+            SkillUsageValues values = new SkillUsageValues(_selectedPerformer,_selectedTarget,_selectedSkill);
+            CombatSystemSingleton.EventsHolder.OnCombatSkillSubmit(in values);
             playerEvents.OnSkillSubmit(in _selectedSkill);
             playerEvents.OnTargetSubmit(in _selectedTarget);
 
@@ -82,12 +83,12 @@ namespace CombatSystem.Player
         {
         }
 
-        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
            
         }
 
-        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
         }
 

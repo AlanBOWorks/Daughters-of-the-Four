@@ -356,13 +356,14 @@ namespace CombatSystem.Player.UI
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonExit(in skill);
         }
 
-        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
+            var usedSkill = values.UsedSkill;
             if (_activeButtons.ContainsKey(usedSkill))
                 _activeButtons[usedSkill].UpdateCostReal();
         }
 
-        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
             
         }

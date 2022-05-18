@@ -78,7 +78,7 @@ namespace CombatSystem.Player.Events
         }
 
 
-        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
             if(!_isActive) return;
 
@@ -88,7 +88,7 @@ namespace CombatSystem.Player.Events
             OnPerformerSwitch(in nextControl);
         }
 
-        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
         }
 

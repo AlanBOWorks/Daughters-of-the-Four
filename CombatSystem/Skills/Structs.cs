@@ -29,5 +29,12 @@ namespace CombatSystem.Skills
             Target = target;
             UsedSkill = usedSkill;
         }
+
+        public readonly void Extract(out CombatEntity performer, out CombatEntity target, out CombatSkill usedSkill)
+        {
+            performer = Performer;
+            target = Target;
+            usedSkill = UsedSkill;
+        }
     }
 }

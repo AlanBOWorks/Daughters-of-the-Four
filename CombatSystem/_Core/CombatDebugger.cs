@@ -262,10 +262,10 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private SkillsSubmitLogs _skillsLogs = new SkillsSubmitLogs();
 
-        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnSubmit) return;
-
+            values.Extract(out var performer, out var target, out var usedSkill);
             Debug.Log($"----------------- SKILL --------------- \n" +
                       $"Random Controller: {performer.GetProviderEntityName()} / " +
                       $"Used : {usedSkill.Preset} /" +
@@ -273,10 +273,10 @@ namespace CombatSystem._Core
             Debug.Log($"Performer ACTIONS: {performer.Stats.UsedActions}");
         }
 
-        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnPerform) return;
-            Debug.Log($"Performing ----- > {usedSkill.GetSkillName()}");
+            Debug.Log($"Performing ----- > {values.UsedSkill.GetSkillName()}");
         }
 
         public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)

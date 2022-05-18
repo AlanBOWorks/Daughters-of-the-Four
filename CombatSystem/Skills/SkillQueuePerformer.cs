@@ -11,10 +11,10 @@ namespace CombatSystem.Skills
     {
         public SkillQueuePerformer()
         {
-            _usedSkillsQueue = new Queue<QueueValues>();
+            _usedSkillsQueue = new Queue<SkillUsageValues>();
         }
         [ShowInInspector]
-        private readonly Queue<QueueValues> _usedSkillsQueue;
+        private readonly Queue<SkillUsageValues> _usedSkillsQueue;
 
         private CoroutineHandle _queueHandle;
 
@@ -35,16 +35,15 @@ namespace CombatSystem.Skills
 
 
 
-        public void OnCombatSkillSubmit(in CombatEntity performer,in CombatSkill usedSkill,in CombatEntity target)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
-            QueueValues submit = new QueueValues(in performer, in usedSkill, in target);
-            _usedSkillsQueue.Enqueue(submit);
+            _usedSkillsQueue.Enqueue(values);
 
             if(_queueHandle.IsRunning) return;
             _queueHandle = Timing.RunCoroutine(_DoQueue());
         }
 
-        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
         }
 
@@ -76,8 +75,8 @@ namespace CombatSystem.Skills
                 yield return Timing.WaitForSeconds(DebugTimingOffset);
 #endif
                 var queueValues = _usedSkillsQueue.Dequeue();
-                queueValues.Extract(out var performer, out var usedSkill, out var target);
-                eventsHolder.OnCombatSkillPerform(in performer, in usedSkill, in target);
+                queueValues.Extract(out var performer,out var target,out var usedSkill);
+                eventsHolder.OnCombatSkillPerform(in queueValues);
 
 
                 animator.PerformActionAnimation(in performer,in usedSkill, in target);
@@ -89,28 +88,5 @@ namespace CombatSystem.Skills
                 yield return Timing.WaitForOneFrame; //safeWait
             }
         }
-
-
-        private struct QueueValues
-        {
-            private readonly CombatEntity _performer;
-            private readonly CombatEntity _target;
-            private readonly CombatSkill _skill;
-
-            public QueueValues(in CombatEntity performer, in CombatSkill combatSkill, in CombatEntity target)
-            {
-                _performer = performer;
-                _target = target;
-                _skill = combatSkill;
-            }
-
-            public readonly void Extract(out CombatEntity performer, out CombatSkill usedSkill, out CombatEntity target)
-            {
-                performer = _performer;
-                usedSkill = _skill;
-                target = _target;
-            }
-        }
-
     }
 }

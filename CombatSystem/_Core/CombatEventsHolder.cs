@@ -330,29 +330,31 @@ namespace CombatSystem._Core
 
         // ------ SKILLS ----- 
 
-        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill,in CombatEntity target)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
 
-            _eventsHolder.OnCombatSkillSubmit(in performer, in usedSkill, in target);
-            _playerCombatEvents.OnCombatSkillSubmit(in performer, in usedSkill, in target);
-            _enemyCombatEvents.OnCombatSkillSubmit(in performer, in usedSkill, in target);
+            _eventsHolder.OnCombatSkillSubmit(in values);
+            _playerCombatEvents.OnCombatSkillSubmit(in values);
+            _enemyCombatEvents.OnCombatSkillSubmit(in values);
 
-            _currentDiscriminatedEntityEventsHolder.OnCombatSkillSubmit(in performer, in usedSkill,in target);
+            _currentDiscriminatedEntityEventsHolder.OnCombatSkillSubmit(in values);
 
-
+            var performer = values.Performer;
+            var usedSkill = values.UsedSkill;
             _entityEventHandler.OnCombatSkillSubmit(in performer, in usedSkill);
 
         }
 
-        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
+            values.Extract(out var performer,out var target,out var usedSkill);
             _entityEventHandler.OnCombatSkillPerform(in performer, in usedSkill, in target);
 
-            _eventsHolder.OnCombatSkillPerform(in performer, in usedSkill, in target);
-            _playerCombatEvents.OnCombatSkillPerform(in performer, in usedSkill, in target);
-            _enemyCombatEvents.OnCombatSkillPerform(in performer, in usedSkill, in target);
+            _eventsHolder.OnCombatSkillPerform(in values);
+            _playerCombatEvents.OnCombatSkillPerform(in values);
+            _enemyCombatEvents.OnCombatSkillPerform(in values);
 
-            _currentDiscriminatedEntityEventsHolder.OnCombatSkillPerform(in performer, in usedSkill, in target);
+            _currentDiscriminatedEntityEventsHolder.OnCombatSkillPerform(in values);
 
         }
 
@@ -1017,19 +1019,19 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnCombatSkillSubmit(in performer, in usedSkill, in target);
+                listener.OnCombatSkillSubmit(in values);
             }
         }
 
-        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnCombatSkillPerform(in performer, in usedSkill, in target);
+                listener.OnCombatSkillPerform(in values);
             }
         }
 

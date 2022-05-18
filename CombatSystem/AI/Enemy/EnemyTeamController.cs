@@ -37,11 +37,11 @@ namespace CombatSystem.AI
         {
         }
 
-        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
         }
 
-        public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
         }
 
@@ -115,7 +115,8 @@ namespace CombatSystem.AI
             var target = SelectTarget(in skill);
 
             eventsHolder.OnTargetSelect(in target);
-            CombatSystemSingleton.EventsHolder.OnCombatSkillSubmit(in _currentControl, in skill, in target);
+            SkillUsageValues values = new SkillUsageValues(_currentControl,target,skill);
+            CombatSystemSingleton.EventsHolder.OnCombatSkillSubmit(in values);
         }
 
         private CombatEntity SelectTarget(in CombatSkill skill)
