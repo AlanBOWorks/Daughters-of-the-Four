@@ -35,6 +35,12 @@ namespace CombatSystem.Entity
             
         }
 
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+            var stats = entity.Stats;
+            stats.CurrentInitiative = 0;
+        }
+
         public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)
         {
             var stats = entity.Stats;

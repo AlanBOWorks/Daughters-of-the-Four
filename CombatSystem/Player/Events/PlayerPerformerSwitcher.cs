@@ -8,6 +8,7 @@ using UnityEngine;
 namespace CombatSystem.Player.Events
 {
     public sealed class PlayerPerformerSwitcher : ICombatPreparationListener, 
+        ITempoEntityStatesListener,
         ITempoEntityStatesExtraListener, 
         ITempoTeamStatesListener,
 
@@ -15,6 +16,16 @@ namespace CombatSystem.Player.Events
 
     {
         private IReadOnlyList<CombatEntity> _activeEntities;
+        private CombatEntity _currentEntity;
+
+        private void DoSwitchPerformer(in CombatEntity entity)
+        {
+            if(entity == _currentEntity) return;
+            _currentEntity = entity;
+            PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(in entity);
+
+        }
+
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             _activeEntities = playerTeam.GetControllingMembers();
@@ -29,7 +40,7 @@ namespace CombatSystem.Player.Events
             if (!_isActive || _activeEntities.Count <= 0) return;
 
             var nextCall = _activeEntities[0];
-            PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(in nextCall);
+            DoSwitchPerformer(in nextCall);
         }
 
         public void OnNoActionsForcedFinish(in CombatEntity entity)
@@ -37,11 +48,22 @@ namespace CombatSystem.Player.Events
         }
 
         private bool _isActive;
+
+        private void DoPerformNextEntity()
+        {
+            if (!_isActive) return;
+
+            CombatEntity nextControl = null;
+            if (_activeEntities.Count > 0) nextControl = _activeEntities[0];
+
+            DoSwitchPerformer(in nextControl);
+        }
+
         public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
             _isActive = true;
             var firstEntity = _activeEntities[0];
-            OnPerformerSwitch(in firstEntity);
+            DoSwitchPerformer(in firstEntity);
         }
 
         public void OnAllActorsNoActions(in CombatEntity lastActor)
@@ -66,26 +88,10 @@ namespace CombatSystem.Player.Events
             _isActive = false;
         }
 
-        public void OnPerformerSwitch(in CombatEntity performer)
-        {
-            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.OnPerformerSwitch(in performer);
-        }
-
-        public void OnAllPlayerEntitiesFinish()
-        {
-
-        }
-
 
         public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
-            if(!_isActive) return;
-
-            CombatEntity nextControl = null;
-            if (_activeEntities.Count > 0) nextControl = _activeEntities[0];
-
-            OnPerformerSwitch(in nextControl);
+            DoPerformNextEntity();
         }
 
         public void OnCombatSkillPerform(in SkillUsageValues values)
@@ -97,6 +103,32 @@ namespace CombatSystem.Player.Events
         }
 
         public void OnCombatSkillFinish(in CombatEntity performer)
+        {
+        }
+
+        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
+        {
+        }
+
+        public void OnEntityRequestAction(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityBeforeSkill(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+            if(entity == _currentEntity)
+                DoPerformNextEntity();
+        }
+
+        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
         }
     }

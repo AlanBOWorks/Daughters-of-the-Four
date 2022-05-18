@@ -85,6 +85,10 @@ namespace CombatSystem._Core
         {
         }
 
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+        }
+
         public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
             _tickingTrackers.Add(entity);

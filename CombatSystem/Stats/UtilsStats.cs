@@ -262,10 +262,14 @@ namespace CombatSystem.Stats
             stats.UsedActions += usedSkill.SkillCost;
         }
 
+
+        public static void FullTickActions(in CombatEntity entity) => FullTickActions(entity.Stats);
+
         public static void FullTickActions(in CombatStats stats)
         {
             stats.UsedActions = MaxActionAmount + 1;
         }
+
 
         public static void CalculateTempoPercent(in CombatStats entity, out float currentTickAmount,
             out float initiativePercent)

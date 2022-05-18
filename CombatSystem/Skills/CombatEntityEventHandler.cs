@@ -8,19 +8,26 @@ namespace CombatSystem.Skills
 {
     public sealed class CombatEntityEventHandler 
     {
-        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill)
+        public void OnCombatSkillPreSubmit(in CombatEntity performer,in CombatSkill usedSkill)
         {
             var performerStats = performer.Stats;
             UtilsCombatStats.TickActions(in performerStats, in usedSkill);
             usedSkill.IncreaseCost();
+        }
 
-            if(UtilsCombatStats.CanControlRequest(in performer)) return;
-            var performerTeam = performer.Team;
-            performerTeam.RemoveFromControllingEntities(performer, false);
-
+        public void OnCombatSkillSubmit(in CombatEntity performer, in CombatSkill usedSkill)
+        {
+           
 
             var eventHolder = CombatSystemSingleton.EventsHolder;
             eventHolder.OnEntityBeforeSkill(performer);
+
+
+            if (UtilsCombatStats.CanControlRequest(in performer)) return;
+            var performerTeam = performer.Team;
+            performerTeam.RemoveFromControllingEntities(performer, false);
+
+            eventHolder.OnEntityEmptyActions(performer);
 
             if(performerTeam.CanControl()) return;
             eventHolder.OnAllActorsNoActions(in performer);

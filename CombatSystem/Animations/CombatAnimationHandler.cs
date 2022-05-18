@@ -51,6 +51,10 @@ namespace CombatSystem.Animations
            
         }
 
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+        }
+
         public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
             var animator = GetAnimator(in entity);

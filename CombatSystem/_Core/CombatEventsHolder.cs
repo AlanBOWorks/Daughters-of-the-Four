@@ -227,6 +227,15 @@ namespace CombatSystem._Core
 
         }
 
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+            _eventsHolder.OnEntityEmptyActions(entity);
+            _playerCombatEvents.OnEntityEmptyActions(entity);
+            _enemyCombatEvents.OnEntityEmptyActions(entity);
+
+            _currentDiscriminatedEntityEventsHolder.OnEntityEmptyActions(entity);
+        }
+
         public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
             _entityEventHandler.OnEntityFinishSequence(entity,in isForcedByController);
@@ -332,6 +341,10 @@ namespace CombatSystem._Core
 
         public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
+            var performer = values.Performer;
+            var usedSkill = values.UsedSkill;
+
+            _entityEventHandler.OnCombatSkillPreSubmit(in performer, in usedSkill);
 
             _eventsHolder.OnCombatSkillSubmit(in values);
             _playerCombatEvents.OnCombatSkillSubmit(in values);
@@ -339,8 +352,6 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnCombatSkillSubmit(in values);
 
-            var performer = values.Performer;
-            var usedSkill = values.UsedSkill;
             _entityEventHandler.OnCombatSkillSubmit(in performer, in usedSkill);
 
         }
@@ -966,6 +977,14 @@ namespace CombatSystem._Core
             foreach (var listener in _tempoEntityListeners)
             {
                 listener.OnEntityFinishAction(entity);
+            }
+        }
+
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+            foreach (var listener in _tempoEntityListeners)
+            {
+                listener.OnEntityEmptyActions(entity);
             }
         }
 

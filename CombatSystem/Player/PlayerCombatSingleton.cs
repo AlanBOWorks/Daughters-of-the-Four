@@ -38,6 +38,7 @@ namespace CombatSystem.Player
             playerEvents.ManualSubscribe((ICombatPreparationListener) PerformerSwitcher);
             discriminationEvents.ManualSubscribe((ITempoTeamStatesListener)PerformerSwitcher);
             discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesExtraListener);
+            discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesListener);
             
 
         }

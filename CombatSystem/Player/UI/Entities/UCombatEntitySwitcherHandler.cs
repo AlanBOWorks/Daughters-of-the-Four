@@ -158,16 +158,19 @@ namespace CombatSystem.Player.UI
 
        public void OnEntityBeforeSkill(CombatEntity entity)
        {
-           bool canControl = UtilsCombatStats.CanControlRequest(entity);
-           if(canControl) return;
-           DisableButton(in entity);
+           
        }
 
        public void OnEntityFinishAction(CombatEntity entity)
        {
        }
 
-       public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+       public void OnEntityEmptyActions(CombatEntity entity)
+       {
+           DisableButton(in entity);
+       }
+
+        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
        {
        }
        private void DisableButton(in CombatEntity entity)

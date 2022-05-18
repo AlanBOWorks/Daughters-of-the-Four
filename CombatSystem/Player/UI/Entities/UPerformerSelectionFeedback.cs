@@ -29,6 +29,8 @@ namespace CombatSystem.Player.UI
 
         public void OnPerformerSwitch(in CombatEntity performer)
         {
+            if(performer == null) return;
+
             var buttons = switcherHandler.GetDictionary();
             ;
             var targetButton = buttons[performer];

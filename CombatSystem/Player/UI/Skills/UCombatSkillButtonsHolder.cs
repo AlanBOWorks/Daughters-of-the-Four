@@ -236,12 +236,11 @@ namespace CombatSystem.Player.UI
 
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
-            HideAll();
         }
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            
+            HideAll();
         }
 
         public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
@@ -359,8 +358,10 @@ namespace CombatSystem.Player.UI
         public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
             var usedSkill = values.UsedSkill;
-            if (_activeButtons.ContainsKey(usedSkill))
-                _activeButtons[usedSkill].UpdateCostReal();
+            if (!_activeButtons.ContainsKey(usedSkill)) return;
+
+            _activeButtons[usedSkill].UpdateCostReal();
+            DeselectSkill(in usedSkill);
         }
 
         public void OnCombatSkillPerform(in SkillUsageValues values)
@@ -378,6 +379,7 @@ namespace CombatSystem.Player.UI
 
         public void OnPerformerSwitch(in CombatEntity performer)
         {
+            if(performer == null) return;
             SwitchControllingEntity(in performer);
         }
 

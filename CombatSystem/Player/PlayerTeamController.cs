@@ -50,17 +50,25 @@ namespace CombatSystem.Player
 
         public void OnSkillDeselect(in CombatSkill skill)
         {
-            _selectedSkill = null;
+            DeselectSkill(in skill);
         }
 
         public void OnSkillCancel(in CombatSkill skill)
         {
-            if (_selectedSkill == skill) _selectedSkill = null;
+            DeselectSkill(in skill);
         }
 
         public void OnSkillSubmit(in CombatSkill skill)
         {
+            DeselectSkill(in skill);
         }
+
+
+        private void DeselectSkill(in CombatSkill skill)
+        {
+            if (_selectedSkill == skill) _selectedSkill = null;
+        }
+
 
         public void OnPerformerSwitch(in CombatEntity performer)
         {
@@ -98,8 +106,7 @@ namespace CombatSystem.Player
 
         public void OnCombatSkillFinish(in CombatEntity performer)
         {
-            _selectedTarget = null;
-            _selectedSkill = null;
+           
         }
 
 

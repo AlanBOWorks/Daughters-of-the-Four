@@ -31,6 +31,8 @@ namespace CombatSystem._Core
             const bool isForced = true;
             foreach (var entity in allActives)
             {
+                UtilsCombatStats.FullTickActions(entity);
+                eventsHolder.OnEntityEmptyActions(entity);
                 eventsHolder.OnEntityFinishSequence(entity, isForced);
             }
 

@@ -176,6 +176,14 @@ namespace CombatSystem._Core
         /// it's called before [<see cref="OnEntityRequestAction"/>] and [<see cref="OnEntityFinishSequence"/>].
         /// </summary>
         void OnEntityFinishAction(CombatEntity entity);
+
+        /// <summary>
+        /// Invoked when the (<paramref name="entity"/>) has not actions left.<br></br>
+        /// It's invoked before [<seealso cref="OnEntityFinishSequence"/>] and SkillPerform;<br></br>
+        /// Resets and buff's behaviors are not performed yet
+        /// </summary>
+        void OnEntityEmptyActions(CombatEntity entity);
+
         /// <summary>
         /// The very last event invoked when there's no [<seealso cref="CombatStats.UsedActions"/>] left or when
         /// the [<see cref="CombatEntity"/>] passes its actions somehow. <br></br><br></br>

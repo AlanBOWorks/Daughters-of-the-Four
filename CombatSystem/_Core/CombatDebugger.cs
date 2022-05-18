@@ -173,6 +173,10 @@ namespace CombatSystem._Core
             Debug.Log($"> --- Entity [END] Action: {entity.GetProviderEntityName()}");
         }
 
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+        }
+
         public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
             if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnFinishSequence) return;

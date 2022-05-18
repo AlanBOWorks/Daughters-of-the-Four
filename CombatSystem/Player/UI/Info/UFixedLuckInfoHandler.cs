@@ -65,6 +65,11 @@ namespace CombatSystem.Player.UI
         {
         }
 
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+            
+        }
+
         public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
         {
             if(isForcedByController) return;
