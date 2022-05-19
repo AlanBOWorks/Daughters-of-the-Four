@@ -188,6 +188,37 @@ namespace CombatSystem.Skills
             target.CurrentMortality = 0;
             mortalityLost = true;
         }
+
+        public static void DoHealTo(in CombatStats target,in float healAmount)
+        {
+            float targetHealth = target.CurrentHealth + healAmount;
+            DoOverrideHealth(in target, ref targetHealth);
+        }
+
+        public static void DoHealToPercent(in CombatStats target, in float healPercent)
+        {
+            if(healPercent < 0) return;
+            float targetHealth = UtilsStatsFormula.CalculateMaxHealth(target) * (1 + healPercent);
+
+            DoOverrideHealth(in target, ref targetHealth);
+        }
+
+        private static void DoOverrideHealth(in CombatStats target, ref float targetHealth, in float maxHealth)
+        {
+            if (targetHealth >= maxHealth)
+            {
+                targetHealth = maxHealth;
+
+                //todo call MaxHealth event
+            }
+
+            target.CurrentHealth = targetHealth;
+        }
+        private static void DoOverrideHealth(in CombatStats target, ref float targetHealth)
+        {
+            float maxHealth = UtilsStatsFormula.CalculateMaxHealth(target);
+            DoOverrideHealth(in target, ref targetHealth, in maxHealth);
+        }
     }
 }
 

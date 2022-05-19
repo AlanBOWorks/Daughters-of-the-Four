@@ -49,6 +49,8 @@ namespace CombatSystem._Core
             void HandleTickEntity(CombatEntity entity)
             {
                 CombatStats stats = entity.Stats;
+                if(!stats.IsAlive()) return;
+
 
                 UtilsCombatStats.TickInitiative(stats, out var entityInitiativeAmount);
                 UtilsCombatStats.CalculateTempoPercent(in entityInitiativeAmount, out var initiativePercent);

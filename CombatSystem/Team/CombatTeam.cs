@@ -34,8 +34,8 @@ namespace CombatSystem.Team
 
             _teamSkills = new List<CombatTeamSkill>();
         }
-        
-        public CombatTeam(bool isPlayerTeam,IReadOnlyCollection<ICombatEntityProvider> members) : this(isPlayerTeam)
+
+        private CombatTeam(bool isPlayerTeam,IEnumerable<ICombatEntityProvider> members) : this(isPlayerTeam)
         {
             if (members == null)
                 throw new ArgumentNullException(nameof(members));
@@ -47,6 +47,16 @@ namespace CombatSystem.Team
             }
         }
 
+        public CombatTeam(bool isPlayerTeam, ICombatTeamProvider provider) : this(isPlayerTeam,provider.GetSelectedCharacters())
+        {
+            var skills = provider.GetTeamSkills();
+            foreach (var skillPreset in skills)
+            {
+                Add(skillPreset);
+            }
+        }
+
+
         [Title("Team Data")]
         public readonly bool IsPlayerTeam;
 
@@ -54,6 +64,7 @@ namespace CombatSystem.Team
         // ------------ DATA ------------ 
         public readonly TeamDataValues DataValues;
         public readonly TeamLineBlockerHandler GuardHandler;
+        [ShowInInspector]
         private readonly List<CombatTeamSkill> _teamSkills;
 
         public IReadOnlyList<CombatTeamSkill> GetTeamSkills() => _teamSkills;
@@ -185,7 +196,16 @@ namespace CombatSystem.Team
             CombatEntity entity = new CombatEntity(provider,this);
             Add(entity);
         }
-        
+
+        private void Add(ITeamSkillPreset preset)
+        {
+            if(preset == null) return;
+
+            CombatTeamSkill skill = new CombatTeamSkill(preset);
+            Add(skill);
+        }
+
+
         private void Add(CombatEntity entity)
         {
             if(entity == null)
@@ -202,6 +222,12 @@ namespace CombatSystem.Team
 
             if(!isMainAddition) _offRolesGroup.AddMember(roleType, in entity);
         }
+
+        private void Add(CombatTeamSkill skill)
+        {
+            _teamSkills.Add(skill);
+        }
+
 
         public void SwitchTeamMemberToThis(CombatEntity entity)
         {

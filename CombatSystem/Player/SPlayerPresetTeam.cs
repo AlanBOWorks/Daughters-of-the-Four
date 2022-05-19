@@ -14,12 +14,17 @@ namespace CombatSystem.Player
         private const string AssetDetailName = " [Player Predefined Team]";
         [SerializeField] private string teamName;
 
+        [Title("Characters")]
         [SerializeField]
         private SPlayerPreparationEntity[] characters = new SPlayerPreparationEntity[EnumTeam.RoleTypesAmount];
+        [Title("Skills")]
+        [SerializeField]
+        private STeamSkill[] teamSkills = new STeamSkill[0];
 
         internal SPlayerPreparationEntity[] GetPresetCharacters() => characters;
 
-        public IReadOnlyCollection<ICombatEntityProvider> GetSelectedCharacters() => characters;
+        public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => characters;
+        public IEnumerable<ITeamSkillPreset> GetTeamSkills() => teamSkills;
 
 
         [Button]

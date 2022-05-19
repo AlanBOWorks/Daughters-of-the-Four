@@ -31,10 +31,6 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatStops()
-        {
-            DestroyAliveReference();
-        }
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {

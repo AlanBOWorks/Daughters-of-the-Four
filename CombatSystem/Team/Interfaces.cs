@@ -7,7 +7,8 @@ namespace CombatSystem.Team
 {
     public interface ICombatTeamProvider
     {
-        IReadOnlyCollection<ICombatEntityProvider> GetSelectedCharacters();
+        IEnumerable<ICombatEntityProvider> GetSelectedCharacters();
+        IEnumerable<ITeamSkillPreset> GetTeamSkills();
     }
 
     public interface IOppositionTeamStructureRead<out T>

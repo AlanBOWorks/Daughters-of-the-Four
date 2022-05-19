@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CombatSystem.Animations;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using MEC;
 using Sirenix.OdinInspector;
@@ -33,6 +34,7 @@ namespace CombatSystem._Core
 
             var skillsQueue = new SkillQueuePerformer();
 
+            KnockOutHandler = new KnockOutHandler();
             CombatAnimationHandler = new CombatAnimationHandler();
 
 
@@ -40,7 +42,7 @@ namespace CombatSystem._Core
             EntityPrefabsPoolHandler = new EntityPrefabsPoolHandler();
 
 
-
+            systemEventsHolder.Subscribe(KnockOutHandler);
             systemEventsHolder.Subscribe(skillsQueue);
             systemEventsHolder.Subscribe(CombatAnimationHandler);
             systemEventsHolder.Subscribe(TeamControllers);
@@ -48,6 +50,9 @@ namespace CombatSystem._Core
         }
         private CombatSystemSingleton() { }
         public static CombatSystemSingleton GetInstance() => Instance;
+
+        public static bool GetIsCombatActive() => AliveGameObjectReference;
+
 
         internal static PrefabInstantiationHandler PrefabInstantiationHandler;
         [ShowInInspector]
@@ -87,10 +92,12 @@ namespace CombatSystem._Core
         public static CombatTeamControllersHandler TeamControllers { get; private set; }
 
         // ------- TARGETING ------
-        [Title("Targeting")]
+        [Title("Combat Behaviors")]
         [ShowInInspector]
         public static readonly SkillTargetingHandler SkillTargetingHandler;
 
+        [ShowInInspector] 
+        public static readonly KnockOutHandler KnockOutHandler;
 
         // ------- TEMPO ------
         [Title("Tempo")]

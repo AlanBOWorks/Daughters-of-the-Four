@@ -3,7 +3,7 @@ using CombatSystem.Entity;
 namespace CombatSystem.Skills
 {
 
-    public struct PerformEffectValues
+    public readonly struct PerformEffectValues
     {
         public PerformEffectValues(in IEffect effect, in float effectValue, in EnumsEffect.TargetType targetType)
         {
@@ -17,7 +17,7 @@ namespace CombatSystem.Skills
         public readonly EnumsEffect.TargetType TargetType;
     }
 
-    public struct SkillUsageValues
+    public readonly struct SkillUsageValues
     {
         public readonly CombatEntity Performer;
         public readonly CombatEntity Target;
@@ -30,7 +30,7 @@ namespace CombatSystem.Skills
             UsedSkill = usedSkill;
         }
 
-        public readonly void Extract(out CombatEntity performer, out CombatEntity target, out CombatSkill usedSkill)
+        public void Extract(out CombatEntity performer, out CombatEntity target, out CombatSkill usedSkill)
         {
             performer = Performer;
             target = Target;

@@ -27,8 +27,8 @@ namespace CombatSystem._Core
             CombatSystemSingleton.PrefabInstantiationHandler.FirstInstantiation();
 
             PrepareTeams(
-                playerTeam.GetSelectedCharacters(),
-                enemyTeam.GetSelectedCharacters());
+                playerTeam,
+                enemyTeam);
 
             PrepareTeamControllers();
             //InitialStatsPreparations();
@@ -37,8 +37,8 @@ namespace CombatSystem._Core
 
 
         private static void PrepareTeams(
-            IReadOnlyCollection<ICombatEntityProvider> playerTeam,
-            IReadOnlyCollection<ICombatEntityProvider> enemyTeam)
+            ICombatTeamProvider playerTeam,
+            ICombatTeamProvider enemyTeam)
         {
             var systemEvents = CombatSystemSingleton.EventsHolder;
 
@@ -162,6 +162,7 @@ namespace CombatSystem._Core
         }
 
         private bool InvalidSetup() => !playerTesterTeam || !oppositionTeam;
+        private bool CanFinish() => CombatSystemSingleton.GetIsCombatActive();
 
 
         [Button(ButtonSizes.Large), GUIColor(.3f,.7f,.8f), DisableIf("InvalidSetup"), DisableInEditorMode,
@@ -171,7 +172,7 @@ namespace CombatSystem._Core
             TestStartCombat(playerTesterTeam, oppositionTeam);
         }
 
-        [Button, DisableIf("InvalidSetup"), DisableInEditorMode]
+        [Button, DisableIf("CanFinish"), DisableInEditorMode]
         private void FinishCombat(bool isWin = true)
         {
             CombatFinishHandler.FinishCombat(isWin);

@@ -39,6 +39,7 @@ namespace CombatSystem.AI
 
         public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
+            Step();
         }
 
         public void OnCombatSkillPerform(in SkillUsageValues values)
@@ -51,7 +52,6 @@ namespace CombatSystem.AI
 
         public void OnCombatSkillFinish(in CombatEntity performer)
         {
-            Step();
         }
 
 

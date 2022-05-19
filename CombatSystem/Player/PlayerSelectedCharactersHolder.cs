@@ -19,10 +19,15 @@ namespace CombatSystem.Player
             {
                 _characters.Add(null);
             }
+
+            _teamSkills = new List<ITeamSkillPreset>();
         }
 
         [ShowInInspector,DisableInEditorMode,DisableInPlayMode]
         private readonly List<ICombatEntityProvider> _characters;
+
+        [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
+        private readonly List<ITeamSkillPreset> _teamSkills;
 
         [Button]
         private void DebugCount()
@@ -33,11 +38,12 @@ namespace CombatSystem.Player
         [Button]
         public void AddTeam(SPlayerPresetTeam predefinedTeam)
         {
-            foreach (var character in predefinedTeam.GetSelectedCharacters())
-            {
-                Add(character);
-            }
+            var teamMembers = predefinedTeam.GetPresetCharacters();
+            _characters.AddRange(teamMembers);
+            var teamSkills = predefinedTeam.GetTeamSkills();
+            _teamSkills.AddRange(teamSkills);
         }
+
 
         [Button]
         private void AddCharacter(SPlayerPreparationEntity selectedCharacter)
@@ -53,7 +59,6 @@ namespace CombatSystem.Player
 
             int roleIndex = UtilsTeam.GetRoleIndex(selectedCharacter);
             _characters[roleIndex] = selectedCharacter;
-            Count++;
         }
 
         public void TryRemove(ICombatEntityProvider selectedCharacter)
@@ -62,15 +67,27 @@ namespace CombatSystem.Player
 
             int roleIndex = UtilsTeam.GetRoleIndex(selectedCharacter);
             _characters[roleIndex] = null;
-            Count--;
+        }
+
+        public void Add(ITeamSkillPreset teamSkill)
+        {
+            _teamSkills.Add(teamSkill);
+        }
+
+        public void TryRemove(ITeamSkillPreset teamSkill)
+        {
+            if (_teamSkills.Contains(teamSkill)) return;
+            _teamSkills.Remove(teamSkill);
         }
 
 
         public IEnumerator<ICombatEntityProvider> GetEnumerator() => _characters.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        [ShowInInspector,DisableInEditorMode,DisableInPlayMode,PropertyOrder(-10)]
-        public int Count { get; private set; }
-        public IReadOnlyCollection<ICombatEntityProvider> GetSelectedCharacters() => _characters;
+
+        public int Count => _characters.Count;
+        public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => _characters;
+        public IEnumerable<ITeamSkillPreset> GetTeamSkills() => _teamSkills;
+
         public bool IsValid() => Count > 0;
 
     }

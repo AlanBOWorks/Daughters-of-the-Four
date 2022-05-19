@@ -48,7 +48,7 @@ namespace CombatSystem.Skills
 
         public static bool CanBeTargeted(in CombatEntity target)
         {
-            return target != null && target.CanBeTarget();
+            return target != null;
         }
 
         public static void HandlePossibleTargets(ICollection<CombatEntity> targetsHelper,

@@ -61,8 +61,10 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnTotalDamage(in CombatEntity target, in CombatEntity performer, in float amount)
+        public void OnRevive(in CombatEntity entity, bool isHealRevive)
         {
+            _infoDictionary[entity].UpdateToCurrentStats();
         }
+
     }
 }

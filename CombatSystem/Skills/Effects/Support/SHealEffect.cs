@@ -25,16 +25,7 @@ namespace CombatSystem.Skills.Effects
 
         private static void DoHeal(in CombatStats target, in float healAmount)
         {
-            float targetHealth = target.CurrentHealth + healAmount;
-            float maxHealth = UtilsStatsFormula.CalculateMaxHealth(target);
-            if (targetHealth >= maxHealth)
-            {
-                targetHealth = maxHealth;
-
-                //todo call MaxHealth event
-            }
-
-            target.CurrentHealth = targetHealth;
+           UtilsEffect.DoHealTo(in target, in healAmount);
         }
     }
 }

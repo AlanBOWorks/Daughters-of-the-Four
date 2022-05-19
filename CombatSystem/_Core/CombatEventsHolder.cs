@@ -411,6 +411,13 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnDamageDone(in performer, in target, in amount);
         }
 
+        public void OnRevive(in CombatEntity entity, bool isHealRevive)
+        {
+            _eventsHolder.OnRevive(in entity, isHealRevive);
+            _playerCombatEvents.OnRevive(in entity, isHealRevive);
+            _enemyCombatEvents.OnRevive(in entity, isHealRevive);
+        }
+
 
         public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
@@ -764,6 +771,13 @@ namespace CombatSystem._Core
             }
         }
 
+        public void OnRevive(in CombatEntity entity, bool isHealRevive)
+        {
+            foreach (var listener in _vitalityChangeListeners)
+            {
+                listener.OnRevive(in entity, isHealRevive);
+            }
+        }
 
 
         public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)

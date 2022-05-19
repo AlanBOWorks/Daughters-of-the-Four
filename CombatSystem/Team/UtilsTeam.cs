@@ -87,6 +87,25 @@ namespace CombatSystem.Team
             }
         }
 
+        public static CombatEntity GetMember(in CombatTeam team,in EnumTeam.ActiveRole role)
+        {
+            return role switch
+            {
+                EnumTeam.ActiveRole.MainVanguard => team.VanguardType,
+                EnumTeam.ActiveRole.MainAttacker => team.AttackerType,
+                EnumTeam.ActiveRole.MainSupport => team.SupportType,
+                EnumTeam.ActiveRole.MainFlex => team.FlexType,
+                EnumTeam.ActiveRole.SecondaryVanguard => team.SecondaryVanguardElement,
+                EnumTeam.ActiveRole.SecondaryAttacker => team.SecondaryAttackerElement,
+                EnumTeam.ActiveRole.SecondarySupport => team.SecondarySupportElement,
+                EnumTeam.ActiveRole.SecondaryFlex => team.SecondaryFlexElement,
+                EnumTeam.ActiveRole.ThirdVanguard => team.ThirdVanguardElement,
+                EnumTeam.ActiveRole.ThirdAttacker => team.ThirdAttackerElement,
+                EnumTeam.ActiveRole.ThirdSupport => team.ThirdSupportElement,
+                EnumTeam.ActiveRole.ThirdFlex => team.ThirdFlexElement,
+                _ => null
+            };
+        }
 
         public static T GetElement<T>(CombatEntity member, IOppositionTeamStructureRead<T> structure)
         {

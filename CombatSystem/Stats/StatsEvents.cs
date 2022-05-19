@@ -18,6 +18,8 @@ namespace CombatSystem.Stats
         /// </summary>
         void OnDamageDone(in CombatEntity performer, in CombatEntity target, in float amount);
 
+        void OnRevive(in CombatEntity entity, bool isHealRevive);
+
     }
 
     public interface IDamageDoneListener : ICombatEventListener
