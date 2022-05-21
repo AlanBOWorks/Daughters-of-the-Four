@@ -98,23 +98,41 @@ namespace CombatSystem.Stats
             IterateRevivingCollection();
         }
 
-        private const int ReviveThreshold = TempoTicker.LoopThreshold;
-        
+        public const int ReviveThreshold = TempoTicker.LoopThreshold;
 
-       
-        public void HealKnockOut(CombatEntity target, float percent)
+        private static int CalculateTick(int current, int increment)
         {
+            int target = current + increment;
+            if (target > ReviveThreshold) return ReviveThreshold;
+            return target;
+        }
+
+
+        private void DoHealKnockOut(CombatEntity performer,int index, int currentTick, int increment,in SystemCombatEventsHolder eventsHolder)
+        {
+            var target = _knockOutEntities[index];
+            _knockOutValues[index] = currentTick;
+
+            eventsHolder.OnKnockHeal(in performer, in target, in currentTick, in increment);
+        }
+
+        private void DoHealKnockOut(CombatEntity performer, int index, int currentTick, int increment)
+            => DoHealKnockOut(performer, index, currentTick, increment, CombatSystemSingleton.EventsHolder);
+
+
+        public void HealKnockOut(CombatEntity performer, CombatEntity target, float healPercent)
+        {
+            if(healPercent <= 0) return;
+
             int index = _knockOutEntities.IndexOf(target);
-            float increment = ReviveThreshold * percent;
-            var knockOutTick = _knockOutValues[index] + increment;
-            if (knockOutTick < ReviveThreshold)
-            {
-                _knockOutValues[index] = (int)knockOutTick;
-            }
-            else
-            {
-                DoReviveEntity(target, true);
-            }
+            float increment = ReviveThreshold * healPercent;
+            int knockOutTick = CalculateTick(_knockOutValues[index] , (int)increment);
+            
+            DoHealKnockOut(performer,index,knockOutTick,ReviveTickIncrement);
+
+            if (knockOutTick < ReviveThreshold) return;
+            DoReviveEntity(target, true);
+
         }
 
 
@@ -123,23 +141,21 @@ namespace CombatSystem.Stats
         private const int ReviveTickIncrement = 8;
         private void IterateKnockOutCollections()
         {
+            var eventHolder = CombatSystemSingleton.EventsHolder;
             for (var i = 0; i < _knockOutEntities.Count; i++)
             {
                 TickHealEntity(ref i);
             }
 
-            void TickHealEntity(ref int i)
+            void TickHealEntity(ref int index)
             {
-                var knockOutTick = _knockOutValues[i] + ReviveTickIncrement;
-                if (knockOutTick < ReviveThreshold)
-                {
-                    _knockOutValues[i] = knockOutTick;
-                }
-                else
-                {
-                    DoReviveEntity(i, false);
-                    i--;
-                }
+                int knockOutTick = CalculateTick(_knockOutValues[index] , ReviveTickIncrement);
+                DoHealKnockOut(null, index, knockOutTick, ReviveTickIncrement, in eventHolder);
+
+                if (knockOutTick < ReviveThreshold) return;
+                DoReviveEntity(index, false);
+                index--;
+
             }
         }
 

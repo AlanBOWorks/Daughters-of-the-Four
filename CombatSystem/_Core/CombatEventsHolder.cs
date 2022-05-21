@@ -454,6 +454,42 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnKnockOut(in performer, in target);
         }
 
+        public void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+            _eventsHolder.OnShieldGain(in performer, in target, in amount);
+            _playerCombatEvents.OnShieldGain(in performer, in target, in amount);
+            _enemyCombatEvents.OnShieldGain(in performer, in target, in amount);
+        }
+
+        public void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+            _eventsHolder.OnHealthGain(in performer, in target, in amount);
+            _playerCombatEvents.OnHealthGain(in performer, in target, in amount);
+            _enemyCombatEvents.OnHealthGain(in performer, in target, in amount);
+        }
+
+        public void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+            _eventsHolder.OnMortalityGain(in performer, in target, in amount);
+            _playerCombatEvents.OnMortalityGain(in performer, in target, in amount);
+            _enemyCombatEvents.OnMortalityGain(in performer, in target, in amount);
+        }
+
+        public void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target)
+        {
+            _eventsHolder.OnRecoveryReceive(in performer, in target);
+            _playerCombatEvents.OnRecoveryReceive(in performer, in target);
+            _enemyCombatEvents.OnRecoveryReceive(in performer, in target);
+        }
+
+        public void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentAmount, in int amount)
+        {
+            _eventsHolder.OnKnockHeal(in performer, in target, in currentAmount, in amount);
+            _playerCombatEvents.OnKnockHeal(in performer, in target, in currentAmount, in amount);
+            _enemyCombatEvents.OnKnockHeal(in performer, in target, in currentAmount, in amount);
+        }
+
+
         public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
             _eventsHolder.OnStanceChange(in team, in switchedStance);
@@ -605,7 +641,10 @@ namespace CombatSystem._Core
             _combatTerminationListeners = new HashSet<ICombatTerminationListener>();
             _combatStatesListeners = new HashSet<ICombatStatesListener>();
             _entitiesExistenceListeners = new HashSet<ICombatEntityExistenceListener>();
+            
+            
             _damageDoneListeners = new HashSet<IDamageDoneListener>();
+            _recoveryDoneListeners = new HashSet<IRecoveryDoneListener>();
             _vitalityChangeListeners = new HashSet<IVitalityChangeListener>();
         }
 
@@ -623,6 +662,8 @@ namespace CombatSystem._Core
         private readonly ICollection<ICombatEntityExistenceListener> _entitiesExistenceListeners;
         [ShowInInspector] 
         private readonly ICollection<IDamageDoneListener> _damageDoneListeners;
+        [ShowInInspector]
+        private readonly ICollection<IRecoveryDoneListener> _recoveryDoneListeners;
 
         [ShowInInspector] 
         private readonly ICollection<IVitalityChangeListener> _vitalityChangeListeners;
@@ -819,6 +860,49 @@ namespace CombatSystem._Core
             foreach (var listener in _damageDoneListeners)
             {
                 listener.OnKnockOut(in performer, in target);
+            }
+        }
+
+
+        public void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+            foreach (var listener in _recoveryDoneListeners)
+            {
+                listener.OnShieldGain(in performer, in target, in amount);
+            }
+        }
+
+        public void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+            foreach (var listener in _recoveryDoneListeners)
+            {
+                listener.OnHealthGain(in performer, in target, in amount);
+            }
+
+        }
+
+        public void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+            foreach (var listener in _recoveryDoneListeners)
+            {
+                listener.OnMortalityGain(in performer, in target, in amount);
+            }
+
+        }
+
+        public void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target)
+        {
+            foreach (var listener in _recoveryDoneListeners)
+            {
+                listener.OnRecoveryReceive(in performer, in target);
+            }
+        }
+
+        public void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentTick, in int amount)
+        {
+            foreach (var listener in _recoveryDoneListeners)
+            {
+                listener.OnKnockHeal(in performer, in target, in currentTick, in amount);
             }
         }
 
@@ -1132,7 +1216,7 @@ namespace CombatSystem._Core
         ITeamEventListener,
         ICombatEntityExistenceListener, 
         ISkillUsageListener,
-        IDamageDoneListener, IVitalityChangeListener
+        IDamageDoneListener, IVitalityChangeListener, IRecoveryDoneListener
     {
         void Subscribe(ICombatEventListener listener);
         void UnSubscribe(ICombatEventListener listener);

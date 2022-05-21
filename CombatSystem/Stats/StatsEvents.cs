@@ -43,4 +43,20 @@ namespace CombatSystem.Stats
         /// </summary>
         void OnKnockOut(in CombatEntity performer, in CombatEntity target);
     }
+
+    public interface IRecoveryDoneListener : ICombatEventListener
+    {
+        void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount);
+        void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount);
+        void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount);
+        /// <summary>
+        /// After call of the concrete events calls:
+        /// <br></br>- <see cref="OnShieldGain"/>
+        /// <br></br>- <see cref="OnHealthGain"/>
+        /// <br></br>- <see cref="OnMortalityGain"/>
+        /// </summary>
+        void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target);
+        void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentTick, in int amount);
+
+    }
 }
