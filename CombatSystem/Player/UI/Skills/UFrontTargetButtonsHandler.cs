@@ -36,6 +36,10 @@ namespace CombatSystem.Player.UI
             playerEventsHolder.ManualSubscribe(this as ISkillPointerListener);
         }
 
+        public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntity> holder)
+        {
+        }
+
         public void OnElementCreated(UUIHoverEntity element, CombatEntity entity,
             int index)
         {
@@ -44,6 +48,10 @@ namespace CombatSystem.Player.UI
             targetButton.Inject(entity);
             targetButton.Inject(this);
             targetButton.HideInstantly();
+        }
+
+        public void OnCombatEnd()
+        {
         }
 
 

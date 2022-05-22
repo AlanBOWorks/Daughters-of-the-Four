@@ -23,6 +23,10 @@ namespace CombatSystem.Player.UI
             _infoDictionary = new Dictionary<CombatEntity, UVitalityInfo>();
         }
 
+        public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntity> holder)
+        {
+        }
+
         public void OnElementCreated(UUIHoverEntity element, CombatEntity entity,
             int index)
         {
@@ -30,6 +34,11 @@ namespace CombatSystem.Player.UI
             _infoDictionary.Add(entity,healthInfo);
 
             healthInfo.EntityInjection(in entity);
+        }
+
+        public void OnCombatEnd()
+        {
+            ClearEntities();
         }
 
         public void ClearEntities()

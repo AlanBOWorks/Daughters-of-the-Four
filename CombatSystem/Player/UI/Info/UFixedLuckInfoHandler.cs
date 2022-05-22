@@ -8,10 +8,9 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UFixedLuckInfoHandler : MonoBehaviour, 
-        IEntityElementInstantiationListener<UVitalityInfo>, //This is because I want to use UVitalityTrackerHandler's events
-        ITempoEntityStatesListener,
-        ICombatStatesListener
+    public class UFixedLuckInfoHandler : MonoBehaviour,
+        ITeamElementSpawnListener<UVitalityInfo>, //This is because I want to use UVitalityTrackerHandler's events
+        ITempoEntityStatesListener
     {
         [ShowInInspector,DisableInEditorMode]
         private Dictionary<CombatEntity, ULuckInfo> _elementsDictionary;
@@ -26,12 +25,7 @@ namespace CombatSystem.Player.UI
             _elementsDictionary.Clear();
         }
 
-        public void OnCombatPreStarts()
-        {
-            ResetState();
-        }
-
-        public void OnFinishPreStarts()
+        public void OnAfterElementsCreated(UTeamElementSpawner<UVitalityInfo> holder)
         {
             foreach (var pair in _elementsDictionary)
             {
@@ -41,13 +35,19 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        public void OnIterationCall(in UVitalityInfo element, in CombatEntity entity, in TeamStructureIterationValues values)
+        public void OnElementCreated(UVitalityInfo element, CombatEntity entity, int index)
         {
-            if(entity == null) return;
+            if (entity == null) return;
 
             var luckInfoHolder = element.GetComponent<ULuckInfo>();
             _elementsDictionary.Add(entity, luckInfoHolder);
         }
+
+        public void OnCombatEnd()
+        {
+            ResetState();
+        }
+
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
         }
@@ -92,26 +92,5 @@ namespace CombatSystem.Player.UI
 
         }
 
-        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
-        {
-            
-        }
-
-        public void OnCombatStart()
-        {
-        }
-
-        public void OnCombatEnd()
-        {
-            ResetState();
-        }
-
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-        }
     }
 }

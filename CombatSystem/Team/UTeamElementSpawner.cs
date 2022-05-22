@@ -46,6 +46,7 @@ namespace CombatSystem.Team
         private IReadOnlyDictionary<CombatEntity, T> _dictionary;
         public IReadOnlyDictionary<CombatEntity, T> GetDictionary() => _dictionary;
 
+        [ShowInInspector,HideInEditorMode]
         private ITeamElementSpawnListener<T>[] _listeners;
 
         private void Awake()
@@ -66,11 +67,35 @@ namespace CombatSystem.Team
                 prefabReferences.HideAll();
         }
 
+        private void CallPreStartEvents()
+        {
+            foreach (var listener in _listeners)
+            {
+                listener.OnAfterElementsCreated(this);
+            }
+        }
+        private void CallIterationEvents(CombatEntity entity, T element, int index)
+        {
+            foreach (var listener in _listeners)
+            {
+                listener.OnElementCreated(element, entity, index);
+            }
+        }
+
+        private void CallEndCombatEvents()
+        {
+            foreach (var listener in _listeners)
+            {
+                listener.OnCombatEnd();
+            }
+        }
+
 
         public void OnCombatEnd()
         {
             _playerTeamReferences.DeSpawn();
             _enemyTeamReferences.DeSpawn();
+            CallEndCombatEvents();
         }
 
         public virtual void OnCombatFinish(bool isPlayerWin)
@@ -85,7 +110,7 @@ namespace CombatSystem.Team
         {
             HandlePlayer();
             HandleEnemy();
-
+            CallPreStartEvents();
 
 
             void HandlePlayer()
@@ -106,17 +131,11 @@ namespace CombatSystem.Team
 
         private void DoCreateElement(CombatEntity entity, T element, int index, bool isPlayerElement)
         {
-            CallEvents(entity, element, index);
+            CallIterationEvents(entity, element, index);
             OnCreateElement(entity,element, index);
             OnCreateElement(entity, element, isPlayerElement);
         }
-        private void CallEvents(CombatEntity entity, T element, int index)
-        {
-            foreach (var listener in _listeners)
-            {
-                listener.OnElementCreated(element, entity, index);
-            }
-        }
+        
 
         protected virtual void OnCreateElement(CombatEntity entity, T element,
             int index)
@@ -277,8 +296,11 @@ namespace CombatSystem.Team
     /// Interfaces for being called during [<see cref="UTeamElementSpawner{T}.OnCombatPreStarts"/>]
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface ITeamElementSpawnListener<in T>
+    public interface ITeamElementSpawnListener<T> where T : UnityEngine.Object
     {
         void OnElementCreated(T element, CombatEntity entity, int index);
+        void OnAfterElementsCreated(UTeamElementSpawner<T> holder);
+        void OnCombatEnd();
+
     }
 }
