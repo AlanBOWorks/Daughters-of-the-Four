@@ -86,7 +86,7 @@ namespace CombatSystem.Skills
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             if (eventCallback)
-                eventsHolder.OnDamageDone(in performer, in target, in damage);
+                eventsHolder.OnDamageBeforeDone(in performer, in target, in damage);
 
 
             IDamageableStats<float> healthStats = target.Stats;

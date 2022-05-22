@@ -14,9 +14,10 @@ namespace CombatSystem.Stats
         /// It also triggers before of all events of [<see cref="IDamageDoneListener"/>]'s.
         /// <br></br><br></br>
         /// Note:<br></br>
-        /// This depends on the attacker's behalf; for knowing if damage had happen check: [<seealso cref="IDamageDoneListener.OnDamageReceive"/>]
+        /// This depends on the attacker's behalf; for knowing if damage
+        /// had happen check: [<seealso cref="IDamageDoneListener.OnDamageReceive"/>]
         /// </summary>
-        void OnDamageDone(in CombatEntity performer, in CombatEntity target, in float amount);
+        void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount);
 
         void OnRevive(in CombatEntity entity, bool isHealRevive);
 
@@ -34,7 +35,7 @@ namespace CombatSystem.Stats
         /// <br></br>- <see cref="OnMortalityLost"/>
         /// <br></br><br></br>
         /// Note:<br></br>
-        /// It the receiving end of the event [<seealso cref="IVitalityChangeListener.OnDamageDone"/>], a.k.a: depends if the
+        /// It the receiving end of the event [<seealso cref="IVitalityChangeListener.OnDamageBeforeDone"/>], a.k.a: depends if the
         /// damage had happen.
         /// </summary>
         void OnDamageReceive(in CombatEntity performer, in CombatEntity target);

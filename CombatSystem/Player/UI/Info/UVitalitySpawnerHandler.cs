@@ -6,8 +6,21 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UVitalityTrackerHandler : UTeamColumnElementSpawner<UVitalityInfo>, IDamageDoneListener
+    public class UVitalitySpawnerHandler : UTeamColumnElementSpawner<UVitalityInfo>,
+        IVitalityChangeListener,IDamageDoneListener, IRecoveryDoneListener
     {
+
+        public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+
+        }
+
+        public void OnRevive(in CombatEntity entity, bool isHealRevive)
+        {
+            var dictionary = GetDictionary();
+            dictionary[entity].HideKnockOut();
+        }
+
         public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
         { }
 
@@ -19,25 +32,56 @@ namespace CombatSystem.Player.UI
 
         public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
         {
-            UpdateTarget(in target);
+            UpdateTargetVitality(target);
         }
 
         public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
         {
-            UpdateTarget(in target);
+            var dictionary = GetDictionary();
+            dictionary[target].ShowKnockOut();
         }
 
-        private void UpdateTarget(in CombatEntity target)
+
+        public void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+        }
+
+        public void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+        }
+
+        public void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        {
+        }
+
+        public void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target)
+        {
+            UpdateTargetVitality(target);
+        }
+
+        public void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentTick, in int amount)
+        {
+            TickKnockOut(target, currentTick);
+        }
+
+
+        private void UpdateTargetVitality(CombatEntity target)
         {
             var dictionary = GetDictionary();
-            if (dictionary.ContainsKey(target))
-                dictionary[target].UpdateToCurrentStats();
+            dictionary[target].UpdateToCurrentStats();
+        }
+
+        private void TickKnockOut(CombatEntity target,int tick)
+        {
+            var dictionary = GetDictionary();
+            dictionary[target].UpdateKnockOut(tick);
         }
 
         protected override void OnCreateElement(CombatEntity entity, UVitalityInfo element, bool isPlayerElement)
         {
             UtilsVitalityInfosHandler.HandleHandler(in element, in entity, isPlayerElement);
         }
+
     }
 
     public static class UtilsVitalityInfosHandler
@@ -53,20 +97,6 @@ namespace CombatSystem.Player.UI
                 HandleActiveEnemy(in element, in entity);
             }
         }
-        public static void HandleHandler(in UVitalityInfo element, in CombatEntity entity, in TeamStructureIterationValues values)
-        {
-            bool isPlayerElement = values.IsPlayerElement;
-
-            if (isPlayerElement)
-            {
-                HandleActivePlayer(in element, in entity);
-            }
-            else
-            {
-                HandleActiveEnemy(in element, in entity);
-            }
-        }
-
         private static void HandleActivePlayer(in UVitalityInfo element, in CombatEntity entity)
         {
             if(element==null) return;

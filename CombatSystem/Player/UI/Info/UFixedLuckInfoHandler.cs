@@ -9,7 +9,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UFixedLuckInfoHandler : MonoBehaviour,
-        ITeamElementSpawnListener<UVitalityInfo>, //This is because I want to use UVitalityTrackerHandler's events
+        ITeamElementSpawnListener<UVitalityInfo>, //This is because I want to use UVitalitySpawnerHandler's events
         ITempoEntityStatesListener
     {
         [ShowInInspector,DisableInEditorMode]

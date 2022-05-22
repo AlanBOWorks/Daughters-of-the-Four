@@ -138,7 +138,7 @@ namespace CombatSystem.Stats
 
 
 
-        private const int ReviveTickIncrement = 8;
+        private const int ReviveTickIncrement = 1;
         private void IterateKnockOutCollections()
         {
             var eventHolder = CombatSystemSingleton.EventsHolder;

@@ -36,7 +36,7 @@ namespace CombatSystem._Core
             targetStats.CurrentShields = 0;
 
             CombatEntity performer = null;
-            CombatSystemSingleton.EventsHolder.OnDamageDone(performer,in member, 99999);
+            CombatSystemSingleton.EventsHolder.OnDamageBeforeDone(performer,in member, 99999);
             CombatSystemSingleton.EventsHolder.OnKnockOut(performer,in member);
         }
 

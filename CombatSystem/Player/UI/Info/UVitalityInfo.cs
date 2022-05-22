@@ -5,6 +5,7 @@ using CombatSystem.Stats;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
+using Utils;
 
 namespace CombatSystem.Player.UI
 {
@@ -19,13 +20,16 @@ namespace CombatSystem.Player.UI
         [SerializeField] private TextMeshProUGUI shieldsText;
         [SerializeField] private VitalityInfoHolder healthInfoHolder = new VitalityInfoHolder();
         [SerializeField] private VitalityInfoHolder mortalityInfoHolder = new VitalityInfoHolder();
-
+        [Title("KnockOut")]
+        [SerializeField] private VitalityInfoHolder knockOutInfoHolder = new VitalityInfoHolder();
+        [SerializeField] private GameObject knockOutHolder;
 
 
         private void Awake()
         {
             healthInfoHolder.Awake();
             mortalityInfoHolder.Awake();
+            knockOutInfoHolder.Awake();
         }
 
 
@@ -82,6 +86,7 @@ namespace CombatSystem.Player.UI
         {
             _currentStats = injection;
             UpdateToCurrentStats();
+            HideKnockOut();
         }
 
         private const string OnNullName = "-------";
@@ -99,16 +104,16 @@ namespace CombatSystem.Player.UI
         {
             var stats = _currentStats;
             float shields = stats.CurrentShields;
-            UpdateShields(in shields);
+            UpdateShields(shields);
 
             float currentHealth = stats.CurrentHealth;
             float maxHealth = UtilsStatsFormula.CalculateMaxHealth(stats);
-            UpdateHealth(in currentHealth, in maxHealth);
+            UpdateHealth(currentHealth, maxHealth);
 
 
             float currentMortality = stats.CurrentMortality;
             float maxMortality = UtilsStatsFormula.CalculateMaxMortality(stats);
-            UpdateMortality(in currentMortality, in maxMortality);
+            UpdateMortality(currentMortality, maxMortality);
         }
 
         public void ResetDisplayedValues()
@@ -118,20 +123,43 @@ namespace CombatSystem.Player.UI
             UpdateMortality(0,0);
         }
 
-        public void UpdateShields(in float amount)
+        public void UpdateShields(float amount)
         {
             shieldsText.text = amount.ToString(CultureInfo.InvariantCulture);
         }
 
-        public void UpdateHealth(in float amount, in float max)
+        public void UpdateHealth(float amount, float max)
         {
-            healthInfoHolder.UpdateHealth(in amount, in max);
+            healthInfoHolder.UpdateHealth(amount, max);
         }
 
-        public void UpdateMortality(in float amount, in float max)
+        public void UpdateMortality(float amount, float max)
         {
-            mortalityInfoHolder.UpdateHealth(in amount, in max);
+            mortalityInfoHolder.UpdateHealth(amount, max);
         }
+
+
+        public void ShowKnockOut()
+        {
+            if(!knockOutHolder) return;
+            knockOutHolder.SetActive(true);
+
+        }
+
+        public void HideKnockOut()
+        {
+            if(!knockOutHolder) return;
+            knockOutHolder.SetActive(false);
+        }
+        private const float KnockOutThreshold = KnockOutHandler.ReviveThreshold +1;
+        public void UpdateKnockOut(int currentTick)
+        {
+            if(!knockOutHolder) return;
+
+            float tick = KnockOutThreshold - currentTick;
+            knockOutInfoHolder.UpdateHealth(tick, KnockOutThreshold);
+        }
+
 
         [Serializable]
         private sealed class VitalityInfoHolder
@@ -139,27 +167,33 @@ namespace CombatSystem.Player.UI
             [SerializeField] private TextMeshProUGUI currentValueText;
             [SerializeField] private TextMeshProUGUI maxValueText;
             [SerializeField] private RectTransform percentBar;
+
             private float _barMaxWidth;
 
           
 
             public void Awake()
             {
+                if(!percentBar) return;
                 _barMaxWidth = percentBar.sizeDelta.x;
             }
 
-            public void UpdateHealth(in float amount, in float max)
+            public void UpdateHealth(float customAmountText, float amount, float max)
             {
                 float percent = amount / max;
-                UpdatePercentBar(in percent);
+                UpdatePercentBar(percent);
 
-                if(currentValueText)
-                    currentValueText.text = amount.ToString("####");
-                if(maxValueText)
+                if (currentValueText)
+                    currentValueText.text = customAmountText.ToString("####");
+                if (maxValueText)
                     maxValueText.text = max.ToString("####");
-
             }
-            private void UpdatePercentBar(in float percent)
+
+            public void UpdateHealth(float amount, float max)
+            {
+                UpdateHealth(amount,amount,max);
+            }
+            private void UpdatePercentBar(float percent)
             {
                 if(!percentBar) return;
 

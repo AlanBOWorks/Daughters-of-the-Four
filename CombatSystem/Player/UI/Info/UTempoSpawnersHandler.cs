@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UTempoTrackersHandler : UTeamColumnElementSpawner<UTempoTrackerHolder>,
+    public class UTempoSpawnersHandler : UTeamColumnElementSpawner<UTempoTrackerHolder>,
         ITempoEntityPercentListener, ITempoDedicatedEntityStatesListener
     {
         protected override void OnCreateElement(CombatEntity entity, UTempoTrackerHolder element, bool isPlayerElement)

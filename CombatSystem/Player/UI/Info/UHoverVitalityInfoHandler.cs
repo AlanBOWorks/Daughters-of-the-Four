@@ -68,7 +68,7 @@ namespace CombatSystem.Player.UI
             _infoDictionary[target].UpdateToCurrentStats();
         }
 
-        public void OnDamageDone(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
         {
         }
 

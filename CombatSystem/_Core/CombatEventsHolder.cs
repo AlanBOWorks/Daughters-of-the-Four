@@ -404,11 +404,11 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnDestroyEntity(in entity, in isPlayers);
         }
         
-        public void OnDamageDone(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            _eventsHolder.OnDamageDone(in performer, in target, in amount);
-            _playerCombatEvents.OnDamageDone(in performer, in target, in amount);
-            _enemyCombatEvents.OnDamageDone(in performer, in target, in amount);
+            _eventsHolder.OnDamageBeforeDone(in performer, in target, in amount);
+            _playerCombatEvents.OnDamageBeforeDone(in performer, in target, in amount);
+            _enemyCombatEvents.OnDamageBeforeDone(in performer, in target, in amount);
         }
 
         public void OnRevive(in CombatEntity entity, bool isHealRevive)
@@ -692,6 +692,8 @@ namespace CombatSystem._Core
 
             if(listener is IDamageDoneListener damageDoneListener)
                 _damageDoneListeners.Add(damageDoneListener);
+            if(listener is IRecoveryDoneListener recoveryDoneListener)
+                _recoveryDoneListeners.Add(recoveryDoneListener);
             if(listener is IVitalityChangeListener vitalityChangeListener)
                 _vitalityChangeListeners.Add(vitalityChangeListener);
 
@@ -719,6 +721,8 @@ namespace CombatSystem._Core
 
             if (listener is IDamageDoneListener damageDoneListener)
                 _damageDoneListeners.Remove(damageDoneListener);
+            if (listener is IRecoveryDoneListener recoveryDoneListener)
+                _recoveryDoneListeners.Remove(recoveryDoneListener);
             if (listener is IVitalityChangeListener vitalityChangeListener)
                 _vitalityChangeListeners.Add(vitalityChangeListener);
         }
@@ -804,11 +808,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnDamageDone(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
         {
             foreach (var listener in _vitalityChangeListeners)
             {
-                listener.OnDamageDone(in performer, in target, in amount);
+                listener.OnDamageBeforeDone(in performer, in target, in amount);
             }
         }
 
