@@ -57,6 +57,15 @@ namespace CombatSystem.Player.UI
             alphaGroup.alpha = 1;
         }
 
+        public void OnInstantiation()
+        {
+            ShowElement();
+        }
+
+        public void OnDestruction()
+        {
+        }
+
         private const float DisableAlphaValue = .3f;
         public void DisableElement()
         {

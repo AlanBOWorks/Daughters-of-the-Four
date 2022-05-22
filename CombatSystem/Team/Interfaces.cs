@@ -17,15 +17,15 @@ namespace CombatSystem.Team
         T EnemyTeamType { get; }
     }
 
-    public interface ITeamFullRolesStructureRead<out T> : ITeamFlexRoleStructureRead<T>, ITeamOffStructureRead<T> 
+    public interface ITeamFullStructureRead<out T> : ITeamFlexStructureRead<T>, ITeamOffStructureRead<T> 
     { }
 
-    public interface ITeamFlexRoleStructureInject<in T> : ITeamRoleStructureInject<T>
+    public interface ITeamFlexStructureInject<in T> : ITeamTrinityStructureInject<T>
     {
         T FlexType { set; }
 
     }
-    public interface ITeamFlexRoleStructureRead<out T> : ITeamRoleStructureRead<T>
+    public interface ITeamFlexStructureRead<out T> : ITeamTrinityStructureRead<T>
     {
         T FlexType { get; }
     }
@@ -35,13 +35,13 @@ namespace CombatSystem.Team
         T FlexLineType { get; }
     }
 
-    public interface ITeamRoleStructureRead<out T>
+    public interface ITeamTrinityStructureRead<out T>
     {
         T VanguardType { get; }
         T AttackerType { get; }
         T SupportType { get; }
     }
-    public interface ITeamRoleStructureInject<in T>
+    public interface ITeamTrinityStructureInject<in T>
     {
         T VanguardType { set; }
         T AttackerType { set; }

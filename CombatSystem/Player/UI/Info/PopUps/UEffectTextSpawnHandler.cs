@@ -16,7 +16,6 @@ namespace CombatSystem.Player.UI
         [SerializeField] private DamageNumber numberPrefab;
         [SerializeField, Min(0), SuffixLabel("s")] private float popUpFrequency = .2f;
 
-        private IReadOnlyDictionary<CombatEntity, UUIHoverEntity> _hoverDictionary;
         private Queue<KeyValuePair<RectTransform, string>> _popUpQueue;
 
         private void Awake()
@@ -25,10 +24,6 @@ namespace CombatSystem.Player.UI
             CombatSystemSingleton.EventsHolder.Subscribe(this);
         }
 
-        private void Start()
-        {
-            _hoverDictionary = PlayerCombatSingleton.HoverEntityElements;
-        }
 
         private void OnDestroy()
         {
@@ -79,9 +74,10 @@ namespace CombatSystem.Player.UI
 
         private void EnQueue(in CombatEntity target, in PerformEffectValues values)
         {
-            if (!_hoverDictionary.ContainsKey(target)) return;
+            var hoverDictionary = PlayerCombatSingleton.HoverEntityElements;
+            if (!hoverDictionary.ContainsKey(target)) return;
 
-            var hoverElement = _hoverDictionary[target];
+            var hoverElement = hoverDictionary[target];
             RectTransform targetTransform = (RectTransform) hoverElement.transform;
             string popUpText = LocalizeSkills.LocalizeEffect(in values);
 

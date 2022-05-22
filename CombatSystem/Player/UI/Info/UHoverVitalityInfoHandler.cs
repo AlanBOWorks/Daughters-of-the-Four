@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
+using CombatSystem.Team;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UHoverVitalityInfoHandler : UCombatEventsSubscriber, IUIHoverListener,
+    public class UHoverVitalityInfoHandler : UCombatEventsSubscriber, ITeamElementSpawnListener<UUIHoverEntity>,
          IDamageDoneListener, IVitalityChangeListener
     {
         private Dictionary<CombatEntity, UVitalityInfo> _infoDictionary;
@@ -22,7 +23,8 @@ namespace CombatSystem.Player.UI
             _infoDictionary = new Dictionary<CombatEntity, UVitalityInfo>();
         }
 
-        public void OnElementCreated(in UUIHoverEntity element, in CombatEntity entity)
+        public void OnElementCreated(UUIHoverEntity element, CombatEntity entity,
+            int index)
         {
             var healthInfo = element.GetHealthInfo();
             _infoDictionary.Add(entity,healthInfo);

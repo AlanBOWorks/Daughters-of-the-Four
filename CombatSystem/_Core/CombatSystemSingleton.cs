@@ -38,7 +38,7 @@ namespace CombatSystem._Core
             CombatAnimationHandler = new CombatAnimationHandler();
 
 
-            PrefabInstantiationHandler = new PrefabInstantiationHandler();
+            PrefabInstantiationHandler = new AssetPrefabInstantiationHandler();
             EntityPrefabsPoolHandler = new EntityPrefabsPoolHandler();
 
 
@@ -54,7 +54,7 @@ namespace CombatSystem._Core
         public static bool GetIsCombatActive() => AliveGameObjectReference;
 
 
-        internal static PrefabInstantiationHandler PrefabInstantiationHandler;
+        internal static AssetPrefabInstantiationHandler PrefabInstantiationHandler;
         [ShowInInspector]
         internal static EntityPrefabsPoolHandler EntityPrefabsPoolHandler;
 

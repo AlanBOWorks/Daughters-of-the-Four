@@ -31,12 +31,12 @@ namespace CombatSystem.Player.UI
             
         }
 
-        public void ShowElement()
+        public void OnInstantiation()
         {
             gameObject.SetActive(true);
         }
 
-        public void HideElement()
+        public void OnDestruction()
         {
             gameObject.SetActive(false);
         }

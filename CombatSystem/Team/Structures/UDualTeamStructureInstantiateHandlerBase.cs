@@ -113,35 +113,36 @@ namespace CombatSystem.Team
         protected override void IterationTeam(in CombatTeam team, bool isPlayerElement, in IEntityElementInstantiationListener<T>[] callListeners)
         {
             var mainMembers = GetStructureMembers(in team);
-            IterationValues.IsPlayerElement = isPlayerElement;
+            IterationValues.ResetState(isPlayerElement);
             var references = (isPlayerElement) ? playerTeamType : enemyTeamType;
             var elements = references.Members;
 
-            int notNullIndex = 0;
             int notFlexRoleThreshold = elements.Length;
             for (var i = 0; i < notFlexRoleThreshold; i++)
             {
                 var element = elements[i];
                 var member = mainMembers[i];
 
-                IterationValues.NotNullIndex = notNullIndex;
-                IterationValues.IterationIndex = i;
-
+               
 
                 foreach (var listener in callListeners)
                 {
                     listener.OnIterationCall(in element, in member, in IterationValues);
                 }
 
-                if (member == null) continue;
+                if (member == null)
+                {
+                    IterationValues.IncrementAsNull();
+                    continue;
+                }
 
                 ActiveElementsDictionary.Add(member, element);
 
 
-                notNullIndex++;
+                IterationValues.IncrementAsNotNull();
             }
 
-            references.activeCount = notNullIndex;
+            references.activeCount = IterationValues.NotNullIndex;
         }
         private IReadOnlyList<CombatEntity> GetStructureMembers(in CombatTeam team)
         {

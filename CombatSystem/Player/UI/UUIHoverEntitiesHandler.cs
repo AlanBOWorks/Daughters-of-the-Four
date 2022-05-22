@@ -8,33 +8,25 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UUIHoverEntitiesHandler : UOnEntityCreatedSpawnerWithListeners<UUIHoverEntity>
+    public class UUIHoverEntitiesHandler : UTeamElementSpawner<UUIHoverEntity>
     {
-        protected override void Awake()
+        private void Start()
         {
-            base.Awake();
-            PlayerCombatSingleton.Injection(base.ActiveElementsDictionary);
+            PlayerCombatSingleton.Injection(base.GetDictionary());
+            PlayerCombatSingleton.PlayerCombatEvents.Subscribe(this);
+        }
+        private void OnDestroy()
+        {
+            PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
         }
 
-        protected override IEntityExistenceElementListener<UUIHoverEntity>[] GetListeners()
-        {
-            return GetComponents<IUIHoverListener>();
-        }
 
-        protected override void OnElementCreated(in UUIHoverEntity element, in CombatEntity entity)
+
+        protected override void OnCreateElement(CombatEntity entity, UUIHoverEntity element,
+            int index)
         {
             element.Show();
-            base.OnElementCreated(in element, in entity);
+            element.EntityInjection(in entity);
         }
-
-    }
-
-    /// <summary>
-    /// An [<seealso cref="IEntityExistenceElementListener{T}"/>] where T: [<see cref="UUIHoverEntity"/>];<br></br>
-    /// Becomes a listener for [<see cref="UUIHoverEntitiesHandler"/>] if in same component level.
-    /// </summary>
-    public interface IUIHoverListener : IEntityExistenceElementListener<UUIHoverEntity>
-    {
-       
     }
 }

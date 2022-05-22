@@ -166,7 +166,7 @@ namespace CombatSystem.Team
             };
         }
 
-        public static T GetElement<T>(EnumTeam.Role role, ITeamFlexRoleStructureRead<T> structure)
+        public static T GetElement<T>(EnumTeam.Role role, ITeamFlexStructureRead<T> structure)
         {
             return role switch
             {
@@ -216,7 +216,7 @@ namespace CombatSystem.Team
         }
 
 
-        public static T GetElement<T>(EnumTeam.ActiveRole role, ITeamFullRolesStructureRead<T> structure)
+        public static T GetElement<T>(EnumTeam.ActiveRole role, ITeamFullStructureRead<T> structure)
         {
             switch (role)
             {
@@ -254,7 +254,7 @@ namespace CombatSystem.Team
 
 
 
-        public static T GetElement<T>(int index, ITeamFullRolesStructureRead<T> structure)
+        public static T GetElement<T>(int index, ITeamFullStructureRead<T> structure)
         {
             return index switch
             {
@@ -320,7 +320,7 @@ namespace CombatSystem.Team
         }
 
 
-        public static T SafeGetElement<T>(int index, ITeamFullRolesStructureRead<T> structure)
+        public static T SafeGetElement<T>(int index, ITeamFullStructureRead<T> structure)
         {
             return index switch
             {
@@ -406,7 +406,13 @@ namespace CombatSystem.Team
         }
 
 
-        public static IEnumerable<T> GetEnumerable<T>(TeamBasicGroupStructure<T> structure)
+        public static IEnumerable<T> GetEnumerable<T>(ITeamTrinityStructureRead<T> structure)
+        {
+            yield return structure.VanguardType;
+            yield return structure.AttackerType;
+            yield return structure.SupportType;
+        }
+        public static IEnumerable<T> GetEnumerable<T>(ITeamPositionStructureRead<T> structure)
         {
             yield return structure.FrontLineType;
             yield return structure.MidLineType;
@@ -414,7 +420,7 @@ namespace CombatSystem.Team
         }
 
         public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
-            TeamBasicGroupStructure<TKey> keys, TeamBasicGroupStructure<TValue> values)
+            ITeamPositionStructureRead<TKey> keys, ITeamPositionStructureRead<TValue> values)
         {
             yield return new KeyValuePair<TKey, TValue>(keys.FrontLineType,values.FrontLineType);
             yield return new KeyValuePair<TKey, TValue>(keys.MidLineType,values.MidLineType);
@@ -428,6 +434,15 @@ namespace CombatSystem.Team
             yield return structure.BackLineType;
             yield return structure.FlexLineType;
         }
+
+        public static IEnumerable<T> GetEnumerable<T>(ITeamFlexStructureRead<T> structure)
+        {
+            yield return structure.VanguardType;
+            yield return structure.AttackerType;
+            yield return structure.SupportType;
+            yield return structure.FlexType;
+        }
+
         public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
             ITeamFlexPositionStructureRead<TKey> keys, ITeamFlexPositionStructureRead<TValue> values)
         {
@@ -440,6 +455,18 @@ namespace CombatSystem.Team
 
         public static IEnumerable<T> GetEnumerable<T>(ITeamOffStructureRead<T> structure)
         {
+            yield return structure.SecondaryVanguardElement;
+            yield return structure.SecondaryAttackerElement;
+            yield return structure.SecondarySupportElement;
+            yield return structure.SecondaryFlexElement;
+            yield return structure.ThirdVanguardElement;
+            yield return structure.ThirdAttackerElement;
+            yield return structure.ThirdSupportElement;
+            yield return structure.ThirdFlexElement;
+        }
+        public static IEnumerable<T> GetOffElementWithFlex<T>(ITeamFullStructureRead<T> structure)
+        {
+            yield return structure.FlexType;
             yield return structure.SecondaryVanguardElement;
             yield return structure.SecondaryAttackerElement;
             yield return structure.SecondarySupportElement;
@@ -463,7 +490,7 @@ namespace CombatSystem.Team
             yield return new KeyValuePair<TKey, TValue>(keys.ThirdFlexElement, values.ThirdFlexElement);
         }
 
-        public static IEnumerable<T> GetEnumerable<T>(ITeamFullRolesStructureRead<T> structure)
+        public static IEnumerable<T> GetEnumerable<T>(ITeamFullStructureRead<T> structure)
         {
             yield return structure.VanguardType;
             yield return structure.AttackerType;
@@ -479,7 +506,7 @@ namespace CombatSystem.Team
             yield return structure.ThirdFlexElement;
         }
         public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
-            ITeamFullRolesStructureRead<TKey> keys, ITeamFullRolesStructureRead<TValue> values)
+            ITeamFullStructureRead<TKey> keys, ITeamFullStructureRead<TValue> values)
         {
             yield return new KeyValuePair<TKey, TValue>(keys.VanguardType, values.VanguardType);
             yield return new KeyValuePair<TKey, TValue>(keys.AttackerType, values.AttackerType);
@@ -496,7 +523,7 @@ namespace CombatSystem.Team
         }
 
         public static IEnumerable<KeyValuePair<TKey, TValue>> GetSafeEnumerable<TKey, TValue>(
-            ITeamFullRolesStructureRead<TKey> keys, ITeamFullRolesStructureRead<TValue> values)
+            ITeamFullStructureRead<TKey> keys, ITeamFullStructureRead<TValue> values)
         {
             yield return new KeyValuePair<TKey, TValue>(keys.VanguardType, values.VanguardType);
             yield return new KeyValuePair<TKey, TValue>(keys.AttackerType, values.AttackerType);
@@ -516,7 +543,7 @@ namespace CombatSystem.Team
 
 
         public static IEnumerable<KeyValuePair<TKey, TValue>> GetSafeUnityEnumerable<TKey, TValue>(
-            ITeamFullRolesStructureRead<TKey> keys, ITeamFullRolesStructureRead<TValue> values)
+            ITeamFullStructureRead<TKey> keys, ITeamFullStructureRead<TValue> values)
         where TValue : UnityEngine.Object
         {
             yield return new KeyValuePair<TKey, TValue>(keys.VanguardType, values.VanguardType);
@@ -545,8 +572,6 @@ namespace CombatSystem.Team
                 values.ThirdFlexElement ? values.ThirdFlexElement : values.FlexType);
 
         }
-
-
     }
 
     public static class UtilsCombatTeam

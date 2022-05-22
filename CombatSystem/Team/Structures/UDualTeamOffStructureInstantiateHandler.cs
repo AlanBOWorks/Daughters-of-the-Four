@@ -40,20 +40,16 @@ namespace CombatSystem.Team
 
         protected override void IterationTeam(in CombatTeam team, bool isPlayerElement, in IEntityElementInstantiationListener<T>[] callListeners)
         {
-            IterationValues.IsPlayerElement = isPlayerElement;
+            IterationValues.ResetState(isPlayerElement);
             var references = (isPlayerElement) ? playerTeamType : enemyTeamType;
             ITeamOffStructureRead<CombatEntity> offMembers = team.GetOffMembersStructure();
 
             var enumerable = UtilsTeam.GetEnumerable(offMembers, references);
-            int notNullIndex = 0;
-            int iterationIndex = 0;
 
             foreach (var pair in enumerable)
             {
                 var member = pair.Key;
                 var element = pair.Value;
-                IterationValues.NotNullIndex = notNullIndex;
-                IterationValues.IterationIndex = iterationIndex;
 
                 foreach (var listener in callListeners)
                 {
@@ -61,15 +57,19 @@ namespace CombatSystem.Team
                 }
 
 
-                iterationIndex++;
-                if (member == null) continue;
-                notNullIndex++;
+                if (member == null)
+                {
+                    IterationValues.IncrementAsNull();
+                    continue;
+                }
+
+                IterationValues.IncrementAsNotNull();
 
                 ActiveElementsDictionary.Add(member, element);
             }
 
 
-            references.activeCount = notNullIndex;
+            references.activeCount = IterationValues.NotNullIndex;
         }
 
 

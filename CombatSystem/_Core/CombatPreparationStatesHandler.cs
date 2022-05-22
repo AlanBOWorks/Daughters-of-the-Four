@@ -87,6 +87,10 @@ namespace CombatSystem._Core
 
     }
 
+    /// <summary>
+    /// The very first event call on combat preparation;<br></br>
+    /// [<seealso cref="ICombatStatesListener"/>] is called after this
+    /// </summary>
     public interface ICombatPreparationListener : ICombatEventListener
     {
         void OnCombatPrepares(
@@ -95,6 +99,10 @@ namespace CombatSystem._Core
             CombatTeam enemyTeam);
     }
 
+    /// <summary>
+    /// The second step of combat preparation;<br></br>
+    /// [<seealso cref="ICombatPreparationListener"/>] is called before this
+    /// </summary>
     public interface ICombatStatesListener : ICombatTerminationListener
     {
         /// <summary>

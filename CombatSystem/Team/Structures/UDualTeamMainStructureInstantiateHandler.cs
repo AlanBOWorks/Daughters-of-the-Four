@@ -10,7 +10,7 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public abstract class UDualTeamMainStructureInstantiateHandler<T> : UDualTeamStructureInstantiateHandlerBase<T>,
-        IOppositionTeamStructureRead<ITeamFlexRoleStructureRead<T>>
+        IOppositionTeamStructureRead<ITeamFlexStructureRead<T>>
       
         where T : MonoBehaviour
     {
@@ -41,23 +41,21 @@ namespace CombatSystem.Team
         protected TeamMainStructureInstantiateHandler<T> GetPlayerHandler() => playerTeamType;
         protected TeamMainStructureInstantiateHandler<T> GetEnemyHandler() => enemyTeamType;
 
-        public ITeamFlexRoleStructureRead<T> PlayerTeamType => playerTeamType;
-        public ITeamFlexRoleStructureRead<T> EnemyTeamType => enemyTeamType;
+        public ITeamFlexStructureRead<T> PlayerTeamType => playerTeamType;
+        public ITeamFlexStructureRead<T> EnemyTeamType => enemyTeamType;
         
         protected override void IterationTeam(in CombatTeam team, bool isPlayerElement, in IEntityElementInstantiationListener<T>[] callListeners)
         {
             var mainMembers = GetStructureMembers(in team);
-            IterationValues.IsPlayerElement = isPlayerElement;
+            IterationValues.ResetState(isPlayerElement);
             var references = (isPlayerElement) ? playerTeamType : enemyTeamType;
 
-            int notNullIndex = 0;
             for (var i = 0; i < mainMembers.Count; i++)
             {
                 var element = references.Members[i];
                 var member = mainMembers[i];
 
-                IterationValues.NotNullIndex = notNullIndex;
-                IterationValues.IterationIndex = i;
+                
 
 
                 foreach (var listener in callListeners)
@@ -65,15 +63,19 @@ namespace CombatSystem.Team
                     listener.OnIterationCall(in element, in member, in IterationValues);
                 }
 
-                if (member == null) continue;
+                if (member == null)
+                {
+                    IterationValues.IncrementAsNull();
+                    continue;
+                }
 
                 ActiveElementsDictionary.Add(member, element);
 
 
-                notNullIndex++;
+                IterationValues.IncrementAsNotNull();
             }
 
-            references.activeCount = notNullIndex;
+            references.activeCount = IterationValues.NotNullIndex;
         }
       
 

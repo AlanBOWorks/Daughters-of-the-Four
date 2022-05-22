@@ -1,19 +1,17 @@
+using System;
 using CombatSystem.Entity;
 using CombatSystem.Player;
+using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Utils
 {
-    public class USandBox : MonoBehaviour
+    public class USandBox : UTeamElementSpawner<GameObject>
     {
-        [SerializeReference] private SPlayerPreparationEntity[] serializedReference;
-
-        [Button]
-        private void TrySerialize(SPlayerPresetTeam preset)
+        protected override void OnCreateElement(CombatEntity entity, GameObject element,
+            int index)
         {
-            serializedReference = preset.GetPresetCharacters();
         }
     }
-
 }

@@ -11,7 +11,7 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public sealed class CombatTeam : 
-        ITeamFullRolesStructureRead<CombatEntity>,
+        ITeamFullStructureRead<CombatEntity>,
         ITeamFlexPositionStructureRead<IEnumerable<CombatEntity>>,
         IReadOnlyList<CombatEntity>
     {

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public class TeamOffGroupStructure<T> : IEnumerable<T>, 
-        ITeamFlexRoleStructureRead<T[]>, ITeamFlexPositionStructureRead<T[]>, ITeamOffStructureRead<T>
+        ITeamFlexStructureRead<T[]>, ITeamFlexPositionStructureRead<T[]>, ITeamOffStructureRead<T>
     {
         public TeamOffGroupStructure() : this(EnumTeam.OffRoleTypesLength)
         {

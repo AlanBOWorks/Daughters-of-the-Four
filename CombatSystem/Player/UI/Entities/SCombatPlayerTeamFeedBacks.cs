@@ -18,26 +18,26 @@ namespace CombatSystem.Player.UI
 
     [Serializable]
     public sealed class CombatPlayerTeamFeedBack : FlexPositionMainGroupClass<CombatPlayerRoleFeedBack>,
-        ITeamFlexRoleStructureRead<string>, ITeamFlexRoleStructureRead<Sprite>, ITeamFlexRoleStructureRead<Color>
+        ITeamFlexStructureRead<string>, ITeamFlexStructureRead<Sprite>, ITeamFlexStructureRead<Color>
     {
         
 
-        string ITeamRoleStructureRead<string>.VanguardType => VanguardType.GetName();
-        Sprite ITeamRoleStructureRead<Sprite>.VanguardType => VanguardType.GetIcon();
-        Color ITeamRoleStructureRead<Color>.VanguardType => VanguardType.GetColor();
+        string ITeamTrinityStructureRead<string>.VanguardType => VanguardType.GetName();
+        Sprite ITeamTrinityStructureRead<Sprite>.VanguardType => VanguardType.GetIcon();
+        Color ITeamTrinityStructureRead<Color>.VanguardType => VanguardType.GetColor();
 
-        string ITeamRoleStructureRead<string>.AttackerType => AttackerType.GetName();
-        Sprite ITeamRoleStructureRead<Sprite>.AttackerType => AttackerType.GetIcon();
-        Color ITeamRoleStructureRead<Color>.AttackerType => AttackerType.GetColor();
+        string ITeamTrinityStructureRead<string>.AttackerType => AttackerType.GetName();
+        Sprite ITeamTrinityStructureRead<Sprite>.AttackerType => AttackerType.GetIcon();
+        Color ITeamTrinityStructureRead<Color>.AttackerType => AttackerType.GetColor();
 
-        string ITeamRoleStructureRead<string>.SupportType => SupportType.GetName();
-        Sprite ITeamRoleStructureRead<Sprite>.SupportType => SupportType.GetIcon();
-        Color ITeamRoleStructureRead<Color>.SupportType => SupportType.GetColor();
+        string ITeamTrinityStructureRead<string>.SupportType => SupportType.GetName();
+        Sprite ITeamTrinityStructureRead<Sprite>.SupportType => SupportType.GetIcon();
+        Color ITeamTrinityStructureRead<Color>.SupportType => SupportType.GetColor();
 
 
-        string ITeamFlexRoleStructureRead<string>.FlexType => FlexType.GetName();
-        Sprite ITeamFlexRoleStructureRead<Sprite>.FlexType => FlexType.GetIcon();
-        Color ITeamFlexRoleStructureRead<Color>.FlexType => FlexType.GetColor();
+        string ITeamFlexStructureRead<string>.FlexType => FlexType.GetName();
+        Sprite ITeamFlexStructureRead<Sprite>.FlexType => FlexType.GetIcon();
+        Color ITeamFlexStructureRead<Color>.FlexType => FlexType.GetColor();
 
 
     }

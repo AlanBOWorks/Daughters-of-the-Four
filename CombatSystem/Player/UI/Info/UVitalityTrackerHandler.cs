@@ -6,11 +6,8 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UDualMainVitalityInfosHandler : UDualTeamMainStructureInstantiateHandler<UVitalityInfo>, IDamageDoneListener
+    public class UVitalityTrackerHandler : UTeamColumnElementSpawner<UVitalityInfo>, IDamageDoneListener
     {
-        [Title("OffRole - References")]
-        [SerializeField] private RectTransform offRolesParent;
-
         public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
         { }
 
@@ -32,57 +29,27 @@ namespace CombatSystem.Player.UI
 
         private void UpdateTarget(in CombatEntity target)
         {
-            if (GetActiveElementsDictionary().ContainsKey(target))
-                GetActiveElementsDictionary()[target].UpdateToCurrentStats();
+            var dictionary = GetDictionary();
+            if (dictionary.ContainsKey(target))
+                dictionary[target].UpdateToCurrentStats();
         }
 
-
-        public override void OnIterationCall(in UVitalityInfo element, in CombatEntity entity, in TeamStructureIterationValues values)
+        protected override void OnCreateElement(CombatEntity entity, UVitalityInfo element, bool isPlayerElement)
         {
-            UtilsVitalityInfosHandler.HandleHandler(in element, in entity, in values, out var repositionIndex);
-            RepositionElementByIndex(in element, in repositionIndex);
-        }
-
-        public override void OnFinishPreStarts()
-        {
-            int offRolesIndex = GetEnemyHandler().activeCount +1; //Since the last position is already used > +1 for put this below
-            RepositionElementByIndex(in offRolesParent, offRolesIndex);
-        }
-
-        private const float ElementMarginTop = 8;
-        private static void RepositionElementByIndex(in UVitalityInfo element, in int index)
-        {
-            var rectTransform = element.GetComponent<RectTransform>();
-            RepositionElementByIndex(in rectTransform, in index);
-        }
-
-        private const float RectHeight = 50;
-        private static void RepositionElementByIndex(in RectTransform element, in int index)
-        {
-            var rectTransform = element.GetComponent<RectTransform>();
-            var position = rectTransform.localPosition;
-
-            position.y = -(RectHeight + ElementMarginTop) * index;
-
-            rectTransform.localPosition = position;
+            UtilsVitalityInfosHandler.HandleHandler(in element, in entity, isPlayerElement);
         }
     }
 
     public static class UtilsVitalityInfosHandler
     {
-        public static void HandleHandler(in UVitalityInfo element, in CombatEntity entity, in TeamStructureIterationValues values,
-            out int repositionIndex)
+        public static void HandleHandler(in UVitalityInfo element, in CombatEntity entity, bool isPlayerElement)
         {
-            bool isPlayerElement = values.IsPlayerElement;
-
             if (isPlayerElement)
             {
-                repositionIndex = values.IterationIndex;
                 HandleActivePlayer(in element, in entity);
             }
             else
             {
-                repositionIndex = values.NotNullIndex;
                 HandleActiveEnemy(in element, in entity);
             }
         }

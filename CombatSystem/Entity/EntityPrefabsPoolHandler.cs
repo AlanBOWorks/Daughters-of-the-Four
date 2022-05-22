@@ -7,7 +7,7 @@ using Object = UnityEngine.Object;
 
 namespace CombatSystem.Entity
 {
-    public sealed class EntityPrefabsPoolHandler : IOppositionTeamStructureRead<ITeamFullRolesStructureRead<Transform>>,
+    public sealed class EntityPrefabsPoolHandler : IOppositionTeamStructureRead<ITeamFullStructureRead<Transform>>,
         ICombatStatesListener
     {
         private readonly PlayerPrefabsHolder _playerTeamType;
@@ -20,9 +20,9 @@ namespace CombatSystem.Entity
         }
 
         [ShowInInspector,HorizontalGroup()]
-        public ITeamFullRolesStructureRead<Transform> PlayerTeamType => _playerTeamType;
+        public ITeamFullStructureRead<Transform> PlayerTeamType => _playerTeamType;
         [ShowInInspector,HorizontalGroup()]
-        public ITeamFullRolesStructureRead<Transform> EnemyTeamType => _enemyTeamType;
+        public ITeamFullStructureRead<Transform> EnemyTeamType => _enemyTeamType;
 
 
 
@@ -30,7 +30,7 @@ namespace CombatSystem.Entity
         {
             private bool _instantiated;
 
-            public override void PoolMembers(CombatTeam team, ITeamFullRolesStructureRead<Transform> positions)
+            public override void PoolMembers(CombatTeam team, ITeamFullStructureRead<Transform> positions)
             {
                 if(!_instantiated)
                 {
@@ -87,7 +87,7 @@ namespace CombatSystem.Entity
         private class PrefabsHolder : TeamFullGroupStructure<Transform>
         {
 
-            public virtual void PoolMembers(CombatTeam team, ITeamFullRolesStructureRead<Transform> positions)
+            public virtual void PoolMembers(CombatTeam team, ITeamFullStructureRead<Transform> positions)
             {
                 var keyValuePairs = UtilsTeam.GetEnumerable(team, positions);
                 int index = 0;

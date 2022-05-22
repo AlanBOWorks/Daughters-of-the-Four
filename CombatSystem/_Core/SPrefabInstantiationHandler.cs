@@ -47,7 +47,7 @@ namespace CombatSystem._Core
         }
     }
 
-    internal sealed class PrefabInstantiationHandler 
+    internal sealed class AssetPrefabInstantiationHandler 
     {
         public void FirstInstantiation()
         {

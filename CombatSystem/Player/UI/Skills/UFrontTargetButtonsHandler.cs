@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UFrontTargetButtonsHandler : MonoBehaviour, IUIHoverListener, 
+    public class UFrontTargetButtonsHandler : MonoBehaviour, ITeamElementSpawnListener<UUIHoverEntity>, 
         IPlayerEntityListener,ITempoTeamStatesListener,
         ISkillSelectionListener, ISkillPointerListener,
         ITargetSelectionListener, ITargetPointerListener
@@ -36,14 +36,16 @@ namespace CombatSystem.Player.UI
             playerEventsHolder.ManualSubscribe(this as ISkillPointerListener);
         }
 
-        public void OnElementCreated(in UUIHoverEntity element, in CombatEntity entity)
+        public void OnElementCreated(UUIHoverEntity element, CombatEntity entity,
+            int index)
         {
             var targetButton = element.GetTargetButton();
-            _buttonsDictionary.Add(entity,targetButton);
+            _buttonsDictionary.Add(entity, targetButton);
             targetButton.Inject(entity);
             targetButton.Inject(this);
             targetButton.HideInstantly();
         }
+
 
         public void ClearEntities()
         {
@@ -181,5 +183,6 @@ namespace CombatSystem.Player.UI
                 ShowTargets(in _currentSkill);
 
         }
+
     }
 }

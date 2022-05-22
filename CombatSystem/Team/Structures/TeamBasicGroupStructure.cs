@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public class TeamBasicGroupStructure<T> : ITeamRoleStructureRead<T>, ITeamPositionStructureRead<T>
+    public class TeamBasicGroupStructure<T> : ITeamTrinityStructureRead<T>, ITeamPositionStructureRead<T>
     {
         public TeamBasicGroupStructure() : this(new T[EnumTeam.BasicPositioningAmount])
         { }
@@ -74,7 +74,7 @@ namespace CombatSystem.Team
     }
 
 
-    public class FlexPositionMainGroupStructure<T> : TeamBasicGroupStructure<T>, ITeamFlexRoleStructureRead<T>, ITeamFlexPositionStructureRead<T>
+    public class FlexPositionMainGroupStructure<T> : TeamBasicGroupStructure<T>, ITeamFlexStructureRead<T>, ITeamFlexPositionStructureRead<T>
     {
         public FlexPositionMainGroupStructure() : base(new T[EnumTeam.PositioningAmount])
         { }
@@ -97,7 +97,7 @@ namespace CombatSystem.Team
     }
 
     [Serializable]
-    public class FlexPositionMainGroupClass<T> : ITeamFlexRoleStructureRead<T>, ITeamFlexPositionStructureRead<T> where T : new()
+    public class FlexPositionMainGroupClass<T> : ITeamFlexStructureRead<T>, ITeamFlexPositionStructureRead<T> where T : new()
     {
         [SerializeField] private T frontLineType = new T();
         [SerializeField] private T midLineType = new T();

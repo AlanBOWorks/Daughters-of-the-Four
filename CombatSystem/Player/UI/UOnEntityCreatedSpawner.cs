@@ -166,7 +166,7 @@ namespace CombatSystem.Player.UI
             {
                 T element = Instantiate(elementEntityPrefab, instantiationParent);
                 element.EntityInjection(entity);
-                element.ShowElement();
+                element.OnInstantiation();
                 ActiveCount++;
 
 
@@ -179,6 +179,7 @@ namespace CombatSystem.Player.UI
 
             public void PushElement(in T element)
             {
+                element.OnDestruction();
                 Destroy(element.gameObject);
                 ActiveCount--;
             }
@@ -236,8 +237,8 @@ namespace CombatSystem.Player.UI
     {
         void EntityInjection(in CombatEntity entity);
         void OnPreStartCombat();
-        void ShowElement();
-        void HideElement();
+        void OnInstantiation();
+        void OnDestruction();
     }
 
 

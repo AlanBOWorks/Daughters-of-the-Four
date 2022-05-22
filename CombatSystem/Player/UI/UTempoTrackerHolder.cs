@@ -89,6 +89,15 @@ namespace CombatSystem.Player.UI
 
         }
 
+        public void OnInstantiation()
+        {
+            ShowElement();
+        }
+
+        public void OnDestruction()
+        {
+        }
+
         private const float AnimationTimeOffset = .02f;
         private const float AnimationDuration = TempoTicker.TickPeriodSeconds - AnimationTimeOffset;
         public void TickTempo(in float currentTickInitiative, in float percentInitiative)

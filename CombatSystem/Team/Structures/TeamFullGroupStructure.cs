@@ -7,17 +7,17 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public class TeamFullGroupStructure<T> : TeamOffGroupStructure<T>,
-        ITeamFullRolesStructureRead<T>, ITeamFlexPositionStructureRead<T>,
-        ITeamFlexRoleStructureInject<T>
+        ITeamFullStructureRead<T>, ITeamFlexPositionStructureRead<T>,
+        ITeamFlexStructureInject<T>
     {
         public TeamFullGroupStructure() : base(EnumTeam.TeamAlimentRolesLength)
         { }
 
-        T ITeamRoleStructureRead<T>.VanguardType => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+        T ITeamTrinityStructureRead<T>.VanguardType => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex];
        
-        T ITeamRoleStructureRead<T>.AttackerType => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-        T ITeamRoleStructureRead<T>.SupportType => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-        T ITeamFlexRoleStructureRead<T>.FlexType => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+        T ITeamTrinityStructureRead<T>.AttackerType => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+        T ITeamTrinityStructureRead<T>.SupportType => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex];
+        T ITeamFlexStructureRead<T>.FlexType => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex];
 
         T ITeamPositionStructureRead<T>.FrontLineType => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex];
         T ITeamPositionStructureRead<T>.MidLineType => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
@@ -71,7 +71,7 @@ namespace CombatSystem.Team
 
     [Serializable]
     public abstract class UTeamFullGroupStructure<T> : MonoBehaviour,
-        ITeamFullRolesStructureRead<T>,
+        ITeamFullStructureRead<T>,
         ITeamFlexPositionStructureRead<T[]>
     {
         [SerializeField, HorizontalGroup("FrontLiners")] private RoleAliment frontAliment = new RoleAliment();
