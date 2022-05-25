@@ -53,7 +53,7 @@ namespace CombatSystem.Player.UI
         }
         private void OnEnable()
         {
-            _playerCamera = PlayerCombatSingleton.CombatMainCamera;
+            _playerCamera = PlayerCombatSingleton.CamerasHolder.GetMainCameraType;
         }
 
         private void LateUpdate()

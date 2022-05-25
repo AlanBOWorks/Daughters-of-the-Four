@@ -99,5 +99,6 @@ namespace CombatSystem.Player.Events
     {
         void OnSwitchMainCamera(in Camera combatCamera);
         void OnSwitchBackCamera(in Camera combatBackCamera);
+        void OnSwitchFrontCamera(in Camera combatFrontCamera);
     }
 }

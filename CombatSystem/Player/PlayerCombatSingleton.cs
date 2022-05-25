@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player
 {
-    public sealed class PlayerCombatSingleton 
+    public sealed class PlayerCombatSingleton : IPlayerCameraStructureRead<Camera>
     {
         public static readonly PlayerCombatSingleton Instance = new PlayerCombatSingleton();
 
@@ -72,25 +72,21 @@ namespace CombatSystem.Player
 
         [Title("Mono References")]
         [ShowInInspector]
-        public static Camera CombatMainCamera { get; private set; }
+        public static IPlayerCameraStructureRead<Camera> CamerasHolder { get; private set; }
 
-        public static Camera BackLayerCamera { get; private set; }
+
+        public Camera GetMainCameraType => CamerasHolder.GetMainCameraType;
+        public Camera GetBackCameraType => CamerasHolder.GetBackCameraType;
+        public Camera GetFrontCameraType => CamerasHolder.GetFrontCameraType;
+        public Camera GetCharacterCameraType => CamerasHolder.GetCharacterCameraType;
 
 
         [Title("Elements")]
         public static IReadOnlyDictionary<CombatEntity,UUIHoverEntity> HoverEntityElements { get; private set; }
 
 
-        public static void InjectCombatMainCamera(in Camera camera)
-        {
-            CombatMainCamera = camera;
-            PlayerCombatEvents.OnSwitchMainCamera(in camera);
-        }
-        public static void InjectCombatBackCamera(in Camera camera)
-        {
-            BackLayerCamera = camera;
-            PlayerCombatEvents.OnSwitchBackCamera(in camera);
-        }
+        public static void Injection(IPlayerCameraStructureRead<Camera> holder) => CamerasHolder = holder;
+       
         public static void Injection(IReadOnlyDictionary<CombatEntity, UUIHoverEntity> dictionary)
             => HoverEntityElements = dictionary;
 
@@ -122,6 +118,7 @@ namespace CombatSystem.Player
                 _feedBacks = PlayerCombatUserInterfaceSingleton.CombatTeemFeedBacks;
             }
         }
+
     }
 
 }

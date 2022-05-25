@@ -18,7 +18,9 @@ namespace CombatSystem.Player.UI
         ISkillSelectionListener, ISkillPointerListener
     {
         [SerializeField] private TextMeshProUGUI actionsLimitText;
-        [SerializeField] private TextMeshProUGUI actionsUsedText;
+        [SerializeField] private TextMeshProUGUI actionsLimitTextBackground;
+        [SerializeField] private TextMeshProUGUI actionsUsedFirstDigit;
+        [SerializeField] private TextMeshProUGUI actionsUsedSecondDigit;
         [SerializeField] private TextMeshProUGUI actionsTooltipText;
 
         [ShowInInspector]
@@ -59,14 +61,21 @@ namespace CombatSystem.Player.UI
         private void UpdateLimitText()
         {
             var actionsLimitValue = UtilsStatsFormula.CalculateActionsAmount(_currentEntity.Stats);
-            actionsLimitText.text = actionsLimitValue.ToString("00");
+            string limitText = actionsLimitValue.ToString("00");
+            actionsLimitText.text = limitText;
+            actionsLimitTextBackground.text = limitText;
         }
 
         private float _usedActions;
         private void UpdateUsedActionsText()
         {
             _usedActions = _currentEntity.Stats.UsedActions;
-            actionsUsedText.text = _usedActions.ToString("00");
+            string fullText = _usedActions.ToString("00");
+            string firstDigit = fullText[^1..];
+            string secondDigit = fullText.Substring(0,1);
+
+            actionsUsedFirstDigit.text = firstDigit;
+            actionsUsedSecondDigit.text = secondDigit;
         }
 
         private void ToggleActiveToolTip(bool enabledGO)

@@ -189,6 +189,14 @@ namespace CombatSystem.Player
             }
         }
 
+        public void OnSwitchFrontCamera(in Camera combatFrontCamera)
+        {
+            foreach (var listener in _cameraHolderListeners)
+            {
+                listener.OnSwitchFrontCamera(in combatFrontCamera);
+            }
+        }
+
         public void OnPerformerSwitch(in CombatEntity performer)
         {
             foreach (var listener in _playerEntityListeners)
