@@ -6,7 +6,7 @@ namespace CombatSystem.Player.UI
 {
     public class UCombatPlayerTeamFeedBacksInjector : MonoBehaviour
     {
-        [SerializeField] private SCombatPlayerTeamFeedBacks defaultAsset;
+        [SerializeField] private SCombatPlayerTeamFeedBacksTheme defaultAsset;
 
         private void Awake()
         {

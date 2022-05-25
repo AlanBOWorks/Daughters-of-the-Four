@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    [CreateAssetMenu(fileName = "N [CombatTeamFeedBacks]",
-        menuName = "Combat/UI/FeedBacks")]
-    public sealed class SCombatPlayerTeamFeedBacks : ScriptableObject, IOppositionTeamStructureRead<CombatPlayerTeamFeedBack>
+    [CreateAssetMenu(fileName = "N [CombatTeamFeedBacksThemes]",
+        menuName = "Combat/UI/FeedBacks [Themes]")]
+    public sealed class SCombatPlayerTeamFeedBacksTheme : ScriptableObject, IOppositionTeamStructureRead<CombatPlayerTeamFeedBack>
     {
         [SerializeField,HorizontalGroup()] private CombatPlayerTeamFeedBack playerTeamType;
         [SerializeField,HorizontalGroup()] private CombatPlayerTeamFeedBack enemyTeamType;

@@ -24,7 +24,7 @@ namespace CombatSystem._Core
             // This is just in case these weren't instantiated
             var playerSingleton = PlayerCombatSingleton.Instance;
             var enemySingleton = EnemyCombatSingleton.Instance;
-            CombatSystemSingleton.PrefabInstantiationHandler.FirstInstantiation();
+            AssetPrefabInstantiationHandler.FirstCombatObjectsInstantiation();
 
             PrepareTeams(
                 playerTeam,

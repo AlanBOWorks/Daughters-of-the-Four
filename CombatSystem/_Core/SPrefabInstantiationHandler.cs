@@ -15,23 +15,46 @@ namespace CombatSystem._Core
         private const string AssetFolderPath = "Assets/ScriptableObjects/_Core/Instantiations/";
         private const string AssetName = "Prefab Instantiations [Handler]";
 
-        [SerializeField] private GameObject[] instantiateObjects;
+        [SerializeField] private GameObject[] coreInstantiateObjects;
+        [SerializeField] private GameObject[] combatInstantiateObjects;
 
-
-        public void InstantiateRequiredObjects()
+        public void CoreInstantiationRequiredObjects(out GameObject holder)
         {
-            Debug.Log("------ Instantiation : " + AssetDatabase.GetAssetPath(this));
+#if UNITY_EDITOR
+            Debug.Log("------ Instantiation (CORE) : " + AssetDatabase.GetAssetPath(this));
+#endif
+            string holderName = "----- CORE System [HOLDER] ------";
+            InstantiateHolder(in holderName, out holder, out var holderTransform);
+            InstantiateObjects(in holderTransform, in coreInstantiateObjects);
 
-            GameObject holder = new GameObject("----- Combat System [HOLDER] ------");
-            var holderTransform = holder.transform;
-            DontDestroyOnLoad(holder);
+        }
 
+        public void CombatInstantiateRequiredObjects()
+        {
+#if UNITY_EDITOR
+            Debug.Log("------ Instantiation (COMBAT) : " + AssetDatabase.GetAssetPath(this));
+#endif
+            string holderName = "----- Combat System [HOLDER] ------";
+            InstantiateHolder(in holderName,out var holder, out var holderTransform);
+            InstantiateObjects(in holderTransform,in combatInstantiateObjects);
+            
             CombatSystemSingleton.CombatHolderNotDestroyReference = holder;
-            foreach (var gameObject in instantiateObjects)
+        }
+
+        private static void InstantiateHolder(in string holderName, out GameObject holder, out Transform holderTransform)
+        {
+            holder = new GameObject(holderName);
+            holderTransform = holder.transform;
+            DontDestroyOnLoad(holder);
+        }
+        private static void InstantiateObjects(in Transform parent, in GameObject[] objects)
+        {
+            foreach (var gameObject in objects)
             {
-                Instantiate(gameObject, holderTransform);
+                Instantiate(gameObject, parent);
             }
         }
+
 
         [Button]
         private void DebugAssetPath()
@@ -47,14 +70,27 @@ namespace CombatSystem._Core
         }
     }
 
-    internal sealed class AssetPrefabInstantiationHandler 
+    internal sealed class AssetPrefabInstantiationHandler
     {
-        public void FirstInstantiation()
+        private static GameObject _coreInstantiationReference;
+
+        [RuntimeInitializeOnLoadMethod]
+        public static void FirstCoreObjectsInstantiation()
+        {
+            if(!Application.isPlaying) return;
+            if(_coreInstantiationReference) return;
+
+            SPrefabInstantiationHandler instantiationHandler = SPrefabInstantiationHandler.GetAsset();
+            instantiationHandler.CoreInstantiationRequiredObjects(out var holder);
+            _coreInstantiationReference = holder;
+        }
+
+        public static void FirstCombatObjectsInstantiation()
         {
             if(CombatSystemSingleton.CombatHolderNotDestroyReference) return;
 
             SPrefabInstantiationHandler instantiationHandler = SPrefabInstantiationHandler.GetAsset();
-            instantiationHandler.InstantiateRequiredObjects();
+            instantiationHandler.CombatInstantiateRequiredObjects();
         }
     }
 }
