@@ -70,6 +70,10 @@ namespace CombatSystem.Player.UI
 
         }
 
+        public void OnSkillSelectFromNull(in CombatSkill skill)
+        {
+        }
+
         public void OnSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)
         {
             var targetButton = skillButtonsHolder.GetDictionary()[skill];

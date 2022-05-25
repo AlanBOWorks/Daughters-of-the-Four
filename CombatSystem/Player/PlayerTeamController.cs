@@ -4,13 +4,17 @@ using CombatSystem.Player.Events;
 using CombatSystem.Skills;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace CombatSystem.Player
 {
     public sealed class PlayerTeamController : CombatTeamControllerBase,
-        IPlayerEntityListener, ITempoTeamStatesListener,
-        ISkillUsageListener,
-        ISkillSelectionListener,
+        IOverridePauseElement,
+        IPlayerEntityListener, 
+
+        ITempoTeamStatesListener,
+
+        ISkillUsageListener, ISkillSelectionListener,
         ITargetSelectionListener
     {
         [ShowInInspector] 
@@ -22,6 +26,12 @@ namespace CombatSystem.Player
 
         internal CombatEntity GetPerformer() => _selectedPerformer;
         internal CombatSkill GetSkill() => _selectedSkill;
+
+
+        public void OnPauseInputReturnState(IOverridePauseElement lastElement)
+        {
+            HandleSkillCancel();
+        }
 
 
         public override void InvokeStartControl()
@@ -40,6 +50,11 @@ namespace CombatSystem.Player
 
         public void OnSkillSelect(in CombatSkill skill)
         {
+        }
+
+        public void OnSkillSelectFromNull(in CombatSkill skill)
+        {
+            PlayerCombatSingleton.GetCombatEscapeButtonHandler().PushOverridingAction(this);
         }
 
         public void OnSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)
@@ -100,15 +115,14 @@ namespace CombatSystem.Player
         {
         }
 
-        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
         }
 
-        public void OnCombatSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(CombatEntity performer)
         {
            
         }
-
 
         private void OnControlFinish()
         {
@@ -117,11 +131,12 @@ namespace CombatSystem.Player
             HandleSkillCancel();
         }
 
+
         private void HandleSkillCancel()
         {
             if (_selectedSkill == null) return;
 
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillCancel(in _selectedSkill);
+            PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(in _selectedSkill);
             _selectedSkill = null;
         }
 

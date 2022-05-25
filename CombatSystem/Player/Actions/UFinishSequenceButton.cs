@@ -3,7 +3,7 @@ using CombatSystem.Entity;
 using CombatSystem.Team;
 using UnityEngine;
 
-namespace CombatSystem.Player.Actions
+namespace CombatSystem.Player
 {
     public class UFinishSequenceButton : UHoldButton
     {

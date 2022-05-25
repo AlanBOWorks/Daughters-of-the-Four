@@ -60,7 +60,10 @@ namespace CombatSystem._Core
         {
             var aliveReference = new GameObject("-- Combat System Alive Reference --");
             CombatSystemSingleton.AliveGameObjectReference = aliveReference;
-            CombatSystemSingleton.MasterCoroutineHandle = Timing.RunCoroutine(_TrackAlive(), Segment.RealtimeUpdate);
+            const int layer = CombatSystemSingleton.CombatCoroutineLayer;
+            const Segment segment = Segment.RealtimeUpdate;
+            CombatSystemSingleton.MasterCoroutineHandle 
+                = Timing.RunCoroutine(_TrackAlive(), segment, layer);
 
 
             IEnumerator<float> _TrackAlive()

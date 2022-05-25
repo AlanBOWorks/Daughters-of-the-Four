@@ -13,8 +13,9 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillButtonsHolder : MonoBehaviour, 
+        IPlayerEntityListener, 
+
         ITempoTeamStatesListener, ITeamEventListener,
-        IPlayerEntityListener,
         ISkillUsageListener, ICombatStatesListener,
 
         ISkillButtonListener
@@ -293,6 +294,10 @@ namespace CombatSystem.Player.UI
             OnSkillSwitch(in skill, in _currentSelectedSkill);
         }
 
+        public void OnSkillSelectFromNull(in CombatSkill skill)
+        {
+        }
+
         private UCombatSkillButton GetButton(in CombatSkill skill)
         {
             return _activeButtons.ContainsKey(skill) 
@@ -302,7 +307,11 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
         {
-            if(!enabled || skill == null) return; //this prevents null skills and (_currentSelectedSkill = null) == skill check
+            if(!enabled)
+                return; 
+
+            if(skill == null)
+                return; //this prevents null skills and (_currentSelectedSkill = null) == skill check
 
             if (previousSelection == skill)
             {
@@ -310,10 +319,16 @@ namespace CombatSystem.Player.UI
             }
             else
             {
+                var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+                if (_currentSelectedSkill == null)
+                {
+                    playerEvents.OnSkillSelectFromNull(in skill);
+                }
+
                 _currentSelectedSkill = skill;
                 var button = GetButton(in skill);
                 button.SelectButton();
-                PlayerCombatSingleton.PlayerCombatEvents.OnSkillSwitch(in skill, previousSelection);
+                playerEvents.OnSkillSwitch(in skill, previousSelection);
             }
         }
 
@@ -369,11 +384,11 @@ namespace CombatSystem.Player.UI
             
         }
 
-        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
         }
 
-        public void OnCombatSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(CombatEntity performer)
         {
         }
 

@@ -369,22 +369,22 @@ namespace CombatSystem._Core
 
         }
 
-        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
-            _eventsHolder.OnCombatEffectPerform(in performer,in target, in values);
-            _playerCombatEvents.OnCombatEffectPerform(in performer,in target, in values);
-            _enemyCombatEvents.OnCombatEffectPerform(in performer,in target, in values);
+            _eventsHolder.OnCombatEffectPerform(performer,target, in values);
+            _playerCombatEvents.OnCombatEffectPerform(performer,target, in values);
+            _enemyCombatEvents.OnCombatEffectPerform(performer,target, in values);
 
-            _currentDiscriminatedEntityEventsHolder.OnCombatEffectPerform(in performer, target, values);
+            _currentDiscriminatedEntityEventsHolder.OnCombatEffectPerform(performer, target, values);
         }
 
-        public void OnCombatSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(CombatEntity performer)
         {
-            _eventsHolder.OnCombatSkillFinish(in performer);
-            _playerCombatEvents.OnCombatSkillFinish(in performer);
-            _enemyCombatEvents.OnCombatSkillFinish(in performer);
+            _eventsHolder.OnCombatSkillFinish(performer);
+            _playerCombatEvents.OnCombatSkillFinish(performer);
+            _enemyCombatEvents.OnCombatSkillFinish(performer);
 
-            _currentDiscriminatedEntityEventsHolder.OnCombatSkillFinish(in performer);
+            _currentDiscriminatedEntityEventsHolder.OnCombatSkillFinish(performer);
 
             OnEntityFinishAction(performer);
         }
@@ -1156,19 +1156,19 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnCombatEffectPerform(in performer, in target, in values);
+                listener.OnCombatEffectPerform(performer, target, in values);
             }
         }
 
-        public void OnCombatSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(CombatEntity performer)
         {
             foreach (var listener in _skillUsageListeners)
             {
-                listener.OnCombatSkillFinish(in performer);
+                listener.OnCombatSkillFinish(performer);
             }
         }
 

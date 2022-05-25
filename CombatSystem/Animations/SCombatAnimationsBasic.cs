@@ -10,6 +10,9 @@ namespace CombatSystem.Animations
         menuName = "Combat/Animations/Basic Structure")]
     public class SCombatAnimationsBasic : ScriptableObject, IEntityAnimationsPackStructureRead<AnimationClip>
     {
+        [Title("Cinematic Clips")]
+        [SerializeField] private AnimationClip initialAnimationClip;
+        [Title("Actions Clips")]
         [SerializeField] private AnimationClip idle;
         [SerializeField] private AnimationClip activeIdle;
 
@@ -19,6 +22,7 @@ namespace CombatSystem.Animations
         public AnimationClip GetIdleClip() => idle;
         public AnimationClip GetActiveClip() => activeIdle;
 
+        public AnimationClip InitialAnimationType => initialAnimationClip;
         public ISkillArchetypeStructureRead<AnimationClip> AnimationPerformType => performActionClips;
         public ISkillArchetypeStructureRead<AnimationClip> AnimationReceiveType => receiveActionClips;
 

@@ -99,6 +99,10 @@ namespace CombatSystem.Player.UI
 
         }
 
+        public void OnSkillSelectFromNull(in CombatSkill skill)
+        {
+        }
+
         public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
         {
             _selectedSkill = skill;

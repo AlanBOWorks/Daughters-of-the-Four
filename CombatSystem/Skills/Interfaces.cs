@@ -68,9 +68,9 @@ namespace CombatSystem.Skills
         /// Will be invoked for each [<see cref="IEffectPreset"/>] that the [<see cref="CombatSkill"/>] has;<br></br>
         /// For one call only use [<seealso cref="OnCombatSkillPerform"/>] better;
         /// </summary>
-        void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values);
+        void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values);
 
-        void OnCombatSkillFinish(in CombatEntity performer);
+        void OnCombatSkillFinish(CombatEntity performer);
     }
 
 }

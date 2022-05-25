@@ -16,6 +16,9 @@ namespace CombatSystem.Entity
             Entity = user;
         }
 
+        public abstract void PerformInitialCombatAnimation();
+        public abstract void PerformEndCombatAnimation();
+
 
         public abstract void OnRequestSequenceAnimation();
         public abstract void OnEndSequenceAnimation();
@@ -41,6 +44,14 @@ namespace CombatSystem.Entity
     public sealed class ProvisionalCombatAnimator : ICombatEntityAnimator
     {
         public void Injection(in CombatEntity user)
+        {
+        }
+
+        public void PerformInitialCombatAnimation()
+        {
+        }
+
+        public void PerformEndCombatAnimation()
         {
         }
 

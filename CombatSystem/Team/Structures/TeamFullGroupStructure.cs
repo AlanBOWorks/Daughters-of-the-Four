@@ -92,15 +92,15 @@ namespace CombatSystem.Team
         public T SupportType => backAliment.MainRole;
         public T FlexType => flexAliment.MainRole;
 
-        public T SecondaryVanguardElement => frontAliment.SecondaryRole;
-        public T SecondaryAttackerElement => midAliment.SecondaryRole;
-        public T SecondarySupportElement => backAliment.SecondaryRole;
-        public T SecondaryFlexElement => flexAliment.SecondaryRole;
+        public T SecondaryVanguardElement => frontAliment.SecondaryRole ?? frontAliment.MainRole;
+        public T SecondaryAttackerElement => midAliment.SecondaryRole ?? midAliment.MainRole;
+        public T SecondarySupportElement => backAliment.SecondaryRole ?? backAliment.MainRole;
+        public T SecondaryFlexElement => flexAliment.SecondaryRole ?? flexAliment.MainRole;
 
-        public T ThirdVanguardElement => frontAliment.ThirdRole;
-        public T ThirdAttackerElement => midAliment.ThirdRole;
-        public T ThirdSupportElement => backAliment.ThirdRole;
-        public T ThirdFlexElement => flexAliment.ThirdRole;
+        public T ThirdVanguardElement => frontAliment.ThirdRole ?? SecondaryVanguardElement;
+        public T ThirdAttackerElement => midAliment.ThirdRole ?? SecondaryAttackerElement;
+        public T ThirdSupportElement => backAliment.ThirdRole ?? SecondarySupportElement;
+        public T ThirdFlexElement => flexAliment.ThirdRole ?? SecondaryFlexElement;
 
         [Serializable]
         private sealed class RoleAliment : IFullRoleAlimentRead<T>

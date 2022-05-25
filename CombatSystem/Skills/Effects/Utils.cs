@@ -44,7 +44,7 @@ namespace CombatSystem.Skills
                 if (effectTarget == exclusion) continue;
                 preset.DoEffect(in performer,in effectTarget,in effectValue);
 
-                eventsHolder.OnCombatEffectPerform(in performer, in effectTarget, in values);
+                eventsHolder.OnCombatEffectPerform(performer, effectTarget, in values);
 
                 i++;
             }

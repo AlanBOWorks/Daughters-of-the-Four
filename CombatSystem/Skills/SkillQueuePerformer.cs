@@ -47,11 +47,11 @@ namespace CombatSystem.Skills
         {
         }
 
-        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
         }
 
-        public void OnCombatSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(CombatEntity performer)
         {
             
         }
@@ -84,7 +84,7 @@ namespace CombatSystem.Skills
                 animator.PerformReceiveAnimations(in usedSkill, in performer);
                 yield return Timing.WaitForSeconds(AnimationOffsetDuration);
               
-                eventsHolder.OnCombatSkillFinish(in performer);
+                eventsHolder.OnCombatSkillFinish(performer);
                 yield return Timing.WaitForOneFrame; //safeWait
             }
         }

@@ -4,17 +4,19 @@ using UnityEngine;
 
 namespace CombatSystem.Player
 {
-    [RequireComponent(typeof(Canvas))]
     public class UPlayerCameraCanvasHandler : MonoBehaviour, ICameraHolderListener
     {
-        private Canvas _canvas;
+        [SerializeField]
+        private Canvas mainCanvas;
+
+
         void Start()
         {
-            var playerCamera = PlayerCombatSingleton.InterfaceCombatCamera;
+            var playerCamera = PlayerCombatSingleton.CombatMainCamera;
 
-            _canvas = GetComponent<Canvas>();
+            mainCanvas = GetComponent<Canvas>();
 
-            OnSwitchCamera(in playerCamera);
+            OnSwitchMainCamera(in playerCamera);
             PlayerCombatSingleton.PlayerCombatEvents.ManualSubscribe(this);
         }
 
@@ -23,9 +25,14 @@ namespace CombatSystem.Player
             PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
         }
 
-        public void OnSwitchCamera(in Camera combatCamera)
+        public void OnSwitchMainCamera(in Camera combatCamera)
         {
-            _canvas.worldCamera = combatCamera;
+            mainCanvas.worldCamera = combatCamera;
+        }
+
+        public void OnSwitchBackCamera(in Camera combatBackCamera)
+        {
+            throw new NotImplementedException();
         }
     }
 }

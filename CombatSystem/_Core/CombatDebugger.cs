@@ -283,13 +283,13 @@ namespace CombatSystem._Core
             Debug.Log($"Performing ----- > {values.UsedSkill.GetSkillName()}");
         }
 
-        public void OnCombatEffectPerform(in CombatEntity performer, in CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnEffect) return;
             Debug.Log($"Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
         }
 
-        public void OnCombatSkillFinish(in CombatEntity performer)
+        public void OnCombatSkillFinish(CombatEntity performer)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnFinish) return;
             Debug.Log($"Performer ACTIONS: {performer.Stats.UsedActions}");
@@ -343,10 +343,33 @@ namespace CombatSystem._Core
 
 
     public sealed class CombatPlayerEventsLogs :
+        ICombatPauseListener,
         ISkillPointerListener, ISkillSelectionListener,
         ITargetPointerListener, ITargetSelectionListener, IHoverInteractionTargetsListener,
         IPlayerEntityListener
     {
+
+        public bool ShowPauseLogs = false;
+        private sealed class PauseLogs
+        {
+            public bool OnPause = true;
+            public bool OnResume = true;
+        }
+        [ShowInInspector]
+        private PauseLogs _pauseLogs = new PauseLogs();
+
+        public void OnCombatPause()
+        {
+            if(!ShowPauseLogs || !_pauseLogs.OnPause) return;
+            Debug.Log("XxXxX - PAUSE Combat - XxXxX");
+        }
+
+        public void OnCombatResume()
+        {
+            if (!ShowPauseLogs || !_pauseLogs.OnResume) return;
+            Debug.Log("XxXxX - RESUME Combat - XxXxX");
+        }
+
         [Title("Skill Buttons")]
         public bool ShowSkillButtonLogs = false;
         private sealed class SkillPointerLogs
@@ -374,6 +397,7 @@ namespace CombatSystem._Core
         private sealed class SkillSelectionLogs
         {
             public bool OnSelect = true;
+            public bool OnSelectFromNull = true;
             public bool OnSwitch = true;
             public bool OnDeselect = true;
             public bool OnCancel = true;
@@ -386,6 +410,12 @@ namespace CombatSystem._Core
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSelect) return;
             Debug.Log($"Skill Select: {skill.Preset}");
+        }
+
+        public void OnSkillSelectFromNull(in CombatSkill skill)
+        {
+            if (!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSelectFromNull) return;
+            Debug.Log($"Skill Select (From NULL): {skill.Preset}");
         }
 
         public void OnSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)

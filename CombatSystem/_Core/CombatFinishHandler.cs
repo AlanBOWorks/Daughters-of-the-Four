@@ -10,10 +10,10 @@ namespace CombatSystem._Core
             var combatCoroutine = CombatSystemSingleton.MasterCoroutineHandle;
             if(!combatCoroutine.IsRunning) return;
 
-            Timing.KillCoroutines(combatCoroutine);
+            Timing.KillCoroutines(combatCoroutine); //safe kill
+            Timing.KillCoroutines(CombatSystemSingleton.CombatCoroutineLayer);
 
             CombatSystemSingleton.EventsHolder.OnCombatFinish(isWinCombat);
-            //todo call finish
         }
     }
 }

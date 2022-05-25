@@ -5,8 +5,13 @@ using UnityEngine;
 
 namespace CombatSystem.Player.Events
 {
+    internal interface ICombatPauseListener : ICombatEventListener
+    {
+        void OnCombatPause();
+        void OnCombatResume();
+    }
 
-    interface ISkillButtonListener : ISkillPointerListener, ISkillSelectionListener { }
+    internal interface ISkillButtonListener : ISkillPointerListener, ISkillSelectionListener { }
 
     internal interface ISkillPointerListener : ICombatEventListener
     {
@@ -20,6 +25,13 @@ namespace CombatSystem.Player.Events
         /// Triggers always even if the selected is the same
         /// </summary>
         void OnSkillSelect(in CombatSkill skill);
+
+        /// <summary>
+        /// Triggers only when the skill selected was from Null (the invert of [<seealso cref="OnSkillSwitch"/>])
+        /// </summary>
+        /// <param name="skill"></param>
+        void OnSkillSelectFromNull(in CombatSkill skill);
+
         /// <summary>
         /// Is the same that <see cref="OnSkillSelect"/> but triggers when the selected is only different (and not null)
         /// </summary>
@@ -85,6 +97,7 @@ namespace CombatSystem.Player.Events
 
     internal interface ICameraHolderListener : ICombatEventListener
     {
-        void OnSwitchCamera(in Camera combatCamera);
+        void OnSwitchMainCamera(in Camera combatCamera);
+        void OnSwitchBackCamera(in Camera combatBackCamera);
     }
 }

@@ -14,33 +14,50 @@ namespace CombatSystem.Animations
 
         [SerializeField, InlineEditor()] private SCombatAnimationsBasic animations;
 
-        private void Animate(in AnimationClip clip, in float fade)
+        private const int MainAnimationLayer = 0;
+
+        private void Animate(AnimationClip clip, float fade)
         {
             if(!clip) return;
-            animancer.Play(clip, fade);
+            var targetLayer = animancer.Layers[MainAnimationLayer];
+
+            if(targetLayer.CurrentState != null) targetLayer.Stop();
+            targetLayer.Play(clip, fade);
+        }
+
+        public override void PerformInitialCombatAnimation()
+        {
+            var initialAnimation = animations.InitialAnimationType;
+            if(initialAnimation == null) return;
+
+            Animate(initialAnimation, idleFade);
+        }
+
+        public override void PerformEndCombatAnimation()
+        {
         }
 
         public override void OnRequestSequenceAnimation()
         {
             var activeIdle = animations.GetActiveClip();
-            Animate(in activeIdle, in idleFade);
+            Animate(activeIdle, idleFade);
         }
         public override void OnEndSequenceAnimation()
         {
             var idle = animations.GetIdleClip();
-            Animate(in idle, in idleFade);
+            Animate(idle, idleFade);
         }
 
         protected override void DoPerformActionAnimation(in EnumsSkill.Archetype type)
         {
             var clip = UtilsSkill.GetElement(type, animations.AnimationPerformType);
-            Animate(in clip, in actionFade);
+            Animate(clip, actionFade);
         }
 
         protected override void DoReceiveActionAnimation(in EnumsSkill.Archetype type)
         {
             var clip = UtilsSkill.GetElement(type, animations.AnimationReceiveType);
-            Animate(in clip, in actionFade);
+            Animate(clip, actionFade);
         }
     }
 }

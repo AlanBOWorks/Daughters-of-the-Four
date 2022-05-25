@@ -111,7 +111,7 @@ namespace CombatSystem._Core
 
 
 
-
+        public const int CombatCoroutineLayer = 4;
         public static CoroutineHandle MasterCoroutineHandle;
         public static CoroutineHandle LinkCoroutineToMaster(
             in IEnumerator<float> coroutineIterator, in MEC.Segment tickSegment = Segment.RealtimeUpdate)
@@ -128,7 +128,7 @@ namespace CombatSystem._Core
 
         public static void Clear()
         {
-
+            Timing.KillCoroutines(CombatCoroutineLayer);
         }
 
     }

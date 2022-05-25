@@ -40,13 +40,22 @@ namespace CombatSystem.Player
             discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesExtraListener);
             discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesListener);
             
-
+            CombatEscapeButtonHandler = new CombatEscapeButtonHandler();
+            playerEvents.ManualSubscribe((ICombatStatesListener) CombatEscapeButtonHandler);
+            playerEvents.SubscribeAsPlayerEvent(CombatEscapeButtonHandler);
+            playerEvents.DiscriminationEventsHolder.Subscribe(CombatEscapeButtonHandler);
         }
 
 
         [Title("Events")]
         [ShowInInspector]
         public static PlayerCombatEventsHolder PlayerCombatEvents { get; private set; }
+
+        public static IEscapeButtonHandler GetCombatEscapeButtonHandler() => CombatEscapeButtonHandler;
+
+        [ShowInInspector] 
+        internal static readonly CombatEscapeButtonHandler CombatEscapeButtonHandler;
+
         [Title("Controller")]
         [ShowInInspector]
         public static PlayerTeamController PlayerTeamController { get; private set; }
@@ -63,19 +72,25 @@ namespace CombatSystem.Player
 
         [Title("Mono References")]
         [ShowInInspector]
-        public static Camera InterfaceCombatCamera { get; private set; }
+        public static Camera CombatMainCamera { get; private set; }
+
+        public static Camera BackLayerCamera { get; private set; }
 
 
         [Title("Elements")]
         public static IReadOnlyDictionary<CombatEntity,UUIHoverEntity> HoverEntityElements { get; private set; }
 
 
-        public static void InjectCombatCamera(in Camera camera)
+        public static void InjectCombatMainCamera(in Camera camera)
         {
-            InterfaceCombatCamera = camera;
-            PlayerCombatEvents.OnSwitchCamera(in camera);
+            CombatMainCamera = camera;
+            PlayerCombatEvents.OnSwitchMainCamera(in camera);
         }
-
+        public static void InjectCombatBackCamera(in Camera camera)
+        {
+            BackLayerCamera = camera;
+            PlayerCombatEvents.OnSwitchBackCamera(in camera);
+        }
         public static void Injection(IReadOnlyDictionary<CombatEntity, UUIHoverEntity> dictionary)
             => HoverEntityElements = dictionary;
 

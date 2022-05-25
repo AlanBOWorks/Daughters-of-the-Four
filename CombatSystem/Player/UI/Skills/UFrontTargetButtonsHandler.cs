@@ -78,6 +78,11 @@ namespace CombatSystem.Player.UI
         {
 
         }
+
+        public void OnSkillSelectFromNull(in CombatSkill skill)
+        {
+        }
+
         public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
         {
             _currentSkill = skill;
@@ -134,7 +139,7 @@ namespace CombatSystem.Player.UI
 
         public void OnTargetCancel(in CombatEntity target)
         {
-            
+            HideTargets();
         }
 
         public void OnTargetSubmit(in CombatEntity target)

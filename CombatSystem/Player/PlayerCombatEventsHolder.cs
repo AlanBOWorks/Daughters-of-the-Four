@@ -10,7 +10,7 @@ using UnityEngine;
 namespace CombatSystem.Player
 {
     public sealed class PlayerCombatEventsHolder : ControllerCombatEventsHolder, ITempoTickListener, IDiscriminationEventsHolder,
-        
+        ICombatPauseListener,
         IPlayerEntityListener,
 
         ISkillPointerListener, ISkillSelectionListener,
@@ -23,6 +23,7 @@ namespace CombatSystem.Player
             var combatEventsHolder = CombatSystemSingleton.EventsHolder;
             combatEventsHolder.SubscribeEventsHandler(this);
 
+            _pauseListeners = new HashSet<ICombatPauseListener>();
             _playerEntityListeners = new HashSet<IPlayerEntityListener>();
 
             _skillPointerListeners = new HashSet<ISkillPointerListener>();
@@ -41,6 +42,8 @@ namespace CombatSystem.Player
         }
 
         [ShowInInspector] 
+        private readonly HashSet<ICombatPauseListener> _pauseListeners;
+        [ShowInInspector]
         private readonly HashSet<IPlayerEntityListener> _playerEntityListeners;
 
         [ShowInInspector,HorizontalGroup("Skills")]
@@ -75,7 +78,8 @@ namespace CombatSystem.Player
         /// </summary>
         public void SubscribeAsPlayerEvent(ICombatEventListener listener)
         {
-
+            if (listener is ICombatPauseListener pauseListener)
+                _pauseListeners.Add(pauseListener);
             if (listener is IPlayerEntityListener playerEntityListener)
                 _playerEntityListeners.Add(playerEntityListener);
 
@@ -98,6 +102,9 @@ namespace CombatSystem.Player
         public override void UnSubscribe(ICombatEventListener listener)
         {
             base.UnSubscribe(listener);
+
+            if (listener is ICombatPauseListener pauseListener)
+                _pauseListeners.Remove(pauseListener);
 
             if (listener is IPlayerEntityListener playerEntityListener)
                 _playerEntityListeners.Remove(playerEntityListener);
@@ -147,13 +154,41 @@ namespace CombatSystem.Player
             _cameraHolderListeners.Add(cameraHolderListener);
         }
 
-        public void OnSwitchCamera(in Camera combatCamera)
+
+
+
+        public void OnCombatPause()
+        {
+            foreach (var listener in _pauseListeners)
+            {
+                listener.OnCombatPause();
+            }
+        }
+
+        public void OnCombatResume()
+        {
+            foreach (var listener in _pauseListeners)
+            {
+                listener.OnCombatResume();
+            }
+        }
+
+        public void OnSwitchMainCamera(in Camera combatCamera)
         {
             foreach (var listener in _cameraHolderListeners)
             {
-                listener.OnSwitchCamera(in combatCamera);
+                listener.OnSwitchMainCamera(in combatCamera);
             }
         }
+
+        public void OnSwitchBackCamera(in Camera combatBackCamera)
+        {
+            foreach (var listener in _cameraHolderListeners)
+            {
+                listener.OnSwitchBackCamera(in combatBackCamera);
+            }
+        }
+
         public void OnPerformerSwitch(in CombatEntity performer)
         {
             foreach (var listener in _playerEntityListeners)
@@ -186,6 +221,14 @@ namespace CombatSystem.Player
             foreach (var listener in _skillSelectionListeners)
             {
                 listener.OnSkillSelect(in skill);
+            }
+        }
+
+        public void OnSkillSelectFromNull(in CombatSkill skill)
+        {
+            foreach (var listener in _skillSelectionListeners)
+            {
+                listener.OnSkillSelectFromNull(in skill);
             }
         }
 
@@ -282,5 +325,6 @@ namespace CombatSystem.Player
                 listener.OnHoverTargetExit();
             }
         }
+
     }
 }
