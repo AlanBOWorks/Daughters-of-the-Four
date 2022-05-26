@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using Common;
 using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -15,10 +16,14 @@ namespace CombatSystem._Core
         internal readonly HashSet<ITempoTickListener> TickListeners;
         [ShowInInspector] internal readonly CombatEntitiesTempoTicker EntitiesTempoTicker;
 
+        private readonly IPlayerPauseValues _playerPauseValues;
+
         public TempoTicker()
         {
             EntitiesTempoTicker = new CombatEntitiesTempoTicker();
             TickListeners = new HashSet<ITempoTickListener>();
+
+            _playerPauseValues = PlayerCommonControlValuesSingleton.GetPauseValues();
         }
 
         public void Subscribe(ITempoTickListener tickListener)
@@ -74,12 +79,14 @@ namespace CombatSystem._Core
         private int _roundTickCount;
         public int GetCurrentRoundTicks() => _roundTickCount;
 
-        [Button,HideIf("_pauseTicking")]
+#if UNITY_EDITOR
+        [Button, HideIf("_pauseTicking")]
         private void PauseNextTick() => _pauseTicking = true;
-        [Button,ShowIf("_pauseTicking")]
+        [Button, ShowIf("_pauseTicking")]
         private void ResumeNextTick() => _pauseTicking = false;
 
-        private bool _pauseTicking = false;
+        private bool _pauseTicking = false; 
+#endif
         private IEnumerator<float> _TickingLoop()
         {
             var controllers = CombatSystemSingleton.TeamControllers;
@@ -92,7 +99,11 @@ namespace CombatSystem._Core
                 yield return Timing.WaitForSeconds(TickPeriodSeconds);
                 _roundTickCount++;
 
-                while (_pauseTicking)
+#if UNITY_EDITOR
+                while (_playerPauseValues.IsGamePaused || _pauseTicking)
+#else
+                while (_playerPauseValues.IsGamePaused)
+#endif
                 {
                     yield return Timing.WaitForOneFrame;
                 }

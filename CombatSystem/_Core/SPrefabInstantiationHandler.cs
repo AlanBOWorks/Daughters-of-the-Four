@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Team;
@@ -15,8 +16,8 @@ namespace CombatSystem._Core
         private const string AssetFolderPath = "Assets/ScriptableObjects/_Core/Instantiations/";
         private const string AssetName = "Prefab Instantiations [Handler]";
 
-        [SerializeField] private GameObject[] coreInstantiateObjects;
-        [SerializeField] private GameObject[] combatInstantiateObjects;
+        [SerializeField] private PrefabValues[] coreInstantiateObjects;
+        [SerializeField] private PrefabValues[] combatInstantiateObjects;
 
         public void CoreInstantiationRequiredObjects(out GameObject holder)
         {
@@ -47,11 +48,14 @@ namespace CombatSystem._Core
             holderTransform = holder.transform;
             DontDestroyOnLoad(holder);
         }
-        private static void InstantiateObjects(in Transform parent, in GameObject[] objects)
+        private static void InstantiateObjects(in Transform parent, in PrefabValues[] prefabs)
         {
-            foreach (var gameObject in objects)
+            foreach (var values in prefabs)
             {
-                Instantiate(gameObject, parent);
+                var prefab = values.prefab;
+                var gameObject = Instantiate(prefab, parent);
+                if(values.disableOnInstantiation)
+                    gameObject.SetActive(false);
             }
         }
 
@@ -67,6 +71,13 @@ namespace CombatSystem._Core
         {
             const string path = AssetFolderPath + AssetName + UtilsAssets.AssetExtension;
             return AssetDatabase.LoadAssetAtPath<SPrefabInstantiationHandler>(path);
+        }
+
+        [Serializable]
+        private struct PrefabValues
+        {
+            public GameObject prefab;
+            public bool disableOnInstantiation;
         }
     }
 

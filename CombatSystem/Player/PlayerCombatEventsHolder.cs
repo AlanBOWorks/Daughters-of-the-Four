@@ -154,7 +154,17 @@ namespace CombatSystem.Player
             _cameraHolderListeners.Add(cameraHolderListener);
         }
 
+        internal void ManualSubscribe(ICombatPauseListener pauseListener)
+        {
+            _pauseListeners.Add(pauseListener);
+        }
 
+
+
+        internal void ManualUnSubscribe(ICombatPauseListener pauseListener)
+        {
+            _pauseListeners.Remove(pauseListener);
+        }
 
 
         public void OnCombatPause()
