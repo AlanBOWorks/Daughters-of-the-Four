@@ -79,7 +79,7 @@ namespace CombatSystem.Player.UI
 
             var hoverElement = hoverDictionary[target];
             RectTransform targetTransform = (RectTransform) hoverElement.transform;
-            string popUpText = LocalizeSkills.LocalizeEffect(in values);
+            string popUpText = LocalizeEffects.LocalizeEffectDigitValue(in values);
 
             KeyValuePair<RectTransform,string> queueElement = new KeyValuePair<RectTransform, string>(targetTransform,popUpText);
             _popUpQueue.Enqueue(queueElement);

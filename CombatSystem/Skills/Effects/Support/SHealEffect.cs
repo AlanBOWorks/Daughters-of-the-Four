@@ -6,7 +6,7 @@ namespace CombatSystem.Skills.Effects
 {
     [CreateAssetMenu(menuName = "Combat/Effect/Heal",
         fileName = "Heal [Effect]")]
-    public class SHealEffect : SEffect
+    public class SHealEffect : SEffect, ISupportEffect
     {
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

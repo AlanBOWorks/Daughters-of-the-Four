@@ -1,8 +1,11 @@
 using CombatSystem.Entity;
+using CombatSystem.Skills.Effects;
 
 namespace CombatSystem.Skills
 {
-
+    /// <summary>
+    /// Contains necessary information for performing <see cref="IEffect"/>] (ReadOnly)
+    /// </summary>
     public readonly struct PerformEffectValues
     {
         public PerformEffectValues(in IEffect effect, in float effectValue, in EnumsEffect.TargetType targetType)
@@ -17,6 +20,9 @@ namespace CombatSystem.Skills
         public readonly EnumsEffect.TargetType TargetType;
     }
 
+    /// <summary>
+    /// Contains important information of the [<see cref="CombatSkill"/>] usage. (ReadOnly)
+    /// </summary>
     public readonly struct SkillUsageValues
     {
         public readonly CombatEntity Performer;

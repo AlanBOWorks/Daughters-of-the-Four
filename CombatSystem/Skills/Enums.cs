@@ -21,20 +21,4 @@ namespace CombatSystem.Skills
         }
     }
 
-    public static class EnumsEffect
-    {
-        public enum TargetType
-        {
-            Target,
-            TargetTeam,
-            
-            Performer,
-            PerformerTeam,
-
-            TargetLine,
-            PerformerLine,
-
-            All
-        }
-    }
 }

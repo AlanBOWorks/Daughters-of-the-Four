@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
-using CombatSystem.Skills;
-using CombatSystem.Team;
+using CombatSystem.Skills.Effects;
 using Sirenix.OdinInspector;
 
 namespace CombatSystem.Stats

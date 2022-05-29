@@ -8,7 +8,7 @@ namespace CombatSystem.Skills.Effects
 {
     [CreateAssetMenu(fileName = "N [Effect]",
         menuName = "Combat/Effect/Team/Stance")]
-    public class STeamSwitchStanceEffect : SEffect
+    public class STeamSwitchStanceEffect : SEffect, ITeamEffect
     {
         [SerializeField] private EnumTeam.Stance stance;
 

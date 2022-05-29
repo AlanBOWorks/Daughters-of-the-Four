@@ -50,12 +50,22 @@ namespace CombatSystem._Core
 
         public void SubscribeEventsHandler(PlayerCombatEventsHolder eventsHandler)
         {
+            if (_playerCombatEvents != null)
+                throw new ArgumentOutOfRangeException(nameof(eventsHandler),
+                    "Trying to inject another Player's Events holder");
+
             _playerCombatEvents = eventsHandler;
+            _eventsHolder.ManualSubscribe(eventsHandler);
         }
 
         public void SubscribeEventsHandler(EnemyCombatEventsHolder eventsHandler)
         {
+            if(_enemyCombatEvents != null)
+                throw new ArgumentOutOfRangeException(nameof(eventsHandler), 
+                    "Trying to inject another enemy's Events Holder");
+
             _enemyCombatEvents = eventsHandler;
+            _eventsHolder.ManualSubscribe(eventsHandler);
         }
 
 
@@ -530,6 +540,17 @@ namespace CombatSystem._Core
             {
                 _tempoTicker.UnSubscribe(tickListener);
             }
+
+            public void ManualSubscribe(ITempoTickListener tickListener)
+            {
+                SubscribeTempo(tickListener);
+            }
+
+            public void ManualUnSubscribe(ITempoTickListener tickListener)
+            {
+                UnSubscribeTempo(tickListener);
+            }
+
         }
 
 

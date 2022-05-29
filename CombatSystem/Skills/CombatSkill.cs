@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CombatSystem.Entity;
+using CombatSystem.Skills.Effects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -18,11 +19,15 @@ namespace CombatSystem.Skills
 
         public string GetSkillName() => Preset.GetSkillName();
         public Sprite GetSkillIcon() => Preset.GetSkillIcon();
+        public IEnumerable<PerformEffectValues> GetEffects() => Preset.GetEffects();
+
+
         [ShowInInspector]
         public int SkillCost { get; private set; }
         public EnumsSkill.Archetype Archetype => Preset.Archetype;
         public EnumsSkill.TargetType TargetType => Preset.TargetType;
-        
+        public IEffect GetMainEffectArchetype() => Preset.GetMainEffectArchetype();
+
 
         public bool IgnoreSelf() => Preset.IgnoreSelf();
 

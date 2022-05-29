@@ -14,6 +14,7 @@ namespace CombatSystem.Player
         IPlayerEntityListener,
 
         ISkillPointerListener, ISkillSelectionListener,
+        ISkillTooltipListener,
 
         ITargetPointerListener, ITargetSelectionListener, IHoverInteractionTargetsListener,
         ICameraHolderListener
@@ -28,6 +29,7 @@ namespace CombatSystem.Player
 
             _skillPointerListeners = new HashSet<ISkillPointerListener>();
             _skillSelectionListeners = new HashSet<ISkillSelectionListener>();
+            _skillTooltipListeners = new HashSet<ISkillTooltipListener>();
 
             _targetPointerListeners = new HashSet<ITargetPointerListener>();
             _targetSelectionListeners = new HashSet<ITargetSelectionListener>();
@@ -46,15 +48,18 @@ namespace CombatSystem.Player
         [ShowInInspector]
         private readonly HashSet<IPlayerEntityListener> _playerEntityListeners;
 
-        [ShowInInspector,HorizontalGroup("Skills")]
+        [ShowInInspector, TitleGroup("Skills")]
         private readonly HashSet<ISkillPointerListener> _skillPointerListeners;
-        [ShowInInspector,HorizontalGroup("Skills")]
+        [ShowInInspector,TitleGroup("Skills")]
         private readonly HashSet<ISkillSelectionListener> _skillSelectionListeners;
-        [ShowInInspector,HorizontalGroup("Target")]
+        [ShowInInspector, TitleGroup("Skills")]
+        private readonly HashSet<ISkillTooltipListener> _skillTooltipListeners;
+
+        [ShowInInspector, TitleGroup("Target")]
         private readonly HashSet<ITargetPointerListener> _targetPointerListeners;
-        [ShowInInspector,HorizontalGroup("Target")]
+        [ShowInInspector, TitleGroup("Target")]
         private readonly HashSet<ITargetSelectionListener> _targetSelectionListeners;
-        [ShowInInspector, HorizontalGroup("Target")]
+        [ShowInInspector, TitleGroup("Target")]
         private readonly HashSet<IHoverInteractionTargetsListener> _hoverTargetsListeners;
 
         [ShowInInspector] 
@@ -87,6 +92,8 @@ namespace CombatSystem.Player
                 _skillPointerListeners.Add(skillPointerListener);
             if (listener is ISkillSelectionListener skillSelectionListener)
                 _skillSelectionListeners.Add(skillSelectionListener);
+            if (listener is ISkillTooltipListener skillTooltipListener)
+                _skillTooltipListeners.Add(skillTooltipListener);
 
             if (listener is ITargetPointerListener targetPointerListener)
                 _targetPointerListeners.Add(targetPointerListener);
@@ -113,6 +120,8 @@ namespace CombatSystem.Player
                 _skillPointerListeners.Remove(skillPointerListener);
             if (listener is ISkillSelectionListener skillSelectionListener)
                 _skillSelectionListeners.Remove(skillSelectionListener);
+            if (listener is ISkillTooltipListener skillTooltipListener)
+                _skillTooltipListeners.Remove(skillTooltipListener);
 
             if (listener is ITargetPointerListener targetPointerListener)
                 _targetPointerListeners.Remove(targetPointerListener);
@@ -282,6 +291,45 @@ namespace CombatSystem.Player
             }
 
             OnHoverTargetExit();
+        }
+        public void OnTooltipEffect(in PerformEffectValues values)
+        {
+            foreach (var listener in _skillTooltipListeners)
+            {
+                listener.OnTooltipEffect(in values);
+            }
+        }
+
+        public void OnToolTipOffensiveEffect(in PerformEffectValues values)
+        {
+            foreach (var listener in _skillTooltipListeners)
+            {
+                listener.OnToolTipOffensiveEffect(in values);
+            }
+        }
+
+        public void OnTooltipSupportEffect(in PerformEffectValues values)
+        {
+            foreach (var listener in _skillTooltipListeners)
+            {
+                listener.OnTooltipSupportEffect(in values);
+            }
+        }
+
+        public void OnTooltipTeamEffect(in PerformEffectValues values)
+        {
+            foreach (var listener in _skillTooltipListeners)
+            {
+                listener.OnTooltipTeamEffect(in values);
+            }
+        }
+
+        public void OnFinishPoolEffects()
+        {
+            foreach (var listener in _skillTooltipListeners)
+            {
+                listener.OnFinishPoolEffects();
+            }
         }
 
 

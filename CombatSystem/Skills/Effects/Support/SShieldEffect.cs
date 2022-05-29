@@ -6,7 +6,7 @@ namespace CombatSystem.Skills.Effects
 {
     [CreateAssetMenu(menuName = "Combat/Effect/Shield",
         fileName = "Shielding [Effect]")]
-    public class SShieldEffect : SEffect
+    public class SShieldEffect : SEffect, ISupportEffect
     {
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)

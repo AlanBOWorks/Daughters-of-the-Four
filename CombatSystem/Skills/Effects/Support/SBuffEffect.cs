@@ -5,7 +5,7 @@ using Utils;
 
 namespace CombatSystem.Skills.Effects
 {
-    public abstract class SBuffEffect : SEffect
+    public abstract class SBuffEffect : SEffect, ISupportEffect
     {
         [SerializeField] protected bool isBurst;
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)

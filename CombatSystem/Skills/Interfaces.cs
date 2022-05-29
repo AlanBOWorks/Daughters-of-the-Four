@@ -25,6 +25,8 @@ namespace CombatSystem.Skills
     {
         string GetSkillName();
         Sprite GetSkillIcon();
+
+        IEnumerable<PerformEffectValues> GetEffects();
     }
 
     public interface ISkill
@@ -33,20 +35,9 @@ namespace CombatSystem.Skills
         EnumsSkill.Archetype Archetype { get; }
         EnumsSkill.TargetType TargetType { get; }
 
+        IEffect GetMainEffectArchetype();
 
         bool IgnoreSelf();
-    }
-
-    public interface IEffectPreset
-    {
-        IEffect GetPreset();
-        EnumsEffect.TargetType TargetType { get; }
-        float GetValue();
-    }
-
-    public interface IEffect
-    {
-        void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue);
     }
 
 

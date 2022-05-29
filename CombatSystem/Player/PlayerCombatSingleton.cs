@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player
 {
-    public sealed class PlayerCombatSingleton : IPlayerCameraStructureRead<Camera>
+    public sealed class PlayerCombatSingleton
     {
         public static readonly PlayerCombatSingleton Instance = new PlayerCombatSingleton();
 
@@ -44,6 +44,9 @@ namespace CombatSystem.Player
             playerEvents.ManualSubscribe((ICombatStatesListener) CombatEscapeButtonHandler);
             playerEvents.SubscribeAsPlayerEvent(CombatEscapeButtonHandler);
             playerEvents.DiscriminationEventsHolder.Subscribe(CombatEscapeButtonHandler);
+
+            var playerSkillInfoHandler = new SkillInfoHandler();
+            playerEvents.Subscribe(playerSkillInfoHandler);
         }
 
 
@@ -73,12 +76,6 @@ namespace CombatSystem.Player
         [Title("Mono References")]
         [ShowInInspector]
         public static IPlayerCameraStructureRead<Camera> CamerasHolder { get; private set; }
-
-
-        public Camera GetMainCameraType => CamerasHolder.GetMainCameraType;
-        public Camera GetBackCameraType => CamerasHolder.GetBackCameraType;
-        public Camera GetFrontCameraType => CamerasHolder.GetFrontCameraType;
-        public Camera GetCharacterCameraType => CamerasHolder.GetCharacterCameraType;
 
 
         [Title("Elements")]

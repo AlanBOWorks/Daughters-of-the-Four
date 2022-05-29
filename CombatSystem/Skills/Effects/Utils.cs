@@ -4,7 +4,7 @@ using CombatSystem.Entity;
 using CombatSystem.Stats;
 using UnityEngine;
 
-namespace CombatSystem.Skills
+namespace CombatSystem.Skills.Effects
 {
     public static class UtilsCombatSkill
     {

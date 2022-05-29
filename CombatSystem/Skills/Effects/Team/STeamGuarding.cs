@@ -5,7 +5,7 @@ namespace CombatSystem.Skills.Effects
 {
     [CreateAssetMenu(fileName = "N [Effect]",
         menuName = "Combat/Effect/Team/Guarding")]
-    public class STeamGuarding : SEffect
+    public class STeamGuarding : SEffect, ITeamEffect
     {
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

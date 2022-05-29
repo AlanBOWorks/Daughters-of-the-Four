@@ -13,8 +13,9 @@ namespace CombatSystem.Player
 
         public Canvas[] GetMainCameraType => mainCameraCanvases;
         public Canvas[] GetBackCameraType => backCameraCanvases;
+        public Canvas[] GetCharacterBackCameraType => null;
         public Canvas[] GetFrontCameraType => frontCameraCanvases;
-        public Canvas[] GetCharacterCameraType => null;
+        public Canvas[] GetCharacterFrontCameraType => null;
 
         private void Start()
         {

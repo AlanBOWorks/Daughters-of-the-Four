@@ -35,18 +35,42 @@ namespace CombatSystem.Skills
         [SerializeField] private EnumsSkill.TargetType targetType 
             = EnumsSkill.TargetType.Direct;
 
-        [Title("Effects")]
+        [Title("Effects"),
+         InfoBox("Null: mainEffect will be taken from [effects].first element", "IsMainEffectNull")] 
+        [SerializeField] private SEffect mainEffectReference;
+        
         [SerializeField]
         private PresetEffectValues[] effects = new PresetEffectValues[0];
 
-
+        private bool IsMainEffectNull() => !mainEffectReference;
+        public bool HasEffects() => effects.Length > 0;
 
         public string GetSkillName() => skillName;
         public Sprite GetSkillIcon() => skillIcon;
+
+        public IEnumerable<PerformEffectValues> GetEffects()
+        {
+            for (int i = 0; i < effects.Length; i++)
+            {
+                yield return effects[i].GenerateValues();
+            }
+        }
+
         public int SkillCost => skillCost;
         public EnumsSkill.TargetType TargetType => targetType;
         public EnumsSkill.Archetype Archetype => archetype;
         internal PresetEffectValues[] GetEffectValues() => effects;
+
+
+        public IEffect GetMainEffectArchetype()
+        {
+            IEffect mainEffect = mainEffectReference;
+            if (mainEffect == null && HasEffects())
+                mainEffect = effects[0].GetPreset();
+
+
+            return mainEffect;
+        }
 
         public bool IgnoreSelf() => ignoreSelf && archetype != EnumsSkill.Archetype.Self;
         

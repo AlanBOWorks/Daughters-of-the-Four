@@ -5,7 +5,7 @@ using Utils;
 
 namespace CombatSystem.Skills.Effects
 {
-    public abstract class SDeBuffEffect : SEffect
+    public abstract class SDeBuffEffect : SEffect, IOffensiveEffect
     {
         [SerializeField] protected bool isBurst;
 

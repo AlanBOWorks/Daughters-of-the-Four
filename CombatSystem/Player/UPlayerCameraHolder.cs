@@ -8,7 +8,8 @@ namespace CombatSystem.Player
         [SerializeField] private Camera combatMainCamera;
         [SerializeField] private Camera combatBackCamera;
         [SerializeField] private Camera combatFrontCamera;
-        [SerializeField] private Camera combatCharacterCamera;
+        [SerializeField] private Camera combatCharacterBackCamera;
+        [SerializeField] private Camera combatCharacterFrontCamera;
 
         private void Awake()
         {
@@ -21,15 +22,20 @@ namespace CombatSystem.Player
 
         public Camera GetMainCameraType => combatMainCamera;
         public Camera GetBackCameraType => combatBackCamera;
+
+        public Camera GetCharacterBackCameraType => combatCharacterBackCamera;
+
         public Camera GetFrontCameraType => combatFrontCamera;
-        public Camera GetCharacterCameraType => combatCharacterCamera;
+        public Camera GetCharacterFrontCameraType => combatCharacterFrontCamera;
     }
 
     public interface IPlayerCameraStructureRead<out T>
     {
         T GetMainCameraType { get; }
+
         T GetBackCameraType { get; }
+        T GetCharacterBackCameraType { get; }
+        T GetCharacterFrontCameraType { get; }
         T GetFrontCameraType { get; }
-        T GetCharacterCameraType { get; }
     }
 }

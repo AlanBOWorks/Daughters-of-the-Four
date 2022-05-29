@@ -6,7 +6,7 @@ namespace CombatSystem.Skills.Effects
 {
     [CreateAssetMenu(menuName = "Combat/Effect/Damage",
         fileName = "Damage [Effect]")]
-    public class SDamageEffect : SEffect
+    public class SDamageEffect : SEffect, IOffensiveEffect
     {
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
@@ -26,8 +26,6 @@ namespace CombatSystem.Skills.Effects
                 UtilsEffect.DoDamageTo(in target, in performer, in damage);
             }
         }
-
-
-
     }
+
 }

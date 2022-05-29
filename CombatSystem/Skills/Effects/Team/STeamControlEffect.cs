@@ -9,7 +9,7 @@ namespace CombatSystem.Skills.Effects
 
     [CreateAssetMenu(fileName = "N [Effect]",
         menuName = "Combat/Effect/Team/Control")]
-    public class STeamControlEffect : SEffect
+    public class STeamControlEffect : SEffect, ITeamEffect
     {
         [SerializeField] private bool isBurst;
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)

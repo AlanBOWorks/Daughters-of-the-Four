@@ -61,6 +61,15 @@ namespace CombatSystem.Player.Events
         /// </summary>
         void OnSkillSubmit(in CombatSkill skill);
     }
+    internal interface ISkillTooltipListener : ICombatEventListener
+    {
+        void OnTooltipEffect(in PerformEffectValues values);
+        void OnToolTipOffensiveEffect(in PerformEffectValues values);
+        void OnTooltipSupportEffect(in PerformEffectValues values);
+        void OnTooltipTeamEffect(in PerformEffectValues values);
+        void OnFinishPoolEffects();
+    }
+
     internal interface ITargetPointerListener : ICombatEventListener
     {
         void OnTargetButtonHover(in CombatEntity target);
@@ -101,4 +110,5 @@ namespace CombatSystem.Player.Events
         void OnSwitchBackCamera(in Camera combatBackCamera);
         void OnSwitchFrontCamera(in Camera combatFrontCamera);
     }
+
 }
