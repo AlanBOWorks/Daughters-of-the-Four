@@ -7,6 +7,10 @@ namespace CombatSystem.Skills.Effects
 {
     public abstract class SDeBuffEffect : SEffect, IOffensiveEffect
     {
+
+        private const string DeBuffPrefix = "DeBUFF";
+        private const string DeBurstPrefix = "DeBURST";
+
         [SerializeField] protected bool isBurst;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
@@ -27,10 +31,13 @@ namespace CombatSystem.Skills.Effects
             in float effectValue,
             in IBasicStats<float> buffingStats);
 
+
+        protected string GetBuffPrefix() => (isBurst) ? DeBurstPrefix : DeBuffPrefix;
+
         protected string GenerateAssetName(in string statTypeName)
         {
-            string buffType = ((isBurst) ? "DeBURST" : "DeBUFF") + " Stat - ";
-            string suffix = " [Effect]";
+            string buffType =  GetBuffPrefix() + " Stat - ";
+            const string suffix = " [Effect]";
 
             return buffType + statTypeName + suffix;
         }
@@ -39,5 +46,6 @@ namespace CombatSystem.Skills.Effects
             string generatedName = GenerateAssetName(in statTypeName);
             UtilsAssets.UpdateAssetName(this, generatedName);
         }
+
     }
 }

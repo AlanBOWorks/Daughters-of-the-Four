@@ -11,6 +11,13 @@ namespace CombatSystem.Skills.Effects
     public class STeamSwitchStanceEffect : SEffect, ITeamEffect
     {
         [SerializeField] private EnumTeam.Stance stance;
+        private string _effectTag;
+
+        private void OnEnable()
+        {
+            _effectTag = "STANCE_" + stance + "_" + EffectPrefix;
+        }
+        public override string EffectTag => _effectTag;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

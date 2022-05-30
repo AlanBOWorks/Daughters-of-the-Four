@@ -8,6 +8,10 @@ namespace CombatSystem.Skills.Effects
         fileName = "Damage [Effect]")]
     public class SDamageEffect : SEffect, IOffensiveEffect
     {
+
+        private const string DamageEffectTag = "Damage_Effect";
+        public override string EffectTag => DamageEffectTag;
+
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
             float damage = effectValue;

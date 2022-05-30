@@ -10,5 +10,8 @@ namespace CombatSystem.Skills.Effects
         {
             UtilsCombatTeam.PutOnStandBy(in target);
         }
+
+        private const string WaitEffectTag = "Wait_Effect";
+        public override string EffectTag => WaitEffectTag;
     }
 }

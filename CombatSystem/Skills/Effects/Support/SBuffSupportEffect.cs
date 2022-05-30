@@ -10,6 +10,13 @@ namespace CombatSystem.Skills.Effects
     public class SBuffSupportEffect : SBuffEffect
     {
         [SerializeField] private EnumStats.SupportStatType type;
+        private string _effectTag;
+
+        private void OnEnable()
+        {
+            _effectTag = GetBuffPrefix() + "_" + type + "_" + EffectPrefix;
+        } public override string EffectTag => _effectTag;
+
 
         protected override void DoBuff(in float performerBuffPower, in float targetBuffReceivePower,
             in float effectValue,
@@ -44,5 +51,6 @@ namespace CombatSystem.Skills.Effects
         {
             base.UpdateAssetName(type.ToString());
         }
+
     }
 }

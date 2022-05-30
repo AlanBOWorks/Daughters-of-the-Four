@@ -7,6 +7,9 @@ namespace CombatSystem.Skills.Effects
         menuName = "Combat/Effect/Team/Guarding")]
     public class STeamGuarding : SEffect, ITeamEffect
     {
+        private const string GuardingEffectTag = "Guarding_Effect";
+        public override string EffectTag => GuardingEffectTag;
+
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
             performer.Team.GuardHandler.SetGuarder(in target);

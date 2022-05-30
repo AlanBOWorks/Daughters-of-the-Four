@@ -11,7 +11,7 @@ namespace CombatSystem.Skills.Effects
         float GetValue();
     }
 
-    public interface IEffect
+    public interface IEffect : IEffectBasicInfo
     {
         void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue);
     }
@@ -25,6 +25,11 @@ namespace CombatSystem.Skills.Effects
         T OffensiveEffectType { get; }
         T SupportEffectType { get; }
         T TeamEffectType { get; }
+    }
+
+    public interface IEffectBasicInfo
+    {
+        string EffectTag { get; }
     }
 
 }

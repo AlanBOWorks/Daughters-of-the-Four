@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
-using CombatSystem.Stats;
 using CombatSystem.Team;
 using UnityEngine;
 

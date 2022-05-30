@@ -1,3 +1,4 @@
+using System;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
 using UnityEngine;
@@ -8,6 +9,9 @@ namespace CombatSystem.Skills.Effects
         fileName = "Heal [Effect]")]
     public class SHealEffect : SEffect, ISupportEffect
     {
+        public const string HealEffectTag = "Heal_Effect";
+        public override string EffectTag => HealEffectTag;
+
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
             float healAmount = effectValue;

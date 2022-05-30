@@ -10,6 +10,16 @@ namespace CombatSystem.Skills.Effects
     public class SBuffVitalityEffect : SBuffEffect
     {
         [SerializeField] private EnumStats.VitalityStatType type;
+        private string _effectTag;
+
+        private void OnEnable()
+        {
+            _effectTag = GetBuffPrefix() + "_" + type + EffectPrefix;
+        }
+        public override string EffectTag => _effectTag;
+
+
+
         protected override void DoBuff(in float performerBuffPower, in float targetBuffReceivePower,
             in float effectValue,
             in IBasicStats<float> buffingStats)

@@ -8,6 +8,8 @@ namespace CombatSystem.Skills.Effects
         fileName = "Shielding [Effect]")]
     public class SShieldEffect : SEffect, ISupportEffect
     {
+        private const string ShieldEffectTag = "Shield_Effect";
+        public override string EffectTag => ShieldEffectTag;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
@@ -23,6 +25,7 @@ namespace CombatSystem.Skills.Effects
             performer.ProtectionDoneTracker.DoShields(in target, in addingShields);
             target.ProtectionReceiveTracker.DoShields(in performer, in addingShields);
         }
+
 
         private static void DoShieldAddition(IDamageableStats<float> target, in float addingShields)
         {

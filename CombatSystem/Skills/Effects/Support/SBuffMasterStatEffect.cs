@@ -12,6 +12,13 @@ namespace CombatSystem.Skills.Effects
     public class SBuffMasterStatEffect : SEffect
     {
         [SerializeField] private EnumStats.MasterStatType type;
+        private string _effectTag;
+
+        private void OnEnable()
+        {
+            _effectTag = "BuffMASTER_" + type + "_" + EffectPrefix;
+        }
+        public override string EffectTag => _effectTag;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
@@ -48,8 +55,8 @@ namespace CombatSystem.Skills.Effects
 
         protected string GenerateAssetName(string statTypeName)
         {
-            string buffType = "MASTER Stat - ";
-            string suffix = " [Effect]";
+            const string buffType = "MASTER Stat - ";
+            const string suffix = " [Effect]";
 
             return buffType + statTypeName + suffix;
         }

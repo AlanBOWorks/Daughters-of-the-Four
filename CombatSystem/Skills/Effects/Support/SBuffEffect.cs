@@ -7,6 +7,10 @@ namespace CombatSystem.Skills.Effects
 {
     public abstract class SBuffEffect : SEffect, ISupportEffect
     {
+        private const string BuffPrefix = "BUFF";
+        private const string BurstPrefix = "BURST";
+        protected string GetBuffPrefix() => (isBurst) ? BurstPrefix : BuffPrefix;
+
         [SerializeField] protected bool isBurst;
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
@@ -28,8 +32,8 @@ namespace CombatSystem.Skills.Effects
 
         protected string GenerateAssetName(in string statTypeName)
         {
-            string buffType = ((isBurst) ? "BURST" : "BUFF") + " Stat - ";
-            string suffix = " [Effect]";
+            string buffType = GetBuffPrefix() + " Stat - ";
+            const string suffix = " [Effect]";
 
             return buffType + statTypeName + suffix;
         }

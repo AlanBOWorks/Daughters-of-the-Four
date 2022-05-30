@@ -1,6 +1,7 @@
 using System;
 using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
+using Localization.Combat;
 using UnityEngine;
 
 namespace CombatSystem.Localization
@@ -9,10 +10,11 @@ namespace CombatSystem.Localization
     {
         public static string LocalizeEffectTooltip(in PerformEffectValues values)
         {
-            //string targetType; todo
-            string localizedName = values.Effect.ToString();
-            string localizedDigits = LocalizeEffectDigitValue(in values);
+            string localizationTag = values.Effect.EffectTag;
+            string localizedName = CombatLocalizations.LocalizeEffectName(in localizationTag);
 
+
+            string localizedDigits = LocalizeEffectDigitValue(in values);
             return localizedName + ": " + localizedDigits;
         }
 

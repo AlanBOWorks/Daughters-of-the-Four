@@ -1,3 +1,4 @@
+using System;
 using CombatSystem.Entity;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -12,6 +13,14 @@ namespace CombatSystem.Skills.Effects
     public class STeamControlEffect : SEffect, ITeamEffect
     {
         [SerializeField] private bool isBurst;
+        private string _effectTag;
+        public override string EffectTag => _effectTag;
+
+        private void OnEnable()
+        {
+            _effectTag = "CONTROL_" + GetBurstSuffix() + "_" + EffectPrefix;
+        }
+
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
             var targetTeam = target.Team;
@@ -31,15 +40,18 @@ namespace CombatSystem.Skills.Effects
             }
         }
 
+        private const string BurstPrefix = "BURST";
+        private const string GainPrefix = "GAIN";
+
+        private string GetBurstSuffix() => isBurst ? BurstPrefix : GainPrefix;
 
         [Button]
         protected void UpdateAssetName()
         {
-            string header = "Team CONTROL - ";
-            string body;
-            string suffix = " [Effect]";
+            const string header = "Team CONTROL - ";
+            const string suffix = " [Effect]";
 
-            body = isBurst ? "Burst" : "Gain";
+            var body = GetBurstSuffix();
 
             string generatedName = header + body + suffix;
             UtilsAssets.UpdateAssetName(this, generatedName);

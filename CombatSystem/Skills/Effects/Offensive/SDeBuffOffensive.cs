@@ -11,6 +11,14 @@ namespace CombatSystem.Skills.Effects
     public class SDeBuffOffensive : SDeBuffEffect
     {
         [SerializeField] private EnumStats.OffensiveStatType type;
+        private string _effectTag;
+
+        private void OnEnable()
+        {
+            _effectTag = GetBuffPrefix() + "_" + type + "_" + EffectPrefix;
+        }
+        public override string EffectTag => _effectTag;
+
 
 
         protected override void DoDeBuff(in float performerDeBuffPower, in float targetDeBuffResistance, in float effectValue,
