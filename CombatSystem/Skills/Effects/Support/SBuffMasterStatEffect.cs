@@ -37,20 +37,21 @@ namespace CombatSystem.Skills.Effects
             switch (type)
             {
                 case EnumStats.MasterStatType.Offensive:
-                    stats.OffensiveType += addingValue;
+                    UtilsBuffStats.MasterBuffOffensive(stats.BuffStats, in addingValue);
                     break;
                 case EnumStats.MasterStatType.Support:
-                    stats.SupportType += addingValue;
+                    UtilsBuffStats.MasterBuffSupport(stats.BuffStats, in addingValue);
                     break;
                 case EnumStats.MasterStatType.Vitality:
-                    stats.VitalityType += addingValue;
+                    UtilsBuffStats.MasterBuffVitality(stats.BuffStats, in addingValue);
                     break;
                 case EnumStats.MasterStatType.Concentration:
-                    stats.ConcentrationType += addingValue;
+                    UtilsBuffStats.MasterBuffConcentration(stats.BuffStats, in addingValue);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
         }
 
         protected string GenerateAssetName(string statTypeName)

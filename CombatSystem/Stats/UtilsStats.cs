@@ -10,14 +10,6 @@ namespace CombatSystem.Stats
     public static class UtilsStats 
     {
 
-        public static float GetCharacterControlAmount(CombatStats stats)
-        {
-            return stats.ConcentrationType * (
-                stats.BaseStats.ControlType +
-                stats.BuffStats.ControlType +
-                stats.BurstStats.ControlType);
-        }
-
         public static void DoCopyMaster<T>(IMainStatsInject<T> inject, IMainStatsRead<T> copyFrom)
         {
             inject.OffensiveType = copyFrom.OffensiveType;
@@ -287,5 +279,43 @@ namespace CombatSystem.Stats
             const float initiativeThreshold = TempoTicker.LoopThreshold;
             initiativePercent = currentTickAmount / initiativeThreshold;
         }
+    }
+
+    public static class UtilsBuffStats
+    {
+        public static void MasterBuffOffensive(IOffensiveStats<float> stats, in float percentValue)
+        {
+            stats.AttackType += percentValue;
+            stats.OverTimeType += percentValue;
+            stats.DeBuffType += percentValue;
+            stats.FollowUpType += percentValue;
+        }
+
+        public static void MasterBuffSupport(ISupportStats<float> stats, in float percentValue)
+        {
+            stats.HealType += percentValue;
+            stats.ShieldingType += percentValue;
+            stats.BuffType += percentValue;
+            stats.ReceiveBuffType += percentValue;
+        }
+
+        public static void MasterBuffVitality(IVitalityStats<float> stats, in float percentValue)
+        {
+            stats.DamageReductionType += percentValue;
+            stats.DeBuffResistanceType += percentValue;
+            //todo Health
+        }
+
+        private const float ActionAmountModifier = 10;
+        private const float SpeedAmountModifier = 10;
+        public static void MasterBuffConcentration(IConcentrationStats<float> stats, in float percentValue)
+        {
+            stats.ControlType += percentValue;
+            stats.CriticalType += percentValue;
+
+            stats.SpeedType += percentValue * SpeedAmountModifier;
+            stats.ActionsType += percentValue * ActionAmountModifier;
+        }
+
     }
 }

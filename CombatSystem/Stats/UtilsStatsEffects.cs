@@ -47,7 +47,6 @@ namespace CombatSystem.Stats
         public static void CalculateDamageFromAttackAttribute(in CombatStats stats, ref float baseDamage)
         {
             UtilsStatsFormula.CalculateValue(in stats, EnumStats.OffensiveStatType.Attack, ref baseDamage);
-            baseDamage *= stats.OffensiveType;
 
             if (baseDamage < 0) baseDamage = 0;
         }
@@ -68,7 +67,6 @@ namespace CombatSystem.Stats
         public static void CalculateHealAmount(in CombatStats performerStats, ref float baseHeal)
         {
             UtilsStatsFormula.CalculateValue(in performerStats, EnumStats.SupportStatType.Heal, ref baseHeal);
-            baseHeal *= performerStats.SupportType;
 
             if (baseHeal < 0) baseHeal = 0;
         }
@@ -83,7 +81,7 @@ namespace CombatSystem.Stats
             UtilsStatsFormula.ExtractStats(in performerStats,
                 out float baseStats, out float buffStats, out float burstStats,
                 EnumStats.SupportStatType.Shielding);
-            float statsModifier = performerStats.SupportType * (baseStats + buffStats + burstStats);
+            float statsModifier = (baseStats + buffStats + burstStats);
 
             desiredShields *= statsModifier;
         }
@@ -93,10 +91,7 @@ namespace CombatSystem.Stats
         public static void ClampShieldsAmount(in CombatStats targetStats,
             ref float addingShields)
         {
-            UtilsStatsFormula.ExtractStats(in targetStats,
-                out float baseStats, out float buffStats, out float burstStats,
-                EnumStats.SupportStatType.Shielding);
-            float statsModifier = targetStats.SupportType * (baseStats + buffStats + burstStats);
+            float statsModifier = UtilsStatsFormula.CalculateStatsSum(in targetStats, EnumStats.SupportStatType.Shielding);
             float maxShields = VanillaMaxShieldAmount * statsModifier;
 
             float currentShields = targetStats.CurrentShields;
@@ -107,36 +102,24 @@ namespace CombatSystem.Stats
             addingShields = desiredShields - currentShields;
         }
 
-        public static float CalculateBuffPower(in CombatStats performerStats)
-        {
-            return performerStats.SupportType * (
-                                                  performerStats.BaseStats.BuffType +
-                                                  performerStats.BuffStats.BuffType)
-                                              * (performerStats.BurstType.BuffType);
-        }
+        public static float CalculateBuffPower(in CombatStats performerStats) =>
+            (performerStats.BaseStats.BuffType +
+             performerStats.BuffStats.BuffType)
+            * (performerStats.BurstType.BuffType);
 
-        public static float CalculateBuffReceivePower(in CombatStats targetStats)
-        {
-            return targetStats.SupportType * (
-                                               targetStats.BaseStats.ReceiveBuffType +
-                                               targetStats.BuffStats.ReceiveBuffType)
-                                           * (targetStats.BurstType.ReceiveBuffType);
-        }
+        public static float CalculateBuffReceivePower(in CombatStats targetStats) =>
+            (targetStats.BaseStats.ReceiveBuffType +
+             targetStats.BuffStats.ReceiveBuffType)
+            * (targetStats.BurstType.ReceiveBuffType);
 
-        public static float CalculateDeBuffPower(in CombatStats performerStats)
-        {
-            return performerStats.OffensiveType * (
-                performerStats.BaseStats.DeBuffType +
-                performerStats.BuffStats.DeBuffType +
-                performerStats.BurstStats.DeBuffType);
-        }
+        public static float CalculateDeBuffPower(in CombatStats performerStats) =>
+            performerStats.BaseStats.DeBuffType +
+            performerStats.BuffStats.DeBuffType +
+            performerStats.BurstStats.DeBuffType;
 
-        public static float CalculateDeBuffResistance(in CombatStats targetStats)
-        {
-            return targetStats.VitalityType * (
-                targetStats.BaseStats.DeBuffResistanceType +
-                targetStats.BuffStats.DeBuffResistanceType +
-                targetStats.BurstStats.DeBuffResistanceType);
-        }
+        public static float CalculateDeBuffResistance(in CombatStats targetStats) =>
+            targetStats.BaseStats.DeBuffResistanceType +
+            targetStats.BuffStats.DeBuffResistanceType +
+            targetStats.BurstStats.DeBuffResistanceType;
     }
 }

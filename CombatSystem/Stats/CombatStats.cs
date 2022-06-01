@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatSystem.Stats
 {
-    public class CombatStats : ICombatStats<float>, IMainStats<float>, 
+    public class CombatStats : ICombatStats<float>,
         IStatsTypesRead<IBasicStatsRead<float>>
     {
         public CombatStats(IStatsRead<float> baseStats)
@@ -14,16 +14,6 @@ namespace CombatSystem.Stats
             BaseStats = baseStats;
             BuffStats = new StatsBase<float>(0);
             BurstStats = new BurstStats();
-
-            // --------------------- 
-            // Master's assignation
-            // --------------------- 
-            OffensiveType = 1;
-            SupportType = 1;
-            VitalityType = 1;
-            ConcentrationType = 1;
-            UtilsStats.DoCopyMaster(this, baseStats);
-            
 
             // --------------------- 
             // Special case's assignation
@@ -86,16 +76,6 @@ namespace CombatSystem.Stats
         [ShowInInspector]
         public float CurrentInitiative { get; set; }
 
-        [Title("Masters")]
-        [ShowInInspector]
-        public float OffensiveType { get; set; }
-        [ShowInInspector]
-        public float SupportType { get; set; }
-        [ShowInInspector]
-        public float VitalityType { get; set; }
-        [ShowInInspector]
-        public float ConcentrationType { get; set; }
-        
 
         public bool IsAlive()
         {

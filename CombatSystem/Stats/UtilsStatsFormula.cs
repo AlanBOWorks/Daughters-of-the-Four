@@ -43,11 +43,27 @@ namespace CombatSystem.Stats
             burstStats = UtilsStats.GetElement(type, stats.BurstStats);
         }
 
+        public static float CalculateStatsSum(in CombatStats stats, in EnumStats.OffensiveStatType type)
+        {
+            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
+            return 1 + baseStats + buffStats + burstStats;
+        }
+        public static float CalculateStatsSum(in CombatStats stats, in EnumStats.SupportStatType type)
+        {
+            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
+            return 1 + baseStats + buffStats + burstStats;
+        }
+        public static float CalculateStatsSum(in CombatStats stats, in EnumStats.VitalityStatType type)
+        {
+            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
+            return 1 + baseStats + buffStats + burstStats;
+        }
 
-        private static float SumOfValues(in StatsValues values)
+        private static float CalculateStatsSum(in StatsValues values)
         {
             return values.BaseType + values.BuffType + values.BurstType;
         }
+
 
         public static void CalculateValue(in CombatStats stats, in EnumStats.OffensiveStatType type,
             ref float modifyValue)
@@ -77,7 +93,6 @@ namespace CombatSystem.Stats
             float speedAmount = stats.BaseStats.SpeedType
                                 + stats.BuffStats.SpeedType
                                 + stats.BurstStats.SpeedType;
-            speedAmount *= stats.ConcentrationType;
 
             // by design, 0 speed will be set by an skill > forcing the enemy reaching this stats.
             // the problem: the entity never will reach 100% initiative, so this should be fixed with small increments
@@ -94,8 +109,6 @@ namespace CombatSystem.Stats
                 + stats.BuffStats.CriticalType
                 + stats.BurstType.CriticalType;
 
-            luckAmount *= stats.ConcentrationType;
-
             return luckAmount;
         }
 
@@ -104,16 +117,14 @@ namespace CombatSystem.Stats
         {
             ExtractStats(in stats, out var values, EnumStats.StatType.Health);
 
-            float maxHealth = SumOfValues(values);
-            maxHealth *= stats.VitalityType;
+            float maxHealth = CalculateStatsSum(values);
             return maxHealth;
         }
         public static float CalculateMaxMortality(CombatStats stats)
         {
             ExtractStats(in stats, out var values, EnumStats.StatType.Mortality);
 
-            float maxMortality = SumOfValues(in values);
-            maxMortality *= stats.VitalityType;
+            float maxMortality = CalculateStatsSum(in values);
             return maxMortality;
         }
 
@@ -122,7 +133,7 @@ namespace CombatSystem.Stats
         {
             ExtractStats(in stats, out var values, EnumStats.StatType.Actions);
 
-            float actionsAmount = SumOfValues(values);
+            float actionsAmount = CalculateStatsSum(values);
 
             if (actionsAmount > MaxActionsAmount)
                 actionsAmount = MaxActionsAmount;
