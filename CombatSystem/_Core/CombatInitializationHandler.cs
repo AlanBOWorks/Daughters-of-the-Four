@@ -95,7 +95,8 @@ namespace CombatSystem._Core
 
             void InitialStatsPreparation(in CombatTeam team)
             {
-                foreach (var member in team)
+                var members = team.GetAllMembers();
+                foreach (var member in members)
                 {
                     member.Stats.SetToFullInitiative();
                 }
@@ -103,25 +104,27 @@ namespace CombatSystem._Core
         }
 
 
-        private sealed class CombatMembersHolder : IReadOnlyList<CombatEntity>
+        private sealed class CombatMembersHolder : IReadOnlyCollection<CombatEntity>
         {
             public CombatMembersHolder(CombatTeam playerTeam, CombatTeam enemyTeam)
             {
-                _playerTeam = playerTeam;
-                _enemyTeam = enemyTeam;
+                _playerTeam = playerTeam.GetAllMembers();
+                _enemyTeam = enemyTeam.GetAllMembers();
             }
 
-            private readonly CombatTeam _playerTeam;
-            private readonly CombatTeam _enemyTeam;
+            private readonly IReadOnlyCollection<CombatEntity> _playerTeam;
+            private readonly IReadOnlyCollection<CombatEntity> _enemyTeam;
 
             public IEnumerator<CombatEntity> GetEnumerator()
             {
-                foreach (var member in _playerTeam)
+                var playerMembers = _playerTeam;
+                foreach (var member in playerMembers)
                 {
                     yield return member;
                 }
 
-                foreach (var member in _enemyTeam)
+                var enemyMembers = _enemyTeam;
+                foreach (var member in enemyMembers)
                 {
                     yield return member;
                 }
@@ -134,16 +137,6 @@ namespace CombatSystem._Core
 
             public int Count => _playerTeam.Count + _enemyTeam.Count;
 
-            public CombatEntity this[int index]
-            {
-                get
-                {
-                    int playerCount = _playerTeam.Count;
-                    return index < playerCount 
-                        ? _playerTeam[index] 
-                        : _enemyTeam[index - playerCount];
-                }
-            }
         }
     }
 

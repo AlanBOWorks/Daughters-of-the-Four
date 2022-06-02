@@ -57,7 +57,8 @@ namespace CombatSystem.Player.UI
 
             void GenerateElements(in EntityElementSpawner spawner, in CombatTeam team)
             {
-                foreach (var member in team)
+                var members = team.GetAllMembers();
+                foreach (var member in members)
                 {
                     OnSpawnElementForEntity(in member, in spawner);
                 }

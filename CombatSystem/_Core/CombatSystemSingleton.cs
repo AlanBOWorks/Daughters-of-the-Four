@@ -77,7 +77,7 @@ namespace CombatSystem._Core
         // ------- TEAM ------
         [Title("Team")]
         [ShowInInspector,DisableInEditorMode]
-        internal static IReadOnlyList<CombatEntity> AllMembersCollection { private get; set; }
+        internal static IReadOnlyCollection<CombatEntity> AllMembersCollection { private get; set; }
 
         public static CombatTeamsHolder TeamsHolder;
 

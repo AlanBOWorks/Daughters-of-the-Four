@@ -74,7 +74,7 @@ namespace CombatSystem.Player.UI
         {
             _buttonsDictionary.Clear();
 
-            ITeamFlexPositionStructureRead<CombatEntity> members = playerTeam.GetMainMembers();
+            ITeamFlexPositionStructureRead<CombatEntity> members = playerTeam.GetMainPositions();
             var enumerable = UtilsTeam.GetEnumerable(members, references);
             foreach (var pair in enumerable)
             {

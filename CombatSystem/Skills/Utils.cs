@@ -94,7 +94,7 @@ namespace CombatSystem.Skills
                 var members =
                     enemyGuarding.CanGuard()
                         ? GetGuarderLine()
-                        : enemyTeam;
+                        : enemyTeam.GetAllMembers();
 
                 foreach (var member in members)
                 {
@@ -112,7 +112,7 @@ namespace CombatSystem.Skills
             void HandleSupportMembers()
             {
                 var team = performer.Team;
-                foreach (var member in team)
+                foreach (var member in team.GetAllMembers())
                 {
                     if (ignoreSelf && member == performer)
                         continue;
@@ -157,17 +157,18 @@ namespace CombatSystem.Skills
 
         internal static IEnumerable<CombatEntity> GetOffensiveLine(CombatEntity targetEntity)
         {
-            ExtractTargetEffectsValues(in targetEntity,out var targetTeam, out var positioning);
+            ExtractTargetEffectsValues(in targetEntity, out var team, out var positioning);
+            var membersPositions = team.GetAllPositions();
             switch (positioning)
             {
                 case EnumTeam.Positioning.FrontLine:
-                    return targetTeam.FrontLineType;
+                    return membersPositions.FrontLineType;
                 case EnumTeam.Positioning.MidLine:
-                    return targetTeam.MidLineType.Concat(targetTeam.FlexLineType);
+                    return membersPositions.MidLineType.Concat(membersPositions.FlexLineType);
                 case EnumTeam.Positioning.BackLine:
-                    return targetTeam.BackLineType;
+                    return membersPositions.BackLineType;
                 case EnumTeam.Positioning.FlexLine:
-                    return targetTeam.FlexLineType;
+                    return membersPositions.FlexLineType;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null);
             }
@@ -175,26 +176,30 @@ namespace CombatSystem.Skills
 
         internal static IEnumerable<CombatEntity> GetSupportLine(CombatEntity targetEntity)
         {
-            ExtractTargetEffectsValues(in targetEntity,out var targetTeam, out var positioning);
+            ExtractTargetEffectsValues(in targetEntity,out var team, out var positioning);
+            var membersPositions = team.GetAllPositions();
             switch (positioning)
             {
                 case EnumTeam.Positioning.FrontLine:
-                    return ConcatLineToFlex(targetTeam.FrontLineType);
+                    return ConcatLineToFlex(membersPositions.FrontLineType);
                 case EnumTeam.Positioning.MidLine:
-                    return ConcatLineToFlex(targetTeam.MidLineType);
+                    return ConcatLineToFlex(membersPositions.MidLineType);
                 case EnumTeam.Positioning.BackLine:
-                    return ConcatLineToFlex(targetTeam.BackLineType);
+                    return ConcatLineToFlex(membersPositions.BackLineType);
                 case EnumTeam.Positioning.FlexLine:
-                    return targetTeam.FlexLineType;
+                    return membersPositions.FlexLineType;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null);
             }
 
             IEnumerable<CombatEntity> ConcatLineToFlex(IEnumerable<CombatEntity> line) =>
-                line.Concat(targetTeam.FlexLineType);
+                line.Concat(membersPositions.FlexLineType);
         }
 
-        private static void ExtractTargetEffectsValues(in CombatEntity targetEntity,out CombatTeam targetTeam, out EnumTeam.Positioning positioning)
+        private static void ExtractTargetEffectsValues(
+            in CombatEntity targetEntity,
+            out CombatTeam targetTeam, 
+            out EnumTeam.Positioning positioning)
         {
             targetTeam = targetEntity.Team;
             positioning = targetEntity.PositioningType;
@@ -222,7 +227,7 @@ namespace CombatSystem.Skills
         {
             aliveTeam.Clear(); //safe clear
 
-            foreach (var member in target.Team)
+            foreach (var member in target.Team.GetAllMembers())
             {
                 if (UtilsTarget.CanBeTargeted(in member))
                     aliveTeam.Add(member);

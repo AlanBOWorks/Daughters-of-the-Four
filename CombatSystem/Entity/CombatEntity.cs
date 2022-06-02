@@ -117,12 +117,6 @@ namespace CombatSystem.Entity
             Team = team;
         }
 
-        public void SwitchTeam(CombatTeam team)
-        {
-            Team.Remove(this);
-            InjectTeam(team);
-        }
-
 
         /// <summary>
         /// ReadOnly StanceSkills in the current [<seealso cref="EnumTeam.StanceFull"/>];<br></br>

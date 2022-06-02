@@ -24,7 +24,8 @@ namespace CombatSystem._Core
 
         public void AddEntities(CombatTeam team)
         {
-            foreach (var member in team)
+            var members = team.GetAllMembers();
+            foreach (var member in members)
             {
                 AddEntity(member);
             }

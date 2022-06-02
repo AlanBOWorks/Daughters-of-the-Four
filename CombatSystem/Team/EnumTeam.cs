@@ -10,6 +10,19 @@ namespace CombatSystem.Team
             TeamPosition
         }
 
+        /// <summary>
+        /// Index = 0
+        /// </summary>
+        public const int MainRoleIndex = 0;
+        /// <summary>
+        /// Index = 1
+        /// </summary>
+        public const int SecondaryRoleIndex = MainRoleIndex + 1;
+        /// <summary>
+        /// Index = 2
+        /// </summary>
+        public const int ThirdRoleIndex = SecondaryRoleIndex + 1;
+
         public const int InvalidIndex = -1;
         public const int VanguardIndex = 0;
         public const int AttackerIndex = VanguardIndex + 1;

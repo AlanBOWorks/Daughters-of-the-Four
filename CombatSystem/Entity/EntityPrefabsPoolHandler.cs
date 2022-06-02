@@ -45,7 +45,9 @@ namespace CombatSystem.Entity
 
             private void Pool(in CombatTeam team)
             {
-                var keyValuePairs = UtilsTeam.GetEnumerable(team,this);
+                
+                var members = team.GetAllEntities();
+                var keyValuePairs = UtilsTeam.GetEnumerable(members, this);
                 foreach (var pair in keyValuePairs)
                 {
                     var entity = pair.Key;
@@ -89,7 +91,8 @@ namespace CombatSystem.Entity
 
             public virtual void PoolMembers(CombatTeam team, ITeamFullStructureRead<Transform> positions)
             {
-                var keyValuePairs = UtilsTeam.GetEnumerable(team, positions);
+                var members = team.GetAllEntities();
+                var keyValuePairs = UtilsTeam.GetEnumerable(members, positions);
                 int index = 0;
                 foreach (var pair in keyValuePairs)
                 {

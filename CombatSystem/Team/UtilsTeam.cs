@@ -55,7 +55,7 @@ namespace CombatSystem.Team
 
         public static IEnumerable<CombatEntity> GetMemberLine(in CombatEntity target)
         {
-            var targetTeam = target.Team;
+            var targetTeam = target.Team.GetAllPositions();
             var targetPositioning = target.PositioningType;
             return GetElement(targetPositioning,targetTeam);
         }
@@ -89,20 +89,21 @@ namespace CombatSystem.Team
 
         public static CombatEntity GetMember(in CombatTeam team,in EnumTeam.ActiveRole role)
         {
+            var entitiesHolder = team.GetAllEntities();
             return role switch
             {
-                EnumTeam.ActiveRole.MainVanguard => team.VanguardType,
-                EnumTeam.ActiveRole.MainAttacker => team.AttackerType,
-                EnumTeam.ActiveRole.MainSupport => team.SupportType,
-                EnumTeam.ActiveRole.MainFlex => team.FlexType,
-                EnumTeam.ActiveRole.SecondaryVanguard => team.SecondaryVanguardElement,
-                EnumTeam.ActiveRole.SecondaryAttacker => team.SecondaryAttackerElement,
-                EnumTeam.ActiveRole.SecondarySupport => team.SecondarySupportElement,
-                EnumTeam.ActiveRole.SecondaryFlex => team.SecondaryFlexElement,
-                EnumTeam.ActiveRole.ThirdVanguard => team.ThirdVanguardElement,
-                EnumTeam.ActiveRole.ThirdAttacker => team.ThirdAttackerElement,
-                EnumTeam.ActiveRole.ThirdSupport => team.ThirdSupportElement,
-                EnumTeam.ActiveRole.ThirdFlex => team.ThirdFlexElement,
+                EnumTeam.ActiveRole.MainVanguard => entitiesHolder.VanguardType,
+                EnumTeam.ActiveRole.MainAttacker => entitiesHolder.AttackerType,
+                EnumTeam.ActiveRole.MainSupport => entitiesHolder.SupportType,
+                EnumTeam.ActiveRole.MainFlex => entitiesHolder.FlexType,
+                EnumTeam.ActiveRole.SecondaryVanguard => entitiesHolder.SecondaryVanguardElement,
+                EnumTeam.ActiveRole.SecondaryAttacker => entitiesHolder.SecondaryAttackerElement,
+                EnumTeam.ActiveRole.SecondarySupport => entitiesHolder.SecondarySupportElement,
+                EnumTeam.ActiveRole.SecondaryFlex => entitiesHolder.SecondaryFlexElement,
+                EnumTeam.ActiveRole.ThirdVanguard => entitiesHolder.ThirdVanguardElement,
+                EnumTeam.ActiveRole.ThirdAttacker => entitiesHolder.ThirdAttackerElement,
+                EnumTeam.ActiveRole.ThirdSupport => entitiesHolder.ThirdSupportElement,
+                EnumTeam.ActiveRole.ThirdFlex => entitiesHolder.ThirdFlexElement,
                 _ => null
             };
         }
@@ -613,11 +614,6 @@ namespace CombatSystem.Team
         }
 
 
-
-        public static void PutOnStandBy(in CombatEntity target)
-        {
-            target.Team.StandByMembers.PutOnStandBy(in target);
-        }
     }
 
     public static class UtilsTeamMembers

@@ -72,7 +72,7 @@ namespace CombatSystem.Animations
             Timing.RunCoroutine(_IterationCall(), coroutineLayer);
             IEnumerator<float> _IterationCall()
             {
-                foreach (var entity in team)
+                foreach (var entity in team.GetAllMembers())
                 {
                     yield return Timing.WaitForSeconds(IterationWait);
                     CallInitialAnimation(entity);

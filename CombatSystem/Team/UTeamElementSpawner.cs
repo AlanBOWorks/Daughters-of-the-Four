@@ -1,10 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using Sirenix.OdinInspector;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Utils;
 using Object = UnityEngine.Object;
@@ -205,15 +203,16 @@ namespace CombatSystem.Team
                 out IEnumerable<CombatEntity> mainRoles,
                 out IEnumerable<CombatEntity> offRole)
             {
-                mainRoles = UtilsTeam.GetEnumerable(team as ITeamFlexStructureRead<CombatEntity>);
-                offRole = UtilsTeam.GetEnumerable(team as ITeamOffStructureRead<CombatEntity>);
+                mainRoles = team.GetMainRoles();
+                offRole = team.GetOffRoles();
             }
-            private void FlexIsOff(CombatTeam team, 
+            private static void FlexIsOff(CombatTeam team, 
                 out IEnumerable<CombatEntity> mainRoles,
                 out IEnumerable<CombatEntity> offRole)
             {
-                mainRoles = UtilsTeam.GetEnumerable(team as ITeamTrinityStructureRead<CombatEntity>);
-                offRole = UtilsTeam.GetOffElementWithFlex(team);
+                var teamEntities = team.GetAllEntities();
+                mainRoles = UtilsTeam.GetEnumerable((ITeamTrinityStructureRead<CombatEntity>) teamEntities);
+                offRole = UtilsTeam.GetOffElementWithFlex(teamEntities);
             }
 
             private void HandleIterator(IEnumerable<CombatEntity> members, 
