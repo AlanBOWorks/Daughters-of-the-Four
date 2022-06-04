@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
-using CombatSystem.Player.Events;
+using CombatSystem.Player.Handlers;
 using CombatSystem.Player.UI;
-using CombatSystem.Skills;
 using CombatSystem.Team;
+using CombatSystem.VFX;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -95,8 +95,8 @@ namespace CombatSystem.Player
             [ShowInInspector, TabGroup("Functionality")]
             private PlayerCombatSingleton _singleton;
 
-            [ShowInInspector, TabGroup("Visuals"),InlineEditor(InlineEditorObjectFieldModes.Foldout)]
-            private IOppositionTeamStructureRead<CombatPlayerTeamFeedBack> _feedBacks;
+            [ShowInInspector, TabGroup("Visuals")]
+            private PlayerCombatVisualsSingleton _visualsSingleton;
 
 
             [MenuItem("Combat/Debug/Player Singleton", priority = -4)]
@@ -112,7 +112,7 @@ namespace CombatSystem.Player
             private void LoadReferences()
             {
                 _singleton = Instance;
-                _feedBacks = PlayerCombatUserInterfaceSingleton.CombatTeemFeedBacks;
+                _visualsSingleton = PlayerCombatVisualsSingleton.Instance;
             }
         }
 

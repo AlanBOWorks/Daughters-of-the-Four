@@ -12,6 +12,9 @@ namespace CombatSystem.Skills.Effects
         protected string GetBuffPrefix() => (isBurst) ? BurstPrefix : BuffPrefix;
 
         [SerializeField] protected bool isBurst;
+
+        public override EnumStats.StatType EffectType => EnumStats.StatType.Buff;
+
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
             var performerStats = performer.Stats;

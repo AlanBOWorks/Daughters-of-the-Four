@@ -11,6 +11,7 @@ namespace CombatSystem.Skills.Effects
 
         private const string DamageEffectTag = "Damage_Effect";
         public override string EffectTag => DamageEffectTag;
+        public override EnumStats.StatType EffectType => EnumStats.StatType.Attack;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

@@ -46,11 +46,6 @@ namespace CombatSystem.Skills
         public void OnCombatSkillPerform(in SkillUsageValues values)
         {
         }
-
-        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
-        {
-        }
-
         public void OnCombatSkillFinish(CombatEntity performer)
         {
             

@@ -10,6 +10,7 @@ namespace CombatSystem.Skills.Effects
     {
         private const string ShieldEffectTag = "Shield_Effect";
         public override string EffectTag => ShieldEffectTag;
+        public override EnumStats.StatType EffectType => EnumStats.StatType.Shielding;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

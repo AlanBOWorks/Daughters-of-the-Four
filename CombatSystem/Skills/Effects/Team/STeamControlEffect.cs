@@ -1,5 +1,6 @@
 using System;
 using CombatSystem.Entity;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace CombatSystem.Skills.Effects
         [SerializeField] private bool isBurst;
         private string _effectTag;
         public override string EffectTag => _effectTag;
+        public override EnumStats.StatType EffectType => EnumStats.StatType.Control;
 
         private void OnEnable()
         {

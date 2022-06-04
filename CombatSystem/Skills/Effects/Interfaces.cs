@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Stats;
 using UnityEngine;
 
 namespace CombatSystem.Skills.Effects
@@ -30,6 +31,8 @@ namespace CombatSystem.Skills.Effects
     public interface IEffectBasicInfo
     {
         string EffectTag { get; }
+        EnumStats.StatType EffectType { get; }
+        GameObject GetSecondaryParticlesPrefab();
     }
 
 }

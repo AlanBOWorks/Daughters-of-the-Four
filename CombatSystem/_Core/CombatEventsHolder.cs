@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using CombatSystem.AI;
 using CombatSystem.Entity;
@@ -379,13 +380,22 @@ namespace CombatSystem._Core
 
         }
 
-        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
-            _eventsHolder.OnCombatEffectPerform(performer,target, in values);
-            _playerCombatEvents.OnCombatEffectPerform(performer,target, in values);
-            _enemyCombatEvents.OnCombatEffectPerform(performer,target, in values);
+            _eventsHolder.OnCombatPrimaryEffectPerform(performer, target, in values);
+            _playerCombatEvents.OnCombatPrimaryEffectPerform(performer, target, in values);
+            _enemyCombatEvents.OnCombatPrimaryEffectPerform(performer, target, in values);
 
-            _currentDiscriminatedEntityEventsHolder.OnCombatEffectPerform(performer, target, values);
+            _currentDiscriminatedEntityEventsHolder.OnCombatPrimaryEffectPerform(performer, target, values);
+        }
+
+        public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+            _eventsHolder.OnCombatSecondaryEffectPerform(performer,target, in values);
+            _playerCombatEvents.OnCombatSecondaryEffectPerform(performer,target, in values);
+            _enemyCombatEvents.OnCombatSecondaryEffectPerform(performer,target, in values);
+
+            _currentDiscriminatedEntityEventsHolder.OnCombatSecondaryEffectPerform(performer, target, values);
         }
 
         public void OnCombatSkillFinish(CombatEntity performer)
@@ -933,10 +943,7 @@ namespace CombatSystem._Core
 
     }
 
-    public class CombatEntityEventsHolder : 
-        ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
-        ITempoTeamStatesListener,
-        ISkillUsageListener, ITeamEventListener
+    public class CombatEntityEventsHolder :  ICombatEventsHolderBase
     {
         public CombatEntityEventsHolder()
         {
@@ -947,6 +954,8 @@ namespace CombatSystem._Core
             _tempoTeamListeners = new HashSet<ITempoTeamStatesListener>();
 
             _skillUsageListeners = new HashSet<ISkillUsageListener>();
+            _effectUsageListeners = new HashSet<IEffectUsageListener>();
+
             _teamEventListeners = new HashSet<ITeamEventListener>();
         }
 
@@ -961,6 +970,8 @@ namespace CombatSystem._Core
         private readonly ICollection<ITempoTeamStatesListener> _tempoTeamListeners;
 
         [ShowInInspector] private readonly ICollection<ISkillUsageListener> _skillUsageListeners;
+        [ShowInInspector] private readonly ICollection<IEffectUsageListener> _effectUsageListeners;
+
         [ShowInInspector] private readonly ICollection<ITeamEventListener> _teamEventListeners;
 
 
@@ -983,6 +994,8 @@ namespace CombatSystem._Core
 
             if (listener is ISkillUsageListener skillUsageListener)
                 _skillUsageListeners.Add(skillUsageListener);
+            if(listener is IEffectUsageListener effectUsageListener)
+                _effectUsageListeners.Add(effectUsageListener);
 
 
             if (listener is ITeamEventListener teamEventListener)
@@ -1004,6 +1017,8 @@ namespace CombatSystem._Core
 
             if (listener is ISkillUsageListener skillUsageListener)
                 _skillUsageListeners.Remove(skillUsageListener);
+            if (listener is IEffectUsageListener effectUsageListener)
+                _effectUsageListeners.Remove(effectUsageListener);
 
 
             if (listener is ITeamEventListener teamEventListener)
@@ -1177,11 +1192,19 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
-            foreach (var listener in _skillUsageListeners)
+            foreach (var listener in _effectUsageListeners)
             {
-                listener.OnCombatEffectPerform(performer, target, in values);
+                listener.OnCombatPrimaryEffectPerform(performer,target,in values);
+            }
+        }
+
+        public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+            foreach (var listener in _effectUsageListeners)
+            {
+                listener.OnCombatSecondaryEffectPerform(performer, target, in values);
             }
         }
 
@@ -1234,13 +1257,17 @@ namespace CombatSystem._Core
         }
     }
 
-
-    public interface ICombatEventsHolder : ICombatPreparationListener, ICombatStatesListener,
-        ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
+    public interface ICombatEventsHolderBase : ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
         ITempoTeamStatesListener,
-        ITeamEventListener,
+        ISkillUsageListener, IEffectUsageListener,
+        ITeamEventListener
+    {
+
+    }
+
+    public interface ICombatEventsHolder : ICombatEventsHolderBase,
+        ICombatPreparationListener, ICombatStatesListener,
         ICombatEntityExistenceListener, 
-        ISkillUsageListener,
         IDamageDoneListener, IVitalityChangeListener, IRecoveryDoneListener
     {
         void Subscribe(ICombatEventListener listener);

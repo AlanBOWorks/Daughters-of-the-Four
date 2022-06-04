@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UEffectTextSpawnHandler : MonoBehaviour, ISkillUsageListener
+    public class UEffectTextSpawnHandler : MonoBehaviour, IEffectUsageListener
     {
         [SerializeField] private DamageNumber numberPrefab;
         [SerializeField, Min(0), SuffixLabel("s")] private float popUpFrequency = .2f;
@@ -38,13 +38,16 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnCombatSkillSubmit(in SkillUsageValues values)
+        public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
+            OnCombatEffectPerform(performer,target,in values);
         }
 
-        public void OnCombatSkillPerform(in SkillUsageValues values)
+        public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
+            OnCombatEffectPerform(performer,target,in values);
         }
+
 
         public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
@@ -53,10 +56,6 @@ namespace CombatSystem.Player.UI
             _loopHandle = Timing.RunCoroutine(_StartSpawningPopUps(), Segment.RealtimeUpdate);
         }
 
-        public void OnCombatSkillFinish(CombatEntity performer)
-        {
-            
-        }
 
         private CoroutineHandle _loopHandle;
         private IEnumerator<float> _StartSpawningPopUps()

@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -18,6 +19,7 @@ namespace CombatSystem.Skills.Effects
             _effectTag = "STANCE_" + stance + "_" + EffectPrefix;
         }
         public override string EffectTag => _effectTag;
+        public override EnumStats.StatType EffectType => EnumStats.StatType.Control;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

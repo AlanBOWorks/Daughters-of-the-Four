@@ -14,6 +14,8 @@ namespace CombatSystem.Skills.Effects
         [SerializeField] private EnumStats.MasterStatType type;
         private string _effectTag;
 
+        public override EnumStats.StatType EffectType => EnumStats.StatType.Buff;
+
         private void OnEnable()
         {
             _effectTag = "BuffMASTER_" + type + "_" + EffectPrefix;

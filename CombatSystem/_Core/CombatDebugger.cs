@@ -65,7 +65,7 @@ namespace CombatSystem._Core
 
     internal sealed class CombatEventsLogs : ITempoTeamStatesListener,
         ITempoDedicatedEntityStatesListener, ITempoEntityStatesListener,
-        ITempoTickListener, ISkillUsageListener,
+        ITempoTickListener, ISkillUsageListener, IEffectUsageListener,
         ITempoEntityStatesExtraListener,
         IDamageDoneListener
     {
@@ -259,7 +259,6 @@ namespace CombatSystem._Core
         {
             public bool OnSubmit = true;
             public bool OnPerform = true;
-            public bool OnEffect = true;
             public bool OnFinish = true;
         }
 
@@ -283,18 +282,35 @@ namespace CombatSystem._Core
             Debug.Log($"Performing ----- > {values.UsedSkill.GetSkillName()}");
         }
 
-        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
-        {
-            if (!ShowSkillLogs || !_skillsLogs.OnEffect) return;
-            Debug.Log($"Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
-        }
-
         public void OnCombatSkillFinish(CombatEntity performer)
         {
             if (!ShowSkillLogs || !_skillsLogs.OnFinish) return;
             Debug.Log($"Performer ACTIONS: {performer.Stats.UsedActions}");
             Debug.Log("-------------- SKILL END --------------- ");
         }
+
+        [Title("Skills")]
+        public bool ShowEffectLogs = false;
+        private class EffectsSubmitLogs
+        {
+            public bool OnPrimary = true;
+            public bool OnSecondary = true;
+        }
+        [ShowInInspector]
+        private EffectsSubmitLogs _effectLogs = new EffectsSubmitLogs();
+
+        public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+            if (!ShowEffectLogs || !_effectLogs.OnPrimary) return;
+            Debug.Log($"Primary Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
+        }
+
+        public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+            if (!ShowEffectLogs || !_effectLogs.OnSecondary) return;
+            Debug.Log($"Secondary Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
+        }
+
 
         [Title("Damage")] 
         public bool ShowDamageLogs = false;
@@ -338,6 +354,7 @@ namespace CombatSystem._Core
             Debug.Log($"KNOCKOUT - P[{performer.CombatCharacterName}] > T[{target}");
 
         }
+
     }
 
 

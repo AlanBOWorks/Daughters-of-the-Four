@@ -47,7 +47,7 @@ namespace CombatSystem.Player.UI
         private const float IterationHeight = 70 + 6;
         private void OnInstantiation()
         {
-            var feedBacks = PlayerCombatUserInterfaceSingleton.CombatTeemFeedBacks.PlayerTeamType;
+            var feedBacks = PlayerCombatVisualsSingleton.CombatTeamFeedBacks.PlayerTeamType;
             var enumerable = UtilsTeam.GetEnumerable(references, feedBacks);
             int i = references.activeCount;
             foreach (var pair in enumerable)

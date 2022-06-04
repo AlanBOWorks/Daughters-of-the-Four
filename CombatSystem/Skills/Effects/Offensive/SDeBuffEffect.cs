@@ -13,6 +13,8 @@ namespace CombatSystem.Skills.Effects
 
         [SerializeField] protected bool isBurst;
 
+        public override EnumStats.StatType EffectType => EnumStats.StatType.DeBuff;
+
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
             var performerStats = performer.Stats;

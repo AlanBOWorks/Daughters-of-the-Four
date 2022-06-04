@@ -384,10 +384,6 @@ namespace CombatSystem.Player.UI
             
         }
 
-        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
-        {
-        }
-
         public void OnCombatSkillFinish(CombatEntity performer)
         {
         }

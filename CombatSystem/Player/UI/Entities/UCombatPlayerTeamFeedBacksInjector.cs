@@ -10,7 +10,7 @@ namespace CombatSystem.Player.UI
 
         private void Awake()
         {
-            PlayerCombatUserInterfaceSingleton.CombatTeemFeedBacks = defaultAsset;
+            PlayerCombatVisualsSingleton.CombatTeamFeedBacks = defaultAsset;
         }
     }
 }

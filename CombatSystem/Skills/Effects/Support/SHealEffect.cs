@@ -12,6 +12,8 @@ namespace CombatSystem.Skills.Effects
         public const string HealEffectTag = "Heal_Effect";
         public override string EffectTag => HealEffectTag;
 
+        public override EnumStats.StatType EffectType => EnumStats.StatType.Heal;
+
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
             float healAmount = effectValue;

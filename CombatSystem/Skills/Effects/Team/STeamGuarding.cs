@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Stats;
 using UnityEngine;
 
 namespace CombatSystem.Skills.Effects
@@ -9,6 +10,8 @@ namespace CombatSystem.Skills.Effects
     {
         private const string GuardingEffectTag = "Guarding_Effect";
         public override string EffectTag => GuardingEffectTag;
+        public override EnumStats.StatType EffectType => EnumStats.StatType.DamageReduction;
+
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

@@ -3,9 +3,8 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 using CombatSystem.Team;
-using UnityEngine;
 
-namespace CombatSystem.Player.Events
+namespace CombatSystem.Player.Handlers
 {
     public sealed class PlayerPerformerSwitcher : ICombatPreparationListener, 
         ITempoEntityStatesListener,
@@ -95,10 +94,6 @@ namespace CombatSystem.Player.Events
         }
 
         public void OnCombatSkillPerform(in SkillUsageValues values)
-        {
-        }
-
-        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
         }
 
