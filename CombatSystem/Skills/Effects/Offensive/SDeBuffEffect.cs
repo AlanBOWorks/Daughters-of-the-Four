@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using UnityEngine;
 using Utils;
@@ -8,12 +9,17 @@ namespace CombatSystem.Skills.Effects
     public abstract class SDeBuffEffect : SEffect, IOffensiveEffect
     {
 
-        private const string DeBuffPrefix = "DeBUFF";
-        private const string DeBurstPrefix = "DeBURST";
+        private const string DeBuffPrefix = EffectTags.DeBuffEffectName;
+        private const string DeBurstPrefix = EffectTags.DeBurstEffectName;
+        
+        private const string DeBuffSmallPrefix = EffectTags.DeBuffEffectPrefix;
+        private const string DeBurstSmallPrefix = EffectTags.DeBurstEffectPrefix;
 
         [SerializeField] protected bool isBurst;
 
         public override EnumStats.StatType EffectType => EnumStats.StatType.DeBuff;
+        protected string GetBuffPrefix() => (isBurst) ? DeBurstPrefix : DeBuffPrefix;
+        public override string EffectSmallPrefix => (isBurst) ? DeBurstSmallPrefix : DeBuffSmallPrefix;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {
@@ -34,7 +40,6 @@ namespace CombatSystem.Skills.Effects
             in IBasicStats<float> buffingStats);
 
 
-        protected string GetBuffPrefix() => (isBurst) ? DeBurstPrefix : DeBuffPrefix;
 
         protected string GenerateAssetName(in string statTypeName)
         {

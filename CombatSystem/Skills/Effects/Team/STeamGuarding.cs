@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using UnityEngine;
 
@@ -8,8 +9,11 @@ namespace CombatSystem.Skills.Effects
         menuName = "Combat/Effect/Team/Guarding")]
     public class STeamGuarding : SEffect, ITeamEffect
     {
-        private const string GuardingEffectTag = "Guarding_Effect";
+        private const string GuardingEffectTag = EffectTags.GuardingEffectTag;
+        private const string GuardingSmallPrefix = EffectTags.GuardingEffectPrefix;
+
         public override string EffectTag => GuardingEffectTag;
+        public override string EffectSmallPrefix => GuardingSmallPrefix;
         public override EnumStats.StatType EffectType => EnumStats.StatType.DamageReduction;
 
 

@@ -13,6 +13,7 @@ namespace CombatSystem.Skills.Effects
 
         public abstract void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue);
         public abstract string EffectTag { get; }
+        public abstract string EffectSmallPrefix { get; }
         public abstract EnumStats.StatType EffectType { get; }
 
         public const string EffectPrefix = "Effect";

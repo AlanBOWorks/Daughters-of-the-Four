@@ -1,5 +1,6 @@
 using System;
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,6 +15,8 @@ namespace CombatSystem.Skills.Effects
         [SerializeField] private EnumStats.MasterStatType type;
         private string _effectTag;
 
+        private const string MasterBuffEffectSmallPrefix = EffectTags.BuffEffectName;
+        public override string EffectSmallPrefix => MasterBuffEffectSmallPrefix;
         public override EnumStats.StatType EffectType => EnumStats.StatType.Buff;
 
         private void OnEnable()

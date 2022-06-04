@@ -1,5 +1,6 @@
 using System;
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -15,12 +16,21 @@ namespace CombatSystem.Skills.Effects
     {
         [SerializeField] private bool isBurst;
         private string _effectTag;
-        public override string EffectTag => _effectTag;
         public override EnumStats.StatType EffectType => EnumStats.StatType.Control;
+
+        private const string BurstName = EffectTags.BurstControlEffectName;
+        private const string GainName = EffectTags.GainControlEffectName;
+
+        private string GetControlName() => isBurst ? BurstName : GainName;
+        public override string EffectTag => _effectTag;
+
+        private const string BurstSmallPrefix = EffectTags.BurstControlEffectPrefix;
+        private const string GainSmallPrefix = EffectTags.GainControlEffectPrefix;
+        public override string EffectSmallPrefix => isBurst ? BurstSmallPrefix : GainSmallPrefix;
 
         private void OnEnable()
         {
-            _effectTag = "CONTROL_" + GetBurstSuffix() + "_" + EffectPrefix;
+            _effectTag = GetControlName().ToUpper() + "_" + EffectPrefix;
         }
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
@@ -42,10 +52,7 @@ namespace CombatSystem.Skills.Effects
             }
         }
 
-        private const string BurstPrefix = "BURST";
-        private const string GainPrefix = "GAIN";
 
-        private string GetBurstSuffix() => isBurst ? BurstPrefix : GainPrefix;
 
         [Button]
         protected void UpdateAssetName()
@@ -53,7 +60,7 @@ namespace CombatSystem.Skills.Effects
             const string header = "Team CONTROL - ";
             const string suffix = " [Effect]";
 
-            var body = GetBurstSuffix();
+            var body = GetControlName();
 
             string generatedName = header + body + suffix;
             UtilsAssets.UpdateAssetName(this, generatedName);

@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using UnityEngine;
 
@@ -9,8 +10,10 @@ namespace CombatSystem.Skills.Effects
     public class SDamageEffect : SEffect, IOffensiveEffect
     {
 
-        private const string DamageEffectTag = "Damage_Effect";
+        private const string DamageEffectTag = EffectTags.DamageEffectTag;
+        private const string DamageSmallPrefix = EffectTags.DamageEffectPrefix;
         public override string EffectTag => DamageEffectTag;
+        public override string EffectSmallPrefix => DamageSmallPrefix;
         public override EnumStats.StatType EffectType => EnumStats.StatType.Attack;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)

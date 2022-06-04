@@ -1,5 +1,6 @@
 using System;
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using UnityEngine;
 
@@ -9,8 +10,10 @@ namespace CombatSystem.Skills.Effects
         fileName = "Heal [Effect]")]
     public class SHealEffect : SEffect, ISupportEffect
     {
-        public const string HealEffectTag = "Heal_Effect";
+        private const string HealEffectTag = EffectTags.HealEffectTag;
+        private const string HealEffectSmallPrefix = EffectTags.DamageEffectPrefix;
         public override string EffectTag => HealEffectTag;
+        public override string EffectSmallPrefix => HealEffectSmallPrefix;
 
         public override EnumStats.StatType EffectType => EnumStats.StatType.Heal;
 

@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using UnityEngine;
 using Utils;
@@ -7,9 +8,14 @@ namespace CombatSystem.Skills.Effects
 {
     public abstract class SBuffEffect : SEffect, ISupportEffect
     {
-        private const string BuffPrefix = "BUFF";
-        private const string BurstPrefix = "BURST";
+        private const string BuffPrefix = EffectTags.BuffEffectName;
+        private const string BurstPrefix = EffectTags.BurstEffectName;
+
+        private const string BuffSmallPrefix = EffectTags.BuffEffectPrefix;
+        private const string BurstSmallPrefix = EffectTags.BurstEffectPrefix;
         protected string GetBuffPrefix() => (isBurst) ? BurstPrefix : BuffPrefix;
+        public override string EffectSmallPrefix => (isBurst) ? BurstSmallPrefix : BuffSmallPrefix;
+        
 
         [SerializeField] protected bool isBurst;
 

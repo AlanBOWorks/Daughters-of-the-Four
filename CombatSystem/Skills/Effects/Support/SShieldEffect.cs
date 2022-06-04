@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using UnityEngine;
 
@@ -8,8 +9,11 @@ namespace CombatSystem.Skills.Effects
         fileName = "Shielding [Effect]")]
     public class SShieldEffect : SEffect, ISupportEffect
     {
-        private const string ShieldEffectTag = "Shield_Effect";
+        private const string ShieldEffectTag = EffectTags.ShieldingEffectName;
+        private const string ShieldEffectSmallPrefix = EffectTags.ShieldingEffectPrefix;
+
         public override string EffectTag => ShieldEffectTag;
+        public override string EffectSmallPrefix => ShieldEffectSmallPrefix;
         public override EnumStats.StatType EffectType => EnumStats.StatType.Shielding;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)

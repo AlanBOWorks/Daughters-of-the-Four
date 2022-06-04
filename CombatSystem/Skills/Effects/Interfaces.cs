@@ -31,6 +31,7 @@ namespace CombatSystem.Skills.Effects
     public interface IEffectBasicInfo
     {
         string EffectTag { get; }
+        string EffectSmallPrefix { get; }
         EnumStats.StatType EffectType { get; }
         GameObject GetSecondaryParticlesPrefab();
     }

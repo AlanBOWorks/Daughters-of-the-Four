@@ -10,6 +10,7 @@ namespace CombatSystem.Skills.Effects
     public class SBuffConcentrationEffect : SBuffEffect
     {
         [SerializeField] private EnumStats.ConcentrationStatType type;
+        [ShowInInspector,HideInEditorMode]
         private string _effectTag;
 
         private void OnEnable()

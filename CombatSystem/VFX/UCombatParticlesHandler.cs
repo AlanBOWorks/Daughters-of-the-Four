@@ -12,9 +12,12 @@ namespace CombatSystem.VFX
 {
     public class UCombatParticlesHandler : MonoBehaviour, IOppositionTeamStructureRead<ParticlesSpawnHandler>
     {
+        [Title("Params")]
         [SerializeField] private bool doInjection;
-        [SerializeField,HorizontalGroup()] 
+        [Title("Player")]
+        [SerializeField, HorizontalGroup()] 
         private ParticlesSpawnHandler playerParticlesHolder;
+        [Title("Enemy")]
         [SerializeField,HorizontalGroup()]
         private ParticlesSpawnHandler enemyParticlesHolder;
 
@@ -23,10 +26,10 @@ namespace CombatSystem.VFX
         public ParticlesSpawnHandler PlayerTeamType => playerParticlesHolder;
         public ParticlesSpawnHandler EnemyTeamType => enemyParticlesHolder;
 
-        private CombatEntityEventsHolder GetPlayerEventsHolder() =>
+        private static CombatEntityEventsHolder GetPlayerEventsHolder() =>
             PlayerCombatSingleton.PlayerCombatEvents.DiscriminationEventsHolder;
 
-        private CombatEntityEventsHolder GetEnemyEventsHolder() =>
+        private static CombatEntityEventsHolder GetEnemyEventsHolder() =>
             EnemyCombatSingleton.EnemyEventsHolder.DiscriminationEventsHolder;
 
         private void Awake()

@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -13,12 +14,16 @@ namespace CombatSystem.Skills.Effects
     {
         [SerializeField] private EnumTeam.Stance stance;
         private string _effectTag;
+        private const string ControlEffectName = EffectTags.StanceEffectName;
 
         private void OnEnable()
         {
-            _effectTag = "STANCE_" + stance + "_" + EffectPrefix;
+            _effectTag = ControlEffectName + "_" + stance + "_" + EffectPrefix;
         }
+
+        private const string StanceSmallPrefix = EffectTags.StanceEffectPrefix;
         public override string EffectTag => _effectTag;
+        public override string EffectSmallPrefix => StanceSmallPrefix;
         public override EnumStats.StatType EffectType => EnumStats.StatType.Control;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)

@@ -5,6 +5,7 @@ using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace CombatSystem.VFX
 {
@@ -33,10 +34,10 @@ namespace CombatSystem.VFX
             SpawnParticles(target,effectPrefab);
         }
 
-        private static void SpawnParticles(CombatEntity target, GameObject particles)
+        private void SpawnParticles(CombatEntity target, GameObject particles)
         {
             var targetTransform = target.Body.GetUIHoverHolder();
-            GameObject.Instantiate(particles, targetTransform.position, Quaternion.identity);
+            var particlesObject = Object.Instantiate(particles, targetTransform.position, Quaternion.identity);
         }
 
         [Button]
@@ -44,5 +45,6 @@ namespace CombatSystem.VFX
         {
             _secondaryParticlesHolder = prefabsHolder.GetReferences();
         }
+
     }
 }
