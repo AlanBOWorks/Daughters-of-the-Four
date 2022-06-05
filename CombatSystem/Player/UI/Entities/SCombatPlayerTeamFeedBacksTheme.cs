@@ -17,7 +17,7 @@ namespace CombatSystem.Player.UI
     }
 
     [Serializable]
-    public sealed class CombatPlayerTeamFeedBack : FlexPositionMainGroupClass<CombatPlayerRoleFeedBack>,
+    public sealed class CombatPlayerTeamFeedBack : ClassTeamRolesStructure<CombatPlayerRoleFeedBack>,
         ITeamFlexStructureRead<string>, ITeamFlexStructureRead<Sprite>, ITeamFlexStructureRead<Color>
     {
         
@@ -41,6 +41,9 @@ namespace CombatSystem.Player.UI
 
 
     }
+
+   
+
     [Serializable]
     public sealed class CombatPlayerRoleFeedBack
     {

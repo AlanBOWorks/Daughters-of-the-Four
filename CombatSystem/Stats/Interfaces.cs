@@ -39,10 +39,10 @@ namespace CombatSystem.Stats
     // WRAPPERS
     public interface IMainStats<T> : IMainStatsRead<T>, IMainStatsInject<T>
     {
-        new T OffensiveType { get; set; }
-        new T SupportType { get; set; }
-        new T VitalityType { get; set; }
-        new T ConcentrationType { get; set; }
+        new T OffensiveStatType { get; set; }
+        new T SupportStatType { get; set; }
+        new T VitalityStatType { get; set; }
+        new T ConcentrationStatType { get; set; }
     }
 
     public interface IOffensiveStats<T> : IOffensiveStatsRead<T>, IOffensiveStatsInject<T>
@@ -82,10 +82,10 @@ namespace CombatSystem.Stats
 
     public interface IMainStatsRead<out T>
     {
-        T OffensiveType { get; }
-        T SupportType { get; }
-        T VitalityType { get; }
-        T ConcentrationType { get; }
+        T OffensiveStatType { get; }
+        T SupportStatType { get; }
+        T VitalityStatType { get; }
+        T ConcentrationStatType { get; }
     }
 
     public interface IOffensiveStatsRead<out T>
@@ -126,10 +126,10 @@ namespace CombatSystem.Stats
 
     public interface IMainStatsInject<in T>
     {
-        T OffensiveType { set; }
-        T SupportType { set; }
-        T VitalityType { set; }
-        T ConcentrationType { set; }
+        T OffensiveStatType { set; }
+        T SupportStatType { set; }
+        T VitalityStatType { set; }
+        T ConcentrationStatType { set; }
     }
 
     public interface IOffensiveStatsInject<in T>

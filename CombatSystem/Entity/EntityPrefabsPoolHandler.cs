@@ -108,6 +108,7 @@ namespace CombatSystem.Entity
                     var entityGameObject = UtilsEntity.InstantiateProviderBody(entity);
                     var entityTransform = entityGameObject.transform;
 
+                    entityGameObject.layer = CombatRenderLayers.CombatCharacterBackIndex;
                     entityTransform.position = positionTransform.position;
                     entityTransform.rotation = positionTransform.rotation;
                     entity.Body.InjectPositionReference(in entityTransform);

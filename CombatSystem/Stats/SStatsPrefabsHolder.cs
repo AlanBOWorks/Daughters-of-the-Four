@@ -4,8 +4,8 @@ using UnityEngine;
 namespace CombatSystem.Stats
 {
 
-    [CreateAssetMenu(fileName = "N [StatsType Prefab Holder]",
-        menuName = "Combat/Prefabs/Stats Type [Holder]")]
+    [CreateAssetMenu(fileName = "PREFAB - N [StatsType Holder]",
+        menuName = "Combat/Holders/Stats Type/Prefabs [Holder]")]
     public class SStatsPrefabsHolder : ScriptableObject
     {
         [SerializeField]

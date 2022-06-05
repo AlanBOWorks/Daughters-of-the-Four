@@ -95,23 +95,4 @@ namespace CombatSystem.Team
             protected set => Members[EnumTeam.FlexLineIndex] = value;
         }
     }
-
-    [Serializable]
-    public class FlexPositionMainGroupClass<T> : ITeamFlexStructureRead<T>, ITeamFlexPositionStructureRead<T> where T : new()
-    {
-        [SerializeField] private T frontLineType = new T();
-        [SerializeField] private T midLineType = new T();
-        [SerializeField] private T backLineType = new T();
-        [SerializeField] private T flexLineType = new T();
-
-        public T VanguardType => frontLineType;
-        public T AttackerType => midLineType;
-        public T SupportType => backLineType;
-        public T FlexType => flexLineType;
-
-        public T FrontLineType => frontLineType;
-        public T MidLineType => midLineType;
-        public T BackLineType => backLineType;
-        public T FlexLineType => flexLineType;
-    }
 }

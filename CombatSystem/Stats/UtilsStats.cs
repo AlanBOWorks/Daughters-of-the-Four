@@ -12,10 +12,10 @@ namespace CombatSystem.Stats
 
         public static void DoCopyMaster<T>(IMainStatsInject<T> inject, IMainStatsRead<T> copyFrom)
         {
-            inject.OffensiveType = copyFrom.OffensiveType;
-            inject.SupportType = copyFrom.SupportType;
-            inject.VitalityType = copyFrom.VitalityType;
-            inject.ConcentrationType = copyFrom.ConcentrationType;
+            inject.OffensiveStatType = copyFrom.OffensiveStatType;
+            inject.SupportStatType = copyFrom.SupportStatType;
+            inject.VitalityStatType = copyFrom.VitalityStatType;
+            inject.ConcentrationStatType = copyFrom.ConcentrationStatType;
         }
 
         /// <summary>

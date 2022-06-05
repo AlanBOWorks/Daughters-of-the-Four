@@ -21,12 +21,6 @@ namespace CombatSystem.Skills.Effects
     public interface ISupportEffect : IEffect { }
     public interface ITeamEffect : IEffect { }
 
-    public interface IEffectTypeStructureRead<out T>
-    {
-        T OffensiveEffectType { get; }
-        T SupportEffectType { get; }
-        T TeamEffectType { get; }
-    }
 
     public interface IEffectBasicInfo
     {

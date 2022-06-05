@@ -31,6 +31,8 @@ namespace CombatSystem.VFX
                 effectPrefab = UtilsStats.GetElement(effectType, _secondaryParticlesHolder);
             }
 
+            if(!effectPrefab) return;
+
             SpawnParticles(target,effectPrefab);
         }
 
