@@ -124,6 +124,149 @@ namespace CombatSystem.Stats
         }
     }
 
+    [Serializable]
+    public class ClassStatsStructure<T> : ClassTeamRolesStructure<T>, IStatsRead<T> where T : new()
+    {
+        public ClassStatsStructure() : base()
+        {
+            attackType = new T();
+            overTimeType = new T();
+            deBuffType = new T();
+            followUpType = new T();
+
+            healType = new T();
+            shieldingType = new T();
+            buffType = new T();
+            receiveBuffType = new T();
+
+            healthType = new T();
+            mortalityType = new T();
+            damageReductionType = new T();
+            deBuffResistanceType = new T();
+
+            actionsType = new T();
+            speedType = new T();
+            controlType = new T();
+            criticalType = new T();
+        }
+
+
+        [HorizontalGroup("Top")]
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] private T attackType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] private T overTimeType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] private T deBuffType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] private T followUpType;
+
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] private T healType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] private T shieldingType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] private T buffType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] private T receiveBuffType;
+
+        [HorizontalGroup("Bottom")]
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] private T healthType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] private T mortalityType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] private T damageReductionType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] private T deBuffResistanceType;
+
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] private T actionsType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] private T speedType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] private T controlType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] private T criticalType;
+
+
+
+
+
+
+        public T AttackType
+        {
+            get => attackType;
+            set => attackType = value;
+        }
+        public T OverTimeType
+        {
+            get => overTimeType;
+            set => overTimeType = value;
+        }
+        public T DeBuffType
+        {
+            get => deBuffType;
+            set => deBuffType = value;
+        }
+        public T FollowUpType
+        {
+            get => followUpType;
+            set => followUpType = value;
+        }
+
+
+        public T HealType
+        {
+            get => healType;
+            set => healType = value;
+        }
+        public T ShieldingType
+        {
+            get => shieldingType;
+            set => shieldingType = value;
+        }
+        public T BuffType
+        {
+            get => buffType;
+            set => buffType = value;
+        }
+        public T ReceiveBuffType
+        {
+            get => receiveBuffType;
+            set => receiveBuffType = value;
+        }
+
+
+        public T HealthType
+        {
+            get => healthType;
+            set => healthType = value;
+        }
+        public T MortalityType
+        {
+            get => mortalityType;
+            set => mortalityType = value;
+        }
+        public T DamageReductionType
+        {
+            get => damageReductionType;
+            set => damageReductionType = value;
+        }
+        public T DeBuffResistanceType
+        {
+            get => deBuffResistanceType;
+            set => deBuffResistanceType = value;
+        }
+
+
+        public T ActionsType
+        {
+            get => actionsType;
+            set => actionsType = value;
+        }
+        public T SpeedType
+        {
+            get => speedType;
+            set => speedType = value;
+        }
+        public T ControlType
+        {
+            get => controlType;
+            set => controlType = value;
+        }
+        public T CriticalType
+        {
+            get => criticalType;
+            set => criticalType = value;
+        }
+    }
+
+
     /// <summary>
     /// Same as [<seealso cref="MonoStatsStructure{T}"/>] but with a [<see cref="PreviewFieldAttribute"/>] for
     /// Editors purposes

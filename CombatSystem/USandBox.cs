@@ -7,11 +7,14 @@ using UnityEngine;
 
 namespace Utils
 {
-    public class USandBox : UTeamElementSpawner<GameObject>
+    public class USandBox : MonoBehaviour
     {
-        protected override void OnCreateElement(CombatEntity entity, GameObject element,
-            int index)
+        [SerializeField] private GameObject destroyTest;
+
+        [Button,DisableInEditorMode]
+        public void DestroyThing()
         {
+            Destroy(destroyTest);
         }
     }
 }

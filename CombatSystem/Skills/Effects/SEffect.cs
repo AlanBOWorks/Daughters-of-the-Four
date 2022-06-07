@@ -7,7 +7,10 @@ namespace CombatSystem.Skills.Effects
 {
     public abstract class SEffect : ScriptableObject, IEffect
     {
+        [SerializeField, AssetsOnly] private Sprite icon;
         [SerializeField,AssetsOnly] private GameObject secondaryParticlePrefab;
+
+        public Sprite GetIcon() => icon;
         public GameObject GetSecondaryParticlesPrefab() => secondaryParticlePrefab;
 
 

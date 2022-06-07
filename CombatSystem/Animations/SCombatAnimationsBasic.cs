@@ -38,9 +38,9 @@ namespace CombatSystem.Animations
             [SerializeField] private AnimationClip offensiveType;
             [SerializeField] private AnimationClip supportType;
 
-            public AnimationClip SelfType => selfType ? selfType : globalClip;
-            public AnimationClip OffensiveType => offensiveType ? offensiveType : globalClip;
-            public AnimationClip SupportType => supportType ? supportType : globalClip;
+            public AnimationClip SelfSkillType => selfType ? selfType : globalClip;
+            public AnimationClip OffensiveSkillType => offensiveType ? offensiveType : globalClip;
+            public AnimationClip SupportSkillType => supportType ? supportType : globalClip;
         }
     }
 }

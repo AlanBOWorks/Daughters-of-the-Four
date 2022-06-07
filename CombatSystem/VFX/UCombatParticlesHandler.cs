@@ -1,9 +1,6 @@
-using System;
 using CombatSystem._Core;
 using CombatSystem.AI;
 using CombatSystem.Player;
-using CombatSystem.Player.UI;
-using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,8 +9,11 @@ namespace CombatSystem.VFX
 {
     public class UCombatParticlesHandler : MonoBehaviour, IOppositionTeamStructureRead<ParticlesSpawnHandler>
     {
+#if UNITY_EDITOR
         [Title("Params")]
-        [SerializeField] private bool doInjection;
+        [SerializeField] private bool disableInjectionForDebugging = false; 
+#endif
+
         [Title("Player")]
         [SerializeField, HorizontalGroup()] 
         private ParticlesSpawnHandler playerParticlesHolder;
@@ -34,7 +34,9 @@ namespace CombatSystem.VFX
 
         private void Awake()
         {
-            if(!doInjection) return;
+#if UNITY_EDITOR
+            if (disableInjectionForDebugging) return;
+#endif
 
             Subscription(GetPlayerEventsHolder(),playerParticlesHolder);
             Subscription(GetEnemyEventsHolder(), enemyParticlesHolder);

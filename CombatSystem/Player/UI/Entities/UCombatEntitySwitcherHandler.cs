@@ -47,13 +47,12 @@ namespace CombatSystem.Player.UI
         private const float IterationHeight = 70 + 6;
         private void OnInstantiation()
         {
-            var feedBacks = PlayerCombatVisualsSingleton.CombatTeamFeedBacks.PlayerTeamType;
+            var feedBacks = CombatThemeSingleton.RolesThemeHolder;
             var enumerable = UtilsTeam.GetEnumerable(references, feedBacks);
             int i = references.activeCount;
-            foreach (var pair in enumerable)
+            foreach ((UCombatEntitySwitchButton button, CombatThemeHolder value) in enumerable)
             {
-                var button = pair.Key;
-                var icon = pair.Value.GetIcon();
+                var icon = value.GetThemeIcon();
                 OnInstantiateButton(in button);
                 button.Injection(in icon);
                 i--;

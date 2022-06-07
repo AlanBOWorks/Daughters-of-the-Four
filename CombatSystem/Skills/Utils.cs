@@ -17,11 +17,11 @@ namespace CombatSystem.Skills
             switch (type)
             {
                 case EnumsSkill.Archetype.Self:
-                    return structure.SelfType;
+                    return structure.SelfSkillType;
                 case EnumsSkill.Archetype.Offensive:
-                    return structure.OffensiveType;
+                    return structure.OffensiveSkillType;
                 case EnumsSkill.Archetype.Support:
-                    return structure.SupportType;
+                    return structure.SupportSkillType;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
@@ -163,12 +163,11 @@ namespace CombatSystem.Skills
             {
                 case EnumTeam.Positioning.FrontLine:
                     return membersPositions.FrontLineType;
+                case EnumTeam.Positioning.FlexLine:
                 case EnumTeam.Positioning.MidLine:
                     return membersPositions.MidLineType.Concat(membersPositions.FlexLineType);
                 case EnumTeam.Positioning.BackLine:
                     return membersPositions.BackLineType;
-                case EnumTeam.Positioning.FlexLine:
-                    return membersPositions.FlexLineType;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null);
             }
@@ -182,12 +181,11 @@ namespace CombatSystem.Skills
             {
                 case EnumTeam.Positioning.FrontLine:
                     return ConcatLineToFlex(membersPositions.FrontLineType);
+                case EnumTeam.Positioning.FlexLine:
                 case EnumTeam.Positioning.MidLine:
                     return ConcatLineToFlex(membersPositions.MidLineType);
                 case EnumTeam.Positioning.BackLine:
                     return ConcatLineToFlex(membersPositions.BackLineType);
-                case EnumTeam.Positioning.FlexLine:
-                    return membersPositions.FlexLineType;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null);
             }

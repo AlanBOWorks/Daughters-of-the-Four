@@ -15,9 +15,9 @@ namespace CombatSystem.Skills
 
     public interface ISkillArchetypeStructureRead<out T>
     {
-        T SelfType { get; }
-        T OffensiveType { get; }
-        T SupportType { get; }
+        T SelfSkillType { get; }
+        T OffensiveSkillType { get; }
+        T SupportSkillType { get; }
     }
 
 

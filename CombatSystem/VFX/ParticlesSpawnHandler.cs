@@ -12,9 +12,7 @@ namespace CombatSystem.VFX
     [Serializable]
     public sealed class ParticlesSpawnHandler : IEffectUsageListener
     {
-        [SerializeReference]
-        private SStatsPrefabsHolder.ReferenceHolder _secondaryParticlesHolder;
-
+        [SerializeField] private SStatsPrefabsHolder particlesHolder;
 
         public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
@@ -27,8 +25,9 @@ namespace CombatSystem.VFX
             var effectPrefab = effect.GetSecondaryParticlesPrefab();
             if (!effectPrefab)
             {
+                var secondaryParticlesHolder = particlesHolder.GetReferences();
                 var effectType = effect.EffectType;
-                effectPrefab = UtilsStats.GetElement(effectType, _secondaryParticlesHolder);
+                effectPrefab = UtilsStats.GetElement(effectType, secondaryParticlesHolder);
             }
 
             if(!effectPrefab) return;
@@ -40,13 +39,8 @@ namespace CombatSystem.VFX
         {
             var targetTransform = target.Body.GetUIHoverHolder();
             var particlesObject = Object.Instantiate(particles, targetTransform.position, Quaternion.identity);
-        }
 
-        [Button]
-        private void InjectFromScriptable(SStatsPrefabsHolder prefabsHolder)
-        {
-            _secondaryParticlesHolder = prefabsHolder.GetReferences();
+            CombatParticleDeSpawnHandler.HandleDeSpawnParticles(particlesObject);
         }
-
     }
 }

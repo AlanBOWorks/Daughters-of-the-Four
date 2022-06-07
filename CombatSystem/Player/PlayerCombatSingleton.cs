@@ -96,7 +96,7 @@ namespace CombatSystem.Player
             private PlayerCombatSingleton _singleton;
 
             [ShowInInspector, TabGroup("Visuals")]
-            private PlayerCombatVisualsSingleton _visualsSingleton;
+            private CombatThemeSingleton _themeSingleton;
 
 
             [MenuItem("Combat/Debug/Player Singleton", priority = -4)]
@@ -112,7 +112,7 @@ namespace CombatSystem.Player
             private void LoadReferences()
             {
                 _singleton = Instance;
-                _visualsSingleton = PlayerCombatVisualsSingleton.Instance;
+                _themeSingleton = CombatThemeSingleton.Instance;
             }
         }
 

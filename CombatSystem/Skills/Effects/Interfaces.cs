@@ -15,6 +15,7 @@ namespace CombatSystem.Skills.Effects
     public interface IEffect : IEffectBasicInfo
     {
         void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue);
+
     }
 
     public interface IOffensiveEffect : IEffect { }
@@ -27,6 +28,7 @@ namespace CombatSystem.Skills.Effects
         string EffectTag { get; }
         string EffectSmallPrefix { get; }
         EnumStats.StatType EffectType { get; }
+        Sprite GetIcon();
         GameObject GetSecondaryParticlesPrefab();
     }
 

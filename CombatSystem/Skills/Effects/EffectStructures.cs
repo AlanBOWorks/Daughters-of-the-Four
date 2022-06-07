@@ -8,24 +8,24 @@ namespace CombatSystem.Skills.Effects
     public class EffectStructure<T> : IEffectTypeStructureRead<T>, IEffectStructureRead<T>
     {
         [TitleGroup("Master")]
-        [SerializeField] private T offensiveEffectType;
-        [SerializeField] private T supportEffectType;
-        [SerializeField] private T teamEffectType;
+        [SerializeField] protected T offensiveEffectType;
+        [SerializeField] protected T supportEffectType;
+        [SerializeField] protected T teamEffectType;
 
         [TitleGroup("Offensive")]
-        [SerializeField] private T damageType;
-        [SerializeField] private T damageOverTimeType;
-        [SerializeField] private T deBuffEffectType;
-        [SerializeField] private T deBurstEffectType;
+        [SerializeField] protected T damageType;
+        [SerializeField] protected T damageOverTimeType;
+        [SerializeField] protected T deBuffEffectType;
+        [SerializeField] protected T deBurstEffectType;
         [TitleGroup("Support")]
-        [SerializeField] private T healType;
-        [SerializeField] private T shieldingType;
-        [SerializeField] private T buffEffectType;
-        [SerializeField] private T burstEffectType;
+        [SerializeField] protected T healType;
+        [SerializeField] protected T shieldingType;
+        [SerializeField] protected T buffEffectType;
+        [SerializeField] protected T burstEffectType;
         [TitleGroup("Team")]
-        [SerializeField] private T guardingType;
-        [SerializeField] private T controlType;
-        [SerializeField] private T stanceType;
+        [SerializeField] protected T guardingType;
+        [SerializeField] protected T controlType;
+        [SerializeField] protected T stanceType;
 
         public T OffensiveEffectType => offensiveEffectType;
         public T SupportEffectType => supportEffectType;
@@ -41,6 +41,31 @@ namespace CombatSystem.Skills.Effects
         public T BurstEffectType => burstEffectType;
         public T ControlType => controlType;
         public T StanceType => stanceType;
+    }
+
+    [Serializable]
+    public class ClassEffectStructure<T> : EffectStructure<T> where T : new()
+    {
+        public ClassEffectStructure()
+        {
+            offensiveEffectType = new T();
+            supportEffectType = new T();
+            teamEffectType = new T();
+
+            damageType = new T();
+            damageOverTimeType = new T();
+            deBuffEffectType = new T();
+            deBurstEffectType = new T();
+
+            healType = new T();
+            shieldingType = new T();
+            buffEffectType = new T();
+            burstEffectType = new T();
+
+            guardingType = new T();
+            controlType = new T();
+            stanceType = new T();
+        }
     }
 
     [Serializable]

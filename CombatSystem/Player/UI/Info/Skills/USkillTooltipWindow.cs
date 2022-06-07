@@ -1,11 +1,17 @@
 using System;
 using System.Collections.Generic;
+using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Skills;
-using Exoa.Responsive;
+using CombatSystem.Skills.Effects;
+using CombatSystem.Stats;
+using CombatSystem.Team;
 using MEC;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Utils;
 using Utils.Utils;
 
@@ -19,6 +25,13 @@ namespace CombatSystem.Player.UI
         [Title("Mono References")] 
         [SerializeField]
         private RectTransform parentHolder;
+        
+        [SerializeField] 
+        private SkillInfoHandler skillInfo = new SkillInfoHandler();
+
+        [Title("Params")] 
+        [SerializeField,SuffixLabel("px")] private float topMargin = 12;
+        [SerializeField,SuffixLabel("px")] private float bottomMargin = 12;
 
         private void Awake()
         {
@@ -46,30 +59,44 @@ namespace CombatSystem.Player.UI
         }
 
 
+
+        public void HandleSkill(CombatSkill skill)
+        {
+            skillInfo.HandleEffect(skill);
+        }
+
         public void HandleEffect(in PerformEffectValues values)
         {
             var textElement = pool.Get();
-            HandleText(in textElement, in values);
+            HandleText(textElement, in values);
+            HandleIcon(textElement,values.Effect);
         }
-
-        private static void HandleText(in TextMeshProUGUI text, in PerformEffectValues values)
+        private static void HandleText(UEffectTooltipHolder holder, in PerformEffectValues values)
         {
+            var text = holder.GetTextHolder();
             var effectText = Localization.LocalizeEffects.LocalizeEffectTooltip(in values);
             text.text = effectText;
         }
 
-        private float _accumulatedHeight;
-        private void HandleHeight(in TextMeshProUGUI text)
+        public static void HandleIcon(UEffectTooltipHolder holder, IEffectBasicInfo effect)
         {
-            var textTransform = text.rectTransform;
-            float textHeight = text.preferredHeight;
-
-            float pivotHeight = _accumulatedHeight;
-            UtilsRectTransform.SetPivotVertical(in textTransform, -pivotHeight);
-
-            _accumulatedHeight += textHeight;
+            var icon = GetIcon(effect);
+            var iconHolder = holder.GetIconHolder();
+            iconHolder.sprite = icon;
         }
 
+        private static Sprite GetIcon(IEffectBasicInfo effect)
+        {
+            var icon = effect.GetIcon();
+            if(icon) return icon;
+
+            var type = effect.EffectType;
+            var theme = CombatThemeSingleton.StatsThemeHolder;
+            return UtilsStats.GetElement(type, theme).GetThemeIcon();
+        }
+
+
+        private float _accumulatedHeight;
         private CoroutineHandle _coroutineHandle;
         public void OnFinisHandlingEffects()
         {
@@ -93,18 +120,55 @@ namespace CombatSystem.Player.UI
         // SOLUTION: force a wait through a coroutine
         private IEnumerator<float> _HeightResize()
         {
-            _accumulatedHeight = 0;
+            _accumulatedHeight = topMargin;
             yield return Timing.WaitForOneFrame;
             var activeElements = pool.GetActiveElements();
             foreach (var element in activeElements)
             {
                 HandleHeight(in element);
             }
+
+            _accumulatedHeight += bottomMargin;
             parentHolder.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _accumulatedHeight);
         }
+        private void HandleHeight(in UEffectTooltipHolder holder)
+        {
+            var text = holder.GetTextHolder();
+            var textTransform = text.rectTransform;
+            float textHeight = text.preferredHeight;
+
+            float pivotHeight = _accumulatedHeight;
+            UtilsRectTransform.SetPivotVertical(in textTransform, -pivotHeight);
+
+            _accumulatedHeight += textHeight;
+        }
+
 
         [Serializable]
-        private sealed class ToolTipWindowPool : TrackedMonoObjectPool<TextMeshProUGUI>
+        private sealed class SkillInfoHandler
+        {
+            [SerializeField] private TextMeshProUGUI nameHolder;
+            [SerializeField] private Image roleIconHolder;
+
+            public void HandleEffect(CombatSkill skill)
+            {
+                var skillName = LocalizeSkills.LocalizeSkill(skill);
+                nameHolder.text = skillName;
+
+                var archetype = skill.Archetype;
+                var roleThemesHolder = CombatThemeSingleton.SkillsThemeHolder;
+                var roleTheme = UtilsSkill.GetElement(archetype, roleThemesHolder);
+                var roleColor = roleTheme.GetThemeColor();
+                var roleIcon = roleTheme.GetThemeIcon();
+
+                roleIconHolder.sprite = roleIcon;
+                roleIconHolder.color = roleColor;
+            }
+        }
+
+
+        [Serializable]
+        private sealed class ToolTipWindowPool : TrackedMonoObjectPool<UEffectTooltipHolder>
         {
             
         }

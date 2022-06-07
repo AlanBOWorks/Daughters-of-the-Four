@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Stats;
 using Sirenix.OdinInspector;
@@ -24,7 +25,8 @@ namespace CombatSystem.Team
     public class TeamRolesStructure<T> : 
         ITeamFlexStructureRead<T>, ITeamFlexPositionStructureRead<T>, 
         IMainStatsRead<T>, IEffectTypeStructureRead<T>,
-        IStanceStructureRead<T>
+        IStanceStructureRead<T>,
+        ISkillArchetypeStructureRead<T>
     {
         [SerializeField] protected T vanguardType;
         [SerializeField] protected T attackerType;
@@ -54,6 +56,11 @@ namespace CombatSystem.Team
         public T NeutralStance => supportType;
         public T DefendingStance => vanguardType;
 
+
+        public T SelfSkillType => vanguardType;
+        public T OffensiveSkillType => attackerType;
+        public T SupportSkillType => supportType;
+
         public IEnumerable<T> GetEnumerable()
         {
             yield return vanguardType;
@@ -61,6 +68,7 @@ namespace CombatSystem.Team
             yield return supportType;
             yield return flexType;
         }
+
     }
 
     [Serializable]
