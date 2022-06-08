@@ -14,8 +14,7 @@ namespace CombatSystem.Skills.Effects
         private const string HealEffectSmallPrefix = EffectTags.DamageEffectPrefix;
         public override string EffectTag => HealEffectTag;
         public override string EffectSmallPrefix => HealEffectSmallPrefix;
-
-        public override EnumStats.StatType EffectType => EnumStats.StatType.Heal;
+        public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Heal;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

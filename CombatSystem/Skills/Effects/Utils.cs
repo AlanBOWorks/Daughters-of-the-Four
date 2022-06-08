@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Player.UI;
 using CombatSystem.Stats;
 using UnityEngine;
 
@@ -221,6 +223,87 @@ namespace CombatSystem.Skills.Effects
         {
             float maxHealth = UtilsStatsFormula.CalculateMaxHealth(target);
             DoOverrideHealth(in target, ref targetHealth, in maxHealth);
+        }
+    }
+
+    public static class UtilsStructureEffect
+    {
+        public static T GetElement<T>(EnumsEffect.ConcreteType type, IEffectStructureRead<T> theme)
+        {
+            return type switch
+            {
+                EnumsEffect.ConcreteType.DamageType => theme.DamageType,
+                EnumsEffect.ConcreteType.DoT => theme.DamageOverTimeType,
+                EnumsEffect.ConcreteType.DeBuff => theme.DeBuffEffectType,
+                EnumsEffect.ConcreteType.DeBurst => theme.DeBurstEffectType,
+                EnumsEffect.ConcreteType.Heal => theme.HealType,
+                EnumsEffect.ConcreteType.Shielding => theme.ShieldingType,
+                EnumsEffect.ConcreteType.Buff => theme.BuffEffectType,
+                EnumsEffect.ConcreteType.Burst => theme.BurstEffectType,
+                EnumsEffect.ConcreteType.Guarding => theme.GuardingType,
+                EnumsEffect.ConcreteType.ControlGain => theme.ControlType,
+                EnumsEffect.ConcreteType.Stance => theme.StanceType,
+                EnumsEffect.ConcreteType.ControlBurst => theme.ControlBurstType,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+        public static T GetElement<T>(EnumsEffect.ConcreteType type, IFullEffectStructureRead<T> theme)
+        {
+            return type switch
+            {
+                EnumsEffect.ConcreteType.DamageType => (theme.DamageType ?? theme.OffensiveEffectType),
+                EnumsEffect.ConcreteType.DoT => (theme.DamageOverTimeType ?? theme.OffensiveEffectType),
+                EnumsEffect.ConcreteType.DeBuff => (theme.DeBuffEffectType ?? theme.OffensiveEffectType),
+                EnumsEffect.ConcreteType.DeBurst => (theme.DeBurstEffectType ?? theme.OffensiveEffectType),
+                EnumsEffect.ConcreteType.Heal => (theme.HealType ?? theme.SupportEffectType),
+                EnumsEffect.ConcreteType.Shielding => (theme.ShieldingType ?? theme.SupportEffectType),
+                EnumsEffect.ConcreteType.Buff => (theme.BuffEffectType ?? theme.SupportEffectType),
+                EnumsEffect.ConcreteType.Burst => (theme.BurstEffectType ?? theme.SupportEffectType),
+                EnumsEffect.ConcreteType.Guarding => (theme.GuardingType ?? theme.TeamEffectType),
+                EnumsEffect.ConcreteType.ControlGain => (theme.ControlType ?? theme.TeamEffectType),
+                EnumsEffect.ConcreteType.Stance => (theme.StanceType ?? theme.TeamEffectType),
+                EnumsEffect.ConcreteType.ControlBurst => (theme.ControlBurstType ?? theme.TeamEffectType),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
+
+        public static T GetUnityElement<T>(EnumsEffect.ConcreteType type, IFullEffectStructureRead<T> theme) where T: UnityEngine.Object
+        {
+            return type switch
+            {
+                EnumsEffect.ConcreteType.DamageType => GetOffensiveIfNull(theme.DamageType),
+                EnumsEffect.ConcreteType.DoT => GetOffensiveIfNull(theme.DamageOverTimeType),
+                EnumsEffect.ConcreteType.DeBuff => GetOffensiveIfNull(theme.DeBuffEffectType),
+                EnumsEffect.ConcreteType.DeBurst => GetOffensiveIfNull(theme.DeBurstEffectType),
+                EnumsEffect.ConcreteType.Heal => GetSupportIfNull(theme.HealType),
+                EnumsEffect.ConcreteType.Shielding => GetSupportIfNull(theme.ShieldingType),
+                EnumsEffect.ConcreteType.Buff => GetSupportIfNull(theme.BuffEffectType),
+                EnumsEffect.ConcreteType.Burst => GetSupportIfNull(theme.BurstEffectType),
+                EnumsEffect.ConcreteType.Guarding => GetTeamIfNull(theme.GuardingType),
+                EnumsEffect.ConcreteType.ControlGain => GetTeamIfNull(theme.ControlType),
+                EnumsEffect.ConcreteType.Stance => GetTeamIfNull(theme.StanceType),
+                EnumsEffect.ConcreteType.ControlBurst => GetTeamIfNull(theme.ControlBurstType),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+
+            T GetOffensiveIfNull(T element)
+            {
+                if (element) return element;
+                return theme.OffensiveEffectType;
+            }
+
+            T GetSupportIfNull(T element)
+            {
+                if (element) return element;
+                return theme.SupportEffectType;
+            }
+
+            T GetTeamIfNull(T element)
+            {
+                if (element) return element;
+                return theme.TeamEffectType;
+            }
         }
     }
 }

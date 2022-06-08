@@ -17,7 +17,10 @@ namespace CombatSystem.Player.UI
             CombatThemeSingleton.RolesThemeHolder = rolesHolder;
             CombatThemeSingleton.SkillsThemeHolder = rolesHolder;
             CombatThemeSingleton.StatsThemeHolder = statsThemeHolder.GetHolder();
-            CombatThemeSingleton.EffectThemeHolder = effectsTheme.GetHolder();
+
+            CombatThemeSingleton.EffectsNameTagsHolder = effectsTheme.GetNamesTagsHolder();
+            CombatThemeSingleton.EffectsIconsHolder = effectsTheme.GetIcons();
+            CombatThemeSingleton.EffectsColorsHolder = effectsTheme.GetColorsHolder();
         }
     }
 }

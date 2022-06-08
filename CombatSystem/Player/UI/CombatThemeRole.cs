@@ -7,7 +7,7 @@ namespace CombatSystem.Player.UI
 {
 
     [Serializable]
-    public sealed class CombatThemeHolder
+    public sealed class CombatThemeHolder : IThemeHolder
     {
         [FormerlySerializedAs("roleName")] 
         [SerializeField] private string themeName;
@@ -18,5 +18,12 @@ namespace CombatSystem.Player.UI
         public string GetThemeName() => themeName;
         public Sprite GetThemeIcon() => themeIcon;
         public Color GetThemeColor() => themeColor;
+    }
+
+    public interface IThemeHolder
+    {
+        string GetThemeName();
+        Sprite GetThemeIcon();
+        Color GetThemeColor();
     }
 }

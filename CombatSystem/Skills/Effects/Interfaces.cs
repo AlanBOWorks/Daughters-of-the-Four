@@ -27,7 +27,7 @@ namespace CombatSystem.Skills.Effects
     {
         string EffectTag { get; }
         string EffectSmallPrefix { get; }
-        EnumStats.StatType EffectType { get; }
+        EnumsEffect.ConcreteType EffectType { get; }
         Sprite GetIcon();
         GameObject GetSecondaryParticlesPrefab();
     }

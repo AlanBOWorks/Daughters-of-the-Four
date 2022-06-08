@@ -1,4 +1,5 @@
 using System;
+using CombatSystem.Skills.Effects;
 using UnityEngine;
 
 namespace CombatSystem.Stats
@@ -11,12 +12,12 @@ namespace CombatSystem.Stats
         [SerializeField]
         private ReferenceHolder holder = new ReferenceHolder();
 
-        public IStatsRead<GameObject> GetHolder() => holder;
+        public IFullEffectStructureRead<GameObject> GetHolder() => holder;
         internal ReferenceHolder GetReferences() => holder;
 
 
         [Serializable]
-        internal sealed class ReferenceHolder : MonoStatsStructure<GameObject>
+        internal sealed class ReferenceHolder : MonoEffectStructure<GameObject>
         {
             
         }

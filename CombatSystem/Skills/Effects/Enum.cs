@@ -32,5 +32,23 @@ namespace CombatSystem.Skills.Effects
             Support,
             Team
         }
+
+        public enum ConcreteType
+        {
+            DamageType,
+            DoT,
+            DeBuff,
+            DeBurst,
+
+            Heal,
+            Shielding,
+            Buff,
+            Burst,
+
+            Guarding,
+            ControlGain,
+            Stance,
+            ControlBurst
+        }
     }
 }

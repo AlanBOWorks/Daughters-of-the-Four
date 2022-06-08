@@ -74,25 +74,15 @@ namespace CombatSystem.Player.UI
         private static void HandleText(UEffectTooltipHolder holder, in PerformEffectValues values)
         {
             var text = holder.GetTextHolder();
-            var effectText = Localization.LocalizeEffects.LocalizeEffectTooltip(in values);
+            var effectText = LocalizeEffects.LocalizeEffectTooltip(in values);
             text.text = effectText;
         }
 
         public static void HandleIcon(UEffectTooltipHolder holder, IEffectBasicInfo effect)
         {
-            var icon = GetIcon(effect);
+            var icon = UtilsVisual.GetEffectSprite(effect);
             var iconHolder = holder.GetIconHolder();
             iconHolder.sprite = icon;
-        }
-
-        private static Sprite GetIcon(IEffectBasicInfo effect)
-        {
-            var icon = effect.GetIcon();
-            if(icon) return icon;
-
-            var type = effect.EffectType;
-            var theme = CombatThemeSingleton.StatsThemeHolder;
-            return UtilsStats.GetElement(type, theme).GetThemeIcon();
         }
 
 

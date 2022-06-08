@@ -9,13 +9,25 @@ namespace CombatSystem.Skills.Effects
         menuName = "Combat/Holders/Effect Type/Icons [Holder]")]
     public class SEffectsThemeHolder : ScriptableObject
     {
-        [SerializeField] private ThemeHolder themeHolder = new ThemeHolder();
+        [SerializeField] private NamesHolder namesHolder = new NamesHolder();
+        [SerializeField] private ColorsHolder colorsHolder = new ColorsHolder();
+        [SerializeField] private IconsHolder iconsHolder = new IconsHolder();
 
-        public IEffectStructureRead<CombatThemeHolder> GetHolder() => themeHolder;
+
+        public IFullEffectStructureRead<string> GetNamesTagsHolder() => namesHolder;
+        public IFullEffectStructureRead<Color> GetColorsHolder() => colorsHolder;
+        public IFullEffectStructureRead<Sprite> GetIcons() => iconsHolder;
 
         [Serializable]
-        private sealed class ThemeHolder : ClassEffectStructure<CombatThemeHolder>
+        private sealed class NamesHolder : EffectStructure<string>
         { }
 
+        [Serializable]
+        private sealed class ColorsHolder : EffectStructure<Color>
+        { }
+
+        [Serializable]
+        private sealed class IconsHolder : PreviewMonoEffectStructure<Sprite>
+        { }
     }
 }

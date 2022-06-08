@@ -16,7 +16,10 @@ namespace CombatSystem.Skills.Effects
     {
         [SerializeField] private bool isBurst;
         private string _effectTag;
-        public override EnumStats.StatType EffectType => EnumStats.StatType.Control;
+
+        public override EnumsEffect.ConcreteType EffectType => (isBurst)
+            ? EnumsEffect.ConcreteType.ControlBurst 
+            : EnumsEffect.ConcreteType.ControlGain;
 
         private const string BurstName = EffectTags.BurstControlEffectName;
         private const string GainName = EffectTags.GainControlEffectName;

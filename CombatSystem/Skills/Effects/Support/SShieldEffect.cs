@@ -14,7 +14,7 @@ namespace CombatSystem.Skills.Effects
 
         public override string EffectTag => ShieldEffectTag;
         public override string EffectSmallPrefix => ShieldEffectSmallPrefix;
-        public override EnumStats.StatType EffectType => EnumStats.StatType.Shielding;
+        public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Shielding;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

@@ -1,6 +1,7 @@
 using System;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Skills.Effects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -27,7 +28,7 @@ namespace CombatSystem.VFX
             {
                 var secondaryParticlesHolder = particlesHolder.GetReferences();
                 var effectType = effect.EffectType;
-                effectPrefab = UtilsStats.GetElement(effectType, secondaryParticlesHolder);
+                effectPrefab = UtilsStructureEffect.GetElement(effectType, secondaryParticlesHolder);
             }
 
             if(!effectPrefab) return;

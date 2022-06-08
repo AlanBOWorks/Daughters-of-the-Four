@@ -19,7 +19,10 @@ namespace CombatSystem.Skills.Effects
 
         [SerializeField] protected bool isBurst;
 
-        public override EnumStats.StatType EffectType => EnumStats.StatType.Buff;
+        public override EnumsEffect.ConcreteType EffectType => (isBurst)
+            ? EnumsEffect.ConcreteType.Burst
+            : EnumsEffect.ConcreteType.Buff;
+
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

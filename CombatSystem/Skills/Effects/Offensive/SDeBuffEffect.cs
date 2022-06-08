@@ -17,7 +17,8 @@ namespace CombatSystem.Skills.Effects
 
         [SerializeField] protected bool isBurst;
 
-        public override EnumStats.StatType EffectType => EnumStats.StatType.DeBuff;
+        public override EnumsEffect.ConcreteType EffectType => (isBurst) 
+            ? EnumsEffect.ConcreteType.DeBurst : EnumsEffect.ConcreteType.DeBuff;
         protected string GetBuffPrefix() => (isBurst) ? DeBurstPrefix : DeBuffPrefix;
         public override string EffectSmallPrefix => (isBurst) ? DeBurstSmallPrefix : DeBuffSmallPrefix;
 

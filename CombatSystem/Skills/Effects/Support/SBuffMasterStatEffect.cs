@@ -17,7 +17,7 @@ namespace CombatSystem.Skills.Effects
 
         private const string MasterBuffEffectSmallPrefix = EffectTags.BuffEffectName;
         public override string EffectSmallPrefix => MasterBuffEffectSmallPrefix;
-        public override EnumStats.StatType EffectType => EnumStats.StatType.Buff;
+        public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Buff;
 
         private void OnEnable()
         {

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace CombatSystem.Skills.Effects
 {
     [Serializable]
-    public class EffectStructure<T> : IEffectTypeStructureRead<T>, IEffectStructureRead<T>
+    public class EffectStructure<T> : IFullEffectStructureRead<T>
     {
         [TitleGroup("Master")]
         [SerializeField] protected T offensiveEffectType;
@@ -25,6 +25,7 @@ namespace CombatSystem.Skills.Effects
         [TitleGroup("Team")]
         [SerializeField] protected T guardingType;
         [SerializeField] protected T controlType;
+        [SerializeField] protected T controlBurstType;
         [SerializeField] protected T stanceType;
 
         public T OffensiveEffectType => offensiveEffectType;
@@ -40,6 +41,7 @@ namespace CombatSystem.Skills.Effects
         public T BuffEffectType => buffEffectType;
         public T BurstEffectType => burstEffectType;
         public T ControlType => controlType;
+        public T ControlBurstType => controlBurstType;
         public T StanceType => stanceType;
     }
 
@@ -65,11 +67,12 @@ namespace CombatSystem.Skills.Effects
             guardingType = new T();
             controlType = new T();
             stanceType = new T();
+            controlBurstType = new T();
         }
     }
 
     [Serializable]
-    public class MonoEffectStructure<T> : IEffectTypeStructureRead<T>, IEffectStructureRead<T>
+    public class MonoEffectStructure<T> : IFullEffectStructureRead<T>
         where T : UnityEngine.Object
     {
         [TitleGroup("Master")]
@@ -90,6 +93,7 @@ namespace CombatSystem.Skills.Effects
         [TitleGroup("Team")]
         [SerializeField] private T guardingType;
         [SerializeField] private T controlType;
+        [SerializeField] private T controlBurstType;
         [SerializeField] private T stanceType;
 
         public T OffensiveEffectType => offensiveEffectType;
@@ -108,12 +112,13 @@ namespace CombatSystem.Skills.Effects
         public T BurstEffectType => (burstEffectType) ? burstEffectType : supportEffectType;
 
         public T ControlType => (controlType) ? controlType : teamEffectType;
+        public T ControlBurstType => (controlBurstType) ? controlBurstType : teamEffectType;
         public T StanceType => (stanceType) ? stanceType : teamEffectType;
 
 
     }
     [Serializable]
-    public class PreviewMonoEffectStructure<T> : IEffectTypeStructureRead<T>, IEffectStructureRead<T> 
+    public class PreviewMonoEffectStructure<T> : IFullEffectStructureRead<T> 
         where T : UnityEngine.Object
     {
         [TitleGroup("Master")]
@@ -136,6 +141,7 @@ namespace CombatSystem.Skills.Effects
         [TitleGroup("Team")]
         [SerializeField, PreviewField, GUIColor(0.3f, 0.3f, 0.3f)] private T guardingType;
         [SerializeField, PreviewField, GUIColor(0.3f, 0.3f, 0.3f)] private T controlType;
+        [SerializeField, PreviewField, GUIColor(0.3f, 0.3f, 0.3f)] private T controlBurstType;
         [SerializeField, PreviewField, GUIColor(0.3f, 0.3f, 0.3f)] private T stanceType;
 
         public T OffensiveEffectType => offensiveEffectType;
@@ -155,12 +161,13 @@ namespace CombatSystem.Skills.Effects
 
         public T ControlType => (controlType) ? controlType : teamEffectType;
         public T StanceType => (stanceType) ? stanceType : teamEffectType;
-
+        public T ControlBurstType => (controlBurstType) ? controlBurstType : teamEffectType;
 
     }
 
 
-
+    public interface IFullEffectStructureRead<out T> : IEffectTypeStructureRead<T>, IEffectStructureRead<T>
+    { }
 
     public interface IEffectTypeStructureRead<out T>
     {
@@ -196,5 +203,6 @@ namespace CombatSystem.Skills.Effects
     {
         T ControlType { get; }
         T StanceType { get; }
+        T ControlBurstType { get; }
     }
 }

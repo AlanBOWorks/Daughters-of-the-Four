@@ -16,11 +16,11 @@ namespace CombatSystem.Player.UI
         [SerializeField] private DamageNumber numberPrefab;
         [SerializeField, Min(0), SuffixLabel("s")] private float popUpFrequency = .2f;
 
-        private Queue<KeyValuePair<RectTransform, string>> _popUpQueue;
+        private Queue<KeyValuePair<RectTransform, PerformEffectValues>> _popUpQueue;
 
         private void Awake()
         {
-            _popUpQueue = new Queue<KeyValuePair<RectTransform, string>>(16);
+            _popUpQueue = new Queue<KeyValuePair<RectTransform, PerformEffectValues>>(16);
             CombatSystemSingleton.EventsHolder.Subscribe(this);
         }
 
@@ -78,16 +78,18 @@ namespace CombatSystem.Player.UI
 
             var hoverElement = hoverDictionary[target];
             RectTransform targetTransform = (RectTransform) hoverElement.transform;
-            string popUpText = LocalizeEffects.LocalizeEffectDigitValue(in values);
 
-            KeyValuePair<RectTransform,string> queueElement = new KeyValuePair<RectTransform, string>(targetTransform,popUpText);
+            var queueElement = new KeyValuePair<RectTransform, PerformEffectValues>(targetTransform,values);
             _popUpQueue.Enqueue(queueElement);
         }
 
-        private void Spawn(in RectTransform targetTransform, in string popUpText)
+        private void Spawn(in RectTransform targetTransform, in PerformEffectValues queueValues)
         {
+            var popUpText = LocalizeEffects.LocalizeEffectDigitValue(in queueValues);
             var popUpElement = numberPrefab.Spawn(Vector3.zero, popUpText);
             popUpElement.SetAnchoredPosition(targetTransform, Vector2.zero);
+            var textHandler = popUpElement.GetComponent<UEffectTextHandler>();
+            textHandler.HandleEffect(in queueValues);
         }
     }
 }

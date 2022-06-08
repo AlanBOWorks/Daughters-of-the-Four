@@ -14,7 +14,7 @@ namespace CombatSystem.Skills.Effects
         private const string DamageSmallPrefix = EffectTags.DamageEffectPrefix;
         public override string EffectTag => DamageEffectTag;
         public override string EffectSmallPrefix => DamageSmallPrefix;
-        public override EnumStats.StatType EffectType => EnumStats.StatType.Attack;
+        public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.DamageType;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

@@ -24,7 +24,7 @@ namespace CombatSystem.Skills.Effects
         private const string StanceSmallPrefix = EffectTags.StanceEffectPrefix;
         public override string EffectTag => _effectTag;
         public override string EffectSmallPrefix => StanceSmallPrefix;
-        public override EnumStats.StatType EffectType => EnumStats.StatType.Control;
+        public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Stance;
 
         public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
         {

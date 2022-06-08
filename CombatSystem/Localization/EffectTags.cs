@@ -16,7 +16,7 @@ namespace CombatSystem.Localization
         public const string ShieldingEffectName = StatsTags.ShieldingStatName;
         public const string GuardingEffectName = "Guarding";
 
-        public const string BurstControlEffectName = "Burst Control";
+        public const string BurstControlEffectName = "Burst ControlGain";
         public const string GainControlEffectName = StatsTags.ControlStatName;
 
         public const string StanceEffectName = "Stance";

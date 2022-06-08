@@ -28,7 +28,7 @@ namespace CombatSystem.Localization
 
         public const string ActionsStatName = "Actions";
         public const string SpeedStatName = "Speed";
-        public const string ControlStatName = "Control";
+        public const string ControlStatName = "ControlGain";
         public const string CriticalStatName = "Luck";
 
 
