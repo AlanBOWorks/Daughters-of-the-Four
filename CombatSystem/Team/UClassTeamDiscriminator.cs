@@ -6,7 +6,10 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public abstract class UTeamDiscriminator<T> : MonoBehaviour, ICombatPreparationListener where T : new()
+    /// <summary>
+    /// Holds Player's and Enemy's objects references and discriminates based on [<see cref="CombatTeam"/>]
+    /// </summary>
+    public abstract class UClassTeamDiscriminator<T> : MonoBehaviour, ICombatPreparationListener where T : new()
     {
         [SerializeField]
         private T playerType = new T();
@@ -36,7 +39,11 @@ namespace CombatSystem.Team
         protected abstract void OnCombatPrepares(in T element, in CombatTeam team);
     }
 
-    public abstract class UTeamDiscriminatorListener<T> : UTeamDiscriminator<T>, ITeamEventListener where T : new()
+    /// <summary>
+    /// Discriminates based on [<see cref="ITeamEventListener"/>]'s callbacks
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public abstract class UClassTeamDiscriminatorListener<T> : UClassTeamDiscriminator<T>, ITeamEventListener where T : new()
     {
         public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {
@@ -56,7 +63,8 @@ namespace CombatSystem.Team
         protected abstract void OnControlChange(in T element, in float phasedControl, in bool isBurst);
     }
 
-    public abstract class UTeamMonoDiscriminator<T> : MonoBehaviour, ICombatPreparationListener where T : MonoBehaviour
+
+    public abstract class UTeamDiscriminator<T> : MonoBehaviour, ICombatPreparationListener
     {
         [SerializeField]
         private T playerType;
@@ -86,8 +94,7 @@ namespace CombatSystem.Team
         protected abstract void OnCombatPrepares(in T element, in CombatTeam team);
     }
 
-    public abstract class UTeamMonoDiscriminatorListener<T> : UTeamMonoDiscriminator<T>, ITeamEventListener
-        where T : MonoBehaviour
+    public abstract class UTeamDiscriminatorListener<T> : UTeamDiscriminator<T>, ITeamEventListener
     {
         public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
         {

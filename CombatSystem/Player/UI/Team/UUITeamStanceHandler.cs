@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UUITeamStanceHandler : UTeamDiscriminatorListener<UUITeamStanceHandler.StanceHandler>
+    public class UUITeamStanceHandler : UClassTeamDiscriminatorListener<UUITeamStanceHandler.StanceHandler>
     {
         protected override void OnCombatPrepares(in StanceHandler element, in CombatTeam team)
         {

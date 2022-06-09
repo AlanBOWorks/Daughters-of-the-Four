@@ -16,7 +16,7 @@ namespace CombatSystem.Player
 
         [Title("Characters")]
         [SerializeField]
-        private SPlayerPreparationEntity[] characters = new SPlayerPreparationEntity[EnumTeam.RoleTypesAmount];
+        private SPlayerPreparationEntity[] characters = new SPlayerPreparationEntity[EnumTeam.RoleTypesCount];
         [Title("Skills")]
         [SerializeField]
         private STeamSkill[] teamSkills = new STeamSkill[0];

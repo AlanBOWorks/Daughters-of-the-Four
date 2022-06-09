@@ -13,7 +13,7 @@ namespace CombatSystem.Player
     {
         public PlayerSelectedCharactersHolder()
         {
-            int rolesAmount = EnumTeam.RoleTypesAmount;
+            int rolesAmount = EnumTeam.RoleTypesCount;
             _characters = new List<ICombatEntityProvider>(rolesAmount);
             for (int i = 0; i < rolesAmount; i++)
             {
@@ -38,6 +38,7 @@ namespace CombatSystem.Player
         [Button]
         public void AddTeam(SPlayerPresetTeam predefinedTeam)
         {
+            _characters.Clear();
             var teamMembers = predefinedTeam.GetPresetCharacters();
             _characters.AddRange(teamMembers);
             var teamSkills = predefinedTeam.GetTeamSkills();

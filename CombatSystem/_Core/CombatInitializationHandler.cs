@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,10 @@ namespace CombatSystem._Core
             ICombatTeamProvider playerTeam,
             ICombatTeamProvider enemyTeam)
         {
+            if(CombatSystemSingleton.GetIsCombatActive())
+                throw new AccessViolationException("Trying to access combat while mid Combat");
+
+
             // This is just in case these weren't instantiated
             var playerSingleton = PlayerCombatSingleton.Instance;
             var enemySingleton = EnemyCombatSingleton.Instance;
@@ -165,7 +170,7 @@ namespace CombatSystem._Core
             TestStartCombat(playerTesterTeam, oppositionTeam);
         }
 
-        [Button, DisableIf("CanFinish"), DisableInEditorMode]
+        [Button, EnableIf("CanFinish"), DisableInEditorMode]
         private void FinishCombat(bool isWin = true)
         {
             CombatFinishHandler.FinishCombat(isWin);

@@ -29,6 +29,12 @@ namespace CombatSystem.Team
         public const int SupportIndex = AttackerIndex + 1;
         public const int FlexIndex = SupportIndex + 1;
 
+
+        public const int VanguardInvertedIndex = AttackerInvertedIndex +1;
+        public const int AttackerInvertedIndex = SupportInvertedIndex +1;
+        public const int SupportInvertedIndex = FlexInvertedIndex +1;
+        public const int FlexInvertedIndex = 0;
+
         /// <summary>
         /// Amount of Role up to [<seealso cref="SupportIndex"/>]
         /// </summary>
@@ -36,12 +42,12 @@ namespace CombatSystem.Team
         /// <summary>
         /// Total of role, including up to [<seealso cref="FlexIndex"/>]
         /// </summary>
-        public const int RoleTypesAmount = FlexIndex + 1;
+        public const int RoleTypesCount = FlexIndex + 1;
 
         /// <summary>
-        /// Total of [<see cref="RoleTypesAmount"/>]*2; this is for two teams Collection initializations 
+        /// Total of [<see cref="RoleTypesCount"/>]*2; this is for two teams Collection initializations 
         /// </summary>
-        public const int OppositeTeamRolesAmount = RoleTypesAmount * 2;
+        public const int OppositeTeamRolesAmount = RoleTypesCount * 2;
         public enum Role
         {
             InvalidRole = InvalidIndex,
@@ -58,7 +64,7 @@ namespace CombatSystem.Team
         /// <summary>
         /// The amount of OffRolesIndexes = 8
         /// </summary>
-        public const int OffRoleIndexCount = RoleTypesAmount * 2;
+        public const int OffRoleIndexCount = RoleTypesCount * 2;
 
         /// <summary>
         /// The index in an array for secondary Roles = 0;
@@ -73,7 +79,7 @@ namespace CombatSystem.Team
         /// </summary>
         public const int MainRoleInFullTeamArrayIndex = ThirdRoleInOffArrayIndex + 1; //In full team comp, mains are placed in last
 
-        public const int SecondaryVanguardIndex = RoleTypesAmount;
+        public const int SecondaryVanguardIndex = RoleTypesCount;
         public const int SecondaryAttackerIndex = SecondaryVanguardIndex + 1;
         public const int SecondarySupportIndex = SecondaryAttackerIndex + 1;
         public const int SecondaryFlexIndex = SecondarySupportIndex + 1;
@@ -189,6 +195,6 @@ namespace CombatSystem.Team
         /// <summary>
         /// The total amount of indexes in a FullTeam Structure (Mains + Offs)
         /// </summary>
-        public const int FullTeamIndexCount = RoleTypesAmount+OffRoleIndexCount;
+        public const int FullTeamIndexCount = RoleTypesCount+OffRoleIndexCount;
     }
 }

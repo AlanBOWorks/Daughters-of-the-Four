@@ -71,7 +71,9 @@ namespace CombatSystem._Core
         public static SystemCombatEventsHolder EventsHolder { get; private set; }
 
         // ------- ESSENTIALS ------
+        [ShowInInspector]
         internal static UTeamFullGroupStructure<Transform> PlayerPositionTransformReferences { get; set; }
+        [ShowInInspector]
         internal static UTeamFullGroupStructure<Transform> EnemyPositionTransformReferences { get; set; }
 
         // ------- TEAM ------

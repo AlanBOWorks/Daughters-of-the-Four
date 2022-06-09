@@ -15,7 +15,7 @@ namespace CombatSystem.Team
 
         [Title("Characters")]
         [SerializeField]
-        private SPreparationEntity[] characters = new SPreparationEntity[EnumTeam.RoleTypesAmount];
+        private SPreparationEntity[] characters = new SPreparationEntity[EnumTeam.RoleTypesCount];
         [SerializeField]
         [Title("Skills")]
         private STeamSkill[] teamSkills = new STeamSkill[0];

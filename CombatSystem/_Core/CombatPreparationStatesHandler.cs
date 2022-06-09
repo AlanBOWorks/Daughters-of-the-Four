@@ -18,7 +18,6 @@ namespace CombatSystem._Core
 
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            DestroyAliveReference();
             CreateAliveReference();
             _eventsHolder.OnCombatPrepares(allMembers, playerTeam, enemyTeam);
 
@@ -45,7 +44,6 @@ namespace CombatSystem._Core
 
         public void OnCombatEnd()
         {
-            DestroyAliveReference();
         }
 
         public void OnCombatFinish(bool isPlayerWin)
@@ -75,19 +73,7 @@ namespace CombatSystem._Core
                 CombatSystemSingleton.EventsHolder.OnCombatFinish(false);
             }
         }
-
-        private static void DestroyAliveReference()
-        {
-            var aliveReference = CombatSystemSingleton.AliveGameObjectReference;
-            if (aliveReference)
-            {
-                Object.Destroy(aliveReference);
-            }
-
-
-
-        }
-
+        
     }
 
     /// <summary>

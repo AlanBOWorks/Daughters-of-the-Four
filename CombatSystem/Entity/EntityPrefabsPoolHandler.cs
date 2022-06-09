@@ -10,7 +10,9 @@ namespace CombatSystem.Entity
     public sealed class EntityPrefabsPoolHandler : IOppositionTeamStructureRead<ITeamFullStructureRead<Transform>>,
         ICombatStatesListener
     {
-        private readonly PlayerPrefabsHolder _playerTeamType;
+        [ShowInInspector,HorizontalGroup()]
+        private readonly PrefabsHolder _playerTeamType;
+        [ShowInInspector,HorizontalGroup()]
         private readonly PrefabsHolder _enemyTeamType;
 
         public EntityPrefabsPoolHandler()
@@ -19,11 +21,43 @@ namespace CombatSystem.Entity
             _enemyTeamType = new PrefabsHolder();
         }
 
-        [ShowInInspector,HorizontalGroup()]
         public ITeamFullStructureRead<Transform> PlayerTeamType => _playerTeamType;
-        [ShowInInspector,HorizontalGroup()]
         public ITeamFullStructureRead<Transform> EnemyTeamType => _enemyTeamType;
 
+
+        public void HandleTeams(CombatTeam playerTeam, CombatTeam enemyTeam)
+        {
+            var playerPositions = CombatSystemSingleton.PlayerPositionTransformReferences;
+            _playerTeamType.PoolMembers(playerTeam, playerPositions);
+
+            var enemyPositions = CombatSystemSingleton.EnemyPositionTransformReferences;
+            _enemyTeamType.PoolMembers(enemyTeam, enemyPositions);
+        }
+
+
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
+        {
+            // The instantiation is made by CombatInitializationHandler.InitiateModels
+        }
+
+        public void OnCombatStart()
+        {
+        }
+
+        public void OnCombatEnd()
+        {
+            _playerTeamType.OnFinishCombat();
+            _enemyTeamType.OnFinishCombat();
+        }
+
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+        }
+
+        public void OnCombatQuit()
+        {
+
+        }
 
 
         private sealed class PlayerPrefabsHolder : PrefabsHolder
@@ -48,11 +82,11 @@ namespace CombatSystem.Entity
                 
                 var members = team.GetAllEntities();
                 var keyValuePairs = UtilsTeam.GetEnumerable(members, this);
-                foreach (var pair in keyValuePairs)
+                int index = 0;
+                foreach ((CombatEntity entity, Transform entityTransform) in keyValuePairs)
                 {
-                    var entity = pair.Key;
                     if(entity == null) continue;
-                    var entityTransform = pair.Value;
+
                     var entityGO = entityTransform.gameObject;
 
                     UtilsEntity.HandleInjections(in entity, in entityGO);
@@ -61,6 +95,7 @@ namespace CombatSystem.Entity
                     var body = entity.Body;
                     body.Injection(in entity);
                     body.InjectPositionReference(in entityTransform);
+                    index++;
                 }
             }
 
@@ -71,7 +106,7 @@ namespace CombatSystem.Entity
 
             private void Hide()
             {
-                var allMembers = UtilsTeam.GetEnumerable(this);
+                var allMembers = UtilsTeam.GetEnumerable(this as ITeamFullStructureRead<Transform>);
                 foreach (var member in allMembers)
                 {
                     if(member == null) continue;
@@ -124,7 +159,7 @@ namespace CombatSystem.Entity
 
             protected void Destroy()
             {
-                var allMembers = UtilsTeam.GetEnumerable(this);
+                var allMembers = UtilsTeam.GetEnumerable(this as ITeamFullStructureRead<Transform>);
                 foreach (var member in allMembers)
                 {
                     if(!member) continue;
@@ -133,38 +168,5 @@ namespace CombatSystem.Entity
             }
         }
 
-        public void HandleTeams(CombatTeam playerTeam, CombatTeam enemyTeam)
-        {
-            var playerPositions = CombatSystemSingleton.PlayerPositionTransformReferences;
-            _playerTeamType.PoolMembers(playerTeam, playerPositions);
-
-            var enemyPositions = CombatSystemSingleton.EnemyPositionTransformReferences;
-            _enemyTeamType.PoolMembers(enemyTeam, enemyPositions);
-        }
-
-
-        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
-        {
-            // The instantiation is made by CombatInitializationHandler.InitiateModels
-        }
-
-        public void OnCombatStart()
-        {
-        }
-
-        public void OnCombatEnd()
-        {
-            _playerTeamType.OnFinishCombat();
-            _enemyTeamType.OnFinishCombat();
-        }
-
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-            
-        }
     }
 }

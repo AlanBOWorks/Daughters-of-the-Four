@@ -10,6 +10,7 @@ using Object = UnityEngine.Object;
 namespace CombatSystem.Team
 {
     /// <summary>
+    /// [ Used for spawning all members as [<see cref="T"/>] elements ] <br></br><br></br>
     /// Spawn elements of [<see cref="T"/>] by Instantiation through prefab references;<br></br>
     /// It also saves the dictionaries keeps dictionaries for all entities and each team of
     /// type(<see cref="CombatEntity"/>,<see cref="T"/>).<br></br><br></br>

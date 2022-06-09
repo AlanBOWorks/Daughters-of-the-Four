@@ -363,48 +363,10 @@ namespace CombatSystem.Team
 
             int ConvertIndexIntoOffRoleIndex()
             {
-                return index + EnumTeam.RoleTypesAmount;
+                return index + EnumTeam.RoleTypesCount;
             }
         }
 
-        public static void SetElement<T>(int index, TeamOffGroupStructure<T> structure, T value)
-        {
-            var offRoleIndex = ConvertIndexIntoOffRoleIndex();
-            switch (offRoleIndex)
-            {
-                case EnumTeam.SecondaryVanguardIndex:
-                    structure.SecondaryVanguardElement = value;
-                    break;
-                case EnumTeam.SecondaryAttackerIndex:
-                    structure.SecondaryAttackerElement = value;
-                    break;
-                case EnumTeam.SecondarySupportIndex:
-                    structure.SecondarySupportElement = value;
-                    break;
-                case EnumTeam.SecondaryFlexIndex:
-                    structure.SecondaryFlexElement = value;
-                    break;
-                case EnumTeam.ThirdVanguardIndex:
-                    structure.ThirdVanguardElement = value;
-                    break;
-                case EnumTeam.ThirdAttackerIndex:
-                    structure.ThirdAttackerElement = value;
-                    break;
-                case EnumTeam.ThirdSupportIndex:
-                    structure.ThirdSupportElement = value;
-                    break;
-                case EnumTeam.ThirdFlexIndex:
-                    structure.ThirdFlexElement = value;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(offRoleIndex), offRoleIndex, null);
-            }
-
-            int ConvertIndexIntoOffRoleIndex()
-            {
-                return index + EnumTeam.RoleTypesAmount;
-            }
-        }
 
 
         public static IEnumerable<T> GetEnumerable<T>(ITeamTrinityStructureRead<T> structure)

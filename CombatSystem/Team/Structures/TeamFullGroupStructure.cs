@@ -6,66 +6,25 @@ using UnityEngine;
 
 namespace CombatSystem.Team
 {
-    public class TeamFullGroupStructure<T> : TeamOffGroupStructure<T>,
-        ITeamFullStructureRead<T>, ITeamFlexPositionStructureRead<T>,
-        ITeamFlexStructureInject<T>
+    public class TeamFullGroupStructure<T> : TeamMainGroupStructure<T>, ITeamFullStructureRead<T>
     {
-        public TeamFullGroupStructure() : base(EnumTeam.TeamAlimentRolesLength)
-        { }
+        [ShowInInspector, TitleGroup("Vanguard")]
+        public T SecondaryVanguardElement { get; set; }
+        [ShowInInspector, TitleGroup("Attacker")]
+        public T SecondaryAttackerElement { get; set; }
+        [ShowInInspector, TitleGroup("Support")]
+        public T SecondarySupportElement { get; set; }
+        [ShowInInspector, TitleGroup("Flex")]
+        public T SecondaryFlexElement { get; set; }
 
-        T ITeamTrinityStructureRead<T>.VanguardType => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-       
-        T ITeamTrinityStructureRead<T>.AttackerType => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-        T ITeamTrinityStructureRead<T>.SupportType => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-        T ITeamFlexStructureRead<T>.FlexType => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-
-        T ITeamPositionStructureRead<T>.FrontLineType => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-        T ITeamPositionStructureRead<T>.MidLineType => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-        T ITeamPositionStructureRead<T>.BackLineType => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-        T ITeamFlexPositionStructureRead<T>.FlexLineType => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-
-
-        public new T VanguardType
-        {
-            get => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-            set => VanguardFrontLine[EnumTeam.MainRoleInFullTeamArrayIndex] = value;
-        }
-
-        public new T AttackerType
-        {
-            get => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-            set => AttackerMidLine[EnumTeam.MainRoleInFullTeamArrayIndex] = value;
-        }
-
-        public new T SupportType
-        {
-            get => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-            set => SupportBackLine[EnumTeam.MainRoleInFullTeamArrayIndex] = value;
-        }
-
-        public new T FlexType
-        {
-            get => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex];
-            set => FlexFlexLine[EnumTeam.MainRoleInFullTeamArrayIndex] = value;
-        }
-
-        public new IEnumerator<T> GetEnumerator()
-        {
-            yield return VanguardType;
-            yield return AttackerType;
-            yield return SupportType;
-            yield return FlexType;
-
-            yield return SecondaryVanguardElement;
-            yield return SecondaryAttackerElement;
-            yield return SecondarySupportElement;
-            yield return SecondaryFlexElement;
-
-            yield return ThirdVanguardElement;
-            yield return ThirdAttackerElement;
-            yield return ThirdSupportElement;
-            yield return ThirdFlexElement;
-        }
+        [ShowInInspector, TitleGroup("Vanguard")]
+        public T ThirdVanguardElement { get; set; }
+        [ShowInInspector, TitleGroup("Attacker")]
+        public T ThirdAttackerElement { get; set; }
+        [ShowInInspector, TitleGroup("Support")]
+        public T ThirdSupportElement { get; set; }
+        [ShowInInspector, TitleGroup("Flex")]
+        public T ThirdFlexElement { get; set; }
     }
 
 
