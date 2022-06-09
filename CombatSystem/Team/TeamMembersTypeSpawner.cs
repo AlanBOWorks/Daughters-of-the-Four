@@ -17,7 +17,7 @@ namespace CombatSystem.Team
         [SerializeField]
         protected PrefabHolder prefabHolder = new PrefabHolder();
 
-        [SerializeField] private bool poolElements;
+        [SerializeField] private bool doPooling = true;
 
 
         [ShowInInspector, DisableInEditorMode]
@@ -32,7 +32,7 @@ namespace CombatSystem.Team
             if(_activeElements != null) return;
 
             _activeElements = new Queue<T>();
-            if(poolElements)
+            if(doPooling)
                 _pool = new Stack<T>();
         }
 
@@ -49,7 +49,7 @@ namespace CombatSystem.Team
             while (_activeElements.Count > 0)
             {
                 var element = _activeElements.Dequeue();
-                if (poolElements)
+                if (doPooling)
                 {
                     _pool.Push(element);
                     onDisableCallback?.Invoke(element);

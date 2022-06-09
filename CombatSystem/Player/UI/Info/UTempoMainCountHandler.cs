@@ -28,7 +28,7 @@ namespace CombatSystem.Player.UI
         [ShowInInspector,DisableInEditorMode]
         private Dictionary<CombatEntity, UTempoTrackerHolder> _dictionary;
 
-        
+        public IReadOnlyDictionary<CombatEntity, UTempoTrackerHolder> GetDictionary() => _dictionary;
 
 
         private void Awake()
@@ -63,6 +63,8 @@ namespace CombatSystem.Player.UI
 
             playerOffRoles.OnCombatFinish(hideTracker);
             enemyOffRoles.OnCombatFinish(hideTracker);
+
+            _dictionary.Clear();
         }
 
         public void OnCombatFinish(bool isPlayerWin)
