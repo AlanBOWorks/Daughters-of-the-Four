@@ -5,6 +5,7 @@ using CombatSystem.Entity;
 using JetBrains.Annotations;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Utils.Collections;
 
 namespace CombatSystem.Team
 {
@@ -52,7 +53,8 @@ namespace CombatSystem.Team
         public ITeamFlexPositionStructureRead<CombatEntity> GetMainPositions() => _positionWrapper;
         public IReadOnlyCollection<CombatEntity> GetMainRoles() => _roleWrapper.MainRoles;
         public IReadOnlyCollection<CombatEntity> GetOffRoles() => _roleWrapper.OffRoles;
-
+        public IEnumerable<CombatEntity> GetSecondaryRoles() => _roleWrapper.SecondaryRoles;
+        public IEnumerable<CombatEntity> GetThirdRoles() => _roleWrapper.ThirdRoles;
 
 
         CombatEntity ITeamTrinityStructureRead<CombatEntity>.VanguardType 
@@ -156,15 +158,18 @@ namespace CombatSystem.Team
                 FlexType = new List<CombatEntity>(LineMembersMaxCapacity);
 
                 _mainRoles = new List<CombatEntity>(TeamLinesMaxCapacity);
-                _offRoles = new List<CombatEntity>();
+                _offRoles = new OffRolesCollection();
             }
 
 
             private readonly List<CombatEntity> _mainRoles;
-            private readonly List<CombatEntity> _offRoles;
+            [ShowInInspector]
+            private readonly OffRolesCollection _offRoles;
 
             public IReadOnlyCollection<CombatEntity> MainRoles => _mainRoles;
             public IReadOnlyCollection<CombatEntity> OffRoles => _offRoles;
+            public IEnumerable<CombatEntity> SecondaryRoles => _offRoles.GetFirstEnumerable();
+            public IEnumerable<CombatEntity> ThirdRoles => _offRoles.GetSecondEnumerable();
 
             [ShowInInspector, HorizontalGroup("FrontLine")]
             public List<CombatEntity> VanguardType { get; }
@@ -178,12 +183,18 @@ namespace CombatSystem.Team
             public void AddMember(in EnumTeam.Role role, in CombatEntity member)
             {
                 var roleGroup = UtilsTeam.GetElement(role, this);
-                bool isMainRole = roleGroup.Count == 0;
+                int roleGroupCount = roleGroup.Count;
+                bool isMainRole = roleGroupCount == 0;
                 roleGroup.Add(member);
 
                 if(!isMainRole)
                 {
-                    _offRoles.Add(member);
+                    bool isSecondRole = roleGroupCount == 1;
+                    var offRoleList = isSecondRole 
+                        ? _offRoles.GetFirstList() 
+                        : _offRoles.GetSecondList();
+
+                    offRoleList.Add(member);
                     return;
                 }
 
@@ -202,6 +213,12 @@ namespace CombatSystem.Team
                 var role = entity.RoleType;
                 if (role == EnumTeam.Role.Flex || role == EnumTeam.Role.InvalidRole) return false;
                 return _mainRoles.Contains(entity);
+            }
+
+            private sealed class OffRolesCollection : ConcatDualList<CombatEntity>
+            {
+                public OffRolesCollection() : base(TeamLinesMaxCapacity)
+                { }
             }
         }
     }

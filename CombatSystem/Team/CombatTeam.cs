@@ -110,6 +110,9 @@ namespace CombatSystem.Team
         public IReadOnlyCollection<CombatEntity> GetAllMembers() => _membersHolder.AllMembers;
         public IReadOnlyCollection<CombatEntity> GetMainRoles() => _membersHolder.GetMainRoles();
         public IReadOnlyCollection<CombatEntity> GetOffRoles() => _membersHolder.GetOffRoles();
+        public IEnumerable<CombatEntity> GetSecondaryRoles() => _membersHolder.GetSecondaryRoles();
+        public IEnumerable<CombatEntity> GetThirdRoles() => _membersHolder.GetThirdRoles();
+
 
         [ShowInInspector]
         private readonly CombatTeamControlMembers _controlMembers;
