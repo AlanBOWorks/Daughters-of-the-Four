@@ -10,15 +10,10 @@ namespace CombatSystem.Player.UI
 {
     public class UTempoMainCountHandler : MonoBehaviour, ICombatStatesListener, ITempoEntityPercentListener
     {
-        [SerializeField,HorizontalGroup("Main Roles")] 
-        private MainRolesHolder playerMainRoles = new MainRolesHolder();
-        [SerializeField,HorizontalGroup("Main Roles")]
-        private MainRolesHolder enemyMainRoles = new MainRolesHolder();
-
-        [SerializeField, HorizontalGroup("Off Roles")]
-        private OffRolesHolder playerOffRoles = new OffRolesHolder();
-        [SerializeField, HorizontalGroup("Off Roles")]
-        private OffRolesHolder enemyOffRoles = new OffRolesHolder();
+        [SerializeField, HorizontalGroup("Roles")]
+        private RolesHolder playerHolder = new RolesHolder();
+        [SerializeField, HorizontalGroup("Roles")]
+        private RolesHolder enemyHolder = new RolesHolder();
 
         [Title("Params")] 
         [SerializeField] private bool hidePrefabs = true;
@@ -36,17 +31,8 @@ namespace CombatSystem.Player.UI
             PlayerCombatSingleton.PlayerCombatEvents.Subscribe(this);
             _dictionary = new Dictionary<CombatEntity, UTempoTrackerHolder>();
 
-            playerMainRoles.GetPrefab().gameObject.SetActive(false); 
-            enemyMainRoles.GetPrefab().gameObject.SetActive(false); 
-
-            playerOffRoles.GetPrefab()?.gameObject.SetActive(false); 
-            enemyOffRoles.GetPrefab()?.gameObject.SetActive(false); 
-
-            playerMainRoles.Injection(this);
-            enemyMainRoles.Injection(this);
-
-            playerOffRoles.Injection(this);
-            enemyOffRoles.Injection(this);
+            playerHolder.DoInjection(this);
+            enemyHolder.DoInjection(this);
         }
 
 
@@ -57,12 +43,10 @@ namespace CombatSystem.Player.UI
         }
         public void OnCombatEnd()
         {
-            Action<UTempoTrackerHolder> hideTracker = HideActiveTracker; 
-            playerMainRoles.OnCombatFinish(hideTracker);
-            enemyMainRoles.OnCombatFinish(hideTracker);
+            Action<UTempoTrackerHolder> hideTracker = HideActiveTracker;
 
-            playerOffRoles.OnCombatFinish(hideTracker);
-            enemyOffRoles.OnCombatFinish(hideTracker);
+            playerHolder.OnFinish(hideTracker);
+            enemyHolder.OnFinish(hideTracker);
 
             _dictionary.Clear();
         }
@@ -77,11 +61,8 @@ namespace CombatSystem.Player.UI
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            playerMainRoles.OnCombatPrepares(playerTeam, null);
-            enemyMainRoles.OnCombatPrepares(enemyTeam, null);
-
-            playerOffRoles.OnCombatPrepares(playerTeam, null);
-            enemyOffRoles.OnCombatPrepares(enemyTeam, null);
+            playerHolder.DoInjection(playerTeam);
+            enemyHolder.DoInjection(enemyTeam);
         }
 
         public void OnCombatStart()
@@ -130,27 +111,60 @@ namespace CombatSystem.Player.UI
 
 
         [Serializable]
-        private sealed class MainRolesHolder : TeamMainMembersSpawner<UTempoTrackerHolder>
+        private sealed class RolesHolder
         {
-            private UTempoMainCountHandler _handler;
-            public void Injection(UTempoMainCountHandler handler) => _handler = handler;
+            [SerializeField]
+            private RolesSpawner mainRoles = new RolesSpawner();
+            [SerializeField]
+            private RolesSpawner secondaryRoles = new RolesSpawner();
+            [SerializeField]
+            private RolesSpawner thirdRoles = new RolesSpawner();
 
-            protected override void OnInstantiationElement(UTempoTrackerHolder element, CombatEntity entity, int count)
+            public void DoInjection(UTempoMainCountHandler handler)
             {
-                _handler.HandleEntity(entity,element);
+                foreach (var spawner in GetEnumerable())
+                {
+                    if(!spawner.IsValid()) return;
+
+                    spawner.Injection(handler);
+                    spawner.GetPrefab().gameObject.SetActive(false);
+                }
+            }
+
+            public void DoInjection(CombatTeam team)
+            {
+                mainRoles.OnCombatPrepares(team.GetMainRoles(),null);
+                secondaryRoles.OnCombatPrepares(team.GetSecondaryRoles(),null);
+                thirdRoles.OnCombatPrepares(team.GetThirdRoles(),null);
+            }
+
+            public void OnFinish(Action<UTempoTrackerHolder> hideTracker)
+            {
+                foreach (var spawner in GetEnumerable())
+                {
+                    spawner.OnCombatFinish(hideTracker);
+                }
+            }
+
+            private IEnumerable<RolesSpawner> GetEnumerable()
+            {
+                yield return mainRoles;
+                yield return secondaryRoles;
+                yield return thirdRoles;
             }
         }
+
+
         [Serializable]
-        private sealed class OffRolesHolder : TeamOffMembersSpawner<UTempoTrackerHolder>
+        private sealed class RolesSpawner : TeamMembersTypeSpawner<UTempoTrackerHolder>
         {
-
             private UTempoMainCountHandler _handler;
             public void Injection(UTempoMainCountHandler handler) => _handler = handler;
+
             protected override void OnInstantiationElement(UTempoTrackerHolder element, CombatEntity entity, int count)
             {
                 _handler.HandleEntity(entity,element);
             }
         }
-
     }
 }

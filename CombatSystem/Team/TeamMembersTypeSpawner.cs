@@ -16,14 +16,17 @@ namespace CombatSystem.Team
     {
         [SerializeField]
         protected PrefabHolder prefabHolder = new PrefabHolder();
+        [SerializeField] 
+        private bool doPooling = true;
 
-        [SerializeField] private bool doPooling = true;
 
-
+        private IEnumerable<CombatEntity> _entities;
         [ShowInInspector, DisableInEditorMode]
         private Queue<T> _activeElements;
         [ShowInInspector,DisableInEditorMode]
         private Stack<T> _pool;
+
+        public bool IsValid() => prefabHolder.IsValid();
 
 
         public T GetPrefab() => prefabHolder.GetPrefab();
@@ -37,11 +40,11 @@ namespace CombatSystem.Team
         }
 
 
-        public void OnCombatPrepares(CombatTeam team, Action<KeyValuePair<CombatEntity,T>> onCreationCallback)
+        public void OnCombatPrepares(IEnumerable<CombatEntity> members, Action<KeyValuePair<CombatEntity,T>> onCreationCallback)
         {
             Awake();
-            var members = GetMembers(team);
-            DoInstantiation(members, onCreationCallback);
+            _entities = members;
+            DoInstantiation(onCreationCallback);
         }
 
         public void OnCombatFinish(Action<T> onDisableCallback)
@@ -59,9 +62,9 @@ namespace CombatSystem.Team
             }
         }
 
-        private void DoInstantiation(IEnumerable<CombatEntity> members, Action<KeyValuePair<CombatEntity, T>> onCreationCallback)
+        private void DoInstantiation(Action<KeyValuePair<CombatEntity, T>> onCreationCallback)
         {
-            foreach (var entity in members)
+            foreach (var entity in _entities)
             {
                 var element = PoolOrInstantiate();
                 _activeElements.Enqueue(element);
@@ -69,16 +72,17 @@ namespace CombatSystem.Team
                 OnInstantiationElement(element,entity, _activeElements.Count);
                 onCreationCallback?.Invoke(new KeyValuePair<CombatEntity, T>(entity, element));
             }
+
+
+            T PoolOrInstantiate()
+            {
+                return _pool != null && _pool.Count > 0
+                    ? _pool.Pop()
+                    : prefabHolder.SpawnElement();
+            }
         }
 
-        private T PoolOrInstantiate()
-        {
-            return _pool != null && _pool.Count > 0
-                ? _pool.Pop() 
-                : prefabHolder.SpawnElement();
-        }
 
-        protected abstract IEnumerable<CombatEntity> GetMembers(CombatTeam team);
         protected abstract void OnInstantiationElement(T element, CombatEntity entity, int count);
 
 
@@ -87,23 +91,6 @@ namespace CombatSystem.Team
         protected sealed class PrefabHolder : PrefabInstantiationHandler<T>
         {
             
-        }
-    }
-
-    public abstract class TeamMainMembersSpawner<T> : TeamMembersTypeSpawner<T>
-        where T : Object
-    {
-        protected override IEnumerable<CombatEntity> GetMembers(CombatTeam team)
-        {
-            return team.GetMainRoles();
-        }
-    }
-
-    public abstract class TeamOffMembersSpawner<T> : TeamMembersTypeSpawner<T> where T : Object
-    {
-        protected override IEnumerable<CombatEntity> GetMembers(CombatTeam team)
-        {
-            return team.GetOffRoles();
         }
     }
 }
