@@ -24,6 +24,11 @@ namespace Utils
         public bool IsValid() => prefab;
 
         public TValue GetPrefab() => prefab;
+
+        public static void TryHide<T>(PrefabInstantiationHandler<T> handler) where T : MonoBehaviour
+        {
+            handler.prefab.gameObject.SetActive(false);
+        }
     }
 
     [Serializable]

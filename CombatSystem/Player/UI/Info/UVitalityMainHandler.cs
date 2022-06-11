@@ -16,9 +16,9 @@ namespace CombatSystem.Player.UI.Info
 
     {
         [SerializeField, SuffixLabel("px")] 
-        private float playerHorizontalElementsSeparation = 12f;
+        private float playerHorizontalMargin = -126f - 12;
         [SerializeField, SuffixLabel("px")] 
-        private float enemyHorizontalElementsSeparation = 12f;
+        private float enemyHorizontalMargin = 126f + 12;
 
         [SerializeField]
         private PlayerVitalityPrefabSpawners playerPrefabs = new PlayerVitalityPrefabSpawners();
@@ -41,25 +41,20 @@ namespace CombatSystem.Player.UI.Info
         {
             PlayerCombatSingleton.PlayerCombatEvents.Subscribe(this);
             _dictionary = new Dictionary<CombatEntity, UVitalityInfo>();
-            playerPrefabs.HidePrefabs();
-            enemyPrefabs.HidePrefabs();
+
+
+            UtilsTeamPrefabs.TryHide(playerPrefabs);
+            UtilsTeamPrefabs.TryHide(enemyPrefabs);
         }
 
-        public void HandleElementInjection(CombatEntity entity, UVitalityInfo element)
-        {
-            _dictionary.Add(entity, element);
-            element.EntityInjection(in entity);
-        }
 
-        private void OnSpawnElement(CombatEntity entity, UVitalityInfo element, float horizontalSeparation , bool invertPosition)
+        private void OnSpawnElement(CombatEntity entity, UVitalityInfo element, float horizontalSeparation)
         {
             var entityRole = entity.RoleType;
             var modifier = EnumTeam.GetRoleIndex(entityRole);
             var elementTransform = (RectTransform)element.transform;
-            float size = elementTransform.rect.width;
 
-            float horizontalPosition = (size + horizontalSeparation) * modifier;
-            if (invertPosition) horizontalPosition = -horizontalPosition;
+            float horizontalPosition = (horizontalSeparation) * modifier;
 
             var position = elementTransform.localPosition;
             position.x = horizontalPosition;
@@ -67,28 +62,24 @@ namespace CombatSystem.Player.UI.Info
 
             element.ShowElement();
             element.EntityInjection(in entity);
+
+            _dictionary.Add(entity, element);
         }
 
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            Action<CombatEntity,UVitalityInfo> onCreationAction = HandleElementInjection;
+            HandlePlayerElements(playerTeam, OnSpawnPlayerElement);
+            HandleEnemyElements(enemyTeam, OnSpawnEnemyElement);
 
-            onCreationAction += OnSpawnPlayerElement;
-            HandlePlayerElements(playerTeam, onCreationAction);
-            onCreationAction -= OnSpawnPlayerElement;
-
-            onCreationAction += OnSpawnEnemyElement;
-            HandleEnemyElements(enemyTeam, onCreationAction);
 
             void OnSpawnPlayerElement(CombatEntity entity, UVitalityInfo element)
             {
-                OnSpawnElement(entity, element, playerHorizontalElementsSeparation, true);
+                OnSpawnElement(entity, element, playerHorizontalMargin);
             }
-
             void OnSpawnEnemyElement(CombatEntity entity, UVitalityInfo element)
             {
-                OnSpawnElement(entity, element, enemyHorizontalElementsSeparation, false);
+                OnSpawnElement(entity, element, enemyHorizontalMargin);
             }
         }
         public void OnCombatStart()
@@ -98,6 +89,13 @@ namespace CombatSystem.Player.UI.Info
         public void OnCombatEnd()
         {
             _dictionary.Clear();
+            Action<UVitalityInfo> onFinishAction = HideVitality;
+            ReturnElements(onFinishAction);
+        }
+
+        private static void HideVitality(UVitalityInfo element)
+        {
+            element.HideElement();
         }
 
         public void OnCombatFinish(bool isPlayerWin)
@@ -197,15 +195,8 @@ namespace CombatSystem.Player.UI.Info
         }
 
         [Serializable]
-        private sealed class PlayerVitalityPrefabSpawners : ITeamAlimentStructureRead<VitalityPrefabSpawner>
+        private sealed class PlayerVitalityPrefabSpawners : TeamAlimentStructureMainOnlyClass<VitalityPrefabSpawner>
         {
-            [SerializeField]
-            private VitalityPrefabSpawner mainRole = new VitalityPrefabSpawner();
-
-            public VitalityPrefabSpawner MainRole => mainRole;
-            public VitalityPrefabSpawner SecondaryRole => null;
-            public VitalityPrefabSpawner ThirdRole => null;
-
             public void HidePrefabs()
             {
                 mainRole.GetPrefab().gameObject.SetActive(false);

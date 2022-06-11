@@ -4,10 +4,11 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
 using UnityEngine;
+using Utils;
 
 namespace CombatSystem.Team
 {
-    internal static class UtilsTeam 
+    public static class UtilsTeam 
     {
 
         public static bool IsAllyEntity(in CombatEntity entity, in CombatEntity control)
@@ -533,7 +534,6 @@ namespace CombatSystem.Team
                 values.ThirdSupportElement ? values.ThirdSupportElement : values.SupportType);
             yield return new KeyValuePair<TKey, TValue>(keys.ThirdFlexElement,
                 values.ThirdFlexElement ? values.ThirdFlexElement : values.FlexType);
-
         }
 
         public static IEnumerable<T> GetEnumerable<T>(ITeamAlimentStructureRead<T> structure)
@@ -639,6 +639,36 @@ namespace CombatSystem.Team
                 else
                     eventsHolder.OnOffEntityRequestSequence(member, canControlMember);
             }
+        }
+    }
+
+    public static class UtilsTeamPrefabs
+    {
+        public static void TryHide<TType>(ITeamAlimentStructureRead<TType> structure) where TType : MonoBehaviour
+        {
+            HandleElement(structure.MainRole);
+            HandleElement(structure.SecondaryRole);
+            HandleElement(structure.ThirdRole);
+        }
+
+        private static void HandleElement<TType>(TType element) where TType : MonoBehaviour
+        {
+            if (element) element.gameObject.SetActive(false);
+        }
+
+        public static void TryHide<TType>(ITeamAlimentStructureRead<PrefabInstantiationHandler<TType>> structure) where TType : MonoBehaviour
+        {
+            HandleElement(structure.MainRole);
+            HandleElement(structure.SecondaryRole);
+            HandleElement(structure.ThirdRole);
+        }
+
+        private static void HandleElement<TType>(PrefabInstantiationHandler<TType> handler) where TType : MonoBehaviour
+        {
+            if (handler == null) return;
+
+            var element = handler.GetPrefab();
+            if (element) element.gameObject.SetActive(false);
         }
     }
 }

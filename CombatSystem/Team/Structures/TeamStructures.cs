@@ -146,4 +146,14 @@ namespace CombatSystem.Team
             thirdRole = new T();
         }
     }
+
+    [Serializable]
+    public class TeamAlimentStructureMainOnlyClass<T> : ITeamAlimentStructureRead<T> where T : class
+    {
+        [SerializeField] protected T mainRole;
+
+        public T MainRole => mainRole;
+        public T SecondaryRole => null;
+        public T ThirdRole => null;
+    }
 }
