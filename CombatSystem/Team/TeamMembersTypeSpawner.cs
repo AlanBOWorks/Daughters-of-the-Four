@@ -93,4 +93,140 @@ namespace CombatSystem.Team
             
         }
     }
+
+    public abstract class TeamAlimentHolder<THandler, TElement> :
+        ITeamAlimentStructureRead<TeamMembersTypeSpawner<TElement>>
+        where THandler : ICombatEntityElementHolder<TElement>
+        where TElement : MonoBehaviour
+    {
+        [SerializeField]
+        private RolesSpawner mainRoles = new RolesSpawner();
+        [SerializeField]
+        private RolesSpawner secondaryRoles = new RolesSpawner();
+        [SerializeField]
+        private RolesSpawner thirdRoles = new RolesSpawner();
+
+
+        public TeamMembersTypeSpawner<TElement> MainRole => mainRoles;
+        public TeamMembersTypeSpawner<TElement> SecondaryRole => secondaryRoles;
+        public TeamMembersTypeSpawner<TElement> ThirdRole => thirdRoles;
+
+        public void DoInjection(THandler handler)
+        {
+            foreach (var spawner in GetEnumerable())
+            {
+                if (!spawner.IsValid()) return;
+
+                spawner.Injection(handler);
+                var prefabReference = spawner.GetPrefab();
+                prefabReference.gameObject.SetActive(false);
+            }
+        }
+
+        public void DoInjection(CombatTeam team)
+        {
+            mainRoles.OnCombatPrepares(team.GetMainRoles(), null);
+            secondaryRoles.OnCombatPrepares(team.GetSecondaryRoles(), null);
+            thirdRoles.OnCombatPrepares(team.GetThirdRoles(), null);
+        }
+
+        public void OnFinish(Action<TElement> hideTracker)
+        {
+            foreach (var spawner in GetEnumerable())
+            {
+                spawner.OnCombatFinish(hideTracker);
+            }
+        }
+
+        private IEnumerable<RolesSpawner> GetEnumerable()
+        {
+            yield return mainRoles;
+            yield return secondaryRoles;
+            yield return thirdRoles;
+        }
+
+        [Serializable]
+        private class RolesSpawner : TeamMembersTypeSpawner<TElement>
+        {
+            private THandler _handler;
+            public void Injection(THandler handler) => _handler = handler;
+
+            protected override void OnInstantiationElement(TElement element, CombatEntity entity, int count)
+            {
+                _handler.HandleElementInjection(entity, element);
+            }
+        }
+
+    }
+
+
+    public abstract class UTeamDualAlimentHandler<TElement> : MonoBehaviour,
+        IOppositionTeamStructureRead<ITeamAlimentStructureRead<PrefabInstantiationHandlerPool<TElement>>>
+        where TElement : MonoBehaviour
+    {
+        private void Awake()
+        {
+            Instantiate(PlayerTeamType);
+            Instantiate(EnemyTeamType);
+        }
+
+        public abstract ITeamAlimentStructureRead<PrefabInstantiationHandlerPool<TElement>> PlayerTeamType { get; }
+        public abstract ITeamAlimentStructureRead<PrefabInstantiationHandlerPool<TElement>> EnemyTeamType { get; }
+
+        private static void Instantiate(ITeamAlimentStructureRead<PrefabInstantiationHandlerPool<TElement>> holder)
+        {
+            var enumerable = UtilsTeam.GetEnumerable(holder);
+            foreach (var handler in enumerable)
+            {
+                handler?.Instantiations();
+            }
+        }
+
+        public void HandleElements(CombatTeam playerTeam, CombatTeam enemyTeam, Action<CombatEntity, TElement> onCreationFallback)
+        {
+            HandleElements(PlayerTeamType,playerTeam, onCreationFallback);
+            HandleElements(EnemyTeamType,enemyTeam, onCreationFallback);
+        }
+
+        public void HandlePlayerElements(CombatTeam playerTeam, Action<CombatEntity, TElement> onCreationFallback) 
+            => HandleElements(PlayerTeamType,playerTeam,onCreationFallback);
+        public void HandleEnemyElements(CombatTeam enemyTeam, Action<CombatEntity, TElement> onCreationFallback)
+            => HandleElements(EnemyTeamType, enemyTeam, onCreationFallback);
+
+
+        private static void HandleElements(ITeamAlimentStructureRead<
+            PrefabInstantiationHandlerPool<TElement>> holder, 
+            CombatTeam team,
+            Action<CombatEntity,TElement> onCreationFallback)
+        {
+            var enumerable = UtilsTeam.GetEnumerable( team.GetRolesAliments(), holder);
+            foreach (var (members, spawner) in enumerable)
+            {
+                if(spawner == null || members == null) continue;
+
+                spawner.DoPopKeys(members, onCreationFallback);
+            }
+        }
+
+        public void ReturnElements(Action<TElement> onReturnElementFallBack)
+        {
+            ReturnElements(PlayerTeamType,onReturnElementFallBack);
+            ReturnElements(EnemyTeamType,onReturnElementFallBack);
+        }
+        private static void ReturnElements(ITeamAlimentStructureRead<PrefabInstantiationHandlerPool<TElement>> holder,
+            Action<TElement> onReturnElementFallBack)
+        {
+            var enumerable = UtilsTeam.GetEnumerable(holder);
+            foreach (var handlerPool in enumerable)
+            {
+                handlerPool.ReturnActives(onReturnElementFallBack);
+            }
+        }
+    }
+
+
+    public interface ICombatEntityElementHolder<in T>
+    {
+        void HandleElementInjection(CombatEntity entity, T element);
+    }
 }

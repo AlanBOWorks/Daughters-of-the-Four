@@ -79,7 +79,7 @@ namespace CombatSystem.Team
         void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst);
     }
 
-    public interface IFullRoleAlimentRead<out T>
+    public interface ITeamAlimentStructureRead<out T>
     {
         T MainRole { get; }
         T SecondaryRole { get; }

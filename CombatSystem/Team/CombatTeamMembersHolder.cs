@@ -56,6 +56,8 @@ namespace CombatSystem.Team
         public IEnumerable<CombatEntity> GetSecondaryRoles() => _roleWrapper.SecondaryRoles;
         public IEnumerable<CombatEntity> GetThirdRoles() => _roleWrapper.ThirdRoles;
 
+        public ITeamAlimentStructureRead<IEnumerable<CombatEntity>> GetAlimentRoles() => _roleWrapper;
+
 
         CombatEntity ITeamTrinityStructureRead<CombatEntity>.VanguardType 
             => GetMember(_roleWrapper.VanguardType, EnumTeam.MainRoleIndex);
@@ -148,7 +150,7 @@ namespace CombatSystem.Team
 
             private static CombatEntity GetLineFirstMember(in List<CombatEntity> line) => (line.Count == 0) ? null : line[0];
         }
-        private sealed class RoleWrapper : ITeamFlexStructureRead<List<CombatEntity>>
+        private sealed class RoleWrapper : ITeamFlexStructureRead<List<CombatEntity>>, ITeamAlimentStructureRead<IEnumerable<CombatEntity>>
         {
             public RoleWrapper()
             {
@@ -179,6 +181,11 @@ namespace CombatSystem.Team
             public List<CombatEntity> SupportType { get; }
             [ShowInInspector, HorizontalGroup("BackLine")]
             public List<CombatEntity> FlexType { get; }
+
+
+            public IEnumerable<CombatEntity> MainRole => _mainRoles;
+            public IEnumerable<CombatEntity> SecondaryRole => _offRoles.GetFirstEnumerable();
+            public IEnumerable<CombatEntity> ThirdRole => _offRoles.GetSecondEnumerable();
 
             public void AddMember(in EnumTeam.Role role, in CombatEntity member)
             {

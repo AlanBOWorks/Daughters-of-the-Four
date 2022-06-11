@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UTempoMainCountHandler : MonoBehaviour, ICombatStatesListener, ITempoEntityPercentListener
+    public class UTempoMainTickHandler : MonoBehaviour, ICombatStatesListener, ITempoEntityPercentListener
     {
         [SerializeField, HorizontalGroup("Roles")]
         private RolesHolder playerHolder = new RolesHolder();
@@ -16,7 +16,6 @@ namespace CombatSystem.Player.UI
         private RolesHolder enemyHolder = new RolesHolder();
 
         [Title("Params")] 
-        [SerializeField] private bool hidePrefabs = true;
         [SerializeField] private float verticalSpacing = 32;
 
         [Title("Trackers")]
@@ -91,14 +90,7 @@ namespace CombatSystem.Player.UI
 
         private float TargetHeight(EnumTeam.Role role)
         {
-            return role switch
-            {
-                EnumTeam.Role.Vanguard => (EnumTeam.VanguardInvertedIndex * verticalSpacing),
-                EnumTeam.Role.Attacker => (EnumTeam.AttackerInvertedIndex * verticalSpacing),
-                EnumTeam.Role.Support => (EnumTeam.SupportInvertedIndex * verticalSpacing),
-                EnumTeam.Role.Flex => (EnumTeam.FlexInvertedIndex * verticalSpacing),
-                _ => 0
-            };
+            return EnumTeam.GetRoleInvertIndex(role) * verticalSpacing;
         }
 
 
@@ -111,7 +103,7 @@ namespace CombatSystem.Player.UI
 
 
         [Serializable]
-        private sealed class RolesHolder
+        private sealed class RolesHolder : ITeamAlimentStructureRead<TeamMembersTypeSpawner<UTempoTrackerHolder>>
         {
             [SerializeField]
             private RolesSpawner mainRoles = new RolesSpawner();
@@ -120,7 +112,7 @@ namespace CombatSystem.Player.UI
             [SerializeField]
             private RolesSpawner thirdRoles = new RolesSpawner();
 
-            public void DoInjection(UTempoMainCountHandler handler)
+            public void DoInjection(UTempoMainTickHandler handler)
             {
                 foreach (var spawner in GetEnumerable())
                 {
@@ -152,14 +144,18 @@ namespace CombatSystem.Player.UI
                 yield return secondaryRoles;
                 yield return thirdRoles;
             }
+
+            public TeamMembersTypeSpawner<UTempoTrackerHolder> MainRole => mainRoles;
+            public TeamMembersTypeSpawner<UTempoTrackerHolder> SecondaryRole => secondaryRoles;
+            public TeamMembersTypeSpawner<UTempoTrackerHolder> ThirdRole => thirdRoles;
         }
 
 
         [Serializable]
         private sealed class RolesSpawner : TeamMembersTypeSpawner<UTempoTrackerHolder>
         {
-            private UTempoMainCountHandler _handler;
-            public void Injection(UTempoMainCountHandler handler) => _handler = handler;
+            private UTempoMainTickHandler _handler;
+            public void Injection(UTempoMainTickHandler handler) => _handler = handler;
 
             protected override void OnInstantiationElement(UTempoTrackerHolder element, CombatEntity entity, int count)
             {

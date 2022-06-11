@@ -62,7 +62,7 @@ namespace CombatSystem.Team
         public T ThirdFlexElement => flexAliment.ThirdRole ?? SecondaryFlexElement;
 
         [Serializable]
-        private sealed class RoleAliment : IFullRoleAlimentRead<T>
+        private sealed class RoleAliment : ITeamAlimentStructureRead<T>
         {
             [Title("Members")]
             [SerializeField] private T mainRole;

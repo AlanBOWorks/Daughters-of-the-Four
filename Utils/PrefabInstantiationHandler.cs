@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -23,6 +24,75 @@ namespace Utils
         public bool IsValid() => prefab;
 
         public TValue GetPrefab() => prefab;
+    }
+
+    [Serializable]
+    public class PrefabInstantiationHandlerPool<TValue> : PrefabInstantiationHandler<TValue>
+        where TValue : Object
+    {
+        [SerializeField]
+        private bool doPooling = true;
+
+        [ShowInInspector,HorizontalGroup(), DisableInEditorMode]
+        private Queue<TValue> _activeElements;
+        [ShowInInspector, HorizontalGroup(), DisableInEditorMode]
+        private Stack<TValue> _pool;
+
+        public IReadOnlyCollection<TValue> GetActiveElements() => _activeElements;
+
+        public void Instantiations()
+        {
+            if (_activeElements != null) return;
+
+            _activeElements = new Queue<TValue>();
+            if (doPooling)
+                _pool = new Stack<TValue>();
+        }
+
+        public TValue GetElement()
+        {
+            var element = (_pool != null && _pool.Count > 0)
+                ? _pool.Pop()
+                : SpawnElement();
+
+            OnSpawnElement(element);
+            return element;
+        }
+
+        /// <summary>
+        /// Callback when the element is instantiated or pooled; <br></br>
+        /// The element is added to [<see cref="_activeElements"/>] inside here
+        /// </summary>
+        protected virtual void OnSpawnElement(TValue element)
+        {
+            _activeElements.Enqueue(element);
+        }
+
+        public void PushElement(TValue element)
+        {
+            if(_pool != null) _pool.Push(element);
+            else Object.Destroy(element);
+        }
+
+        public void DoPopKeys<TKeys>(IEnumerable<TKeys> keys, Action<TKeys, TValue> onCreationCallback)
+        {
+            foreach (var key in keys)
+            {
+                var element = GetElement();
+                onCreationCallback?.Invoke(key,element);
+            }
+        }
+
+        public void ReturnActives(Action<TValue> onDisableCallback)
+        {
+            while (_activeElements.Count > 0)
+            {
+                var element = _activeElements.Dequeue();
+                PushElement(element);
+                onDisableCallback?.Invoke(element);
+            }
+        }
+
     }
 
     public class PrefabDictionary<TKey, TValue> : Dictionary<TKey, TValue> where TValue : Object

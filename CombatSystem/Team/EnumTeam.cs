@@ -140,24 +140,31 @@ namespace CombatSystem.Team
 
 
 
-        public static int GetRoleIndex(in Role role)
+
+        public static int GetRoleIndex(Role role)
         {
-            switch (role)
+            return role switch
             {
-                case Role.Vanguard:
-                    return VanguardIndex;
-                case Role.Attacker:
-                    return AttackerIndex;
-                case Role.Support:
-                    return SupportIndex;
-                case Role.Flex:
-                    return FlexLineIndex;
-                default:
-                    return InvalidIndex;
-            }
+                Role.Vanguard => VanguardIndex,
+                Role.Attacker => AttackerIndex,
+                Role.Support => SupportIndex,
+                Role.Flex => FlexIndex,
+                _ => InvalidIndex
+            };
         }
 
-        public static int GetPositioningIndex(in Positioning positioning)
+        public static int GetRoleInvertIndex(Role role)
+        {
+            return role switch
+            {
+                Role.Vanguard => VanguardInvertedIndex,
+                Role.Attacker => AttackerInvertedIndex,
+                Role.Support => SupportInvertedIndex,
+                Role.Flex => FlexInvertedIndex,
+                _ => InvalidIndex
+            };
+        }
+        public static int GetPositioningIndex(Positioning positioning)
         {
             switch (positioning)
             {
@@ -174,7 +181,7 @@ namespace CombatSystem.Team
             }
         }
 
-        public static ActiveRole ParseMainActiveRole(in Positioning positioning)
+        public static ActiveRole ParseMainActiveRole(Positioning positioning)
         {
             return positioning switch
             {

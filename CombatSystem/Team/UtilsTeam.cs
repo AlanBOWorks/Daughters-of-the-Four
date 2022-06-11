@@ -13,7 +13,7 @@ namespace CombatSystem.Team
         public static bool IsAllyEntity(in CombatEntity entity, in CombatEntity control)
         {
             var entityTeam = entity.Team;
-            return entityTeam.Contains(control);
+            return entityTeam.Contains(in control);
         }
 
         public static bool IsAllyEntity(in CombatEntity entity, in CombatTeam inTeam)
@@ -535,6 +535,23 @@ namespace CombatSystem.Team
                 values.ThirdFlexElement ? values.ThirdFlexElement : values.FlexType);
 
         }
+
+        public static IEnumerable<T> GetEnumerable<T>(ITeamAlimentStructureRead<T> structure)
+        {
+            yield return structure.MainRole;
+            yield return structure.SecondaryRole;
+            yield return structure.ThirdRole;
+        }
+
+        public static IEnumerable<KeyValuePair<TKey,TValue>> GetEnumerable<TKey,TValue>(
+            ITeamAlimentStructureRead<TKey> keys,
+            ITeamAlimentStructureRead<TValue> values)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.MainRole,values.MainRole);
+            yield return new KeyValuePair<TKey, TValue>(keys.SecondaryRole,values.SecondaryRole);
+            yield return new KeyValuePair<TKey, TValue>(keys.ThirdRole,values.ThirdRole);
+        }
+
     }
 
     public static class UtilsCombatTeam

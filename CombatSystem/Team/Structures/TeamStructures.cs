@@ -123,4 +123,27 @@ namespace CombatSystem.Team
         public T NeutralStance => supportType;
         public T DefendingStance => vanguardType;
     }
+
+    [Serializable]
+    public class TeamAlimentStructure<T> : ITeamAlimentStructureRead<T>
+    {
+        [SerializeField] protected T mainRole;
+        [SerializeField] protected T secondaryRole;
+        [SerializeField] protected T thirdRole;
+
+        public T MainRole => mainRole;
+        public T SecondaryRole => secondaryRole;
+        public T ThirdRole => thirdRole;
+    }
+
+    [Serializable]
+    public class TeamAlimentStructureClass<T> : TeamAlimentStructure<T> where T : new()
+    {
+        public TeamAlimentStructureClass()
+        {
+            mainRole = new T();
+            secondaryRole = new T();
+            thirdRole = new T();
+        }
+    }
 }

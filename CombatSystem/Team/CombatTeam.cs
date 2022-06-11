@@ -103,7 +103,7 @@ namespace CombatSystem.Team
 
         public bool Contains(in CombatEntity entity)
         {
-            return _membersHolder.Contains(in entity);
+            return entity.Team == this;
         }
 
 
@@ -112,7 +112,7 @@ namespace CombatSystem.Team
         public IReadOnlyCollection<CombatEntity> GetOffRoles() => _membersHolder.GetOffRoles();
         public IEnumerable<CombatEntity> GetSecondaryRoles() => _membersHolder.GetSecondaryRoles();
         public IEnumerable<CombatEntity> GetThirdRoles() => _membersHolder.GetThirdRoles();
-
+        public ITeamAlimentStructureRead<IEnumerable<CombatEntity>> GetRolesAliments() => _membersHolder.GetAlimentRoles();
 
         [ShowInInspector]
         private readonly CombatTeamControlMembers _controlMembers;
