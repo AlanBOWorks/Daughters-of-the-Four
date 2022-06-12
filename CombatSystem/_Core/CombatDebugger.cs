@@ -423,37 +423,37 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private SkillSelectionLogs _skillSelectionLogs = new SkillSelectionLogs();
 
-        public void OnSkillSelect(in CombatSkill skill)
+        public void OnSkillSelect(CombatSkill skill)
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSelect) return;
             Debug.Log($"Skill Select: {skill.Preset}");
         }
 
-        public void OnSkillSelectFromNull(in CombatSkill skill)
+        public void OnSkillSelectFromNull(CombatSkill skill)
         {
             if (!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSelectFromNull) return;
             Debug.Log($"Skill Select (From NULL): {skill.Preset}");
         }
 
-        public void OnSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSwitch) return;
             Debug.Log($"Skill SWITCH: {skill.Preset} FROM {previousSelection.Preset}");
         }
 
-        public void OnSkillDeselect(in CombatSkill skill)
+        public void OnSkillDeselect(CombatSkill skill)
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnDeselect) return;
             Debug.Log($"Skill DESELECTED: {skill.Preset}");
         }
 
-        public void OnSkillCancel(in CombatSkill skill)
+        public void OnSkillCancel(CombatSkill skill)
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnCancel) return;
             Debug.Log($"Skill CANCEL: {skill.Preset}");
         }
 
-        public void OnSkillSubmit(in CombatSkill skill)
+        public void OnSkillSubmit(CombatSkill skill)
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSubmit) return;
             Debug.Log($"xxxx - Skill Submit: {skill.Preset}");
@@ -468,13 +468,13 @@ namespace CombatSystem._Core
         }
         [ShowInInspector]
         private TargetPointerLogs _targetPointerLogs = new TargetPointerLogs();
-        public void OnTargetButtonHover(in CombatEntity target)
+        public void OnTargetButtonHover(CombatEntity target)
         {
             if(!ShowTargetPointerLogs || !_targetPointerLogs.OnButtonHover) return;
             Debug.Log($"Target Hover: {target.GetProviderEntityName()}");
         }
 
-        public void OnTargetButtonExit(in CombatEntity target)
+        public void OnTargetButtonExit(CombatEntity target)
         {
             if(!ShowTargetPointerLogs || !_targetPointerLogs.OnButtonExit) return;
             Debug.Log($"Target Exit: {target.GetProviderEntityName()}");
@@ -491,19 +491,19 @@ namespace CombatSystem._Core
         }
         [ShowInInspector]
         private TargetSelectionLogs _targetSelectionLogs = new TargetSelectionLogs();
-        public void OnTargetSelect(in CombatEntity target)
+        public void OnTargetSelect(CombatEntity target)
         {
             if(!ShowTargetSelectionLogs || !_targetSelectionLogs.OnSelect) return;
             Debug.Log($"Target Select: {target.GetProviderEntityName()}");
         }
 
-        public void OnTargetCancel(in CombatEntity target)
+        public void OnTargetCancel(CombatEntity target)
         {
             if(!ShowTargetSelectionLogs || !_targetSelectionLogs.OnCancel) return;
             Debug.Log($"Target Cancel: {target.GetProviderEntityName()}");
         }
 
-        public void OnTargetSubmit(in CombatEntity target)
+        public void OnTargetSubmit(CombatEntity target)
         {
             if(!ShowTargetSelectionLogs || !_targetSelectionLogs.OnSubmit) return;
             Debug.Log($"xxxx - Target SUBMIT: {target.GetProviderEntityName()}");

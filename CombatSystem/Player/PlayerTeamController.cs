@@ -43,37 +43,37 @@ namespace CombatSystem.Player
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             SkillUsageValues values = new SkillUsageValues(_selectedPerformer,_selectedTarget,_selectedSkill);
             CombatSystemSingleton.EventsHolder.OnCombatSkillSubmit(in values);
-            playerEvents.OnSkillSubmit(in _selectedSkill);
-            playerEvents.OnTargetSubmit(in _selectedTarget);
+            playerEvents.OnSkillSubmit(_selectedSkill);
+            playerEvents.OnTargetSubmit(_selectedTarget);
 
         }
 
-        public void OnSkillSelect(in CombatSkill skill)
+        public void OnSkillSelect(CombatSkill skill)
         {
         }
 
-        public void OnSkillSelectFromNull(in CombatSkill skill)
+        public void OnSkillSelectFromNull(CombatSkill skill)
         {
             PlayerCombatSingleton.GetCombatEscapeButtonHandler().PushOverridingAction(this);
         }
 
-        public void OnSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
             _selectedSkill = skill;
 
         }
 
-        public void OnSkillDeselect(in CombatSkill skill)
+        public void OnSkillDeselect(CombatSkill skill)
         {
             DeselectSkill(in skill);
         }
 
-        public void OnSkillCancel(in CombatSkill skill)
+        public void OnSkillCancel(CombatSkill skill)
         {
             DeselectSkill(in skill);
         }
 
-        public void OnSkillSubmit(in CombatSkill skill)
+        public void OnSkillSubmit(CombatSkill skill)
         {
             DeselectSkill(in skill);
         }
@@ -92,17 +92,17 @@ namespace CombatSystem.Player
         }
 
 
-        public void OnTargetSelect(in CombatEntity target)
+        public void OnTargetSelect(CombatEntity target)
         {
             _selectedTarget = target;
             PerformRequestAction();
         }
 
-        public void OnTargetCancel(in CombatEntity target)
+        public void OnTargetCancel(CombatEntity target)
         {
         }
 
-        public void OnTargetSubmit(in CombatEntity target)
+        public void OnTargetSubmit(CombatEntity target)
         {
         }
 
@@ -131,8 +131,7 @@ namespace CombatSystem.Player
         private void HandleSkillCancel()
         {
             if (_selectedSkill == null) return;
-
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(in _selectedSkill);
+            PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(_selectedSkill);
             _selectedSkill = null;
         }
 

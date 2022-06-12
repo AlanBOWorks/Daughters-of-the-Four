@@ -65,16 +65,16 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnSkillSelect(in CombatSkill skill)
+        public void OnSkillSelect(CombatSkill skill)
         {
 
         }
 
-        public void OnSkillSelectFromNull(in CombatSkill skill)
+        public void OnSkillSelectFromNull(CombatSkill skill)
         {
         }
 
-        public void OnSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
             var targetButton = skillButtonsHolder.GetDictionary()[skill];
 
@@ -82,17 +82,17 @@ namespace CombatSystem.Player.UI
             DoAnimate(in focusHolder,in targetButton, in _focusInitialRotation);
         }
 
-        public void OnSkillDeselect(in CombatSkill skill)
+        public void OnSkillDeselect(CombatSkill skill)
         {
             Hide(in focusHolder);
         }
 
-        public void OnSkillCancel(in CombatSkill skill)
+        public void OnSkillCancel(CombatSkill skill)
         {
             Hide(in focusHolder);
         }
 
-        public void OnSkillSubmit(in CombatSkill skill)
+        public void OnSkillSubmit(CombatSkill skill)
         {
             Hide(in focusHolder);
         }

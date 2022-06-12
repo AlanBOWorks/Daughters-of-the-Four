@@ -73,7 +73,7 @@ namespace CombatSystem.Player.UI
 
         private void EnQueue(in CombatEntity target, in PerformEffectValues values)
         {
-            var hoverDictionary = PlayerCombatSingleton.HoverEntityElements;
+            var hoverDictionary = PlayerCombatSingleton.HoverEntitiesHandler.GetDictionary();
             if (!hoverDictionary.ContainsKey(target)) return;
 
             var hoverElement = hoverDictionary[target];

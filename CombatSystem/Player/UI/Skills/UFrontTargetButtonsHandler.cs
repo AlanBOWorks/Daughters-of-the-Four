@@ -13,7 +13,7 @@ namespace CombatSystem.Player.UI
     public class UFrontTargetButtonsHandler : MonoBehaviour, ITeamElementSpawnListener<UUIHoverEntity>, 
         IPlayerEntityListener,ITempoTeamStatesListener,
         ISkillSelectionListener, ISkillPointerListener,
-        ITargetSelectionListener, ITargetPointerListener
+        ITargetSelectionListener
     {
         [ShowInInspector,ReadOnly]
         private Dictionary<CombatEntity, UTargetButton> _buttonsDictionary;
@@ -74,40 +74,32 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnSkillSelect(in CombatSkill skill)
-        {
+        public void OnSkillSelect(CombatSkill skill)
+        { }
 
-        }
+        public void OnSkillSelectFromNull(CombatSkill skill)
+        { }
 
-        public void OnSkillSelectFromNull(in CombatSkill skill)
-        {
-        }
-
-        public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
             _currentSkill = skill;
             HideTargets();
             ShowTargets(in skill);
         }
 
-        public void OnSkillDeselect(in CombatSkill skill)
+        public void OnSkillDeselect(CombatSkill skill)
         {
-            if(_currentSkill == skill)
-            {
-                _currentSkill = null;
-            }
+            if (_currentSkill != skill) return;
 
+            _currentSkill = null;
             HideTargets();
         }
 
-        public void OnSkillCancel(in CombatSkill skill)
-        {
-        }
+        public void OnSkillCancel(CombatSkill skill)
+        { }
 
-        public void OnSkillSubmit(in CombatSkill skill)
-        {
-            
-        }
+        public void OnSkillSubmit(CombatSkill skill)
+        { }
 
         private void ShowTargets(in CombatSkill skill)
         {
@@ -128,34 +120,44 @@ namespace CombatSystem.Player.UI
                 buttonHolder.enabled = false;
                 buttonHolder.Hide();
             }
+            if (_hoverTarget != null)
+                DoTargetButtonExit(_hoverTarget);
         }
 
-        public void OnTargetSelect(in CombatEntity target)
+        public void DoTargetSelect(CombatEntity target)
         {
             PlayerCombatSingleton.PlayerCombatEvents.
-                OnTargetSelect(in target);
+                OnTargetSelect(target);
+        }
+
+        private CombatEntity _hoverTarget;
+        public void DoTargetButtonHover(CombatEntity target)
+        {
+            _hoverTarget = target;
+            PlayerCombatSingleton.PlayerCombatEvents.
+                OnTargetButtonHover(target);
+        }
+
+        public void DoTargetButtonExit(CombatEntity target)
+        {
+            if (_hoverTarget == target) _hoverTarget = null;
+
+            PlayerCombatSingleton.PlayerCombatEvents.
+                OnTargetButtonExit(target);
+        }
+
+        public void OnTargetSelect(CombatEntity target)
+        {
+        }
+
+        public void OnTargetCancel(CombatEntity target)
+        {
             HideTargets();
         }
 
-        public void OnTargetCancel(in CombatEntity target)
+        public void OnTargetSubmit(CombatEntity target)
         {
             HideTargets();
-        }
-
-        public void OnTargetSubmit(in CombatEntity target)
-        {
-        }
-
-        public void OnTargetButtonHover(in CombatEntity target)
-        {
-            PlayerCombatSingleton.PlayerCombatEvents.
-               OnTargetButtonHover(in target);
-        }
-
-        public void OnTargetButtonExit(in CombatEntity target)
-        {
-            PlayerCombatSingleton.PlayerCombatEvents.
-                OnTargetButtonExit(in target);
         }
 
         public void OnTempoPreStartControl(in CombatTeamControllerBase controller)

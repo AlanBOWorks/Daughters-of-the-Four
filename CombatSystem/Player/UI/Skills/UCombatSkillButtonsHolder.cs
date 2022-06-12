@@ -17,8 +17,7 @@ namespace CombatSystem.Player.UI
 
         ITempoTeamStatesListener, ITeamEventListener,
         ISkillUsageListener, ICombatStatesListener,
-
-        ISkillButtonListener
+        ISkillSelectionListener
     {
         [Title("References")]
         [SerializeField] 
@@ -62,11 +61,7 @@ namespace CombatSystem.Player.UI
 
             // PROBLEM: stackOverFlow in hoverSkill;
             // SOLUTION: manual subscriptions
-            playerEvents.ManualSubscribe(this as ISkillUsageListener);
-            playerEvents.ManualSubscribe(this as ITeamEventListener);
-            playerEvents.ManualSubscribe(this as ICombatStatesListener);
-            playerEvents.ManualSubscribe(this as ITempoTeamStatesListener);
-            playerEvents.ManualSubscribe(this as IPlayerEntityListener);
+            playerEvents.Subscribe(this);
         }
 
         private void OnDestroy()
@@ -127,11 +122,9 @@ namespace CombatSystem.Player.UI
             {
                 var skill = skills[i];
 
-                UCombatSkillButton button;
-                if (_instantiationPool.Count > 0)
-                    button = _instantiationPool.Pop();
-                else
-                    button = InstantiateButton();
+                UCombatSkillButton button = _instantiationPool.Count > 0 
+                    ? _instantiationPool.Pop() 
+                    : InstantiateButton();
 
                 _activeButtons.Add(skill, button);
                 button.Injection(in skill);
@@ -280,92 +273,94 @@ namespace CombatSystem.Player.UI
         {
             if (_currentSelectedSkill != null)
             {
-                DeselectSkill(in _currentSelectedSkill);
+                DeselectSkill(_currentSelectedSkill);
             }
 
             _currentControlEntity = targetEntity;
             ResetPoolSkillsToCurrent();
         }
 
-        public void OnSkillSelect(in CombatSkill skill)
+
+        public void DoSkillSelect(CombatSkill skill)
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.OnSkillSelect(in skill);
-            OnSkillSwitch(in skill, in _currentSelectedSkill);
+            playerEvents.OnSkillSelect(skill);
+            DoSkillSwitch(in skill, in _currentSelectedSkill);
         }
 
-        public void OnSkillSelectFromNull(in CombatSkill skill)
+        private void DoSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)
         {
-        }
+            if (!enabled)
+                return;
 
-        private UCombatSkillButton GetButton(in CombatSkill skill)
-        {
-            return _activeButtons.ContainsKey(skill) 
-                ? _activeButtons[skill] 
-                : null;
-        }
-
-        public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
-        {
-            if(!enabled)
-                return; 
-
-            if(skill == null)
+            if (skill == null)
                 return; //this prevents null skills and (_currentSelectedSkill = null) == skill check
+
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
 
             if (previousSelection == skill)
             {
-                DeselectSkill(in skill);
+                playerEvents.OnSkillDeselect(skill);
             }
             else
             {
-                var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
                 if (_currentSelectedSkill == null)
                 {
-                    playerEvents.OnSkillSelectFromNull(in skill);
+                    playerEvents.OnSkillSelectFromNull(skill);
                 }
 
                 _currentSelectedSkill = skill;
                 var button = GetButton(in skill);
                 button.SelectButton();
-                playerEvents.OnSkillSwitch(in skill, previousSelection);
+                playerEvents.OnSkillSwitch(skill, previousSelection);
             }
         }
-
-        public void OnSkillDeselect(in CombatSkill skill)
-        {
-            DeselectSkill(in skill);
-        }
-        public void OnSkillCancel(in CombatSkill skill)
-        {
-            DeselectSkill(in skill);
-        }
-        public void OnSkillSubmit(in CombatSkill skill)
-        {
-            DeselectSkill(in skill);
-        }
-
-        private void DeselectSkill(in CombatSkill skill)
+        private void DeselectSkill(CombatSkill skill)
         {
             if (skill == null || skill != _currentSelectedSkill) return;
 
             var button = GetButton(in _currentSelectedSkill);
-            if(button == null) return;
+            if (button == null) return;
 
             button.DeSelectButton();
 
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(in _currentSelectedSkill);
-
             _currentSelectedSkill = null;
+        }
+        private UCombatSkillButton GetButton(in CombatSkill skill)
+        {
+            return _activeButtons.ContainsKey(skill)
+                ? _activeButtons[skill]
+                : null;
+        }
+
+        public void OnSkillSelect(CombatSkill skill)
+        {}
+        public void OnSkillSelectFromNull(CombatSkill skill)
+        {}
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        {}
+
+        public void OnSkillDeselect(CombatSkill skill)
+        {
+            DeselectSkill(skill);
+        }
+        public void OnSkillCancel(CombatSkill skill)
+        {
+            DeselectSkill(skill);
+        }
+        public void OnSkillSubmit(CombatSkill skill)
+        {
+            DeselectSkill(skill);
         }
 
 
-        public void OnSkillButtonHover(in CombatSkill skill)
+
+        public void DoSkillButtonHover(in CombatSkill skill)
         {
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonHover(in skill);
         }
 
-        public void OnSkillButtonExit(in CombatSkill skill)
+        public void DoSkillButtonExit(in CombatSkill skill)
         {
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonExit(in skill);
         }
@@ -376,7 +371,7 @@ namespace CombatSystem.Player.UI
             if (!_activeButtons.ContainsKey(usedSkill)) return;
 
             _activeButtons[usedSkill].UpdateCostReal();
-            DeselectSkill(in usedSkill);
+            DeselectSkill(usedSkill);
         }
 
         public void OnCombatSkillPerform(in SkillUsageValues values)

@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Team;
-using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
@@ -12,7 +7,7 @@ namespace CombatSystem.Player.UI
     {
         private void Start()
         {
-            PlayerCombatSingleton.Injection(base.GetDictionary());
+            PlayerCombatSingleton.Injection(this);
             PlayerCombatSingleton.PlayerCombatEvents.Subscribe(this);
         }
         private void OnDestroy()

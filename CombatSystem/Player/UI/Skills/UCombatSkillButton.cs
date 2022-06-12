@@ -25,12 +25,12 @@ namespace CombatSystem.Player.UI
         private CoroutineHandle _fadeHandle;
         private const float FadeSpeed = 8f;
 
-        private ISkillButtonListener _holder;
+        private UCombatSkillButtonsHolder _holder;
 
         [ShowInInspector,DisableInEditorMode]
         private CombatSkill _skill;
 
-        internal void Injection(in ISkillButtonListener holder)
+        internal void Injection(in UCombatSkillButtonsHolder holder)
         {
             _holder = holder;
         }
@@ -130,17 +130,17 @@ namespace CombatSystem.Player.UI
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _holder.OnSkillSelect(in _skill);
+            _holder.DoSkillSelect(_skill);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            _holder.OnSkillButtonHover(in _skill);
+            _holder.DoSkillButtonHover(in _skill);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            _holder.OnSkillButtonExit(in _skill);
+            _holder.DoSkillButtonExit(in _skill);
         }
     }
 }

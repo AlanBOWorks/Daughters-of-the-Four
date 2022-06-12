@@ -243,51 +243,51 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnSkillSelect(in CombatSkill skill)
+        public void OnSkillSelect(CombatSkill skill)
         {
             foreach (var listener in _skillSelectionListeners)
             {
-                listener.OnSkillSelect(in skill);
+                listener.OnSkillSelect(skill);
             }
         }
 
-        public void OnSkillSelectFromNull(in CombatSkill skill)
+        public void OnSkillSelectFromNull(CombatSkill skill)
         {
             foreach (var listener in _skillSelectionListeners)
             {
-                listener.OnSkillSelectFromNull(in skill);
+                listener.OnSkillSelectFromNull(skill);
             }
         }
 
-        public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
             foreach (var listener in _skillSelectionListeners)
             {
-                listener.OnSkillSwitch(in skill, in previousSelection);
+                listener.OnSkillSwitch(skill, previousSelection);
             }
         }
 
-        public void OnSkillDeselect(in CombatSkill skill)
+        public void OnSkillDeselect(CombatSkill skill)
         {
             foreach (var listener in _skillSelectionListeners)
             {
-                listener.OnSkillDeselect(in skill);
+                listener.OnSkillDeselect(skill);
             }
         }
 
-        public void OnSkillCancel(in CombatSkill skill)
+        public void OnSkillCancel(CombatSkill skill)
         {
             foreach (var listener in _skillSelectionListeners)
             {
-                listener.OnSkillCancel(in skill);
+                listener.OnSkillCancel(skill);
             }
         }
 
-        public void OnSkillSubmit(in CombatSkill skill)
+        public void OnSkillSubmit(CombatSkill skill)
         {
             foreach (var listener in _skillSelectionListeners)
             {
-                listener.OnSkillSubmit(in skill);
+                listener.OnSkillSubmit(skill);
             }
 
             OnHoverTargetExit();
@@ -334,45 +334,45 @@ namespace CombatSystem.Player
 
 
         // TARGET Events
-        public void OnTargetButtonHover(in CombatEntity target)
+        public void OnTargetButtonHover(CombatEntity target)
         {
             foreach (var listener in _targetPointerListeners)
             {
-                listener.OnTargetButtonHover(in target);
+                listener.OnTargetButtonHover(target);
             }
         }
 
-        public void OnTargetButtonExit(in CombatEntity target)
+        public void OnTargetButtonExit(CombatEntity target)
         {
             foreach (var listener in _targetPointerListeners)
             {
-                listener.OnTargetButtonExit(in target);
+                listener.OnTargetButtonExit(target);
             }
             OnHoverTargetExit();
         }
 
 
-        public void OnTargetSelect(in CombatEntity target)
+        public void OnTargetSelect(CombatEntity target)
         {
             foreach (var listener in _targetSelectionListeners)
             {
-                listener.OnTargetSelect(in target);
+                listener.OnTargetSelect(target);
             }
         }
 
-        public void OnTargetCancel(in CombatEntity target)
+        public void OnTargetCancel(CombatEntity target)
         {
             foreach (var listener in _targetSelectionListeners)
             {
-                listener.OnTargetCancel(in target);
+                listener.OnTargetCancel(target);
             }
         }
 
-        public void OnTargetSubmit(in CombatEntity target)
+        public void OnTargetSubmit(CombatEntity target)
         {
             foreach (var listener in _targetSelectionListeners)
             {
-                listener.OnTargetSubmit(in target);
+                listener.OnTargetSubmit(target);
             }
         }
 

@@ -1,12 +1,15 @@
 using System;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
+using CombatSystem.Skills;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UFrontTargetFeedback : MonoBehaviour, ITargetPointerListener, ITargetSelectionListener
+    public class UFrontTargetFeedback : MonoBehaviour, 
+        ITargetPointerListener, ITargetSelectionListener,
+        ISkillSelectionListener
     {
         [SerializeField] private UFrontTargetButtonsHandler targetButtonsHandler;
         [SerializeField, SuffixLabel("deltas")] private float animationDeltaSpeed = 4f;
@@ -34,34 +37,6 @@ namespace CombatSystem.Player.UI
             float finalScaleModifier = animationCurve.Evaluate(_scaleModifier);
             transform.localScale = Vector3.one * finalScaleModifier;
         }
-
-        public void OnTargetButtonHover(in CombatEntity target)
-        {
-            var button = targetButtonsHandler.GetDictionary()[target];
-            transform.position = button.transform.position;
-            Show();
-        }
-
-        public void OnTargetButtonExit(in CombatEntity target)
-        {
-            Hide();
-        }
-
-        public void OnTargetSelect(in CombatEntity target)
-        {
-            Hide();
-        }
-
-        public void OnTargetCancel(in CombatEntity target)
-        {
-            Hide();
-        }
-
-        public void OnTargetSubmit(in CombatEntity target)
-        {
-            Hide();
-        }
-
         private void Show()
         {
             gameObject.SetActive(true);
@@ -70,6 +45,60 @@ namespace CombatSystem.Player.UI
         private void Hide()
         {
             gameObject.SetActive(false);
+        }
+
+
+        public void OnTargetButtonHover(CombatEntity target)
+        {
+            var button = targetButtonsHandler.GetDictionary()[target];
+            transform.position = button.transform.position;
+            Show();
+        }
+
+        public void OnTargetButtonExit(CombatEntity target)
+        {
+            Hide();
+        }
+
+        public void OnTargetSelect(CombatEntity target)
+        {
+            Hide();
+        }
+
+        public void OnTargetCancel(CombatEntity target)
+        {
+            Hide();
+        }
+
+        public void OnTargetSubmit(CombatEntity target)
+        {
+            Hide();
+        }
+
+
+        public void OnSkillSelect(CombatSkill skill)
+        {
+        }
+
+        public void OnSkillSelectFromNull(CombatSkill skill)
+        {
+        }
+
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        {
+        }
+
+        public void OnSkillDeselect(CombatSkill skill)
+        {
+            Hide();
+        }
+
+        public void OnSkillCancel(CombatSkill skill)
+        {
+        }
+
+        public void OnSkillSubmit(CombatSkill skill)
+        {
         }
     }
 }

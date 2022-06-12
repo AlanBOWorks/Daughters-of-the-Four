@@ -66,39 +66,39 @@ namespace CombatSystem.Player.UI
                 _performer = performer;
             }
 
-            public void OnTargetButtonHover(in CombatEntity target)
+            public void OnTargetButtonHover(CombatEntity target)
             {
                 HandleSkill(in _performer, in _selectedSkill, in target);
             }
 
-            public void OnTargetButtonExit(in CombatEntity target)
+            public void OnTargetButtonExit(CombatEntity target)
             {
             }
 
 
 
-            public void OnSkillSelect(in CombatSkill skill)
+            public void OnSkillSelect(CombatSkill skill)
             {
             }
 
-            public void OnSkillSelectFromNull(in CombatSkill skill)
+            public void OnSkillSelectFromNull(CombatSkill skill)
             {
             }
 
-            public void OnSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)
+            public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
             {
                 _selectedSkill = skill;
             }
 
-            public void OnSkillDeselect(in CombatSkill skill)
+            public void OnSkillDeselect(CombatSkill skill)
             {
             }
 
-            public void OnSkillCancel(in CombatSkill skill)
+            public void OnSkillCancel(CombatSkill skill)
             {
             }
 
-            public void OnSkillSubmit(in CombatSkill skill)
+            public void OnSkillSubmit(CombatSkill skill)
             {
             }
 

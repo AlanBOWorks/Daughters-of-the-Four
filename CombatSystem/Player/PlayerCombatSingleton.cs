@@ -76,16 +76,14 @@ namespace CombatSystem.Player
         [Title("Mono References")]
         [ShowInInspector]
         public static IPlayerCameraStructureRead<Camera> CamerasHolder { get; private set; }
+        public static UUIHoverEntitiesHandler HoverEntitiesHandler { get; private set; }
 
 
-        [Title("Elements")]
-        public static IReadOnlyDictionary<CombatEntity,UUIHoverEntity> HoverEntityElements { get; private set; }
 
 
         public static void Injection(IPlayerCameraStructureRead<Camera> holder) => CamerasHolder = holder;
        
-        public static void Injection(IReadOnlyDictionary<CombatEntity, UUIHoverEntity> dictionary)
-            => HoverEntityElements = dictionary;
+        public static void Injection(UUIHoverEntitiesHandler hoverEntitiesHandler) => HoverEntitiesHandler = hoverEntitiesHandler;
 
 
 

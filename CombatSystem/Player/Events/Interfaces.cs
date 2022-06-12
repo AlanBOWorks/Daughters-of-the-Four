@@ -24,30 +24,30 @@ namespace CombatSystem.Player.Events
         /// <summary>
         /// Triggers always even if the selected is the same
         /// </summary>
-        void OnSkillSelect(in CombatSkill skill);
+        void OnSkillSelect(CombatSkill skill);
 
         /// <summary>
         /// Triggers only when the skill selected was from Null (the invert of [<seealso cref="OnSkillSwitch"/>])
         /// </summary>
         /// <param name="skill"></param>
-        void OnSkillSelectFromNull(in CombatSkill skill);
+        void OnSkillSelectFromNull(CombatSkill skill);
 
         /// <summary>
         /// Is the same that <see cref="OnSkillSelect"/> but triggers when the selected is only different (and not null)
         /// </summary>
-        void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection);
+        void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection);
         /// <summary>
         /// Happens only if the same skill is deselected (things should become null);<br></br><br></br>
         /// Note: <br></br>
         /// Used [<seealso cref="OnSkillSwitch"/>] for switching without deselecting (selected skill becomes null)
         /// </summary>
-        void OnSkillDeselect(in CombatSkill skill);
+        void OnSkillDeselect(CombatSkill skill);
 
         /// <summary>
         /// A cancel the selection; could be because it selected the same skill, use ESC, time-out, target is invalid
         /// after submit (because it was killed), etc
         /// </summary>
-        void OnSkillCancel(in CombatSkill skill);
+        void OnSkillCancel(CombatSkill skill);
         /// <summary>
         /// It's called at the same time with [<seealso cref="ITargetSelectionListener.OnTargetSubmit"/>]
         /// <br></br><br></br>
@@ -59,7 +59,7 @@ namespace CombatSystem.Player.Events
         /// a lot of skills in the Queue to be performed, in which case the submit > perform will be out of sync
         /// because of the Wait.
         /// </summary>
-        void OnSkillSubmit(in CombatSkill skill);
+        void OnSkillSubmit(CombatSkill skill);
     }
     internal interface ISkillTooltipListener : ICombatEventListener
     {
@@ -72,8 +72,8 @@ namespace CombatSystem.Player.Events
 
     internal interface ITargetPointerListener : ICombatEventListener
     {
-        void OnTargetButtonHover(in CombatEntity target);
-        void OnTargetButtonExit(in CombatEntity target);
+        void OnTargetButtonHover(CombatEntity target);
+        void OnTargetButtonExit(CombatEntity target);
     }
 
     internal interface ITargetSelectionListener : ICombatEventListener
@@ -82,16 +82,16 @@ namespace CombatSystem.Player.Events
         /// <summary>
         /// Virtually this is the same than [<see cref="OnTargetSubmit"/>]; but this is invoked first
         /// </summary>
-        void OnTargetSelect(in CombatEntity target);
+        void OnTargetSelect(CombatEntity target);
         /// <summary>
         /// Invoked only if the target was cancel (eg: targets was dead; target condition was false after previous execution, etc)
         /// </summary>
-        void OnTargetCancel(in CombatEntity target);
+        void OnTargetCancel(CombatEntity target);
         /// <summary>
         /// It's called at the same time with [<seealso cref="ISkillSelectionListener.OnSkillSubmit"/>]
         /// <br></br><br></br>
         /// </summary>
-        void OnTargetSubmit(in CombatEntity target);
+        void OnTargetSubmit(CombatEntity target);
     }
 
     internal interface IPlayerEntityListener : ICombatEventListener

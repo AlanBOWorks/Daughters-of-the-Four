@@ -103,34 +103,34 @@ namespace CombatSystem.Player.UI
 
 
 
-        public void OnSkillSelect(in CombatSkill skill)
+        public void OnSkillSelect(CombatSkill skill)
         {
 
         }
 
-        public void OnSkillSelectFromNull(in CombatSkill skill)
+        public void OnSkillSelectFromNull(CombatSkill skill)
         {
         }
 
-        public void OnSkillSwitch(in CombatSkill skill,in CombatSkill previousSelection)
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
             _selectedSkill = skill;
             UpdateActionsToolTip(in skill);
             ToggleActiveToolTip(true);
         }
 
-        public void OnSkillDeselect(in CombatSkill skill)
+        public void OnSkillDeselect(CombatSkill skill)
         {
             _selectedSkill = null;
             ToggleActiveToolTip(false);
         }
 
-        public void OnSkillCancel(in CombatSkill skill)
+        public void OnSkillCancel(CombatSkill skill)
         {
             //todo reset all to the current values of the entity as fresh
         }
 
-        public void OnSkillSubmit(in CombatSkill skill)
+        public void OnSkillSubmit(CombatSkill skill)
         {
             _selectedSkill = null;
             ToggleActiveToolTip(false);
