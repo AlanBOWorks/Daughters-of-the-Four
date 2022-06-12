@@ -7,11 +7,5 @@ namespace CombatSystem.Player
         {
             PlayerCombatSingleton.PlayerTeamController.ForceFinish();
         }
-
-
-        protected override void DoAction()
-        {
-            PassTurn();
-        }
     }
 }

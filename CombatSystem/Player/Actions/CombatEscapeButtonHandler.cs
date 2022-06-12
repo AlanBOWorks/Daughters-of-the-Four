@@ -58,7 +58,24 @@ namespace CombatSystem.Player
             _onTopPauseElements.Push(listener);
         }
 
-        public void ClearStack()
+        public void ClearStack(IOverridePauseElement lastElementCheck)
+        {
+            if(_onTopPauseElements.Count == 0) return;
+            if (_onTopPauseElements.Peek() != lastElementCheck) return;
+            ClearStack();
+        }
+
+        public void RemoveIfLast(IOverridePauseElement lastElementCheck)
+        {
+            if(_onTopPauseElements.Count == 0) return;
+
+            var lastElement = _onTopPauseElements.Peek();
+            bool shouldRemove = lastElement == lastElementCheck;
+            if(shouldRemove) 
+                _onTopPauseElements.Pop();
+        }
+
+        private void ClearStack()
         {
             _onTopPauseElements.Clear();
         }
@@ -161,7 +178,8 @@ namespace CombatSystem.Player
     public interface IEscapeButtonHandler
     {
         void PushOverridingAction(IOverridePauseElement listener);
-        void ClearStack();
+        void ClearStack(IOverridePauseElement lastElementCheck);
+        void RemoveIfLast(IOverridePauseElement lastElementCheck);
     }
 
     public interface IOverridePauseElement

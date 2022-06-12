@@ -4,22 +4,36 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Team;
 using MEC;
+using MPUIKIT;
 using Sirenix.OdinInspector;
+using UltEvents;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Utils;
 
 namespace CombatSystem.Player
 {
     public abstract class UHoldButton : MonoBehaviour,
         IPointerDownHandler, IPointerUpHandler,
-        ITempoTeamStatesListener
+        ITempoTeamStatesListener,
+        IOverridePauseElement
     {
-        [SerializeField, Range(0, 3), SuffixLabel("seg")] private float holdAmount = .4f;
+        [Title("References")]
+        [SerializeField] private MPImage percentFiller;
+
+        [Title("Params")]
+        [SerializeField, Range(0, 3), SuffixLabel("seg")] 
+        private float holdAmount = .4f;
+
+        [SerializeField] 
+        private UltEvent onHoldSuccess = new UltEvent();
+
 
         private void Awake()
         {
             PlayerCombatSingleton.PlayerCombatEvents.DiscriminationEventsHolder.ManualSubscribe(this);
             gameObject.SetActive(false);
+            FillImage(0);
         }
 
         private void OnDestroy()
@@ -29,10 +43,43 @@ namespace CombatSystem.Player
 
         private void OnDisable()
         {
-            Timing.KillCoroutines(_pointerHandle);
+            ResetHoldState();
         }
 
+        private void ResetHoldState()
+        {
+            if (!_pointerHandle.IsRunning) return;
+
+            Timing.KillCoroutines(_pointerHandle);
+            FillImage(0);
+            RemoveFromPauseStateHandler();
+        }
+
+        public void OnPauseInputReturnState(IOverridePauseElement lastElement)
+        {
+            ResetHoldState();
+        }
+
+        private void AddsToPauseStateHandler()
+        {
+            PlayerCombatSingleton.GetCombatEscapeButtonHandler().PushOverridingAction(this);
+
+            // Reminder: The PauseHandler already clears the stack once the Control is Finish 
+        }
+        private void RemoveFromPauseStateHandler()
+        {
+            PlayerCombatSingleton.GetCombatEscapeButtonHandler().RemoveIfLast(this);
+        }
+
+        private void FillImage(float percent)
+        {
+            if (!percentFiller) return;
+            percentFiller.fillAmount = percent;
+        }
+
+
         private CoroutineHandle _pointerHandle;
+        private const float MinPercentHoldFillImage = .12f;
         public void OnPointerDown(PointerEventData eventData)
         {
             if (holdAmount <= 0)
@@ -45,17 +92,37 @@ namespace CombatSystem.Player
 
             IEnumerator<float> _HoldClick()
             {
-                yield return Timing.WaitForSeconds(holdAmount);
+                AddsToPauseStateHandler();
+                float timer = 0;
+                while (timer < holdAmount)
+                {
+                    float delta = Timing.DeltaTime;
+                    yield return delta;
+                    timer += delta;
+
+                    if(!percentFiller) continue;
+
+                    float percent = SRange.Percent(timer, holdAmount);
+                    if (percent < MinPercentHoldFillImage) percent = MinPercentHoldFillImage;
+
+                    percentFiller.fillAmount = percent;
+                }
+                FillImage(0);
                 DoAction();
             }
         }
 
+
         public void OnPointerUp(PointerEventData eventData)
         {
-            Timing.KillCoroutines(_pointerHandle);
+            ResetHoldState();
         }
 
-        protected abstract void DoAction();
+        protected virtual void DoAction()
+        {
+            onHoldSuccess.Invoke();
+            RemoveFromPauseStateHandler();
+        }
 
 
         protected void Show()
@@ -91,5 +158,6 @@ namespace CombatSystem.Player
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
         }
+
     }
 }

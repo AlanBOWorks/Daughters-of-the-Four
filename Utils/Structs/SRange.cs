@@ -21,6 +21,11 @@ namespace Utils
         public float Evaluate(float percent) => Mathf.LerpUnclamped(minValue, maxValue, percent);
         public float EvaluateClamped(float percent) => Mathf.Lerp(minValue, maxValue, percent);
 
+
+        public static float Percent(float low, float high) => (low / high);
+        public static float Percent(SRange range) => Percent(range.minValue, range.maxValue);
+
+        public static int IntPercent(int low, int high) => (low / high);
     }
 
 }

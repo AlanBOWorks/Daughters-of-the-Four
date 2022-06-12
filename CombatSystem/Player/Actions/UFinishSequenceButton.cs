@@ -14,7 +14,7 @@ namespace CombatSystem.Player
             Disable();
         }
 
-        protected override void DoAction()
+        protected static void DoFinishSequenceAction()
         {
             PlayerCombatSingleton.PlayerTeamController.FinishCurrentPerformer();
         }
