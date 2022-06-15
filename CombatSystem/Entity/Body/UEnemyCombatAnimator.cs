@@ -8,9 +8,7 @@ namespace CombatSystem.Animations
 {
     public class UEnemyCombatAnimator : UCombatEntityAnimator
     {
-        [SerializeField] private AnimancerComponent animancer;
-        [SerializeField, SuffixLabel("s"),Range(0,1)] private float idleFade = .2f;
-        [SerializeField, SuffixLabel("s"),Range(0,1)] private float actionFade = .12f;
+        
 
         [SerializeField, InlineEditor()] private SCombatAnimationsBasic animations;
 
@@ -25,39 +23,24 @@ namespace CombatSystem.Animations
             targetLayer.Play(clip, fade);
         }
 
-        public override void PerformInitialCombatAnimation()
-        {
-            var initialAnimation = animations.InitialAnimationType;
-            if(initialAnimation == null) return;
 
-            Animate(initialAnimation, idleFade);
-        }
+        protected override AnimationClip GetInitialAnimationClip() => animations.InitialAnimationType;
+        protected override AnimationClip GetIdleClip() => animations.GetIdleClip();
+        protected override AnimationClip GetActiveIdleClip() => animations.GetActiveClip();
+
 
         public override void PerformEndCombatAnimation()
         {
         }
 
-        public override void OnRequestSequenceAnimation()
+        protected override AnimationClip GetActionAnimation(CombatSkill skill, EnumsSkill.Archetype type)
         {
-            var activeIdle = animations.GetActiveClip();
-            Animate(activeIdle, idleFade);
-        }
-        public override void OnEndSequenceAnimation()
-        {
-            var idle = animations.GetIdleClip();
-            Animate(idle, idleFade);
+            return UtilsSkill.GetElement(type, animations.AnimationPerformType);
         }
 
-        protected override void DoPerformActionAnimation(in EnumsSkill.Archetype type)
+        protected override AnimationClip GetReceiveActionAnimation(CombatSkill skill, EnumsSkill.Archetype type)
         {
-            var clip = UtilsSkill.GetElement(type, animations.AnimationPerformType);
-            Animate(clip, actionFade);
-        }
-
-        protected override void DoReceiveActionAnimation(in EnumsSkill.Archetype type)
-        {
-            var clip = UtilsSkill.GetElement(type, animations.AnimationReceiveType);
-            Animate(clip, actionFade);
+            return UtilsSkill.GetElement(type, animations.AnimationReceiveType);
         }
     }
 }

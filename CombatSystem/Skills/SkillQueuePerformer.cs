@@ -63,7 +63,7 @@ namespace CombatSystem.Skills
         private IEnumerator<float> _DoQueue()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            var animator = CombatSystemSingleton.CombatAnimationHandler;
+            var animator = CombatSystemSingleton.CombatControllerAnimationHandler;
             while (_usedSkillsQueue.Count > 0)
             {
 #if UNITY_EDITOR

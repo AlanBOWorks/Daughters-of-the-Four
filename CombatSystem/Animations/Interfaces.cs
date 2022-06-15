@@ -11,8 +11,8 @@ namespace CombatSystem.Animations
         void PerformEndCombatAnimation();
 
         void OnRequestSequenceAnimation();
-        void PerformActionAnimation(in CombatSkill skill, in CombatEntity onTarget);
-        void ReceiveActionAnimation(in CombatSkill fromSkill, in CombatEntity fromPerformer);
+        void PerformActionAnimation(CombatSkill skill, in CombatEntity onTarget);
+        void ReceiveActionAnimation(CombatSkill fromSkill, in CombatEntity fromPerformer);
         void OnEndSequenceAnimation();
     }
 
@@ -26,5 +26,11 @@ namespace CombatSystem.Animations
     {
         T AnimationPerformType { get; }
         T AnimationReceiveType { get; }
+    }
+
+    public interface IEntityAnimationsLayerStructureRead<out T>
+    {
+        T IdleAnimationType { get; }
+        T ActionAnimationType { get; }
     }
 }

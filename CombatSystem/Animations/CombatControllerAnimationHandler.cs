@@ -8,14 +8,14 @@ using UnityEngine;
 
 namespace CombatSystem.Animations
 {
-    public sealed class CombatAnimationHandler : ITempoEntityStatesListener, ICombatStatesListener
+    public sealed class CombatControllerAnimationHandler : ITempoEntityStatesListener, ICombatStatesListener
     {
         private static ICombatEntityAnimator GetAnimator(in CombatEntity entity) => entity.Body.GetAnimator();
 
         public void PerformActionAnimation(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
             var animator = GetAnimator(in performer);
-            animator.PerformActionAnimation(in usedSkill, in target);
+            animator.PerformActionAnimation(usedSkill, in target);
         }
 
 
@@ -30,7 +30,7 @@ namespace CombatSystem.Animations
         private void PerformReceiveAnimation(in CombatEntity target, in CombatSkill usedSkill, in CombatEntity performer)
         {
             var targetAnimator = GetAnimator(in target);
-            targetAnimator.ReceiveActionAnimation(in usedSkill, in performer);
+            targetAnimator.ReceiveActionAnimation(usedSkill, in performer);
         }
 
 

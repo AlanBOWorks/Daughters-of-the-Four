@@ -35,7 +35,7 @@ namespace CombatSystem._Core
             var skillsQueue = new SkillQueuePerformer();
 
             KnockOutHandler = new KnockOutHandler();
-            CombatAnimationHandler = new CombatAnimationHandler();
+            CombatControllerAnimationHandler = new CombatControllerAnimationHandler();
 
 
             PrefabInstantiationHandler = new AssetPrefabInstantiationHandler();
@@ -44,7 +44,7 @@ namespace CombatSystem._Core
 
             systemEventsHolder.Subscribe(KnockOutHandler);
             systemEventsHolder.Subscribe(skillsQueue);
-            systemEventsHolder.Subscribe(CombatAnimationHandler);
+            systemEventsHolder.Subscribe(CombatControllerAnimationHandler);
             systemEventsHolder.Subscribe(TeamControllers);
             systemEventsHolder.Subscribe(EntityPrefabsPoolHandler);
         }
@@ -109,7 +109,7 @@ namespace CombatSystem._Core
 
         // ------- ANIMATIONS ------
         [Title("Animator")] 
-        public static readonly CombatAnimationHandler CombatAnimationHandler;
+        public static readonly CombatControllerAnimationHandler CombatControllerAnimationHandler;
 
 
 
