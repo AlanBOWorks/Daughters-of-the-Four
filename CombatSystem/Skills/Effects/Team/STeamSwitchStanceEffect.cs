@@ -26,7 +26,7 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => StanceSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Stance;
 
-        public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
+        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
         {
             var targetTeam = target.Team;
             bool isAlly = UtilsTeam.IsAllyEntity(in performer, in targetTeam);

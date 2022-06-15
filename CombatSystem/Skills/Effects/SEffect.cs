@@ -14,7 +14,7 @@ namespace CombatSystem.Skills.Effects
         public GameObject GetSecondaryParticlesPrefab() => secondaryParticlePrefab;
 
 
-        public abstract void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue);
+        public abstract void DoEffect(CombatEntity performer, CombatEntity target, float effectValue);
         public abstract string EffectTag { get; }
         public abstract string EffectSmallPrefix { get; }
         public abstract EnumsEffect.ConcreteType EffectType { get; }

@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Player;
+using CombatSystem.Skills;
 using CombatSystem.Team;
 using MPUIKIT;
 using Sirenix.OdinInspector;
@@ -11,33 +13,6 @@ namespace Utils
 {
     public class USandBox : MonoBehaviour
     {
-        [SerializeField] private MPImage blackImage;
-
-        private bool _shitHappen;
-        private void Update()
-        {
-            if(_shitHappen)
-                DoDisable();
-            else
-                DoEnable();
-        }
-
-        private void DoEnable()
-        {
-            if (Keyboard.current.spaceKey.wasReleasedThisFrame)
-            {
-                blackImage.gameObject.SetActive(true);
-                _shitHappen = true;
-            }
-        }
-
-        private void DoDisable()
-        {
-            if (Keyboard.current.spaceKey.wasReleasedThisFrame)
-            {
-                blackImage.gameObject.SetActive(false);
-                _shitHappen = false;
-            }
-        }
+        [SerializeField] private SVanguardSkillPreset vanguardSkill;
     }
 }

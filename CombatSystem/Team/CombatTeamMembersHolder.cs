@@ -11,7 +11,7 @@ namespace CombatSystem.Team
 {
     public sealed class CombatTeamMembersHolder : 
         ITeamFlexPositionStructureRead<IReadOnlyCollection<CombatEntity>>,
-        ITeamFlexStructureRead<IReadOnlyCollection<CombatEntity>>,
+        ITeamFlexStructureRead<IReadOnlyList<CombatEntity>>,
         ITeamFullStructureRead<CombatEntity>
     {
         public CombatTeamMembersHolder()
@@ -43,12 +43,10 @@ namespace CombatSystem.Team
         public IReadOnlyCollection<CombatEntity> FlexLineType => _positionWrapper.FlexLineType;
 
 
-        public IReadOnlyCollection<CombatEntity> VanguardType => _roleWrapper.VanguardType;
-
-
-        public IReadOnlyCollection<CombatEntity> AttackerType => _roleWrapper.AttackerType;
-        public IReadOnlyCollection<CombatEntity> SupportType => _roleWrapper.SupportType;
-        public IReadOnlyCollection<CombatEntity> FlexType => _roleWrapper.FlexType;
+        public IReadOnlyList<CombatEntity> VanguardType => _roleWrapper.VanguardType;
+        public IReadOnlyList<CombatEntity> AttackerType => _roleWrapper.AttackerType;
+        public IReadOnlyList<CombatEntity> SupportType => _roleWrapper.SupportType;
+        public IReadOnlyList<CombatEntity> FlexType => _roleWrapper.FlexType;
 
         public ITeamFlexPositionStructureRead<CombatEntity> GetMainPositions() => _positionWrapper;
         public IReadOnlyCollection<CombatEntity> GetMainRoles() => _roleWrapper.MainRoles;
@@ -150,7 +148,9 @@ namespace CombatSystem.Team
 
             private static CombatEntity GetLineFirstMember(in List<CombatEntity> line) => (line.Count == 0) ? null : line[0];
         }
-        private sealed class RoleWrapper : ITeamFlexStructureRead<List<CombatEntity>>, ITeamAlimentStructureRead<IEnumerable<CombatEntity>>
+        private sealed class RoleWrapper : 
+            ITeamFlexStructureRead<List<CombatEntity>>, 
+            ITeamAlimentStructureRead<IEnumerable<CombatEntity>>
         {
             public RoleWrapper()
             {

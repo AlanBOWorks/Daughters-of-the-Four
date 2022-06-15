@@ -14,7 +14,7 @@ namespace CombatSystem.Skills.Effects
 
     public interface IEffect : IEffectBasicInfo
     {
-        void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue);
+        void DoEffect(CombatEntity performer, CombatEntity target, float effectValue);
 
     }
 

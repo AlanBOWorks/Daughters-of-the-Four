@@ -7,6 +7,7 @@ using DG.Tweening;
 using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Utils;
 
 namespace CombatSystem.Entity
 {
@@ -20,6 +21,8 @@ namespace CombatSystem.Entity
         protected float idleLayerFade = .2f;
         [SerializeField, SuffixLabel("s(%)"), Range(0, 1)]
         protected float actionLayerFade = .12f;
+        [SerializeField] 
+        private SRange speedRandomness = new SRange(.8f,1.2f);
 
       
 
@@ -54,13 +57,11 @@ namespace CombatSystem.Entity
 
             if(!idleAnimation) return;
             
-            AnimancerState initialAnimationState;
             AnimancerState idleAnimationState;
             CreateStates();
-            if(initialAnimationState != null)
-                PlayInitialAnimation();
-            else
                 PlayIdleAnimationDirectly();
+            if(initialAnimation != null)
+                PlayInitialAnimation();
 
             ////
             void GetAnimations()
@@ -70,19 +71,12 @@ namespace CombatSystem.Entity
             }
             void CreateStates()
             {
-                initialAnimationState = (initialAnimation != null) 
-                    ? baseLayer.CreateState(initialAnimation)
-                    : null;
-                idleAnimationState = baseLayer.CreateState(idleAnimation);
+                idleAnimationState = baseLayer.GetOrCreateState(idleAnimation);
             }
 
             void PlayInitialAnimation()
             {
-                float normalizedTriggerTime = 1 - idleLayerFade;
-                initialAnimationState.Events.Add(normalizedTriggerTime, FadeToInitialState);
-                baseLayer.Play(initialAnimationState);
-
-                void FadeToInitialState() => baseLayer.Play(idleAnimationState, idleLayerFade, FadeMode.FixedDuration);
+                DoActionAnimation(initialAnimation);
             }
             void PlayIdleAnimationDirectly()
             {
@@ -140,44 +134,44 @@ namespace CombatSystem.Entity
             DoActionAnimation(clip);
         }
 
-        private AnimationClip _currentAnimationClip;
-        private const float OnSameClipRewindToTime = .2f;
+        private AnimancerState _currentActionState;
+        private const float OnSameClipResetTimerTo = .2f;
         private void DoActionAnimation(AnimationClip clip)
         {
             var actionLayer = ActionAnimationType;
-            if (clip == _currentAnimationClip)
+            var targetState = actionLayer.GetOrCreateState(clip);
+            float targetInitialTime = 0;
+            if (targetState == _currentActionState)
             {
-                actionLayer.CurrentState.NormalizedTime = OnSameClipRewindToTime;
-                return;
+                targetInitialTime = OnSameClipResetTimerTo;
             }
+         
+            _currentActionState = actionLayer.Play(targetState,actionLayerFade);
+            _currentActionState.NormalizedTime = targetInitialTime;
+            _currentActionState.Speed = speedRandomness.CalculateRandom();
 
-            _currentAnimationClip = clip;
-            actionLayer.Play(clip,actionLayerFade);
-
-            if(_animationCoroutineHandle.IsRunning) return;;
-            actionLayer.StartFade(1,actionLayerFade);
+            if (_animationCoroutineHandle.IsRunning) return;
             _animationCoroutineHandle = Timing.RunCoroutine(_waitUntilAnimationFinishToIdle(actionLayer).CancelWith(animancer));
         }
 
         private IEnumerator<float> _waitUntilAnimationFinishToIdle(AnimancerLayer layer)
         {
+            var actionLayer = ActionAnimationType;
+
+            actionLayer.StartFade(1,actionLayerFade);
             while (CalculateThreshold())
             {
                 yield return Timing.WaitForOneFrame;
             }
 
-            var actionLayer = ActionAnimationType;
-            DoLayerFade(actionLayer,0);
+            _currentActionState = null;
+            actionLayer.StartFade(0,idleLayerFade);
+
 
             bool CalculateThreshold()
             {
                 var currentAnimancerState = layer.CurrentState;
                 return currentAnimancerState.RemainingDuration > idleLayerFade;
-            }
-
-            void DoLayerFade(AnimancerLayer onLayer, float targetWeight)
-            {
-                onLayer.StartFade(targetWeight,idleLayerFade);
             }
         }
     }

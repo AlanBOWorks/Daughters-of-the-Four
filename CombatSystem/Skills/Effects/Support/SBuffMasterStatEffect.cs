@@ -25,7 +25,7 @@ namespace CombatSystem.Skills.Effects
         }
         public override string EffectTag => _effectTag;
 
-        public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
+        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
         {
             var performerStats = performer.Stats;
             var targetStats = target.Stats;

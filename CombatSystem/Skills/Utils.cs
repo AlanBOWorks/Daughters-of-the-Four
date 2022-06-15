@@ -6,6 +6,7 @@ using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace CombatSystem.Skills
@@ -34,9 +35,14 @@ namespace CombatSystem.Skills
         private static readonly List<CombatEntity> TargetsHelper = new List<CombatEntity>();
 
 
-        public static EnumsSkill.Archetype GetReceiveSkillType(in CombatSkill skill, in CombatEntity performer,
+        public static EnumsSkill.Archetype GetReceiveSkillType([NotNull]in CombatSkill skill, in CombatEntity performer,
             in CombatEntity target)
         {
+            if (performer == null || target == null)
+            {
+                return skill.Archetype;
+            }
+
             var type = skill.Archetype;
             if (performer == target) return EnumsSkill.Archetype.Self;
             if (type != EnumsSkill.Archetype.Self) return type;

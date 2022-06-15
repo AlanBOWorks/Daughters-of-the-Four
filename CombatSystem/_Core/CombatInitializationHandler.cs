@@ -75,8 +75,6 @@ namespace CombatSystem._Core
                 var combatEntitiesPrefabPool = CombatSystemSingleton.EntityPrefabsPoolHandler;
                 combatEntitiesPrefabPool.HandleTeams(playerCombatTeam, enemyCombatTeam);
             }
-
-           
         }
 
         private static void PrepareTeamControllers()

@@ -53,6 +53,11 @@ namespace CombatSystem.Team
             return IsTrinityRole(in entity, in entityTeam);
         }
 
+        public static bool IsMainVanguard(in CombatEntity entity)
+        {
+            return entity.ActiveRole == EnumTeam.ActiveRole.MainVanguard;
+        }
+
 
         public static IEnumerable<CombatEntity> GetMemberLine(in CombatEntity target)
         {
@@ -108,6 +113,29 @@ namespace CombatSystem.Team
                 _ => null
             };
         }
+
+
+        public static T GetFrontMostElement<T>(ITeamFlexStructureRead<T> structure) where T : class
+        {
+            T element = structure.VanguardType;
+            if (element != null) return element;
+            element = structure.AttackerType;
+            if (element != null) return element;
+            element = structure.FlexType;
+            return element ?? structure.SupportType;
+        }
+        public static ICollection<T> GetFrontMostElement<T>(ITeamFlexStructureRead<ICollection<T>> structure) 
+        {
+            var element = structure.VanguardType;
+            if (IsValidElement()) return element;
+            element = structure.AttackerType;
+            if (IsValidElement()) return element;
+            element = structure.FlexType;
+            return IsValidElement() ? element : structure.SupportType;
+
+            bool IsValidElement() => element != null && element.Count > 0;
+        }
+
 
         public static T GetElement<T>(CombatEntity member, IOppositionTeamStructureRead<T> structure)
         {

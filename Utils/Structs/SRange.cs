@@ -1,4 +1,5 @@
 using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -13,7 +14,9 @@ namespace Utils
             maxValue = max;
         }
 
+        [HorizontalGroup()]
         public float minValue;
+        [HorizontalGroup()]
         public float maxValue;
 
         public float Clamp(float value) => Mathf.Clamp(value, minValue, maxValue);

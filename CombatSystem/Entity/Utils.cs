@@ -20,7 +20,7 @@ namespace CombatSystem.Entity
             if (copyReference == null)
             {
                 instantiatedGameObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                var body = instantiatedGameObject.AddComponent<UCombatEntityBody>();
+                instantiatedGameObject.AddComponent<UCombatEntityBody>();
             }
             else
                 instantiatedGameObject = Object.Instantiate(copyReference);

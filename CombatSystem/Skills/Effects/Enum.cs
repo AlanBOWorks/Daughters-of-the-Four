@@ -1,3 +1,5 @@
+using System;
+
 namespace CombatSystem.Skills.Effects
 {
     public static class EnumsEffect
@@ -35,7 +37,11 @@ namespace CombatSystem.Skills.Effects
 
         public enum ConcreteType
         {
-            DamageType,
+            DefaultOffensive = -100,
+            DefaultSupport,
+            DefaultTeam,
+
+            DamageType = 0,
             DoT,
             DeBuff,
             DeBurst,
@@ -50,5 +56,6 @@ namespace CombatSystem.Skills.Effects
             Stance,
             ControlBurst
         }
+
     }
 }

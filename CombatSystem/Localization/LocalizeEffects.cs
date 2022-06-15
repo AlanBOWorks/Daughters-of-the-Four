@@ -46,5 +46,19 @@ namespace CombatSystem.Localization
                 };
             }*/
         }
+
+        public const string PercentSuffix = "%";
+        public const string UnitSuffix = "u";
+        public const string MixUnitSuffix = "u/%";
+
+        public static string GetEffectValueSuffix(IEffect effect)
+        {
+            return effect switch
+            {
+                IOffensiveEffect o => UnitSuffix,
+                ISupportEffect s => PercentSuffix,
+                _ => MixUnitSuffix
+            };
+        }
     }
 }

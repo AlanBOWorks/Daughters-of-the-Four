@@ -8,7 +8,7 @@ namespace CombatSystem.Skills
     /// </summary>
     public readonly struct PerformEffectValues
     {
-        public PerformEffectValues(in IEffect effect, in float effectValue, in EnumsEffect.TargetType targetType)
+        public PerformEffectValues(IEffect effect, float effectValue, EnumsEffect.TargetType targetType)
         {
             Effect = effect;
             EffectValue = effectValue;
@@ -18,6 +18,12 @@ namespace CombatSystem.Skills
         public readonly IEffect Effect;
         public readonly float EffectValue;
         public readonly EnumsEffect.TargetType TargetType;
+
+        public static PerformEffectValues operator ++(PerformEffectValues a)
+        {
+            float effectValue = a.EffectValue;
+            return new PerformEffectValues(a.Effect,effectValue *2, a.TargetType);
+        }
     }
 
     /// <summary>

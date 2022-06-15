@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
+using CombatSystem.Team.VanguardEffects;
 using JetBrains.Annotations;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -19,10 +20,10 @@ namespace CombatSystem.Team
             DataValues = new TeamDataValues();
             GuardHandler = new TeamLineBlockerHandler();
             _teamSkills = new List<CombatTeamSkill>();
+            VanguardEffectsHolder = new VanguardEffectsHolder(this);
+
 
             _membersHolder = new CombatTeamMembersHolder();
-
-
             _controlMembers = new CombatTeamControlMembers();
         }
 
@@ -58,6 +59,9 @@ namespace CombatSystem.Team
         public readonly TeamLineBlockerHandler GuardHandler;
         [ShowInInspector]
         private readonly List<CombatTeamSkill> _teamSkills;
+
+        public readonly VanguardEffectsHolder VanguardEffectsHolder;
+
 
         public IReadOnlyList<CombatTeamSkill> GetTeamSkills() => _teamSkills;
 
@@ -113,6 +117,8 @@ namespace CombatSystem.Team
         public IEnumerable<CombatEntity> GetSecondaryRoles() => _membersHolder.GetSecondaryRoles();
         public IEnumerable<CombatEntity> GetThirdRoles() => _membersHolder.GetThirdRoles();
         public ITeamAlimentStructureRead<IEnumerable<CombatEntity>> GetRolesAliments() => _membersHolder.GetAlimentRoles();
+        public ITeamFlexStructureRead<IReadOnlyList<CombatEntity>> GetRolesStructures() => _membersHolder;
+
 
         [ShowInInspector]
         private readonly CombatTeamControlMembers _controlMembers;

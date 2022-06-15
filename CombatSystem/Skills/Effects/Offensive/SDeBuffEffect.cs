@@ -22,7 +22,7 @@ namespace CombatSystem.Skills.Effects
         protected string GetBuffPrefix() => (isBurst) ? DeBurstPrefix : DeBuffPrefix;
         public override string EffectSmallPrefix => (isBurst) ? DeBurstSmallPrefix : DeBuffSmallPrefix;
 
-        public override void DoEffect(in CombatEntity performer, in CombatEntity target, in float effectValue)
+        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
         {
             var performerStats = performer.Stats;
             var targetStats = target.Stats;
