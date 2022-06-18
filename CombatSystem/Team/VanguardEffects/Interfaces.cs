@@ -1,12 +1,13 @@
 using CombatSystem._Core;
+using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
 using UnityEngine;
 
 namespace CombatSystem.Team.VanguardEffects
 {
-    public interface IVanguardSkill
+    public interface IVanguardSkill : ISkill
     {
-
+        PerformEffectValues GetVanguardEffectTooltip();
     }
 
     public interface IVanguardEffectsStructuresRead<out T> : IVanguardEffectStructureBaseRead<T>

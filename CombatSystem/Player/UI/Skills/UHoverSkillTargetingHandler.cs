@@ -68,7 +68,7 @@ namespace CombatSystem.Player.UI
 
             public void OnTargetButtonHover(CombatEntity target)
             {
-                HandleSkill(in _performer, in _selectedSkill, in target);
+                HandleSkill(_performer, _selectedSkill, target);
             }
 
             public void OnTargetButtonExit(CombatEntity target)

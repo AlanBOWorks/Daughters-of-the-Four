@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatSystem.Skills
 {
-    public class CombatSkill : IFullSkill
+    public class CombatSkill : ICombatSkill
     {
         public CombatSkill(IFullSkill preset)
         {
@@ -15,11 +15,12 @@ namespace CombatSystem.Skills
         }
 
         [ShowInInspector,InlineEditor()]
-        public readonly IFullSkill Preset;
+        public IFullSkill Preset { get; }
 
         public string GetSkillName() => Preset.GetSkillName();
         public Sprite GetSkillIcon() => Preset.GetSkillIcon();
         public IEnumerable<PerformEffectValues> GetEffects() => Preset.GetEffects();
+        public IEnumerable<PerformEffectValues> GetEffectsFeedBacks() => Preset.GetEffectsFeedBacks();
 
 
         [ShowInInspector]

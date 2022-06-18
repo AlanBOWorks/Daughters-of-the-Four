@@ -45,12 +45,12 @@ namespace CombatSystem.Player.UI
             tooltipWindow.OnFinisHandlingEffects();
         }
 
-        public void OnSkillButtonHover(in CombatSkill skill)
+        public void OnSkillButtonHover(ICombatSkill skill)
         {
             tooltipWindow.HandleSkill(skill);
         }
 
-        public void OnSkillButtonExit(in CombatSkill skill)
+        public void OnSkillButtonExit(ICombatSkill skill)
         {
             tooltipWindow.Hide();
         }

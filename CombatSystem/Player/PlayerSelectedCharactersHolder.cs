@@ -8,7 +8,6 @@ using UnityEngine;
 namespace CombatSystem.Player
 {
     internal sealed class PlayerSelectedCharactersHolder : 
-        IReadOnlyCollection<ICombatEntityProvider>,
         ICombatTeamProvider
     {
         public PlayerSelectedCharactersHolder()
@@ -80,10 +79,6 @@ namespace CombatSystem.Player
             if (_teamSkills.Contains(teamSkill)) return;
             _teamSkills.Remove(teamSkill);
         }
-
-
-        public IEnumerator<ICombatEntityProvider> GetEnumerator() => _characters.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public int Count => _characters.Count;
         public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => _characters;

@@ -71,7 +71,6 @@ namespace CombatSystem.Player
         [Title("Characters")]
         [ShowInInspector]
         internal static readonly PlayerSelectedCharactersHolder SelectedCharactersHolder;
-        public static IReadOnlyCollection<ICombatEntityProvider> SelectedCharacters => SelectedCharactersHolder;
 
         [Title("Mono References")]
         [ShowInInspector]

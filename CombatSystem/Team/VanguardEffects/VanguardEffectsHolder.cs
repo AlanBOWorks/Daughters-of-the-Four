@@ -4,6 +4,7 @@ using System.Linq;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Team.VanguardEffects
@@ -15,33 +16,38 @@ namespace CombatSystem.Team.VanguardEffects
             if (mainResponsibleEntity == null) return;
 
             _mainEntity = mainResponsibleEntity;
-            _effectDictionaries = new VanguardEffectDictionaries<IVanguardSkill, PerformEffectValues>();
+            _effectDictionaries = new VanguardEffectDictionaries<IVanguardSkill, int>();
             _offensiveRecordsDictionaries = new VanguardEffectDictionariesBasic<CombatEntity, int>();
         }
 
 
-
+        [Title("Entity")]
+        [ShowInInspector]
         private readonly CombatEntity _mainEntity;
 
-        private readonly VanguardEffectDictionaries<IVanguardSkill, PerformEffectValues> _effectDictionaries;
+        [Title("Effects")]
+        [ShowInInspector]
+        private readonly VanguardEffectDictionaries<IVanguardSkill, int> _effectDictionaries;
+        [ShowInInspector]
         private readonly VanguardEffectDictionariesBasic<CombatEntity, int> _offensiveRecordsDictionaries;
 
 
         public void AddEffect(
             IVanguardSkill skill, 
-            EnumsVanguardEffects.VanguardEffectType effectType,
-            PerformEffectValues effectValue)
+            EnumsVanguardEffects.VanguardEffectType effectType)
         {
             if (_mainEntity == null) return;
             if (skill == null) return;
 
-            var targetCollection = UtilsVanguardEffects.GetElement(effectType, _effectDictionaries);
+
+            var targetCollection = 
+                UtilsVanguardEffects.GetElement(effectType, _effectDictionaries);
             if (targetCollection.ContainsKey(skill))
             {
                 targetCollection[skill]++;
                 return;
             }
-            targetCollection.Add(skill, effectValue);
+            targetCollection.Add(skill, 1);
         }
 
         public void OnOffensiveDone(CombatEntity enemyPerformer, CombatEntity onTarget)
@@ -83,6 +89,7 @@ namespace CombatSystem.Team.VanguardEffects
             {
                 VanguardDelayImproveType = new Dictionary<TKey, TValue>();
             }
+            [ShowInInspector]
             public Dictionary<TKey, TValue> VanguardDelayImproveType { get; }
         }
 
@@ -94,7 +101,9 @@ namespace CombatSystem.Team.VanguardEffects
                 VanguardRevengeType = new Dictionary<TKey, TValue>();
                 VanguardPunishType = new Dictionary<TKey, TValue>();
             }
+            [ShowInInspector,HorizontalGroup()]
             public Dictionary<TKey, TValue> VanguardRevengeType { get; }
+            [ShowInInspector,HorizontalGroup()]
             public Dictionary<TKey, TValue> VanguardPunishType { get; }
         }
 

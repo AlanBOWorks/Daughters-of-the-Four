@@ -25,7 +25,7 @@ namespace CombatSystem.Player.UI
         [SerializeField] private Transform onParent;
 
         private Stack<UCombatSkillButton> _instantiationPool;
-        private Dictionary<CombatSkill,UCombatSkillButton> _activeButtons;
+        private Dictionary<ICombatSkill,UCombatSkillButton> _activeButtons;
 
 
         [Title("Parameters")] 
@@ -40,7 +40,7 @@ namespace CombatSystem.Player.UI
         private CombatEntity _currentControlEntity;
 
 
-        public IReadOnlyDictionary<CombatSkill, UCombatSkillButton> GetDictionary() => _activeButtons;
+        public IReadOnlyDictionary<ICombatSkill, UCombatSkillButton> GetDictionary() => _activeButtons;
 
         private void Awake()
         {
@@ -49,7 +49,7 @@ namespace CombatSystem.Player.UI
             _buttonSizes.y = 0; // This is just to avoid the buttons moving upwards in ShowSkills
 
             _instantiationPool = new Stack<UCombatSkillButton>();
-            _activeButtons = new Dictionary<CombatSkill, UCombatSkillButton>();
+            _activeButtons = new Dictionary<ICombatSkill, UCombatSkillButton>();
 
             //Hide the reference (is used as a visual key for UI Design)
             clonableSkillButton.gameObject.SetActive(false);
@@ -357,12 +357,12 @@ namespace CombatSystem.Player.UI
 
         public void DoSkillButtonHover(in CombatSkill skill)
         {
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonHover(in skill);
+            PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonHover(skill);
         }
 
         public void DoSkillButtonExit(in CombatSkill skill)
         {
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonExit(in skill);
+            PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonExit(skill);
         }
 
         public void OnCombatSkillSubmit(in SkillUsageValues values)

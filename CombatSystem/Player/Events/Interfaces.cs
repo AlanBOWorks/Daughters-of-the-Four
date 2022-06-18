@@ -15,8 +15,8 @@ namespace CombatSystem.Player.Events
 
     internal interface ISkillPointerListener : ICombatEventListener
     {
-        void OnSkillButtonHover(in CombatSkill skill);
-        void OnSkillButtonExit(in CombatSkill skill);
+        void OnSkillButtonHover(ICombatSkill skill);
+        void OnSkillButtonExit(ICombatSkill skill);
     }
 
     internal interface ISkillSelectionListener : ICombatEventListener

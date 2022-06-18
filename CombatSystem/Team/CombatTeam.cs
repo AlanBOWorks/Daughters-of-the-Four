@@ -33,9 +33,9 @@ namespace CombatSystem.Team
                 throw new ArgumentNullException(nameof(members));
 
 
-            foreach (var provider in members)
+            foreach (var memberProvider in members)
             {
-                Add(provider);
+                GenerateEntityAndAdd(memberProvider);
             }
 
             IReadOnlyList<CombatEntity> mainVanguards = UtilsTeam.GetFrontMostElement(_membersHolder as
@@ -52,7 +52,7 @@ namespace CombatSystem.Team
             var skills = provider.GetTeamSkills();
             foreach (var skillPreset in skills)
             {
-                Add(skillPreset);
+                GenerateSkillAndAdd(skillPreset);
             }
         }
 
@@ -83,7 +83,7 @@ namespace CombatSystem.Team
         }
 
 
-        private void Add(ITeamSkillPreset preset)
+        private void GenerateSkillAndAdd(ITeamSkillPreset preset)
         {
             if (preset == null) return;
 
@@ -104,7 +104,7 @@ namespace CombatSystem.Team
         [ShowInInspector, Title("All Members")]
         private readonly CombatTeamMembersHolder _membersHolder;
 
-        private void Add(ICombatEntityProvider provider)
+        private void GenerateEntityAndAdd(ICombatEntityProvider provider)
         {
             if (provider == null) return;
 

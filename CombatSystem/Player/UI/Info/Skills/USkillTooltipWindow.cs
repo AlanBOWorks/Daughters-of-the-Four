@@ -60,7 +60,7 @@ namespace CombatSystem.Player.UI
 
 
 
-        public void HandleSkill(CombatSkill skill)
+        public void HandleSkill(ICombatSkill skill)
         {
             skillInfo.HandleEffect(skill);
         }
@@ -140,7 +140,7 @@ namespace CombatSystem.Player.UI
             [SerializeField] private TextMeshProUGUI nameHolder;
             [SerializeField] private Image roleIconHolder;
 
-            public void HandleEffect(CombatSkill skill)
+            public void HandleEffect(ICombatSkill skill)
             {
                 var skillName = LocalizeSkills.LocalizeSkill(skill);
                 nameHolder.text = skillName;

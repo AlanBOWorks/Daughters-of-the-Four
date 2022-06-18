@@ -12,39 +12,31 @@ namespace CombatSystem.Skills
         menuName = "Combat/Skill/Single Preset")]
     public class SSkillPreset : SSkillPresetBase
     {
-        [Title("Targeting")]
+        [TitleGroup("Values")]
         [SerializeField] private bool ignoreSelf;
 
-        [SerializeField] 
+        [TitleGroup("Values")]
+        [SerializeField]
         private EnumsSkill.Archetype archetype 
             = EnumsSkill.Archetype.Offensive;
 
-        [SerializeField] private EnumsSkill.TargetType targetType 
+        [TitleGroup("Values")]
+        [SerializeField]
+        private EnumsSkill.TargetType targetType 
             = EnumsSkill.TargetType.Direct;
 
-        [Title("Effects"),
+        [TitleGroup("Effects"),
          InfoBox("Null: mainEffect will be taken from [effects].first element", "IsMainEffectNull")]
         [SerializeField] private SEffect mainEffectReference;
 
-        [SerializeField]
-        private PresetEffectValues[] effects = new PresetEffectValues[0];
 
 
-        public override IEnumerable<PerformEffectValues> GetEffects()
-        {
-            for (int i = 0; i < effects.Length; i++)
-            {
-                yield return effects[i].GenerateValues();
-            }
-        }
+        
+
+        public override IEnumerable<PerformEffectValues> GetEffectsFeedBacks() => GetEffects();
 
         public override EnumsSkill.TargetType TargetType => targetType;
         public override EnumsSkill.Archetype Archetype => archetype;
-        internal PresetEffectValues[] GetEffectValues() => effects;
-        public bool HasEffects() => effects.Length > 0;
-        public override bool IgnoreSelf() => ignoreSelf && Archetype != EnumsSkill.Archetype.Self;
-
-
         public override IEffect GetMainEffectArchetype()
         {
             IEffect mainEffect = mainEffectReference;
@@ -54,27 +46,43 @@ namespace CombatSystem.Skills
 
             return mainEffect;
         }
+        public override bool IgnoreSelf() => ignoreSelf && Archetype != EnumsSkill.Archetype.Self;
+
+
+       
     }
 
     public abstract class SSkillPresetBase : ScriptableObject, IFullSkill
     {
-        [Title("ToolTips")]
+        [TitleGroup("ToolTips")]
         [SerializeField]
         private string skillName = "NULL";
 
         [SerializeField, PreviewField]
         private Sprite skillIcon;
 
-        [Title("Values")]
+        [TitleGroup("Values")]
         [SerializeField]
         private int skillCost = 1;
 
-
+        [TitleGroup("Effects")]
+        [SerializeField]
+        private protected PresetEffectValues[] effects = new PresetEffectValues[0];
 
 
         public string GetSkillName() => skillName;
         public Sprite GetSkillIcon() => skillIcon;
-        public abstract IEnumerable<PerformEffectValues> GetEffects();
+        public virtual IEnumerable<PerformEffectValues> GetEffects()
+        {
+            for (int i = 0; i < effects.Length; i++)
+            {
+                yield return effects[i].GenerateValues();
+            }
+        }
+        internal PresetEffectValues[] GetEffectValues() => effects;
+
+
+        public abstract IEnumerable<PerformEffectValues> GetEffectsFeedBacks();
         public int SkillCost => skillCost;
         public abstract EnumsSkill.Archetype Archetype { get; }
         public abstract EnumsSkill.TargetType TargetType { get; }
@@ -83,6 +91,7 @@ namespace CombatSystem.Skills
 
         public abstract IEffect GetMainEffectArchetype();
         public abstract bool IgnoreSelf();
+        public bool HasEffects() => effects.Length > 0;
 
 
         [Button]
@@ -110,14 +119,12 @@ namespace CombatSystem.Skills
             public EnumsEffect.TargetType TargetType => targetType;
             public float GetValue() => effectValue;
 
-            public PerformEffectValues GenerateValues() => new PerformEffectValues(effect, effectValue, targetType);
+            public readonly PerformEffectValues GenerateValues() => new PerformEffectValues(effect, effectValue, targetType);
 
             private string SuffixByType()
             {
                 return LocalizeEffects.GetEffectValueSuffix(effect);
             }
-
-
         }
     }
 }

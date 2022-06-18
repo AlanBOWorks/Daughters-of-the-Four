@@ -397,13 +397,13 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private SkillPointerLogs _skillPointerLogs = new SkillPointerLogs();
         
-        public void OnSkillButtonHover(in CombatSkill skill)
+        public void OnSkillButtonHover(ICombatSkill skill)
         {
             if(!ShowSkillButtonLogs || !_skillPointerLogs.OnButtonHover) return;
             Debug.Log($"Skill-Button Hover: {skill.Preset}");
         }
 
-        public void OnSkillButtonExit(in CombatSkill skill)
+        public void OnSkillButtonExit(ICombatSkill skill)
         {
             if(!ShowSkillButtonLogs || !_skillPointerLogs.OnButtonExit) return;
             Debug.Log($"Skill-Button Exit: {skill.Preset}");

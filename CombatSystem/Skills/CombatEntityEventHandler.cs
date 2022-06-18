@@ -36,7 +36,7 @@ namespace CombatSystem.Skills
 
         public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
         {
-            UtilsCombatSkill.DoSkillOnTarget(in usedSkill,in performer, in target);
+            UtilsCombatSkill.DoSkillOnTarget(usedSkill,performer, target);
         }
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)

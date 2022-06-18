@@ -60,7 +60,7 @@ namespace CombatSystem.Skills
 
         public static void HandlePossibleTargets(ICollection<CombatEntity> targetsHelper,
             CombatEntity performer,
-            CombatSkill skill)
+            ICombatSkill skill)
         {
             bool ignoreSelf = skill.IgnoreSelf();
             HandlePossibleTargets(targetsHelper, performer, skill.Archetype, ignoreSelf);
@@ -128,7 +128,7 @@ namespace CombatSystem.Skills
 
             }
         }
-        public static IReadOnlyList<CombatEntity> GetPossibleTargets(CombatEntity performer, CombatSkill skill)
+        public static IReadOnlyList<CombatEntity> GetPossibleTargets(CombatEntity performer, ICombatSkill skill)
         {
             HandlePossibleTargets(TargetsHelper, performer, skill);
             return TargetsHelper;

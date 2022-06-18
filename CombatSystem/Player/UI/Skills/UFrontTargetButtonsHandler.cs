@@ -84,7 +84,7 @@ namespace CombatSystem.Player.UI
         {
             _currentSkill = skill;
             HideTargets();
-            ShowTargets(in skill);
+            ShowTargets(skill);
         }
 
         public void OnSkillDeselect(CombatSkill skill)
@@ -101,7 +101,7 @@ namespace CombatSystem.Player.UI
         public void OnSkillSubmit(CombatSkill skill)
         { }
 
-        private void ShowTargets(in CombatSkill skill)
+        private void ShowTargets(ICombatSkill skill)
         {
             var possibleTargets = UtilsTarget.GetPossibleTargets(_currentControl, skill);
             foreach (var target in possibleTargets)
@@ -183,18 +183,18 @@ namespace CombatSystem.Player.UI
             
         }
 
-        public void OnSkillButtonHover(in CombatSkill skill)
+        public void OnSkillButtonHover(ICombatSkill skill)
         {
             if(_currentSkill != null)
                 HideTargets();
-            ShowTargets(in skill);
+            ShowTargets(skill);
         }
 
-        public void OnSkillButtonExit(in CombatSkill skill)
+        public void OnSkillButtonExit(ICombatSkill skill)
         {
             HideTargets();
             if (_currentSkill != null)
-                ShowTargets(in _currentSkill);
+                ShowTargets(_currentSkill);
 
         }
 

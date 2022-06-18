@@ -227,19 +227,19 @@ namespace CombatSystem.Player
 
 
         // SKILL Events
-        public void OnSkillButtonHover(in CombatSkill skill)
+        public void OnSkillButtonHover(ICombatSkill skill)
         {
             foreach (var listener in _skillPointerListeners)
             {
-                listener.OnSkillButtonHover(in skill);
+                listener.OnSkillButtonHover(skill);
             }
         }
 
-        public void OnSkillButtonExit(in CombatSkill skill)
+        public void OnSkillButtonExit(ICombatSkill skill)
         {
             foreach (var listener in _skillPointerListeners)
             {
-                listener.OnSkillButtonExit(in skill);
+                listener.OnSkillButtonExit(skill);
             }
         }
 

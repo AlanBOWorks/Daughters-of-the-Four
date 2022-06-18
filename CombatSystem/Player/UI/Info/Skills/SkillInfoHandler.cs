@@ -1,22 +1,21 @@
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
-using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
     public class SkillInfoHandler : ISkillPointerListener
     {
-        public void OnSkillButtonHover(in CombatSkill skill)
+        public void OnSkillButtonHover(ICombatSkill skill)
         {
-            var effects = skill.GetEffects();
+            var effects = skill.GetEffectsFeedBacks();
             foreach (PerformEffectValues values in effects)
             {
                 HandleEffect(in values);
             }
             PlayerCombatSingleton.PlayerCombatEvents.OnFinishPoolEffects();
         }
-        public void OnSkillButtonExit(in CombatSkill skill)
+        public void OnSkillButtonExit(ICombatSkill skill)
         {
         }
 

@@ -76,9 +76,9 @@ namespace CombatSystem.Entity
         [Serializable]
         private sealed class EntitySkills : IStanceStructureRead<IReadOnlyCollection<IFullSkill>>
         {
-            [SerializeField] private SSkillPreset[] attackingSkills;
-            [SerializeField] private SSkillPreset[] neutralSkills;
-            [SerializeField] private SSkillPreset[] defendingSkills;
+            [SerializeField] private SSkillPresetBase[] attackingSkills;
+            [SerializeField] private SSkillPresetBase[] neutralSkills;
+            [SerializeField] private SSkillPresetBase[] defendingSkills;
 
 
             public IReadOnlyCollection<IFullSkill> AttackingStance => attackingSkills;

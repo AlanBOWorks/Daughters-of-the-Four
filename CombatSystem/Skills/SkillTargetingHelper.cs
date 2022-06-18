@@ -90,23 +90,23 @@ namespace CombatSystem.Skills
 
         public IEnumerable<CombatEntity> GetInteractions() => InteractionsEntities;
 
-        public void HandleSkill(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void HandleSkill(CombatEntity performer, CombatSkill usedSkill, CombatEntity target)
         {
 
             bool isAlly = performer.Team.Contains(target);
             TargetHelper.HandleAlive(in target, in isAlly);
             PerformerHelper.HandleAlive(in performer, in isAlly);
 
-            HandleInteractions(in usedSkill, in target);
+            HandleInteractions(usedSkill, target);
         }
 
 
-        private void HandleInteractions(in CombatSkill usedSkill, in CombatEntity target)
+        private void HandleInteractions(CombatSkill usedSkill, CombatEntity target)
         {
             InteractionsEntities.Clear();
 
             AddInteractionEntity(in target);
-            IEnumerable<IEffectPreset> effects = UtilsEffect.ExtractEffects(in usedSkill);
+            var effects = usedSkill.GetEffects();
             IEnumerable<CombatEntity> performerGroup = null;
             IEnumerable<CombatEntity> targetGroup = null;
             HandleEffects(effects, ref performerGroup, ref targetGroup,
@@ -119,7 +119,7 @@ namespace CombatSystem.Skills
             HandleInteractionsGroup(in targetGroup);
         }
 
-        private void HandleEffects(IEnumerable<IEffectPreset> effects, 
+        private void HandleEffects(IEnumerable<PerformEffectValues> effects, 
             ref IEnumerable<CombatEntity> performerGroup, 
             ref IEnumerable<CombatEntity> targetGroup,
             out bool performerSingleTarget,

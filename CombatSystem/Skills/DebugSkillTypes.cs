@@ -46,6 +46,7 @@ namespace CombatSystem.Skills
             public Sprite GetSkillIcon() => null;
 
             public IEnumerable<PerformEffectValues> GetEffects() => null;
+            public IEnumerable<PerformEffectValues> GetEffectsFeedBacks() => null;
         }
 
     }

@@ -10,74 +10,67 @@ namespace CombatSystem.Skills.Effects
 {
     public static class UtilsCombatSkill
     {
-        public static void DoSkillOnTarget(in CombatSkill skill, in CombatEntity performer, in CombatEntity onTarget)
+        public static void DoSkillOnTarget(CombatSkill skill, CombatEntity performer, CombatEntity onTarget)
         {
-            CombatSystemSingleton.SkillTargetingHandler.HandleSkill(in performer, in skill, in onTarget);
+            CombatSystemSingleton.SkillTargetingHandler.HandleSkill(performer, skill, onTarget);
 
 
 
             var preset = skill.Preset;
-            CombatEntity exclusion = skill.IgnoreSelf() ? performer : null;
 
-            if(preset is SSkillPreset assetSkill)
-                DoSkillOnTarget(in assetSkill, in performer, in exclusion);
-        }
-
-        private static void DoSkillOnTarget(in SSkillPreset preset, in CombatEntity performer, in CombatEntity exclusion)
-        {
-            var effects = preset.GetEffectValues();
-            foreach (var effect in effects)
+            if (preset is SSkillPresetBase assetSkill)
             {
-                PerformEffectValues values = effect.GenerateValues();
-                DoEffect(in performer, in exclusion, in values);
+                CombatEntity exclusion = skill.IgnoreSelf() ? performer : null;
+                DoSkillOnTarget(assetSkill, performer, exclusion);
+                return;
             }
         }
 
-        private static void DoEffect(in CombatEntity performer, in CombatEntity exclusion, in PerformEffectValues values)
+        private static void DoSkillOnTarget(SSkillPresetBase preset, CombatEntity performer, CombatEntity exclusion)
+        {
+            var effects = preset.GetEffects();
+            foreach (var effect in effects)
+            {
+                PerformEffectValues values = effect;
+                DoEffect(performer, exclusion, values);
+            }
+        }
+
+        private static void DoEffect(CombatEntity performer, CombatEntity exclusion, PerformEffectValues values)
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            var targets = UtilsTarget.GetEffectTargets(values.TargetType);
+            var targetType = values.TargetType;
+            var targets = UtilsTarget.GetEffectTargets(targetType);
             var preset = values.Effect;
             var effectValue = values.EffectValue;
 
             int i = 0;
             foreach (var effectTarget in targets)
             {
-                if (effectTarget == exclusion) continue;
-                preset.DoEffect(performer,effectTarget,effectValue);
+                bool isPerformerExclusive = (targetType == EnumsEffect.TargetType.Performer && performer == exclusion);
+                if (!isPerformerExclusive)
+                    if (effectTarget == exclusion)
+                        continue;
 
-                if(i == 0)
-                    eventsHolder.OnCombatPrimaryEffectPerform(performer, effectTarget, in values);
-                else
-                    eventsHolder.OnCombatSecondaryEffectPerform(performer, effectTarget, in values);
+                DoEffectOnTarget();
+                void DoEffectOnTarget()
+                {
 
-                i++;
+                    preset.DoEffect(performer, effectTarget, effectValue);
+
+                    if (i == 0)
+                        eventsHolder.OnCombatPrimaryEffectPerform(performer, effectTarget, in values);
+                    else
+                        eventsHolder.OnCombatSecondaryEffectPerform(performer, effectTarget, in values);
+
+                    i++;
+                }
             }
         }
     }
 
     public static class UtilsEffect
     {
-        public static IEnumerable<IEffectPreset> ExtractEffects(in CombatSkill skill)
-        {
-            var skillPreset = skill.Preset;
-            if (skillPreset is SSkillPreset assetSkill)
-            {
-                return ExtractEffects(assetSkill);
-            }
-
-            return null;
-        }
-
-        public static IEnumerable<IEffectPreset> ExtractEffects(SSkillPreset preset)
-        {
-            foreach (var value in preset.GetEffectValues())
-            {
-                yield return value;
-            }
-        }
-
-
         public static void DoDamageTo(in CombatEntity target, in CombatEntity performer, in float damage, bool eventCallback = true)
         {
             if( damage <= 0) return;
@@ -228,29 +221,14 @@ namespace CombatSystem.Skills.Effects
 
     public static class UtilsStructureEffect
     {
-        public static T GetElement<T>(EnumsEffect.ConcreteType type, IEffectStructureRead<T> theme)
-        {
-            return type switch
-            {
-                EnumsEffect.ConcreteType.DamageType => theme.DamageType,
-                EnumsEffect.ConcreteType.DoT => theme.DamageOverTimeType,
-                EnumsEffect.ConcreteType.DeBuff => theme.DeBuffEffectType,
-                EnumsEffect.ConcreteType.DeBurst => theme.DeBurstEffectType,
-                EnumsEffect.ConcreteType.Heal => theme.HealType,
-                EnumsEffect.ConcreteType.Shielding => theme.ShieldingType,
-                EnumsEffect.ConcreteType.Buff => theme.BuffEffectType,
-                EnumsEffect.ConcreteType.Burst => theme.BurstEffectType,
-                EnumsEffect.ConcreteType.Guarding => theme.GuardingType,
-                EnumsEffect.ConcreteType.ControlGain => theme.ControlType,
-                EnumsEffect.ConcreteType.Stance => theme.StanceType,
-                EnumsEffect.ConcreteType.ControlBurst => theme.ControlBurstType,
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
-        }
         public static T GetElement<T>(EnumsEffect.ConcreteType type, IFullEffectStructureRead<T> theme)
         {
             return type switch
             {
+                EnumsEffect.ConcreteType.DefaultOffensive => theme.OffensiveEffectType,
+                EnumsEffect.ConcreteType.DefaultSupport => theme.SupportEffectType,
+                EnumsEffect.ConcreteType.DefaultTeam => theme.TeamEffectType,
+
                 EnumsEffect.ConcreteType.DamageType => (theme.DamageType ?? theme.OffensiveEffectType),
                 EnumsEffect.ConcreteType.DoT => (theme.DamageOverTimeType ?? theme.OffensiveEffectType),
                 EnumsEffect.ConcreteType.DeBuff => (theme.DeBuffEffectType ?? theme.OffensiveEffectType),
@@ -263,6 +241,7 @@ namespace CombatSystem.Skills.Effects
                 EnumsEffect.ConcreteType.ControlGain => (theme.ControlType ?? theme.TeamEffectType),
                 EnumsEffect.ConcreteType.Stance => (theme.StanceType ?? theme.TeamEffectType),
                 EnumsEffect.ConcreteType.ControlBurst => (theme.ControlBurstType ?? theme.TeamEffectType),
+
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
@@ -272,6 +251,10 @@ namespace CombatSystem.Skills.Effects
         {
             return type switch
             {
+                EnumsEffect.ConcreteType.DefaultOffensive => theme.OffensiveEffectType,
+                EnumsEffect.ConcreteType.DefaultSupport => theme.SupportEffectType,
+                EnumsEffect.ConcreteType.DefaultTeam => theme.TeamEffectType,
+
                 EnumsEffect.ConcreteType.DamageType => GetOffensiveIfNull(theme.DamageType),
                 EnumsEffect.ConcreteType.DoT => GetOffensiveIfNull(theme.DamageOverTimeType),
                 EnumsEffect.ConcreteType.DeBuff => GetOffensiveIfNull(theme.DeBuffEffectType),

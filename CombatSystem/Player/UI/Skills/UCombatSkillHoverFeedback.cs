@@ -51,7 +51,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnSkillButtonHover(in CombatSkill skill)
+        public void OnSkillButtonHover(ICombatSkill skill)
         {
             var targetButton = skillButtonsHolder.GetDictionary()[skill];
 
@@ -59,7 +59,7 @@ namespace CombatSystem.Player.UI
             DoAnimate(in hoverHolder,in targetButton, in _hoverInitialRotation);
         }
 
-        public void OnSkillButtonExit(in CombatSkill skill)
+        public void OnSkillButtonExit(ICombatSkill skill)
         {
             Hide(in hoverHolder);
         }

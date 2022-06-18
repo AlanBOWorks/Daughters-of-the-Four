@@ -104,8 +104,8 @@ namespace CombatSystem.Team
             var roleType = entity.RoleType;
 
             _allMembers.Add(entity);
-            _positionWrapper.AddMember(in positioning,in entity);
-            _roleWrapper.AddMember(in roleType, in entity);
+            _positionWrapper.AddMember(positioning,entity);
+            _roleWrapper.AddMember(roleType, entity);
         }
 
         private sealed class PositionWrapper : ITeamFlexPositionStructureRead<List<CombatEntity>>,
@@ -139,7 +139,7 @@ namespace CombatSystem.Team
             CombatEntity ITeamPositionStructureRead<CombatEntity>.BackLineType => GetLineFirstMember(in _backLine);
             CombatEntity ITeamFlexPositionStructureRead<CombatEntity>.FlexLineType => GetLineFirstMember(in _flexLine);
 
-            public void AddMember(in EnumTeam.Positioning positioning, in CombatEntity member)
+            public void AddMember(EnumTeam.Positioning positioning, CombatEntity member)
             {
                 ITeamFlexPositionStructureRead<List<CombatEntity>> structure = this;
                 var line = UtilsTeam.GetElement(positioning, structure);
@@ -187,7 +187,7 @@ namespace CombatSystem.Team
             public IEnumerable<CombatEntity> SecondaryRole => _offRoles.GetFirstEnumerable();
             public IEnumerable<CombatEntity> ThirdRole => _offRoles.GetSecondEnumerable();
 
-            public void AddMember(in EnumTeam.Role role, in CombatEntity member)
+            public void AddMember(EnumTeam.Role role, CombatEntity member)
             {
                 var roleGroup = UtilsTeam.GetElement(role, this);
                 int roleGroupCount = roleGroup.Count;

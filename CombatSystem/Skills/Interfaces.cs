@@ -21,12 +21,20 @@ namespace CombatSystem.Skills
     }
 
 
+    public interface ICombatSkill : IFullSkill
+    {
+        IFullSkill Preset { get; }
+        void IncreaseCost();
+        void ResetCost();
+    }
+
     public interface IFullSkill : ISkill
     {
         string GetSkillName();
         Sprite GetSkillIcon();
 
         IEnumerable<PerformEffectValues> GetEffects();
+        IEnumerable<PerformEffectValues> GetEffectsFeedBacks();
     }
 
     public interface ISkill

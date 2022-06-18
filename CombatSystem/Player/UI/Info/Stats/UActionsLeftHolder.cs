@@ -85,7 +85,7 @@ namespace CombatSystem.Player.UI
         }
 
         private const string OverflowText = "XX";
-        private void UpdateActionsToolTip(in CombatSkill skill)
+        private void UpdateActionsToolTip(ICombatSkill skill)
         {
             float cost = skill.SkillCost + _usedActions;
             var costText = cost > 99 
@@ -115,7 +115,7 @@ namespace CombatSystem.Player.UI
         public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
             _selectedSkill = skill;
-            UpdateActionsToolTip(in skill);
+            UpdateActionsToolTip(skill);
             ToggleActiveToolTip(true);
         }
 
@@ -139,14 +139,14 @@ namespace CombatSystem.Player.UI
             UpdateUsedActionsText();
         }
 
-        public void OnSkillButtonHover(in CombatSkill skill)
+        public void OnSkillButtonHover(ICombatSkill skill)
         {
             if(_selectedSkill != null) return;
-            UpdateActionsToolTip(in skill);
+            UpdateActionsToolTip(skill);
             ToggleActiveToolTip(true);
         }
 
-        public void OnSkillButtonExit(in CombatSkill skill)
+        public void OnSkillButtonExit(ICombatSkill skill)
         {
             if(_selectedSkill != null) return;
             ToggleActiveToolTip(false);
