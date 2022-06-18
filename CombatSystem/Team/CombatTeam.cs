@@ -20,7 +20,6 @@ namespace CombatSystem.Team
             DataValues = new TeamDataValues();
             GuardHandler = new TeamLineBlockerHandler();
             _teamSkills = new List<CombatTeamSkill>();
-            VanguardEffectsHolder = new VanguardEffectsHolder(this);
 
 
             _membersHolder = new CombatTeamMembersHolder();
@@ -38,6 +37,14 @@ namespace CombatSystem.Team
             {
                 Add(provider);
             }
+
+            IReadOnlyList<CombatEntity> mainVanguards = UtilsTeam.GetFrontMostElement(_membersHolder as
+                ITeamFlexStructureRead<IReadOnlyList<CombatEntity>>);
+            
+            var mainVanguardResponsible = mainVanguards[0];
+            if(mainVanguardResponsible == null) return;
+
+            VanguardEffectsHolder = new VanguardEffectsHolder(mainVanguardResponsible);
         }
 
         public CombatTeam(bool isPlayerTeam, ICombatTeamProvider provider) : this(isPlayerTeam,provider.GetSelectedCharacters())
@@ -59,7 +66,7 @@ namespace CombatSystem.Team
         public readonly TeamLineBlockerHandler GuardHandler;
         [ShowInInspector]
         private readonly List<CombatTeamSkill> _teamSkills;
-
+        [ShowInInspector]
         public readonly VanguardEffectsHolder VanguardEffectsHolder;
 
 

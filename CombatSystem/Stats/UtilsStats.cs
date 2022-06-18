@@ -202,7 +202,7 @@ namespace CombatSystem.Stats
         /// </summary>
         public static bool CanControlRequest(in CombatEntity entity)
         {
-            return IsAlive(in entity) && CanControlRequest(entity.Stats);
+            return IsAlive(entity) && CanControlRequest(entity.Stats);
         }
 
         /// <summary>
@@ -218,19 +218,19 @@ namespace CombatSystem.Stats
             return usedActionsAmount < actionsLimit;
         }
 
-        public static bool IsAlive(in CombatEntity entity) => IsAlive(entity.Stats);
+        public static bool IsAlive(CombatEntity entity) => IsAlive(entity.Stats);
 
-        public static bool IsAlive(in CombatStats stats)
+        public static bool IsAlive(CombatStats stats)
         {
             return stats.CurrentMortality > 0 || stats.CurrentHealth > 0;
         }
 
         public static void TickInitiative(in CombatStats stats)
         {
-            TickInitiative(in stats, out _);
+            TickInitiative(stats, out _);
         }
 
-        public static void TickInitiative(in CombatStats stats, out float currentTickAmount)
+        public static void TickInitiative(CombatStats stats, out float currentTickAmount)
         {
             float initiativeIncrement = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
             if (initiativeIncrement <= 0)
@@ -252,15 +252,15 @@ namespace CombatSystem.Stats
 
 
 
-        public static void TickActions(in CombatStats stats, in CombatSkill usedSkill)
+        public static void TickActions(CombatStats stats, CombatSkill usedSkill)
         {
             stats.UsedActions += usedSkill.SkillCost;
         }
 
 
-        public static void FullTickActions(in CombatEntity entity) => FullTickActions(entity.Stats);
+        public static void FullTickActions(CombatEntity entity) => FullTickActions(entity.Stats);
 
-        public static void FullTickActions(in CombatStats stats)
+        public static void FullTickActions(CombatStats stats)
         {
             stats.UsedActions = MaxActionAmount + 1;
         }

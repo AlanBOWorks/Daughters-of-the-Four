@@ -1,0 +1,17 @@
+{
+    "name": "_ProjectLore",
+    "rootNamespace": "",
+    "references": [
+        "GUID:6fa701fd2d6cf254bbbc85e452e546a9",
+        "GUID:1c543dec6154b7241809187723ffc905"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

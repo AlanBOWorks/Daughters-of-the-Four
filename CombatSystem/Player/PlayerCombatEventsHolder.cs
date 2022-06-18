@@ -289,8 +289,6 @@ namespace CombatSystem.Player
             {
                 listener.OnSkillSubmit(skill);
             }
-
-            OnHoverTargetExit();
         }
         public void OnTooltipEffect(in PerformEffectValues values)
         {

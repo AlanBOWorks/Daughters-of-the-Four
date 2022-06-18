@@ -12,7 +12,7 @@ namespace CombatSystem.Skills
         public void OnCombatSkillPreSubmit(in CombatEntity performer,in CombatSkill usedSkill)
         {
             var performerStats = performer.Stats;
-            UtilsCombatStats.TickActions(in performerStats, in usedSkill);
+            UtilsCombatStats.TickActions(performerStats, usedSkill);
             usedSkill.IncreaseCost();
         }
 

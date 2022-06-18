@@ -136,6 +136,18 @@ namespace CombatSystem.Team
             bool IsValidElement() => element != null && element.Count > 0;
         }
 
+        public static IReadOnlyList<T> GetFrontMostElement<T>(ITeamFlexStructureRead<IReadOnlyList<T>> structure)
+        {
+            var element = structure.VanguardType;
+            if (IsValidElement()) return element;
+            element = structure.AttackerType;
+            if (IsValidElement()) return element;
+            element = structure.FlexType;
+            return IsValidElement() ? element : structure.SupportType;
+
+            bool IsValidElement() => element != null && element.Count > 0;
+        }
+
 
         public static T GetElement<T>(CombatEntity member, IOppositionTeamStructureRead<T> structure)
         {

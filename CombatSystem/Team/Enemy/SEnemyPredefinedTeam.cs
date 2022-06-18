@@ -8,14 +8,14 @@ namespace CombatSystem.Team
 {
     [CreateAssetMenu(menuName = "Combat/Team/Preset",
         fileName = "N" + AssetDetailName)]
-    public class SPredefinedTeam : ScriptableObject, ICombatTeamProvider
+    public class SEnemyPredefinedTeam : ScriptableObject, ICombatTeamProvider
     {
-        private const string AssetDetailName = " [Preset Team]";
+        private const string AssetDetailName = " [Enemy Preset Team]";
         [SerializeField] private string teamName;
 
         [Title("Characters")]
         [SerializeField]
-        private SPreparationEntity[] characters = new SPreparationEntity[EnumTeam.RoleTypesCount];
+        private SEnemyPreparationEntity[] characters = new SEnemyPreparationEntity[EnumTeam.RoleTypesCount];
         [SerializeField]
         [Title("Skills")]
         private STeamSkill[] teamSkills = new STeamSkill[0];

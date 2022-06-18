@@ -62,17 +62,14 @@ namespace CombatSystem.Player.UI
 
         public void OnTargetSelect(CombatEntity target)
         {
-            Hide();
         }
 
         public void OnTargetCancel(CombatEntity target)
         {
-            Hide();
         }
 
         public void OnTargetSubmit(CombatEntity target)
         {
-            Hide();
         }
 
 

@@ -10,19 +10,18 @@ namespace CombatSystem.Team.VanguardEffects
 {
     public sealed class VanguardEffectsHolder 
     {
-        public VanguardEffectsHolder(CombatTeam team)
+        public VanguardEffectsHolder(CombatEntity mainResponsibleEntity)
         {
-            var teamRoles = team.GetRolesStructures();
-            _mainEntities = UtilsTeam.GetFrontMostElement(teamRoles);
+            if (mainResponsibleEntity == null) return;
 
-            if (_mainEntities == null) return;
-
+            _mainEntity = mainResponsibleEntity;
             _effectDictionaries = new VanguardEffectDictionaries<IVanguardSkill, PerformEffectValues>();
             _offensiveRecordsDictionaries = new VanguardEffectDictionariesBasic<CombatEntity, int>();
         }
 
-        private readonly IReadOnlyList<CombatEntity> _mainEntities;
 
+
+        private readonly CombatEntity _mainEntity;
 
         private readonly VanguardEffectDictionaries<IVanguardSkill, PerformEffectValues> _effectDictionaries;
         private readonly VanguardEffectDictionariesBasic<CombatEntity, int> _offensiveRecordsDictionaries;
@@ -33,7 +32,7 @@ namespace CombatSystem.Team.VanguardEffects
             EnumsVanguardEffects.VanguardEffectType effectType,
             PerformEffectValues effectValue)
         {
-            if (_mainEntities == null) return;
+            if (_mainEntity == null) return;
             if (skill == null) return;
 
             var targetCollection = UtilsVanguardEffects.GetElement(effectType, _effectDictionaries);
@@ -47,10 +46,9 @@ namespace CombatSystem.Team.VanguardEffects
 
         public void OnOffensiveDone(CombatEntity enemyPerformer, CombatEntity onTarget)
         {
-            if(_mainEntities == null || enemyPerformer.Team.Contains(in onTarget)) return;
+            if(_mainEntity == null || enemyPerformer.Team.Contains(in onTarget)) return;
 
-            bool isMainEntitiesTarget = _mainEntities.Contains(onTarget);
-            if (isMainEntitiesTarget)
+            if (onTarget.PositioningType == _mainEntity.PositioningType)
             {
                 var revengeDictionary = _effectDictionaries.VanguardRevengeType;
                 if(revengeDictionary.Count == 0) return;

@@ -157,7 +157,6 @@ namespace CombatSystem.Player.UI
 
         public void OnTargetSubmit(CombatEntity target)
         {
-            HideTargets();
         }
 
         public void OnTempoPreStartControl(in CombatTeamControllerBase controller)

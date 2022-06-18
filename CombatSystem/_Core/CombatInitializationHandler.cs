@@ -148,7 +148,7 @@ namespace CombatSystem._Core
         [Title("Player")]
         public SPlayerPresetTeam playerTesterTeam;
         [Title("Adversary")]
-        public SPredefinedTeam oppositionTeam;
+        public SEnemyPredefinedTeam oppositionTeam;
 
 
         [MenuItem("Combat/COMBAT Initialization [Helper]", priority = -20)]
@@ -174,12 +174,12 @@ namespace CombatSystem._Core
             CombatFinishHandler.FinishCombat(isWin);
         }
 
-        private static void TestStartCombat(SPlayerPresetTeam playerTeam, SPredefinedTeam enemyTeam)
+        private static void TestStartCombat(SPlayerPresetTeam playerTeam, SEnemyPredefinedTeam enemyTeam)
         {
             PlayerCombatSingleton.SelectedCharactersHolder.AddTeam(playerTeam);
             TestStartCombat(enemyTeam);
         }
-        private static void TestStartCombat(SPredefinedTeam enemyTeam)
+        private static void TestStartCombat(SEnemyPredefinedTeam enemyTeam)
         {
             var playerCharacters = PlayerCombatSingleton.SelectedCharactersHolder;
             if (!playerCharacters.IsValid())

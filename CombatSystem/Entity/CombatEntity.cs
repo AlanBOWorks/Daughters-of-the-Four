@@ -36,9 +36,12 @@ namespace CombatSystem.Entity
 
 
             // PLAYER's essentials
-            string providersName = Provider.GetProviderEntityName();
-            CombatCharacterName = LocalizationPlayerCharacters.LocalizeCharactersName(in providersName);
-
+            CombatCharacterName = 
+                LocalizationPlayerCharacters.LocalizeCharactersName(Provider.GetProviderEntityName());
+            CombatCharacterFullName = 
+                LocalizationPlayerCharacters.LocalizeCharactersName(Provider.GetProviderEntityFullName());
+            CombatCharacterShorterName =
+                LocalizationPlayerCharacters.LocalizeCharactersName(Provider.GetProviderShorterName());
 
             // COMBAT's others
             DiceValuesHolder.RollDice();
@@ -53,6 +56,8 @@ namespace CombatSystem.Entity
         /// Localized name
         /// </summary>
         public string CombatCharacterName;
+        public string CombatCharacterFullName;
+        public string CombatCharacterShorterName;
 
         [ShowInInspector, InlineEditor()] 
         public readonly ICombatEntityProvider Provider;
@@ -100,6 +105,17 @@ namespace CombatSystem.Entity
         /// </summary>
         /// <returns></returns>
         public string GetProviderEntityName() => Provider.GetProviderEntityName();
+
+        public string GetProviderEntityFullName()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetProviderShorterName()
+        {
+            throw new NotImplementedException();
+        }
+
         public IReadOnlyCollection<CombatSkill> AllSkills => _skillsHolder;
 
         public bool CanBeTarget()
@@ -252,5 +268,7 @@ namespace CombatSystem.Entity
     public interface ICombatEntityInfoHolder
     {
         string GetProviderEntityName();
+        string GetProviderEntityFullName();
+        string GetProviderShorterName();
     }
 }

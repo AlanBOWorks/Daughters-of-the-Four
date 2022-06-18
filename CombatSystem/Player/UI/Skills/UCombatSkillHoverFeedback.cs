@@ -94,7 +94,6 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillSubmit(CombatSkill skill)
         {
-            Hide(in focusHolder);
         }
     }
 }

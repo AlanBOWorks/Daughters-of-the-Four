@@ -36,6 +36,8 @@ namespace CombatSystem.Player
 
         public override void InvokeStartControl()
         {
+            _selectedSkill = null;
+            _selectedTarget = null;
         }
 
         public void PerformRequestAction()
@@ -75,7 +77,6 @@ namespace CombatSystem.Player
 
         public void OnSkillSubmit(CombatSkill skill)
         {
-            DeselectSkill(in skill);
         }
 
 

@@ -9,25 +9,21 @@ using Utils;
 
 namespace CombatSystem.Entity
 {
-    [CreateAssetMenu(menuName = "Combat/Entities/[Basic] Preparation",
-        fileName = "N " + AssetPrefixName)]
-    public class SPreparationEntity : ScriptableObject, ICombatEntityProvider
+    public abstract class SPreparationEntity : ScriptableObject, ICombatEntityProvider
     {
-        [Title("Info")]
-        [SerializeField] private string entityName = "NULL";
-
-        [SerializeField, AssetsOnly,AssetSelector(Paths = "Assets/Prefabs/Characters")] 
-        private GameObject instantiationObject;
-
+        protected const string AssetPathFolderRoot = "Assets/Prefabs/Characters";
         [SerializeField]
         private PreparationEntity preparationData = new PreparationEntity();
         internal PreparationEntity GetPreparationEntity() => preparationData;
 
 
-        public string GetProviderEntityName() => entityName;
+        public abstract string GetProviderEntityName();
+        public abstract string GetProviderEntityFullName();
+        public abstract string GetProviderShorterName();
+
         public string GetLocalizableCharactersName() => GetProviderEntityName();
 
-        public GameObject GetVisualPrefab() => instantiationObject;
+        public abstract GameObject GetVisualPrefab();
 
         public IStatsRead<float> GetBaseStats() => preparationData.GetBaseStats();
         public TeamAreaData GetAreaData() => preparationData.GetAreaData();
@@ -39,14 +35,13 @@ namespace CombatSystem.Entity
         [Button]
         private void UpdateAssetWithRoleAndID()
         {
-            string finalName = entityName;
+            string finalName = GetProviderEntityName();
             var areaData = GetAreaData();
             finalName += $" - {areaData.RoleType.ToString().ToUpper()} ";
             finalName += AssetPrefix();
 
             UtilsAssets.UpdateAssetNameWithID(this,finalName);
         }
-
     }
 
     [Serializable]
