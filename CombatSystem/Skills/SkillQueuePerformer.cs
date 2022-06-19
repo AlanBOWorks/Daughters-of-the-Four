@@ -16,7 +16,6 @@ namespace CombatSystem.Skills
         [ShowInInspector]
         private readonly Queue<SkillUsageValues> _usedSkillsQueue;
 
-        private CoroutineHandle _queueHandle;
 
 
         public void OnCombatEnd()
@@ -52,6 +51,7 @@ namespace CombatSystem.Skills
         }
 
 
+        public bool IsActing() => _queueHandle.IsRunning;
        
 
         [ShowInInspector] 
@@ -60,6 +60,8 @@ namespace CombatSystem.Skills
         private const float SkillAppliesAfter = .7f;
         private const float AnimationOffsetDuration = .3f;
         public const float MaxAnimationDuration = AnimationOffsetDuration + .3f;
+
+        private CoroutineHandle _queueHandle;
         private IEnumerator<float> _DoQueue()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;

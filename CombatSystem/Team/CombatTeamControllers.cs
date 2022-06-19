@@ -44,20 +44,13 @@ namespace CombatSystem.Team
 
         public IEnumerable<CombatTeamControllerBase> GetActiveControllers()
         {
-            yield return _playerTeamType;
-            yield return _enemyTeamType;
-        }
+            if(IsActive(_playerTeamType))
+                yield return _playerTeamType;
+            if(IsActive(_enemyTeamType))
+                yield return _enemyTeamType;
 
-        public void TickPlayerController()
-        {
-            TryInvokeControl(in _playerTeamType);
+            bool IsActive(CombatTeamControllerBase controller) => controller.ControllingTeam.IsActive();
         }
-
-        public void TickEnemyController()
-        {
-            TryInvokeControl(in _enemyTeamType);
-        }
-
 
         public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {

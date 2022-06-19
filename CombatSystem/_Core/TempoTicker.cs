@@ -125,12 +125,20 @@ namespace CombatSystem._Core
                 var controllersEnumerator = teamControllersHandler.GetActiveControllers();
                 foreach (var controller in controllersEnumerator)
                 {
+                    var skillQueuePerformer = CombatSystemSingleton.SkillQueuePerformer;
+                    do
+                    {
+                        yield return Timing.WaitForOneFrame;
+                    } while (skillQueuePerformer.IsActing());
+
+
                     var controllerTeam = controller.ControllingTeam;
                     teamControllersHandler.TryInvokeControl(in controller);
                     while (controllerTeam.IsActive() || teamControllersHandler.IsControlling())
                     {
                         yield return Timing.WaitForOneFrame;
                     }
+
                 }
 
 
