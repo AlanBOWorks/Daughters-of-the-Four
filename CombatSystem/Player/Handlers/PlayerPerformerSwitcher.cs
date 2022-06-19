@@ -17,11 +17,11 @@ namespace CombatSystem.Player.Handlers
         private IReadOnlyList<CombatEntity> _activeEntities;
         private CombatEntity _currentEntity;
 
-        private void DoSwitchPerformer(in CombatEntity entity)
+        private void DoSwitchPerformer(CombatEntity entity)
         {
             if(entity == _currentEntity) return;
             _currentEntity = entity;
-            PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(in entity);
+            PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(entity);
 
         }
 
@@ -39,7 +39,7 @@ namespace CombatSystem.Player.Handlers
             if (!_isActive || _activeEntities.Count <= 0) return;
 
             var nextCall = _activeEntities[0];
-            DoSwitchPerformer(in nextCall);
+            DoSwitchPerformer(nextCall);
         }
 
         public void OnNoActionsForcedFinish(CombatEntity entity)
@@ -51,34 +51,33 @@ namespace CombatSystem.Player.Handlers
         private void DoPerformNextEntity()
         {
             if (!_isActive) return;
+            if (_activeEntities.Count == 0) return;
+            
 
-            CombatEntity nextControl = null;
-            if (_activeEntities.Count > 0) nextControl = _activeEntities[0];
-
-            DoSwitchPerformer(in nextControl);
+            CombatEntity nextControl = _activeEntities[0];
+            DoSwitchPerformer(nextControl);
         }
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             _isActive = true;
             var firstEntity = _activeEntities[0];
-            DoSwitchPerformer(in firstEntity);
+            DoSwitchPerformer(firstEntity);
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
+        {
+        }
+
+        public void OnControlFinishAllActors(CombatEntity lastActor)
+        {
+        }
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             ResetState();
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
-        {
-        }
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
-        {
-            ResetState();
-        }
-
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
         }
 

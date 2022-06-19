@@ -93,7 +93,7 @@ namespace CombatSystem.Player.UI
                 : cost.ToString("00");
 
             actionsTooltipText.text = costText;
-        } public void OnPerformerSwitch(in CombatEntity performer)
+        } public void OnPerformerSwitch(CombatEntity performer)
         {
             _currentEntity = performer;
             UpdateInfoToCurrent();
@@ -153,27 +153,27 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             ShowUI();
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
             _currentEntity = null;
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnControlFinishAllActors(CombatEntity lastActor)
         {
            
         }
 
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             HideUI();
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             
         }

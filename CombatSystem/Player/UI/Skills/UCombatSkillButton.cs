@@ -30,11 +30,13 @@ namespace CombatSystem.Player.UI
         [ShowInInspector,DisableInEditorMode]
         private CombatSkill _skill;
 
+        private bool _canSubmitSkill;
+
         internal void Injection(in UCombatSkillButtonsHolder holder)
         {
             _holder = holder;
         }
-        internal void Injection(in CombatSkill skill)
+        internal void Injection(CombatSkill skill)
         {
             _skill = skill;
             var preset = skill.Preset;
@@ -78,24 +80,42 @@ namespace CombatSystem.Player.UI
             Timing.PauseCoroutines(_fadeHandle);
         }
 
-        internal void ShowButton()
+        private void AnimateButton(float targetAlpha)
         {
-            gameObject.SetActive(true);
-            enabled = true;
 
+            Timing.KillCoroutines(_fadeHandle);
             _fadeHandle = Timing.RunCoroutine(_FadeAlpha());
             IEnumerator<float> _FadeAlpha()
             {
                 canvasGroup.alpha = 0;
-                while (canvasGroup.alpha < .98f)
+                while (canvasGroup.alpha < targetAlpha)
                 {
                     canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 1, Time.deltaTime * FadeSpeed);
 
                     yield return Timing.WaitForOneFrame;
                 }
 
-                canvasGroup.alpha = 1;
+                canvasGroup.alpha = targetAlpha;
             }
+        }
+
+        internal void DoShowActiveButton()
+        {
+            _canSubmitSkill = true;
+
+            gameObject.SetActive(true);
+            enabled = true;
+            AnimateButton(1);
+        }
+
+        private const float DisableAlpha = .3f;
+        internal void DoShowDisabledButton()
+        {
+            _canSubmitSkill = false;
+
+            gameObject.SetActive(true);
+            enabled = true;
+            AnimateButton(DisableAlpha);
         }
 
         internal void HideButton()
@@ -105,13 +125,7 @@ namespace CombatSystem.Player.UI
             canvasGroup.alpha = 0;
         }
 
-        private const float DisableAlpha = .3f;
-        internal void DisableButton()
-        {
-            Timing.KillCoroutines(_fadeHandle);
-            enabled = false;
-            canvasGroup.alpha = DisableAlpha;
-        }
+       
 
 
         public void SelectButton()
@@ -130,17 +144,19 @@ namespace CombatSystem.Player.UI
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if(!_canSubmitSkill) return;
+
             _holder.DoSkillSelect(_skill);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            _holder.DoSkillButtonHover(in _skill);
+            _holder.DoSkillButtonHover(_skill);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            _holder.DoSkillButtonExit(in _skill);
+            _holder.DoSkillButtonExit(_skill);
         }
     }
 }

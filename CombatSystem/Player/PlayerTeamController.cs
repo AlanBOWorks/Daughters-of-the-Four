@@ -40,7 +40,7 @@ namespace CombatSystem.Player
             _selectedTarget = null;
         }
 
-        public void PerformRequestAction()
+        private void PerformRequestAction()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             SkillUsageValues values = new SkillUsageValues(_selectedPerformer,_selectedTarget,_selectedSkill);
@@ -86,7 +86,7 @@ namespace CombatSystem.Player
         }
 
 
-        public void OnPerformerSwitch(in CombatEntity performer)
+        public void OnPerformerSwitch(CombatEntity performer)
         {
             _selectedPerformer = performer;
             HandleSkillCancel();
@@ -137,31 +137,31 @@ namespace CombatSystem.Player
         }
 
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
+        {
+        }
+
+        public void OnControlFinishAllActors(CombatEntity lastActor)
+        {
+        }
+
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
+        {
+        }
+
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             OnControlFinish();
-        }
-
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
-        {
-        }
-
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
-        {
-        }
-
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
-        {
         }
 
         public void FinishCurrentPerformer()
         {
             if(_selectedPerformer == null) return;
-            UtilsCombatEntity.DoSequenceFinish(in _selectedPerformer);
+            UtilsCombatEntity.DoSequenceFinish(_selectedPerformer);
         }
 
     }

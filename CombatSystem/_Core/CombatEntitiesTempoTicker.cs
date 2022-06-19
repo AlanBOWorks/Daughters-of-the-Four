@@ -59,7 +59,7 @@ namespace CombatSystem._Core
                 eventsHolder.OnEntityTick(in entity, in entityInitiativeAmount, in initiativePercent);
 
                 bool thresholdPassed = UtilsTempo.IsInitiativeTrigger(in entity);
-                bool canControl = UtilsCombatStats.CanControlRequest(in entity);
+                bool canControl = UtilsCombatStats.CanControlRequest(entity);
                 if (thresholdPassed)
                 {
                     entity.Team.AddActiveEntity(in entity, in canControl);

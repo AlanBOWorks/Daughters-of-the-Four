@@ -646,7 +646,7 @@ namespace CombatSystem.Team
 
             if (canControl)
             {
-                eventsHolder.OnTempoPreStartControl(in controller);
+                eventsHolder.OnTempoPreStartControl(controller);
             }
 
             var nonControllingMembers = team.GetNonControllingMembers();

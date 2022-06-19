@@ -52,25 +52,25 @@ namespace CombatSystem.Team
             bool IsActive(CombatTeamControllerBase controller) => controller.ControllingTeam.IsActive();
         }
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             _currentControl = controller;
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnControlFinishAllActors(CombatEntity lastActor)
         {
         }
 
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             _currentControl = null;
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
         }
 

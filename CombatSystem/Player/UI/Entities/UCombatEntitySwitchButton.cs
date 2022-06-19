@@ -32,7 +32,6 @@ namespace CombatSystem.Player.UI
                 ? 1
                 : OnDisableAlpha;
             canvasGroup.alpha = targetAlpha;
-            enabled = enableButton;
         }
 
         public void OnNullEntity()
@@ -45,7 +44,9 @@ namespace CombatSystem.Player.UI
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            switcherHandler.DoSwitchEntity(in _user);
+            if(_user == null) return;
+
+            switcherHandler.DoSwitchEntity(_user);
         }
     }
 }

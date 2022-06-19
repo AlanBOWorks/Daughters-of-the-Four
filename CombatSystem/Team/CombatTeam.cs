@@ -137,6 +137,7 @@ namespace CombatSystem.Team
 
 
         public bool IsActive() => _controlMembers.IsActive();
+        public bool IsActive(CombatEntity member) => _controlMembers.IsActive(member);
         public bool CanControl() => _controlMembers.CanControl();
         public IEnumerable<CombatEntity> GetNonControllingMembers() => _controlMembers.GetNonControllingMembers();
         public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _controlMembers.GetControllingTrinityMembers();

@@ -100,7 +100,7 @@ namespace CombatSystem.Player.Events
         /// Invoked when the main performer(focus) was switch;
         /// It's invoked once per switch 
         /// </summary>
-        void OnPerformerSwitch(in CombatEntity performer);
+        void OnPerformerSwitch(CombatEntity performer);
 
     }
 

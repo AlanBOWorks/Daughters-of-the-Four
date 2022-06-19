@@ -39,7 +39,7 @@ namespace CombatSystem.Entity
 
     public sealed class UtilsCombatEntity
     {
-        public static void DoSequenceFinish(in CombatEntity onEntity)
+        public static void DoSequenceFinish(CombatEntity onEntity)
         {
             CombatSystemSingleton.EventsHolder.OnEntityFinishSequence(onEntity, false);
         }

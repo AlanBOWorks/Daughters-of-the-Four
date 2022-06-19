@@ -216,11 +216,14 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnPerformerSwitch(in CombatEntity performer)
+        public void OnPerformerSwitch(CombatEntity performer)
         {
+            if(performer == null)
+                Debug.LogError("Entity Null");
+
             foreach (var listener in _playerEntityListeners)
             {
-                listener.OnPerformerSwitch(in performer);
+                listener.OnPerformerSwitch(performer);
             }
         }
 

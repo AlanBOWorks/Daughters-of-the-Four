@@ -61,7 +61,7 @@ namespace CombatSystem.Player.UI
             private CombatEntity _performer;
             private CombatSkill _selectedSkill;
 
-            public void OnPerformerSwitch(in CombatEntity performer)
+            public void OnPerformerSwitch(CombatEntity performer)
             {
                 _performer = performer;
             }

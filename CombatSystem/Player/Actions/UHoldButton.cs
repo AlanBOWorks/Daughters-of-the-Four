@@ -136,26 +136,26 @@ namespace CombatSystem.Player
         }
 
 
-        public virtual void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public virtual void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             Show();
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
             
         }
 
-        public virtual void OnControlFinishAllActors(in CombatEntity lastActor)
+        public virtual void OnControlFinishAllActors(CombatEntity lastActor)
         {
         }
 
-        public virtual void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public virtual void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             Hide();
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
         }
 

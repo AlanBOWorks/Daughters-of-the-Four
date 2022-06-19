@@ -4,6 +4,7 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using DG.Tweening;
 using MEC;
@@ -96,11 +97,11 @@ namespace CombatSystem.Player.UI
             enabled = true;
         }
 
+        //safe disable
         public void DisableHolder()
         {
-            DisableActiveButtons();
+            DisableActiveButtons(); 
             _currentSelectedSkill = null;
-            _currentControlEntity = null;
             enabled = false;
         }
 
@@ -109,13 +110,13 @@ namespace CombatSystem.Player.UI
         {
             foreach (var activeButton in _activeButtons)
             {
-                activeButton.Value.DisableButton();
+                activeButton.Value.DoShowDisabledButton();
             }
         }
 
         // Safe check
         private const int MaxSkillAmount = 12;
-        private void HandlePool(in IReadOnlyList<CombatSkill> skills)
+        private void HandlePool(IReadOnlyList<CombatSkill> skills)
         {
             int countThreshold = Mathf.Min(skills.Count, MaxSkillAmount);
             for (var i = 0; i < countThreshold; i++)
@@ -127,7 +128,7 @@ namespace CombatSystem.Player.UI
                     : InstantiateButton();
 
                 _activeButtons.Add(skill, button);
-                button.Injection(in skill);
+                button.Injection(skill);
 
 #if UNITY_EDITOR
                 button.name = skill.GetSkillName() + " [BUTTON] (Clone)";
@@ -149,11 +150,12 @@ namespace CombatSystem.Player.UI
         private const float AnimationDuration = .2f;
         [Button,DisableInEditorMode]
 
-        private void PoolEntitySkills(in CombatEntity entity)
+        private void PoolEntitySkills(CombatEntity entity)
         {
             if(entity == null) return;
             var entitySkills = entity.GetCurrentSkills();
-            HandlePool(in entitySkills);
+            var canAct = UtilsCombatStats.CanAct(entity);
+            HandlePool(entitySkills);
 
             ShowSkillsAnimated();
 
@@ -174,13 +176,13 @@ namespace CombatSystem.Player.UI
                         var buttonHolder = button.Value;
                         yield return Timing.WaitForSeconds(DelayBetweenButtons);
 
-                        ShowIcon(in buttonHolder);
+                        ShowIcon(buttonHolder);
 
                         index++;
                     }
 
 
-                    void ShowIcon(in UCombatSkillButton buttonHolder)
+                    void ShowIcon(UCombatSkillButton buttonHolder)
                     {
                         Vector2 targetPoint = index * (buttonsSeparations + _buttonSizes);
 
@@ -188,8 +190,11 @@ namespace CombatSystem.Player.UI
 
                         buttonTransform.localPosition = lastPoint;
                         buttonTransform.DOLocalMove(targetPoint, AnimationDuration);
-                        EnableButton(in buttonHolder);
 
+                        if(canAct)
+                            EnableButton(buttonHolder);
+                        else
+                            DisableButton(buttonHolder);
 
                         lastPoint = targetPoint;
                     }
@@ -198,12 +203,19 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        private static void EnableButton(in UCombatSkillButton buttonHolder)
+        private static void EnableButton(UCombatSkillButton buttonHolder)
         {
             buttonHolder.enabled = true;
-            buttonHolder.ShowButton();
+            buttonHolder.DoShowActiveButton();
         }
-        private static void DisableButton(in UCombatSkillButton buttonHolder)
+
+        private static void DisableButton(UCombatSkillButton buttonHolder)
+        {
+            buttonHolder.enabled = true;
+            buttonHolder.DoShowDisabledButton();
+        }
+
+        private static void HideButton(UCombatSkillButton buttonHolder)
         {
             buttonHolder.enabled = false;
             buttonHolder.HideButton();
@@ -214,25 +226,25 @@ namespace CombatSystem.Player.UI
 
 
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             EnableHolder();
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
             DisableHolder();
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnControlFinishAllActors(CombatEntity lastActor)
         {
         }
 
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             HideAll();
         }
@@ -250,7 +262,7 @@ namespace CombatSystem.Player.UI
             foreach (var button in _activeButtons)
             {
                 var buttonHolder = button.Value;
-                DisableButton(in buttonHolder);
+                HideButton(buttonHolder);
                 _instantiationPool.Push(buttonHolder);
             }
             _activeButtons.Clear();
@@ -264,7 +276,7 @@ namespace CombatSystem.Player.UI
         private void ResetPoolSkillsToCurrent()
         {
             ReturnSkillsToStack();
-            PoolEntitySkills(in _currentControlEntity);
+            PoolEntitySkills(_currentControlEntity);
         }
         
 
@@ -355,12 +367,12 @@ namespace CombatSystem.Player.UI
 
 
 
-        public void DoSkillButtonHover(in CombatSkill skill)
+        public void DoSkillButtonHover(CombatSkill skill)
         {
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonHover(skill);
         }
 
-        public void DoSkillButtonExit(in CombatSkill skill)
+        public void DoSkillButtonExit(CombatSkill skill)
         {
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonExit(skill);
         }
@@ -383,7 +395,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnPerformerSwitch(in CombatEntity performer)
+        public void OnPerformerSwitch(CombatEntity performer)
         {
             if(performer == null) return;
             SwitchControllingEntity(in performer);

@@ -41,6 +41,7 @@ namespace CombatSystem.Team
         /// </summary>
         public bool CanControl() => _allControllingMembers.Count > 0;
 
+        public bool IsActive(CombatEntity member) => _allControllingMembers.Contains(member);
 
         public void AddActiveEntity(in CombatEntity entity, in bool canControl)
         {

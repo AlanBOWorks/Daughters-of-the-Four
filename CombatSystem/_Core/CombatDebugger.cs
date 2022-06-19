@@ -80,32 +80,32 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private TeamLogs _teamLogs = new TeamLogs();
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             if(!ShowTeamLogs || !_teamLogs.OnStartControl) return;
             Debug.Log($"Start Control: {controller} | Controlling {controller.ControllingTeam.GetControllingMembers().Count}");
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
             if (!ShowTeamLogs || !_teamLogs.OnFinishActors) return;
             Debug.Log($"Pre-Finish all Actors: {lastActor.CombatCharacterName}");
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnControlFinishAllActors(CombatEntity lastActor)
         {
             if (!ShowTeamLogs || !_teamLogs.OnFinishActors) return;
             Debug.Log($"Finish all Actors: {lastActor.CombatCharacterName}");
 
         }
 
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             if(!ShowTeamLogs || !_teamLogs.OnFinishControl) return;
             Debug.Log($"Finish Control: {controller}");
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             if(!ShowTeamLogs || !_teamLogs.OnFinishControl) return;
             Debug.Log($"------------------------XXX LAST CONTROL XXX-------------------------------");
@@ -603,7 +603,7 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private EntitiesLogs _entitiesLogs = new EntitiesLogs();
 
-        public void OnPerformerSwitch(in CombatEntity performer)
+        public void OnPerformerSwitch(CombatEntity performer)
         {
             if(!ShowEntitiesLog || !_entitiesLogs.OnPerformerSwitch) return;
             Debug.Log($"xxxx - PERFORMER: {performer.GetProviderEntityName()}");

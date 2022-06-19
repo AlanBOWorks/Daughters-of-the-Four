@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Team;
 using UnityEngine;
 
 namespace CombatSystem.Stats
@@ -200,9 +201,17 @@ namespace CombatSystem.Stats
         /// <summary>
         /// Checks if the entity has enough Actions points
         /// </summary>
-        public static bool CanControlRequest(in CombatEntity entity)
+        public static bool CanControlRequest(CombatEntity entity)
         {
             return IsAlive(entity) && CanControlRequest(entity.Stats);
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="CanControlRequest"/> and if the entity is [<seealso cref="CombatTeam.IsActive(CombatEntity)"/>]= true;
+        /// </summary>
+        public static bool CanAct(CombatEntity entity)
+        {
+            return entity.Team.IsActive(entity) && CanControlRequest(entity);
         }
 
         /// <summary>

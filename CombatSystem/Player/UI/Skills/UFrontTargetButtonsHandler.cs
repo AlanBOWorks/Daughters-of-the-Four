@@ -54,12 +54,6 @@ namespace CombatSystem.Player.UI
         {
         }
 
-
-        public void ClearEntities()
-        {
-            _buttonsDictionary.Clear();
-        }
-
         [ShowInInspector, DisableInEditorMode]
         private CombatEntity _currentControl;
 
@@ -67,7 +61,7 @@ namespace CombatSystem.Player.UI
         private CombatSkill _currentSkill;
 
 
-        public void OnPerformerSwitch(in CombatEntity performer)
+        public void OnPerformerSwitch(CombatEntity performer)
         {
             _currentControl = performer;
             _currentSkill = null;
@@ -159,26 +153,26 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
-        {
-            HideTargets();
-        }
-
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
             HideTargets();
         }
 
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnControlFinishAllActors(CombatEntity lastActor)
         {
             HideTargets();
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
+        {
+            HideTargets();
+        }
+
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             
         }

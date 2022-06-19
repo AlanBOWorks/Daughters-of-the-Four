@@ -118,27 +118,27 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
         }
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
            ShowAll();
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnControlFinishAllActors(CombatEntity lastActor)
         {
             
         }
 
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
        {
            _currentPerformer = null;
            HideAll();
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
         }
 
@@ -179,14 +179,14 @@ namespace CombatSystem.Player.UI
        }
 
         private CombatEntity _currentPerformer;
-        public void DoSwitchEntity(in CombatEntity entity)
+        public void DoSwitchEntity(CombatEntity entity)
         {
-            if(entity == _currentPerformer) return;
+            if(entity == _currentPerformer || entity == null) return;
 
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.OnPerformerSwitch(in entity);
+            playerEvents.OnPerformerSwitch(entity);
         }
-        public void OnPerformerSwitch(in CombatEntity performer)
+        public void OnPerformerSwitch(CombatEntity performer)
         {
             _currentPerformer = performer;
         }

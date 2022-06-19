@@ -24,14 +24,14 @@ namespace CombatSystem.Skills
             eventHolder.OnEntityBeforeSkill(performer);
 
 
-            if (UtilsCombatStats.CanControlRequest(in performer)) return;
+            if (UtilsCombatStats.CanControlRequest(performer)) return;
             var performerTeam = performer.Team;
             performerTeam.RemoveFromControllingEntities(performer, false);
 
             eventHolder.OnEntityEmptyActions(performer);
 
             if(performerTeam.CanControl()) return;
-            eventHolder.OnAllActorsNoActions(in performer);
+            eventHolder.OnAllActorsNoActions(performer);
         }
 
         public void OnCombatSkillPerform(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
@@ -110,7 +110,7 @@ namespace CombatSystem.Skills
             if (controllingMembers.Count > 0) return;
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnControlFinishAllActors(in entity);
+            eventsHolder.OnControlFinishAllActors(entity);
         }
     }
 }

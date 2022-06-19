@@ -291,59 +291,59 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             HandleCurrentEntityEventsHolder(in controller);
 
 
-            _eventsHolder.OnTempoPreStartControl(in controller);
-            _playerCombatEvents.OnTempoPreStartControl(in controller);
-            _enemyCombatEvents.OnTempoPreStartControl(in controller);
+            _eventsHolder.OnTempoPreStartControl(controller);
+            _playerCombatEvents.OnTempoPreStartControl(controller);
+            _enemyCombatEvents.OnTempoPreStartControl(controller);
 
-            _currentDiscriminatedEntityEventsHolder.OnTempoPreStartControl(in controller);
+            _currentDiscriminatedEntityEventsHolder.OnTempoPreStartControl(controller);
 
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
-            _eventsHolder.OnAllActorsNoActions(in lastActor);
-            _playerCombatEvents.OnAllActorsNoActions(in lastActor);
-            _enemyCombatEvents.OnAllActorsNoActions(in lastActor);
+            _eventsHolder.OnAllActorsNoActions(lastActor);
+            _playerCombatEvents.OnAllActorsNoActions(lastActor);
+            _enemyCombatEvents.OnAllActorsNoActions(lastActor);
 
-            _currentDiscriminatedEntityEventsHolder.OnAllActorsNoActions(in lastActor);
+            _currentDiscriminatedEntityEventsHolder.OnAllActorsNoActions(lastActor);
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnControlFinishAllActors(CombatEntity lastActor)
         {
-            _eventsHolder.OnControlFinishAllActors(in lastActor);
-            _playerCombatEvents.OnControlFinishAllActors(in lastActor);
-            _enemyCombatEvents.OnControlFinishAllActors(in lastActor);
+            _eventsHolder.OnControlFinishAllActors(lastActor);
+            _playerCombatEvents.OnControlFinishAllActors(lastActor);
+            _enemyCombatEvents.OnControlFinishAllActors(lastActor);
 
-            _currentDiscriminatedEntityEventsHolder.OnControlFinishAllActors(in lastActor);
+            _currentDiscriminatedEntityEventsHolder.OnControlFinishAllActors(lastActor);
         }
 
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
-            _eventsHolder.OnTempoFinishControl(in controller);
-            _playerCombatEvents.OnTempoFinishControl(in controller);
-            _enemyCombatEvents.OnTempoFinishControl(in controller);
+            _eventsHolder.OnTempoFinishControl(controller);
+            _playerCombatEvents.OnTempoFinishControl(controller);
+            _enemyCombatEvents.OnTempoFinishControl(controller);
 
-            _currentDiscriminatedEntityEventsHolder.OnTempoFinishControl(in controller);
+            _currentDiscriminatedEntityEventsHolder.OnTempoFinishControl(controller);
 
             _sequenceStepper.OnTempoFinishControl(in controller);
 
-            OnTempoFinishLastCall(in controller);
+            OnTempoFinishLastCall(controller);
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             _sequenceStepper.OnTempoFinishLastCall(in controller);
 
-            _eventsHolder.OnTempoFinishLastCall(in controller);
-            _playerCombatEvents.OnTempoFinishLastCall(in controller);
-            _enemyCombatEvents.OnTempoFinishLastCall(in controller);
+            _eventsHolder.OnTempoFinishLastCall(controller);
+            _playerCombatEvents.OnTempoFinishLastCall(controller);
+            _enemyCombatEvents.OnTempoFinishLastCall(controller);
 
-            _currentDiscriminatedEntityEventsHolder.OnTempoFinishLastCall(in controller);
+            _currentDiscriminatedEntityEventsHolder.OnTempoFinishLastCall(controller);
         }
 
 
@@ -1166,44 +1166,44 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             foreach (var listener in _tempoTeamListeners)
             {
-                listener.OnTempoPreStartControl(in controller);
+                listener.OnTempoPreStartControl(controller);
             }
         }
 
-        public void OnAllActorsNoActions(in CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
             foreach (var listener in _tempoTeamListeners)
             {
-                listener.OnAllActorsNoActions(in lastActor);
+                listener.OnAllActorsNoActions(lastActor);
             }
         }
 
-        public void OnControlFinishAllActors(in CombatEntity lastActor)
+        public void OnControlFinishAllActors(CombatEntity lastActor)
         {
             foreach (var listener in _tempoTeamListeners)
             {
-                listener.OnControlFinishAllActors(in lastActor);
+                listener.OnControlFinishAllActors(lastActor);
             }
         }
 
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             foreach (var listener in _tempoTeamListeners)
             {
-                listener.OnTempoFinishControl(in controller);
+                listener.OnTempoFinishControl(controller);
             }
 
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             foreach (var listener in _tempoTeamListeners)
             {
-                listener.OnTempoFinishLastCall(in controller);
+                listener.OnTempoFinishLastCall(controller);
             }
         }
 
