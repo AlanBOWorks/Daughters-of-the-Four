@@ -16,6 +16,7 @@ namespace CombatSystem.Player.UI
         [SerializeField] private RectTransform hoverHolder;
         [SerializeField] private RectTransform focusHolder;
 
+        [Title("Animation Params")] 
 
         private Quaternion _hoverInitialRotation;
         private Quaternion _focusInitialRotation;
@@ -36,16 +37,21 @@ namespace CombatSystem.Player.UI
         }
 
         private const float AnimationDuration = .08f;
-        private static void DoAnimate(in RectTransform imageHolder, in UCombatSkillButton onButton, in Quaternion targetRotation)
+        private static void DoAnimate(RectTransform imageHolder, UCombatSkillButton onButton, Quaternion targetRotation)
         {
             imageHolder.gameObject.SetActive(true);
-            imageHolder.position = onButton.transform.position;
+            var groupHolder = onButton.GetGroupHolder();
+            imageHolder.SetParent(groupHolder);
+            imageHolder.localPosition = Vector3.zero;
 
             DOTween.Kill(imageHolder);
             imageHolder.DOLocalRotateQuaternion(targetRotation, AnimationDuration);
+            DOTween.Kill(groupHolder);
+            groupHolder.localScale = Vector3.one;
+            groupHolder.DOPunchScale(Vector3.one * -.2f, AnimationDuration);
         }
 
-        private static void Hide(in RectTransform imageHolder)
+        private static void Hide(Component imageHolder)
         {
             imageHolder.gameObject.SetActive(false);
         }
@@ -56,12 +62,12 @@ namespace CombatSystem.Player.UI
             var targetButton = skillButtonsHolder.GetDictionary()[skill];
 
             hoverHolder.localRotation = Quaternion.AngleAxis(-10, Vector3.forward);
-            DoAnimate(in hoverHolder,in targetButton, in _hoverInitialRotation);
+            DoAnimate(hoverHolder,targetButton, _hoverInitialRotation);
         }
 
         public void OnSkillButtonExit(ICombatSkill skill)
         {
-            Hide(in hoverHolder);
+            Hide(hoverHolder);
         }
 
 
@@ -79,17 +85,17 @@ namespace CombatSystem.Player.UI
             var targetButton = skillButtonsHolder.GetDictionary()[skill];
 
             focusHolder.localRotation = _hoverInitialRotation;
-            DoAnimate(in focusHolder,in targetButton, in _focusInitialRotation);
+            DoAnimate(focusHolder,targetButton, _focusInitialRotation);
         }
 
         public void OnSkillDeselect(CombatSkill skill)
         {
-            Hide(in focusHolder);
+            Hide(focusHolder);
         }
 
         public void OnSkillCancel(CombatSkill skill)
         {
-            Hide(in focusHolder);
+            Hide(focusHolder);
         }
 
         public void OnSkillSubmit(CombatSkill skill)

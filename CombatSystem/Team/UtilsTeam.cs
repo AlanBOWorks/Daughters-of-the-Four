@@ -643,12 +643,6 @@ namespace CombatSystem.Team
 
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-
-            if (canControl)
-            {
-                eventsHolder.OnTempoPreStartControl(controller);
-            }
-
             var nonControllingMembers = team.GetNonControllingMembers();
             HandleMembers(in nonControllingMembers, false);
 

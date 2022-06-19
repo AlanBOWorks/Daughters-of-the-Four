@@ -135,7 +135,6 @@ namespace CombatSystem.Player.UI
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
        {
            _currentPerformer = null;
-           HideAll();
         }
 
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)

@@ -90,6 +90,8 @@ namespace CombatSystem._Core
         private IEnumerator<float> _TickingLoop()
         {
             var teamControllersHandler = CombatSystemSingleton.TeamControllers;
+            var skillQueuePerformer = CombatSystemSingleton.SkillQueuePerformer;
+
             foreach (var listener in TickListeners)
             {
                 listener.OnStartTicking();
@@ -120,30 +122,34 @@ namespace CombatSystem._Core
 
                 yield return Timing.WaitForOneFrame;
 
-
-                // ------ CONTROLLERS
-                var controllersEnumerator = teamControllersHandler.GetActiveControllers();
-                foreach (var controller in controllersEnumerator)
+                
+                bool controllersWaiting = teamControllersHandler.HasTeamWaiting();
+                if (controllersWaiting)
                 {
-                    var skillQueuePerformer = CombatSystemSingleton.SkillQueuePerformer;
+                    var controllersEnumerator = teamControllersHandler.GetActiveControllers();
+                    var combatEvents = CombatSystemSingleton.EventsHolder;
+
+                    // ----- Wait For Animations
                     do
                     {
                         yield return Timing.WaitForOneFrame;
                     } while (skillQueuePerformer.IsActing());
 
-
-                    var controllerTeam = controller.ControllingTeam;
-                    teamControllersHandler.TryInvokeControl(in controller);
-                    while (controllerTeam.IsActive() || teamControllersHandler.IsControlling())
+                    // ------ CONTROLLERS
+                    foreach (var controller in controllersEnumerator)
                     {
+                        combatEvents.OnTempoPreStartControl(controller);
                         yield return Timing.WaitForOneFrame;
+
+                        var controllerTeam = controller.ControllingTeam;
+                        teamControllersHandler.TryInvokeControl(in controller);
+                        while (controllerTeam.IsActive() || teamControllersHandler.IsControlling())
+                        {
+                            yield return Timing.WaitForOneFrame;
+                        }
+
                     }
-
                 }
-
-
-
-
 
 
                 if (_roundTickCount < LoopThreshold) continue;

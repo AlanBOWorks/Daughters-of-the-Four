@@ -1018,6 +1018,8 @@ namespace CombatSystem._Core
 
             if (listener is ITempoTeamStatesListener tempoTeamStatesListener)
                 _tempoTeamListeners.Add(tempoTeamStatesListener);
+            if (listener is ITeamEventListener teamEventListener)
+                _teamEventListeners.Add(teamEventListener);
 
 
             if (listener is ISkillUsageListener skillUsageListener)
@@ -1028,8 +1030,6 @@ namespace CombatSystem._Core
                 _vanguardEffectUsageListeners.Add(vanguardEffectUsageListener);
 
 
-            if (listener is ITeamEventListener teamEventListener)
-                _teamEventListeners.Add(teamEventListener);
         }
 
         public virtual void UnSubscribe(ICombatEventListener listener)

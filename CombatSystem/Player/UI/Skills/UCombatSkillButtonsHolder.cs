@@ -60,14 +60,17 @@ namespace CombatSystem.Player.UI
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
 
-            // PROBLEM: stackOverFlow in hoverSkill;
-            // SOLUTION: manual subscriptions
-            playerEvents.Subscribe(this);
+            
+            playerEvents.SubscribeAsPlayerEvent(this);
+            playerEvents.ManualSubscribe(this as ICombatStatesListener);
+            playerEvents.DiscriminationEventsHolder.Subscribe(this);
         }
 
         private void OnDestroy()
         {
-            PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            playerEvents.UnSubscribe(this);
+            playerEvents.DiscriminationEventsHolder.UnSubscribe(this);
         }
 
 
@@ -246,7 +249,7 @@ namespace CombatSystem.Player.UI
 
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
-            HideAll();
+            DisableHolder();
         }
 
         public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)

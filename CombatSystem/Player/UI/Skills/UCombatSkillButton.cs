@@ -16,11 +16,16 @@ namespace CombatSystem.Player.UI
     public class UCombatSkillButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] 
+        private RectTransform groupHolder;
+        
+        [SerializeField] 
         private CanvasGroup canvasGroup;
         [SerializeField] 
         private Image iconHolder;
         [SerializeField] 
         private TextMeshProUGUI costText;
+
+        public RectTransform GetGroupHolder() => groupHolder;
 
         private CoroutineHandle _fadeHandle;
         private const float FadeSpeed = 8f;
@@ -87,10 +92,9 @@ namespace CombatSystem.Player.UI
             _fadeHandle = Timing.RunCoroutine(_FadeAlpha());
             IEnumerator<float> _FadeAlpha()
             {
-                canvasGroup.alpha = 0;
-                while (canvasGroup.alpha < targetAlpha)
+                while (Math.Abs(canvasGroup.alpha - targetAlpha) > .05f)
                 {
-                    canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 1, Time.deltaTime * FadeSpeed);
+                    canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, targetAlpha, Time.deltaTime * FadeSpeed);
 
                     yield return Timing.WaitForOneFrame;
                 }

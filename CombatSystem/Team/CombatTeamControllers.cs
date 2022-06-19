@@ -42,6 +42,11 @@ namespace CombatSystem.Team
         [ShowInInspector]
         public bool IsControlling() => _currentControl != null;
 
+        public bool HasTeamWaiting() =>
+            _playerTeamType.ControllingTeam.IsActive() ||
+            _enemyTeamType.ControllingTeam.IsActive();
+
+
         public IEnumerable<CombatTeamControllerBase> GetActiveControllers()
         {
             if(IsActive(_playerTeamType))

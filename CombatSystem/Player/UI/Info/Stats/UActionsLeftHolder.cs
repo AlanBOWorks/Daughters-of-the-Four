@@ -170,7 +170,6 @@ namespace CombatSystem.Player.UI
 
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
-            HideUI();
         }
 
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
