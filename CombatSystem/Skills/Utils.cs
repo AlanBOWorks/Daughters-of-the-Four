@@ -13,19 +13,24 @@ namespace CombatSystem.Skills
 {
     public static class UtilsSkill
     {
-        public static T GetElement<T>(EnumsSkill.Archetype type, ISkillArchetypeStructureRead<T> structure)
+        public static T GetElement<T>(EnumsSkill.TeamTargeting type, ISkillArchetypeStructureRead<T> structure)
         {
             switch (type)
             {
-                case EnumsSkill.Archetype.Self:
+                case EnumsSkill.TeamTargeting.Self:
                     return structure.SelfSkillType;
-                case EnumsSkill.Archetype.Offensive:
+                case EnumsSkill.TeamTargeting.Offensive:
                     return structure.OffensiveSkillType;
-                case EnumsSkill.Archetype.Support:
+                case EnumsSkill.TeamTargeting.Support:
                     return structure.SupportSkillType;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
+        }
+
+        public static bool IsOffensiveSkill(ISkill skill)
+        {
+            return skill.TeamTargeting == EnumsSkill.TeamTargeting.Offensive || skill is IAttackerSkill;
         }
     }
 
@@ -35,22 +40,22 @@ namespace CombatSystem.Skills
         private static readonly List<CombatEntity> TargetsHelper = new List<CombatEntity>();
 
 
-        public static EnumsSkill.Archetype GetReceiveSkillType([NotNull]in CombatSkill skill, in CombatEntity performer,
+        public static EnumsSkill.TeamTargeting GetReceiveSkillType([NotNull]in CombatSkill skill, in CombatEntity performer,
             in CombatEntity target)
         {
             if (performer == null || target == null)
             {
-                return skill.Archetype;
+                return skill.TeamTargeting;
             }
 
-            var type = skill.Archetype;
-            if (performer == target) return EnumsSkill.Archetype.Self;
-            if (type != EnumsSkill.Archetype.Self) return type;
+            var type = skill.TeamTargeting;
+            if (performer == target) return EnumsSkill.TeamTargeting.Self;
+            if (type != EnumsSkill.TeamTargeting.Self) return type;
 
             // if the performer acts as a self but effect are for groups then:
             bool isAlly = UtilsTeam.IsAllyEntity(in performer, in target);
-            if (isAlly) return EnumsSkill.Archetype.Support;
-            return EnumsSkill.Archetype.Offensive;
+            if (isAlly) return EnumsSkill.TeamTargeting.Support;
+            return EnumsSkill.TeamTargeting.Offensive;
         }
 
         public static bool CanBeTargeted(in CombatEntity target)
@@ -63,25 +68,25 @@ namespace CombatSystem.Skills
             ICombatSkill skill)
         {
             bool ignoreSelf = skill.IgnoreSelf();
-            HandlePossibleTargets(targetsHelper, performer, skill.Archetype, ignoreSelf);
+            HandlePossibleTargets(targetsHelper, performer, skill.TeamTargeting, ignoreSelf);
         }
 
 
         public static void HandlePossibleTargets(ICollection<CombatEntity> targetsHelper,
             CombatEntity performer,
-            EnumsSkill.Archetype type, bool ignoreSelf)
+            EnumsSkill.TeamTargeting type, bool ignoreSelf)
         {
             targetsHelper.Clear();
 
             switch (type)
             {
-                case EnumsSkill.Archetype.Self:
+                case EnumsSkill.TeamTargeting.Self:
                     HandleSingleTarget(performer);
                     break;
-                case EnumsSkill.Archetype.Offensive:
+                case EnumsSkill.TeamTargeting.Offensive:
                     HandleOffensiveMembers();
                     break;
-                case EnumsSkill.Archetype.Support:
+                case EnumsSkill.TeamTargeting.Support:
                     HandleSupportMembers();
                     break;
                 default:

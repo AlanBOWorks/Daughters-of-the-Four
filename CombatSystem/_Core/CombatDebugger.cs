@@ -6,6 +6,7 @@ using CombatSystem.Player.UI;
 using CombatSystem.Skills;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using CombatSystem.Team.VanguardEffects;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -63,13 +64,10 @@ namespace CombatSystem._Core
     }
 
 
-    internal sealed class CombatEventsLogs : ITempoTeamStatesListener,
-        ITempoDedicatedEntityStatesListener, ITempoEntityStatesListener,
-        ITempoTickListener, ISkillUsageListener, IEffectUsageListener,
-        ITempoEntityStatesExtraListener,
-        IDamageDoneListener
+    internal sealed class CombatEventsLogs : ICombatEventsHolderBase,
+        ITempoTickListener, IDamageDoneListener
     {
-        [Title("Teams")] 
+        [TitleGroup("Team")] 
         public bool ShowTeamLogs = false;
 
         private sealed class TeamLogs
@@ -78,6 +76,7 @@ namespace CombatSystem._Core
             public bool OnFinishActors = true;
             public bool OnFinishControl = true;
         }
+        [TitleGroup("Team")] 
         [ShowInInspector]
         private TeamLogs _teamLogs = new TeamLogs();
 
@@ -194,19 +193,19 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private EntitySequenceExtraLogs _entitySequenceExtraLogs = new EntitySequenceExtraLogs();
 
-        public void OnAfterEntityRequestSequence(in CombatEntity entity)
+        public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
             if (!ShoEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnRequest) return;
             Debug.Log("After Request Sequence");
         }
 
-        public void OnAfterEntitySequenceFinish(in CombatEntity entity)
+        public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
             if (!ShoEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnFinish) return;
             Debug.Log("--------- -------- END SEQUENCE -------- -------- --------");
         }
 
-        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        public void OnNoActionsForcedFinish(CombatEntity entity)
         {
             if (!ShoEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnNoActions) return;
             Debug.Log($"Request Sequence - NO ACTIONS: {entity.CombatCharacterName}");
@@ -253,7 +252,7 @@ namespace CombatSystem._Core
 
 
 
-        [Title("Skills")]
+        [TitleGroup("Skills")]
         public bool ShowSkillLogs = false;
         private class SkillsSubmitLogs
         {
@@ -262,6 +261,7 @@ namespace CombatSystem._Core
             public bool OnFinish = true;
         }
 
+        [TitleGroup("Skills")]
         [ShowInInspector]
         private SkillsSubmitLogs _skillsLogs = new SkillsSubmitLogs();
 
@@ -289,13 +289,14 @@ namespace CombatSystem._Core
             Debug.Log("-------------- SKILL END --------------- ");
         }
 
-        [Title("Skills")]
+        [TitleGroup("Skills")]
         public bool ShowEffectLogs = false;
         private class EffectsSubmitLogs
         {
             public bool OnPrimary = true;
             public bool OnSecondary = true;
         }
+        [TitleGroup("Skills")]
         [ShowInInspector]
         private EffectsSubmitLogs _effectLogs = new EffectsSubmitLogs();
 
@@ -355,6 +356,62 @@ namespace CombatSystem._Core
 
         }
 
+
+        [Title("Vanguard Effects")] 
+        public bool ShowVanguardEffectsLogs = false;
+        private class VanguardEffectsLogs
+        {
+            public bool OnEffectIncrement = true;
+            public bool OnRevengePerform = true;
+            public bool OnPunishPerform = true;
+        }
+        [ShowInInspector]
+        private VanguardEffectsLogs _vanguardEffectsLogs = new VanguardEffectsLogs();
+
+
+        public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
+        {
+            if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnEffectIncrement) return;
+            Debug.Log($"Vanguard Increment [{type}] <<<< {attacker.CombatCharacterShorterName}");
+        }
+
+        public void OnVanguardRevengeEffectPerform(IVanguardSkill skill, int iterations)
+        {
+            if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnRevengePerform) return;
+            Debug.Log($"REVENGE Perform: {skill} [{iterations}]");
+        }
+
+        public void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations)
+        {
+            if (!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnPunishPerform) return;
+            Debug.Log($"PUNISH Perform: {skill} [{iterations}]");
+        }
+
+        [TitleGroup("Team")] 
+        public bool ShowTeamValuesChangeLogs = false;
+        private class TeamValuesChangeLogs
+        {
+            public bool OnStanceChange = true;
+            public bool OnControlChange = true;
+        }
+        [TitleGroup("Team")] 
+        [ShowInInspector]
+        private TeamValuesChangeLogs _teamValuesChangeLogs = new TeamValuesChangeLogs();
+
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
+        {
+            if(!ShowTeamValuesChangeLogs || !_teamValuesChangeLogs.OnStanceChange) return;
+            string teamName = team.IsPlayerTeam ? "PLAYER" : "ENEMY";
+            Debug.Log($"On Stance Change: {teamName} >> {switchedStance}");
+        }
+
+        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
+        {
+            if (!ShowTeamValuesChangeLogs || !_teamValuesChangeLogs.OnControlChange) return;
+            string teamName = team.IsPlayerTeam ? "PLAYER" : "ENEMY";
+            Debug.Log($"On Control Change: {teamName} >> {phasedControl} [Burst: {isBurst}]");
+
+        }
     }
 
 

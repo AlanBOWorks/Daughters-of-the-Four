@@ -40,7 +40,7 @@ namespace CombatSystem.Skills
     public interface ISkill
     {
         int SkillCost { get; }
-        EnumsSkill.Archetype Archetype { get; }
+        EnumsSkill.TeamTargeting TeamTargeting { get; }
         EnumsSkill.TargetType TargetType { get; }
 
         IEffect GetMainEffectArchetype();

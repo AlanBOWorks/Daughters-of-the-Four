@@ -47,18 +47,18 @@ namespace CombatSystem.Entity
             stats.CurrentInitiative = 0;
         }
 
-        public void OnAfterEntityRequestSequence(in CombatEntity entity)
+        public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
            
         }
 
-        public void OnAfterEntitySequenceFinish(in CombatEntity entity)
+        public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
             var stats = entity.Stats;
             stats.UsedActions = 0;
         }
 
-        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        public void OnNoActionsForcedFinish(CombatEntity entity)
         {
             OnEntityFinishSequence(entity, false);
         }

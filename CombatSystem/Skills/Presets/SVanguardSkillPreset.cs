@@ -9,10 +9,12 @@ using UnityEngine;
 
 namespace CombatSystem.Skills
 {
-    [CreateAssetMenu(fileName = "N [Vanguard Skill Preset]",
+    [CreateAssetMenu(fileName = "N" + VanguardAssetPrefix,
         menuName = "Combat/Skill/Vanguard Preset")]
     public class SVanguardSkillPreset : SSkillPresetBase, IVanguardSkill
     {
+        private const string VanguardAssetPrefix =  " [Vanguard Skill Preset]";
+
         [TitleGroup("Values")]
         [SerializeField]
         private bool ignoreSelf = true;
@@ -25,6 +27,8 @@ namespace CombatSystem.Skills
 
 
         private VanguardEffect _vanguardEffectPreset;
+
+        protected override string GetAssetPrefix() => VanguardAssetPrefix;
 
 
         private void OnEnable()
@@ -51,7 +55,7 @@ namespace CombatSystem.Skills
             }
         }
 
-        public override EnumsSkill.Archetype Archetype => EnumsSkill.Archetype.Self;
+        public override EnumsSkill.TeamTargeting TeamTargeting => EnumsSkill.TeamTargeting.Self;
         public override EnumsSkill.TargetType TargetType => EnumsSkill.TargetType.Direct;
 
 
@@ -59,7 +63,10 @@ namespace CombatSystem.Skills
             new PerformEffectValues(_vanguardEffectPreset, 1, EnumsEffect.TargetType.Performer);
         public PerformEffectValues GetVanguardEffectTooltip() => GenerateVanguardValues();
 
-
+        protected override string GenerateAssetName()
+        {
+            return responseType.ToString().ToUpper() + " - " + base.GenerateAssetName();
+        }
 
         private sealed class VanguardEffect : IEffect
         {

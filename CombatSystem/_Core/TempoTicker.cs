@@ -89,7 +89,7 @@ namespace CombatSystem._Core
 #endif
         private IEnumerator<float> _TickingLoop()
         {
-            var controllers = CombatSystemSingleton.TeamControllers;
+            var teamControllersHandler = CombatSystemSingleton.TeamControllers;
             foreach (var listener in TickListeners)
             {
                 listener.OnStartTicking();
@@ -122,20 +122,17 @@ namespace CombatSystem._Core
 
 
                 // ------ CONTROLLERS
-                controllers.TickPlayerController();
-                do
+                var controllersEnumerator = teamControllersHandler.GetActiveControllers();
+                foreach (var controller in controllersEnumerator)
                 {
-                    yield return Timing.WaitForOneFrame;
-                } while (controllers.IsControlling());
+                    var controllerTeam = controller.ControllingTeam;
+                    teamControllersHandler.TryInvokeControl(in controller);
+                    while (controllerTeam.IsActive() || teamControllersHandler.IsControlling())
+                    {
+                        yield return Timing.WaitForOneFrame;
+                    }
+                }
 
-                yield return Timing.WaitForOneFrame;
-
-                controllers.TickEnemyController();
-                do
-                {
-                    yield return Timing.WaitForOneFrame;
-                } while (controllers.IsControlling());
-                // ------ CONTROLLERS
 
 
 
@@ -211,17 +208,17 @@ namespace CombatSystem._Core
         /// Invoked after [<seealso cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>] and
         /// only it can act;
         /// </summary>
-        void OnAfterEntityRequestSequence(in CombatEntity entity);
+        void OnAfterEntityRequestSequence(CombatEntity entity);
         /// <summary>
         /// Invoked after [<seealso cref="ITempoEntityStatesListener.OnEntityFinishSequence"/>]; <br></br>
         /// This events is called after removing the entity from the [<seealso cref="CombatTeam._controlMembers"/>].<br></br>
         /// </summary>
-        void OnAfterEntitySequenceFinish(in CombatEntity entity);
+        void OnAfterEntitySequenceFinish(CombatEntity entity);
 
         /// <summary>
         /// Invoked after the entity reaches initiation but doesn't have enough actions
         /// </summary>
-        void OnNoActionsForcedFinish(in CombatEntity entity);
+        void OnNoActionsForcedFinish(CombatEntity entity);
     }
 
     public interface ITempoDedicatedEntityStatesListener : ICombatEventListener

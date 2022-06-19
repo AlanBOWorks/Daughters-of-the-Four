@@ -45,10 +45,10 @@ namespace CombatSystem.Skills
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             if (!canControl)
             {
-                eventsHolder.OnNoActionsForcedFinish(in entity);
+                eventsHolder.OnNoActionsForcedFinish(entity);
                 return;
             }
-            eventsHolder.OnAfterEntityRequestSequence(in entity);
+            eventsHolder.OnAfterEntityRequestSequence(entity);
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -89,7 +89,7 @@ namespace CombatSystem.Skills
             else
                 eventsHolder.OnOffEntityFinishSequence(entity);
 
-            eventsHolder.OnAfterEntitySequenceFinish(in entity);
+            eventsHolder.OnAfterEntitySequenceFinish(entity);
         }
 
 

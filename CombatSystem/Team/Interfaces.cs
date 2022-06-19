@@ -75,8 +75,8 @@ namespace CombatSystem.Team
     
     public interface ITeamEventListener : ICombatEventListener
     {
-        void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance);
-        void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst);
+        void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance);
+        void OnControlChange(CombatTeam team, float phasedControl, bool isBurst);
     }
 
     public interface ITeamAlimentStructureRead<out T>

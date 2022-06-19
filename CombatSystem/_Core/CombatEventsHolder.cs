@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using CombatSystem.AI;
 using CombatSystem.Entity;
@@ -7,8 +6,8 @@ using CombatSystem.Player;
 using CombatSystem.Skills;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using CombatSystem.Team.VanguardEffects;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace CombatSystem._Core
 {
@@ -260,35 +259,35 @@ namespace CombatSystem._Core
             _entityEventHandler.OnEntityFinishSequence(entity, in isForcedByController);
         }
 
-        public void OnAfterEntityRequestSequence(in CombatEntity entity)
+        public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
-            _eventsHolder.OnAfterEntityRequestSequence(in entity);
-            _playerCombatEvents.OnAfterEntityRequestSequence(in entity);
-            _enemyCombatEvents.OnAfterEntityRequestSequence(in entity);
+            _eventsHolder.OnAfterEntityRequestSequence(entity);
+            _playerCombatEvents.OnAfterEntityRequestSequence(entity);
+            _enemyCombatEvents.OnAfterEntityRequestSequence(entity);
 
-            _currentDiscriminatedEntityEventsHolder.OnAfterEntityRequestSequence(in entity);
+            _currentDiscriminatedEntityEventsHolder.OnAfterEntityRequestSequence(entity);
 
             _entityEventHandler.RequestEntityAction(in entity);
         }
 
-        public void OnAfterEntitySequenceFinish(in CombatEntity entity)
+        public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
-            _eventsHolder.OnAfterEntitySequenceFinish(in entity);
-            _playerCombatEvents.OnAfterEntitySequenceFinish(in entity);
-            _enemyCombatEvents.OnAfterEntitySequenceFinish(in entity);
+            _eventsHolder.OnAfterEntitySequenceFinish(entity);
+            _playerCombatEvents.OnAfterEntitySequenceFinish(entity);
+            _enemyCombatEvents.OnAfterEntitySequenceFinish(entity);
 
-            _currentDiscriminatedEntityEventsHolder.OnAfterEntitySequenceFinish(in entity);
+            _currentDiscriminatedEntityEventsHolder.OnAfterEntitySequenceFinish(entity);
 
             _entityEventHandler.TryCallOnFinishAllActors(in entity);
         }
 
-        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        public void OnNoActionsForcedFinish(CombatEntity entity)
         {
-            _eventsHolder.OnNoActionsForcedFinish(in entity);
-            _playerCombatEvents.OnNoActionsForcedFinish(in entity);
-            _enemyCombatEvents.OnNoActionsForcedFinish(in entity);
+            _eventsHolder.OnNoActionsForcedFinish(entity);
+            _playerCombatEvents.OnNoActionsForcedFinish(entity);
+            _enemyCombatEvents.OnNoActionsForcedFinish(entity);
 
-            _currentDiscriminatedEntityEventsHolder.OnNoActionsForcedFinish(in entity);
+            _currentDiscriminatedEntityEventsHolder.OnNoActionsForcedFinish(entity);
         }
 
 
@@ -510,20 +509,47 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
         {
-            _eventsHolder.OnStanceChange(in team, in switchedStance);
-            _playerCombatEvents.OnStanceChange(in team, in switchedStance);
-            _enemyCombatEvents.OnStanceChange(in team, in switchedStance);
+            _eventsHolder.OnStanceChange(team, switchedStance);
+            _playerCombatEvents.OnStanceChange(team, switchedStance);
+            _enemyCombatEvents.OnStanceChange(team, switchedStance);
         }
 
-        public void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst)
+        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
         {
-            _eventsHolder.OnControlChange(in team, in phasedControl,in isBurst);
-            _playerCombatEvents.OnControlChange(in team, in phasedControl, in isBurst);
-            _enemyCombatEvents.OnControlChange(in team, in phasedControl, in isBurst);
+            _eventsHolder.OnControlChange(team, phasedControl,isBurst);
+            _playerCombatEvents.OnControlChange(team, phasedControl, isBurst);
+            _enemyCombatEvents.OnControlChange(team, phasedControl, isBurst);
         }
 
+
+        public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
+        {
+            _eventsHolder.OnVanguardEffectIncrement(type,attacker);
+            _playerCombatEvents.OnVanguardEffectIncrement(type,attacker);
+            _enemyCombatEvents.OnVanguardEffectIncrement(type,attacker);
+
+            _currentDiscriminatedEntityEventsHolder.OnVanguardEffectIncrement(type,attacker);
+        }
+
+        public void OnVanguardRevengeEffectPerform(IVanguardSkill skill, int iterations)
+        {
+            _eventsHolder.OnVanguardRevengeEffectPerform(skill, iterations);
+            _playerCombatEvents.OnVanguardRevengeEffectPerform(skill, iterations);
+            _enemyCombatEvents.OnVanguardRevengeEffectPerform(skill, iterations);
+
+            _currentDiscriminatedEntityEventsHolder.OnVanguardRevengeEffectPerform(skill, iterations);
+        }
+
+        public void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations)
+        {
+            _eventsHolder.OnVanguardPunishEffectPerform(skill, iterations);
+            _playerCombatEvents.OnVanguardPunishEffectPerform(skill, iterations);
+            _enemyCombatEvents.OnVanguardPunishEffectPerform(skill, iterations);
+
+            _currentDiscriminatedEntityEventsHolder.OnVanguardPunishEffectPerform(skill, iterations);
+        }
 
 
         private sealed class SystemEventsHolder : CombatEventsHolder
@@ -955,6 +981,7 @@ namespace CombatSystem._Core
 
             _skillUsageListeners = new HashSet<ISkillUsageListener>();
             _effectUsageListeners = new HashSet<IEffectUsageListener>();
+            _vanguardEffectUsageListeners = new HashSet<IVanguardEffectUsageListener>();
 
             _teamEventListeners = new HashSet<ITeamEventListener>();
         }
@@ -971,6 +998,7 @@ namespace CombatSystem._Core
 
         [ShowInInspector] private readonly ICollection<ISkillUsageListener> _skillUsageListeners;
         [ShowInInspector] private readonly ICollection<IEffectUsageListener> _effectUsageListeners;
+        [ShowInInspector] private readonly ICollection<IVanguardEffectUsageListener> _vanguardEffectUsageListeners;
 
         [ShowInInspector] private readonly ICollection<ITeamEventListener> _teamEventListeners;
 
@@ -996,6 +1024,8 @@ namespace CombatSystem._Core
                 _skillUsageListeners.Add(skillUsageListener);
             if(listener is IEffectUsageListener effectUsageListener)
                 _effectUsageListeners.Add(effectUsageListener);
+            if(listener is IVanguardEffectUsageListener vanguardEffectUsageListener)
+                _vanguardEffectUsageListeners.Add(vanguardEffectUsageListener);
 
 
             if (listener is ITeamEventListener teamEventListener)
@@ -1019,6 +1049,8 @@ namespace CombatSystem._Core
                 _skillUsageListeners.Remove(skillUsageListener);
             if (listener is IEffectUsageListener effectUsageListener)
                 _effectUsageListeners.Remove(effectUsageListener);
+            if (listener is IVanguardEffectUsageListener vanguardEffectUsageListener)
+                _vanguardEffectUsageListeners.Remove(vanguardEffectUsageListener);
 
 
             if (listener is ITeamEventListener teamEventListener)
@@ -1216,43 +1248,67 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
         {
             foreach (var listener in _teamEventListeners)
             {
-                listener.OnStanceChange(in team, in switchedStance);
+                listener.OnStanceChange(team, switchedStance);
             }
         }
 
-        public void OnControlChange(in CombatTeam team, in float phasedControl,in bool isBurst)
+        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
         {
             foreach (var listener in _teamEventListeners)
             {
-                listener.OnControlChange(in team, in phasedControl, in isBurst);
+                listener.OnControlChange(team, phasedControl, isBurst);
             }
         }
 
-        public void OnAfterEntityRequestSequence(in CombatEntity entity)
+        public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
             foreach (var listener in _tempoEntityExtraListeners)
             {
-                listener.OnAfterEntityRequestSequence(in entity);
+                listener.OnAfterEntityRequestSequence(entity);
             }
         }
 
-        public void OnAfterEntitySequenceFinish(in CombatEntity entity)
+        public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
             foreach (var listener in _tempoEntityExtraListeners)
             {
-                listener.OnAfterEntitySequenceFinish(in entity);
+                listener.OnAfterEntitySequenceFinish(entity);
             }
         }
 
-        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        public void OnNoActionsForcedFinish(CombatEntity entity)
         {
             foreach (var listener in _tempoEntityExtraListeners)
             {
-                listener.OnNoActionsForcedFinish(in entity);
+                listener.OnNoActionsForcedFinish(entity);
+            }
+        }
+
+        public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
+        {
+            foreach (var listener in _vanguardEffectUsageListeners)
+            {
+                listener.OnVanguardEffectIncrement(type,attacker);
+            }
+        }
+
+        public void OnVanguardRevengeEffectPerform(IVanguardSkill skill, int iterations)
+        {
+            foreach (var listener in _vanguardEffectUsageListeners)
+            {
+                listener.OnVanguardRevengeEffectPerform(skill,iterations);
+            }
+        }
+
+        public void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations)
+        {
+            foreach (var listener in _vanguardEffectUsageListeners)
+            {
+                listener.OnVanguardPunishEffectPerform(skill,iterations);
             }
         }
     }
@@ -1260,6 +1316,7 @@ namespace CombatSystem._Core
     public interface ICombatEventsHolderBase : ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
         ITempoTeamStatesListener,
         ISkillUsageListener, IEffectUsageListener,
+        IVanguardEffectUsageListener,
         ITeamEventListener
     {
 

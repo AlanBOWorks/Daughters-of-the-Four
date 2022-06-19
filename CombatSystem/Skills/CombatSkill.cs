@@ -25,7 +25,7 @@ namespace CombatSystem.Skills
 
         [ShowInInspector]
         public int SkillCost { get; private set; }
-        public EnumsSkill.Archetype Archetype => Preset.Archetype;
+        public EnumsSkill.TeamTargeting TeamTargeting => Preset.TeamTargeting;
         public EnumsSkill.TargetType TargetType => Preset.TargetType;
         public IEffect GetMainEffectArchetype() => Preset.GetMainEffectArchetype();
 

@@ -17,8 +17,8 @@ namespace CombatSystem.Skills
 
         [TitleGroup("Values")]
         [SerializeField]
-        private EnumsSkill.Archetype archetype 
-            = EnumsSkill.Archetype.Offensive;
+        private EnumsSkill.TeamTargeting teamTargeting 
+            = EnumsSkill.TeamTargeting.Offensive;
 
         [TitleGroup("Values")]
         [SerializeField]
@@ -36,7 +36,7 @@ namespace CombatSystem.Skills
         public override IEnumerable<PerformEffectValues> GetEffectsFeedBacks() => GetEffects();
 
         public override EnumsSkill.TargetType TargetType => targetType;
-        public override EnumsSkill.Archetype Archetype => archetype;
+        public override EnumsSkill.TeamTargeting TeamTargeting => teamTargeting;
         public override IEffect GetMainEffectArchetype()
         {
             IEffect mainEffect = mainEffectReference;
@@ -46,7 +46,7 @@ namespace CombatSystem.Skills
 
             return mainEffect;
         }
-        public override bool IgnoreSelf() => ignoreSelf && Archetype != EnumsSkill.Archetype.Self;
+        public override bool IgnoreSelf() => ignoreSelf && TeamTargeting != EnumsSkill.TeamTargeting.Self;
 
 
        
@@ -84,7 +84,7 @@ namespace CombatSystem.Skills
 
         public abstract IEnumerable<PerformEffectValues> GetEffectsFeedBacks();
         public int SkillCost => skillCost;
-        public abstract EnumsSkill.Archetype Archetype { get; }
+        public abstract EnumsSkill.TeamTargeting TeamTargeting { get; }
         public abstract EnumsSkill.TargetType TargetType { get; }
 
 
@@ -93,14 +93,20 @@ namespace CombatSystem.Skills
         public abstract bool IgnoreSelf();
         public bool HasEffects() => effects.Length > 0;
 
+        protected virtual string GetAssetPrefix() => " [SkillPreset]";
+
+        protected virtual string GenerateAssetName()
+        {
+            string generatedName = skillName;
+            generatedName = TeamTargeting.ToString().ToUpper() + " - " + generatedName;
+            generatedName += GetAssetPrefix();
+            return generatedName;
+        }
 
         [Button]
         private void UpdateAssetName()
         {
-            string generatedName = skillName;
-            generatedName = Archetype.ToString().ToUpper() + " - " + generatedName;
-            generatedName += " [SkillPreset]";
-
+            var generatedName = GenerateAssetName();
             UtilsAssets.UpdateAssetNameWithID(this, generatedName);
         }
 
@@ -127,4 +133,16 @@ namespace CombatSystem.Skills
             }
         }
     }
+
+
+    public interface IVanguardSkill : ISkill
+    {
+        PerformEffectValues GetVanguardEffectTooltip();
+    }
+
+    public interface IAttackerSkill : ISkill
+    {
+
+    }
+
 }

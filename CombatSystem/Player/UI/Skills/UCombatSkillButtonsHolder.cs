@@ -237,12 +237,12 @@ namespace CombatSystem.Player.UI
             HideAll();
         }
 
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
         {
             ResetPoolSkillsToCurrent();
         }
 
-        public void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst)
+        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
         {
         }
         private void ReturnSkillsToStack()

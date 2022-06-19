@@ -5,6 +5,7 @@ using CombatSystem.Entity;
 using CombatSystem.Skills;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using CombatSystem.Team.VanguardEffects;
 using MEC;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -33,6 +34,7 @@ namespace CombatSystem._Core
                 = new SkillTargetingHandler();
 
             var skillsQueue = new SkillQueuePerformer();
+            var vanguardEventsHandler = new VanguardEventsHandler();
 
             KnockOutHandler = new KnockOutHandler();
             CombatControllerAnimationHandler = new CombatControllerAnimationHandler();
@@ -44,6 +46,7 @@ namespace CombatSystem._Core
 
             systemEventsHolder.Subscribe(KnockOutHandler);
             systemEventsHolder.Subscribe(skillsQueue);
+            systemEventsHolder.Subscribe(vanguardEventsHandler);
             systemEventsHolder.Subscribe(CombatControllerAnimationHandler);
             systemEventsHolder.Subscribe(TeamControllers);
             systemEventsHolder.Subscribe(EntityPrefabsPoolHandler);

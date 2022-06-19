@@ -30,11 +30,11 @@ namespace CombatSystem.Player.Handlers
             _activeEntities = playerTeam.GetControllingMembers();
         }
 
-        public void OnAfterEntityRequestSequence(in CombatEntity entity)
+        public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
         }
 
-        public void OnAfterEntitySequenceFinish(in CombatEntity entity)
+        public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
             if (!_isActive || _activeEntities.Count <= 0) return;
 
@@ -42,7 +42,7 @@ namespace CombatSystem.Player.Handlers
             DoSwitchPerformer(in nextCall);
         }
 
-        public void OnNoActionsForcedFinish(in CombatEntity entity)
+        public void OnNoActionsForcedFinish(CombatEntity entity)
         {
         }
 

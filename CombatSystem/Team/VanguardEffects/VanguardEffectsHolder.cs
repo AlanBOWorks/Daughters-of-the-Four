@@ -1,9 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
-using CombatSystem.Skills.Effects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -52,19 +50,25 @@ namespace CombatSystem.Team.VanguardEffects
 
         public void OnOffensiveDone(CombatEntity enemyPerformer, CombatEntity onTarget)
         {
-            if(_mainEntity == null || enemyPerformer.Team.Contains(in onTarget)) return;
+            if(_mainEntity == null || enemyPerformer.Team.Contains(onTarget)) return;
 
             if (onTarget.PositioningType == _mainEntity.PositioningType)
             {
+                // Problem: if there's no revenge Skill in the Collection, then accumulating
+                // revenge counts won't make sense > should accumulates if there's at least
+                // one or more Skill
                 var revengeDictionary = _effectDictionaries.VanguardRevengeType;
                 if(revengeDictionary.Count == 0) return;
                 HandleDictionary(_offensiveRecordsDictionaries.VanguardRevengeType);
+                HandleEvents(EnumsVanguardEffects.VanguardEffectType.Revenge);
             }
             else
             {
+                // Same as above
                 var punishDictionary = _effectDictionaries.VanguardPunishType;
                 if(punishDictionary.Count == 0) return;
                 HandleDictionary(_offensiveRecordsDictionaries.VanguardPunishType);
+                HandleEvents(EnumsVanguardEffects.VanguardEffectType.Punish);
             }
 
 
@@ -76,6 +80,12 @@ namespace CombatSystem.Team.VanguardEffects
                     return;
                 }
                 dictionary.Add(enemyPerformer,1);
+            }
+
+            void HandleEvents(EnumsVanguardEffects.VanguardEffectType type)
+            {
+                var eventsHolder = CombatSystemSingleton.EventsHolder;
+                eventsHolder.OnVanguardEffectIncrement(type,enemyPerformer);
             }
         }
 

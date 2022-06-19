@@ -8,11 +8,11 @@ namespace CombatSystem.Skills
     public static class DebugSkillTypes
     {
         public static readonly IFullSkill OffensiveSkillPreset
-            = new PresetSkill(DebugEffectTypes.OffensiveEffect, EnumsSkill.Archetype.Offensive, EnumsSkill.TargetType.Direct);
+            = new PresetSkill(DebugEffectTypes.OffensiveEffect, EnumsSkill.TeamTargeting.Offensive, EnumsSkill.TargetType.Direct);
         public static readonly IFullSkill SupportSkillPreset
-            = new PresetSkill(DebugEffectTypes.SupportEffect,EnumsSkill.Archetype.Support,EnumsSkill.TargetType.Direct);
+            = new PresetSkill(DebugEffectTypes.SupportEffect,EnumsSkill.TeamTargeting.Support,EnumsSkill.TargetType.Direct);
         public static readonly IFullSkill TeamSkillPreset
-            = new PresetSkill(DebugEffectTypes.TeamEffect,EnumsSkill.Archetype.Self,EnumsSkill.TargetType.Direct);
+            = new PresetSkill(DebugEffectTypes.TeamEffect,EnumsSkill.TeamTargeting.Self,EnumsSkill.TargetType.Direct);
 
         public static readonly CombatSkill OffensiveCombatSkill
         = new CombatSkill(OffensiveSkillPreset);
@@ -25,23 +25,23 @@ namespace CombatSystem.Skills
 
         private sealed class PresetSkill : IFullSkill
         {
-            public PresetSkill(IEffect effect, EnumsSkill.Archetype archetype, EnumsSkill.TargetType targetType)
+            public PresetSkill(IEffect effect, EnumsSkill.TeamTargeting teamTargeting, EnumsSkill.TargetType targetType)
             {
                 _effect = effect;
-                Archetype = archetype;
+                TeamTargeting = teamTargeting;
                 TargetType = targetType;
             }
 
             private readonly IEffect _effect;
 
             public int SkillCost => 0;
-            public EnumsSkill.Archetype Archetype { get; }
+            public EnumsSkill.TeamTargeting TeamTargeting { get; }
             public EnumsSkill.TargetType TargetType { get; }
             public IEffect GetMainEffectArchetype() => _effect;
 
             public bool IgnoreSelf() => true;
 
-            public string GetSkillName() => "PRESET - " + Archetype + " [" + TargetType + "] "+ ToString();
+            public string GetSkillName() => "PRESET - " + TeamTargeting + " [" + TargetType + "] "+ ToString();
 
             public Sprite GetSkillIcon() => null;
 

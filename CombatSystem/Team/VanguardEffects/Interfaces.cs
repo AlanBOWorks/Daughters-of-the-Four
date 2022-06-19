@@ -1,15 +1,9 @@
 using CombatSystem._Core;
+using CombatSystem.Entity;
 using CombatSystem.Skills;
-using CombatSystem.Skills.Effects;
-using UnityEngine;
 
 namespace CombatSystem.Team.VanguardEffects
 {
-    public interface IVanguardSkill : ISkill
-    {
-        PerformEffectValues GetVanguardEffectTooltip();
-    }
-
     public interface IVanguardEffectsStructuresRead<out T> : IVanguardEffectStructureBaseRead<T>
     {
         T VanguardDelayImproveType { get; }
@@ -22,7 +16,10 @@ namespace CombatSystem.Team.VanguardEffects
     }
 
 
-    public interface IVanguardEffectTriggerListener : ICombatEventListener
+    public interface IVanguardEffectUsageListener : ICombatEventListener
     {
+        void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker);
+        void OnVanguardRevengeEffectPerform(IVanguardSkill skill, int iterations);
+        void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations);
     }
 }

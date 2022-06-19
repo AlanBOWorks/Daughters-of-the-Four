@@ -45,7 +45,7 @@ namespace CombatSystem.Team
     /// <typeparam name="T"></typeparam>
     public abstract class UClassTeamDiscriminatorListener<T> : UClassTeamDiscriminator<T>, ITeamEventListener where T : new()
     {
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
         {
             var element = GetElement(in team);
             OnStanceChange(in element,in switchedStance);
@@ -54,7 +54,7 @@ namespace CombatSystem.Team
 
         protected abstract void OnStanceChange(in T element, in EnumTeam.StanceFull switchStance);
 
-        public void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst)
+        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
         {
             var element = GetElement(in team);
             OnControlChange(in element, in phasedControl, in isBurst);
@@ -96,7 +96,7 @@ namespace CombatSystem.Team
 
     public abstract class UTeamDiscriminatorListener<T> : UTeamDiscriminator<T>, ITeamEventListener
     {
-        public void OnStanceChange(in CombatTeam team, in EnumTeam.StanceFull switchedStance)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
         {
             var element = GetElement(in team);
             OnStanceChange(in element, in switchedStance);
@@ -105,7 +105,7 @@ namespace CombatSystem.Team
 
         protected abstract void OnStanceChange(in T element, in EnumTeam.StanceFull switchStance);
 
-        public void OnControlChange(in CombatTeam team, in float phasedControl, in bool isBurst)
+        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
         {
             var element = GetElement(in team);
             OnControlChange(in element, in phasedControl, in isBurst);

@@ -14,7 +14,7 @@ namespace CombatSystem.Team
         public static bool IsAllyEntity(in CombatEntity entity, in CombatEntity control)
         {
             var entityTeam = entity.Team;
-            return entityTeam.Contains(in control);
+            return entityTeam.Contains(control);
         }
 
         public static bool IsAllyEntity(in CombatEntity entity, in CombatTeam inTeam)
@@ -604,7 +604,7 @@ namespace CombatSystem.Team
         public static void SwitchStance(in CombatTeam team, in EnumTeam.StanceFull targetStance)
         {
             team.DataValues.CurrentStance = targetStance;
-            CombatSystemSingleton.EventsHolder.OnStanceChange(in team, in targetStance);
+            CombatSystemSingleton.EventsHolder.OnStanceChange(team, targetStance);
         }
 
         public static void GainControl(in CombatTeam team, in float controlVariation)
@@ -620,16 +620,16 @@ namespace CombatSystem.Team
             enemyTeamData.NaturalControl = enemyControl;
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnControlChange(in team, in controlVariation, false);
+            eventsHolder.OnControlChange(team, controlVariation, false);
             float enemyControlVariation = -controlVariation;
-            eventsHolder.OnControlChange(in enemyTeam, in enemyControlVariation, false);
+            eventsHolder.OnControlChange(enemyTeam, enemyControlVariation, false);
         }
 
         public static void BurstControl(in CombatTeam team, in float controlVariation)
         {
             team.DataValues.BurstControl += controlVariation;
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnControlChange(in team, in controlVariation, true);
+            eventsHolder.OnControlChange(team, controlVariation, true);
         }
 
 

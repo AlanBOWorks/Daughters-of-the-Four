@@ -42,6 +42,11 @@ namespace CombatSystem.Team
         [ShowInInspector]
         public bool IsControlling() => _currentControl != null;
 
+        public IEnumerable<CombatTeamControllerBase> GetActiveControllers()
+        {
+            yield return _playerTeamType;
+            yield return _enemyTeamType;
+        }
 
         public void TickPlayerController()
         {
@@ -77,9 +82,7 @@ namespace CombatSystem.Team
         }
 
 
-     
-
-        private void TryInvokeControl(in CombatTeamControllerBase controller)
+        public void TryInvokeControl(in CombatTeamControllerBase controller)
         {
             var team = controller.ControllingTeam;
             bool isActive = team.IsActive();

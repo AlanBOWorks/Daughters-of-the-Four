@@ -1,4 +1,5 @@
 using System;
+using CombatSystem.Entity;
 
 namespace CombatSystem.Team.VanguardEffects
 {
@@ -13,6 +14,15 @@ namespace CombatSystem.Team.VanguardEffects
                 EnumsVanguardEffects.VanguardEffectType.Punish => structure.VanguardPunishType,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
+        }
+
+
+        public static void HandleVanguardOffensive(CombatEntity attacker, CombatEntity onTarget)
+        {
+            var targetTeam = onTarget.Team;
+            if(targetTeam.Contains(attacker)) return;
+            
+            targetTeam.VanguardEffectsHolder.OnOffensiveDone(attacker,onTarget);
         }
     }
 }

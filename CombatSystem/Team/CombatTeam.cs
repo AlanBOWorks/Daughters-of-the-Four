@@ -112,7 +112,7 @@ namespace CombatSystem.Team
             _membersHolder.AddMember(entity);
         }
 
-        public bool Contains(in CombatEntity entity)
+        public bool Contains(CombatEntity entity)
         {
             return entity.Team == this;
         }

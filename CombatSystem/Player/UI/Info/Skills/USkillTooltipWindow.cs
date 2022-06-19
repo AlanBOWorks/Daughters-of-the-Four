@@ -145,7 +145,7 @@ namespace CombatSystem.Player.UI
                 var skillName = LocalizeSkills.LocalizeSkill(skill);
                 nameHolder.text = skillName;
 
-                var archetype = skill.Archetype;
+                var archetype = skill.TeamTargeting;
                 var roleThemesHolder = CombatThemeSingleton.SkillsThemeHolder;
                 var roleTheme = UtilsSkill.GetElement(archetype, roleThemesHolder);
                 var roleColor = roleTheme.GetThemeColor();

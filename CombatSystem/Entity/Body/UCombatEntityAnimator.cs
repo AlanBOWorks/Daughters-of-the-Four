@@ -99,13 +99,13 @@ namespace CombatSystem.Entity
             var baseLayer = IdleAnimationType;
             baseLayer.Play(GetIdleClip(), idleLayerFade);
         }
-        protected abstract AnimationClip GetActionAnimation(CombatSkill skill, EnumsSkill.Archetype type);
-        protected abstract AnimationClip GetReceiveActionAnimation(CombatSkill skill, EnumsSkill.Archetype type);
+        protected abstract AnimationClip GetActionAnimation(CombatSkill skill, EnumsSkill.TeamTargeting type);
+        protected abstract AnimationClip GetReceiveActionAnimation(CombatSkill skill, EnumsSkill.TeamTargeting type);
 
         private CoroutineHandle _animationCoroutineHandle;
         public void PerformActionAnimation(CombatSkill skill, in CombatEntity onTarget)
         {
-            var type = skill.Archetype;
+            var type = skill.TeamTargeting;
             var clip = GetActionAnimation(skill, type);
             if (clip == null)
             {
