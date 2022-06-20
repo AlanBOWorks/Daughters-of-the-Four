@@ -10,6 +10,11 @@ namespace CombatSystem.Animations
 {
     public sealed class CombatControllerAnimationHandler : ITempoEntityStatesListener, ICombatStatesListener
     {
+
+        public const float PerformToReceiveTimeOffset = .5f;
+        public const float FromReceiveToFinishTimeOffset = .3f;
+        public const float MaxAnimationDuration = PerformToReceiveTimeOffset + FromReceiveToFinishTimeOffset;
+
         private static ICombatEntityAnimator GetAnimator(in CombatEntity entity) => entity.Body.GetAnimator();
 
         public void PerformActionAnimation(ICombatSkill usedSkill, CombatEntity performer, CombatEntity target)
@@ -58,7 +63,7 @@ namespace CombatSystem.Animations
         {
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
             var animator = GetAnimator(in entity);
             animator.OnEndSequenceAnimation();

@@ -157,7 +157,7 @@ namespace CombatSystem.Player.UI
         {
             if(entity == null) return;
             var entitySkills = entity.GetCurrentSkills();
-            var canAct = UtilsCombatStats.CanAct(entity);
+            var canAct = UtilsCombatStats.IsControlActive(entity);
             HandlePool(entitySkills);
 
             ShowSkillsAnimated();

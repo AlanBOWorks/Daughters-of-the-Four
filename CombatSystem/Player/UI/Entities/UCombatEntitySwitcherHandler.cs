@@ -167,7 +167,7 @@ namespace CombatSystem.Player.UI
            DisableButton(in entity);
        }
 
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
        {
        }
        private void DisableButton(in CombatEntity entity)

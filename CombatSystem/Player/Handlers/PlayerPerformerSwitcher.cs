@@ -28,7 +28,18 @@ namespace CombatSystem.Player.Handlers
             _currentEntity = entity;
             PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(entity);
         }
+        private void DoPerformNextEntity()
+        {
+            if (!_isActive) return;
+            if (_activeEntities.Count == 0) return;
 
+
+            CombatEntity nextControl = _activeEntities[0];
+            DoSwitchPerformer(nextControl);
+        }
+
+
+        // ----- EVENTS -----
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             _activeEntities = playerTeam.GetControllingMembers();
@@ -36,14 +47,13 @@ namespace CombatSystem.Player.Handlers
 
         public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
+            if(_currentEntity == null)
+                DoPerformNextEntity();
         }
 
         public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
-            if (!_isActive || _activeEntities.Count <= 0) return;
-
-            var nextCall = _activeEntities[0];
-            DoSwitchPerformer(nextCall);
+            DoPerformNextEntity();
         }
 
         public void OnNoActionsForcedFinish(CombatEntity entity)
@@ -52,21 +62,10 @@ namespace CombatSystem.Player.Handlers
 
         private bool _isActive;
 
-        private void DoPerformNextEntity()
-        {
-            if (!_isActive) return;
-            if (_activeEntities.Count == 0) return;
-            
-
-            CombatEntity nextControl = _activeEntities[0];
-            DoSwitchPerformer(nextControl);
-        }
 
         public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             _isActive = true;
-            var firstEntity = _activeEntities[0];
-            DoSwitchPerformerDirect(firstEntity);
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
@@ -88,6 +87,7 @@ namespace CombatSystem.Player.Handlers
         private void ResetState()
         {
             _isActive = false;
+            _currentEntity = null;
         }
 
 
@@ -126,7 +126,7 @@ namespace CombatSystem.Player.Handlers
                 DoPerformNextEntity();
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
         }
     }

@@ -218,7 +218,7 @@ namespace CombatSystem._Core
         /// In this events, the entity is not removed from [<seealso cref="CombatTeam._controlMembers"/>].<br></br>
         /// For that subscribe to [<seealso cref="ITempoEntityStatesExtraListener.OnAfterEntitySequenceFinish"/>]
         /// </summary>
-        void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController);
+        void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController);
     }
 
     public interface ITempoEntityStatesExtraListener : ICombatEventListener
@@ -289,7 +289,7 @@ namespace CombatSystem._Core
 
     public interface ITempoEntityPercentListener : ICombatEventListener
     {
-        void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative);
+        void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative);
     }
 
     public static class UtilsTempo

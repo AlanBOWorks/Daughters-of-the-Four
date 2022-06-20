@@ -89,7 +89,7 @@ namespace CombatSystem.AI
 
         private void HandleSkills(in IReadOnlyList<CombatSkill> skills)
         {
-            if (!UtilsCombatStats.CanControlRequest(_currentControl)) return;
+            if (!UtilsCombatStats.CanControlAct(_currentControl)) return;
 
             var selectedSkill = SelectSkill(in skills);
             HandleSkill(in selectedSkill);

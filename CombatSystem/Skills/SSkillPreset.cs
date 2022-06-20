@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatSystem.Localization;
 using CombatSystem.Skills.Effects;
+using CombatSystem.Team.VanguardEffects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Utils;
@@ -137,6 +138,7 @@ namespace CombatSystem.Skills
 
     public interface IVanguardSkill : ISkill
     {
+        EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType();
         bool IsMultiTrigger();
         PerformEffectValues GetVanguardEffectTooltip();
     }

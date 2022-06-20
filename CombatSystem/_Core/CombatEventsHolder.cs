@@ -20,8 +20,7 @@ namespace CombatSystem._Core
             _sequenceStepper = new TempoSequenceStepper();
             _entityEventHandler = new CombatEntityEventHandler();
 
-            var entityTempoStepper = new EntityTempoStepper();
-            _eventsHolder.Subscribe(entityTempoStepper);
+            _entityTempoStepper = new EntityTempoStepper();
 
 
 
@@ -46,6 +45,7 @@ namespace CombatSystem._Core
 
         private readonly CombatEntityEventHandler _entityEventHandler;
         private readonly TempoSequenceStepper _sequenceStepper;
+        private readonly EntityTempoStepper _entityTempoStepper;
 
 
         public void SubscribeEventsHandler(PlayerCombatEventsHolder eventsHandler)
@@ -144,15 +144,16 @@ namespace CombatSystem._Core
 
         // ------ TEMPO ----- 
 
-        public void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative)
+        public void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative)
         {
-            _playerCombatEvents.OnEntityTick(in entity, in currentTick, in percentInitiative);
-            _enemyCombatEvents.OnEntityTick(in entity, in currentTick, in percentInitiative);
+            _playerCombatEvents.OnEntityTick(entity, currentTick, percentInitiative);
+            _enemyCombatEvents.OnEntityTick(entity, currentTick, percentInitiative);
         }
 
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
+            _entityTempoStepper.OnEntityRequestSequence(entity,canControl);
             _entityEventHandler.OnEntityRequestSequence(entity,canControl);
 
             HandleCurrentEntityEventsHolder(in entity);
@@ -246,15 +247,15 @@ namespace CombatSystem._Core
             _currentDiscriminatedEntityEventsHolder.OnEntityEmptyActions(entity);
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
             _entityEventHandler.OnEntityFinishSequence(entity,in isForcedByController);
 
-            _eventsHolder.OnEntityFinishSequence(entity,in isForcedByController);
-            _playerCombatEvents.OnEntityFinishSequence(entity,in isForcedByController);
-            _enemyCombatEvents.OnEntityFinishSequence(entity,in isForcedByController);
+            _eventsHolder.OnEntityFinishSequence(entity,isForcedByController);
+            _playerCombatEvents.OnEntityFinishSequence(entity,isForcedByController);
+            _enemyCombatEvents.OnEntityFinishSequence(entity,isForcedByController);
 
-            _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity,in isForcedByController);
+            _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity,isForcedByController);
         }
 
         public void OnAfterEntityRequestSequence(CombatEntity entity)
@@ -531,22 +532,13 @@ namespace CombatSystem._Core
             _currentDiscriminatedEntityEventsHolder.OnVanguardEffectIncrement(type,attacker);
         }
 
-        public void OnVanguardRevengeEffectPerform(IVanguardSkill skill, int iterations)
+        public void OnVanguardEffectPerform(IVanguardSkill skill, int iterations)
         {
-            _eventsHolder.OnVanguardRevengeEffectPerform(skill, iterations);
-            _playerCombatEvents.OnVanguardRevengeEffectPerform(skill, iterations);
-            _enemyCombatEvents.OnVanguardRevengeEffectPerform(skill, iterations);
+            _eventsHolder.OnVanguardEffectPerform(skill, iterations);
+            _playerCombatEvents.OnVanguardEffectPerform(skill, iterations);
+            _enemyCombatEvents.OnVanguardEffectPerform(skill, iterations);
 
-            _currentDiscriminatedEntityEventsHolder.OnVanguardRevengeEffectPerform(skill, iterations);
-        }
-
-        public void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations)
-        {
-            _eventsHolder.OnVanguardPunishEffectPerform(skill, iterations);
-            _playerCombatEvents.OnVanguardPunishEffectPerform(skill, iterations);
-            _enemyCombatEvents.OnVanguardPunishEffectPerform(skill, iterations);
-
-            _currentDiscriminatedEntityEventsHolder.OnVanguardPunishEffectPerform(skill, iterations);
+            _currentDiscriminatedEntityEventsHolder.OnVanguardEffectPerform(skill, iterations);
         }
 
 
@@ -676,11 +668,11 @@ namespace CombatSystem._Core
                 listener.OnStopTicking();
             }
         }
-        public void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative)
+        public void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative)
         {
             foreach (var listener in _tempoEntityPercentListeners)
             {
-                listener.OnEntityTick(in entity, in currentTick, in percentInitiative);
+                listener.OnEntityTick(entity, currentTick, percentInitiative);
             }
         }
 
@@ -1156,11 +1148,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)
+        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
             foreach (var listener in _tempoEntityListeners)
             {
-                listener.OnEntityFinishSequence(entity,in isForcedByController);
+                listener.OnEntityFinishSequence(entity,isForcedByController);
             }
         }
 
@@ -1294,19 +1286,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnVanguardRevengeEffectPerform(IVanguardSkill skill, int iterations)
+        public void OnVanguardEffectPerform(IVanguardSkill skill, int iterations)
         {
             foreach (var listener in _vanguardEffectUsageListeners)
             {
-                listener.OnVanguardRevengeEffectPerform(skill,iterations);
-            }
-        }
-
-        public void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations)
-        {
-            foreach (var listener in _vanguardEffectUsageListeners)
-            {
-                listener.OnVanguardPunishEffectPerform(skill,iterations);
+                listener.OnVanguardEffectPerform(skill,iterations);
             }
         }
     }

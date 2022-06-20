@@ -159,7 +159,7 @@ namespace CombatSystem.Team
             _controlMembers.Clear();
         }
 
-        public void AddActiveEntity(in CombatEntity entity, in bool canControl)
+        public void AddActiveEntity(CombatEntity entity, bool canControl)
         {
             _controlMembers.AddActiveEntity(in entity, in canControl);
         }

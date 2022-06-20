@@ -54,6 +54,8 @@ namespace CombatSystem.Team.VanguardEffects
             _offensiveRecordsDictionaries.VanguardRevengeType.Clear();
         }
 
+        public void AddEffect(IVanguardSkill skill) 
+            => AddEffect(skill, skill.GetVanguardEffectType());
         public void AddEffect(
             IVanguardSkill skill, 
             EnumsVanguardEffects.VanguardEffectType effectType)

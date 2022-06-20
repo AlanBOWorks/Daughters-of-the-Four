@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CombatSystem._Core;
+using CombatSystem.Animations;
 using CombatSystem.Entity;
 using MEC;
 using Sirenix.OdinInspector;
@@ -59,13 +60,8 @@ namespace CombatSystem.Skills
         public bool IsActing() => _queueHandle.IsRunning;
        
 
-        [ShowInInspector] 
-        public float DebugTimingOffset = .02f;
-
-        private const float SkillAppliesAfter = .5f;
-        private const float ShortWaitDuration = .2f;
-        private const float AnimationOffsetDuration = .3f;
-        public const float MaxAnimationDuration = AnimationOffsetDuration + .3f;
+        private const float SkillAppliesAfter = CombatControllerAnimationHandler.PerformToReceiveTimeOffset;
+        private const float AnimationOffsetDuration = CombatControllerAnimationHandler.FromReceiveToFinishTimeOffset;
 
         private CoroutineHandle _queueHandle;
         private IEnumerator<float> _DoQueue()
@@ -77,9 +73,6 @@ namespace CombatSystem.Skills
 
             while (_usedSkillsQueue.Count > 0)
             {
-#if UNITY_EDITOR
-                yield return Timing.WaitForSeconds(DebugTimingOffset);
-#endif
 
                 var queueValues = _usedSkillsQueue.Dequeue();
                 queueValues.Extract(out var performer,out var target,out var usedSkill);

@@ -21,8 +21,9 @@ namespace CombatSystem.Skills
             var eventHolder = CombatSystemSingleton.EventsHolder;
             eventHolder.OnEntityBeforeSkill(performer);
 
+            bool canKeepActing = UtilsCombatStats.CanControlAct(performer);
+            if (canKeepActing) return;
 
-            if (UtilsCombatStats.CanControlRequest(performer)) return;
             var performerTeam = performer.Team;
             performerTeam.RemoveFromControllingEntities(performer, false);
 
@@ -63,12 +64,12 @@ namespace CombatSystem.Skills
 
         public void OnEntityAfterFinishAction(in CombatEntity entity)
         {
-            bool canAct = UtilsCombatStats.CanControlRequest(entity);
+            bool hasActionsLeft = UtilsCombatStats.HasActionsLeft(entity.Stats);
             var eventHolder = CombatSystemSingleton.EventsHolder;
-            if (!canAct)
-                eventHolder.OnEntityFinishSequence(entity, false);
-            else
+            if (hasActionsLeft)
                 eventHolder.OnEntityRequestAction(entity);
+            else
+                eventHolder.OnEntityFinishSequence(entity, false);
         }
 
         public void OnEntityFinishSequence(CombatEntity entity,in bool isForcedByController)

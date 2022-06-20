@@ -62,6 +62,8 @@ namespace CombatSystem.Skills
         public PerformEffectValues GenerateVanguardValues() =>
             new PerformEffectValues(_vanguardEffectPreset, 1, EnumsEffect.TargetType.Performer);
 
+        public EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType() => responseType;
+
         public bool IsMultiTrigger() => isMultiTrigger;
         public PerformEffectValues GetVanguardEffectTooltip() => GenerateVanguardValues();
 
@@ -103,9 +105,8 @@ namespace CombatSystem.Skills
             public void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
             {
                 var vanguardEffectsHolder = performer.Team.VanguardEffectsHolder;
-                var type = _skill.responseType;
 
-                vanguardEffectsHolder.AddEffect(_skill,type);
+                vanguardEffectsHolder.AddEffect(_skill);
             }
         }
     }

@@ -199,33 +199,49 @@ namespace CombatSystem.Stats
         private const float MaxActionAmount = 12f;
 
         /// <summary>
-        /// Checks if the entity has enough Actions points
+        /// Check if is Alive and its actionsLimit > 0;
         /// </summary>
         public static bool CanControlRequest(CombatEntity entity)
         {
-            return IsAlive(entity) && CanControlRequest(entity.Stats);
+            float actionsLimit = CalculateActionsLimit(entity.Stats);
+            return IsAlive(entity) && actionsLimit > 0;
         }
 
         /// <summary>
-        /// <inheritdoc cref="CanControlRequest"/> and if the entity is [<seealso cref="CombatTeam.IsActive(CombatEntity)"/>]= true;
+        /// Checks if the entity has enough Actions points, initiative and isAlive
         /// </summary>
-        public static bool CanAct(CombatEntity entity)
+        public static bool CanControlAct(CombatEntity entity)
         {
-            return entity.Team.IsActive(entity) && CanControlRequest(entity);
+            return IsAlive(entity) && HasActionsLeft(entity.Stats);
         }
-
         /// <summary>
         /// Checks if the entity has enough Actions points
         /// </summary>
-        private static bool CanControlRequest(in CombatStats stats)
+        public static bool HasActionsLeft(CombatStats stats)
         {
-            float actionsLimit =
-                stats.BaseStats.ActionsType + stats.BuffStats.ActionsType + stats.BurstStats.ActionsType;
-            if (actionsLimit > MaxActionAmount) actionsLimit = MaxActionAmount;
+            float actionsLimit = CalculateActionsLimit(stats);
             var usedActionsAmount = stats.UsedActions;
 
             return usedActionsAmount < actionsLimit;
         }
+
+        public static float CalculateActionsLimit(CombatStats stats)
+        {
+            float actionsLimit =
+                stats.BaseStats.ActionsType + stats.BuffStats.ActionsType + stats.BurstStats.ActionsType;
+            if (actionsLimit > MaxActionAmount) return MaxActionAmount;
+            return actionsLimit;
+        }
+
+
+        /// <summary>
+        /// <inheritdoc cref="CanControlAct"/> and if the entity is [<seealso cref="CombatTeam.IsActive(CombatEntity)"/>]= true;
+        /// </summary>
+        public static bool IsControlActive(CombatEntity entity)
+        {
+            return entity.Team.IsActive(entity) && CanControlAct(entity);
+        }
+
 
         public static bool IsAlive(CombatEntity entity) => IsAlive(entity.Stats);
 
@@ -234,9 +250,18 @@ namespace CombatSystem.Stats
             return stats.CurrentMortality > 0 || stats.CurrentHealth > 0;
         }
 
-        public static void TickInitiative(in CombatStats stats)
+
+
+        // ----- TEMPO -----
+        public static void ResetTempoStats(CombatStats stats)
         {
-            TickInitiative(stats, out _);
+            ResetInitiative(stats);
+            ResetActions(stats);
+        }
+        // ----- INITIATIVE -----
+        public static void ResetInitiative(CombatStats stats)
+        {
+            stats.CurrentInitiative = 0;
         }
 
         public static void TickInitiative(CombatStats stats, out float currentTickAmount)
@@ -260,6 +285,11 @@ namespace CombatSystem.Stats
         }
 
 
+        // ----- ACTIONS -----
+        public static void ResetActions(CombatStats stats)
+        {
+            stats.UsedActions = 0;
+        }
 
         public static void TickActions(CombatStats stats, ICombatSkill usedSkill)
         {
@@ -279,10 +309,10 @@ namespace CombatSystem.Stats
             out float initiativePercent)
         {
             currentTickAmount = entity.CurrentInitiative;
-            CalculateTempoPercent(in currentTickAmount, out initiativePercent);
+            CalculateTempoPercent(currentTickAmount, out initiativePercent);
         }
 
-        public static void CalculateTempoPercent(in float currentTickAmount,
+        public static void CalculateTempoPercent(float currentTickAmount,
             out float initiativePercent)
         {
             const float initiativeThreshold = TempoTicker.LoopThreshold;

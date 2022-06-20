@@ -44,9 +44,14 @@ namespace CombatSystem.Skills
 
         public void Extract(out CombatEntity performer, out CombatEntity target, out ICombatSkill usedSkill)
         {
+            Extract(out performer, out target);
+            usedSkill = UsedSkill;
+        }
+
+        public void Extract(out CombatEntity performer, out CombatEntity target)
+        {
             performer = Performer;
             target = Target;
-            usedSkill = UsedSkill;
         }
     }
 }

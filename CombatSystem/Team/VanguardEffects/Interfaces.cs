@@ -19,7 +19,6 @@ namespace CombatSystem.Team.VanguardEffects
     public interface IVanguardEffectUsageListener : ICombatEventListener
     {
         void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker);
-        void OnVanguardRevengeEffectPerform(IVanguardSkill skill, int iterations);
-        void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations);
+        void OnVanguardEffectPerform(IVanguardSkill skill, int iterations);
     }
 }

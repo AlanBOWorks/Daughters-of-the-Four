@@ -199,7 +199,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
             if(isForcedByController) return;
 

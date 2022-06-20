@@ -100,7 +100,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative)
+        public void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative)
         {
             if(!_dictionary.ContainsKey(entity)) return;
 

@@ -17,7 +17,7 @@ namespace CombatSystem.Player.UI
             UtilsTempoInfosHandler.HandleHandler(in element, in entity, isPlayerElement);
         }
 
-        public void OnEntityTick(in CombatEntity entity, in float currentTick, in float percentInitiative)
+        public void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative)
         {
             var dictionary = GetDictionary();
             if (dictionary.ContainsKey(entity))
@@ -92,7 +92,7 @@ namespace CombatSystem.Player.UI
         public static void HandleOnFinishSequence(ITempoEntityPercentListener listener,in CombatEntity entity)
         {
             UtilsCombatStats.CalculateTempoPercent(entity.Stats, out var currentTick, out var initiativePercent);
-            listener.OnEntityTick(in entity, in currentTick, in initiativePercent);
+            listener.OnEntityTick(entity, currentTick, initiativePercent);
         }
     }
 }

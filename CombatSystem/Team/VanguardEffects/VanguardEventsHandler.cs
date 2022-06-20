@@ -26,6 +26,7 @@ namespace CombatSystem.Team.VanguardEffects
             if (targetTeam.Contains(attacker)) return;
 
             targetTeam.VanguardEffectsHolder.OnOffensiveDone(attacker, onTarget);
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
         }
 
 
@@ -50,18 +51,17 @@ namespace CombatSystem.Team.VanguardEffects
 
 
                 if(vanguardEffectsHolder.HasDelayEffects())
-                    DoInvokeVanguardEffects(effectsCollection.VanguardDelayImproveType,0);
+                    DoInvokeVanguardEffects(effectsCollection.VanguardDelayImproveType,
+                        0);
                 if (vanguardEffectsHolder.HasPunishEffects())
                 {
-                    DoInvokeVanguardEffects(
-                        recordsCollection.VanguardPunishType,
+                    DoInvokeVanguardEffects(recordsCollection.VanguardPunishType,
                         effectsCollection.VanguardPunishType);
                 }
 
                 if (vanguardEffectsHolder.HasRevengeEffects())
                 {
-                    DoInvokeVanguardEffects(
-                        recordsCollection.VanguardRevengeType,
+                    DoInvokeVanguardEffects(recordsCollection.VanguardRevengeType,
                         effectsCollection.VanguardRevengeType);
                 }
 
@@ -69,31 +69,31 @@ namespace CombatSystem.Team.VanguardEffects
             }
         }
 
-        private static void DoInvokeVanguardEffects(
-            Dictionary<CombatEntity, int> offensiveRecords,
+        private static void DoInvokeVanguardEffects(Dictionary<CombatEntity, int> offensiveRecords,
             Dictionary<IVanguardSkill, int> vanguardEffects)
         {
             DoInvokeAttackersRecord(offensiveRecords,out var allEntitiesInteractionCount);
             DoInvokeVanguardEffects(vanguardEffects, allEntitiesInteractionCount);
         }
 
-        private static void DoInvokeAttackersRecord(Dictionary<CombatEntity, int> collection,
+        private static void DoInvokeAttackersRecord(
+            Dictionary<CombatEntity, int> collection,
             out int allEntitiesInteractionCount)
         {
             allEntitiesInteractionCount = 0;
             foreach (KeyValuePair<CombatEntity, int> pair in collection)
             {
-                // todo eventCall
                 allEntitiesInteractionCount += pair.Value;
             }
         }
 
         private static void DoInvokeVanguardEffects(Dictionary<IVanguardSkill, int> collection, int addition)
         {
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
             foreach (var pair in collection)
             {
                 int elementCountTotal = pair.Value + addition;
-                //todo eventCall
+                eventsHolder.OnVanguardEffectPerform(pair.Key,elementCountTotal);
             }
         }
     }

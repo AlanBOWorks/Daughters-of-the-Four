@@ -176,7 +176,7 @@ namespace CombatSystem._Core
         {
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
             if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnFinishSequence) return;
             Debug.Log($"Sequence Finished | Forced: {isForcedByController}");
@@ -375,7 +375,7 @@ namespace CombatSystem._Core
             Debug.Log($"Vanguard Increment [{type}] <<<< {attacker.CombatCharacterShorterName}");
         }
 
-        public void OnVanguardRevengeEffectPerform(IVanguardSkill skill, int iterations)
+        public void OnVanguardEffectPerform(IVanguardSkill skill, int iterations)
         {
             if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnRevengePerform) return;
             Debug.Log($"REVENGE Perform: {skill} [{iterations}]");

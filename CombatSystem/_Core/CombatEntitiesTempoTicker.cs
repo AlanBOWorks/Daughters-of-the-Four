@@ -54,16 +54,15 @@ namespace CombatSystem._Core
 
 
                 UtilsCombatStats.TickInitiative(stats, out var entityInitiativeAmount);
-                UtilsCombatStats.CalculateTempoPercent(in entityInitiativeAmount, out var initiativePercent);
+                UtilsCombatStats.CalculateTempoPercent(entityInitiativeAmount, out var initiativePercent);
 
-                eventsHolder.OnEntityTick(in entity, in entityInitiativeAmount, in initiativePercent);
+                eventsHolder.OnEntityTick(entity, entityInitiativeAmount, initiativePercent);
 
                 bool thresholdPassed = UtilsTempo.IsInitiativeTrigger(in entity);
+                if (!thresholdPassed) return;
+
                 bool canControl = UtilsCombatStats.CanControlRequest(entity);
-                if (thresholdPassed)
-                {
-                    entity.Team.AddActiveEntity(in entity, in canControl);
-                }
+                entity.Team.AddActiveEntity(entity, canControl);
             }
         }
 
@@ -92,7 +91,7 @@ namespace CombatSystem._Core
         {
         }
 
-        public void OnEntityFinishSequence(CombatEntity entity, in bool isForcedByController)
+        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
             _tickingTrackers.Add(entity);
         }
