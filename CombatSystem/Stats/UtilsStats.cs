@@ -261,7 +261,7 @@ namespace CombatSystem.Stats
 
 
 
-        public static void TickActions(CombatStats stats, CombatSkill usedSkill)
+        public static void TickActions(CombatStats stats, ICombatSkill usedSkill)
         {
             stats.UsedActions += usedSkill.SkillCost;
         }

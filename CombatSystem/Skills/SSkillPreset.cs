@@ -137,6 +137,7 @@ namespace CombatSystem.Skills
 
     public interface IVanguardSkill : ISkill
     {
+        bool IsMultiTrigger();
         PerformEffectValues GetVanguardEffectTooltip();
     }
 

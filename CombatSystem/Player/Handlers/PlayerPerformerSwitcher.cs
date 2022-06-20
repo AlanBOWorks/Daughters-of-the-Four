@@ -20,9 +20,13 @@ namespace CombatSystem.Player.Handlers
         private void DoSwitchPerformer(CombatEntity entity)
         {
             if(entity == _currentEntity) return;
+           DoSwitchPerformerDirect(entity);
+        }
+
+        private void DoSwitchPerformerDirect(CombatEntity entity)
+        {
             _currentEntity = entity;
             PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(entity);
-
         }
 
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
@@ -62,7 +66,7 @@ namespace CombatSystem.Player.Handlers
         {
             _isActive = true;
             var firstEntity = _activeEntities[0];
-            DoSwitchPerformer(firstEntity);
+            DoSwitchPerformerDirect(firstEntity);
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)

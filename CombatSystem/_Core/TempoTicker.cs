@@ -147,8 +147,13 @@ namespace CombatSystem._Core
                         {
                             yield return Timing.WaitForOneFrame;
                         }
-
                     }
+
+                    // ----- Wait For Animations
+                    do
+                    {
+                        yield return Timing.WaitForOneFrame;
+                    } while (skillQueuePerformer.IsActing());
                 }
 
 

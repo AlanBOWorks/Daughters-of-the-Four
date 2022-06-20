@@ -29,6 +29,30 @@ namespace CombatSystem.Team.VanguardEffects
         [ShowInInspector]
         private readonly VanguardEffectDictionariesBasic<CombatEntity, int> _offensiveRecordsDictionaries;
 
+        public IVanguardEffectsStructureRead<Dictionary<IVanguardSkill, int>> GetEffectsStructure() =>
+            _effectDictionaries;
+
+        public IVanguardEffectStructureBaseRead<Dictionary<CombatEntity, int>> GetOffensiveRecordsStructure() =>
+            _offensiveRecordsDictionaries;
+
+
+        // Delay is only added into _effectDictionaries
+        public bool HasDelayEffects() => _effectDictionaries.VanguardDelayImproveType.Count > 0;
+        // Revenge effects are added in both wrappers, but if there wasn't any record of offensive
+        // actions, then the effects can't be invoked.
+        public bool HasRevengeEffects() => _offensiveRecordsDictionaries.VanguardRevengeType.Count > 0;
+        // Same as [Revenge];
+        public bool HasPunishEffects() => _offensiveRecordsDictionaries.VanguardPunishType.Count > 0;
+
+        public void Clear()
+        {
+            _effectDictionaries.VanguardDelayImproveType.Clear();
+            _effectDictionaries.VanguardRevengeType.Clear();
+            _effectDictionaries.VanguardPunishType.Clear();
+
+            _offensiveRecordsDictionaries.VanguardRevengeType.Clear();
+            _offensiveRecordsDictionaries.VanguardRevengeType.Clear();
+        }
 
         public void AddEffect(
             IVanguardSkill skill, 
@@ -93,7 +117,7 @@ namespace CombatSystem.Team.VanguardEffects
 
 
         private sealed class VanguardEffectDictionaries<TKey, TValue> : VanguardEffectDictionariesBasic<TKey, TValue>, 
-            IVanguardEffectsStructuresRead<Dictionary<TKey,TValue>>
+            IVanguardEffectsStructureRead<Dictionary<TKey,TValue>>
         {
             public VanguardEffectDictionaries() : base()
             {

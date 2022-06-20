@@ -1,11 +1,15 @@
 using System;
+using System.Collections.Generic;
 using CombatSystem.Entity;
+using CombatSystem.Skills;
 
 namespace CombatSystem.Team.VanguardEffects
 {
     internal static class UtilsVanguardEffects
     {
-        public static T GetElement<T>(EnumsVanguardEffects.VanguardEffectType type,  IVanguardEffectsStructuresRead<T> structure)
+      
+
+        public static T GetElement<T>(EnumsVanguardEffects.VanguardEffectType type,  IVanguardEffectsStructureRead<T> structure)
         {
             return type switch
             {
@@ -16,13 +20,21 @@ namespace CombatSystem.Team.VanguardEffects
             };
         }
 
-
-        public static void HandleVanguardOffensive(CombatEntity attacker, CombatEntity onTarget)
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
+            IVanguardEffectStructureBaseRead<TKey> keyStructure,
+            IVanguardEffectStructureBaseRead<TValue> valueStructure)
         {
-            var targetTeam = onTarget.Team;
-            if(targetTeam.Contains(attacker)) return;
-            
-            targetTeam.VanguardEffectsHolder.OnOffensiveDone(attacker,onTarget);
+            yield return new KeyValuePair<TKey, TValue>(keyStructure.VanguardRevengeType,valueStructure.VanguardRevengeType);
+            yield return new KeyValuePair<TKey, TValue>(keyStructure.VanguardPunishType,valueStructure.VanguardPunishType);
+        }
+
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
+            IVanguardEffectsStructureRead<TKey> keyStructure,
+            IVanguardEffectsStructureRead<TValue> valueStructure)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keyStructure.VanguardDelayImproveType, valueStructure.VanguardDelayImproveType);
+            yield return new KeyValuePair<TKey, TValue>(keyStructure.VanguardRevengeType, valueStructure.VanguardRevengeType);
+            yield return new KeyValuePair<TKey, TValue>(keyStructure.VanguardPunishType, valueStructure.VanguardPunishType);
         }
     }
 }

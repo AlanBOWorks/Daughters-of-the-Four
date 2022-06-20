@@ -330,7 +330,7 @@ namespace CombatSystem.Player.UI
                 playerEvents.OnSkillSwitch(skill, previousSelection);
             }
         }
-        private void DeselectSkill(CombatSkill skill)
+        private void DeselectSkill(ICombatSkill skill)
         {
             if (skill == null || skill != _currentSelectedSkill) return;
 

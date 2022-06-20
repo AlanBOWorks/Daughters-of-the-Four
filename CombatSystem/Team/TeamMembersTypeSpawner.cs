@@ -219,7 +219,7 @@ namespace CombatSystem.Team
             var enumerable = UtilsTeam.GetEnumerable(holder);
             foreach (var handlerPool in enumerable)
             {
-                handlerPool.ReturnActives(onReturnElementFallBack);
+                handlerPool?.ReturnActives(onReturnElementFallBack);
             }
         }
     }

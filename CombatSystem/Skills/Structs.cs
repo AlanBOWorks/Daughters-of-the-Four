@@ -27,22 +27,22 @@ namespace CombatSystem.Skills
     }
 
     /// <summary>
-    /// Contains important information of the [<see cref="CombatSkill"/>] usage. (ReadOnly)
+    /// Contains important information of the [<see cref="ICombatSkill"/>] usage. (ReadOnly)
     /// </summary>
     public readonly struct SkillUsageValues
     {
         public readonly CombatEntity Performer;
         public readonly CombatEntity Target;
-        public readonly CombatSkill UsedSkill;
+        public readonly ICombatSkill UsedSkill;
 
-        public SkillUsageValues(CombatEntity performer, CombatEntity target, CombatSkill usedSkill)
+        public SkillUsageValues(CombatEntity performer, CombatEntity target, ICombatSkill usedSkill)
         {
             Performer = performer;
             Target = target;
             UsedSkill = usedSkill;
         }
 
-        public void Extract(out CombatEntity performer, out CombatEntity target, out CombatSkill usedSkill)
+        public void Extract(out CombatEntity performer, out CombatEntity target, out ICombatSkill usedSkill)
         {
             performer = Performer;
             target = Target;

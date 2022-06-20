@@ -255,8 +255,6 @@ namespace CombatSystem._Core
             _enemyCombatEvents.OnEntityFinishSequence(entity,in isForcedByController);
 
             _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity,in isForcedByController);
-
-            _entityEventHandler.OnEntityFinishSequence(entity, in isForcedByController);
         }
 
         public void OnAfterEntityRequestSequence(CombatEntity entity)
@@ -354,7 +352,7 @@ namespace CombatSystem._Core
             var performer = values.Performer;
             var usedSkill = values.UsedSkill;
 
-            _entityEventHandler.OnCombatSkillPreSubmit(in performer, in usedSkill);
+            _entityEventHandler.OnCombatSkillPreSubmit(usedSkill, performer);
 
             _eventsHolder.OnCombatSkillSubmit(in values);
             _playerCombatEvents.OnCombatSkillSubmit(in values);
@@ -362,14 +360,14 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnCombatSkillSubmit(in values);
 
-            _entityEventHandler.OnCombatSkillSubmit(in performer, in usedSkill);
+            _entityEventHandler.OnCombatSkillSubmit(usedSkill, performer);
 
         }
 
         public void OnCombatSkillPerform(in SkillUsageValues values)
         {
             values.Extract(out var performer,out var target,out var usedSkill);
-            _entityEventHandler.OnCombatSkillPerform(in performer, in usedSkill, in target);
+            _entityEventHandler.OnCombatSkillPerform(usedSkill, performer, target);
 
             _eventsHolder.OnCombatSkillPerform(in values);
             _playerCombatEvents.OnCombatSkillPerform(in values);

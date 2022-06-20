@@ -10,9 +10,9 @@ namespace CombatSystem.Skills.Effects
 {
     public static class UtilsCombatSkill
     {
-        public static void DoSkillOnTarget(CombatSkill skill, CombatEntity performer, CombatEntity onTarget)
+        public static void DoSkillOnTarget(ICombatSkill skill, CombatEntity performer, CombatEntity onTarget)
         {
-            CombatSystemSingleton.SkillTargetingHandler.HandleSkill(performer, skill, onTarget);
+            CombatSystemSingleton.SkillTargetingHandler.HandleSkill(skill, performer, onTarget);
 
 
 

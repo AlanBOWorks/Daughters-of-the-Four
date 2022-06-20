@@ -40,8 +40,8 @@ namespace CombatSystem.Skills
         private static readonly List<CombatEntity> TargetsHelper = new List<CombatEntity>();
 
 
-        public static EnumsSkill.TeamTargeting GetReceiveSkillType([NotNull]in CombatSkill skill, in CombatEntity performer,
-            in CombatEntity target)
+        public static EnumsSkill.TeamTargeting GetReceiveSkillType([NotNull] ICombatSkill skill, CombatEntity performer,
+            CombatEntity target)
         {
             if (performer == null || target == null)
             {

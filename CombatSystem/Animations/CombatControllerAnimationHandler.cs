@@ -12,25 +12,25 @@ namespace CombatSystem.Animations
     {
         private static ICombatEntityAnimator GetAnimator(in CombatEntity entity) => entity.Body.GetAnimator();
 
-        public void PerformActionAnimation(in CombatEntity performer, in CombatSkill usedSkill, in CombatEntity target)
+        public void PerformActionAnimation(ICombatSkill usedSkill, CombatEntity performer, CombatEntity target)
         {
             var animator = GetAnimator(in performer);
             animator.PerformActionAnimation(usedSkill, in target);
         }
 
 
-        public void PerformReceiveAnimations(in CombatSkill usedSkill, in CombatEntity performer)
+        public void PerformReceiveAnimations(ICombatSkill usedSkill, CombatEntity performer)
         {
             var interactions = CombatSystemSingleton.SkillTargetingHandler.GetInteractions();
             foreach (var entity in interactions)
             {
-                PerformReceiveAnimation(in entity, in usedSkill, in performer);
+                PerformReceiveAnimation(usedSkill, entity, performer);
             }
         }
-        private void PerformReceiveAnimation(in CombatEntity target, in CombatSkill usedSkill, in CombatEntity performer)
+        private void PerformReceiveAnimation(ICombatSkill usedSkill, CombatEntity target, CombatEntity performer)
         {
             var targetAnimator = GetAnimator(in target);
-            targetAnimator.ReceiveActionAnimation(usedSkill, in performer);
+            targetAnimator.ReceiveActionAnimation(usedSkill, performer);
         }
 
 

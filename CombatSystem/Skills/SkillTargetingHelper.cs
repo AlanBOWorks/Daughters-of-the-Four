@@ -90,7 +90,7 @@ namespace CombatSystem.Skills
 
         public IEnumerable<CombatEntity> GetInteractions() => InteractionsEntities;
 
-        public void HandleSkill(CombatEntity performer, CombatSkill usedSkill, CombatEntity target)
+        public void HandleSkill(ICombatSkill usedSkill, CombatEntity performer, CombatEntity target)
         {
 
             bool isAlly = performer.Team.Contains(target);
@@ -101,7 +101,7 @@ namespace CombatSystem.Skills
         }
 
 
-        private void HandleInteractions(CombatSkill usedSkill, CombatEntity target)
+        private void HandleInteractions(IFullSkill usedSkill, CombatEntity target)
         {
             InteractionsEntities.Clear();
 
