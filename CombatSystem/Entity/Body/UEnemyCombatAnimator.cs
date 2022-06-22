@@ -33,12 +33,12 @@ namespace CombatSystem.Animations
         {
         }
 
-        protected override AnimationClip GetActionAnimation(ICombatSkill skill, EnumsSkill.TeamTargeting type)
+        protected override AnimationClip GetActionAnimation(ISkill skill, EnumsSkill.TeamTargeting type)
         {
             return UtilsSkill.GetElement(type, animations.AnimationPerformType);
         }
 
-        protected override AnimationClip GetReceiveActionAnimation(ICombatSkill skill, EnumsSkill.TeamTargeting type)
+        protected override AnimationClip GetReceiveActionAnimation(ISkill skill, EnumsSkill.TeamTargeting type)
         {
             return UtilsSkill.GetElement(type, animations.AnimationReceiveType);
         }

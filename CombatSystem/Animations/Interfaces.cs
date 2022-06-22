@@ -11,8 +11,8 @@ namespace CombatSystem.Animations
         void PerformEndCombatAnimation();
 
         void OnRequestSequenceAnimation();
-        void PerformActionAnimation(ICombatSkill skill, in CombatEntity onTarget);
-        void ReceiveActionAnimation(ICombatSkill fromSkill, CombatEntity fromPerformer);
+        void PerformActionAnimation(ISkill skill, in CombatEntity onTarget);
+        void ReceiveActionAnimation(ISkill fromSkill, CombatEntity fromPerformer);
         void OnEndSequenceAnimation();
     }
 

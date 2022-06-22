@@ -99,18 +99,18 @@ namespace CombatSystem.Entity
             var baseLayer = IdleAnimationType;
             baseLayer.Play(GetIdleClip(), idleLayerFade);
         }
-        protected abstract AnimationClip GetActionAnimation(ICombatSkill skill, EnumsSkill.TeamTargeting type);
-        protected abstract AnimationClip GetReceiveActionAnimation(ICombatSkill skill, EnumsSkill.TeamTargeting type);
+        protected abstract AnimationClip GetActionAnimation(ISkill skill, EnumsSkill.TeamTargeting type);
+        protected abstract AnimationClip GetReceiveActionAnimation(ISkill skill, EnumsSkill.TeamTargeting type);
 
         private CoroutineHandle _animationCoroutineHandle;
-        public void PerformActionAnimation(ICombatSkill skill, in CombatEntity onTarget)
+        public void PerformActionAnimation(ISkill skill, in CombatEntity onTarget)
         {
             var type = skill.TeamTargeting;
             var clip = GetActionAnimation(skill, type);
             if (clip == null)
             {
 #if UNITY_EDITOR
-                Debug.LogWarning($"Animation Null on: {skill.Preset}");
+                Debug.LogWarning($"Animation Null on: {skill}");
 #endif
                 return;
             }
@@ -119,14 +119,14 @@ namespace CombatSystem.Entity
             DoActionAnimation(clip);
         }
 
-        public void ReceiveActionAnimation(ICombatSkill fromSkill, CombatEntity fromPerformer)
+        public void ReceiveActionAnimation(ISkill fromSkill, CombatEntity fromPerformer)
         {
             var type = UtilsTarget.GetReceiveSkillType(fromSkill, fromPerformer, Entity);
             var clip = GetReceiveActionAnimation(fromSkill, type);
             if (clip == null)
             {
 #if UNITY_EDITOR
-                Debug.LogWarning($"Animation Null on: {fromSkill.Preset}");
+                Debug.LogWarning($"Animation Null on: {fromSkill}");
 #endif
                 return;
             }
@@ -205,12 +205,12 @@ namespace CombatSystem.Entity
             _body.DOPunchPosition(Vector3.up, AnimationDuration, 4);
         }
 
-        public void PerformActionAnimation(ICombatSkill skill, in CombatEntity onTarget)
+        public void PerformActionAnimation(ISkill skill, in CombatEntity onTarget)
         {
             _body.DOPunchPosition(Vector3.forward, AnimationDuration, 4);
         }
 
-        public void ReceiveActionAnimation(ICombatSkill fromSkill, CombatEntity fromPerformer)
+        public void ReceiveActionAnimation(ISkill fromSkill, CombatEntity fromPerformer)
         {
             _body.DOPunchScale(Vector3.one * .1f, AnimationDuration);
         }

@@ -375,10 +375,10 @@ namespace CombatSystem._Core
             Debug.Log($"Vanguard Increment [{type}] <<<< {attacker.CombatCharacterShorterName}");
         }
 
-        public void OnVanguardEffectPerform(IVanguardSkill skill, int iterations)
+        public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
         {
             if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnRevengePerform) return;
-            Debug.Log($"REVENGE Perform: {skill} [{iterations}]");
+            Debug.Log($"REVENGE Perform: {values.UsedSkill} [{values.Iterations}]");
         }
 
         public void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations)

@@ -8,41 +8,8 @@ using UnityEngine;
 
 namespace CombatSystem.Skills
 {
-    public sealed class SkillQueuePerformer : ISkillUsageListener, ICombatTerminationListener
+    public sealed class SkillQueuePerformer : TempoQueuePerformer<SkillUsageValues>, ISkillUsageListener
     {
-        public SkillQueuePerformer()
-        {
-            _usedSkillsQueue = new Queue<SkillUsageValues>();
-        }
-        [ShowInInspector]
-        private readonly Queue<SkillUsageValues> _usedSkillsQueue;
-
-
-        public void EnQueueValue(in SkillUsageValues values)
-        {
-            _usedSkillsQueue.Enqueue(values);
-
-            if (_queueHandle.IsRunning) return;
-            _queueHandle = Timing.RunCoroutine(_DoQueue());
-        }
-
-        public void OnCombatEnd()
-        {
-            Timing.KillCoroutines(_queueHandle);
-            _usedSkillsQueue.Clear();
-        }
-
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-        }
-
-
-
-
         public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
             EnQueueValue(in values);
@@ -57,24 +24,22 @@ namespace CombatSystem.Skills
         }
 
 
-        public bool IsActing() => _queueHandle.IsRunning;
        
 
         private const float SkillAppliesAfter = CombatControllerAnimationHandler.PerformToReceiveTimeOffset;
         private const float AnimationOffsetDuration = CombatControllerAnimationHandler.FromReceiveToFinishTimeOffset;
 
-        private CoroutineHandle _queueHandle;
-        private IEnumerator<float> _DoQueue()
+        protected override IEnumerator<float> _DoDeQueue()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             var animator = CombatSystemSingleton.CombatControllerAnimationHandler;
 
             yield return Timing.WaitForOneFrame; //safeWait
 
-            while (_usedSkillsQueue.Count > 0)
+            while (Queue.Count > 0)
             {
 
-                var queueValues = _usedSkillsQueue.Dequeue();
+                var queueValues = Queue.Dequeue();
                 queueValues.Extract(out var performer,out var target,out var usedSkill);
                 eventsHolder.OnCombatSkillPerform(in queueValues);
 

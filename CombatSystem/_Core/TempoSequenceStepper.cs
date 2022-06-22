@@ -9,6 +9,12 @@ namespace CombatSystem._Core
 {
     internal sealed class TempoSequenceStepper 
     {
+        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        {
+            var team = controller.ControllingTeam;
+            team.OnControlStart();
+        }
+
         public void OnTempoFinishControl(in CombatTeamControllerBase controller)
         {
             var remainingEntities = controller.ControllingTeam.GetControllingMembers();
@@ -19,7 +25,9 @@ namespace CombatSystem._Core
 
         public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
         {
-            controller.ControllingTeam.ClearControllingMembers();
+            var controllingTeam = controller.ControllingTeam;
+            controllingTeam.OnControlFinnish();
+
         }
 
         public void OnTempoForceFinish(in CombatTeamControllerBase controller,

@@ -34,7 +34,7 @@ namespace CombatSystem._Core
                 = new SkillTargetingHandler();
 
             SkillQueuePerformer = new SkillQueuePerformer();
-            var vanguardEventsHandler = new VanguardEventsHandler();
+            VanguardEffectsHandler = new VanguardEffectsHandler();
 
             KnockOutHandler = new KnockOutHandler();
             CombatControllerAnimationHandler = new CombatControllerAnimationHandler();
@@ -46,7 +46,7 @@ namespace CombatSystem._Core
 
             systemEventsHolder.Subscribe(KnockOutHandler);
             systemEventsHolder.Subscribe(SkillQueuePerformer);
-            systemEventsHolder.Subscribe(vanguardEventsHandler);
+            systemEventsHolder.Subscribe(VanguardEffectsHandler);
             systemEventsHolder.Subscribe(CombatControllerAnimationHandler);
             systemEventsHolder.Subscribe(TeamControllers);
             systemEventsHolder.Subscribe(EntityPrefabsPoolHandler);
@@ -98,6 +98,7 @@ namespace CombatSystem._Core
 
         // ------- SKILLS ------
         public static readonly SkillQueuePerformer SkillQueuePerformer;
+        public static readonly VanguardEffectsHandler VanguardEffectsHandler;
 
 
         // ------- TARGETING ------

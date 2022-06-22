@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Stats;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -29,11 +30,16 @@ namespace CombatSystem.Team.VanguardEffects
         [ShowInInspector]
         private readonly VanguardEffectDictionariesBasic<CombatEntity, int> _offensiveRecordsDictionaries;
 
+
+        public CombatEntity GetMainEntity() => _mainEntity;
+
         public IVanguardEffectsStructureRead<Dictionary<IVanguardSkill, int>> GetEffectsStructure() =>
             _effectDictionaries;
 
         public IVanguardEffectStructureBaseRead<Dictionary<CombatEntity, int>> GetOffensiveRecordsStructure() =>
             _offensiveRecordsDictionaries;
+
+
 
 
         // Delay is only added into _effectDictionaries
@@ -44,6 +50,21 @@ namespace CombatSystem.Team.VanguardEffects
         // Same as [Revenge];
         public bool HasPunishEffects() => _offensiveRecordsDictionaries.VanguardPunishType.Count > 0;
 
+        public bool IsMainEntityTurn()
+        {
+            var stats = _mainEntity.Stats;
+            return UtilsCombatStats.IsInitiativeEnough(stats);
+        }
+        public bool CanPerform()
+        {
+            var stats = _mainEntity.Stats;
+            return UtilsCombatStats.IsInitiativeEnough(stats)
+                   && UtilsCombatStats.IsAlive(stats)
+                   && HasEffects();
+        }
+
+        public bool HasEffects() => HasRevengeEffects()|| HasPunishEffects() || HasDelayEffects();
+
         public void Clear()
         {
             _effectDictionaries.VanguardDelayImproveType.Clear();
@@ -51,7 +72,7 @@ namespace CombatSystem.Team.VanguardEffects
             _effectDictionaries.VanguardPunishType.Clear();
 
             _offensiveRecordsDictionaries.VanguardRevengeType.Clear();
-            _offensiveRecordsDictionaries.VanguardRevengeType.Clear();
+            _offensiveRecordsDictionaries.VanguardPunishType.Clear();
         }
 
         public void AddEffect(IVanguardSkill skill) 
@@ -142,7 +163,5 @@ namespace CombatSystem.Team.VanguardEffects
             [ShowInInspector,HorizontalGroup()]
             public Dictionary<TKey, TValue> VanguardPunishType { get; }
         }
-
-
     }
 }

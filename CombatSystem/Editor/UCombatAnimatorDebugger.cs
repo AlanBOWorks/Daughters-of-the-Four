@@ -42,7 +42,7 @@ namespace CombatSystem.Editor
         [ButtonGroup("PerformerAnimation"), DisableInEditorMode, GUIColor(.8f, .3f, .3f)]
         private void DoOffensiveAnimation()
         {
-            var skill = DebugSkillTypes.OffensiveCombatSkill;
+            var skill = StaticSkillTypes.OffensiveCombatSkill;
             DoAnimation(skill);
 
             if (synchronizeTo != null)
@@ -51,7 +51,7 @@ namespace CombatSystem.Editor
         [ButtonGroup("PerformerAnimation"), DisableInEditorMode, GUIColor(.3f, .6f, .8f)]
         private void DoSupportAnimation()
         {
-            var skill = DebugSkillTypes.SupportCombatSkill;
+            var skill = StaticSkillTypes.SupportCombatSkill;
             DoAnimation(skill);
 
             if (synchronizeTo != null)
@@ -60,7 +60,7 @@ namespace CombatSystem.Editor
         [ButtonGroup("PerformerAnimation"), DisableInEditorMode, GUIColor(.8f, .8f, .3f)]
         private void DoTeamAnimation()
         {
-            var skill = DebugSkillTypes.TeamCombatSkill;
+            var skill = StaticSkillTypes.TeamCombatSkill;
             DoAnimation(skill);
         }
 
@@ -75,19 +75,19 @@ namespace CombatSystem.Editor
         [ButtonGroup("ReceiveAnimations"), DisableInEditorMode, GUIColor(.8f, .3f, .3f)]
         private void DoOffensiveReceiveAnimation()
         {
-            var skill = DebugSkillTypes.OffensiveCombatSkill;
+            var skill = StaticSkillTypes.OffensiveCombatSkill;
             DoReceiveAnimation(skill);
         }
         [ButtonGroup("ReceiveAnimations"), DisableInEditorMode, GUIColor(.3f, .6f, .8f)]
         private void DoSupportReceiveAnimation()
         {
-            var skill = DebugSkillTypes.SupportCombatSkill;
+            var skill = StaticSkillTypes.SupportCombatSkill;
             DoReceiveAnimation(skill);
         }
         [ButtonGroup("ReceiveAnimations"), DisableInEditorMode, GUIColor(.8f, .8f, .3f)]
         private void DoTeamReceiveAnimation()
         {
-            var skill = DebugSkillTypes.TeamCombatSkill;
+            var skill = StaticSkillTypes.TeamCombatSkill;
             DoReceiveAnimation(skill);
         }
     }

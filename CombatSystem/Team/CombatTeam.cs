@@ -180,6 +180,18 @@ namespace CombatSystem.Team
             _controlMembers.Clear();
         }
 
+        public void OnControlStart()
+        {
+            var mainEntity = VanguardEffectsHolder.GetMainEntity();
+            if (_controlMembers.IsActive(mainEntity))
+            {
+                VanguardEffectsHolder.Clear();
+            }
+        }
+        public void OnControlFinnish()
+        {
+            ClearControllingMembers();
+        }
 
         // ------------ OTHErS ------------ 
         public CombatTeam EnemyTeam { get; private set; }

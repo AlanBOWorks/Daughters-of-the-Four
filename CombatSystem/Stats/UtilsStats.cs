@@ -264,6 +264,7 @@ namespace CombatSystem.Stats
             stats.CurrentInitiative = 0;
         }
 
+        private const float InitiativeThreshold = TempoTicker.LoopThresholdAsIntended;
         public static void TickInitiative(CombatStats stats, out float currentTickAmount)
         {
             float initiativeIncrement = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
@@ -275,15 +276,20 @@ namespace CombatSystem.Stats
 
             currentTickAmount = initiativeIncrement + stats.CurrentInitiative;
 
-            const float loopThreshold = TempoTicker.LoopThresholdAsIntended;
-            if (currentTickAmount >= loopThreshold)
+            if (currentTickAmount >= InitiativeThreshold)
             {
-                currentTickAmount = loopThreshold;
+                currentTickAmount = InitiativeThreshold;
             }
 
             stats.CurrentInitiative = currentTickAmount;
         }
 
+        public static bool IsInitiativeEnough(CombatStats stats)
+        {
+            var currentTickAmount = stats.CurrentInitiative;
+            return currentTickAmount >= InitiativeThreshold;
+
+        }
 
         // ----- ACTIONS -----
         public static void ResetActions(CombatStats stats)

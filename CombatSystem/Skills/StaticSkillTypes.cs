@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
+using CombatSystem.Team.VanguardEffects;
 using UnityEngine;
 
 namespace CombatSystem.Skills
 {
-    public static class DebugSkillTypes
+    public static class StaticSkillTypes
     {
         public static readonly IFullSkill OffensiveSkillPreset
             = new PresetSkill(DebugEffectTypes.OffensiveEffect, EnumsSkill.TeamTargeting.Offensive, EnumsSkill.TargetType.Direct);
@@ -21,8 +23,23 @@ namespace CombatSystem.Skills
         public static readonly CombatSkill TeamCombatSkill
         = new CombatSkill(TeamSkillPreset);
 
+        public static readonly IVanguardSkill DelayVanguardSkill
+        = new VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType.DelayImprove);
+        public static readonly IVanguardSkill RevengeVanguardSkill
+        = new VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType.Revenge);
+        public static readonly IVanguardSkill PunishVanguardSkill
+        = new VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType.Punish);
 
-
+        public static IVanguardSkill GetVanguardSkill(EnumsVanguardEffects.VanguardEffectType type)
+        {
+            return type switch
+            {
+                EnumsVanguardEffects.VanguardEffectType.DelayImprove => DelayVanguardSkill,
+                EnumsVanguardEffects.VanguardEffectType.Revenge => RevengeVanguardSkill,
+                EnumsVanguardEffects.VanguardEffectType.Punish => PunishVanguardSkill,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
         private sealed class PresetSkill : IFullSkill
         {
             public PresetSkill(IEffect effect, EnumsSkill.TeamTargeting teamTargeting, EnumsSkill.TargetType targetType)
@@ -49,6 +66,24 @@ namespace CombatSystem.Skills
             public IEnumerable<PerformEffectValues> GetEffectsFeedBacks() => null;
         }
 
+        private sealed class VanguardPresetSkill : IVanguardSkill
+        {
+            public VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType vanguardEffectType)
+            {
+                _vanguardEffectType = vanguardEffectType;
+            }
+
+            private readonly EnumsVanguardEffects.VanguardEffectType _vanguardEffectType;
+
+            public int SkillCost => 0;
+            public EnumsSkill.TeamTargeting TeamTargeting => EnumsSkill.TeamTargeting.Self;
+            public EnumsSkill.TargetType TargetType => EnumsSkill.TargetType.Direct;
+            public IEffect GetMainEffectArchetype() => null;
+            public bool IgnoreSelf() => false;
+            public EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType() => _vanguardEffectType;
+            public bool IsMultiTrigger() => false;
+            public PerformEffectValues GetVanguardEffectTooltip() => new PerformEffectValues();
+        }
     }
 
     public static class DebugEffectTypes

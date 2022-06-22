@@ -17,7 +17,7 @@ namespace CombatSystem._Core
         public SystemCombatEventsHolder() 
         {
             _eventsHolder = new SystemEventsHolder();
-            _sequenceStepper = new TempoSequenceStepper();
+            _tempoSequenceStepper = new TempoSequenceStepper();
             _entityEventHandler = new CombatEntityEventHandler();
 
             _entityTempoStepper = new EntityTempoStepper();
@@ -44,7 +44,7 @@ namespace CombatSystem._Core
         private CombatEntityEventsHolder _currentDiscriminatedEntityEventsHolder;
 
         private readonly CombatEntityEventHandler _entityEventHandler;
-        private readonly TempoSequenceStepper _sequenceStepper;
+        private readonly TempoSequenceStepper _tempoSequenceStepper;
         private readonly EntityTempoStepper _entityTempoStepper;
 
 
@@ -79,14 +79,14 @@ namespace CombatSystem._Core
             _eventsHolder.UnSubscribe(listener);
         }
 
-        private void HandleCurrentEntityEventsHolder(in CombatTeamControllerBase controller)
+        private void HandleCurrentDiscriminationEventsHolder(in CombatTeamControllerBase controller)
         {
             bool isPlayerElement = CombatSystemSingleton.TeamControllers.PlayerTeamType == controller;
             _currentDiscriminatedEntityEventsHolder = isPlayerElement 
                 ? _playerCombatEvents.DiscriminationEventsHolder 
                 : _enemyCombatEvents.DiscriminationEventsHolder;
         }
-        private void HandleCurrentEntityEventsHolder(in CombatEntity entity)
+        private void HandleCurrentDiscriminationEventsHolder(in CombatEntity entity)
         {
             bool isPlayerElement = UtilsTeam.IsPlayerTeam(in entity);
             _currentDiscriminatedEntityEventsHolder = isPlayerElement
@@ -156,7 +156,7 @@ namespace CombatSystem._Core
             _entityTempoStepper.OnEntityRequestSequence(entity,canControl);
             _entityEventHandler.OnEntityRequestSequence(entity,canControl);
 
-            HandleCurrentEntityEventsHolder(in entity);
+            HandleCurrentDiscriminationEventsHolder(in entity);
 
             _eventsHolder.OnEntityRequestSequence(entity, canControl);
             _playerCombatEvents.OnEntityRequestSequence(entity, canControl);
@@ -292,7 +292,8 @@ namespace CombatSystem._Core
 
         public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
-            HandleCurrentEntityEventsHolder(in controller);
+            HandleCurrentDiscriminationEventsHolder(in controller);
+            _tempoSequenceStepper.OnTempoStartControl(in controller);
 
 
             _eventsHolder.OnTempoPreStartControl(controller);
@@ -329,14 +330,14 @@ namespace CombatSystem._Core
 
             _currentDiscriminatedEntityEventsHolder.OnTempoFinishControl(controller);
 
-            _sequenceStepper.OnTempoFinishControl(in controller);
+            _tempoSequenceStepper.OnTempoFinishControl(in controller);
 
             OnTempoFinishLastCall(controller);
         }
 
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
-            _sequenceStepper.OnTempoFinishLastCall(in controller);
+            _tempoSequenceStepper.OnTempoFinishLastCall(in controller);
 
             _eventsHolder.OnTempoFinishLastCall(controller);
             _playerCombatEvents.OnTempoFinishLastCall(controller);
@@ -532,13 +533,13 @@ namespace CombatSystem._Core
             _currentDiscriminatedEntityEventsHolder.OnVanguardEffectIncrement(type,attacker);
         }
 
-        public void OnVanguardEffectPerform(IVanguardSkill skill, int iterations)
+        public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
         {
-            _eventsHolder.OnVanguardEffectPerform(skill, iterations);
-            _playerCombatEvents.OnVanguardEffectPerform(skill, iterations);
-            _enemyCombatEvents.OnVanguardEffectPerform(skill, iterations);
+            _eventsHolder.OnVanguardEffectPerform(values);
+            _playerCombatEvents.OnVanguardEffectPerform(values);
+            _enemyCombatEvents.OnVanguardEffectPerform(values);
 
-            _currentDiscriminatedEntityEventsHolder.OnVanguardEffectPerform(skill, iterations);
+            _currentDiscriminatedEntityEventsHolder.OnVanguardEffectPerform(values);
         }
 
 
@@ -1286,11 +1287,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnVanguardEffectPerform(IVanguardSkill skill, int iterations)
+        public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
         {
             foreach (var listener in _vanguardEffectUsageListeners)
             {
-                listener.OnVanguardEffectPerform(skill,iterations);
+                listener.OnVanguardEffectPerform(values);
             }
         }
     }
