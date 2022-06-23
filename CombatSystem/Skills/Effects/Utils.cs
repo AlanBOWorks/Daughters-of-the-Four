@@ -10,29 +10,40 @@ namespace CombatSystem.Skills.Effects
 {
     public static class UtilsCombatSkill
     {
-        public static void DoSkillOnTarget(ICombatSkill skill, CombatEntity performer, CombatEntity onTarget)
+        public static void DoSkillOnTarget(ISkill skill, CombatEntity performer, CombatEntity onTarget)
         {
             CombatSystemSingleton.SkillTargetingHandler.HandleSkill(skill, performer, onTarget);
-
-
-
-            var preset = skill.Preset;
-
-            if (preset is SSkillPresetBase assetSkill)
+            
+            var preset = skill;
+            IEnumerable<PerformEffectValues> effects;
+            if (preset is IVanguardSkill vanguardSkill)
+            {
+                effects = vanguardSkill.GetPerformVanguardEffects();
+                // VanguardSkills can't have self-exclusions
+                DoSkillOnTarget(null);
+            }
+            else
             {
                 CombatEntity exclusion = skill.IgnoreSelf() ? performer : null;
-                DoSkillOnTarget(assetSkill, performer, exclusion);
-                return;
+                effects = skill.GetEffects();
+                DoSkillOnTarget(exclusion);
+            }
+
+            void DoSkillOnTarget(CombatEntity exclusion)
+            {
+                DoEffectsOnTarget(performer, exclusion, effects);
+
             }
         }
 
-        private static void DoSkillOnTarget(SSkillPresetBase preset, CombatEntity performer, CombatEntity exclusion)
+
+
+        private static void DoEffectsOnTarget(CombatEntity performer, CombatEntity exclusion,
+            IEnumerable<PerformEffectValues> effects)
         {
-            var effects = preset.GetEffects();
             foreach (var effect in effects)
             {
-                PerformEffectValues values = effect;
-                DoEffect(performer, exclusion, values);
+                DoEffect(performer, exclusion, effect);
             }
         }
 

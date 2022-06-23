@@ -182,11 +182,7 @@ namespace CombatSystem.Team
 
         public void OnControlStart()
         {
-            var mainEntity = VanguardEffectsHolder.GetMainEntity();
-            if (_controlMembers.IsActive(mainEntity))
-            {
-                VanguardEffectsHolder.Clear();
-            }
+            
         }
         public void OnControlFinnish()
         {

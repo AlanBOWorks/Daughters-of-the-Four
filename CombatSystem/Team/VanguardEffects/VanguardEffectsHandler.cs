@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Skills.Effects;
 using MEC;
 
 namespace CombatSystem.Team.VanguardEffects
@@ -52,6 +53,7 @@ namespace CombatSystem.Team.VanguardEffects
                 // DELAY 
                 if (vanguardEffectsHolder.HasDelayEffects())
                 {
+                    //Do animation Once
                     animator.PerformActionAnimation(StaticSkillTypes.DelayVanguardSkill, performer, performer);
                     foreach ((IVanguardSkill vanguardSkill, var count) in vanguardEffects.VanguardDelayImproveType)
                     {
@@ -63,6 +65,7 @@ namespace CombatSystem.Team.VanguardEffects
                 // REVENGE
                 if (vanguardEffectsHolder.HasRevengeEffects())
                 {
+                    //Do animation Once
                     animator.PerformActionAnimation(StaticSkillTypes.RevengeVanguardSkill, performer, performer);
                     int revengeTotalOffensiveCount = CalculateIterationCount(vanguardOffensiveRecords.VanguardRevengeType);
                     foreach ((IVanguardSkill vanguardSkill, var count) in vanguardEffects.VanguardRevengeType)
@@ -75,6 +78,7 @@ namespace CombatSystem.Team.VanguardEffects
                 // PUNISH
                 if (vanguardEffectsHolder.HasPunishEffects())
                 {
+                    //Do animation Once
                     animator.PerformActionAnimation(StaticSkillTypes.PunishVanguardSkill, performer, performer);
                     int punishTotalOffensiveCount = CalculateIterationCount(vanguardOffensiveRecords.VanguardPunishType);
                     foreach ((IVanguardSkill vanguardSkill, var count) in vanguardEffects.VanguardPunishType)
@@ -85,8 +89,9 @@ namespace CombatSystem.Team.VanguardEffects
                 }
                 
 
-
-                yield return Timing.WaitForOneFrame; //safe wait
+                yield return Timing.WaitForOneFrame;
+                vanguardEffectsHolder.Clear();
+                yield return Timing.WaitForOneFrame;
 
                 void InvokeVanguardEffect(IVanguardSkill skill, int totalIteration)
                 {
@@ -95,10 +100,13 @@ namespace CombatSystem.Team.VanguardEffects
                             vanguardEffectsHolder, 
                             skill,
                         totalIteration));
+
+                    UtilsCombatSkill.DoSkillOnTarget(skill,performer,performer);
                 }
             }
-
         }
+
+
         public static void HandleVanguardOffensive(CombatEntity attacker, CombatEntity onTarget)
         {
             var targetTeam = onTarget.Team;

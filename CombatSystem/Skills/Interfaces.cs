@@ -33,7 +33,6 @@ namespace CombatSystem.Skills
         string GetSkillName();
         Sprite GetSkillIcon();
 
-        IEnumerable<PerformEffectValues> GetEffects();
         IEnumerable<PerformEffectValues> GetEffectsFeedBacks();
     }
 
@@ -44,6 +43,7 @@ namespace CombatSystem.Skills
         EnumsSkill.TargetType TargetType { get; }
 
         IEffect GetMainEffectArchetype();
+        IEnumerable<PerformEffectValues> GetEffects();
 
         bool IgnoreSelf();
     }
@@ -76,6 +76,8 @@ namespace CombatSystem.Skills
         /// For one call only use [<seealso cref="ISkillUsageListener.OnCombatSkillPerform"/>] better;
         /// </summary>
         void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values);
+
+        void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values);
 
 
     }

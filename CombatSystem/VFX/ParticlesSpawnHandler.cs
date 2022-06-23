@@ -36,6 +36,11 @@ namespace CombatSystem.VFX
             SpawnParticles(target,effectPrefab);
         }
 
+        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+            OnCombatSecondaryEffectPerform(performer,target, in values);
+        }
+
         private void SpawnParticles(CombatEntity target, GameObject particles)
         {
             var targetTransform = target.Body.GetUIHoverHolder();

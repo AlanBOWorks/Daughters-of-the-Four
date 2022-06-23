@@ -48,6 +48,11 @@ namespace CombatSystem.Player.UI
             OnCombatEffectPerform(performer,target,in values);
         }
 
+        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+            OnCombatEffectPerform(performer,target,in values);
+        }
+
 
         public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {

@@ -84,7 +84,6 @@ namespace CombatSystem.Team.VanguardEffects
             if (_mainEntity == null) return;
             if (skill == null) return;
 
-
             var targetCollection = 
                 UtilsVanguardEffects.GetElement(effectType, _effectDictionaries);
             if (targetCollection.ContainsKey(skill))
@@ -162,6 +161,23 @@ namespace CombatSystem.Team.VanguardEffects
             public Dictionary<TKey, TValue> VanguardRevengeType { get; }
             [ShowInInspector,HorizontalGroup()]
             public Dictionary<TKey, TValue> VanguardPunishType { get; }
+        }
+    }
+
+    public readonly struct VanguardSkillAccumulation
+    {
+        public readonly EnumsVanguardEffects.VanguardEffectType Type;
+        public readonly IVanguardSkill Skill;
+        public readonly int AccumulatedAmount;
+
+        public VanguardSkillAccumulation(
+            EnumsVanguardEffects.VanguardEffectType type, 
+            IVanguardSkill skill, 
+            int accumulatedAmount)
+        {
+            Type = type;
+            Skill = skill;
+            AccumulatedAmount = accumulatedAmount;
         }
     }
 }

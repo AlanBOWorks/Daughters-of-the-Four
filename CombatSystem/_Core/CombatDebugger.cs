@@ -64,7 +64,8 @@ namespace CombatSystem._Core
     }
 
 
-    internal sealed class CombatEventsLogs : ICombatEventsHolderBase,
+    internal sealed class CombatEventsLogs : 
+        ICombatEventsHolderBase,
         ITempoTickListener, IDamageDoneListener
     {
         [TitleGroup("Team")] 
@@ -295,6 +296,7 @@ namespace CombatSystem._Core
         {
             public bool OnPrimary = true;
             public bool OnSecondary = true;
+            public bool OnVanguardEffects = true;
         }
         [TitleGroup("Skills")]
         [ShowInInspector]
@@ -309,6 +311,12 @@ namespace CombatSystem._Core
         public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
             if (!ShowEffectLogs || !_effectLogs.OnSecondary) return;
+            Debug.Log($"Secondary Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
+        }
+
+        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+            if (!ShowEffectLogs || !_effectLogs.OnVanguardEffects) return;
             Debug.Log($"Secondary Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
         }
 
@@ -361,6 +369,7 @@ namespace CombatSystem._Core
         public bool ShowVanguardEffectsLogs = false;
         private class VanguardEffectsLogs
         {
+            public bool OnEffectSubscribe = true;
             public bool OnEffectIncrement = true;
             public bool OnRevengePerform = true;
             public bool OnPunishPerform = true;
@@ -368,6 +377,13 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private VanguardEffectsLogs _vanguardEffectsLogs = new VanguardEffectsLogs();
 
+
+        public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
+        {
+            if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnEffectSubscribe) return;
+            Debug.Log($"Vanguard Subscribe [{values.Type}] >>>> {values.Skill}");
+
+        }
 
         public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
         {

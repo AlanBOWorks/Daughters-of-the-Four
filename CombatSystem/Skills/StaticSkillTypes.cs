@@ -79,10 +79,14 @@ namespace CombatSystem.Skills
             public EnumsSkill.TeamTargeting TeamTargeting => EnumsSkill.TeamTargeting.Self;
             public EnumsSkill.TargetType TargetType => EnumsSkill.TargetType.Direct;
             public IEffect GetMainEffectArchetype() => null;
+            public IEnumerable<PerformEffectValues> GetEffects() => null;
+            public IEnumerable<PerformEffectValues> GetPerformVanguardEffects() => null;
+
             public bool IgnoreSelf() => false;
             public EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType() => _vanguardEffectType;
             public bool IsMultiTrigger() => false;
             public PerformEffectValues GetVanguardEffectTooltip() => new PerformEffectValues();
+           
         }
     }
 

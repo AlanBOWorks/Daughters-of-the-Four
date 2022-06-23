@@ -18,23 +18,19 @@ namespace CombatSystem.Skills
         [TitleGroup("Values")]
         [SerializeField]
         private bool ignoreSelf = true;
-        [SerializeField] 
-        private bool isMultiTrigger = true;
 
         [TitleGroup("Values")]
         [InfoBox("Target Type [Target]: enemy who did the Offensive is the Target\n" +
                  "Target Type [Performer]: the main vanguard is the Performer")]
         [SerializeField]
         private EnumsVanguardEffects.VanguardEffectType responseType;
-
-
         private VanguardEffect _vanguardEffectPreset;
 
         protected override string GetAssetPrefix() => VanguardAssetPrefix;
 
-
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             _vanguardEffectPreset = new VanguardEffect(this);
         }
 
@@ -44,31 +40,22 @@ namespace CombatSystem.Skills
 
 
 
+        public PerformEffectValues GenerateVanguardValues() =>
+            new PerformEffectValues(_vanguardEffectPreset, 1, EnumsEffect.TargetType.Performer);
         public override IEnumerable<PerformEffectValues> GetEffects()
         {
             yield return GenerateVanguardValues();
         }
+        public override IEnumerable<PerformEffectValues> GetEffectsFeedBacks() 
+            => GetPerformVanguardEffects();
+        public IEnumerable<PerformEffectValues> GetPerformVanguardEffects() 
+            => base.GetEffects();
 
-        public override IEnumerable<PerformEffectValues> GetEffectsFeedBacks()
-        {
-            foreach (var effect in effects)
-            {
-                yield return effect.GenerateValues();
-            }
-        }
 
         public override EnumsSkill.TeamTargeting TeamTargeting => EnumsSkill.TeamTargeting.Self;
         public override EnumsSkill.TargetType TargetType => EnumsSkill.TargetType.Direct;
-        public PerformEffectValues GenerateVanguardValues() =>
-            new PerformEffectValues(_vanguardEffectPreset, 1, EnumsEffect.TargetType.Performer);
-
         public EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType() => responseType;
-
-        public bool IsMultiTrigger() => isMultiTrigger;
-        public PerformEffectValues GetVanguardEffectTooltip() => GenerateVanguardValues();
-
-
-
+        
 
 
         protected override string GenerateAssetName()

@@ -22,7 +22,8 @@ namespace CombatSystem._Core
 
             _entityTempoStepper = new EntityTempoStepper();
 
-
+            _mainEventsHolders = GetMainEventsHolder();
+            _discriminationEventsHolders = GetEventsHolderWithDiscrimination();
 
 #if UNITY_EDITOR
             var debugEvents = CombatDebuggerSingleton.CombatEventsLogs;
@@ -47,6 +48,23 @@ namespace CombatSystem._Core
         private readonly TempoSequenceStepper _tempoSequenceStepper;
         private readonly EntityTempoStepper _entityTempoStepper;
 
+        private readonly IEnumerable<ICombatEventsHolder> _mainEventsHolders;
+        private readonly IEnumerable<ICombatEventsHolderBase> _discriminationEventsHolders;
+
+        private IEnumerable<ICombatEventsHolder> GetMainEventsHolder()
+        {
+            yield return _eventsHolder;
+            yield return _playerCombatEvents;
+            yield return _enemyCombatEvents;
+        }
+
+        private IEnumerable<ICombatEventsHolderBase> GetEventsHolderWithDiscrimination()
+        {
+            yield return _eventsHolder;
+            yield return _playerCombatEvents;
+            yield return _enemyCombatEvents;
+            yield return _currentDiscriminatedEntityEventsHolder;
+        }
 
         public void SubscribeEventsHandler(PlayerCombatEventsHolder eventsHandler)
         {
@@ -97,48 +115,53 @@ namespace CombatSystem._Core
         // ------ PREPARATIONS ----- 
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            _eventsHolder.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
-            _playerCombatEvents.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
-            _enemyCombatEvents.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
+            foreach (var eventsHolder in _mainEventsHolders)
+            {
+                eventsHolder.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
+            }
         }
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            _eventsHolder.OnCombatPreStarts(playerTeam, enemyTeam);
-            _playerCombatEvents.OnCombatPreStarts(playerTeam, enemyTeam);
-            _enemyCombatEvents.OnCombatPreStarts(playerTeam, enemyTeam);
+            foreach (var eventsHolder in _mainEventsHolders)
+            {
+                eventsHolder.OnCombatPreStarts(playerTeam,enemyTeam);
+            }
         }
 
         public void OnCombatStart()
         {
-            _eventsHolder.OnCombatStart();
-            _playerCombatEvents.OnCombatStart();
-            _enemyCombatEvents.OnCombatStart();
+            foreach (var eventsHolder in _mainEventsHolders)
+            {
+                eventsHolder.OnCombatStart();
+            }
         }
 
         public void OnCombatEnd()
         {
-            _eventsHolder.OnCombatEnd();
-            _playerCombatEvents.OnCombatEnd();
-            _enemyCombatEvents.OnCombatEnd();
+            foreach (var eventsHolder in _mainEventsHolders)
+            {
+                eventsHolder.OnCombatEnd();
+            }
         }
 
         public void OnCombatFinish(bool isPlayerWin)
         {
             OnCombatEnd();
-
-            _eventsHolder.OnCombatFinish(isPlayerWin);
-            _playerCombatEvents.OnCombatFinish(isPlayerWin);
-            _enemyCombatEvents.OnCombatFinish(isPlayerWin);
+            foreach (var eventsHolder in _mainEventsHolders)
+            {
+                eventsHolder.OnCombatFinish(isPlayerWin);
+            }
         }
 
         public void OnCombatQuit()
         {
             OnCombatEnd();
 
-            _eventsHolder.OnCombatQuit();
-            _playerCombatEvents.OnCombatQuit();
-            _enemyCombatEvents.OnCombatQuit();
+            foreach (var eventsHolder in _mainEventsHolders)
+            {
+                eventsHolder.OnCombatQuit();
+            }
         }
 
 
@@ -157,136 +180,107 @@ namespace CombatSystem._Core
             _entityEventHandler.OnEntityRequestSequence(entity,canControl);
 
             HandleCurrentDiscriminationEventsHolder(in entity);
-
-            _eventsHolder.OnEntityRequestSequence(entity, canControl);
-            _playerCombatEvents.OnEntityRequestSequence(entity, canControl);
-            _enemyCombatEvents.OnEntityRequestSequence(entity, canControl);
-
-            _currentDiscriminatedEntityEventsHolder.OnEntityRequestSequence(entity, canControl);
-
-            _entityEventHandler.OnEntityRequestSequence(entity,canControl);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+            {
+                eventsHolder.OnEntityRequestSequence(entity,canControl);
+            }
         }
 
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            _eventsHolder.OnTrinityEntityRequestSequence(entity,canAct);
-            _playerCombatEvents.OnTrinityEntityRequestSequence(entity, canAct);
-            _enemyCombatEvents.OnTrinityEntityRequestSequence(entity, canAct);
-
-            _currentDiscriminatedEntityEventsHolder.OnTrinityEntityRequestSequence(entity,canAct);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+            {
+                eventsHolder.OnTrinityEntityRequestSequence(entity,canAct);
+            }
         }
 
         public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            _eventsHolder.OnOffEntityRequestSequence(entity, canAct);
-            _playerCombatEvents.OnOffEntityRequestSequence(entity, canAct);
-            _enemyCombatEvents.OnOffEntityRequestSequence(entity, canAct);
-
-            _currentDiscriminatedEntityEventsHolder.OnOffEntityRequestSequence(entity, canAct);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+            {
+                eventsHolder.OnOffEntityRequestSequence(entity,canAct);
+            }
         }
 
         public void OnTrinityEntityFinishSequence(CombatEntity entity)
         {
-            _eventsHolder.OnTrinityEntityFinishSequence(entity);
-            _playerCombatEvents.OnTrinityEntityFinishSequence(entity);
-            _enemyCombatEvents.OnTrinityEntityFinishSequence(entity);
-
-            _currentDiscriminatedEntityEventsHolder.OnTrinityEntityFinishSequence(entity);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+            {
+                eventsHolder.OnTrinityEntityFinishSequence(entity);
+            }
         }
 
         public void OnOffEntityFinishSequence(CombatEntity entity)
         {
-            _eventsHolder.OnOffEntityFinishSequence(entity);
-            _playerCombatEvents.OnOffEntityFinishSequence(entity);
-            _enemyCombatEvents.OnOffEntityFinishSequence(entity);
-
-            _currentDiscriminatedEntityEventsHolder.OnOffEntityFinishSequence(entity);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+            {
+                eventsHolder.OnOffEntityFinishSequence(entity);
+            }
         }
 
 
         public void OnEntityRequestAction(CombatEntity entity)
         {
             _entityEventHandler.OnEntityRequestAction(entity);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+            {
+                eventsHolder.OnEntityRequestAction(entity);
+            }
 
-            _eventsHolder.OnEntityRequestAction(entity);
-            _playerCombatEvents.OnEntityRequestAction(entity);
-            _enemyCombatEvents.OnEntityRequestAction(entity);
-
-            _currentDiscriminatedEntityEventsHolder.OnEntityRequestAction(entity);
         }
 
         public void OnEntityBeforeSkill(CombatEntity entity)
         {
-            _eventsHolder.OnEntityBeforeSkill(entity);
-            _playerCombatEvents.OnEntityBeforeSkill(entity);
-            _enemyCombatEvents.OnEntityBeforeSkill(entity);
-
-            _currentDiscriminatedEntityEventsHolder.OnEntityBeforeSkill(entity);
+            foreach (var eventsHolder in _discriminationEventsHolders) 
+                eventsHolder.OnEntityBeforeSkill(entity);
         }
 
         public void OnEntityFinishAction(CombatEntity entity)
         {
             _entityEventHandler.OnEntityFinishAction(entity);
-
-            _eventsHolder.OnEntityFinishAction(entity);
-            _playerCombatEvents.OnEntityFinishAction(entity);
-            _enemyCombatEvents.OnEntityFinishAction(entity);
-
-            _currentDiscriminatedEntityEventsHolder.OnEntityFinishAction(entity);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnEntityFinishAction(entity);
 
             _entityEventHandler.OnEntityAfterFinishAction(in entity);
-
         }
 
         public void OnEntityEmptyActions(CombatEntity entity)
         {
-            _eventsHolder.OnEntityEmptyActions(entity);
-            _playerCombatEvents.OnEntityEmptyActions(entity);
-            _enemyCombatEvents.OnEntityEmptyActions(entity);
-
-            _currentDiscriminatedEntityEventsHolder.OnEntityEmptyActions(entity);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnEntityEmptyActions(entity);
         }
 
         public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
             _entityEventHandler.OnEntityFinishSequence(entity,in isForcedByController);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnEntityFinishSequence(entity,isForcedByController);
 
-            _eventsHolder.OnEntityFinishSequence(entity,isForcedByController);
-            _playerCombatEvents.OnEntityFinishSequence(entity,isForcedByController);
-            _enemyCombatEvents.OnEntityFinishSequence(entity,isForcedByController);
-
-            _currentDiscriminatedEntityEventsHolder.OnEntityFinishSequence(entity,isForcedByController);
         }
 
         public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
-            _eventsHolder.OnAfterEntityRequestSequence(entity);
-            _playerCombatEvents.OnAfterEntityRequestSequence(entity);
-            _enemyCombatEvents.OnAfterEntityRequestSequence(entity);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnAfterEntityRequestSequence(entity);
 
-            _currentDiscriminatedEntityEventsHolder.OnAfterEntityRequestSequence(entity);
 
             _entityEventHandler.RequestEntityAction(in entity);
         }
 
         public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
-            _eventsHolder.OnAfterEntitySequenceFinish(entity);
-            _playerCombatEvents.OnAfterEntitySequenceFinish(entity);
-            _enemyCombatEvents.OnAfterEntitySequenceFinish(entity);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnAfterEntitySequenceFinish(entity);
 
-            _currentDiscriminatedEntityEventsHolder.OnAfterEntitySequenceFinish(entity);
 
             _entityEventHandler.TryCallOnFinishAllActors(in entity);
         }
 
         public void OnNoActionsForcedFinish(CombatEntity entity)
         {
-            _eventsHolder.OnNoActionsForcedFinish(entity);
-            _playerCombatEvents.OnNoActionsForcedFinish(entity);
-            _enemyCombatEvents.OnNoActionsForcedFinish(entity);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnNoActionsForcedFinish(entity);
 
-            _currentDiscriminatedEntityEventsHolder.OnNoActionsForcedFinish(entity);
         }
 
 
@@ -295,43 +289,28 @@ namespace CombatSystem._Core
             HandleCurrentDiscriminationEventsHolder(in controller);
             _tempoSequenceStepper.OnTempoStartControl(in controller);
 
-
-            _eventsHolder.OnTempoPreStartControl(controller);
-            _playerCombatEvents.OnTempoPreStartControl(controller);
-            _enemyCombatEvents.OnTempoPreStartControl(controller);
-
-            _currentDiscriminatedEntityEventsHolder.OnTempoPreStartControl(controller);
-
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnTempoPreStartControl(controller);
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
         {
-            _eventsHolder.OnAllActorsNoActions(lastActor);
-            _playerCombatEvents.OnAllActorsNoActions(lastActor);
-            _enemyCombatEvents.OnAllActorsNoActions(lastActor);
-
-            _currentDiscriminatedEntityEventsHolder.OnAllActorsNoActions(lastActor);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnAllActorsNoActions(lastActor);
         }
 
         public void OnControlFinishAllActors(CombatEntity lastActor)
         {
-            _eventsHolder.OnControlFinishAllActors(lastActor);
-            _playerCombatEvents.OnControlFinishAllActors(lastActor);
-            _enemyCombatEvents.OnControlFinishAllActors(lastActor);
-
-            _currentDiscriminatedEntityEventsHolder.OnControlFinishAllActors(lastActor);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnControlFinishAllActors(lastActor);
         }
 
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
-            _eventsHolder.OnTempoFinishControl(controller);
-            _playerCombatEvents.OnTempoFinishControl(controller);
-            _enemyCombatEvents.OnTempoFinishControl(controller);
-
-            _currentDiscriminatedEntityEventsHolder.OnTempoFinishControl(controller);
-
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnTempoFinishControl(controller);
+            
             _tempoSequenceStepper.OnTempoFinishControl(in controller);
-
             OnTempoFinishLastCall(controller);
         }
 
@@ -339,11 +318,8 @@ namespace CombatSystem._Core
         {
             _tempoSequenceStepper.OnTempoFinishLastCall(in controller);
 
-            _eventsHolder.OnTempoFinishLastCall(controller);
-            _playerCombatEvents.OnTempoFinishLastCall(controller);
-            _enemyCombatEvents.OnTempoFinishLastCall(controller);
-
-            _currentDiscriminatedEntityEventsHolder.OnTempoFinishLastCall(controller);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnTempoFinishLastCall(controller);
         }
 
 
@@ -356,11 +332,8 @@ namespace CombatSystem._Core
 
             _entityEventHandler.OnCombatSkillPreSubmit(usedSkill, performer);
 
-            _eventsHolder.OnCombatSkillSubmit(in values);
-            _playerCombatEvents.OnCombatSkillSubmit(in values);
-            _enemyCombatEvents.OnCombatSkillSubmit(in values);
-
-            _currentDiscriminatedEntityEventsHolder.OnCombatSkillSubmit(in values);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnCombatSkillSubmit(in values);
 
             _entityEventHandler.OnCombatSkillSubmit(usedSkill, performer);
 
@@ -371,175 +344,167 @@ namespace CombatSystem._Core
             values.Extract(out var performer,out var target,out var usedSkill);
             _entityEventHandler.OnCombatSkillPerform(usedSkill, performer, target);
 
-            _eventsHolder.OnCombatSkillPerform(in values);
-            _playerCombatEvents.OnCombatSkillPerform(in values);
-            _enemyCombatEvents.OnCombatSkillPerform(in values);
-
-            _currentDiscriminatedEntityEventsHolder.OnCombatSkillPerform(in values);
-
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnCombatSkillPerform(in values);
         }
 
         public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
-            _eventsHolder.OnCombatPrimaryEffectPerform(performer, target, in values);
-            _playerCombatEvents.OnCombatPrimaryEffectPerform(performer, target, in values);
-            _enemyCombatEvents.OnCombatPrimaryEffectPerform(performer, target, in values);
-
-            _currentDiscriminatedEntityEventsHolder.OnCombatPrimaryEffectPerform(performer, target, values);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnCombatPrimaryEffectPerform(performer,target,in values);
         }
 
         public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
-            _eventsHolder.OnCombatSecondaryEffectPerform(performer,target, in values);
-            _playerCombatEvents.OnCombatSecondaryEffectPerform(performer,target, in values);
-            _enemyCombatEvents.OnCombatSecondaryEffectPerform(performer,target, in values);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnCombatSecondaryEffectPerform(performer,target,in values);
+        }
 
-            _currentDiscriminatedEntityEventsHolder.OnCombatSecondaryEffectPerform(performer, target, values);
+        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnCombatVanguardEffectPerform(performer,target,in values);
         }
 
         public void OnCombatSkillFinish(CombatEntity performer)
         {
-            _eventsHolder.OnCombatSkillFinish(performer);
-            _playerCombatEvents.OnCombatSkillFinish(performer);
-            _enemyCombatEvents.OnCombatSkillFinish(performer);
-
-            _currentDiscriminatedEntityEventsHolder.OnCombatSkillFinish(performer);
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnCombatSkillFinish(performer);
 
             OnEntityFinishAction(performer);
         }
 
+        // ---- VANGUARD EFFECTS
+        public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
+        {
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnVanguardEffectSubscribe(in values);
+        }
 
+        public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
+        {
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnVanguardEffectIncrement(type,attacker);
+        }
+
+        public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
+        {
+            foreach (var eventsHolder in _discriminationEventsHolders)
+                eventsHolder.OnVanguardEffectPerform(values);
+        }
+
+
+        // ---- ENTITIES
         public void OnCreateEntity(in CombatEntity entity, in bool isPlayers)
         {
-            _eventsHolder.OnCreateEntity(in entity, in isPlayers);
-            _playerCombatEvents.OnCreateEntity(in entity, in isPlayers);
-            _enemyCombatEvents.OnCreateEntity(in entity, in isPlayers);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnCreateEntity(in entity, in isPlayers);
         }
 
         public void OnDestroyEntity(in CombatEntity entity, in bool isPlayers)
         {
-            _eventsHolder.OnDestroyEntity(in entity, in isPlayers);
-            _playerCombatEvents.OnDestroyEntity(in entity, in isPlayers);
-            _enemyCombatEvents.OnDestroyEntity(in entity, in isPlayers);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnDestroyEntity(in entity,in isPlayers);
         }
         
+        // ---- VITALITY
         public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            _eventsHolder.OnDamageBeforeDone(in performer, in target, in amount);
-            _playerCombatEvents.OnDamageBeforeDone(in performer, in target, in amount);
-            _enemyCombatEvents.OnDamageBeforeDone(in performer, in target, in amount);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnDamageBeforeDone(in performer,in target, in amount);
+
         }
 
         public void OnRevive(in CombatEntity entity, bool isHealRevive)
         {
-            _eventsHolder.OnRevive(in entity, isHealRevive);
-            _playerCombatEvents.OnRevive(in entity, isHealRevive);
-            _enemyCombatEvents.OnRevive(in entity, isHealRevive);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnRevive(in entity, isHealRevive);
+
         }
 
 
         public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            _eventsHolder.OnShieldLost(in performer, in target, in amount);
-            _playerCombatEvents.OnShieldLost(in performer, in target, in amount);
-            _enemyCombatEvents.OnShieldLost(in performer, in target, in amount);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnShieldLost(in performer,in target, in amount);
+
         }
 
         public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            _eventsHolder.OnHealthLost(in performer, in target, in amount);
-            _playerCombatEvents.OnHealthLost(in performer, in target, in amount);
-            _enemyCombatEvents.OnHealthLost(in performer, in target, in amount);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnHealthLost(in performer, in target, in amount);
         }
 
         public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            _eventsHolder.OnMortalityLost(in performer, in target, in amount);
-            _playerCombatEvents.OnMortalityLost(in performer, in target, in amount);
-            _enemyCombatEvents.OnMortalityLost(in performer, in target, in amount);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnMortalityLost(in performer, in target, in amount);
         }
 
         public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
         {
-            _eventsHolder.OnDamageReceive(in performer, in target);
-            _playerCombatEvents.OnDamageReceive(in performer, in target);
-            _enemyCombatEvents.OnDamageReceive(in performer, in target);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnDamageReceive(in performer, in target);
+
         }
 
         public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
         {
-            _eventsHolder.OnKnockOut(in performer, in target);
-            _playerCombatEvents.OnKnockOut(in performer, in target);
-            _enemyCombatEvents.OnKnockOut(in performer, in target);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnKnockOut(in performer, in target);
+
         }
 
         public void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            _eventsHolder.OnShieldGain(in performer, in target, in amount);
-            _playerCombatEvents.OnShieldGain(in performer, in target, in amount);
-            _enemyCombatEvents.OnShieldGain(in performer, in target, in amount);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnShieldGain(in performer, in target, in amount);
+
         }
 
         public void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            _eventsHolder.OnHealthGain(in performer, in target, in amount);
-            _playerCombatEvents.OnHealthGain(in performer, in target, in amount);
-            _enemyCombatEvents.OnHealthGain(in performer, in target, in amount);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnHealthGain(in performer, in target, in amount);
+
         }
 
         public void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            _eventsHolder.OnMortalityGain(in performer, in target, in amount);
-            _playerCombatEvents.OnMortalityGain(in performer, in target, in amount);
-            _enemyCombatEvents.OnMortalityGain(in performer, in target, in amount);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnMortalityGain(in performer, in target, in amount);
+
         }
 
         public void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target)
         {
-            _eventsHolder.OnRecoveryReceive(in performer, in target);
-            _playerCombatEvents.OnRecoveryReceive(in performer, in target);
-            _enemyCombatEvents.OnRecoveryReceive(in performer, in target);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnRecoveryReceive(in performer, in target);
+
         }
 
         public void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentAmount, in int amount)
         {
-            _eventsHolder.OnKnockHeal(in performer, in target, in currentAmount, in amount);
-            _playerCombatEvents.OnKnockHeal(in performer, in target, in currentAmount, in amount);
-            _enemyCombatEvents.OnKnockHeal(in performer, in target, in currentAmount, in amount);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnKnockHeal(in performer, in target,in currentAmount, in amount);
+
         }
 
 
+        // ---- TEAM VALUEs
         public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
         {
-            _eventsHolder.OnStanceChange(team, switchedStance);
-            _playerCombatEvents.OnStanceChange(team, switchedStance);
-            _enemyCombatEvents.OnStanceChange(team, switchedStance);
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnStanceChange(team, switchedStance);
+
         }
 
         public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
         {
-            _eventsHolder.OnControlChange(team, phasedControl,isBurst);
-            _playerCombatEvents.OnControlChange(team, phasedControl, isBurst);
-            _enemyCombatEvents.OnControlChange(team, phasedControl, isBurst);
-        }
+            foreach (var eventsHolder in _mainEventsHolders)
+                eventsHolder.OnControlChange(team, phasedControl, isBurst);
 
-
-        public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
-        {
-            _eventsHolder.OnVanguardEffectIncrement(type,attacker);
-            _playerCombatEvents.OnVanguardEffectIncrement(type,attacker);
-            _enemyCombatEvents.OnVanguardEffectIncrement(type,attacker);
-
-            _currentDiscriminatedEntityEventsHolder.OnVanguardEffectIncrement(type,attacker);
-        }
-
-        public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
-        {
-            _eventsHolder.OnVanguardEffectPerform(values);
-            _playerCombatEvents.OnVanguardEffectPerform(values);
-            _enemyCombatEvents.OnVanguardEffectPerform(values);
-
-            _currentDiscriminatedEntityEventsHolder.OnVanguardEffectPerform(values);
         }
 
 
@@ -1231,6 +1196,15 @@ namespace CombatSystem._Core
             }
         }
 
+        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target,
+            in PerformEffectValues values)
+        {
+            foreach (var listener in _effectUsageListeners)
+            {
+                listener.OnCombatVanguardEffectPerform(performer,target,in values);
+            }
+        }
+
         public void OnCombatSkillFinish(CombatEntity performer)
         {
             foreach (var listener in _skillUsageListeners)
@@ -1276,6 +1250,14 @@ namespace CombatSystem._Core
             foreach (var listener in _tempoEntityExtraListeners)
             {
                 listener.OnNoActionsForcedFinish(entity);
+            }
+        }
+
+        public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
+        {
+            foreach (var listener in _vanguardEffectUsageListeners)
+            {
+                listener.OnVanguardEffectSubscribe(in values);
             }
         }
 
