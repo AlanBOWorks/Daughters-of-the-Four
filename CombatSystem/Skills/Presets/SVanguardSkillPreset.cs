@@ -51,6 +51,8 @@ namespace CombatSystem.Skills
         public IEnumerable<PerformEffectValues> GetPerformVanguardEffects() 
             => base.GetEffects();
 
+        public int VanguardEffectCount => effects.Length;
+
 
         public override EnumsSkill.TeamTargeting TeamTargeting => EnumsSkill.TeamTargeting.Self;
         public override EnumsSkill.TargetType TargetType => EnumsSkill.TargetType.Direct;

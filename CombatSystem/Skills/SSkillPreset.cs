@@ -70,16 +70,19 @@ namespace CombatSystem.Skills
         [SerializeField]
         private protected PresetEffectValues[] effects = new PresetEffectValues[0];
 
-        [ShowInInspector,DisableInPlayMode]
-        private PerformEffectValues[] _combatEffects;
+        [ShowInInspector,HideInEditorMode,DisableInPlayMode, NonSerialized]
+        private IEnumerable<PerformEffectValues> _combatEffects;
 
         protected virtual void OnEnable()
         {
-            _combatEffects = new PerformEffectValues[effects.Length];
-            for (var i = 0; i < effects.Length; i++)
+            _combatEffects = GetEffects();
+
+            IEnumerable<PerformEffectValues> GetEffects()
             {
-                var effect = effects[i];
-                _combatEffects[i] = effect.GenerateValues();
+                foreach (var effect in effects)
+                {
+                    yield return effect.GenerateValues();
+                }
             }
         }
 
@@ -87,6 +90,8 @@ namespace CombatSystem.Skills
         {
             _combatEffects = null;
         }
+
+
 
         public string GetSkillName() => skillName;
         public Sprite GetSkillIcon() => skillIcon;
@@ -150,6 +155,7 @@ namespace CombatSystem.Skills
     {
         EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType();
         IEnumerable<PerformEffectValues> GetPerformVanguardEffects();
+        int VanguardEffectCount { get; }
     }
 
     public interface IAttackerSkill : ISkill

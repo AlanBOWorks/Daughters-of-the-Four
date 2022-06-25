@@ -7,6 +7,31 @@ using Object = UnityEngine.Object;
 
 namespace Utils
 {
+
+    public static class UtilsPool
+    {
+        public static TElement PoolElement<TPool, TElement>(TPool pool, TElement prefab, Transform onParent)
+            where TPool : IObjectPoolBasic, IObjectPool<TElement>
+        where TElement : Component
+        {
+            if (pool.CountInactive <= 0) return Object.Instantiate(prefab, onParent);
+
+            var element = pool.Pop();
+            element.transform.SetParent(onParent);
+            return element;
+        }
+
+        public static TElement PoolElement<TElement>(Queue<TElement> pool, TElement prefab, Transform onParent)
+            where TElement : Component
+        {
+            if (pool.Count <= 0) return Object.Instantiate(prefab, onParent);
+
+            var element = pool.Dequeue();
+            element.transform.SetParent(onParent);
+            return element;
+        }
+    }
+
     /// <summary>
     /// Pool for [<see cref="Component"/>]; <br></br>
     ///<br></br>
@@ -15,7 +40,7 @@ namespace Utils
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public abstract class MonoObjectPoolBase<T> : IObjectPoolBasic where T : Component
+    public abstract class MonoObjectPoolBase<T> : IObjectPool<T>, IObjectPoolBasic where T : Component
     {
         [Title("Parents")] 
         [Tooltip("After pool/instantiate element, which parent the created element should go")]
@@ -47,23 +72,17 @@ namespace Utils
 
         public int CountInactive => inactivePool.Count;
 
-        private T PoolOrInstantiate()
-        {
-            if (inactivePool.Count > 0)
-            {
-                var element = inactivePool.Dequeue();
-                element.transform.SetParent(instantiationParent);
-                return element;
-            }
 
-            return Object.Instantiate(poolElement, instantiationParent);
-        }
-
-        protected virtual T GetElement()
+        public virtual T GetElementSafe()
         {
-            var element = PoolOrInstantiate();
+            var element = UtilsPool.PoolElement(inactivePool,poolElement,instantiationParent);
             element.gameObject.SetActive(true);
             return element;
+        }
+
+        public T Pop()
+        {
+            return inactivePool.Dequeue();
         }
 
         public virtual void Release(T element)
@@ -76,14 +95,6 @@ namespace Utils
         }
     }
 
-    /// <summary>
-    /// <inheritdoc cref="MonoObjectPoolBase{T}"/>
-    /// </summary>
-    [Serializable]
-    public abstract class MonoObjectPool<T> : MonoObjectPoolBase<T>, IObjectPool<T> where T : Component
-    {
-        public T Pop() => GetElement();
-    }
 
     /// <summary>
     /// <inheritdoc cref="MonoObjectPoolBase{T}"/>
@@ -104,9 +115,9 @@ namespace Utils
             _activePool = new HashSet<T>();
         }
 
-        public T Pop()
+        public override T GetElementSafe()
         {
-            var element = GetElement();
+            var element = base.GetElementSafe();
             _activePool.Add(element);
 
             return element;
@@ -143,76 +154,6 @@ namespace Utils
         }
 
         public int CountActive => _activePool.Count;
-    }
-
-    public abstract class DictionaryMonoObjectPool<TKey,TValue> : 
-        IDictionaryObjectPool<TKey, TValue>, 
-        IObjectPoolTracked<TValue> where TValue : Component
-    {
-        [SerializeField]
-        private Pool pool = new Pool();
-        private Dictionary<TKey, TValue> _activePool;
-        public IReadOnlyDictionary<TKey, TValue> GetDictionary() => _activePool;
-
-
-        public bool IsActive() => _activePool.Count > 0;
-        public int CountActive => _activePool.Count;
-
-        public IEnumerable<TValue> GetActiveElements()
-        {
-            foreach (var pair in _activePool)
-            {
-                yield return pair.Value;
-            }
-        }
-
-        public void ReturnToElementsToPool()
-        {
-            foreach ((TKey key, TValue element) in _activePool)
-            {
-                Release(key,element);
-            }
-            _activePool.Clear();
-        }
-
-        public void Awake()
-        {
-            _activePool = new Dictionary<TKey, TValue>();
-            pool.Awake();
-        }
-
-        public TValue SafeGetActive(TKey key) 
-            => (_activePool.ContainsKey(key)) ? _activePool[key] : null;
-
-        public TValue Pop(TKey key)
-        {
-            var element = pool.Pop();
-            _activePool.Add(key,element);
-            return element;
-        }
-
-        public void Release(TKey key, TValue element)
-        {
-            if(!_activePool.ContainsKey(key)) return;
-
-            pool.Release(element);
-            _activePool.Remove(key);
-        }
-
-        public void Clear()
-        {
-            _activePool.Clear();
-            pool.Clear();
-        }
-
-        public int CountInactive => pool.CountInactive;
-
-        [Serializable]
-        private sealed class Pool : MonoObjectPool<TValue>
-        {
-           
-        }
-
     }
 
     public interface IObjectPool<T>

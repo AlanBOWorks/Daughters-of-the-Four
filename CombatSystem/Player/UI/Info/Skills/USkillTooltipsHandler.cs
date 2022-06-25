@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CombatSystem.Localization;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
@@ -10,12 +11,13 @@ using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI
 {
-    public class USkillTooltipsHandler : MonoBehaviour, ISkillTooltipListener, ISkillPointerListener
+    public class USkillTooltipsHandler : MonoBehaviour, ISkillPointerListener
     {
 
         [SerializeField]
         private SkillInfoHandler skillInfo = new SkillInfoHandler();
-        [SerializeField] private UEffectsTooltipWindowHandler tooltipWindow;
+        [SerializeField] 
+        private UEffectsTooltipWindowHandler tooltipWindow;
 
         private void Awake()
         {
@@ -27,31 +29,18 @@ namespace CombatSystem.Player.UI
             PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
         }
 
-        public void OnTooltipEffect(in PerformEffectValues values)
-        {
-            tooltipWindow.HandleEffect(in values);
-        }
-
-        public void OnToolTipOffensiveEffect(in PerformEffectValues values)
-        {
-        }
-
-        public void OnTooltipSupportEffect(in PerformEffectValues values)
-        {
-        }
-
-        public void OnTooltipTeamEffect(in PerformEffectValues values)
-        {
-        }
-
-        public void OnFinishPoolEffects()
-        {
-            tooltipWindow.OnFinisHandlingEffects();
-        }
-
         public void OnSkillButtonHover(ICombatSkill skill)
         {
             skillInfo.HandleSkillName(skill);
+            IEnumerable<PerformEffectValues> skillEffects;
+            if (skill.Preset is IVanguardSkill vanguardSkill)
+                skillEffects = vanguardSkill.GetPerformVanguardEffects();
+            else
+                skillEffects = skill.GetEffects();
+
+            tooltipWindow.HandleEffects(skillEffects);
+            tooltipWindow.Show();
+
         }
 
         public void OnSkillButtonExit(ICombatSkill skill)

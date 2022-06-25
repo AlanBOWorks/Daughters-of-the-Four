@@ -1,3 +1,4 @@
+using CombatSystem.Skills;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,7 +10,10 @@ namespace CombatSystem.Player.UI
         [SerializeField] private TextMeshProUGUI effectTextHolder;
         [SerializeField] private Image iconHolder;
 
+        public PerformEffectValues EffectValues { internal get; set; }
+
         public TextMeshProUGUI GetTextHolder() => effectTextHolder;
         public Image GetIconHolder() => iconHolder;
+
     }
 }

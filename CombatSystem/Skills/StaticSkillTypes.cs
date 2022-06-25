@@ -23,8 +23,6 @@ namespace CombatSystem.Skills
         public static readonly CombatSkill TeamCombatSkill
         = new CombatSkill(TeamSkillPreset);
 
-        public static readonly IVanguardSkill DelayVanguardSkill
-        = new VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType.DelayImprove);
         public static readonly IVanguardSkill RevengeVanguardSkill
         = new VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType.Revenge);
         public static readonly IVanguardSkill PunishVanguardSkill
@@ -34,7 +32,6 @@ namespace CombatSystem.Skills
         {
             return type switch
             {
-                EnumsVanguardEffects.VanguardEffectType.DelayImprove => DelayVanguardSkill,
                 EnumsVanguardEffects.VanguardEffectType.Revenge => RevengeVanguardSkill,
                 EnumsVanguardEffects.VanguardEffectType.Punish => PunishVanguardSkill,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
@@ -81,6 +78,7 @@ namespace CombatSystem.Skills
             public IEffect GetMainEffectArchetype() => null;
             public IEnumerable<PerformEffectValues> GetEffects() => null;
             public IEnumerable<PerformEffectValues> GetPerformVanguardEffects() => null;
+            public int VanguardEffectCount => 0;
 
             public bool IgnoreSelf() => false;
             public EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType() => _vanguardEffectType;

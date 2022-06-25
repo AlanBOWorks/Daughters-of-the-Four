@@ -1,10 +1,7 @@
 using System;
 using CombatSystem._Core;
 using CombatSystem.AI;
-using CombatSystem.Entity;
-using CombatSystem.Skills;
 using CombatSystem.Team;
-using CombatSystem.Team.VanguardEffects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -17,8 +14,24 @@ namespace CombatSystem.Player.UI
         [SerializeField, HorizontalGroup()] 
         private UVanguardEffectsTooltipWindowHandler enemyEffectTooltipsHandler;
 
+        private void Awake()
+        {
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            HandleWindowHandlerSubscriptions(playerEvents,playerEffectTooltipsHandler);
 
-        public UVanguardEffectsTooltipWindowHandler PlayerTeamType => playerEffectTooltipsHandler;
-        public UVanguardEffectsTooltipWindowHandler EnemyTeamType => enemyEffectTooltipsHandler;
+            var enemyEvents = EnemyCombatSingleton.EnemyEventsHolder;
+            HandleWindowHandlerSubscriptions(enemyEvents,enemyEffectTooltipsHandler);
+
+            void HandleWindowHandlerSubscriptions(ControllerCombatEventsHolder eventsHolder,
+                ICombatEventListener handler)
+            {
+                eventsHolder.DiscriminationEventsHolder.Subscribe(handler);
+            }
+        }
+
+        public UVanguardEffectsTooltipWindowHandler PlayerTeamType 
+            => playerEffectTooltipsHandler;
+        public UVanguardEffectsTooltipWindowHandler EnemyTeamType 
+            => enemyEffectTooltipsHandler;
     }
 }

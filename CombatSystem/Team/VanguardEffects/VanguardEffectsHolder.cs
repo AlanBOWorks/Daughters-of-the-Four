@@ -174,16 +174,5 @@ namespace CombatSystem.Team.VanguardEffects
             Type = type;
             AccumulatedAmount = accumulatedAmount;
         }
-
-        public IEnumerable<PerformEffectValues> GeneratePerformValues()
-        {
-            foreach (PerformEffectValues effect in Skill.GetPerformVanguardEffects())
-            {
-                yield return new PerformEffectValues
-                    (effect.Effect,
-                    effect.EffectValue * AccumulatedAmount,
-                    effect.TargetType);
-            }
-        }
     }
 }

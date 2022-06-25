@@ -20,11 +20,17 @@ namespace CombatSystem.Skills
         public readonly float EffectValue;
         public readonly EnumsEffect.TargetType TargetType;
 
+
         public static PerformEffectValues operator ++(PerformEffectValues a)
         {
             float effectValue = a.EffectValue;
             return new PerformEffectValues(a.Effect,effectValue *2, a.TargetType);
         }
+        public static PerformEffectValues operator *(PerformEffectValues a, float modifier)
+        {
+            return new PerformEffectValues(a.Effect, a.EffectValue * modifier, a.TargetType);
+        }
+
     }
 
     /// <summary>
