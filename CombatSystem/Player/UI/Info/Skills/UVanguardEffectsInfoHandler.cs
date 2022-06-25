@@ -1,32 +1,24 @@
+using System;
+using CombatSystem._Core;
+using CombatSystem.AI;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Team;
 using CombatSystem.Team.VanguardEffects;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UVanguardEffectsInfoHandler : MonoBehaviour, 
-        IVanguardEffectStructureBaseRead<UEffectsTooltipWindowHandler>,
-        IVanguardEffectUsageListener
+    public class UVanguardEffectsInfoHandler : MonoBehaviour, IOppositionTeamStructureRead<UVanguardEffectsTooltipWindowHandler>
     {
-        [SerializeField] private UEffectsTooltipWindowHandler revengeVanguardEffectWindow;
-        [SerializeField] private UEffectsTooltipWindowHandler punishVanguardEffectWindow;
-        [SerializeField] private bool isPlayer;
-
-        public UEffectsTooltipWindowHandler VanguardRevengeType => revengeVanguardEffectWindow;
-        public UEffectsTooltipWindowHandler VanguardPunishType => punishVanguardEffectWindow;
+        [SerializeField,HorizontalGroup()] 
+        private UVanguardEffectsTooltipWindowHandler playerEffectTooltipsHandler;
+        [SerializeField, HorizontalGroup()] 
+        private UVanguardEffectsTooltipWindowHandler enemyEffectTooltipsHandler;
 
 
-        public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
-        {
-        }
-
-        public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
-        {
-        }
-
-        public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
-        {
-        }
+        public UVanguardEffectsTooltipWindowHandler PlayerTeamType => playerEffectTooltipsHandler;
+        public UVanguardEffectsTooltipWindowHandler EnemyTeamType => enemyEffectTooltipsHandler;
     }
 }

@@ -4,12 +4,7 @@ using CombatSystem.Skills;
 
 namespace CombatSystem.Team.VanguardEffects
 {
-    public interface IVanguardEffectsStructureRead<out T> : IVanguardEffectStructureBaseRead<T>
-    {
-        T VanguardDelayImproveType { get; }
-    }
-
-    public interface IVanguardEffectStructureBaseRead<out T>
+    public interface IVanguardEffectStructureRead<out T>
     {
         T VanguardRevengeType { get; }
         T VanguardPunishType { get; }

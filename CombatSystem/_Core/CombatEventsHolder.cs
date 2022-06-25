@@ -51,6 +51,10 @@ namespace CombatSystem._Core
         private readonly IEnumerable<ICombatEventsHolder> _mainEventsHolders;
         private readonly IEnumerable<ICombatEventsHolderBase> _discriminationEventsHolders;
 
+        public ControllerCombatEventsHolder GetControllerEvents(bool isPlayer) =>
+            (isPlayer) ? _playerCombatEvents : _enemyCombatEvents;
+
+
         private IEnumerable<ICombatEventsHolder> GetMainEventsHolder()
         {
             yield return _eventsHolder;

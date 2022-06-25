@@ -48,19 +48,7 @@ namespace CombatSystem.Team.VanguardEffects
                     = vanguardEffectsHolder.GetEffectsStructure();
                 var vanguardOffensiveRecords
                     = vanguardEffectsHolder.GetOffensiveRecordsStructure();
-
-
-                // DELAY 
-                if (vanguardEffectsHolder.HasDelayEffects())
-                {
-                    //Do animation Once
-                    animator.PerformActionAnimation(StaticSkillTypes.DelayVanguardSkill, performer, performer);
-                    foreach ((IVanguardSkill vanguardSkill, var count) in vanguardEffects.VanguardDelayImproveType)
-                    {
-                        InvokeVanguardEffect(vanguardSkill, count);
-                        yield return Timing.WaitForSeconds(WaitForNextEffect);
-                    }
-                }
+                
 
                 // REVENGE
                 if (vanguardEffectsHolder.HasRevengeEffects())

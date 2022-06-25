@@ -16,7 +16,7 @@ namespace CombatSystem.Team.VanguardEffects
 
             _mainEntity = mainResponsibleEntity;
             _effectDictionaries = new VanguardEffectDictionaries<IVanguardSkill, int>();
-            _offensiveRecordsDictionaries = new VanguardEffectDictionariesBasic<CombatEntity, int>();
+            _offensiveRecordsDictionaries = new VanguardEffectDictionaries<CombatEntity, int>();
         }
 
 
@@ -28,22 +28,20 @@ namespace CombatSystem.Team.VanguardEffects
         [ShowInInspector]
         private readonly VanguardEffectDictionaries<IVanguardSkill, int> _effectDictionaries;
         [ShowInInspector]
-        private readonly VanguardEffectDictionariesBasic<CombatEntity, int> _offensiveRecordsDictionaries;
+        private readonly VanguardEffectDictionaries<CombatEntity, int> _offensiveRecordsDictionaries;
 
 
         public CombatEntity GetMainEntity() => _mainEntity;
 
-        public IVanguardEffectsStructureRead<Dictionary<IVanguardSkill, int>> GetEffectsStructure() =>
+        public IVanguardEffectStructureRead<Dictionary<IVanguardSkill, int>> GetEffectsStructure() =>
             _effectDictionaries;
 
-        public IVanguardEffectStructureBaseRead<Dictionary<CombatEntity, int>> GetOffensiveRecordsStructure() =>
+        public IVanguardEffectStructureRead<Dictionary<CombatEntity, int>> GetOffensiveRecordsStructure() =>
             _offensiveRecordsDictionaries;
 
 
 
 
-        // Delay is only added into _effectDictionaries
-        public bool HasDelayEffects() => _effectDictionaries.VanguardDelayImproveType.Count > 0;
         // Revenge effects are added in both wrappers, but if there wasn't any record of offensive
         // actions, then the effects can't be invoked.
         public bool HasRevengeEffects() => _offensiveRecordsDictionaries.VanguardRevengeType.Count > 0;
@@ -63,11 +61,10 @@ namespace CombatSystem.Team.VanguardEffects
                    && HasEffects();
         }
 
-        public bool HasEffects() => HasRevengeEffects()|| HasPunishEffects() || HasDelayEffects();
+        public bool HasEffects() => HasRevengeEffects()|| HasPunishEffects();
 
         public void Clear()
         {
-            _effectDictionaries.VanguardDelayImproveType.Clear();
             _effectDictionaries.VanguardRevengeType.Clear();
             _effectDictionaries.VanguardPunishType.Clear();
 
@@ -84,14 +81,22 @@ namespace CombatSystem.Team.VanguardEffects
             if (_mainEntity == null) return;
             if (skill == null) return;
 
+            int accumulatedAmount;
             var targetCollection = 
                 UtilsVanguardEffects.GetElement(effectType, _effectDictionaries);
             if (targetCollection.ContainsKey(skill))
             {
-                targetCollection[skill]++;
-                return;
+                accumulatedAmount = targetCollection[skill]++;
             }
-            targetCollection.Add(skill, 1);
+            else
+            {
+                accumulatedAmount = 1;
+                targetCollection.Add(skill, accumulatedAmount);
+            }
+
+            VanguardSkillAccumulation eventValues = new VanguardSkillAccumulation(
+                skill, effectType, accumulatedAmount);
+            CombatSystemSingleton.EventsHolder.OnVanguardEffectSubscribe(in eventValues);
         }
 
         public void OnOffensiveDone(CombatEntity enemyPerformer, CombatEntity onTarget)
@@ -138,21 +143,11 @@ namespace CombatSystem.Team.VanguardEffects
 
 
 
-        private sealed class VanguardEffectDictionaries<TKey, TValue> : VanguardEffectDictionariesBasic<TKey, TValue>, 
-            IVanguardEffectsStructureRead<Dictionary<TKey,TValue>>
-        {
-            public VanguardEffectDictionaries() : base()
-            {
-                VanguardDelayImproveType = new Dictionary<TKey, TValue>();
-            }
-            [ShowInInspector]
-            public Dictionary<TKey, TValue> VanguardDelayImproveType { get; }
-        }
 
-        private class VanguardEffectDictionariesBasic<TKey, TValue> : 
-            IVanguardEffectStructureBaseRead<Dictionary<TKey, TValue>>
+        private class VanguardEffectDictionaries<TKey, TValue> : 
+            IVanguardEffectStructureRead<Dictionary<TKey, TValue>>
         {
-            public VanguardEffectDictionariesBasic()
+            public VanguardEffectDictionaries()
             {
                 VanguardRevengeType = new Dictionary<TKey, TValue>();
                 VanguardPunishType = new Dictionary<TKey, TValue>();
@@ -166,18 +161,29 @@ namespace CombatSystem.Team.VanguardEffects
 
     public readonly struct VanguardSkillAccumulation
     {
-        public readonly EnumsVanguardEffects.VanguardEffectType Type;
         public readonly IVanguardSkill Skill;
+        public readonly EnumsVanguardEffects.VanguardEffectType Type;
         public readonly int AccumulatedAmount;
 
         public VanguardSkillAccumulation(
-            EnumsVanguardEffects.VanguardEffectType type, 
             IVanguardSkill skill, 
+            EnumsVanguardEffects.VanguardEffectType type, 
             int accumulatedAmount)
         {
-            Type = type;
             Skill = skill;
+            Type = type;
             AccumulatedAmount = accumulatedAmount;
+        }
+
+        public IEnumerable<PerformEffectValues> GeneratePerformValues()
+        {
+            foreach (PerformEffectValues effect in Skill.GetPerformVanguardEffects())
+            {
+                yield return new PerformEffectValues
+                    (effect.Effect,
+                    effect.EffectValue * AccumulatedAmount,
+                    effect.TargetType);
+            }
         }
     }
 }

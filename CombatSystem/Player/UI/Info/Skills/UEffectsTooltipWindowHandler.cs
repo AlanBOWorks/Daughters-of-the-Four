@@ -11,56 +11,69 @@ using Utils.Utils;
 
 namespace CombatSystem.Player.UI
 {
-    public class UEffectsTooltipWindowHandler : MonoBehaviour
+    public class UEffectsTooltipWindowHandler : UEffectTooltipWindowHandlerBasic<UEffectTooltipHolder>
     {
         [Title("Pool References")]
         [SerializeField, PropertyOrder(10)] private ToolTipWindowPool pool;
 
-        [Title("Mono References")] 
+        [Serializable]
+        private sealed class ToolTipWindowPool : TrackedMonoObjectPool<UEffectTooltipHolder>
+        {}
+
+        protected override IObjectPoolBasic GetPool() => pool;
+        protected override IObjectPoolTracked<UEffectTooltipHolder> GetTrackedPool() => pool;
+
+        public void HandleEffect(in PerformEffectValues values)
+        {
+            var textElement = pool.Pop();
+            HandleText(textElement, in values);
+            HandleIcon(textElement, values.Effect);
+        }
+    }
+
+    public abstract class UEffectTooltipWindowHandlerBasic<T> : MonoBehaviour where T : UEffectTooltipHolder
+    {
+        [Title("Mono References")]
         [SerializeField]
         private RectTransform parentHolder;
-        
 
-        [Title("Params")] 
-        [SerializeField,SuffixLabel("px")] private float topMargin = 12;
-        [SerializeField,SuffixLabel("px")] private float bottomMargin = 12;
+
+        [Title("Params")]
+        [SerializeField, SuffixLabel("px")] private float topMargin = 12;
+        [SerializeField, SuffixLabel("px")] private float bottomMargin = 12;
+
+        protected abstract IObjectPoolBasic GetPool();
+        protected abstract IObjectPoolTracked<T> GetTrackedPool();
 
         private void Awake()
         {
-            pool.Awake();
+            GetPool().Awake();
             gameObject.SetActive(false);
         }
 
         public void Hide()
         {
             gameObject.SetActive(false);
-            pool.ReturnToElementsToPool();
+            GetTrackedPool().ReturnToElementsToPool();
         }
 
         public void Show()
         {
-            if(gameObject.activeSelf) return;
+            if (gameObject.activeSelf) return;
             gameObject.SetActive(true);
 
             //todo animation?
         }
 
 
-
-        public void HandleEffect(in PerformEffectValues values)
-        {
-            var textElement = pool.Get();
-            HandleText(textElement, in values);
-            HandleIcon(textElement,values.Effect);
-        }
-        private static void HandleText(UEffectTooltipHolder holder, in PerformEffectValues values)
+        protected static void HandleText(T holder, in PerformEffectValues values)
         {
             var text = holder.GetTextHolder();
             var effectText = LocalizeEffects.LocalizeEffectTooltip(in values);
             text.text = effectText;
         }
 
-        public static void HandleIcon(UEffectTooltipHolder holder, IEffectBasicInfo effect)
+        protected static void HandleIcon(T holder, IEffectBasicInfo effect)
         {
             var icon = UtilsVisual.GetEffectSprite(effect);
             var iconHolder = holder.GetIconHolder();
@@ -69,13 +82,15 @@ namespace CombatSystem.Player.UI
 
 
         private float _accumulatedHeight;
-        public void OnFinisHandlingEffects()
+        public void OnFinisHandlingEffects() => OnFinisHandlingEffects(GetTrackedPool());
+
+        private void OnFinisHandlingEffects(IObjectPoolTracked<T> elementsPool)
         {
-            bool isActive = pool.IsActive();
+            bool isActive = elementsPool.IsActive();
 
             if (isActive)
             {
-                HeightResize();
+                HeightResize(elementsPool);
                 Show();
             }
             else
@@ -84,19 +99,19 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        private void HeightResize()
+        private void HeightResize(IObjectPoolTracked<T> elementsPool)
         {
             _accumulatedHeight = topMargin;
-            var activeElements = pool.GetActiveElements();
+            var activeElements = elementsPool.GetActiveElements();
             foreach (var element in activeElements)
             {
-                HandleHeight(in element);
+                HandleHeight(element);
             }
 
             _accumulatedHeight += bottomMargin;
             parentHolder.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _accumulatedHeight);
         }
-        private void HandleHeight(in UEffectTooltipHolder holder)
+        private void HandleHeight(T holder)
         {
             var text = holder.GetTextHolder();
             var textTransform = text.rectTransform;
@@ -106,14 +121,6 @@ namespace CombatSystem.Player.UI
             UtilsRectTransform.SetPivotVertical(in textTransform, -pivotHeight);
 
             _accumulatedHeight += textHeight;
-        }
-
-
-
-        [Serializable]
-        private sealed class ToolTipWindowPool : TrackedMonoObjectPool<UEffectTooltipHolder>
-        {
-            
         }
     }
 }
