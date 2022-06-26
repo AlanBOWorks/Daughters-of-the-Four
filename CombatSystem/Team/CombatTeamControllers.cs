@@ -11,7 +11,7 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     public sealed class CombatTeamControllersHandler : IOppositionTeamStructureRead<CombatTeamControllerBase>,
-        ITempoTeamStatesListener,
+        ITempoTeamStatesListener, ITempoTeamStatesExtraListener,
         ICombatStatesListener
     {
         [ShowInInspector, HorizontalGroup()]
@@ -62,14 +62,14 @@ namespace CombatSystem.Team
             _currentControl = controller;
         }
 
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        {
+        }
+
         public void OnAllActorsNoActions(CombatEntity lastActor)
         {
         }
-
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-        }
-
+        
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             _currentControl = null;

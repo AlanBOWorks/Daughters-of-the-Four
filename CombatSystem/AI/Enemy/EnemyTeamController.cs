@@ -9,7 +9,8 @@ using UnityEngine;
 
 namespace CombatSystem.AI
 {
-    public class EnemyTeamControllerRandom : CombatTeamControllerBase, ITempoTeamStatesListener, ISkillUsageListener
+    public class EnemyTeamControllerRandom : CombatTeamControllerBase, ITempoTeamStatesListener, ITempoTeamStatesExtraListener,
+        ISkillUsageListener
     {
         public override void InvokeStartControl()
         {
@@ -20,11 +21,12 @@ namespace CombatSystem.AI
         {
         }
 
-        public void OnAllActorsNoActions(CombatEntity lastActor)
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
         {
+            
         }
 
-        public void OnControlFinishAllActors(CombatEntity lastActor)
+        public void OnAllActorsNoActions(CombatEntity lastActor)
         {
             ForceFinish();
         }

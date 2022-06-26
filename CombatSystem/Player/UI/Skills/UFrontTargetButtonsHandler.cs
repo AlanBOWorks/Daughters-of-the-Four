@@ -153,8 +153,10 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
         {
+            
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
@@ -162,20 +164,12 @@ namespace CombatSystem.Player.UI
             HideTargets();
         }
 
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-            HideTargets();
-        }
 
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             HideTargets();
         }
 
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
-        {
-            
-        }
 
         public void OnSkillButtonHover(ICombatSkill skill)
         {

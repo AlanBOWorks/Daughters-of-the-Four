@@ -12,7 +12,7 @@ namespace CombatSystem.Player
         IOverridePauseElement,
         IPlayerEntityListener, 
 
-        ITempoTeamStatesListener,
+        ITempoTeamStatesExtraListener,
 
         ISkillUsageListener, ISkillSelectionListener,
         ITargetSelectionListener
@@ -138,18 +138,6 @@ namespace CombatSystem.Player
 
 
         public void OnTempoPreStartControl(CombatTeamControllerBase controller)
-        {
-        }
-
-        public void OnAllActorsNoActions(CombatEntity lastActor)
-        {
-        }
-
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-        }
-
-        public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
         }
 

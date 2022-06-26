@@ -161,6 +161,7 @@ namespace CombatSystem.Player.UI
             HandlePool(entitySkills);
 
             ShowSkillsAnimated();
+            Debug.Log("Shi");
 
             void ShowSkillsAnimated()
             {
@@ -225,11 +226,9 @@ namespace CombatSystem.Player.UI
             buttonHolder.ResetState();
         }
 
+        
 
-
-
-
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
         {
             EnableHolder();
         }
@@ -238,16 +237,8 @@ namespace CombatSystem.Player.UI
         {
             DisableHolder();
         }
-
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-        }
-
+        
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
-        {
-        }
-
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             DisableHolder();
         }
@@ -284,7 +275,7 @@ namespace CombatSystem.Player.UI
         
 
 
-        public void SwitchControllingEntity(in CombatEntity targetEntity)
+        public void SwitchControllingEntity(CombatEntity targetEntity)
         {
             if (_currentSelectedSkill != null)
             {
@@ -401,7 +392,7 @@ namespace CombatSystem.Player.UI
         public void OnPerformerSwitch(CombatEntity performer)
         {
             if(performer == null) return;
-            SwitchControllingEntity(in performer);
+            SwitchControllingEntity(performer);
         }
 
     }

@@ -83,8 +83,13 @@ namespace CombatSystem._Core
 
         public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
-            if(!ShowTeamLogs || !_teamLogs.OnStartControl) return;
+        }
+
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        {
+            if (!ShowTeamLogs || !_teamLogs.OnStartControl) return;
             Debug.Log($"Start Control: {controller} | Controlling {controller.ControllingTeam.GetControllingMembers().Count}");
+
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
@@ -121,6 +126,7 @@ namespace CombatSystem._Core
             public bool OnSequence = true;
             public bool OnAction = true;
             public bool OnFinishAction = true;
+            public bool OnNoActionLeft = true;
             public bool OnFinishSequence = true;
         }
 
@@ -175,6 +181,9 @@ namespace CombatSystem._Core
 
         public void OnEntityEmptyActions(CombatEntity entity)
         {
+            if (!ShowEntitySequenceLogs || !_entitySequenceLogs.OnNoActionLeft) return;
+            Debug.Log($"> --- Entity 0 Action: {entity.GetProviderEntityName()}");
+
         }
 
         public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
@@ -184,7 +193,7 @@ namespace CombatSystem._Core
         }
 
         [Title("Entity Extra")]
-        public bool ShoEntitySequenceExtraLogs = false;
+        public bool ShowEntitySequenceExtraLogs = false;
         private sealed class EntitySequenceExtraLogs
         {
             public bool OnRequest = true;
@@ -196,19 +205,19 @@ namespace CombatSystem._Core
 
         public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
-            if (!ShoEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnRequest) return;
+            if (!ShowEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnRequest) return;
             Debug.Log("After Request Sequence");
         }
 
         public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
-            if (!ShoEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnFinish) return;
+            if (!ShowEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnFinish) return;
             Debug.Log("--------- -------- END SEQUENCE -------- -------- --------");
         }
 
         public void OnNoActionsForcedFinish(CombatEntity entity)
         {
-            if (!ShoEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnNoActions) return;
+            if (!ShowEntitySequenceExtraLogs || !_entitySequenceExtraLogs.OnNoActions) return;
             Debug.Log($"Request Sequence - NO ACTIONS: {entity.CombatCharacterName}");
         }
 

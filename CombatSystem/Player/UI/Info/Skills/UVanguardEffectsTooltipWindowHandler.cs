@@ -14,7 +14,7 @@ namespace CombatSystem.Player.UI
 {
     public class UVanguardEffectsTooltipWindowHandler : MonoBehaviour, 
         IVanguardEffectUsageListener,
-        ITempoTeamStatesListener,
+        ITempoTeamStatesExtraListener,
         ICombatTerminationListener
     {
         [Title("Pool References")] 
@@ -145,19 +145,6 @@ namespace CombatSystem.Player.UI
             if(controller.ControllingTeam.VanguardEffectsHolder.IsMainEntityTurn())
                 ResetHandlerStates();
         }
-
-        public void OnAllActorsNoActions(CombatEntity lastActor)
-        {
-        }
-
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-        }
-
-        public void OnTempoFinishControl(CombatTeamControllerBase controller)
-        {
-        }
-
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
         }

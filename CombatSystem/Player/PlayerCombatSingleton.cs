@@ -35,10 +35,8 @@ namespace CombatSystem.Player
 
 
             PerformerSwitcher = new PlayerPerformerSwitcher();
-            playerEvents.ManualSubscribe((ICombatPreparationListener) PerformerSwitcher);
-            discriminationEvents.ManualSubscribe((ITempoTeamStatesListener)PerformerSwitcher);
-            discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesExtraListener);
-            discriminationEvents.ManualSubscribe(PerformerSwitcher as ITempoEntityStatesListener);
+            playerEvents.ManualSubscribe(PerformerSwitcher);
+            discriminationEvents.Subscribe(PerformerSwitcher);
             
             CombatEscapeButtonHandler = new CombatEscapeButtonHandler();
             playerEvents.ManualSubscribe((ICombatStatesListener) CombatEscapeButtonHandler);

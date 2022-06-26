@@ -9,7 +9,7 @@ namespace CombatSystem._Core
 {
     internal sealed class TempoSequenceStepper 
     {
-        public void OnTempoStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
             var team = controller.ControllingTeam;
             team.OnControlStart();

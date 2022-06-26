@@ -118,18 +118,13 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
         }
 
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
         {
-           ShowAll();
+            ShowAll();
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
         {
-        }
-
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-            
         }
 
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
@@ -137,9 +132,6 @@ namespace CombatSystem.Player.UI
            _currentPerformer = null;
         }
 
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
-        {
-        }
 
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)

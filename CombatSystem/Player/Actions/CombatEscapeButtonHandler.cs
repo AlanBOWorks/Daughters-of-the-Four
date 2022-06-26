@@ -14,7 +14,8 @@ namespace CombatSystem.Player
     
     internal sealed class CombatEscapeButtonHandler : 
         IEscapeButtonHandler,
-        ICombatStatesListener, ITempoTeamStatesListener,
+        ICombatStatesListener, 
+        ITempoTeamStatesListener,
         ISkillSelectionListener
     {
         public CombatEscapeButtonHandler()
@@ -120,21 +121,18 @@ namespace CombatSystem.Player
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            ResetState();
         }
 
         public void OnCombatStart()
         {
         }
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+      
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
         {
+            ResetState();
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
-        {
-        }
-
-        public void OnControlFinishAllActors(CombatEntity lastActor)
         {
         }
 
@@ -143,9 +141,6 @@ namespace CombatSystem.Player
             ClearStack();
         }
 
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
-        {
-        }
       
 
         public void OnSkillSelect(CombatSkill skill)

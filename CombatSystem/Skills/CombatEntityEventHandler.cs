@@ -98,18 +98,5 @@ namespace CombatSystem.Skills
             eventsHolder.OnEntityRequestAction(entity);
         }
 
-        public void TryCallOnFinishAllActors(in CombatEntity entity)
-        {
-            var entityTeam = entity.Team;
-            bool hasMoreEntitiesToControl = entityTeam.CanControl();
-            if (hasMoreEntitiesToControl) return;
-
-
-            var controllingMembers = entityTeam.GetControllingMembers();
-            if (controllingMembers.Count > 0) return;
-
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnControlFinishAllActors(entity);
-        }
     }
 }

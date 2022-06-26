@@ -52,8 +52,7 @@ namespace CombatSystem.Player.UI
             focusIcon.rotation = Quaternion.AngleAxis(-10, Vector3.forward); 
             focusIcon.DORotateQuaternion(Quaternion.identity, AnimationDuration);
         }
-
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
         {
             Show();
         }
@@ -62,18 +61,9 @@ namespace CombatSystem.Player.UI
         {
             Hide();
         }
-
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-        }
-
+        
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
-        }
-
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
-        {
-            
         }
 
 

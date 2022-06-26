@@ -161,7 +161,7 @@ namespace CombatSystem.Team
 
         public void AddActiveEntity(CombatEntity entity, bool canControl)
         {
-            _controlMembers.AddActiveEntity(in entity, in canControl);
+            _controlMembers.AddActiveEntity(entity, canControl);
         }
 
         public void OnEntityRequestSequence(CombatEntity entity)
@@ -187,6 +187,11 @@ namespace CombatSystem.Team
         public void OnControlFinnish()
         {
             ClearControllingMembers();
+            var allMembers = GetAllMembers();
+            foreach (var member in allMembers)
+            {
+                UtilsCombatStats.ResetActions(member.Stats);
+            }
         }
 
         // ------------ OTHErS ------------ 

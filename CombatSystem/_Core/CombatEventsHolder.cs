@@ -285,9 +285,6 @@ namespace CombatSystem._Core
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnAfterEntitySequenceFinish(entity);
-
-
-            _entityEventHandler.TryCallOnFinishAllActors(in entity);
         }
 
         public void OnNoActionsForcedFinish(CombatEntity entity)
@@ -301,10 +298,18 @@ namespace CombatSystem._Core
         public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             HandleCurrentDiscriminationEventsHolder(in controller);
-            _tempoSequenceStepper.OnTempoStartControl(in controller);
+            _tempoSequenceStepper.OnTempoPreStartControl(in controller);
 
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoPreStartControl(controller);
+
+            OnTempoStartControl(controller);
+        }
+
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        {
+            foreach (var eventsHolder in _discriminatedEventsEnumerable) 
+                eventsHolder.OnTempoStartControl(controller);
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
@@ -313,11 +318,6 @@ namespace CombatSystem._Core
                 eventsHolder.OnAllActorsNoActions(lastActor);
         }
 
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-            foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnControlFinishAllActors(lastActor);
-        }
 
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
@@ -948,6 +948,7 @@ namespace CombatSystem._Core
             _tempoEntityExtraListeners = new HashSet<ITempoEntityStatesExtraListener>();
 
             _tempoTeamListeners = new HashSet<ITempoTeamStatesListener>();
+            _tempoExtraTeamListeners = new HashSet<ITempoTeamStatesExtraListener>();
 
             _skillUsageListeners = new HashSet<ISkillUsageListener>();
             _effectUsageListeners = new HashSet<IEffectUsageListener>();
@@ -965,6 +966,7 @@ namespace CombatSystem._Core
 
         [ShowInInspector]
         private readonly ICollection<ITempoTeamStatesListener> _tempoTeamListeners;
+        private readonly ICollection<ITempoTeamStatesExtraListener> _tempoExtraTeamListeners;
 
         [ShowInInspector] private readonly ICollection<ISkillUsageListener> _skillUsageListeners;
         [ShowInInspector] private readonly ICollection<IEffectUsageListener> _effectUsageListeners;
@@ -988,6 +990,8 @@ namespace CombatSystem._Core
 
             if (listener is ITempoTeamStatesListener tempoTeamStatesListener)
                 _tempoTeamListeners.Add(tempoTeamStatesListener);
+            if(listener is ITempoTeamStatesExtraListener tempoExtraStatesListener)
+                _tempoExtraTeamListeners.Add(tempoExtraStatesListener);
             if (listener is ITeamEventListener teamEventListener)
                 _teamEventListeners.Add(teamEventListener);
 
@@ -1013,6 +1017,10 @@ namespace CombatSystem._Core
 
             if (listener is ITempoTeamStatesListener tempoTeamStatesListener)
                 _tempoTeamListeners.Remove(tempoTeamStatesListener);
+            if (listener is ITempoTeamStatesExtraListener tempoExtraStatesListener)
+                _tempoExtraTeamListeners.Remove(tempoExtraStatesListener);
+            if (listener is ITeamEventListener teamEventListener)
+                _teamEventListeners.Remove(teamEventListener);
 
 
             if (listener is ISkillUsageListener skillUsageListener)
@@ -1021,11 +1029,8 @@ namespace CombatSystem._Core
                 _effectUsageListeners.Remove(effectUsageListener);
             if (listener is IVanguardEffectUsageListener vanguardEffectUsageListener)
                 _vanguardEffectUsageListeners.Remove(vanguardEffectUsageListener);
-
-
-            if (listener is ITeamEventListener teamEventListener)
-                _teamEventListeners.Remove(teamEventListener);
         }
+
 
 
         public void ManualSubscribe(ITempoEntityStatesListener tempoEntityListener)
@@ -1033,6 +1038,10 @@ namespace CombatSystem._Core
             _tempoEntityListeners.Add(tempoEntityListener);
         }
 
+        public void ManualSubscribe(ITempoTeamStatesExtraListener tempoTeamStatesExtraListener)
+        {
+            _tempoExtraTeamListeners.Add(tempoTeamStatesExtraListener);
+        }
         public void ManualSubscribe(ITempoEntityStatesExtraListener tempoEntityExtraListener)
         {
             _tempoEntityExtraListeners.Add(tempoEntityExtraListener);
@@ -1138,9 +1147,17 @@ namespace CombatSystem._Core
 
         public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
-            foreach (var listener in _tempoTeamListeners)
+            foreach (var listener in _tempoExtraTeamListeners)
             {
                 listener.OnTempoPreStartControl(controller);
+            }
+        }
+
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        {
+            foreach (var listener in _tempoTeamListeners)
+            {
+                listener.OnTempoStartControl(controller);
             }
         }
 
@@ -1151,15 +1168,7 @@ namespace CombatSystem._Core
                 listener.OnAllActorsNoActions(lastActor);
             }
         }
-
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-            foreach (var listener in _tempoTeamListeners)
-            {
-                listener.OnControlFinishAllActors(lastActor);
-            }
-        }
-
+        
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             foreach (var listener in _tempoTeamListeners)
@@ -1171,7 +1180,7 @@ namespace CombatSystem._Core
 
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
-            foreach (var listener in _tempoTeamListeners)
+            foreach (var listener in _tempoExtraTeamListeners)
             {
                 listener.OnTempoFinishLastCall(controller);
             }
@@ -1293,7 +1302,7 @@ namespace CombatSystem._Core
     }
 
     public interface ICombatEventsHolderBase : ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
-        ITempoTeamStatesListener,
+        ITempoTeamStatesListener, ITempoTeamStatesExtraListener,
         ISkillUsageListener, IEffectUsageListener,
         IVanguardEffectUsageListener,
         ITeamEventListener

@@ -208,7 +208,7 @@ namespace CombatSystem.Stats
         }
 
         /// <summary>
-        /// Checks if the entity has enough Actions points, initiative and isAlive
+        /// Checks if the entity has enough Actions points and isAlive
         /// </summary>
         public static bool CanControlAct(CombatEntity entity)
         {

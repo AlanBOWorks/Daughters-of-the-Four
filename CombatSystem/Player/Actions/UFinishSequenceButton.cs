@@ -19,19 +19,19 @@ namespace CombatSystem.Player
             PlayerCombatSingleton.PlayerTeamController.FinishCurrentPerformer();
         }
 
-        public override void OnTempoPreStartControl(CombatTeamControllerBase controller)
+        public override void OnTempoStartControl(CombatTeamControllerBase controller)
         {
-            base.OnTempoPreStartControl(controller);
-
+            base.OnTempoStartControl(controller);
             bool isSingleActor = controller.GetAllControllingMembers().Count <= 1;
-            if(isSingleActor) return;
-            
+            if (isSingleActor) return;
+
             Enable();
         }
 
-        public override void OnControlFinishAllActors(CombatEntity lastActor)
+        public override void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             Disable();
+            base.OnTempoFinishControl(controller);
         }
 
         private void Enable()

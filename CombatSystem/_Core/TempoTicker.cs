@@ -273,10 +273,10 @@ namespace CombatSystem._Core
     public interface ITempoTeamStatesListener : ICombatEventListener
     {
         /// <summary>
-        /// First call; It's before [<seealso cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>]
+        /// Invoked when the controller starts; It's after [<seealso cref="ITempoTeamStatesExtraListener.OnTempoPreStartControl"/>]
         /// </summary>
-        void OnTempoPreStartControl(CombatTeamControllerBase controller);
-
+        /// <param name="controller"></param>
+        void OnTempoStartControl(CombatTeamControllerBase controller);
         /// <summary>
         /// Similar to [<seealso cref="OnControlFinishAllActors"/>] but before the skills performing
         /// </summary>
@@ -284,19 +284,24 @@ namespace CombatSystem._Core
         void OnAllActorsNoActions(CombatEntity lastActor);
 
         /// <summary>
-        /// Event send after all members had finished; this is invoked before [<seealso cref="OnTempoFinishControl"/>]
-        /// </summary>
-        void OnControlFinishAllActors(CombatEntity lastActor);
-        /// <summary>
         /// Invoked when the Entity's Controller decides that there's no more actions to make
         /// </summary>
         void OnTempoFinishControl(CombatTeamControllerBase controller);
+    }
 
+    public interface ITempoTeamStatesExtraListener : ICombatEventListener
+    {
+        /// <summary>
+        /// First call; It's before [<seealso cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>]
+        /// and [<seealso cref="ITempoTeamStatesListener.OnTempoStartControl"/>]
+        /// </summary>
+        void OnTempoPreStartControl(CombatTeamControllerBase controller);
         /// <summary>
         /// The very last call of this events; when everything was removed and invoked
         /// </summary>
         void OnTempoFinishLastCall(CombatTeamControllerBase controller);
     }
+
 
     public interface ITempoEntityPercentListener : ICombatEventListener
     {

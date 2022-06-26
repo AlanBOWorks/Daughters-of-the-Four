@@ -660,11 +660,11 @@ namespace CombatSystem.Team
             {
                 foreach (var member in members)
                 {
-                    HandleMember(in member, in canControlMember);
+                    HandleMember(member, canControlMember);
                 }
             }
 
-            void HandleMember(in CombatEntity member, in bool canControlMember)
+            void HandleMember(CombatEntity member, bool canControlMember)
             {
                 bool isTrinity = UtilsTeam.IsTrinityRole(in member);
                 eventsHolder.OnEntityRequestSequence(member, canControlMember);

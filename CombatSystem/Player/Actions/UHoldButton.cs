@@ -134,30 +134,21 @@ namespace CombatSystem.Player
         {
             gameObject.SetActive(false);
         }
-
-
-        public virtual void OnTempoPreStartControl(CombatTeamControllerBase controller)
+        
+        public virtual void OnTempoStartControl(CombatTeamControllerBase controller)
         {
             Show();
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
-        {
-            
-        }
+        { }
 
-        public virtual void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-        }
 
         public virtual void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             Hide();
         }
 
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
-        {
-        }
 
     }
 }

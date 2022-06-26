@@ -153,7 +153,8 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+       
+        public void OnTempoStartControl(CombatTeamControllerBase controller)
         {
             ShowUI();
         }
@@ -162,20 +163,12 @@ namespace CombatSystem.Player.UI
         {
             _currentEntity = null;
         }
-
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-           
-        }
-
+        
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
+            _currentEntity = null;
         }
 
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
-        {
-            
-        }
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
