@@ -13,29 +13,33 @@ namespace CombatSystem.Skills.Effects
         public static void DoSkillOnTarget(ISkill skill, CombatEntity performer, CombatEntity onTarget)
         {
             CombatSystemSingleton.SkillTargetingHandler.HandleSkill(skill, performer, onTarget);
-            
-            var preset = skill;
-            IEnumerable<PerformEffectValues> effects;
-            if (preset is IVanguardSkill vanguardSkill)
-            {
-                effects = vanguardSkill.GetPerformVanguardEffects();
-                // VanguardSkills can't have self-exclusions
-                DoSkillOnTarget(null);
-            }
-            else
-            {
-                CombatEntity exclusion = skill.IgnoreSelf() ? performer : null;
-                effects = skill.GetEffects();
-                DoSkillOnTarget(exclusion);
-            }
 
-            void DoSkillOnTarget(CombatEntity exclusion)
+            CombatEntity exclusion = skill.IgnoreSelf() ? performer : null;
+            var effects = skill.GetEffects();
+            DoSkillOnTarget();
+
+            void DoSkillOnTarget()
             {
                 DoEffectsOnTarget(performer, exclusion, effects);
 
             }
         }
 
+        public static void DoVanguardSkill(in VanguardSkillUsageValues values)
+        {
+            var skill = values.UsedSkill;
+            var performer = values.Performer.GetMainEntity();
+            var iterations = values.Iterations;
+
+            foreach (var effect in skill.GetPerformVanguardEffects())
+            {
+                PerformEffectValues performValue = new PerformEffectValues(
+                    effect.Effect,
+                    effect.EffectValue * iterations,
+                    effect.TargetType);
+                DoEffect(performer,null, performValue);
+            }
+        }
 
 
         private static void DoEffectsOnTarget(CombatEntity performer, CombatEntity exclusion,

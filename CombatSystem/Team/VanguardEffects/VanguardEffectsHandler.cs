@@ -83,13 +83,13 @@ namespace CombatSystem.Team.VanguardEffects
 
                 void InvokeVanguardEffect(IVanguardSkill skill, int totalIteration)
                 {
-                    eventsHolder.OnVanguardEffectPerform(
-                        new VanguardSkillUsageValues(
-                            vanguardEffectsHolder, 
-                            skill,
-                        totalIteration));
+                    var vanguardValues = new VanguardSkillUsageValues(
+                        vanguardEffectsHolder,
+                        skill,
+                        totalIteration);
+                    eventsHolder.OnVanguardEffectPerform(vanguardValues);
 
-                    UtilsCombatSkill.DoSkillOnTarget(skill,performer,performer);
+                    UtilsCombatSkill.DoVanguardSkill(in vanguardValues);
                 }
             }
         }

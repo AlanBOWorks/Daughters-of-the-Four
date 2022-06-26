@@ -86,7 +86,8 @@ namespace CombatSystem.Team.VanguardEffects
                 UtilsVanguardEffects.GetElement(effectType, _effectDictionaries);
             if (targetCollection.ContainsKey(skill))
             {
-                accumulatedAmount = targetCollection[skill]++;
+                accumulatedAmount = targetCollection[skill] + 1;
+                targetCollection[skill] = accumulatedAmount;
             }
             else
             {

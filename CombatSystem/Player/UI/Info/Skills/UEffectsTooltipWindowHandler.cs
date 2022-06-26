@@ -63,8 +63,7 @@ namespace CombatSystem.Player.UI
 
         protected void HeightResize(float accumulatedHeight)
         {
-            accumulatedHeight += verticalPadding;
-            resizeWindow.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, accumulatedHeight);
+            UtilsEffectTooltip.HandleRootHeight(resizeWindow,accumulatedHeight,verticalPadding);
         }
     }
 
@@ -74,7 +73,6 @@ namespace CombatSystem.Player.UI
         {
             var textHolder = holder.GetTextHolder();
             var effectText = LocalizeEffects.LocalizeEffectTooltip(in values);
-            holder.EffectValues = values;
             textHolder.text = effectText;
         }
 
@@ -102,6 +100,12 @@ namespace CombatSystem.Player.UI
             UtilsRectTransform.SetPivotVertical(textTransform, -pivotHeight);
 
             accumulatedHeight += textHeight;
+        }
+
+        public static void HandleRootHeight(RectTransform resizeWindow, float accumulatedHeight,float verticalPadding)
+        {
+            accumulatedHeight += verticalPadding;
+            resizeWindow.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, accumulatedHeight);
         }
     }
 }

@@ -6,6 +6,7 @@ using CombatSystem.Skills;
 using CombatSystem.Team;
 using CombatSystem.Team.VanguardEffects;
 using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 using Utils;
 
@@ -22,11 +23,24 @@ namespace CombatSystem.Player.UI
         [SerializeField] 
         private RectTransform onReturnParent;
 
+        [SerializeField, HorizontalGroup("Roots")]
+        private GameObject punishRootHolder;
+        [SerializeField, HorizontalGroup("Roots")]
+        private GameObject revengeRootHolder;
+
+
         [Title("Pools")]
-        [SerializeField]
-        private ObjectPool punishPool;
-        [SerializeField] 
-        private ObjectPool revengePool;
+        [SerializeField,HorizontalGroup("Pools")]
+        private ObjectPool punishPool = new ObjectPool();
+        [Title("Pools")]
+        [SerializeField, HorizontalGroup("Pools")]
+        private ObjectPool revengePool = new ObjectPool();
+
+        [SerializeField, HorizontalGroup("Counter")]
+        private TriggerCountHandler punishCountHandler;
+        [SerializeField, HorizontalGroup("Counter")]
+        private TriggerCountHandler revengeCountHandler;
+
 
         private IReadOnlyDictionary<IVanguardSkill, ICollection<UEffectTooltipHolder>> _dictionary;
         public IReadOnlyDictionary<IVanguardSkill, ICollection<UEffectTooltipHolder>> GetDictionary() => _dictionary;
@@ -44,26 +58,41 @@ namespace CombatSystem.Player.UI
 
             onReturnParent.gameObject.SetActive(false);
             effectPrefab.gameObject.SetActive(false);
+
+            ResetHandlerStates();
         }
 
 
         public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
         {
             var type = values.Type;
-            ObjectPool pool = (type == EnumsVanguardEffects.VanguardEffectType.Revenge)
-                ? revengePool
-                : punishPool;
+            ObjectPool pool;
+            GameObject holderRoot;
+            if (type == EnumsVanguardEffects.VanguardEffectType.Revenge)
+            {
+                pool = revengePool;
+                holderRoot = revengeRootHolder;
+            }
+            else
+            {
+                pool = punishPool;
+                holderRoot = punishRootHolder;
+            }
 
-            var skill = values.Skill;
-            if(_dictionary.ContainsKey(skill))
-                MultiplyEffects();
+            holderRoot.SetActive(true);
+
+            var vanguardSkill = values.Skill;
+            if(_dictionary.ContainsKey(vanguardSkill))
+            {
+                float modifier = values.AccumulatedAmount;
+                MultiplyEffects(modifier);
+            }
             else
                 pool.SpawnSkillEffects(values);
 
-            void MultiplyEffects()
+            void MultiplyEffects(float modifier)
             {
-                var elements = _dictionary[skill];
-                float modifier = skill.VanguardEffectCount;
+                var elements = _dictionary[vanguardSkill];
                 foreach (var holder in elements)
                 {
                     UtilsEffectTooltip.MultiplyEffectText(holder, modifier);
@@ -71,15 +100,25 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        private void ReturnElementsToPool()
+        private void ResetHandlerStates()
         {
+            punishRootHolder.SetActive(false);
+            revengeRootHolder.SetActive(false);
+
             punishPool.ReturnToElementsToPool();
             revengePool.ReturnToElementsToPool();
+
+            punishCountHandler.ResetCount();
+            revengeCountHandler.ResetCount();
         }
 
         public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
         {
+            TriggerCountHandler handler = (type == EnumsVanguardEffects.VanguardEffectType.Revenge)
+                ? revengeCountHandler
+                : punishCountHandler;
 
+            handler.IncrementCount();
         }
 
         public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
@@ -90,7 +129,7 @@ namespace CombatSystem.Player.UI
 
         public void OnCombatEnd()
         {
-            ReturnElementsToPool();
+            ResetHandlerStates();
         }
 
         public void OnCombatFinish(bool isPlayerWin)
@@ -104,7 +143,7 @@ namespace CombatSystem.Player.UI
         public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             if(controller.ControllingTeam.VanguardEffectsHolder.IsMainEntityTurn())
-                ReturnElementsToPool();
+                ResetHandlerStates();
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
@@ -166,12 +205,18 @@ namespace CombatSystem.Player.UI
 
             }
 
+            private const float ParentBottomPadding = 36;
+            private void ResizePopParentSize()
+            {
+                UtilsEffectTooltip.HandleRootHeight(onPopParent, _accumulatedHeight, ParentBottomPadding);
+            }
+
             public void SpawnSkillEffects(VanguardSkillAccumulation values)
             {
                 var skill = values.Skill;
                 int accumulatedAmount = values.AccumulatedAmount;
                 HandleAsNewCollection();
-
+                ResizePopParentSize();
 
                 void HandleAsNewCollection()
                 {
@@ -230,6 +275,7 @@ namespace CombatSystem.Player.UI
                     }
                 }
                 _accumulatedHeight = 0;
+                ResizePopParentSize();
             }
 
             public void ReturnToElementsToPool()
@@ -244,6 +290,34 @@ namespace CombatSystem.Player.UI
                 }
                 _activeElements.Clear();
                 _accumulatedHeight = 0;
+                ResizePopParentSize();
+            }
+        }
+
+        [Serializable]
+        private class TriggerCountHandler
+        {
+            [SerializeField] private TextMeshProUGUI countText;
+            private int _currentCount;
+
+            public void IncrementCount()
+            {
+                _currentCount++;
+                UpdateCount(_currentCount);
+            }
+            public void UpdateCount(int count)
+            {
+                var targetText = count > 99 
+                    ? "XX" 
+                    : count.ToString("##");
+                countText.text = targetText;
+            }
+
+            private const string OnResetText = "0";
+            public void ResetCount()
+            {
+                countText.text = OnResetText;
+                _currentCount = 0;
             }
         }
     }

@@ -14,6 +14,9 @@ namespace CombatSystem.Team.VanguardEffects
     public interface IVanguardEffectUsageListener : ICombatEventListener
     {
         void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values);
+        /// <summary>
+        /// Increment done after the enemy attacks and there's at least one vanguard effect in the target type.
+        /// </summary>
         void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker);
         void OnVanguardEffectPerform(VanguardSkillUsageValues values);
     }

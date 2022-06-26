@@ -22,8 +22,9 @@ namespace CombatSystem._Core
 
             _entityTempoStepper = new EntityTempoStepper();
 
-            _mainEventsHolders = GetMainEventsHolder();
-            _discriminationEventsHolders = GetEventsHolderWithDiscrimination();
+            _mainEventsEnumerable = GetMainEventsHolder();
+            _discriminatedEventsEnumerable = GetEventsHolderWithDiscrimination();
+            _oppositeDiscriminatedEventsEnumerable = GetEventsHolderWithOppositeDiscrimination();
 
 #if UNITY_EDITOR
             var debugEvents = CombatDebuggerSingleton.CombatEventsLogs;
@@ -43,13 +44,15 @@ namespace CombatSystem._Core
         private ControllerCombatEventsHolder _enemyCombatEvents;
         [ShowInInspector]
         private CombatEntityEventsHolder _currentDiscriminatedEntityEventsHolder;
+        private CombatEntityEventsHolder _oppositeDiscriminatedEntityEventsHolder;
 
         private readonly CombatEntityEventHandler _entityEventHandler;
         private readonly TempoSequenceStepper _tempoSequenceStepper;
         private readonly EntityTempoStepper _entityTempoStepper;
 
-        private readonly IEnumerable<ICombatEventsHolder> _mainEventsHolders;
-        private readonly IEnumerable<ICombatEventsHolderBase> _discriminationEventsHolders;
+        private readonly IEnumerable<ICombatEventsHolder> _mainEventsEnumerable;
+        private readonly IEnumerable<ICombatEventsHolderBase> _discriminatedEventsEnumerable;
+        private readonly IEnumerable<ICombatEventsHolderBase> _oppositeDiscriminatedEventsEnumerable;
 
         public ControllerCombatEventsHolder GetControllerEvents(bool isPlayer) =>
             (isPlayer) ? _playerCombatEvents : _enemyCombatEvents;
@@ -68,6 +71,14 @@ namespace CombatSystem._Core
             yield return _playerCombatEvents;
             yield return _enemyCombatEvents;
             yield return _currentDiscriminatedEntityEventsHolder;
+        }
+
+        private IEnumerable<ICombatEventsHolderBase> GetEventsHolderWithOppositeDiscrimination()
+        {
+            yield return _eventsHolder;
+            yield return _playerCombatEvents;
+            yield return _enemyCombatEvents;
+            yield return _oppositeDiscriminatedEntityEventsHolder;
         }
 
         public void SubscribeEventsHandler(PlayerCombatEventsHolder eventsHandler)
@@ -104,22 +115,22 @@ namespace CombatSystem._Core
         private void HandleCurrentDiscriminationEventsHolder(in CombatTeamControllerBase controller)
         {
             bool isPlayerElement = CombatSystemSingleton.TeamControllers.PlayerTeamType == controller;
-            _currentDiscriminatedEntityEventsHolder = isPlayerElement 
-                ? _playerCombatEvents.DiscriminationEventsHolder 
-                : _enemyCombatEvents.DiscriminationEventsHolder;
-        }
-        private void HandleCurrentDiscriminationEventsHolder(in CombatEntity entity)
-        {
-            bool isPlayerElement = UtilsTeam.IsPlayerTeam(in entity);
-            _currentDiscriminatedEntityEventsHolder = isPlayerElement
-                ? _playerCombatEvents.DiscriminationEventsHolder
-                : _enemyCombatEvents.DiscriminationEventsHolder;
+            if (isPlayerElement)
+            {
+                _currentDiscriminatedEntityEventsHolder = _playerCombatEvents.DiscriminationEventsHolder;
+                _oppositeDiscriminatedEntityEventsHolder = _enemyCombatEvents.DiscriminationEventsHolder;
+            }
+            else
+            {
+                _currentDiscriminatedEntityEventsHolder = _enemyCombatEvents.DiscriminationEventsHolder;
+                _oppositeDiscriminatedEntityEventsHolder = _playerCombatEvents.DiscriminationEventsHolder;
+            }
         }
 
         // ------ PREPARATIONS ----- 
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
             {
                 eventsHolder.OnCombatPrepares(allMembers,playerTeam,enemyTeam);
             }
@@ -127,7 +138,7 @@ namespace CombatSystem._Core
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
             {
                 eventsHolder.OnCombatPreStarts(playerTeam,enemyTeam);
             }
@@ -135,7 +146,7 @@ namespace CombatSystem._Core
 
         public void OnCombatStart()
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
             {
                 eventsHolder.OnCombatStart();
             }
@@ -143,7 +154,7 @@ namespace CombatSystem._Core
 
         public void OnCombatEnd()
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
             {
                 eventsHolder.OnCombatEnd();
             }
@@ -152,7 +163,7 @@ namespace CombatSystem._Core
         public void OnCombatFinish(bool isPlayerWin)
         {
             OnCombatEnd();
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
             {
                 eventsHolder.OnCombatFinish(isPlayerWin);
             }
@@ -162,7 +173,7 @@ namespace CombatSystem._Core
         {
             OnCombatEnd();
 
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
             {
                 eventsHolder.OnCombatQuit();
             }
@@ -183,8 +194,7 @@ namespace CombatSystem._Core
             _entityTempoStepper.OnEntityRequestSequence(entity,canControl);
             _entityEventHandler.OnEntityRequestSequence(entity,canControl);
 
-            HandleCurrentDiscriminationEventsHolder(in entity);
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
             {
                 eventsHolder.OnEntityRequestSequence(entity,canControl);
             }
@@ -192,7 +202,7 @@ namespace CombatSystem._Core
 
         public void OnTrinityEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
             {
                 eventsHolder.OnTrinityEntityRequestSequence(entity,canAct);
             }
@@ -200,7 +210,7 @@ namespace CombatSystem._Core
 
         public void OnOffEntityRequestSequence(CombatEntity entity, bool canAct)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
             {
                 eventsHolder.OnOffEntityRequestSequence(entity,canAct);
             }
@@ -208,7 +218,7 @@ namespace CombatSystem._Core
 
         public void OnTrinityEntityFinishSequence(CombatEntity entity)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
             {
                 eventsHolder.OnTrinityEntityFinishSequence(entity);
             }
@@ -216,7 +226,7 @@ namespace CombatSystem._Core
 
         public void OnOffEntityFinishSequence(CombatEntity entity)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
             {
                 eventsHolder.OnOffEntityFinishSequence(entity);
             }
@@ -226,7 +236,7 @@ namespace CombatSystem._Core
         public void OnEntityRequestAction(CombatEntity entity)
         {
             _entityEventHandler.OnEntityRequestAction(entity);
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
             {
                 eventsHolder.OnEntityRequestAction(entity);
             }
@@ -235,14 +245,14 @@ namespace CombatSystem._Core
 
         public void OnEntityBeforeSkill(CombatEntity entity)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders) 
+            foreach (var eventsHolder in _discriminatedEventsEnumerable) 
                 eventsHolder.OnEntityBeforeSkill(entity);
         }
 
         public void OnEntityFinishAction(CombatEntity entity)
         {
             _entityEventHandler.OnEntityFinishAction(entity);
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnEntityFinishAction(entity);
 
             _entityEventHandler.OnEntityAfterFinishAction(in entity);
@@ -250,21 +260,21 @@ namespace CombatSystem._Core
 
         public void OnEntityEmptyActions(CombatEntity entity)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnEntityEmptyActions(entity);
         }
 
         public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
             _entityEventHandler.OnEntityFinishSequence(entity,in isForcedByController);
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnEntityFinishSequence(entity,isForcedByController);
 
         }
 
         public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnAfterEntityRequestSequence(entity);
 
 
@@ -273,7 +283,7 @@ namespace CombatSystem._Core
 
         public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnAfterEntitySequenceFinish(entity);
 
 
@@ -282,7 +292,7 @@ namespace CombatSystem._Core
 
         public void OnNoActionsForcedFinish(CombatEntity entity)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnNoActionsForcedFinish(entity);
 
         }
@@ -293,25 +303,25 @@ namespace CombatSystem._Core
             HandleCurrentDiscriminationEventsHolder(in controller);
             _tempoSequenceStepper.OnTempoStartControl(in controller);
 
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoPreStartControl(controller);
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnAllActorsNoActions(lastActor);
         }
 
         public void OnControlFinishAllActors(CombatEntity lastActor)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnControlFinishAllActors(lastActor);
         }
 
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoFinishControl(controller);
             
             _tempoSequenceStepper.OnTempoFinishControl(in controller);
@@ -322,7 +332,7 @@ namespace CombatSystem._Core
         {
             _tempoSequenceStepper.OnTempoFinishLastCall(in controller);
 
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoFinishLastCall(controller);
         }
 
@@ -336,7 +346,7 @@ namespace CombatSystem._Core
 
             _entityEventHandler.OnCombatSkillPreSubmit(usedSkill, performer);
 
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatSkillSubmit(in values);
 
             _entityEventHandler.OnCombatSkillSubmit(usedSkill, performer);
@@ -348,31 +358,31 @@ namespace CombatSystem._Core
             values.Extract(out var performer,out var target,out var usedSkill);
             _entityEventHandler.OnCombatSkillPerform(usedSkill, performer, target);
 
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatSkillPerform(in values);
         }
 
         public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatPrimaryEffectPerform(performer,target,in values);
         }
 
         public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatSecondaryEffectPerform(performer,target,in values);
         }
 
         public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatVanguardEffectPerform(performer,target,in values);
         }
 
         public void OnCombatSkillFinish(CombatEntity performer)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatSkillFinish(performer);
 
             OnEntityFinishAction(performer);
@@ -381,19 +391,19 @@ namespace CombatSystem._Core
         // ---- VANGUARD EFFECTS
         public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnVanguardEffectSubscribe(in values);
         }
 
         public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _oppositeDiscriminatedEventsEnumerable)
                 eventsHolder.OnVanguardEffectIncrement(type,attacker);
         }
 
         public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
         {
-            foreach (var eventsHolder in _discriminationEventsHolders)
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnVanguardEffectPerform(values);
         }
 
@@ -401,27 +411,27 @@ namespace CombatSystem._Core
         // ---- ENTITIES
         public void OnCreateEntity(in CombatEntity entity, in bool isPlayers)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnCreateEntity(in entity, in isPlayers);
         }
 
         public void OnDestroyEntity(in CombatEntity entity, in bool isPlayers)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnDestroyEntity(in entity,in isPlayers);
         }
         
         // ---- VITALITY
         public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnDamageBeforeDone(in performer,in target, in amount);
 
         }
 
         public void OnRevive(in CombatEntity entity, bool isHealRevive)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnRevive(in entity, isHealRevive);
 
         }
@@ -429,68 +439,68 @@ namespace CombatSystem._Core
 
         public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnShieldLost(in performer,in target, in amount);
 
         }
 
         public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnHealthLost(in performer, in target, in amount);
         }
 
         public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnMortalityLost(in performer, in target, in amount);
         }
 
         public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnDamageReceive(in performer, in target);
 
         }
 
         public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnKnockOut(in performer, in target);
 
         }
 
         public void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnShieldGain(in performer, in target, in amount);
 
         }
 
         public void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnHealthGain(in performer, in target, in amount);
 
         }
 
         public void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnMortalityGain(in performer, in target, in amount);
 
         }
 
         public void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnRecoveryReceive(in performer, in target);
 
         }
 
         public void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentAmount, in int amount)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnKnockHeal(in performer, in target,in currentAmount, in amount);
 
         }
@@ -499,14 +509,14 @@ namespace CombatSystem._Core
         // ---- TEAM VALUEs
         public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnStanceChange(team, switchedStance);
 
         }
 
         public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
         {
-            foreach (var eventsHolder in _mainEventsHolders)
+            foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnControlChange(team, phasedControl, isBurst);
 
         }

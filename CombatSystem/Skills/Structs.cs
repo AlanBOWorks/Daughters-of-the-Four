@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Team.VanguardEffects;
@@ -73,17 +74,6 @@ namespace CombatSystem.Skills
             Performer = performer;
             UsedSkill = usedSkill;
             Iterations = iterations;
-        }
-
-        public void Extract(out VanguardEffectsHolder performer, out IVanguardSkill usedSkill, out int iterations)
-        {
-            performer = Performer;
-            Extract(out usedSkill, out iterations);
-        }
-        public void Extract(out IVanguardSkill usedSkill, out int iterations)
-        {
-            usedSkill = UsedSkill;
-            iterations = Iterations;
         }
     }
 }
