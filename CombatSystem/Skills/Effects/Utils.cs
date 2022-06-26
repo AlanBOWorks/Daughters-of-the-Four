@@ -12,15 +12,13 @@ namespace CombatSystem.Skills.Effects
     {
         public static void DoSkillOnTarget(ISkill skill, CombatEntity performer, CombatEntity onTarget)
         {
-            CombatSystemSingleton.SkillTargetingHandler.HandleSkill(skill, performer, onTarget);
-
             CombatEntity exclusion = skill.IgnoreSelf() ? performer : null;
             var effects = skill.GetEffects();
             DoSkillOnTarget();
 
             void DoSkillOnTarget()
             {
-                DoEffectsOnTarget(performer, exclusion, effects);
+                DoEffectsOnTarget(performer, exclusion, onTarget, effects);
 
             }
         }
@@ -28,8 +26,16 @@ namespace CombatSystem.Skills.Effects
         public static void DoVanguardSkill(in VanguardSkillUsageValues values)
         {
             var skill = values.UsedSkill;
-            var performer = values.Performer.GetMainEntity();
+            var performer = values.EffectsHolder.GetMainEntity();
             var iterations = values.Iterations;
+
+            CombatEntity provisionalTarget = null;
+            var offensiveRecords = values.EffectsHolder.GetOffensiveRecordsStructure();
+            foreach (var offensiveRecord in offensiveRecords.VanguardPunishType)
+            {
+                provisionalTarget = offensiveRecord.Key;
+                break;
+            }
 
             foreach (var effect in skill.GetPerformVanguardEffects())
             {
@@ -37,25 +43,31 @@ namespace CombatSystem.Skills.Effects
                     effect.Effect,
                     effect.EffectValue * iterations,
                     effect.TargetType);
-                DoEffect(performer,null, performValue);
+                DoEffect(performer,null, provisionalTarget, performValue);
             }
         }
 
 
-        private static void DoEffectsOnTarget(CombatEntity performer, CombatEntity exclusion,
+        private static void DoEffectsOnTarget(
+            CombatEntity performer, CombatEntity exclusion,
+            CombatEntity target,
             IEnumerable<PerformEffectValues> effects)
         {
             foreach (var effect in effects)
             {
-                DoEffect(performer, exclusion, effect);
+                DoEffect(performer, exclusion, target, effect);
             }
         }
 
-        private static void DoEffect(CombatEntity performer, CombatEntity exclusion, PerformEffectValues values)
+        private static void DoEffect(
+            CombatEntity performer, 
+            CombatEntity exclusion, 
+            CombatEntity target,
+            PerformEffectValues values)
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             var targetType = values.TargetType;
-            var targets = UtilsTarget.GetEffectTargets(targetType);
+            var targets = UtilsTarget.GetEffectTargets(targetType, performer, target);
             var preset = values.Effect;
             var effectValue = values.EffectValue;
 
@@ -85,6 +97,11 @@ namespace CombatSystem.Skills.Effects
     }
 
     public static class UtilsEffect
+    {
+        
+    }
+
+    public static class UtilsCombatEffect
     {
         public static void DoDamageTo(in CombatEntity target, in CombatEntity performer, in float damage, bool eventCallback = true)
         {

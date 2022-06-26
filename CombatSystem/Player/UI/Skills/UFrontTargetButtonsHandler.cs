@@ -97,7 +97,7 @@ namespace CombatSystem.Player.UI
 
         private void ShowTargets(ICombatSkill skill)
         {
-            var possibleTargets = UtilsTarget.GetPossibleTargets(_currentControl, skill);
+            var possibleTargets = UtilsTarget.GetPossibleTargets(skill, _currentControl);
             foreach (var target in possibleTargets)
             {
                 var buttonHolder = _buttonsDictionary[target];

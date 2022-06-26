@@ -25,7 +25,7 @@ namespace CombatSystem.Animations
 
         public void PerformReceiveAnimations(ISkill usedSkill, CombatEntity performer)
         {
-            var interactions = CombatSystemSingleton.SkillTargetingHandler.GetInteractions();
+            var interactions = UtilsTarget.GetPossibleTargets(usedSkill, performer);
             foreach (var entity in interactions)
             {
                 PerformReceiveAnimation(usedSkill, entity, performer);

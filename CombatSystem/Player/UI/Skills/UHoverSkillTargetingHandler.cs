@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
@@ -10,113 +9,124 @@ namespace CombatSystem.Player.UI
 {
     [RequireComponent(typeof(UUIHoverEntitiesHandler))]
     public sealed class UHoverSkillTargetingHandler : MonoBehaviour, 
-        IHoverInteractionTargetsListener
+        ITargetPointerListener,
+        IPlayerEntityListener, ISkillSelectionListener
     {
-        private HoverSkillTargetingHandler _hoverTargetingHelper;
         private IReadOnlyDictionary<CombatEntity, UUIHoverEntity> _dictionary;
+        private HashSet<CombatEntity> _activeMembers;
 
         private void Awake()
         {
-            _hoverTargetingHelper = new HoverSkillTargetingHandler();
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.SubscribeAsPlayerEvent(_hoverTargetingHelper);
             playerEvents.SubscribeAsPlayerEvent(this);
 
             _dictionary = GetComponent<UUIHoverEntitiesHandler>().GetDictionary();
+            _activeMembers = new HashSet<CombatEntity>();
         }
 
         private void OnDestroy()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.UnSubscribe(_hoverTargetingHelper);
+            playerEvents.UnSubscribe(this);
         }
 
-        public void OnHoverTargetInteraction(in CombatEntity target)
+        public void OnHoverTargetInteraction(CombatEntity target)
         {
-            ToggleHoverElement(in target, true);
+            ToggleHoverElement(target, true);
         }
 
         public void OnHoverTargetExit()
         {
-            bool active = false;
+            const bool active = false;
             foreach (var pair in _dictionary)
             {
                 var entity = pair.Key;
-                ToggleHoverElement(in entity, in active);
+                ToggleHoverElement(entity, active);
             }
         }
 
-        private void ToggleHoverElement(in CombatEntity entity, in bool active)
+        private ISkill _currentSkill;
+        private CombatEntity _currentPerformer;
+
+        private void ToggleHoverElement(CombatEntity entity, bool active)
         {
             if (!_dictionary.ContainsKey(entity)) return;
             _dictionary[entity].GetHoverFeedbackHolder().SetActive(active);
         }
 
-
-
-        private sealed class HoverSkillTargetingHandler : SkillTargetingHandler,
-            IPlayerEntityListener,
-            ITargetPointerListener, ISkillSelectionListener
+        public void OnTargetButtonHover(CombatEntity target)
         {
-            private CombatEntity _performer;
-            private CombatSkill _selectedSkill;
-
-            public void OnPerformerSwitch(CombatEntity performer)
+            _activeMembers.Clear();
+            var effects = _currentSkill.GetEffects();
+            foreach (PerformEffectValues effect in effects)
             {
-                _performer = performer;
+                var effectTargets = UtilsTarget.GetEffectTargets(
+                    effect.TargetType, _currentPerformer, target);
+                VoidHandleEffectsTarget(effectTargets,in effect);
             }
 
-            public void OnTargetButtonHover(CombatEntity target)
+            void VoidHandleEffectsTarget(IEnumerable<CombatEntity> effectTargets, in PerformEffectValues effectValue)
             {
-                HandleSkill(_selectedSkill, _performer, target);
+                foreach (var effectTarget in effectTargets)
+                {
+                        InvokeTarget(effectTarget, in effectValue);
+                }
             }
-
-            public void OnTargetButtonExit(CombatEntity target)
+            void InvokeTarget(CombatEntity possibleTarget, in PerformEffectValues effectValue)
             {
+                if(_activeMembers.Add(possibleTarget))
+                    OnHoverTargetInteraction(possibleTarget);
+                PlayerCombatSingleton.PlayerCombatEvents.OnHoverTargetInteraction(possibleTarget, in effectValue);
             }
+        }
 
+        public void OnTargetButtonExit(CombatEntity target)
+        {
+            OnHoverTargetExit();
+            PlayerCombatSingleton.PlayerCombatEvents.OnHoverTargetExit();
+            _activeMembers.Clear();
+        }
 
+        public void OnPerformerSwitch(CombatEntity performer)
+        {
+            _currentPerformer = performer;
+            _activeMembers.Clear();
+        }
 
-            public void OnSkillSelect(CombatSkill skill)
-            {
-            }
+        public void OnSkillSelect(CombatSkill skill)
+        {
+        }
 
-            public void OnSkillSelectFromNull(CombatSkill skill)
-            {
-            }
+        public void OnSkillSelectFromNull(CombatSkill skill)
+        {
+        }
 
-            public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
-            {
-                _selectedSkill = skill;
-            }
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        {
+            _currentSkill = skill;
+            _activeMembers.Clear();
+        }
 
-            public void OnSkillDeselect(CombatSkill skill)
-            {
-            }
+        public void OnSkillDeselect(CombatSkill skill)
+        {
+        }
 
-            public void OnSkillCancel(CombatSkill skill)
-            {
-            }
+        public void OnSkillCancel(CombatSkill skill)
+        {
+        }
 
-            public void OnSkillSubmit(CombatSkill skill)
-            {
-            }
-
-            protected override void AddInteractionEntity(in CombatEntity entity)
-            {
-                if (InteractionsEntities.Contains(entity)) return;
-                InteractionsEntities.Add(entity);
-
-                PlayerCombatSingleton.PlayerCombatEvents.OnHoverTargetInteraction(in entity);
-            }
+        public void OnSkillSubmit(CombatSkill skill)
+        {
         }
     }
 
     
-
-    public interface IHoverInteractionTargetsListener : ICombatEventListener
+    /// <summary>
+    /// Dedicated event for hovering Effects
+    /// </summary>
+    public interface IHoverInteractionEffectTargetsListener : ICombatEventListener
     {
-        void OnHoverTargetInteraction(in CombatEntity target);
+        void OnHoverTargetInteraction(CombatEntity target, in PerformEffectValues effect);
         void OnHoverTargetExit();
     }
 }

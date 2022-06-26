@@ -30,9 +30,6 @@ namespace CombatSystem._Core
                 = new CombatTeamsHolder();
             TeamControllers 
                 = new CombatTeamControllersHandler();
-            SkillTargetingHandler 
-                = new SkillTargetingHandler();
-
             SkillQueuePerformer = new SkillQueuePerformer();
             VanguardEffectsHandler = new VanguardEffectsHandler();
 
@@ -103,9 +100,6 @@ namespace CombatSystem._Core
 
         // ------- TARGETING ------
         [Title("Combat Behaviors")]
-        [ShowInInspector]
-        public static readonly SkillTargetingHandler SkillTargetingHandler;
-
         [ShowInInspector] 
         public static readonly KnockOutHandler KnockOutHandler;
 

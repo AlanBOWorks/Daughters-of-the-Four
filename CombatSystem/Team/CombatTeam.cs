@@ -118,9 +118,9 @@ namespace CombatSystem.Team
         }
 
 
-        public IReadOnlyCollection<CombatEntity> GetAllMembers() => _membersHolder.AllMembers;
-        public IReadOnlyCollection<CombatEntity> GetMainRoles() => _membersHolder.GetMainRoles();
-        public IReadOnlyCollection<CombatEntity> GetOffRoles() => _membersHolder.GetOffRoles();
+        public IReadOnlyList<CombatEntity> GetAllMembers() => _membersHolder.AllMembers;
+        public IReadOnlyList<CombatEntity> GetMainRoles() => _membersHolder.GetMainRoles();
+        public IReadOnlyList<CombatEntity> GetOffRoles() => _membersHolder.GetOffRoles();
         public IEnumerable<CombatEntity> GetSecondaryRoles() => _membersHolder.GetSecondaryRoles();
         public IEnumerable<CombatEntity> GetThirdRoles() => _membersHolder.GetThirdRoles();
         public ITeamAlimentStructureRead<IEnumerable<CombatEntity>> GetRolesAliments() => _membersHolder.GetAlimentRoles();

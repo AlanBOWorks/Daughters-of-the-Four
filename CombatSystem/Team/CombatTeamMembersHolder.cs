@@ -10,7 +10,7 @@ using Utils.Collections;
 namespace CombatSystem.Team
 {
     public sealed class CombatTeamMembersHolder : 
-        ITeamFlexPositionStructureRead<IReadOnlyCollection<CombatEntity>>,
+        ITeamFlexPositionStructureRead<IReadOnlyList<CombatEntity>>,
         ITeamFlexStructureRead<IReadOnlyList<CombatEntity>>,
         ITeamFullStructureRead<CombatEntity>
     {
@@ -33,14 +33,14 @@ namespace CombatSystem.Team
       
 
 
-        public IReadOnlyCollection<CombatEntity> AllMembers => _allMembers;
+        public IReadOnlyList<CombatEntity> AllMembers => _allMembers;
         public bool Contains(in CombatEntity entity) => _allMembers.Contains(entity);
 
 
-        public IReadOnlyCollection<CombatEntity> FrontLineType => _positionWrapper.FrontLineType;
-        public IReadOnlyCollection<CombatEntity> MidLineType => _positionWrapper.MidLineType;
-        public IReadOnlyCollection<CombatEntity> BackLineType => _positionWrapper.BackLineType;
-        public IReadOnlyCollection<CombatEntity> FlexLineType => _positionWrapper.FlexLineType;
+        public IReadOnlyList<CombatEntity> FrontLineType => _positionWrapper.FrontLineType;
+        public IReadOnlyList<CombatEntity> MidLineType => _positionWrapper.MidLineType;
+        public IReadOnlyList<CombatEntity> BackLineType => _positionWrapper.BackLineType;
+        public IReadOnlyList<CombatEntity> FlexLineType => _positionWrapper.FlexLineType;
 
 
         public IReadOnlyList<CombatEntity> VanguardType => _roleWrapper.VanguardType;
@@ -49,8 +49,8 @@ namespace CombatSystem.Team
         public IReadOnlyList<CombatEntity> FlexType => _roleWrapper.FlexType;
 
         public ITeamFlexPositionStructureRead<CombatEntity> GetMainPositions() => _positionWrapper;
-        public IReadOnlyCollection<CombatEntity> GetMainRoles() => _roleWrapper.MainRoles;
-        public IReadOnlyCollection<CombatEntity> GetOffRoles() => _roleWrapper.OffRoles;
+        public IReadOnlyList<CombatEntity> GetMainRoles() => _roleWrapper.MainRoles;
+        public IReadOnlyList<CombatEntity> GetOffRoles() => _roleWrapper.OffRoles;
         public IEnumerable<CombatEntity> GetSecondaryRoles() => _roleWrapper.SecondaryRoles;
         public IEnumerable<CombatEntity> GetThirdRoles() => _roleWrapper.ThirdRoles;
 
@@ -168,8 +168,8 @@ namespace CombatSystem.Team
             [ShowInInspector]
             private readonly OffRolesCollection _offRoles;
 
-            public IReadOnlyCollection<CombatEntity> MainRoles => _mainRoles;
-            public IReadOnlyCollection<CombatEntity> OffRoles => _offRoles;
+            public IReadOnlyList<CombatEntity> MainRoles => _mainRoles;
+            public IReadOnlyList<CombatEntity> OffRoles => _offRoles;
             public IEnumerable<CombatEntity> SecondaryRoles => _offRoles.GetFirstEnumerable();
             public IEnumerable<CombatEntity> ThirdRoles => _offRoles.GetSecondEnumerable();
 

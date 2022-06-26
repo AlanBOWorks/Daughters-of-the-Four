@@ -16,7 +16,7 @@ namespace CombatSystem.Player
         ISkillPointerListener, ISkillSelectionListener,
         ISkillTooltipListener,
 
-        ITargetPointerListener, ITargetSelectionListener, IHoverInteractionTargetsListener,
+        ITargetPointerListener, ITargetSelectionListener, IHoverInteractionEffectTargetsListener,
         ICameraHolderListener
     {
         public PlayerCombatEventsHolder() : base()
@@ -33,7 +33,7 @@ namespace CombatSystem.Player
 
             _targetPointerListeners = new HashSet<ITargetPointerListener>();
             _targetSelectionListeners = new HashSet<ITargetSelectionListener>();
-            _hoverTargetsListeners = new HashSet<IHoverInteractionTargetsListener>();
+            _hoverTargetsListeners = new HashSet<IHoverInteractionEffectTargetsListener>();
 
             _cameraHolderListeners = new HashSet<ICameraHolderListener>();
 
@@ -60,7 +60,7 @@ namespace CombatSystem.Player
         [ShowInInspector, TitleGroup("Target")]
         private readonly HashSet<ITargetSelectionListener> _targetSelectionListeners;
         [ShowInInspector, TitleGroup("Target")]
-        private readonly HashSet<IHoverInteractionTargetsListener> _hoverTargetsListeners;
+        private readonly HashSet<IHoverInteractionEffectTargetsListener> _hoverTargetsListeners;
 
         [ShowInInspector] 
         private readonly HashSet<ICameraHolderListener> _cameraHolderListeners;
@@ -78,7 +78,7 @@ namespace CombatSystem.Player
         /// <br></br>- <see cref="ISkillSelectionListener"/>
         /// <br></br>- <see cref="ITargetPointerListener"/>
         /// <br></br>- <see cref="ITargetSelectionListener"/>
-        /// <br></br>- <see cref="IHoverInteractionTargetsListener"/>
+        /// <br></br>- <see cref="IHoverInteractionEffectTargetsListener"/>
         /// <br></br>- <see cref="ICameraHolderListener"/>
         /// </summary>
         public void SubscribeAsPlayerEvent(ICombatEventListener listener)
@@ -99,7 +99,7 @@ namespace CombatSystem.Player
                 _targetPointerListeners.Add(targetPointerListener);
             if (listener is ITargetSelectionListener targetSelectionListener)
                 _targetSelectionListeners.Add(targetSelectionListener);
-            if (listener is IHoverInteractionTargetsListener hoverTargetsListener)
+            if (listener is IHoverInteractionEffectTargetsListener hoverTargetsListener)
                 _hoverTargetsListeners.Add(hoverTargetsListener);
 
 
@@ -127,7 +127,7 @@ namespace CombatSystem.Player
                 _targetPointerListeners.Remove(targetPointerListener);
             if (listener is ITargetSelectionListener targetSelectionListener)
                 _targetSelectionListeners.Remove(targetSelectionListener);
-            if (listener is IHoverInteractionTargetsListener hoverTargetsListener)
+            if (listener is IHoverInteractionEffectTargetsListener hoverTargetsListener)
                 _hoverTargetsListeners.Remove(hoverTargetsListener);
 
             if (listener is ICameraHolderListener cameraHolderListener)
@@ -377,11 +377,11 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnHoverTargetInteraction(in CombatEntity target)
+        public void OnHoverTargetInteraction(CombatEntity target, in PerformEffectValues effect)
         {
             foreach (var listener in _hoverTargetsListeners)
             {
-                listener.OnHoverTargetInteraction(in target);
+                listener.OnHoverTargetInteraction(target, in effect);
             }
         }
 

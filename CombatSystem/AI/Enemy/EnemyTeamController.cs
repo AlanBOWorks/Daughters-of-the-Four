@@ -118,7 +118,7 @@ namespace CombatSystem.AI
 
         private CombatEntity SelectTarget(in CombatSkill skill)
         {
-            var possibleTargets = UtilsTarget.GetPossibleTargets(_currentControl, skill);
+            var possibleTargets = UtilsTarget.GetPossibleTargets(skill, _currentControl);
             var randomPick = Random.Range(0, possibleTargets.Count());
 
             return possibleTargets[randomPick];

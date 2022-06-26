@@ -31,7 +31,7 @@ namespace CombatSystem.Skills.Effects
             }
             else
             {
-                UtilsEffect.DoDamageTo(in target, in performer, in damage);
+                UtilsCombatEffect.DoDamageTo(in target, in performer, in damage);
             }
         }
     }

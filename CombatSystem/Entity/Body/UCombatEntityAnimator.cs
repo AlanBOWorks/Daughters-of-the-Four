@@ -121,7 +121,7 @@ namespace CombatSystem.Entity
 
         public void ReceiveActionAnimation(ISkill fromSkill, CombatEntity fromPerformer)
         {
-            var type = UtilsTarget.GetReceiveSkillType(fromSkill, fromPerformer, Entity);
+            var type = UtilsSkill.GetReceiveSkillType(fromSkill, fromPerformer, Entity);
             var clip = GetReceiveActionAnimation(fromSkill, type);
             if (clip == null)
             {

@@ -28,18 +28,6 @@ namespace CombatSystem.Skills
             }
         }
 
-        public static bool IsOffensiveSkill(ISkill skill)
-        {
-            return skill.TeamTargeting == EnumsSkill.TeamTargeting.Offensive || skill is IAttackerSkill;
-        }
-    }
-
-
-    public static class UtilsTarget
-    {
-        private static readonly List<CombatEntity> TargetsHelper = new List<CombatEntity>();
-
-
         public static EnumsSkill.TeamTargeting GetReceiveSkillType([NotNull] ISkill skill, CombatEntity performer,
             CombatEntity target)
         {
@@ -58,111 +46,105 @@ namespace CombatSystem.Skills
             return EnumsSkill.TeamTargeting.Offensive;
         }
 
-        public static bool CanBeTargeted(in CombatEntity target)
+        public static bool IsOffensiveSkill(ISkill skill)
         {
-            return target != null;
+            return skill.TeamTargeting == EnumsSkill.TeamTargeting.Offensive || skill is IAttackerSkill;
         }
+    }
 
-        public static void HandlePossibleTargets(ICollection<CombatEntity> targetsHelper,
-            CombatEntity performer,
-            ICombatSkill skill)
+
+    public static class UtilsTarget
+    {
+        private static readonly List<CombatEntity> TargetSelectionHelper = new List<CombatEntity>();
+        
+        private static IReadOnlyList<CombatEntity> GetIgnoreSelfSupportPossibleTargets(CombatEntity performer)
         {
-            bool ignoreSelf = skill.IgnoreSelf();
-            HandlePossibleTargets(targetsHelper, performer, skill.TeamTargeting, ignoreSelf);
-        }
-
-
-        public static void HandlePossibleTargets(ICollection<CombatEntity> targetsHelper,
-            CombatEntity performer,
-            EnumsSkill.TeamTargeting type, bool ignoreSelf)
-        {
-            targetsHelper.Clear();
-
-            switch (type)
-            {
-                case EnumsSkill.TeamTargeting.Self:
-                    HandleSingleTarget(performer);
-                    break;
-                case EnumsSkill.TeamTargeting.Offensive:
-                    HandleOffensiveMembers();
-                    break;
-                case EnumsSkill.TeamTargeting.Support:
-                    HandleSupportMembers();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            void HandleSingleTarget(CombatEntity target)
-            {
-                targetsHelper.Add(target);
-            }
-
-            void HandleOffensiveMembers()
-            {
-                var enemyTeam = performer.Team.EnemyTeam;
-                var enemyGuarding = enemyTeam.GuardHandler;
-                var members =
-                    enemyGuarding.CanGuard()
-                        ? GetGuarderLine()
-                        : enemyTeam.GetAllMembers();
-
-                foreach (var member in members)
-                {
-                    if (CanBeTargeted(in member))
-                        targetsHelper.Add(member);
-                }
-
-                IEnumerable<CombatEntity> GetGuarderLine()
-                {
-                    var guarder = enemyGuarding.GetCurrentGuarder();
-                    return UtilsTeam.GetMemberLine(in guarder);
-                }
-                }
+            TargetSelectionHelper.Clear();
+            HandleSupportMembers();
+            return TargetSelectionHelper;
 
             void HandleSupportMembers()
             {
                 var team = performer.Team;
                 foreach (var member in team.GetAllMembers())
                 {
-                    if (ignoreSelf && member == performer)
+                    if (member == performer)
                         continue;
 
-                    targetsHelper.Add(member);
+                    TargetSelectionHelper.Add(member);
                 }
 
             }
         }
-        public static IReadOnlyList<CombatEntity> GetPossibleTargets(CombatEntity performer, ICombatSkill skill)
+
+        private static IReadOnlyList<CombatEntity> GetSelfAsCollectionTarget(CombatEntity performer)
         {
-            HandlePossibleTargets(TargetsHelper, performer, skill);
-            return TargetsHelper;
+            TargetSelectionHelper.Clear();
+            TargetSelectionHelper.Add(performer);
+            return TargetSelectionHelper;
         }
 
-        public static IEnumerable<CombatEntity> GetEffectTargets(EnumsEffect.TargetType targetType)
+        public static IReadOnlyList<CombatEntity> GetPossibleTargets(ISkill skill, CombatEntity performer)
         {
-            var targetingHandler = CombatSystemSingleton.SkillTargetingHandler;
+            var type = skill.TeamTargeting;
+            switch (type)
+            {
+                case EnumsSkill.TeamTargeting.Self:
+                    return GetSelfAsCollectionTarget(performer);
+                case EnumsSkill.TeamTargeting.Offensive:
+                    return performer.Team.EnemyTeam.GetAllMembers();
+                case EnumsSkill.TeamTargeting.Support:
+                    return GetSupportTargetType();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+
+            IReadOnlyList<CombatEntity> GetSupportTargetType()
+            {
+                bool isSelfIgnore = skill.IgnoreSelf();
+                return (isSelfIgnore)
+                    ? GetIgnoreSelfSupportPossibleTargets(performer)
+                    : performer.Team.GetAllMembers();
+            }
+        }
+
+        private static IEnumerable<CombatEntity> GetSingleTargetEnumerable(CombatEntity target)
+        {
+            yield return target;
+        }
+
+        public static IEnumerable<CombatEntity> GetEffectTargets(
+            EnumsEffect.TargetType targetType,
+            CombatEntity performer,
+            CombatEntity target)
+        {
             switch (targetType)
             {
                 case EnumsEffect.TargetType.Target:
-                    return targetingHandler.TargetType.SingleType;
+                    return GetSingleTargetEnumerable(target);
                 case EnumsEffect.TargetType.TargetLine:
-                    return targetingHandler.TargetType.TargetLine;
+                    return GetTargetLine();
                 case EnumsEffect.TargetType.TargetTeam:
-                    return targetingHandler.TargetType.TargetTeam;
+                    return target.Team.GetAllMembers();
 
                 case EnumsEffect.TargetType.Performer:
-                    return targetingHandler.PerformerType.SingleType;
+                    return GetSingleTargetEnumerable(performer);
                 case EnumsEffect.TargetType.PerformerLine:
-                    return targetingHandler.PerformerType.TargetLine;
+                    return GetSupportLine(performer);
                 case EnumsEffect.TargetType.PerformerTeam:
-                    return targetingHandler.PerformerType.TargetTeam;
+                    return performer.Team.GetAllMembers();
 
 
-                case EnumsEffect.TargetType.All:
-                    return targetingHandler.AllType;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(targetType), targetType, null);
+            }
+
+            IEnumerable<CombatEntity> GetTargetLine()
+            {
+                return (performer.Team.Contains(target))
+                    ? GetSupportLine(target)
+                    : GetOffensiveLine(target);
             }
         }
 
@@ -181,6 +163,29 @@ namespace CombatSystem.Skills
                     return membersPositions.BackLineType;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null);
+            }
+
+
+            void HandleOffensiveMembers(CombatEntity performer)
+            {
+                var enemyTeam = performer.Team.EnemyTeam;
+                var enemyGuarding = enemyTeam.GuardHandler;
+                var members =
+                    enemyGuarding.CanGuard()
+                        ? GetGuarderLine()
+                        : enemyTeam.GetAllMembers();
+
+                foreach (var member in members)
+                {
+                    if (member != null)
+                        TargetSelectionHelper.Add(member);
+                }
+
+                IEnumerable<CombatEntity> GetGuarderLine()
+                {
+                    var guarder = enemyGuarding.GetCurrentGuarder();
+                    return UtilsTeam.GetMemberLine(in guarder);
+                }
             }
         }
 
@@ -215,33 +220,4 @@ namespace CombatSystem.Skills
         }
     }
 
-    public static class UtilsTargetsCollection
-    {
-        public static void HandleLine(in ICollection<CombatEntity> aliveLine, in CombatEntity target, in bool isAlly)
-        {
-            aliveLine.Clear(); //safe clear
-
-            var targetLine = isAlly
-                ? UtilsTarget.GetSupportLine(target)
-                : UtilsTarget.GetOffensiveLine(target);
-            foreach (var member in targetLine)
-            {
-                if (!UtilsTarget.CanBeTargeted(in member)) continue;
-
-                aliveLine.Add(member);
-            }
-        }
-
-        public static void HandleTeam(in ICollection<CombatEntity> aliveTeam, in CombatEntity target)
-        {
-            aliveTeam.Clear(); //safe clear
-
-            foreach (var member in target.Team.GetAllMembers())
-            {
-                if (UtilsTarget.CanBeTargeted(in member))
-                    aliveTeam.Add(member);
-            }
-        }
-
-    }
 }

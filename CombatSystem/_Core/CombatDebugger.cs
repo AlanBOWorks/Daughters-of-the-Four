@@ -444,7 +444,7 @@ namespace CombatSystem._Core
     public sealed class CombatPlayerEventsLogs :
         ICombatPauseListener,
         ISkillPointerListener, ISkillSelectionListener,
-        ITargetPointerListener, ITargetSelectionListener, IHoverInteractionTargetsListener,
+        ITargetPointerListener, ITargetSelectionListener, IHoverInteractionEffectTargetsListener,
         IPlayerEntityListener
     {
 
@@ -604,11 +604,10 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private TargetFeedbackLogs _targetFeedbackLogs = new TargetFeedbackLogs();
 
-        public void OnHoverTargetInteraction(in CombatEntity target)
+        public void OnHoverTargetInteraction(CombatEntity target, in PerformEffectValues effect)
         {
             if (!ShowTargetFeedbackLogs || !_targetFeedbackLogs.OnPossibleTargets) return;
             Debug.Log($"Possible Target: {target.CombatCharacterName}");
-           
         }
 
         public void OnHoverTargetExit()

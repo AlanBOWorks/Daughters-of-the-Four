@@ -33,7 +33,7 @@ namespace CombatSystem.Skills.Effects
 
         private static void DoHeal(in CombatStats target, in float healAmount)
         {
-           UtilsEffect.DoHealTo(in target, in healAmount);
+           UtilsCombatEffect.DoHealTo(in target, in healAmount);
         }
     }
 }

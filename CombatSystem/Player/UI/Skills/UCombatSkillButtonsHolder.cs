@@ -35,9 +35,9 @@ namespace CombatSystem.Player.UI
         private Vector2 _buttonSizes;
 
 
-        [ShowInInspector]
+        [ShowInInspector, DisableInEditorMode,DisableInPlayMode]
         private CombatSkill _currentSelectedSkill;
-        [ShowInInspector]
+        [ShowInInspector, DisableInEditorMode,DisableInPlayMode]
         private CombatEntity _currentControlEntity;
 
 
@@ -161,7 +161,6 @@ namespace CombatSystem.Player.UI
             HandlePool(entitySkills);
 
             ShowSkillsAnimated();
-            Debug.Log("Shi");
 
             void ShowSkillsAnimated()
             {

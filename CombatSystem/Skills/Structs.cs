@@ -65,13 +65,16 @@ namespace CombatSystem.Skills
 
     public readonly struct VanguardSkillUsageValues
     {
-        public readonly VanguardEffectsHolder Performer;
+        public readonly VanguardEffectsHolder EffectsHolder;
         public readonly IVanguardSkill UsedSkill;
         public readonly int Iterations;
 
-        public VanguardSkillUsageValues(VanguardEffectsHolder performer, IVanguardSkill usedSkill, int iterations)
+        public VanguardSkillUsageValues(
+            VanguardEffectsHolder effectsHolder, 
+            IVanguardSkill usedSkill, 
+            int iterations)
         {
-            Performer = performer;
+            EffectsHolder = effectsHolder;
             UsedSkill = usedSkill;
             Iterations = iterations;
         }
