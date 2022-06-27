@@ -4,9 +4,9 @@ using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Player.UI;
 using CombatSystem.Skills;
+using CombatSystem.Skills.VanguardEffects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
-using CombatSystem.Team.VanguardEffects;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -604,7 +604,7 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private TargetFeedbackLogs _targetFeedbackLogs = new TargetFeedbackLogs();
 
-        public void OnHoverTargetInteraction(CombatEntity target, in PerformEffectValues effect)
+        public void OnHoverTargetInteraction(CombatEntity target, ISkill skill)
         {
             if (!ShowTargetFeedbackLogs || !_targetFeedbackLogs.OnPossibleTargets) return;
             Debug.Log($"Possible Target: {target.CombatCharacterName}");

@@ -56,6 +56,8 @@ namespace CombatSystem.Player.UI
 
         public void OnTargetButtonHover(CombatEntity target)
         {
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+
             _activeMembers.Clear();
             var effects = _currentSkill.GetEffects();
             foreach (PerformEffectValues effect in effects)
@@ -69,14 +71,15 @@ namespace CombatSystem.Player.UI
             {
                 foreach (var effectTarget in effectTargets)
                 {
-                        InvokeTarget(effectTarget, in effectValue);
+                        InvokeTarget(effectTarget, _currentSkill);
                 }
             }
-            void InvokeTarget(CombatEntity possibleTarget, in PerformEffectValues effectValue)
+            void InvokeTarget(CombatEntity possibleTarget, ISkill skill)
             {
-                if(_activeMembers.Add(possibleTarget))
-                    OnHoverTargetInteraction(possibleTarget);
-                PlayerCombatSingleton.PlayerCombatEvents.OnHoverTargetInteraction(possibleTarget, in effectValue);
+                if (!_activeMembers.Add(possibleTarget)) return;
+
+                OnHoverTargetInteraction(possibleTarget);
+                playerEvents.OnHoverTargetInteraction(possibleTarget, skill);
             }
         }
 
@@ -126,7 +129,7 @@ namespace CombatSystem.Player.UI
     /// </summary>
     public interface IHoverInteractionEffectTargetsListener : ICombatEventListener
     {
-        void OnHoverTargetInteraction(CombatEntity target, in PerformEffectValues effect);
+        void OnHoverTargetInteraction(CombatEntity target, ISkill skill);
         void OnHoverTargetExit();
     }
 }

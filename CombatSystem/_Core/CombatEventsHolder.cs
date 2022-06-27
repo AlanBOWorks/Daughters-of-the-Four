@@ -4,9 +4,9 @@ using CombatSystem.AI;
 using CombatSystem.Entity;
 using CombatSystem.Player;
 using CombatSystem.Skills;
+using CombatSystem.Skills.VanguardEffects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
-using CombatSystem.Team.VanguardEffects;
 using Sirenix.OdinInspector;
 
 namespace CombatSystem._Core

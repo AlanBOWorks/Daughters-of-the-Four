@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
+using CombatSystem.Skills.VanguardEffects;
 using CombatSystem.Team;
-using CombatSystem.Team.VanguardEffects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

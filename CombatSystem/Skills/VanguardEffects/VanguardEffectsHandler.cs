@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
-using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
+using CombatSystem.Team;
 using MEC;
 
-namespace CombatSystem.Team.VanguardEffects
+namespace CombatSystem.Skills.VanguardEffects
 {
     public sealed class VanguardEffectsHandler : ISkillUsageListener, ICombatTerminationListener
     {

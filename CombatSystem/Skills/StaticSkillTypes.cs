@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
-using CombatSystem.Team.VanguardEffects;
+using CombatSystem.Skills.VanguardEffects;
 using UnityEngine;
 
 namespace CombatSystem.Skills

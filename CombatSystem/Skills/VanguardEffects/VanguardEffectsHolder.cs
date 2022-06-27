@@ -6,7 +6,7 @@ using CombatSystem.Stats;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace CombatSystem.Team.VanguardEffects
+namespace CombatSystem.Skills.VanguardEffects
 {
     public sealed class VanguardEffectsHolder 
     {

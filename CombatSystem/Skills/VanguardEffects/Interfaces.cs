@@ -2,7 +2,7 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 
-namespace CombatSystem.Team.VanguardEffects
+namespace CombatSystem.Skills.VanguardEffects
 {
     public interface IVanguardEffectStructureRead<out T>
     {

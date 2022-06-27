@@ -109,16 +109,14 @@ namespace CombatSystem.Skills
             }
         }
 
-        private static IEnumerable<CombatEntity> GetSingleTargetEnumerable(CombatEntity target)
-        {
-            yield return target;
-        }
 
         public static IEnumerable<CombatEntity> GetEffectTargets(
             EnumsEffect.TargetType targetType,
             CombatEntity performer,
             CombatEntity target)
         {
+            var targetTeam = target.Team;
+            bool isEnemy = targetTeam.Contains(performer);
             switch (targetType)
             {
                 case EnumsEffect.TargetType.Target:
@@ -140,14 +138,20 @@ namespace CombatSystem.Skills
                     throw new ArgumentOutOfRangeException(nameof(targetType), targetType, null);
             }
 
+
+
             IEnumerable<CombatEntity> GetTargetLine()
             {
-                return (performer.Team.Contains(target))
+                return (isEnemy)
                     ? GetSupportLine(target)
                     : GetOffensiveLine(target);
             }
         }
 
+        private static IEnumerable<CombatEntity> GetSingleTargetEnumerable(CombatEntity target)
+        {
+            yield return target;
+        }
         internal static IEnumerable<CombatEntity> GetOffensiveLine(CombatEntity targetEntity)
         {
             ExtractTargetEffectsValues(in targetEntity, out var team, out var positioning);
@@ -163,29 +167,6 @@ namespace CombatSystem.Skills
                     return membersPositions.BackLineType;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(positioning), positioning, null);
-            }
-
-
-            void HandleOffensiveMembers(CombatEntity performer)
-            {
-                var enemyTeam = performer.Team.EnemyTeam;
-                var enemyGuarding = enemyTeam.GuardHandler;
-                var members =
-                    enemyGuarding.CanGuard()
-                        ? GetGuarderLine()
-                        : enemyTeam.GetAllMembers();
-
-                foreach (var member in members)
-                {
-                    if (member != null)
-                        TargetSelectionHelper.Add(member);
-                }
-
-                IEnumerable<CombatEntity> GetGuarderLine()
-                {
-                    var guarder = enemyGuarding.GetCurrentGuarder();
-                    return UtilsTeam.GetMemberLine(in guarder);
-                }
             }
         }
 

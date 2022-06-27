@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatSystem.Localization;
 using CombatSystem.Skills.Effects;
-using CombatSystem.Team.VanguardEffects;
+using CombatSystem.Skills.VanguardEffects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Utils;

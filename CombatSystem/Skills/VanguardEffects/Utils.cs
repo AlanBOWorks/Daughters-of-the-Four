@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 
-namespace CombatSystem.Team.VanguardEffects
+namespace CombatSystem.Skills.VanguardEffects
 {
     internal static class UtilsVanguardEffects
     {

@@ -1,4 +1,4 @@
-namespace CombatSystem.Team.VanguardEffects
+namespace CombatSystem.Skills.VanguardEffects
 {
     public static class EnumsVanguardEffects
     {

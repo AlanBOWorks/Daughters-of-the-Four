@@ -377,11 +377,11 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnHoverTargetInteraction(CombatEntity target, in PerformEffectValues effect)
+        public void OnHoverTargetInteraction(CombatEntity target, ISkill skill)
         {
             foreach (var listener in _hoverTargetsListeners)
             {
-                listener.OnHoverTargetInteraction(target, in effect);
+                listener.OnHoverTargetInteraction(target, skill);
             }
         }
 

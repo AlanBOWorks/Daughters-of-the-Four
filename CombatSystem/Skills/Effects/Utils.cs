@@ -65,32 +65,53 @@ namespace CombatSystem.Skills.Effects
             CombatEntity target,
             PerformEffectValues values)
         {
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            HandleGuarding();
+            void HandleGuarding()
+            {
+                var targetTeam = target.Team;
+                if(targetTeam.Contains(performer)) return; //not enemy
+
+                var targetGuarder = targetTeam.GuardHandler;
+                if (targetGuarder.IsGuarding())
+                    target = targetGuarder.GetCurrentGuarder();
+            }
+
+
             var targetType = values.TargetType;
             var targets = UtilsTarget.GetEffectTargets(targetType, performer, target);
             var preset = values.Effect;
             var effectValue = values.EffectValue;
 
-            int i = 0;
-            foreach (var effectTarget in targets)
+            DoEffectsTarget();
+
+            void DoEffectsTarget()
             {
-                bool isPerformerExclusive = (targetType == EnumsEffect.TargetType.Performer && performer == exclusion);
-                if (!isPerformerExclusive)
-                    if (effectTarget == exclusion)
-                        continue;
+                var eventsHolder = CombatSystemSingleton.EventsHolder;
 
-                DoEffectOnTarget();
-                void DoEffectOnTarget()
+
+                bool isFirstEffect = true;
+                foreach (var effectTarget in targets)
                 {
+                    bool isPerformerExclusive = (targetType == EnumsEffect.TargetType.Performer && performer == exclusion);
+                    if (!isPerformerExclusive)
+                        if (effectTarget == exclusion)
+                            continue;
 
-                    preset.DoEffect(performer, effectTarget, effectValue);
+                    DoEffectOnTarget();
+                    void DoEffectOnTarget()
+                    {
 
-                    if (i == 0)
-                        eventsHolder.OnCombatPrimaryEffectPerform(performer, effectTarget, in values);
-                    else
-                        eventsHolder.OnCombatSecondaryEffectPerform(performer, effectTarget, in values);
+                        preset.DoEffect(performer, effectTarget, effectValue);
 
-                    i++;
+                        if (isFirstEffect)
+                        {
+                            eventsHolder.OnCombatPrimaryEffectPerform(performer, effectTarget, in values);
+                            isFirstEffect = false;
+                        }
+                        else
+                            eventsHolder.OnCombatSecondaryEffectPerform(performer, effectTarget, in values);
+
+                    }
                 }
             }
         }
