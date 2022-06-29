@@ -66,16 +66,16 @@ namespace CombatSystem.Skills
     {
         public readonly VanguardEffectsHolder EffectsHolder;
         public readonly IVanguardSkill UsedSkill;
-        public readonly int Iterations;
+        public readonly int Accumulation;
 
         public VanguardSkillUsageValues(
             VanguardEffectsHolder effectsHolder, 
             IVanguardSkill usedSkill, 
-            int iterations)
+            int accumulation)
         {
             EffectsHolder = effectsHolder;
             UsedSkill = usedSkill;
-            Iterations = iterations;
+            Accumulation = accumulation;
         }
     }
 }

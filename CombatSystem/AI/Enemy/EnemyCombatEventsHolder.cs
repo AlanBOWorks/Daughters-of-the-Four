@@ -42,11 +42,11 @@ namespace CombatSystem.AI
 
         }
 
-        public void OnControlEntitySelect(in CombatEntity selection)
+        public void OnControlEntitySelect(CombatEntity selection)
         {
             foreach (var listener in _controllerListeners)
             {
-                listener.OnControlEntitySelect(in selection);
+                listener.OnControlEntitySelect(selection);
             }
         }
 
@@ -69,7 +69,7 @@ namespace CombatSystem.AI
 
     public interface IEnemyControllerListener : ICombatEventListener
     {
-        void OnControlEntitySelect(in CombatEntity selection);
+        void OnControlEntitySelect(CombatEntity selection);
         void OnControlSkillSelect(in CombatSkill skill);
         void OnTargetSelect(in CombatEntity target);
     }

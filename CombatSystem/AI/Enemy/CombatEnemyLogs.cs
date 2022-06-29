@@ -20,7 +20,7 @@ namespace CombatSystem.AI.Enemy
 
 
 
-        public void OnControlEntitySelect(in CombatEntity selection)
+        public void OnControlEntitySelect(CombatEntity selection)
         {
             if(!ShowControlLogs || !_controlLogs.OnEntitySelect) return;
             Debug.Log($"Enemy Control > Performer: {selection.CombatCharacterName}");

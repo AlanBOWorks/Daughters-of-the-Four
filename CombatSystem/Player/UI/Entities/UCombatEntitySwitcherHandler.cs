@@ -8,17 +8,17 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UCombatEntitySwitcherHandler : MonoBehaviour, ICombatStatesListener,
-        ITempoTeamStatesListener, ITempoEntityStatesListener,
+    public class UCombatEntitySwitcherHandler : MonoBehaviour, 
+        ICombatStatesListener,
+        ITempoControlStatesListener,
+        ITempoEntityActionStatesListener,
         IPlayerEntityListener
     {
         [SerializeField]
         private TeamReferences references = new TeamReferences();
 
-        [SerializeField] private UCombatSkillButtonsHolder skillsHolder;
         private Dictionary<CombatEntity, UCombatEntitySwitchButton> _buttonsDictionary;
 
-        public FlexPositionMainGroupStructure<UCombatEntitySwitchButton> GetButtons() => references;
         public IReadOnlyDictionary<CombatEntity, UCombatEntitySwitchButton> GetDictionary() => _buttonsDictionary;
 
         private void Start()
@@ -69,6 +69,38 @@ namespace CombatSystem.Player.UI
         }
 
 
+        public void ShowAll()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void HideAll()
+        {
+            gameObject.SetActive(false);
+        }
+
+        private void EnableButton(CombatEntity entity)
+        {
+            if(!_buttonsDictionary.ContainsKey(entity)) return;
+            _buttonsDictionary[entity].DoEnable(true);
+        }
+        private void DisableButton(CombatEntity entity)
+        {
+            if (!_buttonsDictionary.ContainsKey(entity)) return;
+
+            _buttonsDictionary[entity].DoEnable(false);
+        }
+
+        private CombatEntity _currentPerformer;
+        public void DoSwitchEntity(CombatEntity entity)
+        {
+            if (entity == _currentPerformer || entity == null) return;
+
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            playerEvents.OnPerformerSwitch(entity);
+        }
+
+
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             _buttonsDictionary.Clear();
@@ -91,6 +123,7 @@ namespace CombatSystem.Player.UI
             }
         }
 
+
         public void OnCombatStart()
         {
         }
@@ -108,46 +141,44 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void ShowAll()
-        {
-            gameObject.SetActive(true);
-        }
 
-        public void HideAll()
-        {
-            gameObject.SetActive(false);
-        }
 
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             ShowAll();
+            var actors = controller.ControllingTeam.GetControllingMembers();
+            EnableButtons(actors);
+
+            void EnableButtons(IEnumerable<CombatEntity> actingEntities)
+            {
+                foreach (var member in actingEntities)
+                {
+                    EnableButton(member);
+                }
+            }
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
         {
+           DisableButton(lastActor);
         }
 
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
-       {
+        {
            _currentPerformer = null;
         }
 
-
-
-        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
-       {
-           if (!_buttonsDictionary.ContainsKey(entity)) return;
-
-           _buttonsDictionary[entity].DoEnable(canControl);
-       }
-
-       public void OnEntityRequestAction(CombatEntity entity)
+        public void OnPerformerSwitch(CombatEntity performer)
+        {
+            _currentPerformer = performer;
+        }
+        public void OnEntityRequestAction(CombatEntity entity)
        {
        }
 
        public void OnEntityBeforeSkill(CombatEntity entity)
        {
-           
        }
 
        public void OnEntityFinishAction(CombatEntity entity)
@@ -156,37 +187,14 @@ namespace CombatSystem.Player.UI
 
        public void OnEntityEmptyActions(CombatEntity entity)
        {
-           DisableButton(in entity);
+           DisableButton(entity);
        }
 
-        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
-       {
-       }
-       private void DisableButton(in CombatEntity entity)
-       {
-           if (!_buttonsDictionary.ContainsKey(entity)) return;
 
-           _buttonsDictionary[entity].DoEnable(false);
-       }
-
-        private CombatEntity _currentPerformer;
-        public void DoSwitchEntity(CombatEntity entity)
-        {
-            if(entity == _currentPerformer || entity == null) return;
-
-            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.OnPerformerSwitch(entity);
-        }
-        public void OnPerformerSwitch(CombatEntity performer)
-        {
-            _currentPerformer = performer;
-        }
-
-        [Serializable]
+       [Serializable]
        private sealed class TeamReferences : TeamMainStructureInstantiateHandler<UCombatEntitySwitchButton>
        {
 
        }
-
     }
 }

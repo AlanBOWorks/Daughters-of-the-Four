@@ -9,8 +9,9 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public sealed class UPerformerSelectionFeedback : MonoBehaviour, IPlayerEntityListener,
-        ITempoTeamStatesListener
+    public sealed class UPerformerSelectionFeedback : MonoBehaviour, 
+        IPlayerEntityListener,
+        ICombatStatesListener
     {
         [SerializeField] private UCombatEntitySwitcherHandler switcherHandler;
         [SerializeField] private RectTransform focusIcon;
@@ -18,8 +19,7 @@ namespace CombatSystem.Player.UI
         private void Start()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.ManualSubscribe(this);
-            playerEvents.DiscriminationEventsHolder.ManualSubscribe(this);
+            playerEvents.Subscribe(this);
             Hide();
         }
         private void OnDestroy()
@@ -52,20 +52,9 @@ namespace CombatSystem.Player.UI
             focusIcon.rotation = Quaternion.AngleAxis(-10, Vector3.forward); 
             focusIcon.DORotateQuaternion(Quaternion.identity, AnimationDuration);
         }
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
-        {
-            Show();
-        }
-
-        public void OnAllActorsNoActions(CombatEntity lastActor)
-        {
-            Hide();
-        }
-        
-        public void OnTempoFinishControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
         }
-
 
         private void Show()
         {
@@ -74,6 +63,28 @@ namespace CombatSystem.Player.UI
         private void Hide()
         {
             focusIcon.gameObject.SetActive(false);
+        }
+
+        public void OnCombatEnd()
+        {
+            Hide();
+        }
+
+        public void OnCombatFinish(bool isPlayerWin)
+        {
+        }
+
+        public void OnCombatQuit()
+        {
+        }
+
+        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
+        {
+        }
+
+        public void OnCombatStart()
+        {
+            Show();
         }
     }
 }

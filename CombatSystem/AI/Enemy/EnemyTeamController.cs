@@ -9,19 +9,40 @@ using UnityEngine;
 
 namespace CombatSystem.AI
 {
-    public class EnemyTeamControllerRandom : CombatTeamControllerBase, ITempoTeamStatesListener, ITempoTeamStatesExtraListener,
-        ISkillUsageListener
+    public class EnemyTeamController : CombatTeamControllerBase, 
+        ITempoControlStatesListener,
+        ITempoControlStatesExtraListener,
+        ITempoEntityActionStatesListener
     {
         public override void InvokeStartControl()
         {
             StartControl();
         }
 
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+
+        public void OnEntityRequestAction(CombatEntity entity)
         {
         }
 
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        public void OnEntityBeforeSkill(CombatEntity entity)
+        {
+        }
+
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+            DoNextControl();
+        }
+
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+            DoNextControl();
+        }
+
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
+        {
+        }
+
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             
         }
@@ -39,65 +60,48 @@ namespace CombatSystem.AI
         {
         }
 
-        public void OnCombatSkillSubmit(in SkillUsageValues values)
-        {
-            Step();
-        }
-
-        public void OnCombatSkillPerform(in SkillUsageValues values)
-        {
-        }
-        public void OnCombatSkillFinish(CombatEntity performer)
-        {
-        }
-
-
         private void StartControl()
         {
-            DoControl();
+            DoNextControl();
         }
 
-        private void Step()
-        {
-            DoControl();
-        }
 
-        private void DoControl()
+        private void DoNextControl()
         {
             var entities = GetAllControllingMembers();
-            var pick = PickEntity(in entities);
-            HandleEntity(in pick);
+            if(entities.Count <= 0) return;
+
+            var pick = PickEntity(entities);
+            HandleEntity(pick);
 
         }
 
 
-        private static CombatEntity PickEntity(in IReadOnlyList<CombatEntity> members)
+        private static CombatEntity PickEntity(IReadOnlyList<CombatEntity> members)
         {
-            int randomPick = Random.Range(0, members.Count-1);
+            int randomPick = Random.Range(0, members.Count);
             return members[randomPick];
         }
 
 
         private CombatEntity _currentControl;
-        private void HandleEntity(in CombatEntity onEntity)
+        private void HandleEntity(CombatEntity onEntity)
         {
-            EnemyCombatSingleton.EnemyEventsHolder.OnControlEntitySelect(in onEntity);
+            EnemyCombatSingleton.EnemyEventsHolder.OnControlEntitySelect(onEntity);
             _currentControl = onEntity;
             var entitySkills = onEntity.GetCurrentSkills();
 
 
-            HandleSkills(in entitySkills);
+            HandleSkills(entitySkills);
         }
 
-        private void HandleSkills(in IReadOnlyList<CombatSkill> skills)
+        private void HandleSkills(IReadOnlyList<CombatSkill> skills)
         {
-            if (!UtilsCombatStats.CanControlAct(_currentControl)) return;
-
-            var selectedSkill = SelectSkill(in skills);
+            var selectedSkill = SelectSkill(skills);
             HandleSkill(in selectedSkill);
         }
 
-        private static CombatSkill SelectSkill(in IReadOnlyList<CombatSkill> skills)
+        private static CombatSkill SelectSkill(IReadOnlyList<CombatSkill> skills)
         {
             int randomPick = Random.Range(0, skills.Count - 1);
             return skills[randomPick];
@@ -122,6 +126,12 @@ namespace CombatSystem.AI
             var randomPick = Random.Range(0, possibleTargets.Count());
 
             return possibleTargets[randomPick];
+        }
+
+
+        private interface IControllerHandler
+        {
+            
         }
 
     }

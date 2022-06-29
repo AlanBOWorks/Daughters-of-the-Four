@@ -168,11 +168,11 @@ namespace CombatSystem.Team
         {
             GuardHandler.OnEntityRequestSequence(in entity);
         }
-        public void RemoveFromControllingEntities(CombatEntity entity, in bool isForcedByController)
+        public void RemoveFromControllingEntities(CombatEntity entity, bool isForcedByController)
         {
             if (isForcedByController) return;
             //This will be removed with Clear OnTempoForceFinish
-            _controlMembers.SafeRemoveControlling(in entity);
+            _controlMembers.SafeRemoveControlling(entity);
         }
 
         public void OnTempoForceFinish()

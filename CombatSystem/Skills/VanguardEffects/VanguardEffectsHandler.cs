@@ -21,6 +21,31 @@ namespace CombatSystem.Skills.VanguardEffects
         public bool IsActive() => _queueCoroutineHandle.IsRunning;
 
 
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
+        {
+        }
+
+        public void OnCombatSkillPerform(in SkillUsageValues values)
+        {
+            var skill = values.UsedSkill;
+            if (!UtilsSkill.IsOffensiveSkill(skill)) return;
+
+            var attacker = values.Performer;
+            var onTarget = values.Target;
+            HandleVanguardOffensive();
+
+            void HandleVanguardOffensive()
+            {
+                var targetTeam = onTarget.Team;
+                if (targetTeam.Contains(attacker)) return;
+
+                // Events are handled inside this
+                targetTeam.VanguardEffectsHolder.OnOffensiveDone(attacker, onTarget);
+            }
+        }
+        public void OnCombatSkillFinish(CombatEntity performer)
+        {
+        }
         public void EnqueueVanguardEffects(CombatTeam team)
         {
             var vanguardEffectsHolder = team.VanguardEffectsHolder;
@@ -55,10 +80,9 @@ namespace CombatSystem.Skills.VanguardEffects
                 {
                     //Do animation Once
                     animator.PerformActionAnimation(StaticSkillTypes.RevengeVanguardSkill, performer, performer);
-                    int revengeTotalOffensiveCount = CalculateIterationCount(vanguardOffensiveRecords.VanguardRevengeType);
-                    foreach ((IVanguardSkill vanguardSkill, var count) in vanguardEffects.VanguardRevengeType)
+                    foreach ((IVanguardSkill vanguardSkill, var accumulation) in vanguardEffects.VanguardRevengeType)
                     {
-                        InvokeVanguardEffect(vanguardSkill, count + revengeTotalOffensiveCount);
+                        InvokeVanguardEffect(vanguardSkill, accumulation, vanguardOffensiveRecords.VanguardRevengeType);
                         yield return Timing.WaitForSeconds(WaitForNextEffect);
                     }
                 }
@@ -68,10 +92,9 @@ namespace CombatSystem.Skills.VanguardEffects
                 {
                     //Do animation Once
                     animator.PerformActionAnimation(StaticSkillTypes.PunishVanguardSkill, performer, performer);
-                    int punishTotalOffensiveCount = CalculateIterationCount(vanguardOffensiveRecords.VanguardPunishType);
-                    foreach ((IVanguardSkill vanguardSkill, var count) in vanguardEffects.VanguardPunishType)
+                    foreach ((IVanguardSkill vanguardSkill, var accumulation) in vanguardEffects.VanguardPunishType)
                     {
-                        InvokeVanguardEffect(vanguardSkill, count + punishTotalOffensiveCount);
+                        InvokeVanguardEffect(vanguardSkill, accumulation, vanguardOffensiveRecords.VanguardPunishType);
                         yield return Timing.WaitForSeconds(WaitForNextEffect);
                     }
                 }
@@ -81,27 +104,18 @@ namespace CombatSystem.Skills.VanguardEffects
                 vanguardEffectsHolder.Clear();
                 yield return Timing.WaitForOneFrame;
 
-                void InvokeVanguardEffect(IVanguardSkill skill, int totalIteration)
+
+                void InvokeVanguardEffect(IVanguardSkill skill, int accumulation, IReadOnlyDictionary<CombatEntity,int> offensiveRecords)
                 {
                     var vanguardValues = new VanguardSkillUsageValues(
                         vanguardEffectsHolder,
                         skill,
-                        totalIteration);
+                        accumulation);
                     eventsHolder.OnVanguardEffectPerform(vanguardValues);
 
-                    UtilsCombatSkill.DoVanguardSkill(in vanguardValues);
+                    UtilsCombatSkill.DoVanguardSkillOnPerformer(in vanguardValues, offensiveRecords);
                 }
             }
-        }
-
-
-        public static void HandleVanguardOffensive(CombatEntity attacker, CombatEntity onTarget)
-        {
-            var targetTeam = onTarget.Team;
-            if (targetTeam.Contains(attacker)) return;
-
-            // Events are handled inside this
-            targetTeam.VanguardEffectsHolder.OnOffensiveDone(attacker, onTarget);
         }
 
 
@@ -117,23 +131,6 @@ namespace CombatSystem.Skills.VanguardEffects
             return allEntitiesInteractionCount;
         }
 
-
-        public void OnCombatSkillSubmit(in SkillUsageValues values)
-        {
-        }
-
-        public void OnCombatSkillPerform(in SkillUsageValues values)
-        {
-            var skill = values.UsedSkill;
-            if (!UtilsSkill.IsOffensiveSkill(skill)) return;
-
-            var attacker = values.Performer;
-            var target = values.Target;
-            HandleVanguardOffensive(attacker, target);
-        }
-        public void OnCombatSkillFinish(CombatEntity performer)
-        {
-        }
 
 
         public void OnCombatEnd()

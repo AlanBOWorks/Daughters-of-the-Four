@@ -11,7 +11,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UFrontTargetButtonsHandler : MonoBehaviour, ITeamElementSpawnListener<UUIHoverEntity>, 
-        IPlayerEntityListener,ITempoTeamStatesListener,
+        IPlayerEntityListener,ITempoControlStatesListener,
         ISkillSelectionListener, ISkillPointerListener,
         ITargetSelectionListener
     {
@@ -154,7 +154,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             
         }

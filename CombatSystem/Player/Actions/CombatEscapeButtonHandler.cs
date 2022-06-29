@@ -15,7 +15,7 @@ namespace CombatSystem.Player
     internal sealed class CombatEscapeButtonHandler : 
         IEscapeButtonHandler,
         ICombatStatesListener, 
-        ITempoTeamStatesListener,
+        ITempoControlStatesListener,
         ISkillSelectionListener
     {
         public CombatEscapeButtonHandler()
@@ -127,7 +127,7 @@ namespace CombatSystem.Player
         {
         }
       
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             ResetState();
         }

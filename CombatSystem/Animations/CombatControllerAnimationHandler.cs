@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CombatSystem.Animations
 {
-    public sealed class CombatControllerAnimationHandler : ITempoEntityStatesListener, ICombatStatesListener
+    public sealed class CombatControllerAnimationHandler : ITempoEntityMainStatesListener, ICombatStatesListener
     {
 
         public const float PerformToReceiveTimeOffset = .5f;
@@ -43,24 +43,7 @@ namespace CombatSystem.Animations
             var animator = GetAnimator(in entity);
             animator.OnRequestSequenceAnimation();
         }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-            
-        }
-
-        public void OnEntityBeforeSkill(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-           
-        }
-
-        public void OnEntityEmptyActions(CombatEntity entity)
-        {
-        }
+        
 
         public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {

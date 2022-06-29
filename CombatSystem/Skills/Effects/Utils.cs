@@ -23,28 +23,64 @@ namespace CombatSystem.Skills.Effects
             }
         }
 
-        public static void DoVanguardSkill(in VanguardSkillUsageValues values)
+        public static void DoVanguardSkillOnPerformer(in VanguardSkillUsageValues values, IReadOnlyDictionary<CombatEntity, int> offensiveRecords)
         {
             var skill = values.UsedSkill;
             var performer = values.EffectsHolder.GetMainEntity();
-            var iterations = values.Iterations;
+            var iterations = values.Accumulation;
 
-            CombatEntity provisionalTarget = null;
-            var offensiveRecords = values.EffectsHolder.GetOffensiveRecordsStructure();
-            foreach (var offensiveRecord in offensiveRecords.VanguardPunishType)
+            float totalOffensiveIterations = 0;
+            foreach (var offensiveRecord in offensiveRecords)
             {
-                provisionalTarget = offensiveRecord.Key;
-                break;
+                totalOffensiveIterations += offensiveRecord.Value;
             }
 
             foreach (var effect in skill.GetPerformVanguardEffects())
             {
-                PerformEffectValues performValue = new PerformEffectValues(
-                    effect.Effect,
-                    effect.EffectValue * iterations,
-                    effect.TargetType);
-                DoEffect(performer,null, provisionalTarget, performValue);
+                var effectType = effect.TargetType;
+                switch (effectType)
+                {
+                    case EnumsEffect.TargetType.Target:
+                    case EnumsEffect.TargetType.TargetTeam:
+                    case EnumsEffect.TargetType.TargetLine:
+                        DoEffectOnTargets();
+                        break;
+                    case EnumsEffect.TargetType.All:
+                        throw new ArgumentOutOfRangeException();
+                    default:
+                        DoEffectOnPerformer();
+                        break;
+                }
+
+
+                void DoEffectOnTargets()
+                {
+                    foreach ((CombatEntity combatEntity, var i) in offensiveRecords)
+                    {
+                        DoEffectOnTarget(combatEntity, i);
+                    }
+                }
+
+                void DoEffectOnTarget(CombatEntity onTarget, int targetIterations)
+                {
+                    PerformEffectValues performValue = new PerformEffectValues(
+                        effect.Effect,
+                        effect.EffectValue * iterations * targetIterations,
+                        effect.TargetType);
+                    DoEffect(performer, null, onTarget, performValue);
+                }
+
+                void DoEffectOnPerformer()
+                {
+                    PerformEffectValues performValue = new PerformEffectValues(
+                        effect.Effect,
+                        totalOffensiveIterations * effect.EffectValue * iterations,
+                        effectType);
+                    DoEffect(performer, null, performer, performValue);
+                }
             }
+
+           
         }
 
 

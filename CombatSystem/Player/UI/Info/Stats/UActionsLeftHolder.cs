@@ -12,9 +12,10 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UActionsLeftHolder : MonoBehaviour, ITempoEntityStatesListener,
+    public class UActionsLeftHolder : MonoBehaviour, 
+        ITempoEntityActionStatesListener,
         IPlayerEntityListener,
-        ITempoTeamStatesListener,
+        ITempoControlStatesListener,
         ISkillSelectionListener, ISkillPointerListener
     {
         [SerializeField] private TextMeshProUGUI actionsLimitText;
@@ -154,7 +155,7 @@ namespace CombatSystem.Player.UI
 
 
        
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             ShowUI();
         }
@@ -167,11 +168,6 @@ namespace CombatSystem.Player.UI
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             _currentEntity = null;
-        }
-
-
-        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
-        {
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
@@ -190,13 +186,8 @@ namespace CombatSystem.Player.UI
 
         public void OnEntityEmptyActions(CombatEntity entity)
         {
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
-        {
-            if(isForcedByController) return;
-
             UpdateInfoToCurrent();
         }
+
     }
 }

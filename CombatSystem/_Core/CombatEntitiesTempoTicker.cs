@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 namespace CombatSystem._Core
 {
     public sealed class CombatEntitiesTempoTicker :
-        ICombatStatesListener, ITempoEntityStatesListener
+        ICombatStatesListener, ITempoEntityMainStatesListener
     {
         public CombatEntitiesTempoTicker()
         {
@@ -73,24 +73,6 @@ namespace CombatSystem._Core
 
             _tickingTrackers.Remove(entity);
         }
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityBeforeSkill(CombatEntity entity)
-        {
-            
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityEmptyActions(CombatEntity entity)
-        {
-        }
-
         public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
             _tickingTrackers.Add(entity);

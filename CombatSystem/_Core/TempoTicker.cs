@@ -149,14 +149,20 @@ namespace CombatSystem._Core
                         } while (vanguardSkillHandler.IsActive());
 
                         yield return Timing.WaitForOneFrame;
-                        combatEvents.OnTempoPreStartControl(controller);
+                        var controllerTeam = controller.ControllingTeam;
+                        combatEvents.OnTempoPreStartControl(controller, GetFirstActor());
                         yield return Timing.WaitForOneFrame;
 
-                        var controllerTeam = controller.ControllingTeam;
                         teamControllersHandler.TryInvokeControl(in controller);
                         while (controllerTeam.IsActive() || teamControllersHandler.IsControlling())
                         {
                             yield return Timing.WaitForOneFrame;
+                        }
+
+                        CombatEntity GetFirstActor()
+                        {
+                            var actingMembers = controllerTeam.GetControllingMembers();
+                            return actingMembers[0];
                         }
                     }
 
@@ -193,34 +199,14 @@ namespace CombatSystem._Core
         void OnStopTicking();
     }
 
-    public interface ITempoEntityStatesListener : ICombatEventListener
+
+    public interface ITempoEntityMainStatesListener : ICombatEventListener
     {
         /// <summary>
         /// It's send once per sequence and the first time the entity's
         /// [<seealso cref="CombatStats.CurrentInitiative"/>] triggers. 
         /// </summary>
         void OnEntityRequestSequence(CombatEntity entity, bool canControl);
-
-        /// <summary>
-        /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left and if it can act.<br></br>
-        /// If there's no actions left [<see cref="OnEntityFinishSequence"/>] will be invoked instead.
-        /// </summary>
-        void OnEntityRequestAction(CombatEntity entity);
-
-        void OnEntityBeforeSkill(CombatEntity entity);
-
-        /// <summary>
-        /// Invoked after the action is finish; It's the very last call of the action (after animations) and
-        /// it's called before [<see cref="OnEntityRequestAction"/>] and [<see cref="OnEntityFinishSequence"/>].
-        /// </summary>
-        void OnEntityFinishAction(CombatEntity entity);
-
-        /// <summary>
-        /// Invoked when the (<paramref name="entity"/>) has not actions left.<br></br>
-        /// It's invoked before [<seealso cref="OnEntityFinishSequence"/>] and SkillPerform;<br></br>
-        /// Resets and buff's behaviors are not performed yet
-        /// </summary>
-        void OnEntityEmptyActions(CombatEntity entity);
 
         /// <summary>
         /// The very last event invoked when there's no [<seealso cref="CombatStats.UsedActions"/>] left or when
@@ -231,6 +217,32 @@ namespace CombatSystem._Core
         /// </summary>
         void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController);
     }
+
+    public interface ITempoEntityActionStatesListener : ICombatEventListener
+    {
+        /// <summary>
+        /// Invoked per [<seealso cref="CombatStats.UsedActions"/>] left and if it can act.<br></br>
+        /// If there's no actions left [<see cref="ITempoEntityMainStatesListener.OnEntityFinishSequence"/>] will be invoked instead.
+        /// </summary>
+        void OnEntityRequestAction(CombatEntity entity);
+
+        void OnEntityBeforeSkill(CombatEntity entity);
+
+        /// <summary>
+        /// Invoked after the action is finish; It's the very last call of the action (after animations) and
+        /// it's called before [<see cref="OnEntityRequestAction"/>]
+        /// and [<see cref="ITempoEntityMainStatesListener.OnEntityFinishSequence"/>].
+        /// </summary>
+        void OnEntityFinishAction(CombatEntity entity);
+
+        /// <summary>
+        /// Invoked when the (<paramref name="entity"/>) has not actions left.<br></br>
+        /// It's invoked before [<seealso cref="ITempoEntityMainStatesListener.OnEntityFinishSequence"/>] and SkillPerform;<br></br>
+        /// Resets and buff's behaviors are not performed yet
+        /// </summary>
+        void OnEntityEmptyActions(CombatEntity entity);
+    }
+
 
     public interface ITempoEntityStatesExtraListener : ICombatEventListener
     {
@@ -270,15 +282,16 @@ namespace CombatSystem._Core
 
     }
 
-    public interface ITempoTeamStatesListener : ICombatEventListener
+    public interface ITempoControlStatesListener : ICombatEventListener
     {
         /// <summary>
-        /// Invoked when the controller starts; It's after [<seealso cref="ITempoTeamStatesExtraListener.OnTempoPreStartControl"/>]
+        /// Invoked when the controller starts; It's after [<seealso cref="ITempoControlStatesExtraListener.OnTempoPreStartControl"/>]
         /// </summary>
         /// <param name="controller"></param>
-        void OnTempoStartControl(CombatTeamControllerBase controller);
+        /// <param name="firstControl"></param>
+        void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl);
         /// <summary>
-        /// Similar to [<seealso cref="OnControlFinishAllActors"/>] but before the skills performing
+        /// Invoked when all actors had finish acting(no action left)
         /// </summary>
         /// <param name="lastActor"></param>
         void OnAllActorsNoActions(CombatEntity lastActor);
@@ -289,13 +302,13 @@ namespace CombatSystem._Core
         void OnTempoFinishControl(CombatTeamControllerBase controller);
     }
 
-    public interface ITempoTeamStatesExtraListener : ICombatEventListener
+    public interface ITempoControlStatesExtraListener : ICombatEventListener
     {
         /// <summary>
         /// First call; It's before [<seealso cref="ITempoEntityStatesListener.OnEntityRequestSequence"/>]
-        /// and [<seealso cref="ITempoTeamStatesListener.OnTempoStartControl"/>]
+        /// and [<seealso cref="ITempoControlStatesListener.OnTempoStartControl"/>]
         /// </summary>
-        void OnTempoPreStartControl(CombatTeamControllerBase controller);
+        void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity);
         /// <summary>
         /// The very last call of this events; when everything was removed and invoked
         /// </summary>

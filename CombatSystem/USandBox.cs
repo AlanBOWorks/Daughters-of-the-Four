@@ -14,81 +14,49 @@ namespace Utils
 {
     public class USandBox : MonoBehaviour
     {
-        [ShowInInspector] 
-        private IEnumerable<RandomNumber> _enumerable;
-        [ShowInInspector] 
-        private RandomNumber[] _numbers;
+        [ShowInInspector]
+        private CheckNull _toNull;
+        [ShowInInspector]
+        private CheckNull _toCheck;
 
-        [ShowInInspector] private RandomNumber _manualNumber1;
-        [ShowInInspector] private RandomNumber _manualNumber2;
-        [ShowInInspector] private RandomNumber _manualNumber3;
+        public float someValue;
+        public float secondValue;
 
         [Button]
-        private void Randomise(int amount = 4)
+        private void Prepare()
         {
-            if (amount > 10) amount = 10;
-            _numbers = new RandomNumber[amount];
-            for (int i = 0; i < amount; i++)
+            _toNull = new CheckNull();
+            Handle(in _toNull);
+            void Handle(in CheckNull reference)
             {
-                _numbers[i] = new RandomNumber();
+                _toCheck = reference;
             }
 
-            _manualNumber1 = new RandomNumber();
-            _manualNumber2 = new RandomNumber();
-            _manualNumber3 = new RandomNumber();
-        }
+            someValue = Random.value;
 
-        [Button]
-        private void ByManual()
-        {
-            _enumerable = GenerateManualEnumerable();
-        }
-
-        [Button]
-        private void ByArray()
-        {
-            _enumerable = GenerateEnumerable();
-        }
-
-
-        private IEnumerable<RandomNumber> GenerateEnumerable()
-        {
-            foreach (var randomNumber in _numbers)
+            HandleFloat(in someValue);
+            void HandleFloat(in float value)
             {
-                yield return randomNumber;
+                secondValue = value;
             }
         }
 
-        private IEnumerable<RandomNumber> GenerateManualEnumerable()
-        {
-            yield return _manualNumber1;
-            yield return _manualNumber2;
-            yield return _manualNumber3;
-        }
-
         [Button]
-        private void PrintNumbers()
+        private void ToNull()
         {
-            int i = 0;
-            foreach (RandomNumber number in _enumerable)
-            {
-                if (number == null)
-                {
-                    Debug.Log($"NULL {i}");
-                    continue;
-                }
-                Debug.Log(number.RandomValue);
-                i++;
-            }
+            _toNull = null;
+
+            someValue = -1;
         }
 
-        private sealed class RandomNumber
+
+        private sealed class CheckNull
         {
-            public RandomNumber()
+            public CheckNull()
             {
-                RandomValue = Random.Range(0, 10);
+                Value = Random.value;
             }
-            public int RandomValue;
+            public float Value;
         }
     }
 }

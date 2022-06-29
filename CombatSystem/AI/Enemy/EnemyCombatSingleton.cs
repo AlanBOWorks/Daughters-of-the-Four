@@ -13,7 +13,7 @@ namespace CombatSystem.AI
         {
             EnemyEventsHolder = new EnemyCombatEventsHolder();
 
-            TeamController = new EnemyTeamControllerRandom();
+            TeamController = new EnemyTeamController();
 
 
             EnemyEventsHolder.DiscriminationEventsHolder.Subscribe(TeamController);
@@ -22,7 +22,7 @@ namespace CombatSystem.AI
         [ShowInInspector]
         public static EnemyCombatEventsHolder EnemyEventsHolder { get; private set; }
 
-        public static readonly EnemyTeamControllerRandom TeamController;
+        public static readonly EnemyTeamController TeamController;
 
 
 

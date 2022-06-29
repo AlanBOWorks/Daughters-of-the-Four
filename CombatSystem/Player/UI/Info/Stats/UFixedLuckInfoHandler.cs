@@ -10,7 +10,7 @@ namespace CombatSystem.Player.UI
 {
     public class UFixedLuckInfoHandler : MonoBehaviour,
         ITeamElementSpawnListener<UVitalityInfo>, //This is because I want to use UVitalitySpawnerHandler's events
-        ITempoEntityStatesListener
+        ITempoEntityActionStatesListener
     {
         [ShowInInspector,DisableInEditorMode]
         private Dictionary<CombatEntity, ULuckInfo> _elementsDictionary;
@@ -47,11 +47,6 @@ namespace CombatSystem.Player.UI
         {
             ResetState();
         }
-
-        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
-        {
-        }
-
         public void OnEntityRequestAction(CombatEntity entity)
         {
             UpdateLuckInfo(in entity);
@@ -67,15 +62,9 @@ namespace CombatSystem.Player.UI
 
         public void OnEntityEmptyActions(CombatEntity entity)
         {
-            
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
-        {
-            if(isForcedByController) return;
-
             UpdateLuckInfo(in entity);
         }
+
 
         private void UpdateLuckInfo(in CombatEntity entity)
         {

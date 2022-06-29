@@ -15,7 +15,7 @@ namespace CombatSystem.Player
 {
     public abstract class UHoldButton : MonoBehaviour,
         IPointerDownHandler, IPointerUpHandler,
-        ITempoTeamStatesListener,
+        ITempoControlStatesListener,
         IOverridePauseElement
     {
         [Title("References")]
@@ -135,7 +135,7 @@ namespace CombatSystem.Player
             gameObject.SetActive(false);
         }
         
-        public virtual void OnTempoStartControl(CombatTeamControllerBase controller)
+        public virtual void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             Show();
         }

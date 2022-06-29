@@ -16,7 +16,7 @@ namespace CombatSystem.Player.UI
     public class UCombatSkillButtonsHolder : MonoBehaviour, 
         IPlayerEntityListener, 
 
-        ITempoTeamStatesListener, ITeamEventListener,
+        ITempoControlStatesListener, ITeamEventListener,
         ISkillUsageListener, ICombatStatesListener,
         ISkillSelectionListener
     {
@@ -227,7 +227,7 @@ namespace CombatSystem.Player.UI
 
         
 
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             EnableHolder();
         }

@@ -60,7 +60,7 @@ namespace CombatSystem.Team
         }
 
 
-        public void SafeRemoveControlling(in CombatEntity entity)
+        public void SafeRemoveControlling(CombatEntity entity)
         {
 
             if (!_allControllingMembers.Contains(entity)) return;

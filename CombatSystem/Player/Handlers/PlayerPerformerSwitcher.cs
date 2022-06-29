@@ -1,15 +1,14 @@
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
-using CombatSystem.Skills;
 using CombatSystem.Team;
 
 namespace CombatSystem.Player.Handlers
 {
     public sealed class PlayerPerformerSwitcher : 
         ICombatPreparationListener, 
-        ITempoEntityStatesListener, 
-        ITempoTeamStatesListener, ITempoTeamStatesExtraListener
+        ITempoEntityMainStatesListener, ITempoEntityActionStatesListener ,
+        ITempoControlStatesListener, ITempoControlStatesExtraListener
 
 
     {
@@ -21,9 +20,13 @@ namespace CombatSystem.Player.Handlers
 
 
             CombatEntity nextControl = _activeEntities[0];
-            PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(nextControl);
+            DoPerformEntity(nextControl);
         }
 
+        private static void DoPerformEntity(CombatEntity entity)
+        {
+            PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(entity);
+        }
 
         // ----- EVENTS -----
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
@@ -35,9 +38,10 @@ namespace CombatSystem.Player.Handlers
         private bool _isActive;
 
 
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
-            
+            _isActive = true;
+            DoPerformEntity(firstControl);
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
@@ -75,10 +79,9 @@ namespace CombatSystem.Player.Handlers
         {
         }
 
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
         {
-            _isActive = true;
-            DoPerformNextEntity();
+            
         }
 
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)

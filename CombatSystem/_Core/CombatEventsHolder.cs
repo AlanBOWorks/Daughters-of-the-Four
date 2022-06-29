@@ -180,8 +180,8 @@ namespace CombatSystem._Core
         }
 
 
-        // ------ TEMPO ----- 
-
+        // ------ ------ TEMPO ----- ------ 
+        // ------ TICK -----
         public void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative)
         {
             _playerCombatEvents.OnEntityTick(entity, currentTick, percentInitiative);
@@ -189,6 +189,7 @@ namespace CombatSystem._Core
         }
 
 
+        // ------ SEQUENCE REQUEST -----
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
             _entityTempoStepper.OnEntityRequestSequence(entity,canControl);
@@ -215,63 +216,6 @@ namespace CombatSystem._Core
                 eventsHolder.OnOffEntityRequestSequence(entity,canAct);
             }
         }
-
-        public void OnTrinityEntityFinishSequence(CombatEntity entity)
-        {
-            foreach (var eventsHolder in _discriminatedEventsEnumerable)
-            {
-                eventsHolder.OnTrinityEntityFinishSequence(entity);
-            }
-        }
-
-        public void OnOffEntityFinishSequence(CombatEntity entity)
-        {
-            foreach (var eventsHolder in _discriminatedEventsEnumerable)
-            {
-                eventsHolder.OnOffEntityFinishSequence(entity);
-            }
-        }
-
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-            _entityEventHandler.OnEntityRequestAction(entity);
-            foreach (var eventsHolder in _discriminatedEventsEnumerable)
-            {
-                eventsHolder.OnEntityRequestAction(entity);
-            }
-
-        }
-
-        public void OnEntityBeforeSkill(CombatEntity entity)
-        {
-            foreach (var eventsHolder in _discriminatedEventsEnumerable) 
-                eventsHolder.OnEntityBeforeSkill(entity);
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
-            _entityEventHandler.OnEntityFinishAction(entity);
-            foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnEntityFinishAction(entity);
-
-            _entityEventHandler.OnEntityAfterFinishAction(in entity);
-        }
-
-        public void OnEntityEmptyActions(CombatEntity entity)
-        {
-            foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnEntityEmptyActions(entity);
-        }
-
-        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
-        {
-            _entityEventHandler.OnEntityFinishSequence(entity,in isForcedByController);
-            foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnEntityFinishSequence(entity,isForcedByController);
-
-        }
-
         public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
@@ -281,35 +225,87 @@ namespace CombatSystem._Core
             _entityEventHandler.RequestEntityAction(in entity);
         }
 
+
+        // ------ SEQUENCE FINISH -----
+        public void OnEntityEmptyActions(CombatEntity entity)
+        {
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+                eventsHolder.OnEntityEmptyActions(entity);
+        }
+        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
+        {
+            _entityEventHandler.OnEntityFinishSequence(entity, in isForcedByController);
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+                eventsHolder.OnEntityFinishSequence(entity, isForcedByController);
+        }
+        public void OnTrinityEntityFinishSequence(CombatEntity entity)
+        {
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+            {
+                eventsHolder.OnTrinityEntityFinishSequence(entity);
+            }
+        }
+        public void OnOffEntityFinishSequence(CombatEntity entity)
+        {
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+            {
+                eventsHolder.OnOffEntityFinishSequence(entity);
+            }
+        }
         public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnAfterEntitySequenceFinish(entity);
         }
-
+       
         public void OnNoActionsForcedFinish(CombatEntity entity)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnNoActionsForcedFinish(entity);
-
         }
 
+        // ------ SEQUENCE ACTION -----
+        public void OnEntityRequestAction(CombatEntity entity)
+        {
+            _entityEventHandler.OnEntityRequestAction(entity);
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+            {
+                eventsHolder.OnEntityRequestAction(entity);
+            }
+        }
+        public void OnEntityFinishAction(CombatEntity entity)
+        {
+            _entityEventHandler.OnEntityFinishAction(entity);
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+                eventsHolder.OnEntityFinishAction(entity);
 
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+            _entityEventHandler.OnEntityAfterFinishAction(in entity);
+        }
+        public void OnEntityBeforeSkill(CombatEntity entity)
+        {
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+                eventsHolder.OnEntityBeforeSkill(entity);
+        }
+       
+
+
+
+        // ------ TEAM CONTROL -----
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
         {
             HandleCurrentDiscriminationEventsHolder(in controller);
             _tempoSequenceStepper.OnTempoPreStartControl(in controller);
 
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnTempoPreStartControl(controller);
+                eventsHolder.OnTempoPreStartControl(controller, firstEntity);
 
-            OnTempoStartControl(controller);
+            OnTempoStartControl(controller, firstEntity);
         }
 
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable) 
-                eventsHolder.OnTempoStartControl(controller);
+                eventsHolder.OnTempoStartControl(controller, firstControl);
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
@@ -943,12 +939,13 @@ namespace CombatSystem._Core
     {
         public CombatEntityEventsHolder()
         {
-            _tempoEntityListeners = new HashSet<ITempoEntityStatesListener>();
+            _tempoEntityListeners = new HashSet<ITempoEntityMainStatesListener>();
+            _tempoEntityActionListeners = new HashSet<ITempoEntityActionStatesListener>();
             _tempoDedicatedEntitiesListeners = new HashSet<ITempoDedicatedEntityStatesListener>();
             _tempoEntityExtraListeners = new HashSet<ITempoEntityStatesExtraListener>();
 
-            _tempoTeamListeners = new HashSet<ITempoTeamStatesListener>();
-            _tempoExtraTeamListeners = new HashSet<ITempoTeamStatesExtraListener>();
+            _tempoTeamListeners = new HashSet<ITempoControlStatesListener>();
+            _tempoExtraTeamListeners = new HashSet<ITempoControlStatesExtraListener>();
 
             _skillUsageListeners = new HashSet<ISkillUsageListener>();
             _effectUsageListeners = new HashSet<IEffectUsageListener>();
@@ -958,15 +955,18 @@ namespace CombatSystem._Core
         }
 
         [ShowInInspector,HorizontalGroup("Entities")] 
-        private readonly ICollection<ITempoEntityStatesListener> _tempoEntityListeners;
+        private readonly ICollection<ITempoEntityMainStatesListener> _tempoEntityListeners;
+        [ShowInInspector,HorizontalGroup("Entities Extra")] 
+        private readonly ICollection<ITempoEntityActionStatesListener> _tempoEntityActionListeners;
         [ShowInInspector, HorizontalGroup("Entities")]
         private readonly ICollection<ITempoDedicatedEntityStatesListener> _tempoDedicatedEntitiesListeners;
-        [ShowInInspector, HorizontalGroup("Entities")]
+        [ShowInInspector, HorizontalGroup("Entities Extra")]
         private readonly ICollection<ITempoEntityStatesExtraListener> _tempoEntityExtraListeners;
 
-        [ShowInInspector]
-        private readonly ICollection<ITempoTeamStatesListener> _tempoTeamListeners;
-        private readonly ICollection<ITempoTeamStatesExtraListener> _tempoExtraTeamListeners;
+        [ShowInInspector, HorizontalGroup("Tempo team")]
+        private readonly ICollection<ITempoControlStatesListener> _tempoTeamListeners;
+        [ShowInInspector, HorizontalGroup("Tempo team")]
+        private readonly ICollection<ITempoControlStatesExtraListener> _tempoExtraTeamListeners;
 
         [ShowInInspector] private readonly ICollection<ISkillUsageListener> _skillUsageListeners;
         [ShowInInspector] private readonly ICollection<IEffectUsageListener> _effectUsageListeners;
@@ -981,16 +981,18 @@ namespace CombatSystem._Core
                 throw new ArgumentNullException(nameof(listener), "Event listener can't be Null");
 
 
-            if (listener is ITempoEntityStatesListener tempoEntityListener)
+            if (listener is ITempoEntityMainStatesListener tempoEntityListener)
                 _tempoEntityListeners.Add(tempoEntityListener);
+            if(listener is ITempoEntityActionStatesListener tempoEntityActionStatesListener)
+                _tempoEntityActionListeners.Add(tempoEntityActionStatesListener);
             if(listener is ITempoDedicatedEntityStatesListener tempoDedicatedEntityListener)
                 _tempoDedicatedEntitiesListeners.Add(tempoDedicatedEntityListener);
             if(listener is ITempoEntityStatesExtraListener tempoExtraListener)
                 _tempoEntityExtraListeners.Add(tempoExtraListener);
 
-            if (listener is ITempoTeamStatesListener tempoTeamStatesListener)
+            if (listener is ITempoControlStatesListener tempoTeamStatesListener)
                 _tempoTeamListeners.Add(tempoTeamStatesListener);
-            if(listener is ITempoTeamStatesExtraListener tempoExtraStatesListener)
+            if(listener is ITempoControlStatesExtraListener tempoExtraStatesListener)
                 _tempoExtraTeamListeners.Add(tempoExtraStatesListener);
             if (listener is ITeamEventListener teamEventListener)
                 _teamEventListeners.Add(teamEventListener);
@@ -1008,16 +1010,18 @@ namespace CombatSystem._Core
 
         public virtual void UnSubscribe(ICombatEventListener listener)
         {
-            if (listener is ITempoEntityStatesListener tempoEntityListener)
+            if (listener is ITempoEntityMainStatesListener tempoEntityListener)
                 _tempoEntityListeners.Remove(tempoEntityListener);
+            if (listener is ITempoEntityActionStatesListener tempoEntityActionStatesListener)
+                _tempoEntityActionListeners.Remove(tempoEntityActionStatesListener);
             if (listener is ITempoDedicatedEntityStatesListener tempoDedicatedEntityListener)
                 _tempoDedicatedEntitiesListeners.Remove(tempoDedicatedEntityListener);
             if (listener is ITempoEntityStatesExtraListener tempoExtraListener)
                 _tempoEntityExtraListeners.Remove(tempoExtraListener);
 
-            if (listener is ITempoTeamStatesListener tempoTeamStatesListener)
+            if (listener is ITempoControlStatesListener tempoTeamStatesListener)
                 _tempoTeamListeners.Remove(tempoTeamStatesListener);
-            if (listener is ITempoTeamStatesExtraListener tempoExtraStatesListener)
+            if (listener is ITempoControlStatesExtraListener tempoExtraStatesListener)
                 _tempoExtraTeamListeners.Remove(tempoExtraStatesListener);
             if (listener is ITeamEventListener teamEventListener)
                 _teamEventListeners.Remove(teamEventListener);
@@ -1033,12 +1037,12 @@ namespace CombatSystem._Core
 
 
 
-        public void ManualSubscribe(ITempoEntityStatesListener tempoEntityListener)
+        public void ManualSubscribe(ITempoEntityMainStatesListener tempoEntityListener)
         {
             _tempoEntityListeners.Add(tempoEntityListener);
         }
 
-        public void ManualSubscribe(ITempoTeamStatesExtraListener tempoTeamStatesExtraListener)
+        public void ManualSubscribe(ITempoControlStatesExtraListener tempoTeamStatesExtraListener)
         {
             _tempoExtraTeamListeners.Add(tempoTeamStatesExtraListener);
         }
@@ -1051,9 +1055,9 @@ namespace CombatSystem._Core
         {
             _tempoDedicatedEntitiesListeners.Add(tempoEntityListener);
         }
-        public void ManualSubscribe(ITempoTeamStatesListener teamStatesListener)
+        public void ManualSubscribe(ITempoControlStatesListener controlStatesListener)
         {
-            _tempoTeamListeners.Add(teamStatesListener);
+            _tempoTeamListeners.Add(controlStatesListener);
         }
 
         public void ManualSubscribe(ISkillUsageListener skillUsageListener)
@@ -1107,7 +1111,7 @@ namespace CombatSystem._Core
 
         public void OnEntityRequestAction(CombatEntity entity)
         {
-            foreach (var listener in _tempoEntityListeners)
+            foreach (var listener in _tempoEntityActionListeners)
             {
                 listener.OnEntityRequestAction(entity);
             }
@@ -1115,7 +1119,7 @@ namespace CombatSystem._Core
 
         public void OnEntityBeforeSkill(CombatEntity entity)
         {
-            foreach (var listener in _tempoEntityListeners)
+            foreach (var listener in _tempoEntityActionListeners)
             {
                 listener.OnEntityBeforeSkill(entity);
             }
@@ -1123,15 +1127,14 @@ namespace CombatSystem._Core
 
         public void OnEntityFinishAction(CombatEntity entity)
         {
-            foreach (var listener in _tempoEntityListeners)
+            foreach (var listener in _tempoEntityActionListeners)
             {
                 listener.OnEntityFinishAction(entity);
             }
         }
-
         public void OnEntityEmptyActions(CombatEntity entity)
         {
-            foreach (var listener in _tempoEntityListeners)
+            foreach (var listener in _tempoEntityActionListeners)
             {
                 listener.OnEntityEmptyActions(entity);
             }
@@ -1145,19 +1148,19 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
         {
             foreach (var listener in _tempoExtraTeamListeners)
             {
-                listener.OnTempoPreStartControl(controller);
+                listener.OnTempoPreStartControl(controller, firstEntity);
             }
         }
 
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             foreach (var listener in _tempoTeamListeners)
             {
-                listener.OnTempoStartControl(controller);
+                listener.OnTempoStartControl(controller, firstControl);
             }
         }
 
@@ -1301,8 +1304,10 @@ namespace CombatSystem._Core
         }
     }
 
-    public interface ICombatEventsHolderBase : ITempoEntityStatesListener, ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
-        ITempoTeamStatesListener, ITempoTeamStatesExtraListener,
+    public interface ICombatEventsHolderBase : 
+        ITempoEntityMainStatesListener, ITempoEntityActionStatesListener, 
+        ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
+        ITempoControlStatesListener, ITempoControlStatesExtraListener,
         ISkillUsageListener, IEffectUsageListener,
         IVanguardEffectUsageListener,
         ITeamEventListener

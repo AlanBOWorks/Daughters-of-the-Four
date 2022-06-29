@@ -81,11 +81,11 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private TeamLogs _teamLogs = new TeamLogs();
 
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
         {
         }
 
-        public void OnTempoStartControl(CombatTeamControllerBase controller)
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             if (!ShowTeamLogs || !_teamLogs.OnStartControl) return;
             Debug.Log($"Start Control: {controller} | Controlling {controller.ControllingTeam.GetControllingMembers().Count}");
@@ -403,7 +403,7 @@ namespace CombatSystem._Core
         public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
         {
             if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnRevengePerform) return;
-            Debug.Log($"REVENGE Perform: {values.UsedSkill} [{values.Iterations}]");
+            Debug.Log($"REVENGE Perform: {values.UsedSkill} [{values.Accumulation}]");
         }
 
         public void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations)
