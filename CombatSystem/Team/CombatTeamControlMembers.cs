@@ -17,14 +17,14 @@ namespace CombatSystem.Team
             _offControllingMembers = new List<CombatEntity>();
         }
 
-        [ShowInInspector, HorizontalGroup()] 
+        [ShowInInspector, HorizontalGroup("Generic Group")] 
         private readonly HashSet<CombatEntity> _nonControllingMembers;
 
-        [ShowInInspector, HorizontalGroup()] 
+        [ShowInInspector, HorizontalGroup("Generic Group")] 
         private readonly List<CombatEntity> _allControllingMembers;
-        [ShowInInspector,HorizontalGroup()]
+        [ShowInInspector,HorizontalGroup("Dedicated Group")]
         private readonly List<CombatEntity> _trinityControllingMembers;
-        [ShowInInspector,HorizontalGroup()]
+        [ShowInInspector,HorizontalGroup("Dedicated Group")]
         private readonly List<CombatEntity> _offControllingMembers;
 
         public IEnumerable<CombatEntity> GetNonControllingMembers() => _nonControllingMembers;

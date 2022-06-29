@@ -135,9 +135,14 @@ namespace CombatSystem.Team
         public ITeamFullStructureRead<CombatEntity> GetAllEntities() => _membersHolder;
 
 
-
+        /// <summary>
+        /// <inheritdoc cref="CombatTeamControlMembers.IsActive()"/>
+        /// </summary>
         public bool IsActive() => _controlMembers.IsActive();
         public bool IsActive(CombatEntity member) => _controlMembers.IsActive(member);
+        /// <summary>
+        /// <inheritdoc cref="CombatTeamControlMembers.CanControl()"/>
+        /// </summary>
         public bool CanControl() => _controlMembers.CanControl();
         public IEnumerable<CombatEntity> GetNonControllingMembers() => _controlMembers.GetNonControllingMembers();
         public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _controlMembers.GetControllingTrinityMembers();
@@ -166,7 +171,7 @@ namespace CombatSystem.Team
 
         public void OnEntityRequestSequence(CombatEntity entity)
         {
-            GuardHandler.OnEntityRequestSequence(in entity);
+            GuardHandler.OnEntityRequestSequence(entity);
         }
         public void RemoveFromControllingEntities(CombatEntity entity, bool isForcedByController)
         {

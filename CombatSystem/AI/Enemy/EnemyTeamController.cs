@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CombatSystem._Core;
@@ -6,133 +7,108 @@ using CombatSystem.Skills;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace CombatSystem.AI
 {
-    public class EnemyTeamController : CombatTeamControllerBase, 
-        ITempoControlStatesListener,
-        ITempoControlStatesExtraListener,
-        ITempoEntityActionStatesListener
+    public class EnemyTeamController : CombatTeamControllerBase, ISkillUsageListener
+       
     {
+        private static readonly IControllerHandler OnNullController = new RandomController();
+
+        internal IControllerHandler DedicatedTeamController { set; private get; }
+        private IControllerHandler GetEnemyController() => DedicatedTeamController ?? OnNullController;
+
         public override void InvokeStartControl()
         {
-            StartControl();
-        }
-
-
-        public void OnEntityRequestAction(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityBeforeSkill(CombatEntity entity)
-        {
-        }
-
-        public void OnEntityFinishAction(CombatEntity entity)
-        {
             DoNextControl();
         }
-
-        public void OnEntityEmptyActions(CombatEntity entity)
-        {
-            DoNextControl();
-        }
-
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
-        {
-        }
-
-        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
-        {
-            
-        }
-
-        public void OnAllActorsNoActions(CombatEntity lastActor)
-        {
-            ForceFinish();
-        }
-
-        public void OnTempoFinishControl(CombatTeamControllerBase controller)
-        {
-        }
-
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
-        {
-        }
-
-        private void StartControl()
-        {
-            DoNextControl();
-        }
-
 
         private void DoNextControl()
         {
-            var entities = GetAllControllingMembers();
-            if(entities.Count <= 0) return;
+            var controller = GetEnemyController();
+            controller.DoControl(this, out var values);
+            var selectedSkill = values.UsedSkill;
+            if (selectedSkill == null)
+            {
+                throw new ArgumentNullException(nameof(selectedSkill),"[Enemy Controller] -> Selected Skill is Null");
+            }
 
-            var pick = PickEntity(entities);
-            HandleEntity(pick);
+            var onTarget = values.Target;
+            if (onTarget == null)
+            {
+                throw new ArgumentNullException(nameof(onTarget), "[Enemy Controller] -> Selected target is Null");
+            }
 
+            var selectedActor = values.Performer;
+            if (selectedActor == null)
+            {
+                throw new ArgumentNullException(nameof(selectedActor), "Enemy Controller] -> Performer is Null");
+            }
+
+            var eventHolder = CombatSystemSingleton.EventsHolder;
+            eventHolder.OnCombatSkillSubmit(in values);
         }
 
-
-        private static CombatEntity PickEntity(IReadOnlyList<CombatEntity> members)
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
-            int randomPick = Random.Range(0, members.Count);
-            return members[randomPick];
+
         }
 
-
-        private CombatEntity _currentControl;
-        private void HandleEntity(CombatEntity onEntity)
+        public void OnCombatSkillPerform(in SkillUsageValues values)
         {
-            EnemyCombatSingleton.EnemyEventsHolder.OnControlEntitySelect(onEntity);
-            _currentControl = onEntity;
-            var entitySkills = onEntity.GetCurrentSkills();
-
-
-            HandleSkills(entitySkills);
         }
 
-        private void HandleSkills(IReadOnlyList<CombatSkill> skills)
+        public void OnCombatSkillFinish(CombatEntity performer)
         {
-            var selectedSkill = SelectSkill(skills);
-            HandleSkill(in selectedSkill);
+            if(ControllingTeam.CanControl())
+                DoNextControl();
+            else
+                InvokeFinishControl();
         }
 
-        private static CombatSkill SelectSkill(IReadOnlyList<CombatSkill> skills)
+
+
+        private sealed class RandomController : IControllerHandler
         {
-            int randomPick = Random.Range(0, skills.Count - 1);
-            return skills[randomPick];
+            public void DoControl(CombatTeamControllerBase controller,
+                out SkillUsageValues controlValues)
+            {
+                var selectedActor = SelectPerformer(controller);
+                var skills = selectedActor.GetCurrentSkills();
+                var selectedSkill = SelectSkill(skills);
+                var target = SelectTarget(selectedActor, selectedSkill);
+
+                controlValues = new SkillUsageValues(selectedActor,target, selectedSkill);
+            }
+
+            private static CombatEntity SelectPerformer(CombatTeamControllerBase controller)
+            {
+                var entities = controller.GetAllControllingMembers();
+                if (entities.Count <= 0) return null;
+                int randomPick = Random.Range(0, entities.Count);
+
+                return entities[randomPick];
+            }
+            private static CombatSkill SelectSkill(IReadOnlyList<CombatSkill> skills)
+            {
+                int randomPick = Random.Range(0, skills.Count);
+                return skills[randomPick];
+            }
+            private static CombatEntity SelectTarget(CombatEntity performer, ISkill skill)
+            {
+                var possibleTargets = UtilsTarget.GetPossibleTargets(skill, performer);
+                var randomPick = Random.Range(0, possibleTargets.Count());
+
+                return possibleTargets[randomPick];
+            }
         }
+    }
 
 
-        private void HandleSkill(in CombatSkill skill)
-        {
-            var eventsHolder = EnemyCombatSingleton.EnemyEventsHolder;
-            eventsHolder.OnControlSkillSelect(in skill);
-
-            var target = SelectTarget(in skill);
-
-            eventsHolder.OnTargetSelect(in target);
-            SkillUsageValues values = new SkillUsageValues(_currentControl,target,skill);
-            CombatSystemSingleton.EventsHolder.OnCombatSkillSubmit(in values);
-        }
-
-        private CombatEntity SelectTarget(in CombatSkill skill)
-        {
-            var possibleTargets = UtilsTarget.GetPossibleTargets(skill, _currentControl);
-            var randomPick = Random.Range(0, possibleTargets.Count());
-
-            return possibleTargets[randomPick];
-        }
-
-
-        private interface IControllerHandler
-        {
-            
-        }
-
+    internal interface IControllerHandler
+    {
+        void DoControl(CombatTeamControllerBase controller,
+            out SkillUsageValues controlValues);
     }
 }

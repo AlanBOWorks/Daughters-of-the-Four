@@ -47,8 +47,15 @@ namespace CombatSystem.Skills
                 eventsHolder.OnNoActionsForcedFinish(entity);
                 return;
             }
+            HandleEntityTeamOnRequestSequence(entity);
             eventsHolder.OnAfterEntityRequestSequence(entity);
         }
+        private static void HandleEntityTeamOnRequestSequence(CombatEntity entity)
+        {
+            var entityTeam = entity.Team;
+            entityTeam.OnEntityRequestSequence(entity);
+        }
+
 
         public void OnEntityRequestAction(CombatEntity entity)
         {

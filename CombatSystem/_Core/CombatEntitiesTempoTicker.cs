@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 namespace CombatSystem._Core
 {
     public sealed class CombatEntitiesTempoTicker :
-        ICombatStatesListener, ITempoEntityMainStatesListener
+        ICombatStatesListener
     {
         public CombatEntitiesTempoTicker()
         {
@@ -50,10 +50,10 @@ namespace CombatSystem._Core
             void HandleTickEntity(CombatEntity entity)
             {
                 CombatStats stats = entity.Stats;
-                if(!stats.IsAlive()) return;
+                if(!UtilsCombatStats.CanTick(stats) || !UtilsCombatStats.IsAlive(stats)) return;
 
 
-                UtilsCombatStats.TickInitiative(stats, out var entityInitiativeAmount);
+                TickInitiative(stats, out var entityInitiativeAmount);
                 UtilsCombatStats.CalculateTempoPercent(entityInitiativeAmount, out var initiativePercent);
 
                 eventsHolder.OnEntityTick(entity, entityInitiativeAmount, initiativePercent);
@@ -65,18 +65,26 @@ namespace CombatSystem._Core
                 entity.Team.AddActiveEntity(entity, canControl);
             }
         }
-
-
-        public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
+        private const float InitiativeThreshold = TempoTicker.LoopThresholdAsIntended;
+        public static void TickInitiative(CombatStats stats, out float currentTickAmount)
         {
-            if (!canControl) return;
+            float initiativeIncrement = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
+            if (initiativeIncrement <= 0)
+            {
+                currentTickAmount = stats.CurrentInitiative;
+                return;
+            }
 
-            _tickingTrackers.Remove(entity);
+            currentTickAmount = initiativeIncrement + stats.CurrentInitiative;
+
+            if (currentTickAmount >= InitiativeThreshold)
+            {
+                currentTickAmount = InitiativeThreshold;
+            }
+
+            stats.CurrentInitiative = currentTickAmount;
         }
-        public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
-        {
-            _tickingTrackers.Add(entity);
-        }
+
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {

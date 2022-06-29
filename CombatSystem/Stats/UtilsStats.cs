@@ -265,24 +265,17 @@ namespace CombatSystem.Stats
         }
 
         private const float InitiativeThreshold = TempoTicker.LoopThresholdAsIntended;
-        public static void TickInitiative(CombatStats stats, out float currentTickAmount)
+        /// <summary>
+        /// Check if the stats are below the [<see cref="InitiativeThreshold"/>] and thus can be ticked
+        /// </summary>
+        /// <param name="stats"></param>
+        /// <returns></returns>
+        public static bool CanTick(CombatStats stats)
         {
-            float initiativeIncrement = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
-            if (initiativeIncrement <= 0)
-            {
-                currentTickAmount = stats.CurrentInitiative;
-                return;
-            }
-
-            currentTickAmount = initiativeIncrement + stats.CurrentInitiative;
-
-            if (currentTickAmount >= InitiativeThreshold)
-            {
-                currentTickAmount = InitiativeThreshold;
-            }
-
-            stats.CurrentInitiative = currentTickAmount;
+            float currentInitiative = stats.CurrentInitiative;
+            return currentInitiative < InitiativeThreshold;
         }
+
 
         public static bool IsInitiativeEnough(CombatStats stats)
         {
@@ -324,6 +317,7 @@ namespace CombatSystem.Stats
             const float initiativeThreshold = TempoTicker.LoopThreshold;
             initiativePercent = currentTickAmount / initiativeThreshold;
         }
+
     }
 
     public static class UtilsBuffStats

@@ -5,7 +5,7 @@ namespace CombatSystem.Player
     {
         private static void PassTurn()
         {
-            PlayerCombatSingleton.PlayerTeamController.ForceFinish();
+            PlayerCombatSingleton.PlayerTeamController.InvokeFinishControl();
         }
     }
 }

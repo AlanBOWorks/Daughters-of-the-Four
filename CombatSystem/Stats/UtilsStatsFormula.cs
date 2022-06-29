@@ -88,7 +88,7 @@ namespace CombatSystem.Stats
         }
 
         private const float ZeroSpeedInitiativeAmount = .5f;
-        public static float CalculateInitiativeSpeed(in CombatStats stats)
+        public static float CalculateInitiativeSpeed(CombatStats stats)
         {
             float speedAmount = stats.BaseStats.SpeedType
                                 + stats.BuffStats.SpeedType

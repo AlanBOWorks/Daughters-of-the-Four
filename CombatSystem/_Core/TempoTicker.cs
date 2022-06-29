@@ -151,19 +151,22 @@ namespace CombatSystem._Core
                         yield return Timing.WaitForOneFrame;
                         var controllerTeam = controller.ControllingTeam;
                         combatEvents.OnTempoPreStartControl(controller, GetFirstActor());
-                        yield return Timing.WaitForOneFrame;
-
-                        teamControllersHandler.TryInvokeControl(in controller);
-                        while (controllerTeam.IsActive() || teamControllersHandler.IsControlling())
-                        {
-                            yield return Timing.WaitForOneFrame;
-                        }
-
                         CombatEntity GetFirstActor()
                         {
                             var actingMembers = controllerTeam.GetControllingMembers();
                             return actingMembers[0];
                         }
+                        yield return Timing.WaitForOneFrame;
+
+
+
+                        teamControllersHandler.TryInvokeControl(in controller);
+                        do
+                        {
+                            yield return Timing.WaitForOneFrame;
+                        } while (teamControllersHandler.IsControlling());
+                        yield return Timing.WaitForOneFrame;
+
                     }
 
                     // ----- Wait For Animations

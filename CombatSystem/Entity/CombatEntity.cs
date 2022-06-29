@@ -160,6 +160,8 @@ namespace CombatSystem.Entity
             Stats.OnSequenceStart();
             DamageReceiveTracker.ResetOnSequenceValues();
             DamageDoneTracker.ResetOnSequenceValues();
+
+            UtilsCombatStats.ResetTempoStats(Stats);
         }
         public void OnSequenceFinish()
         {

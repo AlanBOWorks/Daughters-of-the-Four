@@ -18,7 +18,7 @@ namespace CombatSystem.Team
         }
 
 
-        public void OnEntityRequestSequence(in CombatEntity entity)
+        public void OnEntityRequestSequence(CombatEntity entity)
         {
             if (entity == _currentGuarder) _currentGuarder = null;
         }

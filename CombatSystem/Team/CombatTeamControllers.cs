@@ -132,7 +132,7 @@ namespace CombatSystem.Team
 
         public abstract void InvokeStartControl();
 
-        public void ForceFinish()
+        public void InvokeFinishControl()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             eventsHolder.OnTempoFinishControl(this);

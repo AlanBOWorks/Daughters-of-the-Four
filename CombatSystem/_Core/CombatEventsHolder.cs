@@ -20,8 +20,6 @@ namespace CombatSystem._Core
             _tempoSequenceStepper = new TempoSequenceStepper();
             _entityEventHandler = new CombatEntityEventHandler();
 
-            _entityTempoStepper = new EntityTempoStepper();
-
             _mainEventsEnumerable = GetMainEventsHolder();
             _discriminatedEventsEnumerable = GetEventsHolderWithDiscrimination();
             _oppositeDiscriminatedEventsEnumerable = GetEventsHolderWithOppositeDiscrimination();
@@ -48,7 +46,6 @@ namespace CombatSystem._Core
 
         private readonly CombatEntityEventHandler _entityEventHandler;
         private readonly TempoSequenceStepper _tempoSequenceStepper;
-        private readonly EntityTempoStepper _entityTempoStepper;
 
         private readonly IEnumerable<ICombatEventsHolder> _mainEventsEnumerable;
         private readonly IEnumerable<ICombatEventsHolderBase> _discriminatedEventsEnumerable;
@@ -192,7 +189,6 @@ namespace CombatSystem._Core
         // ------ SEQUENCE REQUEST -----
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
-            _entityTempoStepper.OnEntityRequestSequence(entity,canControl);
             _entityEventHandler.OnEntityRequestSequence(entity,canControl);
 
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
