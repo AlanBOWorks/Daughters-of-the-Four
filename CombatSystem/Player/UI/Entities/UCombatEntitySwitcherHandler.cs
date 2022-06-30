@@ -5,6 +5,7 @@ using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Team;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI
 {
@@ -16,6 +17,8 @@ namespace CombatSystem.Player.UI
     {
         [SerializeField]
         private TeamReferences references = new TeamReferences();
+        [SerializeField] 
+        private UPerformerSelectionFeedback selectionFeedback;
 
         private Dictionary<CombatEntity, UCombatEntitySwitchButton> _buttonsDictionary;
 
@@ -98,6 +101,15 @@ namespace CombatSystem.Player.UI
 
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.OnPerformerSwitch(entity);
+        }
+
+        public void OnHoverEnter(Image button)
+        {
+            selectionFeedback.OnSwitchButtonHover(button);
+        }
+        public void OnHoverExit()
+        {
+            selectionFeedback.OnSwitchButtonExit();
         }
 
 

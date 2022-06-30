@@ -20,13 +20,13 @@ namespace CombatSystem.Player.UI
         ISkillUsageListener, ICombatStatesListener,
         ISkillSelectionListener
     {
-        [Title("References")]
+        [Title("References")] 
         [SerializeField] 
-        private UCombatSkillButton clonableSkillButton;
-        [SerializeField] private Transform onParent;
+        private UShortcutCommandsHandler shortcutCommandsHandler;
 
-        private Stack<UCombatSkillButton> _instantiationPool;
+
         private Dictionary<ICombatSkill,UCombatSkillButton> _activeButtons;
+
 
 
         [Title("Parameters")] 
@@ -40,21 +40,57 @@ namespace CombatSystem.Player.UI
         [ShowInInspector, DisableInEditorMode,DisableInPlayMode]
         private CombatEntity _currentControlEntity;
 
+        [Title("Skills")] 
+        [SerializeField] private SkillElementsSpawner skillElements = new SkillElementsSpawner();
+
+        public ISkillShortcutCommandStructureRead<UCombatSkillButton> GetSkillsShortcutElements() => skillElements;
+
+        [Serializable]
+        private sealed class SkillElementsSpawner : ShortCutSkillElementsSpawner<UCombatSkillButton>
+        { }
 
         public IReadOnlyDictionary<ICombatSkill, UCombatSkillButton> GetDictionary() => _activeButtons;
 
         private void Awake()
         {
-            var buttonTransform = (RectTransform) clonableSkillButton.transform;
+            _activeButtons = new Dictionary<ICombatSkill, UCombatSkillButton>();
+
+            PreparePrefab();
+            PrepareShortCutElements();
+        }
+
+        private void PreparePrefab()
+        {
+            var skillButtonPrefab = skillElements.GetSkillPrefab();
+            var buttonTransform = (RectTransform) skillButtonPrefab.transform;
             _buttonSizes = buttonTransform.rect.size;
             _buttonSizes.y = 0; // This is just to avoid the buttons moving upwards in ShowSkills
 
-            _instantiationPool = new Stack<UCombatSkillButton>();
-            _activeButtons = new Dictionary<ICombatSkill, UCombatSkillButton>();
 
             //Hide the reference (is used as a visual key for UI Design)
-            clonableSkillButton.gameObject.SetActive(false);
+            skillButtonPrefab.gameObject.SetActive(false);
         }
+
+        private void PrepareShortCutElements()
+        {
+            var shortCutBindingNames
+                = UtilsShortCuts.DefaultNamesHolder.SkillShortCuts;
+            var shortCutInputActionReferences = shortcutCommandsHandler.SkillShortCuts;
+
+
+            skillElements.DoInstantiations(OnInstantiateSkillButton);
+            void OnInstantiateSkillButton(UCombatSkillButton button, int shortcutIndex)
+            {
+                var bidingName = shortCutBindingNames[shortcutIndex];
+                var inputAction = shortCutInputActionReferences[shortcutIndex];
+
+                button.Injection(this);
+                button.SetBindingName(bidingName);
+
+                inputAction.action.performed += button.OnInputPerformer;
+            }
+        }
+
 
         private void Start()
         {
@@ -71,6 +107,19 @@ namespace CombatSystem.Player.UI
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.UnSubscribe(this);
             playerEvents.DiscriminationEventsHolder.UnSubscribe(this);
+
+            UnSubscribeFromInput();
+            void UnSubscribeFromInput()
+            {
+                var shortCutInputActionReferences = shortcutCommandsHandler.SkillShortCuts;
+                var skillButtons = skillElements.SkillShortCuts;
+                for (int i = 0; i < skillButtons.Count; i++)
+                {
+                    var inputReference = shortCutInputActionReferences[i];
+                    var button = skillButtons[i];
+                    inputReference.action.performed -= button.OnInputPerformer;
+                }
+            }
         }
 
 
@@ -122,13 +171,13 @@ namespace CombatSystem.Player.UI
         private void HandlePool(IReadOnlyList<CombatSkill> skills)
         {
             int countThreshold = Mathf.Min(skills.Count, MaxSkillAmount);
-            for (var i = 0; i < countThreshold; i++)
+            var skillShortCutsElements = this.skillElements.SkillShortCuts;
+            int i = 0;
+            for (; i < countThreshold; i++)
             {
                 var skill = skills[i];
 
-                UCombatSkillButton button = _instantiationPool.Count > 0 
-                    ? _instantiationPool.Pop() 
-                    : InstantiateButton();
+                UCombatSkillButton button = skillShortCutsElements[i];
 
                 _activeButtons.Add(skill, button);
                 button.Injection(skill);
@@ -136,16 +185,12 @@ namespace CombatSystem.Player.UI
 #if UNITY_EDITOR
                 button.name = skill.GetSkillName() + " [BUTTON] (Clone)";
 #endif
-
             }
-        }
 
-        private UCombatSkillButton InstantiateButton()
-        {
-            var button = Instantiate(clonableSkillButton, onParent);
-            button.Injection(this);
-
-            return button;
+            for (; i < skillShortCutsElements.Count; i++)
+            {
+                skillShortCutsElements[i].gameObject.SetActive(false);
+            }
         }
 
         private CoroutineHandle _animationHandle;
@@ -256,7 +301,6 @@ namespace CombatSystem.Player.UI
             {
                 var buttonHolder = button.Value;
                 HideButton(buttonHolder);
-                _instantiationPool.Push(buttonHolder);
             }
             _activeButtons.Clear();
         }
@@ -290,10 +334,10 @@ namespace CombatSystem.Player.UI
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.OnSkillSelect(skill);
-            DoSkillSwitch(in skill, in _currentSelectedSkill);
+            DoSkillSwitch(skill, _currentSelectedSkill);
         }
 
-        private void DoSkillSwitch(in CombatSkill skill, in CombatSkill previousSelection)
+        private void DoSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
             if (!enabled)
                 return;
@@ -355,7 +399,6 @@ namespace CombatSystem.Player.UI
         }
         public void OnSkillSubmit(CombatSkill skill)
         {
-            DeselectSkill(skill);
         }
 
 
@@ -376,7 +419,6 @@ namespace CombatSystem.Player.UI
             if (!_activeButtons.ContainsKey(usedSkill)) return;
 
             _activeButtons[usedSkill].UpdateCostReal();
-            DeselectSkill(usedSkill);
         }
 
         public void OnCombatSkillPerform(in SkillUsageValues values)

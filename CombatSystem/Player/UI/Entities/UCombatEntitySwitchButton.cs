@@ -4,15 +4,17 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Utils.UI;
 
 namespace CombatSystem.Player.UI
 {
-    public class UCombatEntitySwitchButton : MonoBehaviour, IPointerClickHandler
+    public class UCombatEntitySwitchButton : UButtonPointerFeedback
     {
+        [Title("Button")]
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private UCombatEntitySwitcherHandler switcherHandler;
         [SerializeField] private Image iconHolder;
-        [ShowInInspector]
+        [ShowInInspector,HideInEditorMode]
         private CombatEntity _user;
 
 
@@ -42,11 +44,24 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnPointerClick(PointerEventData eventData)
+        public override void OnPointerClick(PointerEventData eventData)
         {
+            base.OnPointerClick(eventData);
             if(_user == null) return;
 
             switcherHandler.DoSwitchEntity(_user);
+        }
+
+        public override void OnPointerEnter(PointerEventData eventData)
+        {
+            base.OnPointerEnter(eventData);
+            switcherHandler.OnHoverEnter(iconHolder);
+        }
+
+        public override void OnPointerExit(PointerEventData eventData)
+        {
+            base.OnPointerExit(eventData);
+            switcherHandler.OnHoverExit();
         }
     }
 }

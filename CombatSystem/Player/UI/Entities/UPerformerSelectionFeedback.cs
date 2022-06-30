@@ -6,6 +6,7 @@ using CombatSystem.Player.Events;
 using CombatSystem.Team;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI
 {
@@ -15,12 +16,14 @@ namespace CombatSystem.Player.UI
     {
         [SerializeField] private UCombatEntitySwitcherHandler switcherHandler;
         [SerializeField] private RectTransform focusIcon;
+        [SerializeField] private RectTransform hoverIcon;
 
         private void Start()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.Subscribe(this);
             Hide();
+            hoverIcon.gameObject.SetActive(false); //hover show should active this
         }
         private void OnDestroy()
         {
@@ -30,39 +33,47 @@ namespace CombatSystem.Player.UI
         public void OnPerformerSwitch(CombatEntity performer)
         {
             if(performer == null) return;
+            Show();
 
             var buttons = switcherHandler.GetDictionary();
             ;
             var targetButton = buttons[performer];
-            SwitchFocus(in targetButton);
+            SwitchFocus(focusIcon,targetButton);
         }
         
-        private void SwitchFocus(in UCombatEntitySwitchButton targetButton)
+        public void OnSwitchButtonHover(Image onIcon)
         {
-            focusIcon.position = targetButton.transform.position;
-            DoAnimation();
+            hoverIcon.position = onIcon.transform.position;
+            hoverIcon.gameObject.SetActive(true);
+        }
+
+        public void OnSwitchButtonExit()
+        {
+            hoverIcon.gameObject.SetActive(false);
+        }
+
+        private static void SwitchFocus(RectTransform hoverElement, Component targetButton)
+        {
+            hoverElement.position = targetButton.transform.position;
+            DoAnimation(hoverElement);
         }
 
         private const float AnimationDuration = .2f;
-        private void DoAnimation()
+        private static void DoAnimation(RectTransform hoverElement)
         {
-            DOTween.Kill(this);
-
-
-            focusIcon.rotation = Quaternion.AngleAxis(-10, Vector3.forward); 
-            focusIcon.DORotateQuaternion(Quaternion.identity, AnimationDuration);
-        }
-        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
-        {
+            DOTween.Kill(hoverElement);
+            
+            hoverElement.localScale = new Vector3(1.1f,1.1f,1.1f);
+            hoverElement.DOScale(Vector3.one, AnimationDuration);
         }
 
         private void Show()
         {
-            focusIcon.gameObject.SetActive(true);
+            gameObject.SetActive(true);
         }
         private void Hide()
         {
-            focusIcon.gameObject.SetActive(false);
+            gameObject.SetActive(false);
         }
 
         public void OnCombatEnd()
@@ -84,7 +95,6 @@ namespace CombatSystem.Player.UI
 
         public void OnCombatStart()
         {
-            Show();
         }
     }
 }

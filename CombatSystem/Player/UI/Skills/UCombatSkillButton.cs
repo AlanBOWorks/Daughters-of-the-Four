@@ -9,6 +9,7 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI
@@ -25,6 +26,9 @@ namespace CombatSystem.Player.UI
         [SerializeField] 
         private TextMeshProUGUI costText;
 
+        [SerializeField] 
+        private TextMeshProUGUI bidingText;
+
         public RectTransform GetGroupHolder() => groupHolder;
 
         private CoroutineHandle _fadeHandle;
@@ -37,7 +41,7 @@ namespace CombatSystem.Player.UI
 
         private bool _canSubmitSkill;
 
-        internal void Injection(in UCombatSkillButtonsHolder holder)
+        internal void Injection(UCombatSkillButtonsHolder holder)
         {
             _holder = holder;
         }
@@ -57,6 +61,11 @@ namespace CombatSystem.Player.UI
                 if(icon) iconHolder.sprite = icon;
             }
             
+        }
+
+        public void SetBindingName(string bidingName)
+        {
+            bidingText.text = bidingName;
         }
 
         private const string OverflowCostText = "?";
@@ -146,21 +155,45 @@ namespace CombatSystem.Player.UI
             _skill = null;
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        private void InvokeOnSkillSelect()
         {
-            if(!_canSubmitSkill) return;
+            if(!enabled) return;
+            if (!_canSubmitSkill) return;
 
             _holder.DoSkillSelect(_skill);
         }
 
+        private void InvokeOnHover()
+        {
+            if (!enabled) return;
+            _holder.DoSkillButtonHover(_skill);
+        }
+
+        private void InvokeOnHoverExit()
+        {
+            if (!enabled) return;
+            _holder.DoSkillButtonExit(_skill);
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            InvokeOnSkillSelect();
+        }
+
         public void OnPointerEnter(PointerEventData eventData)
         {
-            _holder.DoSkillButtonHover(_skill);
+            InvokeOnHover();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            _holder.DoSkillButtonExit(_skill);
+            InvokeOnHoverExit();
         }
+
+        public void OnInputPerformer(InputAction.CallbackContext context)
+        {
+            InvokeOnSkillSelect();
+        }
+
     }
 }
