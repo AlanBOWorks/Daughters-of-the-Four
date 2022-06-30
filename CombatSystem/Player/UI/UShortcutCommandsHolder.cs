@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace CombatSystem.Player.UI
 {
-    public class UShortcutCommandsHandler : MonoBehaviour,
+    public class UShortcutCommandsHolder : MonoBehaviour,
         IShortcutCommandStructureRead<InputActionReference>
     {
         [Title("Input References")]

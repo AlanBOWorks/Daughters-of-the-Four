@@ -22,7 +22,7 @@ namespace CombatSystem.Player.UI
     {
         [Title("References")] 
         [SerializeField] 
-        private UShortcutCommandsHandler shortcutCommandsHandler;
+        private UShortcutCommandsHolder shortcutCommandsHolder;
 
 
         private Dictionary<ICombatSkill,UCombatSkillButton> _activeButtons;
@@ -75,7 +75,7 @@ namespace CombatSystem.Player.UI
         {
             var shortCutBindingNames
                 = UtilsShortCuts.DefaultNamesHolder.SkillShortCuts;
-            var shortCutInputActionReferences = shortcutCommandsHandler.SkillShortCuts;
+            var shortCutInputActionReferences = shortcutCommandsHolder.SkillShortCuts;
 
 
             skillElements.DoInstantiations(OnInstantiateSkillButton);
@@ -111,7 +111,7 @@ namespace CombatSystem.Player.UI
             UnSubscribeFromInput();
             void UnSubscribeFromInput()
             {
-                var shortCutInputActionReferences = shortcutCommandsHandler.SkillShortCuts;
+                var shortCutInputActionReferences = shortcutCommandsHolder.SkillShortCuts;
                 var skillButtons = skillElements.SkillShortCuts;
                 for (int i = 0; i < skillButtons.Count; i++)
                 {

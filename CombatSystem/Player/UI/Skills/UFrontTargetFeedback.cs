@@ -8,8 +8,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UFrontTargetFeedback : MonoBehaviour, 
-        ITargetPointerListener, ITargetSelectionListener,
-        ISkillSelectionListener
+        ITargetPointerListener
     {
         [SerializeField] private UFrontTargetButtonsHandler targetButtonsHandler;
         [SerializeField, SuffixLabel("deltas")] private float animationDeltaSpeed = 4f;
@@ -58,44 +57,6 @@ namespace CombatSystem.Player.UI
         public void OnTargetButtonExit(CombatEntity target)
         {
             Hide();
-        }
-
-        public void OnTargetSelect(CombatEntity target)
-        {
-        }
-
-        public void OnTargetCancel(CombatEntity target)
-        {
-        }
-
-        public void OnTargetSubmit(CombatEntity target)
-        {
-        }
-
-
-        public void OnSkillSelect(CombatSkill skill)
-        {
-        }
-
-        public void OnSkillSelectFromNull(CombatSkill skill)
-        {
-        }
-
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
-        {
-        }
-
-        public void OnSkillDeselect(CombatSkill skill)
-        {
-            Hide();
-        }
-
-        public void OnSkillCancel(CombatSkill skill)
-        {
-        }
-
-        public void OnSkillSubmit(CombatSkill skill)
-        {
         }
     }
 }

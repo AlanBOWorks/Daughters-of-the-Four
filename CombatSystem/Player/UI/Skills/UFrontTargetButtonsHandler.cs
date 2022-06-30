@@ -5,6 +5,7 @@ using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
 using CombatSystem.Team;
+using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -74,11 +75,19 @@ namespace CombatSystem.Player.UI
         public void OnSkillSelectFromNull(CombatSkill skill)
         { }
 
+        private CoroutineHandle _switchHandle;
         public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
             _currentSkill = skill;
-            HideTargets();
-            ShowTargets(skill);
+
+            Timing.KillCoroutines(_switchHandle);
+            _switchHandle = Timing.RunCoroutine(_SwitchSkill());
+            IEnumerator<float> _SwitchSkill()
+            {
+                HideTargets();
+                yield return Timing.WaitForOneFrame;
+                ShowTargets(skill);
+            }
         }
 
         public void OnSkillDeselect(CombatSkill skill)
