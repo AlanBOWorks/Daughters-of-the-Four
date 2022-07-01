@@ -43,7 +43,7 @@ namespace CombatSystem.Entity
             _animator.Injection(user);
         }
 
-        public void InjectPositionReference(in Transform reference)
+        public void InjectPositionReference(Transform reference)
         {
             _pointReference = reference;
         }
@@ -56,7 +56,7 @@ namespace CombatSystem.Entity
         Transform GetUIHoverHolder();
         ICombatEntityAnimator GetAnimator();
         void Injection(in CombatEntity user);
-        void InjectPositionReference(in Transform reference);
+        void InjectPositionReference(Transform reference);
     }
 
 }

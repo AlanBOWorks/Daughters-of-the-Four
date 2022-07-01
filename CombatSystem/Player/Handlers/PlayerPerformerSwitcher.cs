@@ -14,7 +14,6 @@ namespace CombatSystem.Player.Handlers
         ITempoControlStatesListener, ITempoControlStatesExtraListener
     {
         private IReadOnlyList<CombatEntity> _allEntities;
-        private IReadOnlyList<CombatEntity> _activeEntities;
         private CombatEntity _lastPerformer;
 
         private int _currentPerformerIndex;
@@ -83,9 +82,9 @@ namespace CombatSystem.Player.Handlers
         // ----- EVENTS -----
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            _activeEntities = playerTeam.GetControllingMembers();
             _allEntities = playerTeam.GetAllMembers();
             _currentPerformerIndex = 0;
+            _lastPerformer = null;
         }
 
 
