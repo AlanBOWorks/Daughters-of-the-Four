@@ -41,7 +41,17 @@ namespace CombatSystem.Skills
             if (type != EnumsSkill.TeamTargeting.Self) return type;
 
             // if the performer acts as a self but effect are for groups then:
-            bool isAlly = UtilsTeam.IsAllyEntity(in performer, in target);
+            bool isAlly = UtilsTeam.IsAllyEntity(performer, target);
+            if (isAlly) return EnumsSkill.TeamTargeting.Support;
+            return EnumsSkill.TeamTargeting.Offensive;
+        }
+
+        public static EnumsSkill.TeamTargeting GetReceiveSkillType(CombatEntity performer,
+            CombatEntity target)
+        {
+            if (performer == target) return EnumsSkill.TeamTargeting.Self;
+
+            bool isAlly = UtilsTeam.IsAllyEntity(performer, target);
             if (isAlly) return EnumsSkill.TeamTargeting.Support;
             return EnumsSkill.TeamTargeting.Offensive;
         }

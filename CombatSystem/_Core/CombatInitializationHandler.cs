@@ -88,25 +88,6 @@ namespace CombatSystem._Core
         }
 
 
-        public static void InitialStatsPreparations()
-        {
-            var playerTeam = CombatSystemSingleton.PlayerTeam;
-            var enemyTeam = CombatSystemSingleton.OppositionTeam;
-
-            InitialStatsPreparation(in playerTeam);
-            InitialStatsPreparation(in enemyTeam);
-
-            void InitialStatsPreparation(in CombatTeam team)
-            {
-                var members = team.GetAllMembers();
-                foreach (var member in members)
-                {
-                    member.Stats.SetToFullInitiative();
-                }
-            }
-        }
-
-
         private sealed class CombatMembersHolder : IReadOnlyCollection<CombatEntity>
         {
             public CombatMembersHolder(CombatTeam playerTeam, CombatTeam enemyTeam)

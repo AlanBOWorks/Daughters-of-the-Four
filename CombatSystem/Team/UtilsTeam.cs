@@ -11,7 +11,7 @@ namespace CombatSystem.Team
     public static class UtilsTeam 
     {
 
-        public static bool IsAllyEntity(in CombatEntity entity, in CombatEntity control)
+        public static bool IsAllyEntity(CombatEntity entity, CombatEntity control)
         {
             var entityTeam = entity.Team;
             return entityTeam.Contains(control);

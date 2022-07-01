@@ -101,18 +101,6 @@ namespace CombatSystem.Skills.Effects
             CombatEntity target,
             PerformEffectValues values)
         {
-            HandleGuarding();
-            void HandleGuarding()
-            {
-                var targetTeam = target.Team;
-                if(targetTeam.Contains(performer)) return; //not enemy
-
-                var targetGuarder = targetTeam.GuardHandler;
-                if (targetGuarder.IsGuarding())
-                    target = targetGuarder.GetCurrentGuarder();
-            }
-
-
             var targetType = values.TargetType;
             var targets = UtilsTarget.GetEffectTargets(targetType, performer, target);
             var preset = values.Effect;

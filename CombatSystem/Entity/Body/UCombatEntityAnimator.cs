@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Animancer;
 using CombatSystem.Animations;
 using CombatSystem.Skills;
+using CombatSystem.Skills.Effects;
 using DG.Tweening;
 using MEC;
 using Sirenix.OdinInspector;
@@ -25,7 +26,7 @@ namespace CombatSystem.Entity
         private SRange speedRandomness = new SRange(.8f,1.2f);
 
       
-
+        [ShowInInspector]
         protected CombatEntity Entity { get; private set; }
         
         public AnimancerLayer IdleAnimationType => UtilsAnimations.GetIdleLayer(animancer);
@@ -36,7 +37,7 @@ namespace CombatSystem.Entity
         protected abstract AnimationClip GetActiveIdleClip();
         
 
-        public void Injection(in CombatEntity user)
+        public void Injection(CombatEntity user)
         {
             Entity = user;
             animancer.States.DestroyAll();
@@ -76,7 +77,7 @@ namespace CombatSystem.Entity
 
             void PlayInitialAnimation()
             {
-                DoActionAnimation(initialAnimation);
+                DoAnimationOnActionLayer(initialAnimation);
             }
             void PlayIdleAnimationDirectly()
             {
@@ -101,42 +102,47 @@ namespace CombatSystem.Entity
         }
         protected abstract AnimationClip GetActionAnimation(ISkill skill, EnumsSkill.TeamTargeting type);
         protected abstract AnimationClip GetReceiveActionAnimation(ISkill skill, EnumsSkill.TeamTargeting type);
+        protected abstract AnimationClip GetReceiveActionAnimation(IEffect effect, EnumsSkill.TeamTargeting type);
 
         private CoroutineHandle _animationCoroutineHandle;
         public void PerformActionAnimation(ISkill skill, in CombatEntity onTarget)
         {
             var type = skill.TeamTargeting;
             var clip = GetActionAnimation(skill, type);
-            if (clip == null)
-            {
-#if UNITY_EDITOR
-                Debug.LogWarning($"Animation Null on: {skill}");
-#endif
-                return;
-            }
-
-
-            DoActionAnimation(clip);
+            HandleActionClip(clip,skill);
         }
 
         public void ReceiveActionAnimation(ISkill fromSkill, CombatEntity fromPerformer)
         {
             var type = UtilsSkill.GetReceiveSkillType(fromSkill, fromPerformer, Entity);
             var clip = GetReceiveActionAnimation(fromSkill, type);
+            HandleActionClip(clip, fromSkill);
+        }
+        public void ReceiveActionAnimation(IEffect fromEffect, CombatEntity fromPerformer)
+        {
+            var type = UtilsSkill.GetReceiveSkillType(fromPerformer, Entity);
+            var clip = GetReceiveActionAnimation(fromEffect, type);
+            HandleActionClip(clip, fromEffect);
+        }
+
+
+        private void HandleActionClip(AnimationClip clip, object holder)
+        {
             if (clip == null)
             {
 #if UNITY_EDITOR
-                Debug.LogWarning($"Animation Null on: {fromSkill}");
+                Debug.LogWarning($"Animation Null on: {holder}");
 #endif
                 return;
             }
 
-            DoActionAnimation(clip);
+
+            DoAnimationOnActionLayer(clip);
         }
 
         private AnimancerState _currentActionState;
         private const float OnSameClipResetTimerTo = .2f;
-        private void DoActionAnimation(AnimationClip clip)
+        private void DoAnimationOnActionLayer(AnimationClip clip)
         {
             var actionLayer = ActionAnimationType;
             var targetState = actionLayer.GetOrCreateState(clip);
@@ -178,7 +184,7 @@ namespace CombatSystem.Entity
 
     public sealed class ProvisionalCombatAnimator : ICombatEntityAnimator
     {
-        public void Injection(in CombatEntity user)
+        public void Injection(CombatEntity user)
         {
         }
 
@@ -211,6 +217,11 @@ namespace CombatSystem.Entity
         }
 
         public void ReceiveActionAnimation(ISkill fromSkill, CombatEntity fromPerformer)
+        {
+            _body.DOPunchScale(Vector3.one * .1f, AnimationDuration);
+        }
+
+        public void ReceiveActionAnimation(IEffect fromEffect, CombatEntity fromPerformer)
         {
             _body.DOPunchScale(Vector3.one * .1f, AnimationDuration);
         }

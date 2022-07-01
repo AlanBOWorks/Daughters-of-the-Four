@@ -94,7 +94,7 @@ namespace CombatSystem.Entity
 
                     var body = entity.Body;
                     body.Injection(in entity);
-                    body.InjectPositionReference(in entityTransform);
+                    body.InjectPositionReference(entityTransform);
                     index++;
                 }
             }
@@ -146,9 +146,13 @@ namespace CombatSystem.Entity
                     entityGameObject.layer = CombatRenderLayers.CombatCharacterBackIndex;
                     entityTransform.position = positionTransform.position;
                     entityTransform.rotation = positionTransform.rotation;
-                    entity.Body.InjectPositionReference(in entityTransform);
+
+                    var entityBody = entity.Body;
+                    entityBody.InjectPositionReference(entityTransform);
+                    entityBody.GetAnimator().Injection(entity);
 
                     UtilsTeam.SetElement(i,this, entityTransform);
+
                 }
             }
 

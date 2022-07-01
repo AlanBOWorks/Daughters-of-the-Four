@@ -2,52 +2,53 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Skills.Effects;
 using CombatSystem.Team;
 using MEC;
 using UnityEngine;
 
 namespace CombatSystem.Animations
 {
-    public sealed class CombatControllerAnimationHandler : ITempoEntityMainStatesListener, ICombatStatesListener
+    public sealed class CombatControllerAnimationHandler : ITempoEntityMainStatesListener, ICombatStatesListener,
+        ISkillUsageListener, IEffectUsageListener
     {
 
         public const float PerformToReceiveTimeOffset = .5f;
         public const float FromReceiveToFinishTimeOffset = .3f;
         public const float MaxAnimationDuration = PerformToReceiveTimeOffset + FromReceiveToFinishTimeOffset;
 
-        private static ICombatEntityAnimator GetAnimator(in CombatEntity entity) => entity.Body.GetAnimator();
-
+        private static ICombatEntityAnimator GetAnimator(CombatEntity entity) => entity.Body.GetAnimator();
+        
         public void PerformActionAnimation(ISkill usedSkill, CombatEntity performer, CombatEntity target)
         {
-            var animator = GetAnimator(in performer);
+            var animator = GetAnimator(performer);
             animator.PerformActionAnimation(usedSkill, in target);
         }
 
-        public void PerformReceiveAnimations(ISkill usedSkill, CombatEntity performer)
-        {
-            var interactions = UtilsTarget.GetPossibleTargets(usedSkill, performer);
-            foreach (var entity in interactions)
-            {
-                PerformReceiveAnimation(usedSkill, entity, performer);
-            }
-        }
+      
         private static void PerformReceiveAnimation(ISkill usedSkill, CombatEntity target, CombatEntity performer)
         {
-            var targetAnimator = GetAnimator(in target);
+            var targetAnimator = GetAnimator(target);
             targetAnimator.ReceiveActionAnimation(usedSkill, performer);
+        }
+
+        private static void PerformReceiveAnimation(IEffect effect, CombatEntity performer, CombatEntity target)
+        {
+            var targetAnimator = GetAnimator(target);
+            targetAnimator.ReceiveActionAnimation(effect,performer);
         }
 
 
         public void OnEntityRequestSequence(CombatEntity entity, bool canControl)
         {
-            var animator = GetAnimator(in entity);
+            var animator = GetAnimator(entity);
             animator.OnRequestSequenceAnimation();
         }
         
 
         public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
         {
-            var animator = GetAnimator(in entity);
+            var animator = GetAnimator(entity);
             animator.OnEndSequenceAnimation();
         }
 
@@ -101,5 +102,32 @@ namespace CombatSystem.Animations
         }
 
 
+        public void OnCombatSkillSubmit(in SkillUsageValues values)
+        {
+            
+        }
+
+        public void OnCombatSkillPerform(in SkillUsageValues values)
+        {
+            PerformActionAnimation(values.UsedSkill, values.Performer, values.Target);
+        }
+
+        public void OnCombatSkillFinish(CombatEntity performer)
+        {
+
+        }
+
+        public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+            PerformReceiveAnimation(values.Effect,performer, target);
+        }
+
+        public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+        }
+
+        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        {
+        }
     }
 }

@@ -40,7 +40,7 @@ namespace CombatSystem.Entity
 
         public void Injection(in CombatEntity user)
         {
-            _animator.Injection(in user);
+            _animator.Injection(user);
         }
 
         public void InjectPositionReference(in Transform reference)

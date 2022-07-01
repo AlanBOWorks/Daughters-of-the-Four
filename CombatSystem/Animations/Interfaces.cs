@@ -1,11 +1,12 @@
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Skills.Effects;
 
 namespace CombatSystem.Animations
 {
     public interface ICombatEntityAnimator
     {
-        void Injection(in CombatEntity user);
+        void Injection(CombatEntity user);
 
         void PerformInitialCombatAnimation();
         void PerformEndCombatAnimation();
@@ -13,6 +14,7 @@ namespace CombatSystem.Animations
         void OnRequestSequenceAnimation();
         void PerformActionAnimation(ISkill skill, in CombatEntity onTarget);
         void ReceiveActionAnimation(ISkill fromSkill, CombatEntity fromPerformer);
+        void ReceiveActionAnimation(IEffect fromEffect, CombatEntity fromPerformer);
         void OnEndSequenceAnimation();
     }
 

@@ -28,11 +28,11 @@ namespace CombatSystem.Skills
 
         private const float SkillAppliesAfter = CombatControllerAnimationHandler.PerformToReceiveTimeOffset;
         private const float AnimationOffsetDuration = CombatControllerAnimationHandler.FromReceiveToFinishTimeOffset;
+        private const float SkillFinishAfter = SkillAppliesAfter + AnimationOffsetDuration;
 
         protected override IEnumerator<float> _DoDeQueue()
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            var animator = CombatSystemSingleton.CombatControllerAnimationHandler;
 
             yield return Timing.WaitForOneFrame; //safeWait
 
@@ -40,18 +40,11 @@ namespace CombatSystem.Skills
             {
 
                 var queueValues = Queue.Dequeue();
-                queueValues.Extract(out var performer,out var target,out var usedSkill);
                 eventsHolder.OnCombatSkillPerform(in queueValues);
 
 
-                animator.PerformActionAnimation(usedSkill, performer, target);
-                yield return Timing.WaitForSeconds(SkillAppliesAfter);
-
-
-                animator.PerformReceiveAnimations(usedSkill, performer);
-                yield return Timing.WaitForSeconds(AnimationOffsetDuration);
-              
-                eventsHolder.OnCombatSkillFinish(performer);
+                yield return Timing.WaitForSeconds(SkillFinishAfter);
+                eventsHolder.OnCombatSkillFinish(queueValues.Performer);
                 yield return Timing.WaitForOneFrame; //safeWait
             }
         }

@@ -1,6 +1,7 @@
 using Animancer;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Skills.Effects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -39,6 +40,11 @@ namespace CombatSystem.Animations
         }
 
         protected override AnimationClip GetReceiveActionAnimation(ISkill skill, EnumsSkill.TeamTargeting type)
+        {
+            return UtilsSkill.GetElement(type, animations.AnimationReceiveType);
+        }
+
+        protected override AnimationClip GetReceiveActionAnimation(IEffect effect, EnumsSkill.TeamTargeting type)
         {
             return UtilsSkill.GetElement(type, animations.AnimationReceiveType);
         }

@@ -8,6 +8,7 @@ using CombatSystem.Skills.VanguardEffects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace CombatSystem._Core
 {
@@ -348,6 +349,7 @@ namespace CombatSystem._Core
         public void OnCombatSkillPerform(in SkillUsageValues values)
         {
             values.Extract(out var performer,out var target,out var usedSkill);
+
             _entityEventHandler.OnCombatSkillPerform(usedSkill, performer, target);
 
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
