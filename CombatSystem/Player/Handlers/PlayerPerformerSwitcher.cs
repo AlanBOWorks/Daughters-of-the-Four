@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Player.Events;
+using CombatSystem.Stats;
 using CombatSystem.Team;
+using UnityEngine;
 
 namespace CombatSystem.Player.Handlers
 {
@@ -9,39 +12,94 @@ namespace CombatSystem.Player.Handlers
         ICombatPreparationListener, 
         ITempoEntityMainStatesListener, ITempoEntityActionStatesListener ,
         ITempoControlStatesListener, ITempoControlStatesExtraListener
-
-
     {
+        private IReadOnlyList<CombatEntity> _allEntities;
         private IReadOnlyList<CombatEntity> _activeEntities;
-        private void DoPerformNextEntity()
+        private CombatEntity _lastPerformer;
+
+        private int _currentPerformerIndex;
+        public void DoPerformNextEntity()
         {
-            if (!_isActive) return;
-            if (_activeEntities.Count == 0) return;
+            CombatEntity nextControl = (_isActive) 
+                ? GetNextActiveEntity()
+                : GetNextInactiveEntity();
 
 
-            CombatEntity nextControl = _activeEntities[0];
-            DoPerformEntity(nextControl);
+            if(nextControl == _lastPerformer) return;
+            
+            DoPerformEntityEvent(nextControl);
+
+            CombatEntity GetNextActiveEntity()
+            {
+                int entitiesCount = _allEntities.Count;
+                for (int i = 0; i < entitiesCount -1; i++) // -1 because we gonna ignore current;
+                {
+                    StepIndexIndex();
+                    var nextEntity = _allEntities[_currentPerformerIndex];
+                    if (nextEntity.IsActive()) return nextEntity;
+                }
+
+                return _lastPerformer;
+            }
+
+            CombatEntity GetNextInactiveEntity()
+            {
+                StepIndexIndex();
+                return _allEntities[_currentPerformerIndex];
+            }
+
+            void StepIndexIndex()
+            {
+                _currentPerformerIndex++;
+                if (_currentPerformerIndex >= _allEntities.Count) _currentPerformerIndex = 0;
+            }
         }
 
-        private static void DoPerformEntity(CombatEntity entity)
+        private void DoPerformEntityEvent(CombatEntity entity)
         {
             PlayerCombatSingleton.PlayerCombatEvents.OnPerformerSwitch(entity);
+            _lastPerformer = entity;
         }
+
+        public void DoPerformEntityWithIndex(CombatEntity entity)
+        {
+            DoPerformEntityEvent(entity);
+            UpdatePerformerIndex(entity);
+        }
+
+        private void UpdatePerformerIndex(CombatEntity entity)
+        {
+            for (var i = 0; i < _allEntities.Count; i++)
+            {
+                var checkEntity = _allEntities[i];
+                if (checkEntity != entity) continue;
+
+                _currentPerformerIndex = i;
+                return;
+            }
+        }
+
 
         // ----- EVENTS -----
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             _activeEntities = playerTeam.GetControllingMembers();
+            _allEntities = playerTeam.GetAllMembers();
+            _currentPerformerIndex = 0;
         }
 
 
         private bool _isActive;
-
-
         public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             _isActive = true;
-            DoPerformEntity(firstControl);
+            if(_lastPerformer != null && _lastPerformer.IsActive())
+            {
+                DoPerformEntityEvent(_lastPerformer);
+                return;
+            }
+
+            DoPerformEntityWithIndex(firstControl);
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
@@ -72,6 +130,8 @@ namespace CombatSystem.Player.Handlers
 
         public void OnEntityEmptyActions(CombatEntity entity)
         {
+            if(!_isActive) return;
+
             DoPerformNextEntity();
         }
 
@@ -87,5 +147,6 @@ namespace CombatSystem.Player.Handlers
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
         }
+
     }
 }

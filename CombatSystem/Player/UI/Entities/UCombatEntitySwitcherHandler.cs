@@ -4,7 +4,10 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Team;
+using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI
@@ -13,8 +16,16 @@ namespace CombatSystem.Player.UI
         ICombatStatesListener,
         ITempoControlStatesListener,
         ITempoEntityActionStatesListener,
-        IPlayerEntityListener
+        IPlayerEntityListener,
+        ISwitchEntityShortcutCommandStructureRead<TextMeshProUGUI>
     {
+        [Title("ShortCuts")]
+        [SerializeField] 
+        private UShortcutCommandsHolder shortcutCommands;
+        [SerializeField] 
+        private TextMeshProUGUI switchPerformerTextHolder;
+
+        [Title("Behaviour")]
         [SerializeField]
         private TeamReferences references = new TeamReferences();
         [SerializeField] 
@@ -26,10 +37,9 @@ namespace CombatSystem.Player.UI
 
         private void Start()
         {
-            references.InstantiateElements();
-            references.activeCount = references.Members.Length;
-            references.HidePrefab();
+           InstantiateReferences();
             OnInstantiation();
+            DoShortcutsInitialization();
 
             _buttonsDictionary = new Dictionary<CombatEntity, UCombatEntitySwitchButton>();
 
@@ -39,12 +49,31 @@ namespace CombatSystem.Player.UI
             playerCombatEvents.DiscriminationEventsHolder.Subscribe(this);
         }
 
+        private void InstantiateReferences()
+        {
+            references.InstantiateElements();
+            references.activeCount = references.Members.Length;
+            references.HidePrefab();
+        }
+
+        private void DoShortcutsInitialization()
+        {
+            var shortcutName = UtilsShortCuts.DefaultNamesHolder.SwitchEntityShortCutElement;
+            var shortCutInputAction = shortcutCommands.SwitchEntityShortCutElement;
+
+            switchPerformerTextHolder.text = shortcutName;
+            shortCutInputAction.action.performed += DoPerformSwitchShortcut;
+        }
+
+
         private void OnDestroy()
         {
             var playerCombatEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerCombatEvents.UnSubscribe(this);
             playerCombatEvents.DiscriminationEventsHolder.UnSubscribe(this);
 
+            var shortCutInputAction = shortcutCommands.SwitchEntityShortCutElement;
+            shortCutInputAction.action.performed -= DoPerformSwitchShortcut;
         }
 
         private const float IterationHeight = 70 + 6;
@@ -71,6 +100,7 @@ namespace CombatSystem.Player.UI
             }
         }
 
+        public TextMeshProUGUI SwitchEntityShortCutElement => switchPerformerTextHolder;
 
         public void ShowAll()
         {
@@ -99,8 +129,8 @@ namespace CombatSystem.Player.UI
         {
             if (entity == _currentPerformer || entity == null) return;
 
-            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerEvents.OnPerformerSwitch(entity);
+            var performerSwitcher = PlayerCombatSingleton.PerformerSwitcher;
+            performerSwitcher.DoPerformEntityWithIndex(entity);
         }
 
         public void OnHoverEnter(Image button)
@@ -111,7 +141,6 @@ namespace CombatSystem.Player.UI
         {
             selectionFeedback.OnSwitchButtonExit();
         }
-
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
@@ -185,6 +214,13 @@ namespace CombatSystem.Player.UI
         {
             _currentPerformer = performer;
         }
+
+        private void DoPerformSwitchShortcut(InputAction.CallbackContext context)
+        {
+            if(!enabled) return;
+            PlayerCombatSingleton.PerformerSwitcher.DoPerformNextEntity();
+        }
+
         public void OnEntityRequestAction(CombatEntity entity)
        {
        }
@@ -208,5 +244,6 @@ namespace CombatSystem.Player.UI
        {
 
        }
+
     }
 }

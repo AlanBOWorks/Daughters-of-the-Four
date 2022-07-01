@@ -88,6 +88,7 @@ namespace CombatSystem.Entity
         [ShowInInspector]
         public CombatTeam Team { get; private set; }
 
+        public bool IsActive() => Team.IsActive(this);
 
         [ShowInInspector,HorizontalGroup("Damage Tracker")]
         public readonly CombatEntityVitalityTracker DamageDoneTracker;
