@@ -342,31 +342,31 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private DamageLogs _damageLogs = new DamageLogs();
 
-        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnShieldLost(CombatEntity performer, CombatEntity target, float amount)
         {
             if(!ShowDamageLogs || !_damageLogs.OnShieldLost) return;
             Debug.Log($"SHIELDS - P[{performer.CombatCharacterName}] > T[{target}] : {amount}");
         }
 
-        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnHealthLost(CombatEntity performer, CombatEntity target, float amount)
         {
             if (!ShowDamageLogs || !_damageLogs.OnHealthLost) return;
             Debug.Log($"HEALTH - P[{performer.CombatCharacterName}] > T[{target}] : {amount}");
 
         }
 
-        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnMortalityLost(CombatEntity performer, CombatEntity target, float amount)
         {
             if (!ShowDamageLogs || !_damageLogs.OnMortalityLost) return;
             Debug.Log($"MORTALITY - P[{performer.CombatCharacterName}] > T[{target}] : {amount}");
 
         }
 
-        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
+        public void OnDamageReceive(CombatEntity performer, CombatEntity target)
         {
         }
 
-        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
+        public void OnKnockOut(CombatEntity performer, CombatEntity target)
         {
             if (!ShowDamageLogs || !_damageLogs.OnKnockOut) return;
             Debug.Log($"KNOCKOUT - P[{performer.CombatCharacterName}] > T[{target}");

@@ -21,7 +21,7 @@ namespace CombatSystem.Player.UI
             int index)
         {
             element.Show();
-            element.EntityInjection(in entity);
+            element.EntityInjection(entity);
         }
     }
 }

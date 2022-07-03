@@ -36,8 +36,8 @@ namespace CombatSystem._Core
             targetStats.CurrentShields = 0;
 
             CombatEntity performer = null;
-            CombatSystemSingleton.EventsHolder.OnDamageBeforeDone(performer,in member, 99999);
-            CombatSystemSingleton.EventsHolder.OnKnockOut(performer,in member);
+            CombatSystemSingleton.EventsHolder.OnDamageBeforeDone(performer,member, 99999);
+            CombatSystemSingleton.EventsHolder.OnKnockOut(performer,member);
         }
 
         private sealed class CombatDebugUtilsWindow : OdinEditorWindow

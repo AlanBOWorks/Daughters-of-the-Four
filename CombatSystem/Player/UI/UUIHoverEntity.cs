@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
 using MEC;
+using SCharacterCreator.Bones;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -18,13 +19,14 @@ namespace CombatSystem.Player.UI
         public UVitalityInfo GetHealthInfo() => healthInfo;
         public GameObject GetHoverFeedbackHolder() => hoverFeedbackHolder;
        
-        public void EntityInjection(in CombatEntity entity)
+        public void EntityInjection(CombatEntity entity)
         {
             var entityBody = entity.Body;
 
-            _followReference = entityBody != null 
-                ? entityBody.GetUIHoverHolder() 
-                : entity.InstantiationReference.transform;
+            if (entityBody != null)
+            {
+                _followReference = entityBody.GetPositions();
+            }
         } 
         public void OnPreStartCombat()
         {
@@ -44,7 +46,7 @@ namespace CombatSystem.Player.UI
         private Camera _playerCamera;
         [Title("RunTime")]
         [ShowInInspector,HideInEditorMode]
-        private Transform _followReference;
+        private IHumanoidRootsStructureRead<Vector3> _followReference;
         private RectTransform _rectTransform;
 
         private void Awake()
@@ -58,10 +60,14 @@ namespace CombatSystem.Player.UI
 
         private void LateUpdate()
         {
-            var targetPoint = _playerCamera.WorldToScreenPoint(_followReference.position);
+            var targetPoint = _playerCamera.WorldToScreenPoint(GetHoverPointFollow());
             _rectTransform.position = targetPoint;
         }
 
+        private Vector3 GetHoverPointFollow()
+        {
+            return _followReference?.PivotRootType ?? transform.position;
+        }
 
         public void Show()
         {

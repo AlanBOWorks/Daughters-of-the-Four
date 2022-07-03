@@ -4,6 +4,7 @@ using CombatSystem.AI;
 using CombatSystem.Entity;
 using CombatSystem.Player;
 using CombatSystem.Skills;
+using CombatSystem.Skills.Effects;
 using CombatSystem.Skills.VanguardEffects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
@@ -180,10 +181,10 @@ namespace CombatSystem._Core
 
         // ------ ------ TEMPO ----- ------ 
         // ------ TICK -----
-        public void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative)
+        public void OnEntityTick(in TempoTickValues tempoValues)
         {
-            _playerCombatEvents.OnEntityTick(entity, currentTick, percentInitiative);
-            _enemyCombatEvents.OnEntityTick(entity, currentTick, percentInitiative);
+            _playerCombatEvents.OnEntityTick(in tempoValues);
+            _enemyCombatEvents.OnEntityTick(in tempoValues);
         }
 
 
@@ -416,87 +417,94 @@ namespace CombatSystem._Core
         }
         
         // ---- VITALITY
-        public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnDamageBeforeDone(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnDamageBeforeDone(in performer,in target, in amount);
+                eventsHolder.OnDamageBeforeDone(performer,target, amount);
 
         }
 
-        public void OnRevive(in CombatEntity entity, bool isHealRevive)
+        public void OnRevive(CombatEntity entity, bool isHealRevive)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnRevive(in entity, isHealRevive);
+                eventsHolder.OnRevive(entity, isHealRevive);
 
         }
 
 
-        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnShieldLost(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnShieldLost(in performer,in target, in amount);
+                eventsHolder.OnShieldLost(performer,target, amount);
 
         }
 
-        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnHealthLost(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnHealthLost(in performer, in target, in amount);
+                eventsHolder.OnHealthLost(performer, target, amount);
         }
 
-        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnMortalityLost(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnMortalityLost(in performer, in target, in amount);
+                eventsHolder.OnMortalityLost(performer, target, amount);
         }
 
-        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
+        public void OnDamageReceive(CombatEntity performer, CombatEntity target)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnDamageReceive(in performer, in target);
-
-        }
-
-        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
-        {
-            foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnKnockOut(in performer, in target);
+                eventsHolder.OnDamageReceive(performer, target);
 
         }
 
-        public void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnKnockOut(CombatEntity performer, CombatEntity target)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnShieldGain(in performer, in target, in amount);
+                eventsHolder.OnKnockOut(performer, target);
 
         }
 
-        public void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnShieldGain(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnHealthGain(in performer, in target, in amount);
+                eventsHolder.OnShieldGain(performer, target, amount);
 
         }
 
-        public void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnHealthGain(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnMortalityGain(in performer, in target, in amount);
+                eventsHolder.OnHealthGain(performer, target, amount);
 
         }
 
-        public void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target)
+        public void OnMortalityGain(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnRecoveryReceive(in performer, in target);
+                eventsHolder.OnMortalityGain(performer, target, amount);
 
         }
 
-        public void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentAmount, in int amount)
+        public void OnRecoveryReceive(CombatEntity performer, CombatEntity target)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnKnockHeal(in performer, in target,in currentAmount, in amount);
+                eventsHolder.OnRecoveryReceive(performer, target);
 
+        }
+
+        public void OnKnockHeal(CombatPerformedEntities entities, int currentAmount, int amount)
+        {
+            foreach (var eventsHolder in _mainEventsEnumerable)
+                eventsHolder.OnKnockHeal(entities,currentAmount, amount);
+
+        }
+
+
+        public void OnBuffDone(CombatPerformedEntities entities, SBuffEffect buff, float value)
+        {
+            foreach (ICombatEventsHolder eventsHolder in _mainEventsEnumerable)
+                eventsHolder.OnBuffDone(entities, buff, value);
         }
 
 
@@ -550,10 +558,7 @@ namespace CombatSystem._Core
             {
                 UnSubscribeTempo(tickListener);
             }
-
         }
-
-
     }
 
 
@@ -642,11 +647,11 @@ namespace CombatSystem._Core
                 listener.OnStopTicking();
             }
         }
-        public void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative)
+        public void OnEntityTick(in TempoTickValues tempoValues)
         {
             foreach (var listener in _tempoEntityPercentListeners)
             {
-                listener.OnEntityTick(entity, currentTick, percentInitiative);
+                listener.OnEntityTick(in tempoValues);
             }
         }
 
@@ -665,8 +670,10 @@ namespace CombatSystem._Core
             
             
             _damageDoneListeners = new HashSet<IDamageDoneListener>();
-            _recoveryDoneListeners = new HashSet<IRecoveryDoneListener>();
             _vitalityChangeListeners = new HashSet<IVitalityChangeListener>();
+
+            _recoveryDoneListeners = new HashSet<IRecoveryDoneListener>();
+            _buffDoneListeners = new HashSet<IBuffDoneListener>();
         }
 
 
@@ -681,13 +688,18 @@ namespace CombatSystem._Core
         private readonly ICollection<ICombatStatesListener> _combatStatesListeners;
         [ShowInInspector] 
         private readonly ICollection<ICombatEntityExistenceListener> _entitiesExistenceListeners;
-        [ShowInInspector] 
-        private readonly ICollection<IDamageDoneListener> _damageDoneListeners;
-        [ShowInInspector]
-        private readonly ICollection<IRecoveryDoneListener> _recoveryDoneListeners;
 
         [ShowInInspector] 
+        private readonly ICollection<IDamageDoneListener> _damageDoneListeners;
+        [ShowInInspector] 
         private readonly ICollection<IVitalityChangeListener> _vitalityChangeListeners;
+
+
+        [ShowInInspector]
+        private readonly ICollection<IRecoveryDoneListener> _recoveryDoneListeners;
+        [ShowInInspector]
+        private readonly ICollection<IBuffDoneListener> _buffDoneListeners;
+
 
         public override void Subscribe(ICombatEventListener listener)
         {
@@ -713,11 +725,13 @@ namespace CombatSystem._Core
 
             if(listener is IDamageDoneListener damageDoneListener)
                 _damageDoneListeners.Add(damageDoneListener);
-            if(listener is IRecoveryDoneListener recoveryDoneListener)
-                _recoveryDoneListeners.Add(recoveryDoneListener);
             if(listener is IVitalityChangeListener vitalityChangeListener)
                 _vitalityChangeListeners.Add(vitalityChangeListener);
-
+            
+            if (listener is IRecoveryDoneListener recoveryDoneListener)
+                _recoveryDoneListeners.Add(recoveryDoneListener);
+            if(listener is IBuffDoneListener buffDoneListener)
+                _buffDoneListeners.Add(buffDoneListener);
         }
 
         public override void UnSubscribe(ICombatEventListener listener)
@@ -742,10 +756,14 @@ namespace CombatSystem._Core
 
             if (listener is IDamageDoneListener damageDoneListener)
                 _damageDoneListeners.Remove(damageDoneListener);
+            if (listener is IVitalityChangeListener vitalityChangeListener)
+                _vitalityChangeListeners.Remove(vitalityChangeListener);
+
             if (listener is IRecoveryDoneListener recoveryDoneListener)
                 _recoveryDoneListeners.Remove(recoveryDoneListener);
-            if (listener is IVitalityChangeListener vitalityChangeListener)
-                _vitalityChangeListeners.Add(vitalityChangeListener);
+            if (listener is IBuffDoneListener buffDoneListener)
+                _buffDoneListeners.Add(buffDoneListener);
+
         }
 
 
@@ -829,108 +847,115 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnDamageBeforeDone(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var listener in _vitalityChangeListeners)
             {
-                listener.OnDamageBeforeDone(in performer, in target, in amount);
+                listener.OnDamageBeforeDone(performer, target, amount);
             }
         }
 
-        public void OnRevive(in CombatEntity entity, bool isHealRevive)
+        public void OnRevive(CombatEntity entity, bool isHealRevive)
         {
             foreach (var listener in _vitalityChangeListeners)
             {
-                listener.OnRevive(in entity, isHealRevive);
+                listener.OnRevive(entity, isHealRevive);
             }
         }
 
 
-        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnShieldLost(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var listener in _damageDoneListeners)
             {
-                listener.OnShieldLost(in performer,in target, in amount);
+                listener.OnShieldLost(performer,target, amount);
             }
         }
 
-        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnHealthLost(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var listener in _damageDoneListeners)
             {
-                listener.OnHealthLost(in performer, in target, in amount);
+                listener.OnHealthLost(performer, target, amount);
             }
 
         }
 
-        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnMortalityLost(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var listener in _damageDoneListeners)
             {
-                listener.OnMortalityLost(in performer, in target, in amount);
+                listener.OnMortalityLost(performer, target, amount);
             }
 
         }
 
-        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
+        public void OnDamageReceive(CombatEntity performer, CombatEntity target)
         {
             foreach (var listener in _damageDoneListeners)
             {
-                listener.OnDamageReceive(in performer, in target);
+                listener.OnDamageReceive(performer, target);
             }
         }
 
-        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
+        public void OnKnockOut(CombatEntity performer, CombatEntity target)
         {
             foreach (var listener in _damageDoneListeners)
             {
-                listener.OnKnockOut(in performer, in target);
+                listener.OnKnockOut(performer, target);
             }
         }
 
 
-        public void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnShieldGain(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var listener in _recoveryDoneListeners)
             {
-                listener.OnShieldGain(in performer, in target, in amount);
+                listener.OnShieldGain(performer, target, amount);
             }
         }
 
-        public void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnHealthGain(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var listener in _recoveryDoneListeners)
             {
-                listener.OnHealthGain(in performer, in target, in amount);
+                listener.OnHealthGain(performer, target, amount);
             }
 
         }
 
-        public void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnMortalityGain(CombatEntity performer, CombatEntity target, float amount)
         {
             foreach (var listener in _recoveryDoneListeners)
             {
-                listener.OnMortalityGain(in performer, in target, in amount);
+                listener.OnMortalityGain(performer, target, amount);
             }
 
         }
 
-        public void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target)
+        public void OnRecoveryReceive(CombatEntity performer, CombatEntity target)
         {
             foreach (var listener in _recoveryDoneListeners)
             {
-                listener.OnRecoveryReceive(in performer, in target);
+                listener.OnRecoveryReceive(performer, target);
             }
         }
 
-        public void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentTick, in int amount)
+        public void OnKnockHeal(CombatPerformedEntities entities, int currentTick, int amount)
         {
             foreach (var listener in _recoveryDoneListeners)
             {
-                listener.OnKnockHeal(in performer, in target, in currentTick, in amount);
+                listener.OnKnockHeal(entities, currentTick, amount);
             }
         }
 
+        public void OnBuffDone(CombatPerformedEntities entities, SBuffEffect buff, float value)
+        {
+            foreach (var listener in _buffDoneListeners)
+            {
+                listener.OnBuffDone(entities,buff,value);
+            }
+        }
     }
 
     public class CombatEntityEventsHolder :  ICombatEventsHolderBase
@@ -1316,7 +1341,8 @@ namespace CombatSystem._Core
     public interface ICombatEventsHolder : ICombatEventsHolderBase,
         ICombatPreparationListener, ICombatStatesListener,
         ICombatEntityExistenceListener, 
-        IDamageDoneListener, IVitalityChangeListener, IRecoveryDoneListener
+        IDamageDoneListener, IVitalityChangeListener, IRecoveryDoneListener,
+        IBuffDoneListener
     {
         void Subscribe(ICombatEventListener listener);
         void UnSubscribe(ICombatEventListener listener);

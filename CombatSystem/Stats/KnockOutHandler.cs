@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
 using Sirenix.OdinInspector;
 
@@ -53,26 +54,26 @@ namespace CombatSystem.Stats
         {
             var entityStats = entity.Stats;
             UtilsCombatEffect.DoHealToPercent(in entityStats, ReviveHealingPercent);
-            CombatSystemSingleton.EventsHolder.OnRevive(in entity, isHealRevive);
+            CombatSystemSingleton.EventsHolder.OnRevive(entity, isHealRevive);
         }
 
-        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnShieldLost(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnHealthLost(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnMortalityLost(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
+        public void OnDamageReceive(CombatEntity performer, CombatEntity target)
         {
         }
 
-        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
+        public void OnKnockOut(CombatEntity performer, CombatEntity target)
         {
             AddKnockOut(in target);
         }
@@ -112,7 +113,7 @@ namespace CombatSystem.Stats
             var target = _knockOutEntities[index];
             _knockOutValues[index] = currentTick;
 
-            eventsHolder.OnKnockHeal(in performer, in target, in currentTick, in increment);
+            eventsHolder.OnKnockHeal(new CombatPerformedEntities(performer,target), currentTick, increment);
         }
 
         private void DoHealKnockOut(CombatEntity performer, int index, int currentTick, int increment)

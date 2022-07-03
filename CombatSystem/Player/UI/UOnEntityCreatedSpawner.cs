@@ -236,7 +236,7 @@ namespace CombatSystem.Player.UI
 
     public interface IEntityExistenceElement<T> where T : UnityEngine.Object, IEntityExistenceElement<T>
     {
-        void EntityInjection(in CombatEntity entity);
+        void EntityInjection(CombatEntity entity);
         void OnPreStartCombat();
         void OnInstantiation();
         void OnDestruction();

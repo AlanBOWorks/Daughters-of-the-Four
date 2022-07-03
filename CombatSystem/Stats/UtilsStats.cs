@@ -303,13 +303,32 @@ namespace CombatSystem.Stats
             stats.UsedActions = MaxActionAmount + 1;
         }
 
-
-        public static void CalculateTempoPercent(in CombatStats entity, out float currentTickAmount,
-            out float initiativePercent)
+        public static TempoTickValues CalculateTempoValues(CombatEntity entity)
         {
-            currentTickAmount = entity.CurrentInitiative;
-            CalculateTempoPercent(currentTickAmount, out initiativePercent);
+            var stats = entity.Stats;
+            float currentTickAmount = stats.CurrentInitiative;
+
+            return CalculateTempoValues(entity, currentTickAmount);
         }
+
+        public static TempoTickValues CalculateTempoValues(CombatEntity entity, float entityInitiativeAmount)
+        {
+            var stats = entity.Stats;
+            CalculateTempoPercent(entityInitiativeAmount, out float initiativePercent);
+            int remainingSteps = CalculateRemainingSteps(stats);
+
+            return new TempoTickValues(entity, entityInitiativeAmount, initiativePercent, remainingSteps);
+        }
+
+        public static int CalculateRemainingSteps(CombatStats stats)
+        {
+            var speed = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
+            var currentInitiative = stats.CurrentInitiative;
+            var remainingTicks = InitiativeThreshold - currentInitiative;
+
+            return Mathf.RoundToInt(remainingTicks / speed);
+        }
+
 
         public static void CalculateTempoPercent(float currentTickAmount,
             out float initiativePercent)

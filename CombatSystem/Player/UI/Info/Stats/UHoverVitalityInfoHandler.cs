@@ -33,7 +33,7 @@ namespace CombatSystem.Player.UI
             var healthInfo = element.GetHealthInfo();
             _infoDictionary.Add(entity,healthInfo);
 
-            healthInfo.EntityInjection(in entity);
+            healthInfo.EntityInjection(entity);
         }
 
         public void OnCombatEnd()
@@ -46,33 +46,33 @@ namespace CombatSystem.Player.UI
             _infoDictionary.Clear();
         }
 
-        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnShieldLost(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnHealthLost(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnMortalityLost(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
-        {
-            _infoDictionary[target].UpdateToCurrentStats();
-        }
-
-        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
+        public void OnDamageReceive(CombatEntity performer, CombatEntity target)
         {
             _infoDictionary[target].UpdateToCurrentStats();
         }
 
-        public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnKnockOut(CombatEntity performer, CombatEntity target)
+        {
+            _infoDictionary[target].UpdateToCurrentStats();
+        }
+
+        public void OnDamageBeforeDone(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnRevive(in CombatEntity entity, bool isHealRevive)
+        public void OnRevive(CombatEntity entity, bool isHealRevive)
         {
             _infoDictionary[entity].UpdateToCurrentStats();
         }

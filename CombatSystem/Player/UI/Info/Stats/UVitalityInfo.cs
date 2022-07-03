@@ -35,7 +35,7 @@ namespace CombatSystem.Player.UI
 
         private CombatStats _currentStats;
 
-        public void EntityInjection(in CombatEntity entity)
+        public void EntityInjection(CombatEntity entity)
         {
             if (entity == null)
             {

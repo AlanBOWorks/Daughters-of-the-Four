@@ -66,6 +66,7 @@ namespace CombatSystem.Player.UI
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
+
             Action<CombatEntity, UTempoTrackerHolder> onCreateCallback = HandleEntity;
             HandleElements(playerTeam, enemyTeam, onCreateCallback);
         }
@@ -82,8 +83,13 @@ namespace CombatSystem.Player.UI
             var entityRole = entity.RoleType;
             var targetHeight = TargetHeight(entityRole);
             HandleHeight(element, targetHeight);
-            element.EntityInjection(in entity);
+            element.EntityInjection(entity);
             element.OnInstantiation();
+
+
+            var rolesTheme = CombatThemeSingleton.RolesThemeHolder;
+            var roleIcon = UtilsTeam.GetElement(entityRole, rolesTheme);
+            element.Injection(roleIcon.GetThemeIcon());
         }
 
         private static void HandleHeight(Component element, float targetHeight)
@@ -96,15 +102,16 @@ namespace CombatSystem.Player.UI
 
         private float TargetHeight(EnumTeam.Role role)
         {
-            return EnumTeam.GetRoleInvertIndex(role) * verticalSpacing;
+            return -EnumTeam.GetRoleIndex(role) * verticalSpacing;
         }
 
 
-        public void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative)
+        public void OnEntityTick(in TempoTickValues values)
         {
+            var entity = values.Entity;
             if(!_dictionary.ContainsKey(entity)) return;
 
-            _dictionary[entity].TickTempo(in currentTick, in percentInitiative);
+            _dictionary[entity].TickTempo(in values);
         }
 
         [Serializable]

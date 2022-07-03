@@ -1,3 +1,4 @@
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Localization;
 using CombatSystem.Stats;
@@ -35,12 +36,13 @@ namespace CombatSystem.Skills.Effects
                 ? UtilsStats.GetBurstStats(in targetStats, in performerStats) 
                 : targetStats.BuffStats;
 
-            DoBuff(in bufferPower, in receivePower, in effectValue, in buffingStats);
+            DoBuff(bufferPower, receivePower, buffingStats, ref effectValue);
+            CombatSystemSingleton.EventsHolder.OnBuffDone(new CombatPerformedEntities(performer,target),this,  effectValue);
         }
 
-        protected abstract void DoBuff(in float performerBuffPower, in float targetBuffReceivePower,
-            in float effectValue,
-            in IBasicStats<float> buffingStats);
+        protected abstract void DoBuff(float performerBuffPower, float targetBuffReceivePower,
+            IBasicStats<float> buffingStats,
+            ref float effectValue);
 
         protected string GenerateAssetName(in string statTypeName)
         {

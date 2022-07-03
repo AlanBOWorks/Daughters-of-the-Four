@@ -154,14 +154,14 @@ namespace CombatSystem.Skills.Effects
 
             PerformDamage(target, performer, damage, eventCallback);
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnDamageReceive(in performer, in target);
+            eventsHolder.OnDamageReceive(performer, target);
         }
 
         private static void PerformDamage(CombatEntity target, CombatEntity performer, float damage, bool eventCallback)
         {
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             if (eventCallback)
-                eventsHolder.OnDamageBeforeDone(in performer, in target, in damage);
+                eventsHolder.OnDamageBeforeDone(performer, target, damage);
 
 
             IDamageableStats<float> healthStats = target.Stats;
@@ -175,7 +175,7 @@ namespace CombatSystem.Skills.Effects
                 performer.DamageDoneTracker.DoShields(in target, in shieldBreaks);
 
                 if (eventCallback)
-                    eventsHolder.OnShieldLost(in performer, in target, in shieldBreaks);
+                    eventsHolder.OnShieldLost(performer, target, shieldBreaks);
 
                 return;
             }
@@ -188,7 +188,7 @@ namespace CombatSystem.Skills.Effects
                 performer.DamageDoneTracker.DoHealth(in target, in damage);
 
                 if (eventCallback)
-                    eventsHolder.OnHealthLost(in performer, in target, in damage);
+                    eventsHolder.OnHealthLost(performer, target, damage);
 
                 return;
             }
@@ -199,7 +199,7 @@ namespace CombatSystem.Skills.Effects
             performer.DamageDoneTracker.DoMortality(in target, in damage);
 
             if (eventCallback)
-                eventsHolder.OnMortalityLost(in performer, in target, in damage);
+                eventsHolder.OnMortalityLost(performer, target, damage);
         }
 
         public static void DoDamageToShields(in IDamageableStats<float> target, in float damage, 

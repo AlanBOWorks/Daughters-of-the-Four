@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Skills;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -10,58 +11,58 @@ namespace CombatSystem.Player.UI
         IVitalityChangeListener,IDamageDoneListener, IRecoveryDoneListener
     {
 
-        public void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnDamageBeforeDone(CombatEntity performer, CombatEntity target, float amount)
         {
 
         }
 
-        public void OnRevive(in CombatEntity entity, bool isHealRevive)
+        public void OnRevive(CombatEntity entity, bool isHealRevive)
         {
             var dictionary = GetDictionary();
             dictionary[entity].HideKnockOut();
         }
 
-        public void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnShieldLost(CombatEntity performer, CombatEntity target, float amount)
         { }
 
-        public void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnHealthLost(CombatEntity performer, CombatEntity target, float amount)
         { }
 
-        public void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnMortalityLost(CombatEntity performer, CombatEntity target, float amount)
         { }
 
-        public void OnDamageReceive(in CombatEntity performer, in CombatEntity target)
+        public void OnDamageReceive(CombatEntity performer, CombatEntity target)
         {
             UpdateTargetVitality(target);
         }
 
-        public void OnKnockOut(in CombatEntity performer, in CombatEntity target)
+        public void OnKnockOut(CombatEntity performer, CombatEntity target)
         {
             var dictionary = GetDictionary();
             dictionary[target].ShowKnockOut();
         }
 
 
-        public void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnShieldGain(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnHealthGain(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount)
+        public void OnMortalityGain(CombatEntity performer, CombatEntity target, float amount)
         {
         }
 
-        public void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target)
+        public void OnRecoveryReceive(CombatEntity performer, CombatEntity target)
         {
             UpdateTargetVitality(target);
         }
 
-        public void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentTick, in int amount)
+        public void OnKnockHeal(CombatPerformedEntities entities, int currentTick, int amount)
         {
-            TickKnockOut(target, currentTick);
+            TickKnockOut(entities.Target, currentTick);
         }
 
 
@@ -109,7 +110,7 @@ namespace CombatSystem.Player.UI
             {
                 element.ShowElement();
             }
-            element.EntityInjection(in entity);
+            element.EntityInjection(entity);
         }
 
         private static void HandleActiveEnemy(in UVitalityInfo element, in CombatEntity entity)
@@ -123,7 +124,7 @@ namespace CombatSystem.Player.UI
             }
 
             element.ShowElement();
-            element.EntityInjection(in entity);
+            element.EntityInjection(entity);
         }
     }
 }

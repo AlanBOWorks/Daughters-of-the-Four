@@ -79,14 +79,14 @@ namespace CombatSystem._Core
         private int _roundTickCount;
         public int GetCurrentRoundTicks() => _roundTickCount;
 
-#if UNITY_EDITOR
+
         [Button, HideIf("_pauseTicking")]
         private void PauseNextTick() => _pauseTicking = true;
         [Button, ShowIf("_pauseTicking")]
         private void ResumeNextTick() => _pauseTicking = false;
 
         private bool _pauseTicking = false; 
-#endif
+
         private IEnumerator<float> _TickingLoop()
         {
             var teamControllersHandler = CombatSystemSingleton.TeamControllers;
@@ -101,11 +101,7 @@ namespace CombatSystem._Core
                 yield return Timing.WaitForSeconds(TickPeriodSeconds);
                 _roundTickCount++;
 
-#if UNITY_EDITOR
                 while (_playerPauseValues.IsGamePaused || _pauseTicking)
-#else
-                while (_playerPauseValues.IsGamePaused)
-#endif
                 {
                     yield return Timing.WaitForOneFrame;
                 }
@@ -193,7 +189,36 @@ namespace CombatSystem._Core
 
     }
 
+    public readonly struct TempoTickValues
+    {
+        public static TempoTickValues ZeroValues = new TempoTickValues(null,0,0,0);
 
+        public readonly CombatEntity Entity; 
+        public readonly float CurrentTick;
+        public readonly float CurrentPercent;
+        public readonly int RemainingSteps;
+
+        public TempoTickValues(CombatEntity entity, float currentTick, float currentPercent, int remainingSteps)
+        {
+            Entity = entity;
+            CurrentTick = currentTick;
+            CurrentPercent = currentPercent;
+            RemainingSteps = remainingSteps;
+        }
+
+        public void ExtractValues(out float currentTick, out float currentPercent)
+        {
+            currentTick = CurrentTick;
+            currentPercent = CurrentPercent;
+        }
+
+        public void ExtractValues(out float currentTick, out float currentPercent, out int remainingSteps)
+        {
+            ExtractValues(out currentTick, out currentPercent);
+            remainingSteps = RemainingSteps;
+        }
+
+    }
     public interface ITempoTickListener : ICombatEventListener
     {
         void OnStartTicking();
@@ -321,7 +346,7 @@ namespace CombatSystem._Core
 
     public interface ITempoEntityPercentListener : ICombatEventListener
     {
-        void OnEntityTick(CombatEntity entity, float currentTick, float percentInitiative);
+        void OnEntityTick(in TempoTickValues tempoValues);
     }
 
     public static class UtilsTempo

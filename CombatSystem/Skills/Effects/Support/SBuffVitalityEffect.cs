@@ -20,9 +20,9 @@ namespace CombatSystem.Skills.Effects
 
 
 
-        protected override void DoBuff(in float performerBuffPower, in float targetBuffReceivePower,
-            in float effectValue,
-            in IBasicStats<float> buffingStats)
+        protected override void DoBuff(float performerBuffPower, float targetBuffReceivePower,
+            IBasicStats<float> buffingStats,
+            ref float effectValue)
         {
             float buffingValue = UtilsStatsEffects.CalculateVitalityStatBuffValue(
                 in performerBuffPower,

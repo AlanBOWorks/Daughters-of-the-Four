@@ -1,5 +1,7 @@
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Skills;
+using CombatSystem.Skills.Effects;
 using UnityEngine;
 
 namespace CombatSystem.Stats
@@ -17,17 +19,17 @@ namespace CombatSystem.Stats
         /// This depends on the attacker's behalf; for knowing if damage
         /// had happen check: [<seealso cref="IDamageDoneListener.OnDamageReceive"/>]
         /// </summary>
-        void OnDamageBeforeDone(in CombatEntity performer, in CombatEntity target, in float amount);
+        void OnDamageBeforeDone(CombatEntity performer, CombatEntity target, float amount);
 
-        void OnRevive(in CombatEntity entity, bool isHealRevive);
+        void OnRevive(CombatEntity entity, bool isHealRevive);
 
     }
 
     public interface IDamageDoneListener : ICombatEventListener
     {
-        void OnShieldLost(in CombatEntity performer, in CombatEntity target, in float amount);
-        void OnHealthLost(in CombatEntity performer, in CombatEntity target, in float amount);
-        void OnMortalityLost(in CombatEntity performer, in CombatEntity target, in float amount);
+        void OnShieldLost(CombatEntity performer, CombatEntity target, float amount);
+        void OnHealthLost(CombatEntity performer, CombatEntity target, float amount);
+        void OnMortalityLost(CombatEntity performer, CombatEntity target, float amount);
         /// <summary>
         /// After call of the concrete events calls:
         /// <br></br>- <see cref="OnShieldLost"/>
@@ -38,26 +40,30 @@ namespace CombatSystem.Stats
         /// It the receiving end of the event [<seealso cref="IVitalityChangeListener.OnDamageBeforeDone"/>], a.k.a: depends if the
         /// damage had happen.
         /// </summary>
-        void OnDamageReceive(in CombatEntity performer, in CombatEntity target);
+        void OnDamageReceive(CombatEntity performer, CombatEntity target);
         /// <summary>
         /// Event raised only if all Vitality values becomes zero
         /// </summary>
-        void OnKnockOut(in CombatEntity performer, in CombatEntity target);
+        void OnKnockOut(CombatEntity performer, CombatEntity target);
     }
 
     public interface IRecoveryDoneListener : ICombatEventListener
     {
-        void OnShieldGain(in CombatEntity performer, in CombatEntity target, in float amount);
-        void OnHealthGain(in CombatEntity performer, in CombatEntity target, in float amount);
-        void OnMortalityGain(in CombatEntity performer, in CombatEntity target, in float amount);
+        void OnShieldGain(CombatEntity performer, CombatEntity target, float amount);
+        void OnHealthGain(CombatEntity performer, CombatEntity target, float amount);
+        void OnMortalityGain(CombatEntity performer, CombatEntity target, float amount);
         /// <summary>
         /// After call of the concrete events calls:
         /// <br></br>- <see cref="OnShieldGain"/>
         /// <br></br>- <see cref="OnHealthGain"/>
         /// <br></br>- <see cref="OnMortalityGain"/>
         /// </summary>
-        void OnRecoveryReceive(in CombatEntity performer, in CombatEntity target);
-        void OnKnockHeal(in CombatEntity performer, in CombatEntity target, in int currentTick, in int amount);
+        void OnRecoveryReceive(CombatEntity performer, CombatEntity target);
+        void OnKnockHeal(CombatPerformedEntities entities, int currentTick, int amount);
+    }
 
+    public interface IBuffDoneListener
+    {
+        void OnBuffDone(CombatPerformedEntities entities, SBuffEffect buff, float value);
     }
 }

@@ -54,9 +54,9 @@ namespace CombatSystem._Core
 
 
                 TickInitiative(stats, out var entityInitiativeAmount);
-                UtilsCombatStats.CalculateTempoPercent(entityInitiativeAmount, out var initiativePercent);
+                var tempoValues = UtilsCombatStats.CalculateTempoValues(entity, entityInitiativeAmount);
 
-                eventsHolder.OnEntityTick(entity, entityInitiativeAmount, initiativePercent);
+                eventsHolder.OnEntityTick(in tempoValues);
 
                 bool thresholdPassed = UtilsTempo.IsInitiativeTrigger(in entity);
                 if (!thresholdPassed) return;

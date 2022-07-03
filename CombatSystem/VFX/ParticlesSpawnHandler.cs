@@ -3,10 +3,8 @@ using CombatSystem.Entity;
 using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Stats;
-using CombatSystem.Team;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using Utils;
 
 namespace CombatSystem.VFX
 {
@@ -41,10 +39,15 @@ namespace CombatSystem.VFX
             OnCombatSecondaryEffectPerform(performer,target, in values);
         }
 
+        private const float LocalPositionCenterOffset = 0.5f;
+        private const float LocalScaleOffset = .2f; 
         private void SpawnParticles(CombatEntity target, GameObject particles)
         {
-            var targetTransform = target.Body.GetUIHoverHolder();
-            var particlesObject = Object.Instantiate(particles, targetTransform.position, Quaternion.identity);
+            var positions = target.Body.GetPositions();
+            var targetPosition = positions.PivotRootType;
+            var particlesObject = UtilsInstantiation.InstantiationTransformRandomness(
+                particles, targetPosition,
+                LocalPositionCenterOffset, LocalScaleOffset);
 
             CombatParticleDeSpawnHandler.HandleDeSpawnParticles(particlesObject);
         }
