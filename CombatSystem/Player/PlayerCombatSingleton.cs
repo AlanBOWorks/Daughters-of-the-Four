@@ -76,7 +76,7 @@ namespace CombatSystem.Player
         public static UUIHoverEntitiesHandler HoverEntitiesHandler { get; private set; }
 
 
-
+        public static bool IsInPauseMenu => CombatEscapeButtonHandler.IsInPause();
 
         public static void Injection(IPlayerCameraStructureRead<Camera> holder) => CamerasHolder = holder;
        

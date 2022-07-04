@@ -38,25 +38,25 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
-            OnCombatEffectPerform(performer,target,in values);
+            OnCombatEffectPerform(entities,in values);
         }
 
-        public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
-            OnCombatEffectPerform(performer,target,in values);
+            OnCombatEffectPerform(entities,in values);
         }
 
-        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
-            OnCombatEffectPerform(performer,target,in values);
+            OnCombatEffectPerform(entities,in values);
         }
 
 
-        public void OnCombatEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
-            EnQueue(in target, values);
+            EnQueue(entities.Target, values);
             if (_loopHandle.IsRunning) return;
             _loopHandle = Timing.RunCoroutine(_StartSpawningPopUps(), Segment.RealtimeUpdate);
         }
@@ -72,11 +72,11 @@ namespace CombatSystem.Player.UI
                 var targetTransform = queueElement.Key;
                 var popUpText = queueElement.Value;
 
-                Spawn(in targetTransform, in popUpText);
+                Spawn(targetTransform, in popUpText);
             }
         }
 
-        private void EnQueue(in CombatEntity target, in PerformEffectValues values)
+        private void EnQueue(CombatEntity target, in PerformEffectValues values)
         {
             var hoverDictionary = PlayerCombatSingleton.HoverEntitiesHandler.GetDictionary();
             if (!hoverDictionary.ContainsKey(target)) return;
@@ -88,7 +88,7 @@ namespace CombatSystem.Player.UI
             _popUpQueue.Enqueue(queueElement);
         }
 
-        private void Spawn(in RectTransform targetTransform, in PerformEffectValues queueValues)
+        private void Spawn(RectTransform targetTransform, in PerformEffectValues queueValues)
         {
             var popUpText = LocalizeEffects.LocalizeEffectDigitValue(in queueValues);
             var popUpElement = numberPrefab.Spawn(Vector3.zero, popUpText);

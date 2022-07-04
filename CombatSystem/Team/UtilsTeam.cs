@@ -17,7 +17,7 @@ namespace CombatSystem.Team
             return entityTeam.Contains(control);
         }
 
-        public static bool IsAllyEntity(in CombatEntity entity, in CombatTeam inTeam)
+        public static bool IsAllyEntity(CombatEntity entity, CombatTeam inTeam)
         {
             return inTeam.Contains(entity);
         }
@@ -596,7 +596,7 @@ namespace CombatSystem.Team
 
     public static class UtilsCombatTeam
     {
-        public static void SwitchStance(in CombatTeam team, in EnumTeam.Stance targetStance)
+        public static void SwitchStance(CombatTeam team, EnumTeam.Stance targetStance)
         {
             var fullStance = UtilsTeam.ParseStance(targetStance);
             SwitchStance(in team, in fullStance);

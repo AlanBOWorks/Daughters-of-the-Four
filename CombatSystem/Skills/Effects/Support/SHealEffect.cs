@@ -1,4 +1,5 @@
 using System;
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Localization;
 using CombatSystem.Stats;
@@ -16,24 +17,27 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => HealEffectSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Heal;
 
-        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, float effectValue)
         {
+            entities.Extract(out var performer, out var target);
             float healAmount = effectValue;
             var performerStats = performer.Stats;
             var targetStats = target.Stats;
 
-            UtilsStatsEffects.CalculateHealAmount(in performerStats, ref healAmount);
-            UtilsStatsEffects.CalculateReceiveHealAmount(in targetStats, ref healAmount);
-            DoHeal(in targetStats, in healAmount);
+            UtilsStatsEffects.CalculateHealAmount(performerStats, ref healAmount);
+            UtilsStatsEffects.CalculateReceiveHealAmount(targetStats, ref healAmount);
+            DoHeal(targetStats, healAmount);
 
             // EVENTS
-            performer.ProtectionDoneTracker.DoHealth(in target, in healAmount);
-            target.ProtectionReceiveTracker.DoHealth(in performer, in healAmount);
+            performer.ProtectionDoneTracker.DoHealth(target, healAmount);
+            target.ProtectionReceiveTracker.DoHealth(performer, healAmount);
+
+            CombatSystemSingleton.EventsHolder.OnHealthGain(performer,target, healAmount);
         }
 
-        private static void DoHeal(in CombatStats target, in float healAmount)
+        private static void DoHeal(CombatStats target, float healAmount)
         {
-           UtilsCombatEffect.DoHealTo(in target, in healAmount);
+           UtilsCombatEffect.DoHealTo(target, healAmount);
         }
     }
 }

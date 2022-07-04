@@ -78,16 +78,4 @@ namespace CombatSystem.Skills
             Accumulation = accumulation;
         }
     }
-
-    public readonly struct CombatPerformedEntities
-    {
-        public readonly CombatEntity Performer;
-        public readonly CombatEntity Target;
-
-        public CombatPerformedEntities(CombatEntity performer, CombatEntity target)
-        {
-            Performer = performer;
-            Target = target;
-        }
-    }
 }

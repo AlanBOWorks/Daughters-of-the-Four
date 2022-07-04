@@ -255,6 +255,24 @@ namespace CombatSystem.Entity
 
     }
 
+    public readonly struct EntityPairInteraction
+    {
+        public readonly CombatEntity Performer;
+        public readonly CombatEntity Target;
+
+        public EntityPairInteraction(CombatEntity performer, CombatEntity target)
+        {
+            Performer = performer;
+            Target = target;
+        }
+
+        public void Extract(out CombatEntity performer, out CombatEntity target)
+        {
+            performer = Performer;
+            target = Target;
+        }
+    }
+
     public interface ICombatEntityProvider : ICombatEntityPreparation, ICombatEntityInfoHolder
     {
         GameObject GetVisualPrefab();

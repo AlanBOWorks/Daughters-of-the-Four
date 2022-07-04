@@ -44,14 +44,14 @@ namespace CombatSystem.Stats
             return effectValue * (debuffDifference);
         }
 
-        public static void CalculateDamageFromAttackAttribute(in CombatStats stats, ref float baseDamage)
+        public static void CalculateDamageFromAttackAttribute(CombatStats stats, ref float baseDamage)
         {
             UtilsStatsFormula.CalculateValue(in stats, EnumStats.OffensiveStatType.Attack, ref baseDamage);
 
             if (baseDamage < 0) baseDamage = 0;
         }
 
-        public static void CalculateDamageReduction(in CombatStats stats, ref float currentDamage)
+        public static void CalculateDamageReduction(CombatStats stats, ref float currentDamage)
         {
             UtilsStatsFormula.ExtractStats(in stats,
                 out float baseStats, out float buffStats, out float burstStats,
@@ -64,19 +64,19 @@ namespace CombatSystem.Stats
             if (currentDamage < 0) currentDamage = 0;
         }
 
-        public static void CalculateHealAmount(in CombatStats performerStats, ref float baseHeal)
+        public static void CalculateHealAmount(CombatStats performerStats, ref float baseHeal)
         {
             UtilsStatsFormula.CalculateValue(in performerStats, EnumStats.SupportStatType.Heal, ref baseHeal);
 
             if (baseHeal < 0) baseHeal = 0;
         }
 
-        public static void CalculateReceiveHealAmount(in CombatStats receiverStats, ref float currentHeal)
+        public static void CalculateReceiveHealAmount(CombatStats receiverStats, ref float currentHeal)
         {
-            CalculateHealAmount(in receiverStats, ref currentHeal);
+            CalculateHealAmount(receiverStats, ref currentHeal);
         }
 
-        public static void CalculateShieldsAmount(in CombatStats performerStats, ref float desiredShields)
+        public static void CalculateShieldsAmount(CombatStats performerStats, ref float desiredShields)
         {
             UtilsStatsFormula.ExtractStats(in performerStats,
                 out float baseStats, out float buffStats, out float burstStats,
@@ -88,7 +88,7 @@ namespace CombatSystem.Stats
 
         private const float VanillaMaxShieldAmount = 2;
 
-        public static void ClampShieldsAmount(in CombatStats targetStats,
+        public static void ClampShieldsAmount(CombatStats targetStats,
             ref float addingShields)
         {
             float statsModifier = UtilsStatsFormula.CalculateStatsSum(in targetStats, EnumStats.SupportStatType.Shielding);

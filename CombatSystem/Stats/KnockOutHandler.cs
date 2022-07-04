@@ -113,7 +113,7 @@ namespace CombatSystem.Stats
             var target = _knockOutEntities[index];
             _knockOutValues[index] = currentTick;
 
-            eventsHolder.OnKnockHeal(new CombatPerformedEntities(performer,target), currentTick, increment);
+            eventsHolder.OnKnockHeal(new EntityPairInteraction(performer,target), currentTick, increment);
         }
 
         private void DoHealKnockOut(CombatEntity performer, int index, int currentTick, int increment)

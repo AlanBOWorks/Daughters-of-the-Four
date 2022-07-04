@@ -17,9 +17,10 @@ namespace CombatSystem.Skills.Effects
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Guarding;
 
 
-        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, float effectValue)
         {
-            performer.Team.GuardHandler.SetGuarder(in target);
+            entities.Extract(out var performer, out var target);
+            performer.Team.GuardHandler.SetGuarder(target);
         }
     }
 }

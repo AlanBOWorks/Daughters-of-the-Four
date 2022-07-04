@@ -124,16 +124,16 @@ namespace CombatSystem.Skills.Effects
                     DoEffectOnTarget();
                     void DoEffectOnTarget()
                     {
-
-                        preset.DoEffect(performer, effectTarget, effectValue);
+                        var entities = new EntityPairInteraction(performer,target);
+                        preset.DoEffect(entities, effectValue);
 
                         if (isFirstEffect)
                         {
-                            eventsHolder.OnCombatPrimaryEffectPerform(performer, effectTarget, in values);
+                            eventsHolder.OnCombatPrimaryEffectPerform(entities, in values);
                             isFirstEffect = false;
                         }
                         else
-                            eventsHolder.OnCombatSecondaryEffectPerform(performer, effectTarget, in values);
+                            eventsHolder.OnCombatSecondaryEffectPerform(entities, in values);
 
                     }
                 }
@@ -148,7 +148,8 @@ namespace CombatSystem.Skills.Effects
 
     public static class UtilsCombatEffect
     {
-        public static void DoDamageTo(in CombatEntity target, in CombatEntity performer, in float damage, bool eventCallback = true)
+        public static void DoDamageTo(CombatEntity target, CombatEntity performer, in float damage,
+            bool eventCallback = true)
         {
             if( damage <= 0) return;
 
@@ -165,14 +166,14 @@ namespace CombatSystem.Skills.Effects
 
 
             IDamageableStats<float> healthStats = target.Stats;
-            DoDamageToShields(in healthStats, in damage, out bool didDamageForBreakMethod);
+            DoDamageToShields(healthStats, damage, out bool didDamageForBreakMethod);
 
 
             if (didDamageForBreakMethod)
             {
                 float shieldBreaks = 1;
-                target.DamageReceiveTracker.DoShields(in performer, in shieldBreaks); //by design shields are lost in ones
-                performer.DamageDoneTracker.DoShields(in target, in shieldBreaks);
+                target.DamageReceiveTracker.DoShields(performer, shieldBreaks); //by design shields are lost in ones
+                performer.DamageDoneTracker.DoShields(target, shieldBreaks);
 
                 if (eventCallback)
                     eventsHolder.OnShieldLost(performer, target, shieldBreaks);
@@ -181,11 +182,11 @@ namespace CombatSystem.Skills.Effects
             }
 
 
-            DoDamageToHealth(in healthStats, in damage, out didDamageForBreakMethod, out var healthLost);
+            DoDamageToHealth(healthStats, damage, out didDamageForBreakMethod, out var healthLost);
             if (didDamageForBreakMethod)
             {
-                target.DamageReceiveTracker.DoHealth(in performer, in damage);
-                performer.DamageDoneTracker.DoHealth(in target, in damage);
+                target.DamageReceiveTracker.DoHealth(performer, damage);
+                performer.DamageDoneTracker.DoHealth(target, damage);
 
                 if (eventCallback)
                     eventsHolder.OnHealthLost(performer, target, damage);
@@ -194,7 +195,7 @@ namespace CombatSystem.Skills.Effects
             }
 
 
-            DoDamageToMortality(in healthStats, in damage, out var mortalityLost);
+            DoDamageToMortality(healthStats, damage, out var mortalityLost);
             target.DamageReceiveTracker.DoMortality(in performer, in damage);
             performer.DamageDoneTracker.DoMortality(in target, in damage);
 
@@ -202,7 +203,7 @@ namespace CombatSystem.Skills.Effects
                 eventsHolder.OnMortalityLost(performer, target, damage);
         }
 
-        public static void DoDamageToShields(in IDamageableStats<float> target, in float damage, 
+        public static void DoDamageToShields(IDamageableStats<float> target, float damage,
             out bool shieldBreak)
         {
             float targetShields = target.CurrentShields;
@@ -216,7 +217,7 @@ namespace CombatSystem.Skills.Effects
             target.CurrentShields = targetShields;
         }
 
-        public static void DoDamageToHealth(in IDamageableStats<float> target, in float damage, 
+        public static void DoDamageToHealth(IDamageableStats<float> target, float damage,
             out bool healthDamage,
             out bool healthLost)
         {
@@ -244,7 +245,7 @@ namespace CombatSystem.Skills.Effects
             target.CurrentHealth = targetHealth;
         }
 
-        public static void DoDamageToMortality(in IDamageableStats<float> target, in float damage,
+        public static void DoDamageToMortality(IDamageableStats<float> target, float damage,
             out bool mortalityLost)
         {
             if (damage <= 0) //damage check is just a safeCheck
@@ -264,10 +265,10 @@ namespace CombatSystem.Skills.Effects
             mortalityLost = true;
         }
 
-        public static void DoHealTo(in CombatStats target,in float healAmount)
+        public static void DoHealTo(CombatStats target, float healAmount)
         {
             float targetHealth = target.CurrentHealth + healAmount;
-            DoOverrideHealth(in target, ref targetHealth);
+            DoOverrideHealth(target, ref targetHealth);
         }
 
         public static void DoHealToPercent(in CombatStats target, in float healPercent)
@@ -275,10 +276,10 @@ namespace CombatSystem.Skills.Effects
             if(healPercent < 0) return;
             float targetHealth = UtilsStatsFormula.CalculateMaxHealth(target) * (1 + healPercent);
 
-            DoOverrideHealth(in target, ref targetHealth);
+            DoOverrideHealth(target, ref targetHealth);
         }
 
-        private static void DoOverrideHealth(in CombatStats target, ref float targetHealth, in float maxHealth)
+        private static void DoOverrideHealth(CombatStats target, ref float targetHealth, float maxHealth)
         {
             if (targetHealth >= maxHealth)
             {
@@ -289,10 +290,10 @@ namespace CombatSystem.Skills.Effects
 
             target.CurrentHealth = targetHealth;
         }
-        private static void DoOverrideHealth(in CombatStats target, ref float targetHealth)
+        private static void DoOverrideHealth(CombatStats target, ref float targetHealth)
         {
             float maxHealth = UtilsStatsFormula.CalculateMaxHealth(target);
-            DoOverrideHealth(in target, ref targetHealth, in maxHealth);
+            DoOverrideHealth(target, ref targetHealth, maxHealth);
         }
     }
 

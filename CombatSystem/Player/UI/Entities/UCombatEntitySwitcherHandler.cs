@@ -218,6 +218,7 @@ namespace CombatSystem.Player.UI
         private void DoPerformSwitchShortcut(InputAction.CallbackContext context)
         {
             if(!enabled) return;
+            if(PlayerCombatSingleton.IsInPauseMenu) return;
             PlayerCombatSingleton.PerformerSwitcher.DoPerformNextEntity();
         }
 

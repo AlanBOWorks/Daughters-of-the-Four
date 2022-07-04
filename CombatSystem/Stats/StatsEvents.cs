@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
@@ -59,11 +60,12 @@ namespace CombatSystem.Stats
         /// <br></br>- <see cref="OnMortalityGain"/>
         /// </summary>
         void OnRecoveryReceive(CombatEntity performer, CombatEntity target);
-        void OnKnockHeal(CombatPerformedEntities entities, int currentTick, int amount);
+        void OnKnockHeal(EntityPairInteraction entities, int currentTick, int amount);
     }
 
-    public interface IBuffDoneListener
+    public interface IStatsChangeListener
     {
-        void OnBuffDone(CombatPerformedEntities entities, SBuffEffect buff, float value);
+        void OnBuffDone(EntityPairInteraction entities, IBuffEffect buff, float effectValue);
+        void OnDeBuffDone(EntityPairInteraction entities, IDeBuffEffect deBuff, float effectValue);
     }
 }

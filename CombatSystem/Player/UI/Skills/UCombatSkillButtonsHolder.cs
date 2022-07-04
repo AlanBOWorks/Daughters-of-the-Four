@@ -332,6 +332,8 @@ namespace CombatSystem.Player.UI
 
         public void DoSkillSelect(CombatSkill skill)
         {
+            if(PlayerCombatSingleton.IsInPauseMenu) return;
+
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.OnSkillSelect(skill);
             DoSkillSwitch(skill, _currentSelectedSkill);

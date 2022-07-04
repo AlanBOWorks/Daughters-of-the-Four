@@ -36,10 +36,11 @@ namespace CombatSystem.Skills.Effects
             _effectTag = GetControlName().ToUpper() + "_" + EffectPrefix;
         }
 
-        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, float effectValue)
         {
+            entities.Extract(out var performer, out var target);
             var targetTeam = target.Team;
-            bool isAlly = UtilsTeam.IsAllyEntity(in performer, in targetTeam);
+            bool isAlly = UtilsTeam.IsAllyEntity(entities.Performer, targetTeam);
             if (!isAlly)
             {
                 //todo make enemy Control variation

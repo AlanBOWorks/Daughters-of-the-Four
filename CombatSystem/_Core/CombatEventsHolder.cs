@@ -357,22 +357,22 @@ namespace CombatSystem._Core
                 eventsHolder.OnCombatSkillPerform(in values);
         }
 
-        public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnCombatPrimaryEffectPerform(performer,target,in values);
+                eventsHolder.OnCombatPrimaryEffectPerform(entities,in values);
         }
 
-        public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnCombatSecondaryEffectPerform(performer,target,in values);
+                eventsHolder.OnCombatSecondaryEffectPerform(entities,in values);
         }
 
-        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnCombatVanguardEffectPerform(performer,target,in values);
+                eventsHolder.OnCombatVanguardEffectPerform(entities,in values);
         }
 
         public void OnCombatSkillFinish(CombatEntity performer)
@@ -493,7 +493,7 @@ namespace CombatSystem._Core
 
         }
 
-        public void OnKnockHeal(CombatPerformedEntities entities, int currentAmount, int amount)
+        public void OnKnockHeal(EntityPairInteraction entities, int currentAmount, int amount)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnKnockHeal(entities,currentAmount, amount);
@@ -501,10 +501,16 @@ namespace CombatSystem._Core
         }
 
 
-        public void OnBuffDone(CombatPerformedEntities entities, SBuffEffect buff, float value)
+        public void OnBuffDone(EntityPairInteraction entities, IBuffEffect buff, float effectValue)
         {
             foreach (ICombatEventsHolder eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnBuffDone(entities, buff, value);
+                eventsHolder.OnBuffDone(entities, buff, effectValue);
+        }
+
+        public void OnDeBuffDone(EntityPairInteraction entities, IDeBuffEffect deBuff, float effectValue)
+        {
+            foreach (ICombatEventsHolder eventsHolder in _mainEventsEnumerable)
+                eventsHolder.OnDeBuffDone(entities, deBuff, effectValue);
         }
 
 
@@ -673,7 +679,7 @@ namespace CombatSystem._Core
             _vitalityChangeListeners = new HashSet<IVitalityChangeListener>();
 
             _recoveryDoneListeners = new HashSet<IRecoveryDoneListener>();
-            _buffDoneListeners = new HashSet<IBuffDoneListener>();
+            _statsChangeListeners = new HashSet<IStatsChangeListener>();
         }
 
 
@@ -698,7 +704,7 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private readonly ICollection<IRecoveryDoneListener> _recoveryDoneListeners;
         [ShowInInspector]
-        private readonly ICollection<IBuffDoneListener> _buffDoneListeners;
+        private readonly ICollection<IStatsChangeListener> _statsChangeListeners;
 
 
         public override void Subscribe(ICombatEventListener listener)
@@ -730,8 +736,8 @@ namespace CombatSystem._Core
             
             if (listener is IRecoveryDoneListener recoveryDoneListener)
                 _recoveryDoneListeners.Add(recoveryDoneListener);
-            if(listener is IBuffDoneListener buffDoneListener)
-                _buffDoneListeners.Add(buffDoneListener);
+            if(listener is IStatsChangeListener buffDoneListener)
+                _statsChangeListeners.Add(buffDoneListener);
         }
 
         public override void UnSubscribe(ICombatEventListener listener)
@@ -761,8 +767,8 @@ namespace CombatSystem._Core
 
             if (listener is IRecoveryDoneListener recoveryDoneListener)
                 _recoveryDoneListeners.Remove(recoveryDoneListener);
-            if (listener is IBuffDoneListener buffDoneListener)
-                _buffDoneListeners.Add(buffDoneListener);
+            if (listener is IStatsChangeListener buffDoneListener)
+                _statsChangeListeners.Add(buffDoneListener);
 
         }
 
@@ -941,7 +947,7 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnKnockHeal(CombatPerformedEntities entities, int currentTick, int amount)
+        public void OnKnockHeal(EntityPairInteraction entities, int currentTick, int amount)
         {
             foreach (var listener in _recoveryDoneListeners)
             {
@@ -949,11 +955,19 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnBuffDone(CombatPerformedEntities entities, SBuffEffect buff, float value)
+        public void OnBuffDone(EntityPairInteraction entities, IBuffEffect buff, float effectValue)
         {
-            foreach (var listener in _buffDoneListeners)
+            foreach (var listener in _statsChangeListeners)
             {
-                listener.OnBuffDone(entities,buff,value);
+                listener.OnBuffDone(entities,buff,effectValue);
+            }
+        }
+
+        public void OnDeBuffDone(EntityPairInteraction entities, IDeBuffEffect deBuff, float effectValue)
+        {
+            foreach (var listener in _statsChangeListeners)
+            {
+                listener.OnDeBuffDone(entities,deBuff,effectValue);
             }
         }
     }
@@ -1229,28 +1243,28 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
             foreach (var listener in _effectUsageListeners)
             {
-                listener.OnCombatPrimaryEffectPerform(performer,target,in values);
+                listener.OnCombatPrimaryEffectPerform(entities,in values);
             }
         }
 
-        public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
             foreach (var listener in _effectUsageListeners)
             {
-                listener.OnCombatSecondaryEffectPerform(performer, target, in values);
+                listener.OnCombatSecondaryEffectPerform(entities, in values);
             }
         }
 
-        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target,
+        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities,
             in PerformEffectValues values)
         {
             foreach (var listener in _effectUsageListeners)
             {
-                listener.OnCombatVanguardEffectPerform(performer,target,in values);
+                listener.OnCombatVanguardEffectPerform(entities,in values);
             }
         }
 
@@ -1342,7 +1356,7 @@ namespace CombatSystem._Core
         ICombatPreparationListener, ICombatStatesListener,
         ICombatEntityExistenceListener, 
         IDamageDoneListener, IVitalityChangeListener, IRecoveryDoneListener,
-        IBuffDoneListener
+        IStatsChangeListener
     {
         void Subscribe(ICombatEventListener listener);
         void UnSubscribe(ICombatEventListener listener);

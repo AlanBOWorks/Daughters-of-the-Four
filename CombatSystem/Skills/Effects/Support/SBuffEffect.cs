@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Localization;
@@ -7,7 +8,7 @@ using Utils;
 
 namespace CombatSystem.Skills.Effects
 {
-    public abstract class SBuffEffect : SEffect, ISupportEffect
+    public abstract class SBuffEffect : SEffect, IBuffEffect
     {
         private const string BuffPrefix = EffectTags.BuffEffectName;
         private const string BurstPrefix = EffectTags.BurstEffectName;
@@ -25,8 +26,9 @@ namespace CombatSystem.Skills.Effects
             : EnumsEffect.ConcreteType.Buff;
 
 
-        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, float effectValue)
         {
+            entities.Extract(out var performer, out var target);
             var performerStats = performer.Stats;
             var targetStats = target.Stats;
             float bufferPower = UtilsStatsEffects.CalculateBuffPower(in performerStats);
@@ -37,8 +39,10 @@ namespace CombatSystem.Skills.Effects
                 : targetStats.BuffStats;
 
             DoBuff(bufferPower, receivePower, buffingStats, ref effectValue);
-            CombatSystemSingleton.EventsHolder.OnBuffDone(new CombatPerformedEntities(performer,target),this,  effectValue);
+            CombatSystemSingleton.EventsHolder.OnBuffDone(entities, this,  effectValue);
         }
+
+        public bool IsBurstEffect() => isBurst;
 
         protected abstract void DoBuff(float performerBuffPower, float targetBuffReceivePower,
             IBasicStats<float> buffingStats,

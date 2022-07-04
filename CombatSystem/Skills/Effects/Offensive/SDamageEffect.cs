@@ -16,13 +16,14 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => DamageSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.DamageType;
 
-        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, float effectValue)
         {
             float damage = effectValue;
+            entities.Extract(out var performer, out var target);
             var targetStats = target.Stats;
 
-            UtilsStatsEffects.CalculateDamageFromAttackAttribute(in performer.Stats, ref damage);
-            UtilsStatsEffects.CalculateDamageReduction(in targetStats,ref damage);
+            UtilsStatsEffects.CalculateDamageFromAttackAttribute(performer.Stats, ref damage);
+            UtilsStatsEffects.CalculateDamageReduction(targetStats,ref damage);
 
 
             if (damage <= 0)
@@ -31,7 +32,7 @@ namespace CombatSystem.Skills.Effects
             }
             else
             {
-                UtilsCombatEffect.DoDamageTo(in target, in performer, in damage);
+                UtilsCombatEffect.DoDamageTo(target, performer, in damage);
             }
         }
     }

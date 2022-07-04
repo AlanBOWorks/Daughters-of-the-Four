@@ -70,14 +70,14 @@ namespace CombatSystem.Skills
     public interface IEffectUsageListener : ICombatEventListener
     {
 
-        void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values);
+        void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values);
         /// <summary>
         /// Will be invoked for each [<see cref="IEffectPreset"/>] that the [<see cref="CombatSkill"/>] has;<br></br>
         /// For one call only use [<seealso cref="ISkillUsageListener.OnCombatSkillPerform"/>] better;
         /// </summary>
-        void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values);
+        void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values);
 
-        void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values);
+        void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in PerformEffectValues values);
 
 
     }

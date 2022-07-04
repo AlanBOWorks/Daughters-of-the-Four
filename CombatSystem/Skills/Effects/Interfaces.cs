@@ -14,13 +14,23 @@ namespace CombatSystem.Skills.Effects
 
     public interface IEffect : IEffectBasicInfo
     {
-        void DoEffect(CombatEntity performer, CombatEntity target, float effectValue);
+        void DoEffect(EntityPairInteraction entities, float effectValue);
 
     }
 
     public interface IOffensiveEffect : IEffect { }
     public interface ISupportEffect : IEffect { }
     public interface ITeamEffect : IEffect { }
+
+    public interface IDeBuffEffect : IOffensiveEffect
+    {
+        bool IsBurstEffect();
+    }
+
+    public interface IBuffEffect : ISupportEffect
+    {
+        bool IsBurstEffect();
+    }
 
 
     public interface IEffectBasicInfo

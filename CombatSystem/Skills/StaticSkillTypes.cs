@@ -113,8 +113,9 @@ namespace CombatSystem.Skills
             public Sprite GetIcon() => null;
             public GameObject GetSecondaryParticlesPrefab() => null;
 
-            public void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
+            public void DoEffect(EntityPairInteraction entities, float effectValue)
             {
+                entities.Extract(out var performer, out var target);
                 Debug.Log(EffectTag + $" - P[{performer.CombatCharacterName}] >> T[{target.CombatCharacterName}]");
             }
         }

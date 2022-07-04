@@ -21,16 +21,16 @@ namespace CombatSystem.Stats
         private readonly VitalityTrackerValues _perSequence;
 
 
-        public void DoShields(in CombatEntity entity, in float amount)
+        public void DoShields(CombatEntity entity, float amount)
         {
-            _perAction.DoShields(in entity, in amount);
-            _perSequence.DoShields(in entity,in amount);
+            _perAction.DoShields(entity, amount);
+            _perSequence.DoShields(entity,amount);
         }
 
-        public void DoHealth(in CombatEntity entity, in float amount)
+        public void DoHealth(CombatEntity entity, float amount)
         {
-            _perAction.DoHealth(in entity, in amount);
-            _perSequence.DoHealth(in entity, in amount);
+            _perAction.DoHealth(entity, amount);
+            _perSequence.DoHealth(entity, amount);
         }
 
         public void DoMortality(in CombatEntity entity, in float amount)
@@ -61,13 +61,13 @@ namespace CombatSystem.Stats
             _dictionary.Add(entity, new VitalityValuesTracker());
         }
 
-        public void DoShields(in CombatEntity entity, in float amount)
+        public void DoShields(CombatEntity entity, float amount)
         {
             HandleKey(in entity);
             var currentValues = _dictionary[entity];
             currentValues.InteractShields(in amount);
         }
-        public void DoHealth(in CombatEntity entity, in float amount)
+        public void DoHealth(CombatEntity entity, float amount)
         {
             HandleKey(in entity);
             var currentValues = _dictionary[entity];
@@ -247,8 +247,8 @@ namespace CombatSystem.Stats
 
     internal interface IDamageHandler
     {
-        void DoShields(in CombatEntity entity, in float amount);
-        void DoHealth(in CombatEntity entity, in float amount);
+        void DoShields(CombatEntity entity, float amount);
+        void DoHealth(CombatEntity entity, float amount);
         void DoMortality(in CombatEntity entity, in float amount);
     }
 }

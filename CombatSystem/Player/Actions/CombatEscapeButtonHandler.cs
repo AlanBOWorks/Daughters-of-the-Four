@@ -34,6 +34,8 @@ namespace CombatSystem.Player
         public IOverridePauseElement GetLastOverridePauseElement() => _lastOverridingElement;
         public IReadOnlyCollection<IOverridePauseElement> GetOverridePauseElements() => _onTopPauseElements;
 
+        public bool IsInPause() => _isPauseActive;
+
 
         private void OnCombatPause()
         {

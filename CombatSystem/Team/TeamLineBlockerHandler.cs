@@ -12,7 +12,7 @@ namespace CombatSystem.Team
 
         public bool IsGuarding() => _currentGuarder != null && _currentGuarder.CanBeTarget();
         public CombatEntity GetCurrentGuarder() => _currentGuarder;
-        public void SetGuarder(in CombatEntity guarder)
+        public void SetGuarder(CombatEntity guarder)
         {
             _currentGuarder = guarder;
         }

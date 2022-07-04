@@ -21,8 +21,8 @@ namespace CombatSystem.Skills.Effects
 
 
 
-        protected override void DoDeBuff(in float performerDeBuffPower, in float targetDeBuffResistance, in float effectValue,
-            in IBasicStats<float> buffingStats)
+        protected override void DoDeBuff(IBasicStats<float> buffingStats, float performerDeBuffPower,
+            float targetDeBuffResistance, ref float effectValue)
         {
             float buffingValue = UtilsStatsEffects.CalculateStatsDeBuffValue(
                 in performerDeBuffPower,

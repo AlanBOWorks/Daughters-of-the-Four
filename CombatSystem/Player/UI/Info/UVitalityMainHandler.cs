@@ -157,7 +157,7 @@ namespace CombatSystem.Player.UI.Info
             UpdateTargetVitality(target);
         }
 
-        public void OnKnockHeal(CombatPerformedEntities entities, int currentTick, int amount)
+        public void OnKnockHeal(EntityPairInteraction entities, int currentTick, int amount)
         {
             TickKnockOut(entities.Target, currentTick);
         }

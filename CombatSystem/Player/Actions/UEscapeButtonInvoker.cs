@@ -20,7 +20,7 @@ namespace CombatSystem.Player
         }
 
 
-        private void InvokeOnEscapeButtonPressed(InputAction.CallbackContext context)
+        private static void InvokeOnEscapeButtonPressed(InputAction.CallbackContext context)
         {
             var eventWrapper = PlayerCombatSingleton.CombatEscapeButtonHandler;
             eventWrapper.InvokeEscapeButtonAction();

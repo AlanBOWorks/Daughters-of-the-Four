@@ -13,12 +13,12 @@ namespace CombatSystem.VFX
     {
         [SerializeField] private SStatsPrefabsHolder particlesHolder;
 
-        public void OnCombatPrimaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
-            OnCombatSecondaryEffectPerform(performer,target,in values); //todo make it by animator
+            OnCombatSecondaryEffectPerform(entities,in values); //todo make it by animator
         }
 
-        public void OnCombatSecondaryEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
             var effect = values.Effect;
             var effectPrefab = effect.GetSecondaryParticlesPrefab();
@@ -31,12 +31,12 @@ namespace CombatSystem.VFX
 
             if(!effectPrefab) return;
 
-            SpawnParticles(target,effectPrefab);
+            SpawnParticles(entities.Target,effectPrefab);
         }
 
-        public void OnCombatVanguardEffectPerform(CombatEntity performer, CombatEntity target, in PerformEffectValues values)
+        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
         {
-            OnCombatSecondaryEffectPerform(performer,target, in values);
+            OnCombatSecondaryEffectPerform(entities, in values);
         }
 
         private const float LocalPositionCenterOffset = 0.5f;

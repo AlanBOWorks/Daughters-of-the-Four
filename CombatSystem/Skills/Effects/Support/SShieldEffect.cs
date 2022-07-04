@@ -16,31 +16,32 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => ShieldEffectSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Shielding;
 
-        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, float effectValue)
         {
+            entities.Extract(out var performer, out var target);
             float addingShields = effectValue;
             var targetStats = target.Stats;
 
-            UtilsStatsEffects.CalculateShieldsAmount(in performer.Stats, ref addingShields);
-            UtilsStatsEffects.ClampShieldsAmount(in targetStats, ref addingShields);
+            UtilsStatsEffects.CalculateShieldsAmount(performer.Stats, ref addingShields);
+            UtilsStatsEffects.ClampShieldsAmount(targetStats, ref addingShields);
 
-            DoShieldAddition(targetStats,in addingShields);
+            DoShieldAddition(targetStats,addingShields);
 
             // EVENTS
-            performer.ProtectionDoneTracker.DoShields(in target, in addingShields);
-            target.ProtectionReceiveTracker.DoShields(in performer, in addingShields);
+            performer.ProtectionDoneTracker.DoShields(target, addingShields);
+            target.ProtectionReceiveTracker.DoShields(performer, addingShields);
         }
 
 
-        private static void DoShieldAddition(IDamageableStats<float> target, in float addingShields)
+        private static void DoShieldAddition(IDamageableStats<float> target, float addingShields)
         {
-            if (addingShields <= 0)
+            if (addingShields > 0)
             {
-                //todo event of zero shields
+                target.CurrentShields += addingShields;
             }
             else
             {
-                target.CurrentShields += addingShields;
+                //todo event of zero shields
             }
         }
     }

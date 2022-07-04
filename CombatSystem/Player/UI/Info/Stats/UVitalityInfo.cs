@@ -17,6 +17,7 @@ namespace CombatSystem.Player.UI
 
         [Title("Elements")]
         [SerializeField] private TextMeshProUGUI entityNameText;
+        [InfoBox("Shield text parent will be deActivated", InfoMessageType.Warning)]
         [SerializeField] private TextMeshProUGUI shieldsText;
         [SerializeField] private VitalityInfoHolder healthInfoHolder = new VitalityInfoHolder();
         [SerializeField] private VitalityInfoHolder mortalityInfoHolder = new VitalityInfoHolder();
@@ -123,9 +124,28 @@ namespace CombatSystem.Player.UI
             UpdateMortality(0,0);
         }
 
+        private const string OverFlowShieldsText = "X"; 
         public void UpdateShields(float amount)
         {
-            shieldsText.text = amount.ToString(CultureInfo.InvariantCulture);
+            if (amount <= 0)
+            {
+                ToggleShieldsHolderActive(false);
+            }
+            else
+            {
+                ToggleShieldsHolderActive(true);
+                if (amount > 9)
+                {
+                    shieldsText.text = OverFlowShieldsText;
+
+                }
+                shieldsText.text = amount.ToString(CultureInfo.InvariantCulture);
+            }
+
+            void ToggleShieldsHolderActive(bool active)
+            {
+                shieldsText.transform.parent.gameObject.SetActive(active);
+            }
         }
 
         public void UpdateHealth(float amount, float max)

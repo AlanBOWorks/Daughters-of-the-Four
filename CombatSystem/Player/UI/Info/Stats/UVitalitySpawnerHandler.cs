@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
 using CombatSystem.Stats;
@@ -60,7 +61,7 @@ namespace CombatSystem.Player.UI
             UpdateTargetVitality(target);
         }
 
-        public void OnKnockHeal(CombatPerformedEntities entities, int currentTick, int amount)
+        public void OnKnockHeal(EntityPairInteraction entities, int currentTick, int amount)
         {
             TickKnockOut(entities.Target, currentTick);
         }

@@ -1,3 +1,4 @@
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Localization;
 using CombatSystem.Stats;
@@ -6,7 +7,7 @@ using Utils;
 
 namespace CombatSystem.Skills.Effects
 {
-    public abstract class SDeBuffEffect : SEffect, IOffensiveEffect
+    public abstract class SDeBuffEffect : SEffect, IDeBuffEffect
     {
 
         private const string DeBuffPrefix = EffectTags.DeBuffEffectName;
@@ -22,10 +23,14 @@ namespace CombatSystem.Skills.Effects
         protected string GetBuffPrefix() => (isBurst) ? DeBurstPrefix : DeBuffPrefix;
         public override string EffectSmallPrefix => (isBurst) ? DeBurstSmallPrefix : DeBuffSmallPrefix;
 
-        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, float effectValue)
         {
+            var performer = entities.Performer;
+            var target = entities.Target;
+
             var performerStats = performer.Stats;
             var targetStats = target.Stats;
+
             float debuffPower = UtilsStatsEffects.CalculateDeBuffPower(in performerStats);
             float debuffResistance = UtilsStatsEffects.CalculateDeBuffResistance(in targetStats);
 
@@ -33,14 +38,15 @@ namespace CombatSystem.Skills.Effects
                 ? UtilsStats.GetBurstStats(in targetStats, in performerStats) 
                 : targetStats.BuffStats;
 
-            DoDeBuff(in debuffPower, in debuffResistance, in effectValue, in debuffStats);
+            DoDeBuff(debuffStats, debuffPower, debuffResistance, ref effectValue);
+            CombatSystemSingleton.EventsHolder.OnDeBuffDone(entities,this,effectValue);
         }
 
-        protected abstract void DoDeBuff(in float performerDeBuffPower, in float targetDeBuffResistance,
-            in float effectValue,
-            in IBasicStats<float> buffingStats);
+        public bool IsBurstEffect() => isBurst;
 
-
+        protected abstract void DoDeBuff(IBasicStats<float> buffingStats, float performerDeBuffPower,
+            float targetDeBuffResistance,
+            ref float effectValue);
 
         protected string GenerateAssetName(in string statTypeName)
         {

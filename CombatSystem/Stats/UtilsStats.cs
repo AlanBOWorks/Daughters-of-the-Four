@@ -341,7 +341,7 @@ namespace CombatSystem.Stats
 
     public static class UtilsBuffStats
     {
-        public static void MasterBuffOffensive(IOffensiveStats<float> stats, in float percentValue)
+        public static void MasterBuffOffensive(IOffensiveStats<float> stats, float percentValue)
         {
             stats.AttackType += percentValue;
             stats.OverTimeType += percentValue;
@@ -349,7 +349,7 @@ namespace CombatSystem.Stats
             stats.FollowUpType += percentValue;
         }
 
-        public static void MasterBuffSupport(ISupportStats<float> stats, in float percentValue)
+        public static void MasterBuffSupport(ISupportStats<float> stats, float percentValue)
         {
             stats.HealType += percentValue;
             stats.ShieldingType += percentValue;
@@ -357,7 +357,7 @@ namespace CombatSystem.Stats
             stats.ReceiveBuffType += percentValue;
         }
 
-        public static void MasterBuffVitality(IVitalityStats<float> stats, in float percentValue)
+        public static void MasterBuffVitality(IVitalityStats<float> stats, float percentValue)
         {
             stats.DamageReductionType += percentValue;
             stats.DeBuffResistanceType += percentValue;
@@ -366,7 +366,7 @@ namespace CombatSystem.Stats
 
         private const float ActionAmountModifier = 10;
         private const float SpeedAmountModifier = 10;
-        public static void MasterBuffConcentration(IConcentrationStats<float> stats, in float percentValue)
+        public static void MasterBuffConcentration(IConcentrationStats<float> stats, float percentValue)
         {
             stats.ControlType += percentValue;
             stats.CriticalType += percentValue;

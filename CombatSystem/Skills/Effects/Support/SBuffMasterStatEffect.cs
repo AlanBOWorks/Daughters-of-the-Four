@@ -1,4 +1,5 @@
 using System;
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Localization;
 using CombatSystem.Stats;
@@ -10,7 +11,7 @@ namespace CombatSystem.Skills.Effects
 {
     [CreateAssetMenu(fileName = "N [Effect]",
         menuName = "Combat/Effect/Buff/MASTER", order = -10)]
-    public class SBuffMasterStatEffect : SEffect
+    public class SBuffMasterStatEffect : SEffect, IBuffEffect
     {
         [SerializeField] private EnumStats.MasterStatType type;
         private string _effectTag;
@@ -25,8 +26,9 @@ namespace CombatSystem.Skills.Effects
         }
         public override string EffectTag => _effectTag;
 
-        public override void DoEffect(CombatEntity performer, CombatEntity target, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, float effectValue)
         {
+            entities.Extract(out var performer, out var target);
             var performerStats = performer.Stats;
             var targetStats = target.Stats;
             float bufferPower = UtilsStatsEffects.CalculateBuffPower(in performerStats);
@@ -34,24 +36,27 @@ namespace CombatSystem.Skills.Effects
 
             float targetValue = effectValue * (bufferPower + receivePower);
 
-            DoBuff(in targetStats, in targetValue);
+            DoBuff(targetStats, targetValue);
+            CombatSystemSingleton.EventsHolder.OnBuffDone(entities,this, targetValue);
         }
 
-        private void DoBuff(in CombatStats stats, in float addingValue)
+        public bool IsBurstEffect() => false;
+
+        private void DoBuff(CombatStats stats, float addingValue)
         {
             switch (type)
             {
                 case EnumStats.MasterStatType.Offensive:
-                    UtilsBuffStats.MasterBuffOffensive(stats.BuffStats, in addingValue);
+                    UtilsBuffStats.MasterBuffOffensive(stats.BuffStats, addingValue);
                     break;
                 case EnumStats.MasterStatType.Support:
-                    UtilsBuffStats.MasterBuffSupport(stats.BuffStats, in addingValue);
+                    UtilsBuffStats.MasterBuffSupport(stats.BuffStats, addingValue);
                     break;
                 case EnumStats.MasterStatType.Vitality:
-                    UtilsBuffStats.MasterBuffVitality(stats.BuffStats, in addingValue);
+                    UtilsBuffStats.MasterBuffVitality(stats.BuffStats, addingValue);
                     break;
                 case EnumStats.MasterStatType.Concentration:
-                    UtilsBuffStats.MasterBuffConcentration(stats.BuffStats, in addingValue);
+                    UtilsBuffStats.MasterBuffConcentration(stats.BuffStats, addingValue);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
