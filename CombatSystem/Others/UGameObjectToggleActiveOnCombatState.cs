@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatSystem.Others
 {
-    public class UGameObjectToggleActiveOnCombatState : MonoBehaviour, ICombatStatesListener
+    public class UGameObjectToggleActiveOnCombatState : MonoBehaviour, ICombatStartListener, ICombatTerminationListener
     {
         private void Awake()
         {

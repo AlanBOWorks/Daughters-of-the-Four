@@ -12,7 +12,7 @@ namespace CombatSystem.Team
 {
     public sealed class CombatTeamControllersHandler : IOppositionTeamStructureRead<CombatTeamControllerBase>,
         ITempoControlStatesListener, ITempoControlStatesExtraListener,
-        ICombatStatesListener
+        ICombatStartListener, ICombatTerminationListener
     {
         [ShowInInspector, HorizontalGroup()]
         private CombatTeamControllerBase _playerTeamType;

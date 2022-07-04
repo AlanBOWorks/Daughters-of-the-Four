@@ -12,7 +12,7 @@ namespace CombatSystem.Player.UI
 {
     public sealed class UPerformerSelectionFeedback : MonoBehaviour, 
         IPlayerEntityListener,
-        ICombatStatesListener
+        ICombatTerminationListener
     {
         [SerializeField] private UCombatEntitySwitcherHandler switcherHandler;
         [SerializeField] private RectTransform focusIcon;
@@ -86,14 +86,6 @@ namespace CombatSystem.Player.UI
         }
 
         public void OnCombatQuit()
-        {
-        }
-
-        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
-        {
-        }
-
-        public void OnCombatStart()
         {
         }
     }

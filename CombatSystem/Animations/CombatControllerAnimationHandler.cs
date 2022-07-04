@@ -5,11 +5,13 @@ using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Team;
 using MEC;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Animations
 {
-    public sealed class CombatControllerAnimationHandler : ITempoEntityMainStatesListener, ICombatStatesListener,
+    public sealed class CombatControllerAnimationHandler : ITempoEntityMainStatesListener, 
+        ICombatStartListener, ICombatTerminationListener,
         ISkillUsageListener, IEffectUsageListener
     {
 
@@ -74,7 +76,9 @@ namespace CombatSystem.Animations
             body?.GetAnimator().PerformInitialCombatAnimation();
         }
 
+        [ShowInInspector]
         private CombatTeam _playerTeam;
+        [ShowInInspector]
         private CombatTeam _enemyTeam;
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {

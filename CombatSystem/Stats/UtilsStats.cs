@@ -87,7 +87,17 @@ namespace CombatSystem.Stats
             data.CriticalType = value;
         }
 
-
+        public static T GetElement<T>(EnumStats.MasterStatType type, IMainStatsRead<T> structure)
+        {
+            return type switch
+            {
+                EnumStats.MasterStatType.Offensive => structure.OffensiveStatType,
+                EnumStats.MasterStatType.Support => structure.SupportStatType,
+                EnumStats.MasterStatType.Vitality => structure.VitalityStatType,
+                EnumStats.MasterStatType.Concentration => structure.ConcentrationStatType,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
         public static T GetElement<T>(EnumStats.OffensiveStatType type, IOffensiveStatsRead<T> structure)
         {
             return type switch

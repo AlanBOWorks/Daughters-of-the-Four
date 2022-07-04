@@ -20,7 +20,7 @@ namespace CombatSystem.Team
     /// where T : [<seealso cref="ITeamElementSpawnListener{T}"/>] >>>><br></br>
     /// >>>> By adding [<seealso cref="ITeamElementSpawnListener{T}"/>] listeners will be called during elements spawning.
     /// </summary>
-    public abstract class UTeamElementSpawner<T> : MonoBehaviour, ICombatStatesListener
+    public abstract class UTeamElementSpawner<T> : MonoBehaviour, ICombatStartListener, ICombatTerminationListener
         where T: Object
 
     {

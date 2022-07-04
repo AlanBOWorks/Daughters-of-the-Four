@@ -54,7 +54,7 @@ namespace CombatSystem.Skills.Effects
             Guarding,
             ControlGain,
             Stance,
-            ControlBurst
+            ControlRemove
         }
 
     }

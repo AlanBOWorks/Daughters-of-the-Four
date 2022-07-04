@@ -10,7 +10,8 @@ using Utils;
 namespace CombatSystem.Player.UI
 {
     public class UTempoMainTickHandler : UTeamDualAlimentHandler<UTempoTrackerHolder>, 
-        ICombatStatesListener, ITempoEntityPercentListener
+        ICombatStartListener, ICombatTerminationListener,
+        ITempoEntityPercentListener
     {
         [SerializeField]
         private PlayerPrefabHolder playerPrefabs = new PlayerPrefabHolder();

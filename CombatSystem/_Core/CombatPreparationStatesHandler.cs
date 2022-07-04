@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CombatSystem._Core
 {
-    public sealed class CombatPreparationStatesHandler : ICombatPreparationListener, ICombatStatesListener
+    public sealed class CombatPreparationStatesHandler : ICombatPreparationListener, ICombatStartListener
     {
         public CombatPreparationStatesHandler(SystemCombatEventsHolder eventsHolder)
         {
@@ -42,18 +42,6 @@ namespace CombatSystem._Core
         {
         }
 
-        public void OnCombatEnd()
-        {
-        }
-
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-        }
-
         private static void CreateAliveReference()
         {
             var aliveReference = new GameObject("-- Combat System Alive Reference --");
@@ -78,7 +66,7 @@ namespace CombatSystem._Core
 
     /// <summary>
     /// The very first event call on combat preparation;<br></br>
-    /// [<seealso cref="ICombatStatesListener"/>] is called after this
+    /// [<seealso cref="ICombatStartListener"/>] is called after this
     /// </summary>
     public interface ICombatPreparationListener : ICombatEventListener
     {
@@ -92,7 +80,7 @@ namespace CombatSystem._Core
     /// The second step of combat preparation;<br></br>
     /// [<seealso cref="ICombatPreparationListener"/>] is called before this
     /// </summary>
-    public interface ICombatStatesListener : ICombatTerminationListener
+    public interface ICombatStartListener : ICombatEventListener
     {
         /// <summary>
         /// Is invoked after [<see cref="ICombatPreparationListener.OnCombatPrepares"/>]
@@ -108,8 +96,6 @@ namespace CombatSystem._Core
         void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam);
 
         void OnCombatStart();
-
-        
     }
 
     public interface ICombatTerminationListener : ICombatEventListener

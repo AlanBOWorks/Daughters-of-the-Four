@@ -14,7 +14,7 @@ namespace CombatSystem.Player
     
     internal sealed class CombatEscapeButtonHandler : 
         IEscapeButtonHandler,
-        ICombatStatesListener, 
+        ICombatStartListener, ICombatTerminationListener,
         ITempoControlStatesListener,
         ISkillSelectionListener
     {

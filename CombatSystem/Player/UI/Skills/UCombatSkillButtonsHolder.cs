@@ -17,7 +17,7 @@ namespace CombatSystem.Player.UI
         IPlayerEntityListener, 
 
         ITempoControlStatesListener, ITeamEventListener,
-        ISkillUsageListener, ICombatStatesListener,
+        ISkillUsageListener, ICombatTerminationListener,
         ISkillSelectionListener
     {
         [Title("References")] 
@@ -98,7 +98,7 @@ namespace CombatSystem.Player.UI
 
             
             playerEvents.SubscribeAsPlayerEvent(this);
-            playerEvents.ManualSubscribe(this as ICombatStatesListener);
+            playerEvents.ManualSubscribe(this as ICombatTerminationListener);
             playerEvents.DiscriminationEventsHolder.Subscribe(this);
         }
 
@@ -120,15 +120,6 @@ namespace CombatSystem.Player.UI
                     inputReference.action.performed -= button.OnInputPerformer;
                 }
             }
-        }
-
-
-        public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
-        {
-        }
-
-        public void OnCombatStart()
-        {
         }
 
         public void OnCombatEnd()
@@ -292,7 +283,7 @@ namespace CombatSystem.Player.UI
             ResetPoolSkillsToCurrent();
         }
 
-        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
+        public void OnControlChange(CombatTeam team, float phasedControl)
         {
         }
         private void ReturnSkillsToStack()

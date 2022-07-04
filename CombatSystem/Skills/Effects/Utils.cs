@@ -318,7 +318,7 @@ namespace CombatSystem.Skills.Effects
                 EnumsEffect.ConcreteType.Guarding => (theme.GuardingType ?? theme.TeamEffectType),
                 EnumsEffect.ConcreteType.ControlGain => (theme.ControlType ?? theme.TeamEffectType),
                 EnumsEffect.ConcreteType.Stance => (theme.StanceType ?? theme.TeamEffectType),
-                EnumsEffect.ConcreteType.ControlBurst => (theme.ControlBurstType ?? theme.TeamEffectType),
+                EnumsEffect.ConcreteType.ControlRemove => (theme.ControlBurstType ?? theme.TeamEffectType),
 
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
@@ -344,7 +344,7 @@ namespace CombatSystem.Skills.Effects
                 EnumsEffect.ConcreteType.Guarding => GetTeamIfNull(theme.GuardingType),
                 EnumsEffect.ConcreteType.ControlGain => GetTeamIfNull(theme.ControlType),
                 EnumsEffect.ConcreteType.Stance => GetTeamIfNull(theme.StanceType),
-                EnumsEffect.ConcreteType.ControlBurst => GetTeamIfNull(theme.ControlBurstType),
+                EnumsEffect.ConcreteType.ControlRemove => GetTeamIfNull(theme.ControlBurstType),
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
 

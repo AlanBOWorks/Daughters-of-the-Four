@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 namespace CombatSystem._Core
 {
     public sealed class CombatEntitiesTempoTicker :
-        ICombatStatesListener
+        ICombatStartListener, ICombatTerminationListener
     {
         public CombatEntitiesTempoTicker()
         {

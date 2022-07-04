@@ -13,7 +13,7 @@ namespace CombatSystem.Player.UI
     /// [<see cref="ICombatEntityExistenceListener"/>]'s events
     /// </summary>
     public abstract class UOnEntityCreatedSpawner<T> : MonoBehaviour, 
-        ICombatStatesListener,
+        ICombatStartListener, ICombatTerminationListener,
         ICombatPreparationListener,
         ICombatEntityExistenceListener
     where T : MonoBehaviour,IEntityExistenceElement<T>

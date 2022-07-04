@@ -12,7 +12,7 @@ using Utils;
 namespace CombatSystem.Player.UI.Info
 {
     public class UVitalityMainHandler : UTeamDualAlimentHandler<UVitalityInfo>,
-        ICombatStatesListener,
+        ICombatStartListener, ICombatTerminationListener,
         IVitalityChangeListener, IDamageDoneListener, IRecoveryDoneListener
 
     {

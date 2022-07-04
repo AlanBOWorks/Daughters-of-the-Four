@@ -39,7 +39,7 @@ namespace CombatSystem.Player
             discriminationEvents.Subscribe(PerformerSwitcher);
             
             CombatEscapeButtonHandler = new CombatEscapeButtonHandler();
-            playerEvents.ManualSubscribe((ICombatStatesListener) CombatEscapeButtonHandler);
+            playerEvents.ManualSubscribe((ICombatStartListener) CombatEscapeButtonHandler);
             playerEvents.SubscribeAsPlayerEvent(CombatEscapeButtonHandler);
             playerEvents.DiscriminationEventsHolder.Subscribe(CombatEscapeButtonHandler);
 

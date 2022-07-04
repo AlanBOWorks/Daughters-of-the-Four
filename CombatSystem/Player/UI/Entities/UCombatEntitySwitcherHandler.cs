@@ -13,7 +13,7 @@ using UnityEngine.UI;
 namespace CombatSystem.Player.UI
 {
     public class UCombatEntitySwitcherHandler : MonoBehaviour, 
-        ICombatStatesListener,
+        ICombatStartListener,
         ITempoControlStatesListener,
         ITempoEntityActionStatesListener,
         IPlayerEntityListener,
@@ -44,7 +44,7 @@ namespace CombatSystem.Player.UI
             _buttonsDictionary = new Dictionary<CombatEntity, UCombatEntitySwitchButton>();
 
             var playerCombatEvents = PlayerCombatSingleton.PlayerCombatEvents;
-            playerCombatEvents.ManualSubscribe(this as ICombatStatesListener);
+            playerCombatEvents.ManualSubscribe(this as ICombatStartListener);
             playerCombatEvents.ManualSubscribe(this as IPlayerEntityListener);
             playerCombatEvents.DiscriminationEventsHolder.Subscribe(this);
         }
@@ -169,18 +169,6 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnCombatEnd()
-        {
-            _buttonsDictionary.Clear();
-        }
-
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-        }
 
 
 

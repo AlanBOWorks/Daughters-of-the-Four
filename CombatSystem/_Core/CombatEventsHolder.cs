@@ -522,10 +522,10 @@ namespace CombatSystem._Core
 
         }
 
-        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
+        public void OnControlChange(CombatTeam team, float phasedControl)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnControlChange(team, phasedControl, isBurst);
+                eventsHolder.OnControlChange(team, phasedControl);
 
         }
 
@@ -670,11 +670,14 @@ namespace CombatSystem._Core
         protected CombatEventsHolder() : base()
         {
             _combatPreparationListeners = new HashSet<ICombatPreparationListener>();
+
             _combatTerminationListeners = new HashSet<ICombatTerminationListener>();
-            _combatStatesListeners = new HashSet<ICombatStatesListener>();
+            _combatStatesListeners = new HashSet<ICombatStartListener>();
+
             _entitiesExistenceListeners = new HashSet<ICombatEntityExistenceListener>();
             
             
+
             _damageDoneListeners = new HashSet<IDamageDoneListener>();
             _vitalityChangeListeners = new HashSet<IVitalityChangeListener>();
 
@@ -691,9 +694,12 @@ namespace CombatSystem._Core
         [ShowInInspector] 
         private readonly ICollection<ICombatTerminationListener> _combatTerminationListeners;
         [ShowInInspector] 
-        private readonly ICollection<ICombatStatesListener> _combatStatesListeners;
+        private readonly ICollection<ICombatStartListener> _combatStatesListeners;
+
         [ShowInInspector] 
         private readonly ICollection<ICombatEntityExistenceListener> _entitiesExistenceListeners;
+
+
 
         [ShowInInspector] 
         private readonly ICollection<IDamageDoneListener> _damageDoneListeners;
@@ -714,12 +720,10 @@ namespace CombatSystem._Core
                 _combatPreparationListeners.Add(preparationListener);
 
             if (listener is ICombatTerminationListener terminationListener)
-            {
                 _combatTerminationListeners.Add(terminationListener);
-                if (listener is ICombatStatesListener combatStatesListener)
-                    _combatStatesListeners.Add(combatStatesListener);
-            }
-           
+            if (listener is ICombatStartListener combatStatesListener)
+                _combatStatesListeners.Add(combatStatesListener);
+
 
 
 
@@ -746,12 +750,13 @@ namespace CombatSystem._Core
 
             if (listener is ICombatPreparationListener preparationListener)
                 _combatPreparationListeners.Remove(preparationListener);
+
             if (listener is ICombatTerminationListener terminationListener)
-            {
                 _combatTerminationListeners.Remove(terminationListener);
-                if (listener is ICombatStatesListener combatStatesListener)
-                    _combatStatesListeners.Remove(combatStatesListener);
-            }
+            if (listener is ICombatStartListener combatStatesListener)
+                _combatStatesListeners.Remove(combatStatesListener);
+
+
 
             if (listener is ITempoTickListener tickListener)
                 UnSubscribeTempo(tickListener);
@@ -776,17 +781,26 @@ namespace CombatSystem._Core
         protected abstract void SubscribeTempo(ITempoTickListener tickListener);
         protected abstract void UnSubscribeTempo(ITempoTickListener tickListener);
 
+        public void SubscribeForCombatPreparation(ICombatPreparationListener listener)
+            => ManualSubscribe(listener);
+        public void SubscribeForCombatStart(ICombatStartListener listener)
+            => ManualSubscribe(listener);
+        public void SubscribeForCombatEnd(ICombatTerminationListener listener)
+            => ManualSubscribe(listener);
 
         public void ManualSubscribe(ICombatPreparationListener preparationListener)
         {
             _combatPreparationListeners.Add(preparationListener);
         }
 
-        public void ManualSubscribe(ICombatStatesListener statesListener)
+        public void ManualSubscribe(ICombatStartListener startListener)
         {
-            _combatStatesListeners.Add(statesListener);
+            _combatStatesListeners.Add(startListener);
         }
-
+        public void ManualSubscribe(ICombatTerminationListener terminationListener)
+        {
+            _combatTerminationListeners.Add(terminationListener);
+        }
 
 
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
@@ -1284,11 +1298,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
+        public void OnControlChange(CombatTeam team, float phasedControl)
         {
             foreach (var listener in _teamEventListeners)
             {
-                listener.OnControlChange(team, phasedControl, isBurst);
+                listener.OnControlChange(team, phasedControl);
             }
         }
 
@@ -1353,7 +1367,7 @@ namespace CombatSystem._Core
     }
 
     public interface ICombatEventsHolder : ICombatEventsHolderBase,
-        ICombatPreparationListener, ICombatStatesListener,
+        ICombatPreparationListener, ICombatStartListener, ICombatTerminationListener,
         ICombatEntityExistenceListener, 
         IDamageDoneListener, IVitalityChangeListener, IRecoveryDoneListener,
         IStatsChangeListener

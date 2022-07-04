@@ -607,32 +607,16 @@ namespace CombatSystem.Team
             CombatSystemSingleton.EventsHolder.OnStanceChange(team, targetStance);
         }
 
-        public static void GainControl(in CombatTeam team, in float controlVariation)
+        public static void GainControl(CombatTeam team, float controlVariation)
         {
             var teamData = team.DataValues;
-            float controlAmount = teamData.NaturalControl + controlVariation;
+            float controlAmount = teamData.CurrentControl + controlVariation;
             controlAmount = Mathf.Clamp01(controlAmount);
-            teamData.NaturalControl = controlAmount;
-
-            var enemyTeam = team.EnemyTeam;
-            var enemyTeamData = enemyTeam.DataValues;
-            float enemyControl = 1-controlAmount; //By design: team vs enemy control goes in percent.
-            enemyTeamData.NaturalControl = enemyControl;
+            teamData.CurrentControl = controlAmount;
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnControlChange(team, controlVariation, false);
-            float enemyControlVariation = -controlVariation;
-            eventsHolder.OnControlChange(enemyTeam, enemyControlVariation, false);
+            eventsHolder.OnControlChange(team, controlVariation);;
         }
-
-        public static void BurstControl(in CombatTeam team, in float controlVariation)
-        {
-            team.DataValues.BurstControl += controlVariation;
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-            eventsHolder.OnControlChange(team, controlVariation, true);
-        }
-
-
     }
 
     public static class UtilsTeamMembers

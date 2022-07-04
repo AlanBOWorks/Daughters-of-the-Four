@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 namespace CombatSystem.Entity
 {
     public sealed class EntityPrefabsPoolHandler : IOppositionTeamStructureRead<ITeamFullStructureRead<Transform>>,
-        ICombatStatesListener
+        ICombatTerminationListener
     {
         [ShowInInspector,HorizontalGroup()]
         private readonly PrefabsHolder _playerTeamType;

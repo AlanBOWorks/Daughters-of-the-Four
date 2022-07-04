@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace CombatSystem._Core
 {
-    public sealed class TempoTicker : ICombatStatesListener
+    public sealed class TempoTicker : ICombatStartListener, ICombatTerminationListener
     {
         [ShowInInspector] 
         internal readonly HashSet<ITempoTickListener> TickListeners;

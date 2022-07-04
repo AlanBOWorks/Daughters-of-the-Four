@@ -433,11 +433,11 @@ namespace CombatSystem._Core
             Debug.Log($"On Stance Change: {teamName} >> {switchedStance}");
         }
 
-        public void OnControlChange(CombatTeam team, float phasedControl, bool isBurst)
+        public void OnControlChange(CombatTeam team, float phasedControl)
         {
             if (!ShowTeamValuesChangeLogs || !_teamValuesChangeLogs.OnControlChange) return;
             string teamName = team.IsPlayerTeam ? "PLAYER" : "ENEMY";
-            Debug.Log($"On Control Change: {teamName} >> {phasedControl} [Burst: {isBurst}]");
+            Debug.Log($"On Control Change: {teamName} >> {phasedControl}");
 
         }
     }

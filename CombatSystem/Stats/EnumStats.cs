@@ -30,7 +30,7 @@ namespace CombatSystem.Stats
             Death
         }
 
-
+        public const int MasterTypeCount = 4;
         public enum MasterStatType
         {
             Offensive,

@@ -14,22 +14,17 @@ namespace CombatSystem.Skills.Effects
         menuName = "Combat/Effect/Team/Control")]
     public class STeamControlEffect : SEffect, ITeamEffect
     {
-        [SerializeField] private bool isBurst;
         private string _effectTag;
 
-        public override EnumsEffect.ConcreteType EffectType => (isBurst)
-            ? EnumsEffect.ConcreteType.ControlBurst 
-            : EnumsEffect.ConcreteType.ControlGain;
+        public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.ControlGain;
 
-        private const string BurstName = EffectTags.BurstControlEffectName;
         private const string GainName = EffectTags.GainControlEffectName;
 
-        private string GetControlName() => isBurst ? BurstName : GainName;
+        private string GetControlName() => GainName;
         public override string EffectTag => _effectTag;
 
-        private const string BurstSmallPrefix = EffectTags.BurstControlEffectPrefix;
         private const string GainSmallPrefix = EffectTags.GainControlEffectPrefix;
-        public override string EffectSmallPrefix => isBurst ? BurstSmallPrefix : GainSmallPrefix;
+        public override string EffectSmallPrefix => GainSmallPrefix;
 
         private void OnEnable()
         {
@@ -40,20 +35,13 @@ namespace CombatSystem.Skills.Effects
         {
             entities.Extract(out var performer, out var target);
             var targetTeam = target.Team;
-            bool isAlly = UtilsTeam.IsAllyEntity(entities.Performer, targetTeam);
+            bool isAlly = UtilsTeam.IsAllyEntity(performer, targetTeam);
             if (!isAlly)
             {
                 //todo make enemy Control variation
             }
 
-            if (isBurst)
-            {
-                UtilsCombatTeam.BurstControl(in targetTeam,in effectValue);
-            }
-            else
-            {
-                UtilsCombatTeam.GainControl(in targetTeam, in effectValue);
-            }
+            UtilsCombatTeam.GainControl(targetTeam, effectValue);
         }
 
 
