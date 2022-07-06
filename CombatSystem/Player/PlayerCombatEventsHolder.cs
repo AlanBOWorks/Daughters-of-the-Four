@@ -4,6 +4,7 @@ using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Player.UI;
 using CombatSystem.Skills;
+using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace CombatSystem.Player
 {
     public sealed class PlayerCombatEventsHolder : ControllerCombatEventsHolder, ITempoTickListener, IDiscriminationEventsHolder,
         ICombatPauseListener,
-        IPlayerEntityListener,
+        IPlayerCombatEventListener,
 
         ISkillPointerListener, ISkillSelectionListener,
         ISkillTooltipListener,
@@ -25,7 +26,7 @@ namespace CombatSystem.Player
             combatEventsHolder.SubscribeEventsHandler(this);
 
             _pauseListeners = new HashSet<ICombatPauseListener>();
-            _playerEntityListeners = new HashSet<IPlayerEntityListener>();
+            _playerCombatEventListeners = new HashSet<IPlayerCombatEventListener>();
 
             _skillPointerListeners = new HashSet<ISkillPointerListener>();
             _skillSelectionListeners = new HashSet<ISkillSelectionListener>();
@@ -46,7 +47,7 @@ namespace CombatSystem.Player
         [ShowInInspector] 
         private readonly HashSet<ICombatPauseListener> _pauseListeners;
         [ShowInInspector]
-        private readonly HashSet<IPlayerEntityListener> _playerEntityListeners;
+        private readonly HashSet<IPlayerCombatEventListener> _playerCombatEventListeners;
 
         [ShowInInspector, TitleGroup("Skills")]
         private readonly HashSet<ISkillPointerListener> _skillPointerListeners;
@@ -73,7 +74,7 @@ namespace CombatSystem.Player
         
         /// <summary>
         /// Check and subscribe as a: 
-        /// <br></br>- <see cref="IPlayerEntityListener"/>
+        /// <br></br>- <see cref="IPlayerCombatEventListener"/>
         /// <br></br>- <see cref="ISkillPointerListener"/>
         /// <br></br>- <see cref="ISkillSelectionListener"/>
         /// <br></br>- <see cref="ITargetPointerListener"/>
@@ -85,8 +86,8 @@ namespace CombatSystem.Player
         {
             if (listener is ICombatPauseListener pauseListener)
                 _pauseListeners.Add(pauseListener);
-            if (listener is IPlayerEntityListener playerEntityListener)
-                _playerEntityListeners.Add(playerEntityListener);
+            if (listener is IPlayerCombatEventListener playerEntityListener)
+                _playerCombatEventListeners.Add(playerEntityListener);
 
             if (listener is ISkillPointerListener skillPointerListener)
                 _skillPointerListeners.Add(skillPointerListener);
@@ -113,8 +114,8 @@ namespace CombatSystem.Player
             if (listener is ICombatPauseListener pauseListener)
                 _pauseListeners.Remove(pauseListener);
 
-            if (listener is IPlayerEntityListener playerEntityListener)
-                _playerEntityListeners.Remove(playerEntityListener);
+            if (listener is IPlayerCombatEventListener playerEntityListener)
+                _playerCombatEventListeners.Remove(playerEntityListener);
 
             if (listener is ISkillPointerListener skillPointerListener)
                 _skillPointerListeners.Remove(skillPointerListener);
@@ -135,9 +136,9 @@ namespace CombatSystem.Player
         }
 
 
-        internal void ManualSubscribe(IPlayerEntityListener playerEntityListener)
+        internal void ManualSubscribe(IPlayerCombatEventListener playerCombatEventListener)
         {
-            _playerEntityListeners.Add(playerEntityListener);
+            _playerCombatEventListeners.Add(playerCombatEventListener);
         }
         internal void ManualSubscribe(ISkillPointerListener skillPointerListener)
         {
@@ -218,15 +219,19 @@ namespace CombatSystem.Player
 
         public void OnPerformerSwitch(CombatEntity performer)
         {
-            if(performer == null)
-                Debug.LogError("Entity Null");
-
-            foreach (var listener in _playerEntityListeners)
+            foreach (var listener in _playerCombatEventListeners)
             {
                 listener.OnPerformerSwitch(performer);
             }
         }
 
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
+            foreach (var listener in _playerCombatEventListeners)
+            {
+                listener.OnTeamStancePreviewSwitch(targetStance);
+            }   
+        }
 
 
         // SKILL Events

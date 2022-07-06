@@ -16,7 +16,7 @@ namespace CombatSystem.Player.UI
         ICombatStartListener,
         ITempoControlStatesListener,
         ITempoEntityActionStatesListener,
-        IPlayerEntityListener,
+        IPlayerCombatEventListener,
         ISwitchEntityShortcutCommandStructureRead<TextMeshProUGUI>
     {
         [Title("ShortCuts")]
@@ -45,7 +45,7 @@ namespace CombatSystem.Player.UI
 
             var playerCombatEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerCombatEvents.ManualSubscribe(this as ICombatStartListener);
-            playerCombatEvents.ManualSubscribe(this as IPlayerEntityListener);
+            playerCombatEvents.ManualSubscribe(this as IPlayerCombatEventListener);
             playerCombatEvents.DiscriminationEventsHolder.Subscribe(this);
         }
 
@@ -201,6 +201,11 @@ namespace CombatSystem.Player.UI
         public void OnPerformerSwitch(CombatEntity performer)
         {
             _currentPerformer = performer;
+        }
+
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
+            
         }
 
         private void DoPerformSwitchShortcut(InputAction.CallbackContext context)

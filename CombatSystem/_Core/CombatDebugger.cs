@@ -448,7 +448,7 @@ namespace CombatSystem._Core
         ICombatPauseListener,
         ISkillPointerListener, ISkillSelectionListener,
         ITargetPointerListener, ITargetSelectionListener, IHoverInteractionEffectTargetsListener,
-        IPlayerEntityListener
+        IPlayerCombatEventListener
     {
 
         public bool ShowPauseLogs = false;
@@ -626,6 +626,7 @@ namespace CombatSystem._Core
         private sealed class EntitiesLogs
         {
             public bool OnPerformerSwitch = true;
+            public bool OnStanceSwitch = true;
         }
         [ShowInInspector]
         private EntitiesLogs _entitiesLogs = new EntitiesLogs();
@@ -636,6 +637,11 @@ namespace CombatSystem._Core
             Debug.Log($"xxxx - PERFORMER: {performer.GetProviderEntityName()}");
         }
 
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
+            if(!ShowEntitiesLog || !_entitiesLogs.OnStanceSwitch) return;
+            Debug.Log($"Preview stance Switch: {targetStance}");
+        }
     }
 
 #endif

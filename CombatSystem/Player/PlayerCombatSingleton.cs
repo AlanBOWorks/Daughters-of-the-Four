@@ -1,10 +1,6 @@
-using System.Collections.Generic;
 using CombatSystem._Core;
-using CombatSystem.Entity;
 using CombatSystem.Player.Handlers;
 using CombatSystem.Player.UI;
-using CombatSystem.Team;
-using CombatSystem.VFX;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -37,6 +33,10 @@ namespace CombatSystem.Player
             PerformerSwitcher = new PlayerPerformerSwitcher();
             playerEvents.ManualSubscribe(PerformerSwitcher);
             discriminationEvents.Subscribe(PerformerSwitcher);
+
+            StanceSwitcher = new PlayerTeamStanceSwitcher();
+            playerEvents.SubscribeForCombatPreparation(StanceSwitcher);
+            discriminationEvents.Subscribe(StanceSwitcher);
             
             CombatEscapeButtonHandler = new CombatEscapeButtonHandler();
             playerEvents.ManualSubscribe((ICombatStartListener) CombatEscapeButtonHandler);
@@ -62,6 +62,7 @@ namespace CombatSystem.Player
         public static PlayerTeamController PlayerTeamController { get; private set; }
 
         public static readonly PlayerPerformerSwitcher PerformerSwitcher;
+        public static readonly PlayerTeamStanceSwitcher StanceSwitcher;
 
         [ShowInInspector]
         public static readonly UHoverSkillTargetingHandler HoverTargetingHelper;

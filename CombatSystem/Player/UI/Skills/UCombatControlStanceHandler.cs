@@ -1,5 +1,7 @@
 using System;
 using CombatSystem._Core;
+using CombatSystem.Entity;
+using CombatSystem.Player.Events;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -9,7 +11,7 @@ namespace CombatSystem.Player.UI.Skills
 {
     public sealed class UCombatControlStanceHandler : MonoBehaviour, 
         ICombatStartListener,
-        ITeamEventListener,
+        ITeamEventListener, IPlayerCombatEventListener,
 
         IStanceStructureRead<UCombatStanceButton>
     {
@@ -30,6 +32,7 @@ namespace CombatSystem.Player.UI.Skills
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.SubscribeForCombatStart(this);
+            playerEvents.SubscribeAsPlayerEvent(this);
             playerEvents.DiscriminationEventsHolder.Subscribe(this);
 
             HandleStanceInitializations();
@@ -57,19 +60,29 @@ namespace CombatSystem.Player.UI.Skills
         {
             if(!enabled) return;
 
-            CombatSystemSingleton.EventsHolder.OnStanceChange(CombatSystemSingleton.PlayerTeam, targetStance);
+            PlayerCombatSingleton.StanceSwitcher.DoSaveStance(targetStance);
         }
 
         private UCombatStanceButton _currentButton;
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
+
+        public void OnPerformerSwitch(CombatEntity performer)
         {
-            var targetButton = UtilsTeam.GetElement(switchedStance, this);
-            if(_currentButton == targetButton) return;
+        }
+
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
+            var targetButton = UtilsTeam.GetElement(targetStance, this);
+            if (_currentButton == targetButton) return;
 
             if (_currentButton != null) _currentButton.DeActivate();
 
             _currentButton = targetButton;
             _currentButton.DoActiveButton();
+        }
+
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
+        {
+           
         }
 
         public void OnControlChange(CombatTeam team, float phasedControl)

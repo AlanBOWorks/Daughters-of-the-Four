@@ -14,7 +14,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillButtonsHolder : MonoBehaviour, 
-        IPlayerEntityListener, 
+        IPlayerCombatEventListener, 
 
         ITempoControlStatesListener, ITeamEventListener,
         ISkillUsageListener, ICombatTerminationListener,
@@ -153,7 +153,7 @@ namespace CombatSystem.Player.UI
         {
             foreach (var activeButton in _activeButtons)
             {
-                activeButton.Value.DoShowDisabledButton();
+                activeButton.Value.DoDisabledButton(AnimationDuration);
             }
         }
 
@@ -186,72 +186,78 @@ namespace CombatSystem.Player.UI
 
         private CoroutineHandle _animationHandle;
         private const float DelayBetweenButtons = .12f;
-        private const float AnimationDuration = .2f;
+        private const float AnimationDuration = .24f;
+
+        private EnumTeam.StanceFull _currentStance;
         [Button,DisableInEditorMode]
 
         private void PoolEntitySkills(CombatEntity entity)
         {
             if(entity == null) return;
-            var entitySkills = entity.GetCurrentSkills();
-            var canAct = UtilsCombatStats.IsControlActive(entity);
+            var entitySkills = entity.GetStanceSkills(_currentStance);
+            var canAct = UtilsCombatStats.IsControlActive(entity) && UtilsTeam.IsEntityInStance(entity,_currentStance);
             HandlePool(entitySkills);
 
-            ShowSkillsAnimated();
+            ShowSkillsAnimated(canAct, true);
 
-            void ShowSkillsAnimated()
+            
+        }
+        private void ShowSkillsAnimated(bool canAct, bool doMoveAnimation)
+        {
+            Timing.KillCoroutines(_animationHandle);
+            _animationHandle = Timing.RunCoroutine(_ShowAll());
+            CombatSystemSingleton.LinkCoroutineToMaster(_animationHandle);
+            IEnumerator<float> _ShowAll()
             {
-                Timing.KillCoroutines(_animationHandle);
-                _animationHandle = Timing.RunCoroutine(_ShowAll());
-                CombatSystemSingleton.LinkCoroutineToMaster(_animationHandle);
-                IEnumerator<float> _ShowAll()
+                int index = 0;
+                yield return Timing.WaitForOneFrame;
+
+                foreach (var button in _activeButtons)
                 {
-                    int index = 0;
-                    Vector2 lastPoint = Vector2.zero;
+                    var buttonHolder = button.Value;
+                    yield return Timing.WaitForSeconds(DelayBetweenButtons);
 
-                    yield return Timing.WaitForOneFrame;
+                    ShowIcon(buttonHolder);
 
-                    foreach (var button in _activeButtons)
-                    {
-                        var buttonHolder = button.Value;
-                        yield return Timing.WaitForSeconds(DelayBetweenButtons);
-
-                        ShowIcon(buttonHolder);
-
-                        index++;
-                    }
-
-
-                    void ShowIcon(UCombatSkillButton buttonHolder)
-                    {
-                        Vector2 targetPoint = index * (buttonsSeparations + _buttonSizes);
-
-                        var buttonTransform = (RectTransform)buttonHolder.transform;
-
-                        buttonTransform.localPosition = lastPoint;
-                        buttonTransform.DOLocalMove(targetPoint, AnimationDuration);
-
-                        if(canAct)
-                            EnableButton(buttonHolder);
-                        else
-                            DisableButton(buttonHolder);
-
-                        lastPoint = targetPoint;
-                    }
-
+                    index++;
                 }
+
+
+                void ShowIcon(UCombatSkillButton buttonHolder)
+                {
+                    Vector2 targetPoint = index * (buttonsSeparations + _buttonSizes);
+
+                    var buttonTransform = buttonHolder.transform;
+
+                    if (doMoveAnimation)
+                    {
+                        DOTween.Kill(buttonTransform);
+                        buttonTransform.localPosition = Vector3.zero;
+                        buttonTransform.DOLocalMove(targetPoint, AnimationDuration);
+                    }
+                    else
+                        buttonTransform.localPosition = targetPoint;
+
+
+                    if (canAct)
+                        EnableButton(buttonHolder);
+                    else
+                        DisableButton(buttonHolder);
+                }
+
             }
         }
 
         private static void EnableButton(UCombatSkillButton buttonHolder)
         {
             buttonHolder.enabled = true;
-            buttonHolder.DoShowActiveButton();
+            buttonHolder.ActivateButton(AnimationDuration);
         }
 
         private static void DisableButton(UCombatSkillButton buttonHolder)
         {
             buttonHolder.enabled = true;
-            buttonHolder.DoShowDisabledButton();
+            buttonHolder.DoDisabledButton(AnimationDuration);
         }
 
         private static void HideButton(UCombatSkillButton buttonHolder)
@@ -277,15 +283,6 @@ namespace CombatSystem.Player.UI
         {
             DisableHolder();
         }
-
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
-        {
-            ResetPoolSkillsToCurrent();
-        }
-
-        public void OnControlChange(CombatTeam team, float phasedControl)
-        {
-        }
         private void ReturnSkillsToStack()
         {
             foreach (var button in _activeButtons)
@@ -301,29 +298,41 @@ namespace CombatSystem.Player.UI
             ReturnSkillsToStack();
             _currentControlEntity = null;
         }
-        private void ResetPoolSkillsToCurrent()
-        {
-            ReturnSkillsToStack();
-            PoolEntitySkills(_currentControlEntity);
-        }
+      
         
 
 
         public void SwitchControllingEntity(CombatEntity targetEntity)
         {
+            if (targetEntity == _currentControlEntity)
+            {
+                var canAct = UtilsCombatStats.IsControlActive(targetEntity);
+                ShowSkillsAnimated(canAct, false);
+                return;
+            }
+           
+            UpdateToEntity(targetEntity);
+        }
+
+        private void UpdateToEntity(CombatEntity targetEntity)
+        {
+
             if (_currentSelectedSkill != null)
             {
                 DeselectSkill(_currentSelectedSkill);
             }
 
             _currentControlEntity = targetEntity;
-            ResetPoolSkillsToCurrent();
+            ReturnSkillsToStack();
+            PoolEntitySkills(_currentControlEntity);
         }
 
 
         public void DoSkillSelect(CombatSkill skill)
         {
+            if (!enabled) return;
             if(PlayerCombatSingleton.IsInPauseMenu) return;
+
 
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.OnSkillSelect(skill);
@@ -332,9 +341,6 @@ namespace CombatSystem.Player.UI
 
         private void DoSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
-            if (!enabled)
-                return;
-
             if (skill == null)
                 return; //this prevents null skills and (_currentSelectedSkill = null) == skill check
 
@@ -429,5 +435,20 @@ namespace CombatSystem.Player.UI
             SwitchControllingEntity(performer);
         }
 
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
+            _currentStance = targetStance;
+            UpdateToEntity(_currentControlEntity);
+        }
+
+
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
+        {
+           
+        }
+
+        public void OnControlChange(CombatTeam team, float phasedControl)
+        {
+        }
     }
 }

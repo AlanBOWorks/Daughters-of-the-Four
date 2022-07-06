@@ -12,7 +12,7 @@ using UnityEngine;
 namespace CombatSystem.Player.UI
 {
     public class UFrontTargetButtonsHandler : MonoBehaviour, ITeamElementSpawnListener<UUIHoverEntity>, 
-        IPlayerEntityListener,ITempoControlStatesListener,
+        IPlayerCombatEventListener,ITempoControlStatesListener,
         ISkillSelectionListener, ISkillPointerListener,
         ITargetSelectionListener
     {
@@ -33,9 +33,17 @@ namespace CombatSystem.Player.UI
             // recursively those events; creating an infinite loop of calls
             // To solve it: manual subscription of ISKillSelection because this is its listening behaviour
             playerEventsHolder.ManualSubscribe(this as ISkillSelectionListener);
-            playerEventsHolder.ManualSubscribe(this as IPlayerEntityListener);
+            playerEventsHolder.ManualSubscribe(this as IPlayerCombatEventListener);
             playerEventsHolder.ManualSubscribe(this as ISkillPointerListener);
         }
+
+        private void DisableTargetHandling()
+        {
+            HideTargets();
+            _currentSkill = null;
+            _currentControl = null;
+        }
+
 
         public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntity> holder)
         {
@@ -66,6 +74,11 @@ namespace CombatSystem.Player.UI
         {
             _currentControl = performer;
             _currentSkill = null;
+        }
+
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
+            
         }
 
 
@@ -165,23 +178,23 @@ namespace CombatSystem.Player.UI
 
         public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
-            
+            _currentControl = firstControl;
         }
 
         public void OnAllActorsNoActions(CombatEntity lastActor)
         {
-            HideTargets();
+            DisableTargetHandling();
         }
-
-
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
-            HideTargets();
+            DisableTargetHandling();
         }
 
 
         public void OnSkillButtonHover(ICombatSkill skill)
         {
+            if(_currentControl == null) return;
+
             if(_currentSkill != null)
                 HideTargets();
             ShowTargets(skill);

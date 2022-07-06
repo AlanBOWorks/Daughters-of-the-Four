@@ -11,7 +11,7 @@ using UnityEngine.UI;
 namespace CombatSystem.Player.UI
 {
     public sealed class UPerformerSelectionFeedback : MonoBehaviour, 
-        IPlayerEntityListener,
+        IPlayerCombatEventListener,
         ICombatTerminationListener
     {
         [SerializeField] private UCombatEntitySwitcherHandler switcherHandler;
@@ -40,7 +40,11 @@ namespace CombatSystem.Player.UI
             var targetButton = buttons[performer];
             SwitchFocus(focusIcon,targetButton);
         }
-        
+
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
+        }
+
         public void OnSwitchButtonHover(Image onIcon)
         {
             hoverIcon.position = onIcon.transform.position;

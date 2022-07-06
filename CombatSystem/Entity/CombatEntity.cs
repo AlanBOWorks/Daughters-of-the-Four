@@ -142,6 +142,8 @@ namespace CombatSystem.Entity
         public IReadOnlyList<CombatSkill> GetCurrentSkills() 
             => _skillsHolder.GetCurrentSkills();
 
+        public IReadOnlyList<CombatSkill> GetStanceSkills(EnumTeam.StanceFull stance)
+            => UtilsTeam.GetElement(stance, _skillsHolder);
 
         // ----- Pseudo - EVENTS
         public void OnActionStart()

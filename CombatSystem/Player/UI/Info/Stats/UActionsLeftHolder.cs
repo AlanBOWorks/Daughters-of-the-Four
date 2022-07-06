@@ -14,7 +14,7 @@ namespace CombatSystem.Player.UI
 {
     public class UActionsLeftHolder : MonoBehaviour, 
         ITempoEntityActionStatesListener,
-        IPlayerEntityListener,
+        IPlayerCombatEventListener,
         ITempoControlStatesListener,
         ISkillSelectionListener, ISkillPointerListener
     {
@@ -94,10 +94,15 @@ namespace CombatSystem.Player.UI
                 : cost.ToString("00");
 
             actionsTooltipText.text = costText;
-        } public void OnPerformerSwitch(CombatEntity performer)
+        } 
+        
+        public void OnPerformerSwitch(CombatEntity performer)
         {
             _currentEntity = performer;
             UpdateInfoToCurrent();
+        }
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
         }
 
         private CombatSkill _selectedSkill;

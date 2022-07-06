@@ -10,7 +10,7 @@ namespace CombatSystem.Player
 {
     public sealed class PlayerTeamController : CombatTeamControllerBase,
         IOverridePauseElement,
-        IPlayerEntityListener, 
+        IPlayerCombatEventListener, 
 
         ITempoControlStatesExtraListener,
 
@@ -90,6 +90,11 @@ namespace CombatSystem.Player
         {
             _selectedPerformer = performer;
             HandleSkillCancel();
+        }
+
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
+            
         }
 
 

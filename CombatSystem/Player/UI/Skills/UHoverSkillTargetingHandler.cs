@@ -3,6 +3,7 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
+using CombatSystem.Team;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
@@ -10,7 +11,7 @@ namespace CombatSystem.Player.UI
     [RequireComponent(typeof(UUIHoverEntitiesHandler))]
     public sealed class UHoverSkillTargetingHandler : MonoBehaviour, 
         ITargetPointerListener,
-        IPlayerEntityListener, ISkillSelectionListener
+        IPlayerCombatEventListener, ISkillSelectionListener
     {
         private IReadOnlyDictionary<CombatEntity, UUIHoverEntity> _dictionary;
         private HashSet<CombatEntity> _activeMembers;
@@ -94,6 +95,11 @@ namespace CombatSystem.Player.UI
         {
             _currentPerformer = performer;
             _activeMembers.Clear();
+        }
+
+        public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
+        {
+            
         }
 
         public void OnSkillSelect(CombatSkill skill)

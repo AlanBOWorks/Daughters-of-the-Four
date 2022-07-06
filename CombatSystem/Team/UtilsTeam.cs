@@ -22,17 +22,17 @@ namespace CombatSystem.Team
             return inTeam.Contains(entity);
         }
 
-        public static bool IsPlayerTeam(in CombatTeam team)
+        public static bool IsPlayerTeam(CombatTeam team)
         {
             return team == CombatSystemSingleton.PlayerTeam;
         }
 
-        public static bool IsPlayerTeam(in CombatEntity entity)
+        public static bool IsPlayerTeam(CombatEntity entity)
         {
             return IsPlayerTeam(entity.Team);
         }
 
-        public static bool IsMainRole(in CombatEntity entity, in CombatTeam team)
+        public static bool IsMainRole(CombatEntity entity, CombatTeam team)
         {
             return team.IsMainRole(in entity);
 
@@ -40,22 +40,27 @@ namespace CombatSystem.Team
         public static bool IsMainRole(in CombatEntity entity)
         {
             var entityTeam = entity.Team;
-            return IsMainRole(in entity, in entityTeam);
+            return IsMainRole(entity, entityTeam);
         }
 
-        public static bool IsTrinityRole(in CombatEntity entity, in CombatTeam team)
+        public static bool IsTrinityRole(CombatEntity entity, CombatTeam team)
         {
             return team.IsTrinityRole(in entity);
         }
-        public static bool IsTrinityRole(in CombatEntity entity)
+        public static bool IsTrinityRole(CombatEntity entity)
         {
             var entityTeam = entity.Team;
-            return IsTrinityRole(in entity, in entityTeam);
+            return IsTrinityRole(entity, entityTeam);
         }
 
-        public static bool IsMainVanguard(in CombatEntity entity)
+        public static bool IsMainVanguard(CombatEntity entity)
         {
             return entity.ActiveRole == EnumTeam.ActiveRole.MainVanguard;
+        }
+
+        public static bool IsEntityInStance(CombatEntity entity, EnumTeam.StanceFull stance)
+        {
+            return entity.Team.DataValues.CurrentStance == stance;
         }
 
 
@@ -675,7 +680,7 @@ namespace CombatSystem.Team
 
             void HandleMember(CombatEntity member, bool canControlMember)
             {
-                bool isTrinity = UtilsTeam.IsTrinityRole(in member);
+                bool isTrinity = UtilsTeam.IsTrinityRole(member);
                 eventsHolder.OnEntityRequestSequence(member, canControlMember);
                 if (isTrinity)
                     eventsHolder.OnTrinityEntityRequestSequence(member, canControlMember);

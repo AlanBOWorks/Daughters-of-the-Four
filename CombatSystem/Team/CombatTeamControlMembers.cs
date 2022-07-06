@@ -52,7 +52,7 @@ namespace CombatSystem.Team
             }
 
             _allControllingMembers.Add(entity);
-            bool isTrinity = UtilsTeam.IsTrinityRole(in entity);
+            bool isTrinity = UtilsTeam.IsTrinityRole(entity);
             if(isTrinity)
                 _trinityControllingMembers.Add(entity);
             else 

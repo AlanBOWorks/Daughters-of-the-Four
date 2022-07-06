@@ -89,7 +89,7 @@ namespace CombatSystem.Skills
             entity.OnSequenceFinish();
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
-            var isTrinityRole = UtilsTeam.IsTrinityRole(in entity);
+            var isTrinityRole = UtilsTeam.IsTrinityRole(entity);
             if (isTrinityRole)
                 eventsHolder.OnTrinityEntityFinishSequence(entity);
             else

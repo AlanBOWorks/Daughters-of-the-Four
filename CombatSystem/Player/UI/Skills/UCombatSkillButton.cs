@@ -4,6 +4,7 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
+using DG.Tweening;
 using MEC;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -31,8 +32,6 @@ namespace CombatSystem.Player.UI
 
         public RectTransform GetGroupHolder() => groupHolder;
 
-        private CoroutineHandle _fadeHandle;
-        private const float FadeSpeed = 8f;
 
         private UCombatSkillButtonsHolder _holder;
 
@@ -40,6 +39,7 @@ namespace CombatSystem.Player.UI
         private CombatSkill _skill;
 
         private bool _canSubmitSkill;
+
 
         internal void Injection(UCombatSkillButtonsHolder holder)
         {
@@ -79,61 +79,37 @@ namespace CombatSystem.Player.UI
             costText.text = skillCostString;
         }
 
-        private void OnDestroy()
+        private void AnimateButton(float animationDuration, float targetAlpha)
         {
-            Timing.KillCoroutines(_fadeHandle);
+            DOTween.Kill(canvasGroup);
+            canvasGroup.DOFade(targetAlpha, animationDuration);
         }
 
-        private void OnEnable()
-        {
-            Timing.ResumeCoroutines(_fadeHandle);
-        }
-
-        private void OnDisable()
-        {
-            Timing.PauseCoroutines(_fadeHandle);
-        }
-
-        private void AnimateButton(float targetAlpha)
-        {
-
-            Timing.KillCoroutines(_fadeHandle);
-            _fadeHandle = Timing.RunCoroutine(_FadeAlpha());
-            IEnumerator<float> _FadeAlpha()
-            {
-                while (Math.Abs(canvasGroup.alpha - targetAlpha) > .05f)
-                {
-                    canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, targetAlpha, Time.deltaTime * FadeSpeed);
-
-                    yield return Timing.WaitForOneFrame;
-                }
-
-                canvasGroup.alpha = targetAlpha;
-            }
-        }
-
-        internal void DoShowActiveButton()
+        internal void ActivateButton(float animationDuration)
         {
             _canSubmitSkill = true;
 
             gameObject.SetActive(true);
             enabled = true;
-            AnimateButton(1);
+            AnimateButton(animationDuration,1);
         }
 
         private const float DisableAlpha = .3f;
-        internal void DoShowDisabledButton()
+        internal void DoDisabledButton(float animationDuration)
         {
             _canSubmitSkill = false;
 
             gameObject.SetActive(true);
             enabled = true;
-            AnimateButton(DisableAlpha);
+
+            AnimateButton(animationDuration,DisableAlpha);
         }
+
+
 
         internal void HideButton()
         {
-            Timing.KillCoroutines(_fadeHandle);
+            DOTween.Kill(canvasGroup);
             gameObject.SetActive(false);
             canvasGroup.alpha = 0;
         }

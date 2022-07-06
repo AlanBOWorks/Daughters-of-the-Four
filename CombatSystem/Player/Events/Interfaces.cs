@@ -1,6 +1,7 @@
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Team;
 using UnityEngine;
 
 namespace CombatSystem.Player.Events
@@ -94,13 +95,19 @@ namespace CombatSystem.Player.Events
         void OnTargetSubmit(CombatEntity target);
     }
 
-    internal interface IPlayerEntityListener : ICombatEventListener
+    internal interface IPlayerCombatEventListener : ICombatEventListener
     {
         /// <summary>
         /// Invoked when the main performer(focus) was switch;
         /// It's invoked once per switch 
         /// </summary>
         void OnPerformerSwitch(CombatEntity performer);
+
+       /// <summary>
+       /// Used on switching the UI skills;<br></br>
+       /// For true stance switching use [<seealso cref="ITeamEventListener.OnStanceChange"/>]
+       /// </summary>
+        void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance);
 
     }
 

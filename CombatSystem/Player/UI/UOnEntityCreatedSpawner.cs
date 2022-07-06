@@ -121,7 +121,7 @@ namespace CombatSystem.Player.UI
             {
                 var element = pair.Value;
                 var entity = pair.Key;
-                bool isPlayerElement = UtilsTeam.IsPlayerTeam(in entity);
+                bool isPlayerElement = UtilsTeam.IsPlayerTeam(entity);
                 var handler = GetHandler(in isPlayerElement);
                 handler.PushElement(in element);
             }
