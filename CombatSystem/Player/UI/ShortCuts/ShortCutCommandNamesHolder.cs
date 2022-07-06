@@ -5,17 +5,25 @@ namespace CombatSystem.Player.UI
 {
     public sealed class ShortCutCommandNamesHolder : IShortcutCommandStructureRead<string>
     {
-        public ShortCutCommandNamesHolder(IReadOnlyList<string> skillShortCuts, string switchEntityShortCutElement)
+        public ShortCutCommandNamesHolder(IReadOnlyList<string> skillShortCuts, 
+            string switchPreviousEntityShortCutElement,
+            string switchNextEntityShortCutElement)
         {
             SkillShortCuts = skillShortCuts;
-            SwitchEntityShortCutElement = switchEntityShortCutElement;
+            SwitchPreviousEntityShortCutElement = switchPreviousEntityShortCutElement;
+            SwitchNextEntityShortCutElement = switchNextEntityShortCutElement;
         }
 
-        private ShortCutCommandNamesHolder(IEnumerable<string> skillShortCuts, string switchEntityShortCutElement):
-         this(skillShortCuts as IReadOnlyList<string>,switchEntityShortCutElement)
+        private ShortCutCommandNamesHolder(IEnumerable<string> skillShortCuts, 
+            string switchPreviousEntityShortCutElement,
+            string switchNextEntityShortCutElement) :
+         this(skillShortCuts as IReadOnlyList<string>,
+             switchPreviousEntityShortCutElement,
+             switchNextEntityShortCutElement)
         { }
 
         public IReadOnlyList<string> SkillShortCuts { get; }
-        public string SwitchEntityShortCutElement { get; }
+        public string SwitchPreviousEntityShortCutElement { get; }
+        public string SwitchNextEntityShortCutElement { get; }
     }
 }

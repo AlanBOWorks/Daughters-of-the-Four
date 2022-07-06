@@ -9,13 +9,18 @@ namespace CombatSystem.Player.UI
     public class UShortcutCommandsHolder : MonoBehaviour,
         IShortcutCommandStructureRead<InputActionReference>
     {
-        [Title("Input References")]
+        [Title("Input Entities")]
+        [SerializeField] private InputActionReference previousPerformerActionReference;
+        [SerializeField] private InputActionReference nextPerformerActionReference;
+
+        [Title("Input Skills")]
         [SerializeField] private InputActionReference[] skillShortcutReferences;
-        [SerializeField] private InputActionReference switchPerformerReference;
+        
 
 
         public IReadOnlyList<InputActionReference> SkillShortCuts => skillShortcutReferences;
-        public InputActionReference SwitchEntityShortCutElement => switchPerformerReference;
+        public InputActionReference SwitchPreviousEntityShortCutElement => previousPerformerActionReference;
+        public InputActionReference SwitchNextEntityShortCutElement => nextPerformerActionReference;
     }
 
     public interface IShortcutCommandStructureRead<out T> : 
@@ -29,6 +34,7 @@ namespace CombatSystem.Player.UI
 
     public interface ISwitchEntityShortcutCommandStructureRead<out T>
     {
-        T SwitchEntityShortCutElement { get; }
+        T SwitchPreviousEntityShortCutElement { get; }
+        T SwitchNextEntityShortCutElement { get; }
     }
 }

@@ -20,37 +20,57 @@ namespace CombatSystem.Player.Handlers
         public void DoPerformNextEntity()
         {
             CombatEntity nextControl = (_isActive) 
-                ? GetNextActiveEntity()
-                : GetNextInactiveEntity();
+                ? SearchActiveEntity(1)
+                : SearchInactiveEntity(1);
 
 
             if(nextControl == _lastPerformer) return;
-            
             DoPerformEntityEvent(nextControl);
+        }
 
-            CombatEntity GetNextActiveEntity()
+        public void DoPerformPreviousEntity()
+        {
+            CombatEntity nextControl = (_isActive)
+                ? SearchActiveEntity(-1)
+                : SearchInactiveEntity(-1);
+
+
+            if (nextControl == _lastPerformer) return;
+            DoPerformEntityEvent(nextControl);
+        }
+
+        private CombatEntity SearchActiveEntity(int indexAddition)
+        {
+            int entitiesCount = _allEntities.Count;
+            for (int i = 0; i < entitiesCount - 1; i++)
             {
-                int entitiesCount = _allEntities.Count;
-                for (int i = 0; i < entitiesCount -1; i++) // -1 because we gonna ignore current;
-                {
-                    StepIndexIndex();
-                    var nextEntity = _allEntities[_currentPerformerIndex];
-                    if (nextEntity.IsActive()) return nextEntity;
-                }
-
-                return _lastPerformer;
+                StepIndex(indexAddition);
+                var nextEntity = _allEntities[_currentPerformerIndex];
+                if (nextEntity.IsActive()) return nextEntity;
             }
 
-            CombatEntity GetNextInactiveEntity()
+            return _lastPerformer;
+        }
+
+        private CombatEntity SearchInactiveEntity(int indexAddition)
+        {
+            StepIndex(indexAddition);
+            return _allEntities[_currentPerformerIndex];
+        }
+
+        private void StepIndex(int indexAddition)
+        {
+            _currentPerformerIndex += indexAddition;
+            int entitiesCount = _allEntities.Count;
+            if (_currentPerformerIndex < 0)
             {
-                StepIndexIndex();
-                return _allEntities[_currentPerformerIndex];
+                _currentPerformerIndex = entitiesCount - 1;
+                return;
             }
 
-            void StepIndexIndex()
+            if (_currentPerformerIndex >= entitiesCount)
             {
-                _currentPerformerIndex++;
-                if (_currentPerformerIndex >= _allEntities.Count) _currentPerformerIndex = 0;
+                _currentPerformerIndex = 0;
             }
         }
 
@@ -104,6 +124,8 @@ namespace CombatSystem.Player.Handlers
         public void OnAllActorsNoActions(CombatEntity lastActor)
         {
             _isActive = false;
+            _lastPerformer = lastActor;
+            UpdatePerformerIndex(lastActor);
         }
 
         public void OnTempoFinishControl(CombatTeamControllerBase controller)

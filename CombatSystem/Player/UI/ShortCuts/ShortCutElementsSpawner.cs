@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 namespace CombatSystem.Player.UI
@@ -12,9 +13,13 @@ namespace CombatSystem.Player.UI
         where T : Component
     {
         [Title("References")]
-        [SerializeField] private T switchEntityElement;
+        [SerializeField] private T switchPreviousEntityElement;
 
-        public T SwitchEntityShortCutElement => switchEntityElement;
+        [FormerlySerializedAs("switchEntityElement")]
+        [SerializeField] private T switchNextEntityElement;
+
+        public T SwitchPreviousEntityShortCutElement => switchPreviousEntityElement;
+        public T SwitchNextEntityShortCutElement => switchNextEntityElement;
     }
 
     [Serializable]

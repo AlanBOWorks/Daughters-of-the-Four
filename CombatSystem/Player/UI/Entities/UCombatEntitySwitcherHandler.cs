@@ -16,14 +16,12 @@ namespace CombatSystem.Player.UI
         ICombatStartListener,
         ITempoControlStatesListener,
         ITempoEntityActionStatesListener,
-        IPlayerCombatEventListener,
-        ISwitchEntityShortcutCommandStructureRead<TextMeshProUGUI>
+        IPlayerCombatEventListener
     {
         [Title("ShortCuts")]
         [SerializeField] 
         private UShortcutCommandsHolder shortcutCommands;
-        [SerializeField] 
-        private TextMeshProUGUI switchPerformerTextHolder;
+       
 
         [Title("Behaviour")]
         [SerializeField]
@@ -39,7 +37,8 @@ namespace CombatSystem.Player.UI
         {
            InstantiateReferences();
             OnInstantiation();
-            DoShortcutsInitialization();
+            DoNextShortcutsInitialization();
+            DoPreviousShortcutsInitialization();
 
             _buttonsDictionary = new Dictionary<CombatEntity, UCombatEntitySwitchButton>();
 
@@ -56,15 +55,20 @@ namespace CombatSystem.Player.UI
             references.HidePrefab();
         }
 
-        private void DoShortcutsInitialization()
+        private void DoNextShortcutsInitialization()
         {
-            var shortcutName = UtilsShortCuts.DefaultNamesHolder.SwitchEntityShortCutElement;
-            var shortCutInputAction = shortcutCommands.SwitchEntityShortCutElement;
+            var shortcutName = UtilsShortCuts.DefaultNamesHolder.SwitchNextEntityShortCutElement;
+            var shortCutInputAction = shortcutCommands.SwitchNextEntityShortCutElement;
 
-            switchPerformerTextHolder.text = shortcutName;
-            shortCutInputAction.action.performed += DoPerformSwitchShortcut;
+            shortCutInputAction.action.performed += DoPerformNextSwitchShortcut;
         }
+        private void DoPreviousShortcutsInitialization()
+        {
+            var shortcutName = UtilsShortCuts.DefaultNamesHolder.SwitchPreviousEntityShortCutElement;
+            var shortCutInputAction = shortcutCommands.SwitchPreviousEntityShortCutElement;
 
+            shortCutInputAction.action.performed += DoPerformPreviousSwitchShortcut;
+        }
 
         private void OnDestroy()
         {
@@ -72,8 +76,10 @@ namespace CombatSystem.Player.UI
             playerCombatEvents.UnSubscribe(this);
             playerCombatEvents.DiscriminationEventsHolder.UnSubscribe(this);
 
-            var shortCutInputAction = shortcutCommands.SwitchEntityShortCutElement;
-            shortCutInputAction.action.performed -= DoPerformSwitchShortcut;
+            var nextShortCutAction = shortcutCommands.SwitchNextEntityShortCutElement;
+            nextShortCutAction.action.performed -= DoPerformNextSwitchShortcut;
+            var previousShortCutAction = shortcutCommands.SwitchPreviousEntityShortCutElement;
+            previousShortCutAction.action.performed -= DoPerformPreviousSwitchShortcut;
         }
 
         private const float IterationHeight = 70 + 6;
@@ -100,7 +106,6 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        public TextMeshProUGUI SwitchEntityShortCutElement => switchPerformerTextHolder;
 
         public void ShowAll()
         {
@@ -208,11 +213,18 @@ namespace CombatSystem.Player.UI
             
         }
 
-        private void DoPerformSwitchShortcut(InputAction.CallbackContext context)
+        private void DoPerformNextSwitchShortcut(InputAction.CallbackContext context)
         {
             if(!enabled) return;
             if(PlayerCombatSingleton.IsInPauseMenu) return;
             PlayerCombatSingleton.PerformerSwitcher.DoPerformNextEntity();
+        }
+
+        private void DoPerformPreviousSwitchShortcut(InputAction.CallbackContext context)
+        {
+            if (!enabled) return;
+            if (PlayerCombatSingleton.IsInPauseMenu) return;
+            PlayerCombatSingleton.PerformerSwitcher.DoPerformPreviousEntity();
         }
 
         public void OnEntityRequestAction(CombatEntity entity)

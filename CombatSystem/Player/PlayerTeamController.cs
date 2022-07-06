@@ -30,7 +30,7 @@ namespace CombatSystem.Player
 
         public void OnPauseInputReturnState(IOverridePauseElement lastElement)
         {
-            HandleSkillCancel();
+            HandleSkillCancel(ref _selectedSkill);
         }
 
 
@@ -67,34 +67,25 @@ namespace CombatSystem.Player
 
         public void OnSkillDeselect(CombatSkill skill)
         {
-            DeselectSkill(in skill);
         }
 
         public void OnSkillCancel(CombatSkill skill)
         {
-            DeselectSkill(in skill);
         }
 
         public void OnSkillSubmit(CombatSkill skill)
         {
         }
 
-
-        private void DeselectSkill(in CombatSkill skill)
-        {
-            if (_selectedSkill == skill) _selectedSkill = null;
-        }
-
-
         public void OnPerformerSwitch(CombatEntity performer)
         {
             _selectedPerformer = performer;
-            HandleSkillCancel();
+            HandleSkillCancel(ref _selectedSkill);
         }
 
         public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
         {
-            
+            HandleSkillCancel(ref _selectedSkill);
         }
 
 
@@ -130,15 +121,15 @@ namespace CombatSystem.Player
         {
             _selectedTarget = null;
             _selectedPerformer = null;
-            HandleSkillCancel();
+            _selectedSkill = null;
         }
 
 
-        private void HandleSkillCancel()
+        private static void HandleSkillCancel(ref CombatSkill skill)
         {
-            if (_selectedSkill == null) return;
-            PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(_selectedSkill);
-            _selectedSkill = null;
+            if (skill == null) return;
+            PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(skill);
+            skill = null;
         }
 
 
