@@ -82,7 +82,7 @@ namespace CombatSystem.Team
         {
             switch (stance)
             {
-                case EnumTeam.StanceFull.Neutral:
+                case EnumTeam.StanceFull.Supporting:
                     return targetPositioning == EnumTeam.Positioning.BackLine;
                 case EnumTeam.StanceFull.Attacking:
                     return targetPositioning == EnumTeam.Positioning.MidLine;
@@ -224,9 +224,20 @@ namespace CombatSystem.Team
         {
             return stance switch
             {
-                EnumTeam.Stance.Neutral => structure.NeutralStance,
+                EnumTeam.Stance.Supporting => structure.SupportingStance,
                 EnumTeam.Stance.Attacking => structure.AttackingStance,
                 EnumTeam.Stance.Defending => structure.DefendingStance,
+                _ => throw new ArgumentOutOfRangeException(nameof(stance), stance, null)
+            };
+        }
+
+        public static T GetElement<T>(EnumTeam.StanceFull stance, IStanceStructureRead<T> structure)
+        {
+            return stance switch
+            {
+                EnumTeam.StanceFull.Supporting => structure.SupportingStance,
+                EnumTeam.StanceFull.Attacking => structure.AttackingStance,
+                EnumTeam.StanceFull.Defending => structure.DefendingStance,
                 _ => throw new ArgumentOutOfRangeException(nameof(stance), stance, null)
             };
         }
@@ -235,7 +246,7 @@ namespace CombatSystem.Team
         {
             return stance switch
             {
-                EnumTeam.StanceFull.Neutral => structure.NeutralStance,
+                EnumTeam.StanceFull.Supporting => structure.SupportingStance,
                 EnumTeam.StanceFull.Attacking => structure.AttackingStance,
                 EnumTeam.StanceFull.Defending => structure.DefendingStance,
                 _ => structure.DisruptionStance
@@ -246,8 +257,8 @@ namespace CombatSystem.Team
         {
             switch (basicStance)
             {
-                case EnumTeam.Stance.Neutral:
-                    return EnumTeam.StanceFull.Neutral;
+                case EnumTeam.Stance.Supporting:
+                    return EnumTeam.StanceFull.Supporting;
                 case EnumTeam.Stance.Attacking:
                     return EnumTeam.StanceFull.Attacking;
                 case EnumTeam.Stance.Defending:
@@ -592,6 +603,20 @@ namespace CombatSystem.Team
             yield return new KeyValuePair<TKey, TValue>(keys.ThirdRole,values.ThirdRole);
         }
 
+        public static IEnumerable<T> GetEnumerable<T>(IStanceStructureRead<T> structure)
+        {
+            yield return structure.DefendingStance;
+            yield return structure.AttackingStance;
+            yield return structure.SupportingStance;
+        }
+
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
+            IStanceStructureRead<TKey> keys, IStanceStructureRead<TValue> values)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.DefendingStance,values.DefendingStance);
+            yield return new KeyValuePair<TKey, TValue>(keys.AttackingStance,values.AttackingStance);
+            yield return new KeyValuePair<TKey, TValue>(keys.SupportingStance,values.SupportingStance);
+        }
     }
 
     public static class UtilsCombatTeam

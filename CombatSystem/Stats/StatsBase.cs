@@ -72,7 +72,7 @@ namespace CombatSystem.Stats
         public T FlexLineType => concentrationType;
 
         public T AttackingStance => offensiveType;
-        public T NeutralStance => supportType;
+        public T SupportingStance => supportType;
         public T DefendingStance => vitalityType;
     }
 
@@ -125,7 +125,7 @@ namespace CombatSystem.Stats
         public T FlexLineType => concentrationType;
 
         public T AttackingStance => offensiveType;
-        public T NeutralStance => supportType;
+        public T SupportingStance => supportType;
         public T DefendingStance => vitalityType;
     }
 

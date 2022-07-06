@@ -1,20 +1,20 @@
 using UnityEngine;
 
-namespace Localization.Combat
+namespace CombatSystem.Localization
 {
     public static class CombatLocalizations 
     {
-        public static string LocalizeSkillName(in string skillTag)
+        public static string LocalizeSkillName(string skillTag)
         {
             return skillTag;
         }
 
-        public static string LocalizeEffectName(in string effectTag)
+        public static string LocalizeEffectName(string effectTag)
         {
             return effectTag;
         }
 
-        public static string LocalizeStance(in string stanceString)
+        public static string LocalizeStance(string stanceString)
         {
             return stanceString;
         }

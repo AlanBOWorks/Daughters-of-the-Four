@@ -1,5 +1,4 @@
 using CombatSystem.Skills;
-using Localization.Combat;
 
 namespace CombatSystem.Localization
 {
@@ -8,7 +7,7 @@ namespace CombatSystem.Localization
         public static string LocalizeSkill(ICombatSkill skill)
         {
             var skillTag = skill.Preset.GetSkillName();
-            return CombatLocalizations.LocalizeSkillName(in skillTag);
+            return CombatLocalizations.LocalizeSkillName(skillTag);
         }
     }
 }

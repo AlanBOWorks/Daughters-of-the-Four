@@ -63,7 +63,7 @@ namespace CombatSystem.Team
     public interface IStanceStructureRead<out T>
     {
         T AttackingStance { get; }
-        T NeutralStance { get; }
+        T SupportingStance { get; }
         T DefendingStance { get; }
     }
 

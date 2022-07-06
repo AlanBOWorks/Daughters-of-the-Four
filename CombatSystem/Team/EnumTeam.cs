@@ -126,16 +126,16 @@ namespace CombatSystem.Team
 
         public enum Stance
         {
-            Neutral,
-            Attacking,
-            Defending
+            Defending = 2,
+            Attacking = 1,
+            Supporting = 0,
         }
         public enum StanceFull
         {
-            Neutral = Stance.Neutral,
-            Attacking = Stance.Attacking,
             Defending = Stance.Defending,
-            Disrupted
+            Attacking = Stance.Attacking,
+            Supporting = Stance.Supporting,
+            Disrupted = -1
         }
 
 

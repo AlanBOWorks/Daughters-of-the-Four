@@ -184,11 +184,11 @@ namespace CombatSystem.Entity
                 _user = user;
                 DisruptionStance = new List<CombatSkill>();
                 AttackingStance = GenerateSkills(skills.AttackingStance);
-                NeutralStance = GenerateSkills(skills.NeutralStance);
+                SupportingStance = GenerateSkills(skills.SupportingStance);
                 DefendingStance = GenerateSkills(skills.DefendingStance);
 
                 _allSkills = new HashSet<CombatSkill>(AttackingStance);
-                AddSkills(NeutralStance);
+                AddSkills(SupportingStance);
                 AddSkills(DefendingStance);
 
                 void AddSkills(IEnumerable<CombatSkill> stanceSkills)
@@ -235,7 +235,7 @@ namespace CombatSystem.Entity
             [ShowInInspector]
             public List<CombatSkill> AttackingStance { get; }
             [ShowInInspector]
-            public List<CombatSkill> NeutralStance { get; }
+            public List<CombatSkill> SupportingStance { get; }
             [ShowInInspector]
             public List<CombatSkill> DefendingStance { get; }
             [ShowInInspector]

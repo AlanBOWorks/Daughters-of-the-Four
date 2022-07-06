@@ -82,7 +82,7 @@ namespace CombatSystem.Entity
 
 
             public IReadOnlyCollection<IFullSkill> AttackingStance => attackingSkills;
-            public IReadOnlyCollection<IFullSkill> NeutralStance => neutralSkills;
+            public IReadOnlyCollection<IFullSkill> SupportingStance => neutralSkills;
             public IReadOnlyCollection<IFullSkill> DefendingStance => defendingSkills;
         }
     }

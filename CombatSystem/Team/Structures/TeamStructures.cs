@@ -53,7 +53,7 @@ namespace CombatSystem.Team
         public T FlexLineType => flexType;
 
         public T AttackingStance => attackerType;
-        public T NeutralStance => supportType;
+        public T SupportingStance => supportType;
         public T DefendingStance => vanguardType;
 
 
@@ -120,7 +120,7 @@ namespace CombatSystem.Team
         public T FlexLineType => flexType;
 
         public T AttackingStance => attackerType;
-        public T NeutralStance => supportType;
+        public T SupportingStance => supportType;
         public T DefendingStance => vanguardType;
     }
 

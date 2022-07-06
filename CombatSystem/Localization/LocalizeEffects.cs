@@ -1,23 +1,21 @@
 using System;
 using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
-using Localization.Combat;
-using UnityEngine;
 
 namespace CombatSystem.Localization
 {
     public static class LocalizeEffects 
     {
-        public static string LocalizeEffectTooltip(in PerformEffectValues values)
+        public static void LocalizeEffectTooltip(in PerformEffectValues values, out string localizedEffect, out string effectValueDigits)
         {
             var effect = values.Effect;
             var targeting = values.TargetType;
             string localizationTag = effect.EffectTag;
-            string localizedName = CombatLocalizations.LocalizeEffectName(in localizationTag);
+            string localizedName = CombatLocalizations.LocalizeEffectName(localizationTag);
             string localizeTargeting = LocalizeLineTargeting(targeting);
 
-            string localizedDigits = LocalizeEffectDigitValue(in values);
-            return "[" + localizeTargeting + "]\n" + localizedName + ": " + localizedDigits;
+            localizedEffect = "[" + localizeTargeting + "]\n" + localizedName + ": ";
+             effectValueDigits= LocalizeEffectDigitValue(in values);
         }
 
         public static string LocalizeEffectDigitValue(in PerformEffectValues values)

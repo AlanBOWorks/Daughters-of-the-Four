@@ -514,12 +514,20 @@ namespace CombatSystem._Core
         }
 
 
-        // ---- TEAM VALUEs
+        // ---- TEAM VALUE
+        private CombatEntityEventsHolder GetTeamEventsHolder(CombatTeam team)
+        {
+            return (team.IsPlayerTeam) 
+                ? _playerCombatEvents.DiscriminationEventsHolder 
+                : _enemyCombatEvents.DiscriminationEventsHolder;
+        }
         public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnStanceChange(team, switchedStance);
 
+            var discriminationEventsHolder = GetTeamEventsHolder(team);
+            discriminationEventsHolder.OnStanceChange(team,switchedStance);
         }
 
         public void OnControlChange(CombatTeam team, float phasedControl)
@@ -527,6 +535,8 @@ namespace CombatSystem._Core
             foreach (var eventsHolder in _mainEventsEnumerable)
                 eventsHolder.OnControlChange(team, phasedControl);
 
+            var discriminationEventsHolder = GetTeamEventsHolder(team);
+            discriminationEventsHolder.OnControlChange(team,phasedControl);
         }
 
 
@@ -583,7 +593,7 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private readonly HashSet<ITempoEntityPercentListener> _tempoEntityPercentListeners;
 
-
+        [ShowInInspector,FoldoutGroup("discriminationEvents")]
         public readonly CombatEntityEventsHolder DiscriminationEventsHolder;
 
         protected override void SubscribeTempo(ITempoTickListener tickListener)
@@ -672,7 +682,7 @@ namespace CombatSystem._Core
             _combatPreparationListeners = new HashSet<ICombatPreparationListener>();
 
             _combatTerminationListeners = new HashSet<ICombatTerminationListener>();
-            _combatStatesListeners = new HashSet<ICombatStartListener>();
+            _combatStartListeners = new HashSet<ICombatStartListener>();
 
             _entitiesExistenceListeners = new HashSet<ICombatEntityExistenceListener>();
             
@@ -694,7 +704,7 @@ namespace CombatSystem._Core
         [ShowInInspector] 
         private readonly ICollection<ICombatTerminationListener> _combatTerminationListeners;
         [ShowInInspector] 
-        private readonly ICollection<ICombatStartListener> _combatStatesListeners;
+        private readonly ICollection<ICombatStartListener> _combatStartListeners;
 
         [ShowInInspector] 
         private readonly ICollection<ICombatEntityExistenceListener> _entitiesExistenceListeners;
@@ -722,7 +732,7 @@ namespace CombatSystem._Core
             if (listener is ICombatTerminationListener terminationListener)
                 _combatTerminationListeners.Add(terminationListener);
             if (listener is ICombatStartListener combatStatesListener)
-                _combatStatesListeners.Add(combatStatesListener);
+                _combatStartListeners.Add(combatStatesListener);
 
 
 
@@ -754,7 +764,7 @@ namespace CombatSystem._Core
             if (listener is ICombatTerminationListener terminationListener)
                 _combatTerminationListeners.Remove(terminationListener);
             if (listener is ICombatStartListener combatStatesListener)
-                _combatStatesListeners.Remove(combatStatesListener);
+                _combatStartListeners.Remove(combatStatesListener);
 
 
 
@@ -795,7 +805,7 @@ namespace CombatSystem._Core
 
         public void ManualSubscribe(ICombatStartListener startListener)
         {
-            _combatStatesListeners.Add(startListener);
+            _combatStartListeners.Add(startListener);
         }
         public void ManualSubscribe(ICombatTerminationListener terminationListener)
         {
@@ -813,7 +823,7 @@ namespace CombatSystem._Core
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            foreach (var listener in _combatStatesListeners)
+            foreach (var listener in _combatStartListeners)
             {
                 listener.OnCombatPreStarts(playerTeam, enemyTeam);
             }
@@ -821,7 +831,7 @@ namespace CombatSystem._Core
 
         public void OnCombatStart()
         {
-            foreach (var listener in _combatStatesListeners)
+            foreach (var listener in _combatStartListeners)
             {
                 listener.OnCombatStart();
             }

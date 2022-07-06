@@ -72,8 +72,8 @@ namespace CombatSystem.Player.UI
         public static void HandleText(UEffectTooltipHolder holder, in PerformEffectValues values)
         {
             var textHolder = holder.GetTextHolder();
-            var effectText = LocalizeEffects.LocalizeEffectTooltip(in values);
-            textHolder.text = effectText;
+            LocalizeEffects.LocalizeEffectTooltip(in values, out var effectText, out var valueDigits);
+            textHolder.text = effectText + ":" + valueDigits;
         }
 
         public static void MultiplyEffectText(UEffectTooltipHolder holder, float modifier)
