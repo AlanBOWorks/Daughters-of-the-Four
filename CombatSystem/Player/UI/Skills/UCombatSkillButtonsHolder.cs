@@ -20,14 +20,7 @@ namespace CombatSystem.Player.UI
         ISkillUsageListener, ICombatTerminationListener,
         ISkillSelectionListener
     {
-        [Title("References")] 
-        [SerializeField] 
-        private UShortcutCommandsHolder shortcutCommandsHolder;
-
-
         private Dictionary<ICombatSkill,UCombatSkillButton> _activeButtons;
-
-
 
         [Title("Parameters")] 
         [SerializeField]
@@ -73,8 +66,9 @@ namespace CombatSystem.Player.UI
 
         private void PrepareShortCutElements()
         {
-            var shortCutBindingNames
-                = UtilsShortCuts.DefaultNamesHolder.SkillShortCuts;
+            var shortcutCommandsHolder = CombatShortcutsSingleton.InputActions;
+            var shortcutName = CombatShortcutsSingleton.ShortcutCommandNames;
+            var shortCutBindingNames = shortcutName.SkillShortCuts;
             var shortCutInputActionReferences = shortcutCommandsHolder.SkillShortCuts;
 
 
@@ -111,6 +105,7 @@ namespace CombatSystem.Player.UI
             UnSubscribeFromInput();
             void UnSubscribeFromInput()
             {
+                var shortcutCommandsHolder = CombatShortcutsSingleton.InputActions;
                 var shortCutInputActionReferences = shortcutCommandsHolder.SkillShortCuts;
                 var skillButtons = skillElements.SkillShortCuts;
                 for (int i = 0; i < skillButtons.Count; i++)

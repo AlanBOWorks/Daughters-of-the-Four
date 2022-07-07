@@ -15,16 +15,29 @@ namespace CombatSystem.Player.UI
 
         [Title("Input Skills")]
         [SerializeField] private InputActionReference[] skillShortcutReferences;
-        
 
+        [Title("Input Stances")] 
+        [SerializeField] private InputActionReference supportStanceReference;
+        [SerializeField] private InputActionReference attackStanceReference;
+        [SerializeField] private InputActionReference defendStanceReference;
 
         public IReadOnlyList<InputActionReference> SkillShortCuts => skillShortcutReferences;
         public InputActionReference SwitchPreviousEntityShortCutElement => previousPerformerActionReference;
         public InputActionReference SwitchNextEntityShortCutElement => nextPerformerActionReference;
+
+        public InputActionReference SupportStanceShortCutElement => supportStanceReference;
+        public InputActionReference AttackStanceShortCutElement => attackStanceReference;
+        public InputActionReference DefendStanceShortCutElement => defendStanceReference;
+
+        private void Awake()
+        {
+            CombatShortcutsSingleton.InputActions = this;
+        }
     }
 
     public interface IShortcutCommandStructureRead<out T> : 
-        ISkillShortcutCommandStructureRead<T>, ISwitchEntityShortcutCommandStructureRead<T>
+        ISkillShortcutCommandStructureRead<T>, ISwitchEntityShortcutCommandStructureRead<T>,
+        ISwitchStanceShortcutCommandStructureRead<T>
     { }
 
     public interface ISkillShortcutCommandStructureRead<out T>
@@ -36,5 +49,12 @@ namespace CombatSystem.Player.UI
     {
         T SwitchPreviousEntityShortCutElement { get; }
         T SwitchNextEntityShortCutElement { get; }
+    }
+
+    public interface ISwitchStanceShortcutCommandStructureRead<out T>
+    {
+        T SupportStanceShortCutElement { get; }
+        T AttackStanceShortCutElement { get; }
+        T DefendStanceShortCutElement { get; }
     }
 }

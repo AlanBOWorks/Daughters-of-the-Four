@@ -8,18 +8,48 @@ using Object = UnityEngine.Object;
 namespace CombatSystem.Player.UI
 {
     [Serializable]
-    public abstract class ShortCutCommandElementsSpawner<T> : ShortCutSkillElementsSpawner<T>, 
-        IShortcutCommandStructureRead<T> 
+    public abstract class ShortCutStanceElementsSpawner<T> : ISwitchStanceShortcutCommandStructureRead<T>
         where T : Component
     {
-        [Title("References")]
-        [SerializeField] private T switchPreviousEntityElement;
+        [Title("Instantiation")]
+        [SerializeField] private Transform skillSpawnOnParent;
+        [SerializeField] private T stancePrefab;
+        [SerializeField] private bool enableOnInstantiation;
 
-        [FormerlySerializedAs("switchEntityElement")]
-        [SerializeField] private T switchNextEntityElement;
+        private T[] _stanceElements;
 
-        public T SwitchPreviousEntityShortCutElement => switchPreviousEntityElement;
-        public T SwitchNextEntityShortCutElement => switchNextEntityElement;
+        public void DoInstantiations(Action<T, int> onInstantiationCallback = null)
+        {
+            InstantiateSkills(onInstantiationCallback);
+        }
+
+        public void DisablePrefab()
+        {
+            stancePrefab.gameObject.SetActive(false);
+        }
+
+        private void InstantiateSkills(Action<T, int> onInstantiation)
+        {
+            if (!stancePrefab) return;
+
+            const int count = EnumShortCuts.StanceShortcutsCount;
+            _stanceElements = new T[count];
+            for (int i = 0; i < count; i++)
+            {
+                var element =
+                    _stanceElements[i] = Object.Instantiate(stancePrefab, skillSpawnOnParent);
+                element.gameObject.SetActive(enableOnInstantiation);
+
+                onInstantiation?.Invoke(element, i);
+            }
+        }
+
+        public T GetSkillPrefab() => stancePrefab;
+        public T[] GetElements() => _stanceElements;
+
+        public T SupportStanceShortCutElement => _stanceElements[EnumShortCuts.SupportStanceIndex];
+        public T AttackStanceShortCutElement => _stanceElements[EnumShortCuts.AttackerStanceIndex];
+        public T DefendStanceShortCutElement => _stanceElements[EnumShortCuts.DefendStanceIndex];
     }
 
     [Serializable]
@@ -46,7 +76,7 @@ namespace CombatSystem.Player.UI
         {
             if (!skillPrefab) return;
 
-            const int count = UtilsShortCuts.SKillShortCutsCount;
+            const int count = EnumShortCuts.SkillShortcutsCount;
             _skillElements = new T[count];
             for (int i = 0; i < count; i++)
             {

@@ -6,19 +6,26 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI.Skills
 {
     public class UCombatStanceButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
+        [Title("Button")]
         [SerializeField] 
         private Image backgroundHolder;
         [SerializeField] 
+        private Image backgroundIcon;
+        [SerializeField]
         private TextMeshProUGUI stanceName;
         [SerializeField]
         private EnumTeam.StanceFull buttonStance;
-        
+
+        [Title("Shortcut's")] 
+        [SerializeField] private TextMeshProUGUI shortcutText;
+
         private Color _initialColor;
         private Color _activeColor;
         private Color _backgroundInitialColor;
@@ -26,6 +33,11 @@ namespace CombatSystem.Player.UI.Skills
 
         private UCombatControlStanceHandler _handler;
 
+        private const float BackgroundIconAlpha = .6f;
+        private Color CalculateIconColor(Color fromColor)
+        {
+            return new Color(fromColor.r, fromColor.g, fromColor.b, BackgroundIconAlpha);
+        }
         private void Awake()
         {
             CombatLocalizations.LocalizeStance(stanceName.name);
@@ -43,6 +55,12 @@ namespace CombatSystem.Player.UI.Skills
         {
             _activeColor = roleColor;
         }
+
+        public void Injection(Sprite roleIcon)
+        {
+            backgroundIcon.sprite = roleIcon;
+        }
+
         public void Injection(UCombatControlStanceHandler handler) => _handler = handler;
 
         private void StopTextAnimations()
@@ -54,12 +72,17 @@ namespace CombatSystem.Player.UI.Skills
         private void StopBackgroundAnimations()
         {
             DOTween.Kill(backgroundHolder);
+            DOTween.Kill(backgroundIcon);
+
             backgroundHolder.color = _backgroundInitialColor;
+            backgroundIcon.color = CalculateIconColor(_initialColor);
         }
+
+        
 
 
         private const float OnAnimateIncrementFontAmount = 2;
-        private const float AnimationDuration = .2f;
+        private const float AnimationDuration = .4f;
         private void DoSizeAnimation()
         {
             StopTextAnimations();
@@ -78,14 +101,32 @@ namespace CombatSystem.Player.UI.Skills
         }
         public void OnPointerDown(PointerEventData eventData)
         {
+            DoPointerDown();
+        }
+        public void OnPointerDown(InputAction.CallbackContext context)
+        {
+            DoPointerDown();
+        }
+
+        private void DoPointerDown()
+        {
             _handler.DoSwitchStance(buttonStance);
+        }
+
+        public void InjectShortcutName(string shortcutName)
+        {
+            shortcutText.text = shortcutName;
         }
 
         public void DoActiveButton()
         {
             stanceName.color = _backgroundInitialColor;
+            shortcutText.color = _backgroundInitialColor;
+
             StopBackgroundAnimations();
             backgroundHolder.DOColor(_activeColor, AnimationDuration);
+            var iconTargetColor = CalculateIconColor(_backgroundInitialColor);
+            backgroundIcon.DOColor(iconTargetColor, AnimationDuration);
 
         }
         public void DeActivate()
@@ -93,6 +134,7 @@ namespace CombatSystem.Player.UI.Skills
             StopTextAnimations();
             StopBackgroundAnimations();
             stanceName.color = _initialColor;
+            shortcutText.color = _initialColor;
         }
     }
 }

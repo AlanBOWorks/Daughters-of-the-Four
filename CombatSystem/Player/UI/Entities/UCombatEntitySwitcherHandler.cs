@@ -18,9 +18,6 @@ namespace CombatSystem.Player.UI
         ITempoEntityActionStatesListener,
         IPlayerCombatEventListener
     {
-        [Title("ShortCuts")]
-        [SerializeField] 
-        private UShortcutCommandsHolder shortcutCommands;
        
 
         [Title("Behaviour")]
@@ -35,7 +32,9 @@ namespace CombatSystem.Player.UI
 
         private void Start()
         {
-           InstantiateReferences();
+            var shortcutCommands = CombatShortcutsSingleton.InputActions;
+
+            InstantiateReferences();
             OnInstantiation();
             DoNextShortcutsInitialization();
             DoPreviousShortcutsInitialization();
@@ -46,6 +45,20 @@ namespace CombatSystem.Player.UI
             playerCombatEvents.ManualSubscribe(this as ICombatStartListener);
             playerCombatEvents.ManualSubscribe(this as IPlayerCombatEventListener);
             playerCombatEvents.DiscriminationEventsHolder.Subscribe(this);
+
+
+            void DoNextShortcutsInitialization()
+            {
+                var shortCutInputAction = shortcutCommands.SwitchNextEntityShortCutElement;
+
+                shortCutInputAction.action.performed += DoPerformNextSwitchShortcut;
+            }
+            void DoPreviousShortcutsInitialization()
+            {
+                var shortCutInputAction = shortcutCommands.SwitchPreviousEntityShortCutElement;
+
+                shortCutInputAction.action.performed += DoPerformPreviousSwitchShortcut;
+            }
         }
 
         private void InstantiateReferences()
@@ -55,23 +68,12 @@ namespace CombatSystem.Player.UI
             references.HidePrefab();
         }
 
-        private void DoNextShortcutsInitialization()
-        {
-            var shortcutName = UtilsShortCuts.DefaultNamesHolder.SwitchNextEntityShortCutElement;
-            var shortCutInputAction = shortcutCommands.SwitchNextEntityShortCutElement;
-
-            shortCutInputAction.action.performed += DoPerformNextSwitchShortcut;
-        }
-        private void DoPreviousShortcutsInitialization()
-        {
-            var shortcutName = UtilsShortCuts.DefaultNamesHolder.SwitchPreviousEntityShortCutElement;
-            var shortCutInputAction = shortcutCommands.SwitchPreviousEntityShortCutElement;
-
-            shortCutInputAction.action.performed += DoPerformPreviousSwitchShortcut;
-        }
+        
 
         private void OnDestroy()
         {
+            var shortcutCommands = CombatShortcutsSingleton.InputActions;
+
             var playerCombatEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerCombatEvents.UnSubscribe(this);
             playerCombatEvents.DiscriminationEventsHolder.UnSubscribe(this);

@@ -6,6 +6,7 @@ using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace CombatSystem.Player.UI.Skills
 {
@@ -13,7 +14,8 @@ namespace CombatSystem.Player.UI.Skills
         ICombatStartListener,
         ITeamEventListener, IPlayerCombatEventListener,
 
-        IStanceStructureRead<UCombatStanceButton>
+        IStanceStructureRead<UCombatStanceButton>,
+        ISwitchStanceShortcutCommandStructureRead<UCombatStanceButton>
     {
         [SerializeField] private TextMeshProUGUI currentControlText;
         [SerializeField] private CanvasGroup canvasGroup;
@@ -27,6 +29,10 @@ namespace CombatSystem.Player.UI.Skills
         public UCombatStanceButton SupportingStance => supportButton;
         public UCombatStanceButton DefendingStance => vanguardButton;
 
+        public UCombatStanceButton SupportStanceShortCutElement => supportButton;
+        public UCombatStanceButton AttackStanceShortCutElement => attackerButton;
+        public UCombatStanceButton DefendStanceShortCutElement => vanguardButton;
+
 
         private void Start()
         {
@@ -36,6 +42,7 @@ namespace CombatSystem.Player.UI.Skills
             playerEvents.DiscriminationEventsHolder.Subscribe(this);
 
             HandleStanceInitializations();
+            HandleShortcutsSubscriptions();
         }
 
         private void OnDestroy()
@@ -43,6 +50,7 @@ namespace CombatSystem.Player.UI.Skills
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.UnSubscribe(this);
             playerEvents.DiscriminationEventsHolder.UnSubscribe(this);
+            UnSubscribeFromShortcuts();
         }
 
         private void HandleStanceInitializations()
@@ -53,8 +61,40 @@ namespace CombatSystem.Player.UI.Skills
             {
                 button.Injection(this);
                 button.Injection(theme.GetThemeColor());
+                button.Injection(theme.GetThemeIcon());
             }
         }
+
+        private void HandleShortcutsSubscriptions()
+        {
+            var shortcutsActions = CombatShortcutsSingleton.InputActions;
+            var shortcutNames = CombatShortcutsSingleton.ShortcutCommandNames;
+
+            var shortcutEnumerator = UtilsShortcuts.GetEnumerator(shortcutsActions, shortcutNames);
+            var buttonsEnumerator = UtilsShortcuts.GetEnumerator(this);
+            while (shortcutEnumerator.MoveNext())
+            {
+                buttonsEnumerator.MoveNext();
+                (InputActionReference shortcutAction, var shortcutName) = shortcutEnumerator.Current;
+                var button = buttonsEnumerator.Current;
+
+                button.InjectShortcutName(shortcutName);
+                shortcutAction.action.performed += button.OnPointerDown;
+            }
+            shortcutEnumerator.Dispose();
+            buttonsEnumerator.Dispose();
+        }
+
+        private void UnSubscribeFromShortcuts()
+        {
+            var shortcutsActions = CombatShortcutsSingleton.InputActions;
+            var enumerable = UtilsShortcuts.GetEnumerable(this, shortcutsActions);
+            foreach ((UCombatStanceButton button, InputActionReference shortcutAction) in enumerable)
+            {
+                shortcutAction.action.performed -= button.OnPointerDown;
+            }
+        }
+
 
         public void DoSwitchStance(EnumTeam.StanceFull targetStance)
         {
