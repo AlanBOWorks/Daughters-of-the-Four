@@ -19,7 +19,7 @@ namespace CombatSystem._Core
         public SystemCombatEventsHolder() 
         {
             _eventsHolder = new SystemEventsHolder();
-            _tempoSequenceStepper = new TempoSequenceStepper();
+            _combatSubEventsSequence = new CombatSubEventsSequence(this);
             _entityEventHandler = new CombatEntityEventHandler();
 
             _mainEventsEnumerable = GetMainEventsHolder();
@@ -47,7 +47,7 @@ namespace CombatSystem._Core
         private CombatEntityEventsHolder _oppositeDiscriminatedEntityEventsHolder;
 
         private readonly CombatEntityEventHandler _entityEventHandler;
-        private readonly TempoSequenceStepper _tempoSequenceStepper;
+        private readonly CombatSubEventsSequence _combatSubEventsSequence;
 
         private readonly IEnumerable<ICombatEventsHolder> _mainEventsEnumerable;
         private readonly IEnumerable<ICombatEventsHolderBase> _discriminatedEventsEnumerable;
@@ -292,7 +292,7 @@ namespace CombatSystem._Core
         public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
         {
             HandleCurrentDiscriminationEventsHolder(in controller);
-            _tempoSequenceStepper.OnTempoPreStartControl(in controller);
+            _combatSubEventsSequence.OnTempoPreStartControl(in controller);
 
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoPreStartControl(controller, firstEntity);
@@ -318,13 +318,13 @@ namespace CombatSystem._Core
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoFinishControl(controller);
             
-            _tempoSequenceStepper.OnTempoFinishControl(in controller);
+            _combatSubEventsSequence.OnTempoFinishControl(in controller);
             OnTempoFinishLastCall(controller);
         }
 
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
-            _tempoSequenceStepper.OnTempoFinishLastCall(in controller);
+            _combatSubEventsSequence.OnTempoFinishLastCall(in controller);
 
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoFinishLastCall(controller);
@@ -521,13 +521,15 @@ namespace CombatSystem._Core
                 ? _playerCombatEvents.DiscriminationEventsHolder 
                 : _enemyCombatEvents.DiscriminationEventsHolder;
         }
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange)
         {
+            _combatSubEventsSequence.OnStanceChance(team, switchedStance, isControlChange);
+
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnStanceChange(team, switchedStance);
+                eventsHolder.OnStanceChange(team, switchedStance, isControlChange);
 
             var discriminationEventsHolder = GetTeamEventsHolder(team);
-            discriminationEventsHolder.OnStanceChange(team,switchedStance);
+            discriminationEventsHolder.OnStanceChange(team,switchedStance, isControlChange);
         }
 
         public void OnControlChange(CombatTeam team, float phasedControl)
@@ -1300,11 +1302,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange)
         {
             foreach (var listener in _teamEventListeners)
             {
-                listener.OnStanceChange(team, switchedStance);
+                listener.OnStanceChange(team, switchedStance, isControlChange);
             }
         }
 

@@ -58,12 +58,6 @@ namespace CombatSystem.Team
             return entity.ActiveRole == EnumTeam.ActiveRole.MainVanguard;
         }
 
-        public static bool IsEntityInStance(CombatEntity entity, EnumTeam.StanceFull stance)
-        {
-            return entity.Team.DataValues.CurrentStance == stance;
-        }
-
-
         public static IEnumerable<CombatEntity> GetMemberLine(in CombatEntity target)
         {
             var targetTeam = target.Team.GetAllPositions();
@@ -626,15 +620,15 @@ namespace CombatSystem.Team
 
     public static class UtilsCombatTeam
     {
-        public static void SwitchStance(CombatTeam team, EnumTeam.Stance targetStance)
+        public static void SwitchStance(CombatTeam team, EnumTeam.Stance targetStance, bool isControlChange)
         {
             var fullStance = UtilsTeam.ParseStance(targetStance);
-            SwitchStance(in team, in fullStance);
+            SwitchStance(team, fullStance, isControlChange);
         }
-        public static void SwitchStance(in CombatTeam team, in EnumTeam.StanceFull targetStance)
+        public static void SwitchStance(CombatTeam team, EnumTeam.StanceFull targetStance, bool isControlChange)
         {
             team.DataValues.CurrentStance = targetStance;
-            CombatSystemSingleton.EventsHolder.OnStanceChange(team, targetStance);
+            CombatSystemSingleton.EventsHolder.OnStanceChange(team, targetStance, isControlChange);
         }
 
         public static void GainControl(CombatTeam team, float controlVariation)

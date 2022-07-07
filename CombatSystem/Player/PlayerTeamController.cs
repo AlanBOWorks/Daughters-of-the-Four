@@ -24,6 +24,7 @@ namespace CombatSystem.Player
         [ShowInInspector]
         private CombatEntity _selectedTarget;
 
+
         internal CombatEntity GetPerformer() => _selectedPerformer;
         internal CombatSkill GetSkill() => _selectedSkill;
 
@@ -88,7 +89,6 @@ namespace CombatSystem.Player
             HandleSkillCancel(ref _selectedSkill);
         }
 
-
         public void OnTargetSelect(CombatEntity target)
         {
             _selectedTarget = target;
@@ -101,6 +101,7 @@ namespace CombatSystem.Player
 
         public void OnTargetSubmit(CombatEntity target)
         {
+
         }
 
         public void OnCombatSkillSubmit(in SkillUsageValues values)

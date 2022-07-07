@@ -7,8 +7,14 @@ using UnityEngine;
 
 namespace CombatSystem._Core
 {
-    internal sealed class TempoSequenceStepper 
+    internal sealed class CombatSubEventsSequence 
     {
+        public CombatSubEventsSequence(SystemCombatEventsHolder eventsHolder)
+        {
+            _eventsHolder = eventsHolder;
+        }
+        private readonly SystemCombatEventsHolder _eventsHolder;
+
         public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
         {
             var team = controller.ControllingTeam;
@@ -33,18 +39,29 @@ namespace CombatSystem._Core
         public void OnTempoForceFinish(in CombatTeamControllerBase controller,
             in IReadOnlyList<CombatEntity> remainingMembers)
         {
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
 
             var allActives = remainingMembers;
             const bool isForced = true;
             foreach (var entity in allActives)
             {
                 UtilsCombatStats.FullTickActions(entity);
-                eventsHolder.OnEntityEmptyActions(entity);
-                eventsHolder.OnEntityFinishSequence(entity, isForced);
+                _eventsHolder.OnEntityEmptyActions(entity);
+                _eventsHolder.OnEntityFinishSequence(entity, isForced);
             }
 
             controller.ControllingTeam.OnTempoForceFinish();
+        }
+
+        public void OnStanceChance(CombatTeam team, EnumTeam.StanceFull targetStance, bool isControlChange)
+        {
+            var teamValues = team.DataValues;
+            teamValues.CurrentStance = targetStance;
+
+            if(!isControlChange) return;
+
+            float currentControl = teamValues.CurrentControl;
+            teamValues.CurrentControl = 0;
+            _eventsHolder.OnControlChange(team, -currentControl);
         }
     }
 }

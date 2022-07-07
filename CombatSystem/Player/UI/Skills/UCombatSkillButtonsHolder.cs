@@ -10,13 +10,14 @@ using DG.Tweening;
 using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace CombatSystem.Player.UI
 {
     public class UCombatSkillButtonsHolder : MonoBehaviour, 
         IPlayerCombatEventListener, 
 
-        ITempoControlStatesListener, ITeamEventListener,
+        ITempoControlStatesListener, 
         ISkillUsageListener, ICombatTerminationListener,
         ISkillSelectionListener
     {
@@ -67,21 +68,20 @@ namespace CombatSystem.Player.UI
         private void PrepareShortCutElements()
         {
             var shortcutCommandsHolder = CombatShortcutsSingleton.InputActions;
-            var shortcutName = CombatShortcutsSingleton.ShortcutCommandNames;
-            var shortCutBindingNames = shortcutName.SkillShortCuts;
             var shortCutInputActionReferences = shortcutCommandsHolder.SkillShortCuts;
 
 
             skillElements.DoInstantiations(OnInstantiateSkillButton);
             void OnInstantiateSkillButton(UCombatSkillButton button, int shortcutIndex)
             {
-                var bidingName = shortCutBindingNames[shortcutIndex];
-                var inputAction = shortCutInputActionReferences[shortcutIndex];
+                var actionReference = shortCutInputActionReferences[shortcutIndex];
+                var inputAction = actionReference.action;
+                var bidingName = inputAction.GetBindingDisplayString(0);
 
                 button.Injection(this);
                 button.SetBindingName(bidingName);
 
-                inputAction.action.performed += button.OnInputPerformer;
+                inputAction.performed += button.OnInputPerformer;
             }
         }
 
@@ -190,12 +190,17 @@ namespace CombatSystem.Player.UI
         {
             if(entity == null) return;
             var entitySkills = entity.GetStanceSkills(_currentStance);
-            var canAct = UtilsCombatStats.IsControlActive(entity) && UtilsTeam.IsEntityInStance(entity,_currentStance);
+            var canAct = UtilsCombatStats.IsControlActive(entity) && CanStanceSwitch();
             HandlePool(entitySkills);
 
             ShowSkillsAnimated(canAct, true);
 
-            
+            bool CanStanceSwitch()
+            {
+                var entityTeamValues = entity.Team.DataValues;
+                return entityTeamValues.CurrentStance == _currentStance ||
+                    entityTeamValues.CurrentControl >= 1;
+            }
         }
         private void ShowSkillsAnimated(bool canAct, bool doMoveAnimation)
         {
@@ -311,7 +316,6 @@ namespace CombatSystem.Player.UI
 
         private void UpdateToEntity(CombatEntity targetEntity)
         {
-
             if (_currentSelectedSkill != null)
             {
                 DeselectSkill(_currentSelectedSkill);
@@ -434,16 +438,6 @@ namespace CombatSystem.Player.UI
         {
             _currentStance = targetStance;
             UpdateToEntity(_currentControlEntity);
-        }
-
-
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
-        {
-           
-        }
-
-        public void OnControlChange(CombatTeam team, float phasedControl)
-        {
         }
     }
 }

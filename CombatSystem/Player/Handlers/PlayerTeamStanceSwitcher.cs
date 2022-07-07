@@ -10,26 +10,27 @@ namespace CombatSystem.Player.Handlers
     public sealed class PlayerTeamStanceSwitcher : ICombatPreparationListener, ISkillUsageListener
     {
         private CombatTeam _team;
+        private EnumTeam.StanceFull _selectedStance;
+
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
             _team = playerTeam;
         }
         public void DoSaveStance(EnumTeam.StanceFull switchedStance)
         {
+            if(switchedStance == _selectedStance) return;
+
             _selectedStance = switchedStance;
             PlayerCombatSingleton.PlayerCombatEvents.OnTeamStancePreviewSwitch(switchedStance);
         }
 
-        private EnumTeam.StanceFull _selectedStance;
 
         public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
             var teamValues = _team.DataValues;
-            if(teamValues.CurrentControl < 1) return;
+            if(teamValues.CurrentControl < 1 || teamValues.CurrentStance == _selectedStance) return;
 
-            _team.DataValues.CurrentStance = _selectedStance;
-            CombatSystemSingleton.EventsHolder.OnStanceChange(_team, _selectedStance);
-            teamValues.CurrentControl = 0;
+            CombatSystemSingleton.EventsHolder.OnStanceChange(_team, _selectedStance, true);
         }
 
         public void OnCombatSkillPerform(in SkillUsageValues values)

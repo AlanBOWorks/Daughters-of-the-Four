@@ -75,7 +75,7 @@ namespace CombatSystem.Team
     
     public interface ITeamEventListener : ICombatEventListener
     {
-        void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance);
+        void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange);
         void OnControlChange(CombatTeam team, float phasedControl);
     }
 

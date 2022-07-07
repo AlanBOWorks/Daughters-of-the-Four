@@ -68,21 +68,15 @@ namespace CombatSystem.Player.UI.Skills
         private void HandleShortcutsSubscriptions()
         {
             var shortcutsActions = CombatShortcutsSingleton.InputActions;
-            var shortcutNames = CombatShortcutsSingleton.ShortcutCommandNames;
 
-            var shortcutEnumerator = UtilsShortcuts.GetEnumerator(shortcutsActions, shortcutNames);
-            var buttonsEnumerator = UtilsShortcuts.GetEnumerator(this);
-            while (shortcutEnumerator.MoveNext())
+            var shortcutEnumerable = UtilsShortcuts.GetEnumerable(shortcutsActions, this);
+            foreach ((InputActionReference inputActionReference, UCombatStanceButton button) in shortcutEnumerable)
             {
-                buttonsEnumerator.MoveNext();
-                (InputActionReference shortcutAction, var shortcutName) = shortcutEnumerator.Current;
-                var button = buttonsEnumerator.Current;
-
+                var shortcutAction = inputActionReference.action;
+                var shortcutName = shortcutAction.GetBindingDisplayString(0);
                 button.InjectShortcutName(shortcutName);
-                shortcutAction.action.performed += button.OnPointerDown;
+                shortcutAction.performed += button.OnPointerDown;
             }
-            shortcutEnumerator.Dispose();
-            buttonsEnumerator.Dispose();
         }
 
         private void UnSubscribeFromShortcuts()
@@ -120,7 +114,7 @@ namespace CombatSystem.Player.UI.Skills
             _currentButton.DoActiveButton();
         }
 
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange)
         {
            
         }

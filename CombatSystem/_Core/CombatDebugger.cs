@@ -426,11 +426,11 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private TeamValuesChangeLogs _teamValuesChangeLogs = new TeamValuesChangeLogs();
 
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange)
         {
             if(!ShowTeamValuesChangeLogs || !_teamValuesChangeLogs.OnStanceChange) return;
             string teamName = team.IsPlayerTeam ? "PLAYER" : "ENEMY";
-            Debug.Log($"On Stance Change: {teamName} >> {switchedStance}");
+            Debug.Log($"On Stance Change: {teamName} >> {switchedStance} [Control: {isControlChange}]");
         }
 
         public void OnControlChange(CombatTeam team, float phasedControl)

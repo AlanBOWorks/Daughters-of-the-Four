@@ -36,7 +36,7 @@ namespace CombatSystem.Skills.Effects
                 //todo make switch enemyStance
             }
 
-            UtilsCombatTeam.SwitchStance(targetTeam, stance);
+            UtilsCombatTeam.SwitchStance(targetTeam, stance, false);
         }
 
 
