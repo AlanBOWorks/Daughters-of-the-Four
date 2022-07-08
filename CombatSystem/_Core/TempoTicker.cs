@@ -51,6 +51,8 @@ namespace CombatSystem._Core
         {
             Timing.KillCoroutines(_tickingHandle); //safe kill
 
+            PauseTicking = false;
+
             _tickingHandle = Timing.RunCoroutine(_TickingLoop(), Segment.RealtimeUpdate);
             CombatSystemSingleton.LinkCoroutineToMaster(in _tickingHandle);
         }
@@ -80,12 +82,12 @@ namespace CombatSystem._Core
         public int GetCurrentRoundTicks() => _roundTickCount;
 
 
-        [Button, HideIf("_pauseTicking")]
-        private void PauseNextTick() => _pauseTicking = true;
-        [Button, ShowIf("_pauseTicking")]
-        private void ResumeNextTick() => _pauseTicking = false;
+        [Button, HideIf("PauseTicking")]
+        private void PauseNextTick() => PauseTicking = true;
+        [Button, ShowIf("PauseTicking")]
+        private void ResumeNextTick() => PauseTicking = false;
 
-        private bool _pauseTicking = false; 
+        public bool PauseTicking = false; 
 
         private IEnumerator<float> _TickingLoop()
         {
@@ -101,7 +103,7 @@ namespace CombatSystem._Core
                 yield return Timing.WaitForSeconds(TickPeriodSeconds);
                 _roundTickCount++;
 
-                while (_playerPauseValues.IsGamePaused || _pauseTicking)
+                while (_playerPauseValues.IsGamePaused || PauseTicking)
                 {
                     yield return Timing.WaitForOneFrame;
                 }

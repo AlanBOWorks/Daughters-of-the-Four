@@ -283,7 +283,7 @@ namespace CombatSystem.Entity
 
     public interface ICombatEntityPreparation
     {
-        IStatsRead<float> GetBaseStats();
+        IBasicStatsRead<float> GetBaseStats();
         TeamAreaData GetAreaData();
     }
 

@@ -25,7 +25,7 @@ namespace CombatSystem.Entity
 
         public abstract GameObject GetVisualPrefab();
 
-        public IStatsRead<float> GetBaseStats() => preparationData.GetBaseStats();
+        public IBasicStatsRead<float> GetBaseStats() => preparationData.GetBaseStats();
         public TeamAreaData GetAreaData() => preparationData.GetAreaData();
         public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => preparationData.GetPresetSkills();
 
@@ -60,15 +60,15 @@ namespace CombatSystem.Entity
         private EnumTeam.Role role;
 
 
-        public IStatsRead<float> GetBaseStats() => baseStats;
+        public IBasicStatsRead<float> GetBaseStats() => baseStats;
         public TeamAreaData GetAreaData() => Team.UtilsTeam.GenerateAreaData(role);
         public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => skills;
 
 
         [Serializable]
-        private class BaseStats : Stats<float>
+        private class BaseStats : StatsBase<float>
         {
-            public BaseStats() : base(1,0)
+            public BaseStats() : base(0)
             {
                 
             }

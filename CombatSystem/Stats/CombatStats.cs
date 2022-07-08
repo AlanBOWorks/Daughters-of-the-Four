@@ -9,7 +9,7 @@ namespace CombatSystem.Stats
     public class CombatStats : ICombatStats<float>,
         IStatsTypesRead<IBasicStatsRead<float>>
     {
-        public CombatStats(IStatsRead<float> baseStats)
+        public CombatStats(IBasicStatsRead<float> baseStats)
         {
             BaseStats = baseStats;
             BuffStats = new StatsBase<float>(0);
@@ -30,7 +30,7 @@ namespace CombatSystem.Stats
 
         // Base stats comes from predefined data structures that can't be altered, that's why it only readable
         [ShowInInspector, InfoBox("This is a reference type; it could modify an SO values", InfoMessageType.Warning)]
-        public readonly IStatsRead<float> BaseStats;
+        public readonly IBasicStatsRead<float> BaseStats;
         public readonly StatsBase<float> BuffStats;
         public readonly BurstStats BurstStats;
 
