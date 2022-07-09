@@ -14,8 +14,8 @@ namespace CombatSystem.Player.UI
 {
     public class UEffectTextSpawnHandler : MonoBehaviour, IEffectUsageListener
     {
-        [SerializeField] private DamageNumber numberPrefab;
-        [SerializeField, Min(0), SuffixLabel("s")] private float popUpFrequency = .2f;
+        [SerializeField, Min(0), SuffixLabel("s")] 
+        private float popUpFrequency = .2f;
         [SerializeField]
         private EffectPopupHandler effectPopupHandler = new EffectPopupHandler();
 
@@ -28,6 +28,13 @@ namespace CombatSystem.Player.UI
             CombatSystemSingleton.EventsHolder.Subscribe(this);
 
             effectPopupHandler.Awake();
+        }
+
+        private Camera _combatCamera;
+        private void OnEnable()
+        {
+            _combatCamera = PlayerCombatSingleton.CamerasHolder.GetMainCameraType;
+
         }
 
         private void Update()
@@ -78,11 +85,10 @@ namespace CombatSystem.Player.UI
             while (_popUpQueue.Count > 0)
             {
                 yield return Timing.WaitForSeconds(popUpFrequency);
-                var queueElement = _popUpQueue.Dequeue();
-                var targetTransform = queueElement.Key;
-                var popUpText = queueElement.Value;
+                (Transform key, PerformEffectValues value) = _popUpQueue.Dequeue();
+                var popUpText = value;
 
-                Spawn(targetTransform, in popUpText);
+                Spawn(key, in popUpText);
             }
         }
 
@@ -96,12 +102,14 @@ namespace CombatSystem.Player.UI
 
         private void Spawn(Transform targetTransform, in PerformEffectValues queueValues)
         {
-            return;
             var popUpText = LocalizeEffects.LocalizeEffectDigitValue(in queueValues);
-            var popUpElement = numberPrefab.Spawn(Vector3.zero, popUpText);
-            popUpElement.SetAnchoredPosition(targetTransform, Vector2.zero);
-            var textHandler = popUpElement.GetComponent<UEffectTextHandler>();
-            textHandler.HandleEffect(in queueValues);
+            var icon = UtilsVisual.GetEffectSprite(queueValues.Effect);
+
+            Vector3 targetPosition = _combatCamera.WorldToScreenPoint(targetTransform.position);
+
+            var popUp = effectPopupHandler.DoEffect(popUpText, icon);
+            popUp.transform.position = targetPosition;
+            popUp.gameObject.SetActive(true);
         }
 
         [Serializable]
@@ -111,27 +119,31 @@ namespace CombatSystem.Player.UI
             private AnimationCurve alphaCurve = new AnimationCurve(
                 new Keyframe(0,0), new Keyframe(.5f,1));
             [SerializeField] private Vector2 velocity;
-
+            [SerializeField] private float deltaSpeed = 4f;
 
             public void Tick()
             {
-                TickAll(Time.deltaTime);
+                TickAll(Time.deltaTime * deltaSpeed);
             }
 
-            public UEffectTextPopUp DoEffect()
+            public UEffectTextPopUp DoEffect(string effectText, Sprite effectIcon)
             {
                 var element = GetElementSafe();
                 element.Injection(this);
+                element.Injection(effectText);
+                element.Injection(effectIcon);
                 return element;
             }
+
 
             private void TickAll(float delta)
             {
                 var deltaVelocity = delta * velocity;
                 foreach (var element in GetActiveElements())
                 {
-                    float currentLerp = element.GetCurrentLerp();
+                    float currentLerp = element.LerpAmount;
                     float targetLerp = currentLerp + delta;
+                    element.LerpAmount = targetLerp;
 
                     element.Translation(deltaVelocity);
                     float targetAlpha = alphaCurve.Evaluate(targetLerp);

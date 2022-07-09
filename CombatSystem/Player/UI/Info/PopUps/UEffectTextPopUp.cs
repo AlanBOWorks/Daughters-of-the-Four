@@ -14,8 +14,8 @@ namespace CombatSystem.Player.UI
 
         private TrackedMonoObjectPool<UEffectTextPopUp> _pool;
 
-        private float _lerpAmount;
-        public float GetCurrentLerp() => _lerpAmount;
+        [NonSerialized]
+        public float LerpAmount;
 
         private void Awake()
         {
@@ -24,12 +24,12 @@ namespace CombatSystem.Player.UI
 
         private void OnEnable()
         {
-            _lerpAmount = 0;
+            LerpAmount = 0;
         }
 
         private void LateUpdate()
         {
-            if (_lerpAmount < 1) return;
+            if (LerpAmount < 1) return;
 
             gameObject.SetActive(false);
             _pool.Release(this);
@@ -52,7 +52,8 @@ namespace CombatSystem.Player.UI
 
         public void Translation(Vector2 translation)
         {
-            transform.Translate(translation);
+            Vector2 lerpedTranslation = (1 - LerpAmount) * translation;
+            transform.Translate(lerpedTranslation);
         }
 
         public void SetAlpha(float alpha)

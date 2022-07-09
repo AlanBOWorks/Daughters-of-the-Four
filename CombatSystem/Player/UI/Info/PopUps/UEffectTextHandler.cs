@@ -15,10 +15,8 @@ namespace CombatSystem.Player.UI
         [SerializeField] private ReferencesHolder secondaryHolder;
 
 
-        public void HandleEffect(in PerformEffectValues effectValues)
+        public void HandleEffect(Sprite icon)
         {
-            var effect = effectValues.Effect;
-            var icon = UtilsVisual.GetEffectSprite(effect);
             mainHolder.SwitchIcon(icon);
             secondaryHolder.SwitchIcon(icon);
         }
