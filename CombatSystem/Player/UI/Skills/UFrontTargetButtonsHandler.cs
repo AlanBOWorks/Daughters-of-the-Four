@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UFrontTargetButtonsHandler : MonoBehaviour, ITeamElementSpawnListener<UUIHoverEntity>, 
+    public class UFrontTargetButtonsHandler : MonoBehaviour, ITeamElementSpawnListener<UUIHoverEntityHolder>, 
         IPlayerCombatEventListener,ITempoControlStatesListener,
         ISkillSelectionListener, ISkillPointerListener,
         ITargetSelectionListener
@@ -45,11 +45,11 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntity> holder)
+        public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntityHolder> holder)
         {
         }
 
-        public void OnElementCreated(UUIHoverEntity element, CombatEntity entity,
+        public void OnElementCreated(UUIHoverEntityHolder element, CombatEntity entity,
             int index)
         {
             var targetButton = element.GetTargetButton();

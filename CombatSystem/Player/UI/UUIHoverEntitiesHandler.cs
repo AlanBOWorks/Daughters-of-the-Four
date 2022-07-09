@@ -3,11 +3,10 @@ using CombatSystem.Team;
 
 namespace CombatSystem.Player.UI
 {
-    public class UUIHoverEntitiesHandler : UTeamElementSpawner<UUIHoverEntity>
+    public class UUIHoverEntitiesHandler : UTeamElementSpawner<UUIHoverEntityHolder>
     {
         private void Start()
         {
-            PlayerCombatSingleton.Injection(this);
             PlayerCombatSingleton.PlayerCombatEvents.Subscribe(this);
         }
         private void OnDestroy()
@@ -17,7 +16,7 @@ namespace CombatSystem.Player.UI
 
 
 
-        protected override void OnCreateElement(CombatEntity entity, UUIHoverEntity element,
+        protected override void OnCreateElement(CombatEntity entity, UUIHoverEntityHolder element,
             int index)
         {
             element.Show();

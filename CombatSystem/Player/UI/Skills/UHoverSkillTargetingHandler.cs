@@ -13,7 +13,7 @@ namespace CombatSystem.Player.UI
         ITargetPointerListener,
         IPlayerCombatEventListener, ISkillSelectionListener
     {
-        private IReadOnlyDictionary<CombatEntity, UUIHoverEntity> _dictionary;
+        private IReadOnlyDictionary<CombatEntity, UUIHoverEntityHolder> _dictionary;
         private HashSet<CombatEntity> _activeMembers;
 
         private void Awake()

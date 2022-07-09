@@ -62,6 +62,7 @@ namespace CombatSystem.Team
 
 
         // ------------ DATA ------------ 
+        [ShowInInspector]
         public readonly TeamDataValues DataValues;
         public readonly TeamLineBlockerHandler GuardHandler;
         [ShowInInspector]

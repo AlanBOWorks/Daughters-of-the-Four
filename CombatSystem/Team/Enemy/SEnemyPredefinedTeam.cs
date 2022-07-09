@@ -6,7 +6,7 @@ using Utils;
 
 namespace CombatSystem.Team
 {
-    [CreateAssetMenu(menuName = "Combat/Team/Preset",
+    [CreateAssetMenu(menuName = "Combat/Team/Enemy Preset",
         fileName = "N" + AssetDetailName)]
     public class SEnemyPredefinedTeam : ScriptableObject, ICombatTeamProvider
     {

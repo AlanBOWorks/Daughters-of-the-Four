@@ -4,6 +4,7 @@ using CombatSystem.Entity;
 using CombatSystem.Stats;
 using DG.Tweening;
 using Localization.Characters;
+using MPUIKIT;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -13,39 +14,35 @@ namespace CombatSystem.Player.UI
 {
     public class UTempoTrackerHolder : MonoBehaviour, IEntityExistenceElement<UTempoTrackerHolder>
     {
-        [Title("Holder")]
-        [SerializeField] private CanvasGroup alphaGroup;
+        [Title("Images")] 
+        [SerializeField] private MPImage backgroundImage;
+        [SerializeField] private Image backgroundIcon;
 
-
-        [Title("Elements")]
+        [Title("Texts")]
         [SerializeField] private TextMeshProUGUI entityName;
         [SerializeField] private TextMeshProUGUI currentTick;
         [SerializeField] private TextMeshProUGUI entitySpeed;
         [SerializeField] private TextMeshProUGUI remainingStepsText;
-        [SerializeField] private Image roleIcon;
 
+        [SerializeField] private Image roleIcon;
+        private Color _roleColor;
+        
         [ShowInInspector,DisableInEditorMode]
         private CombatEntity _user;
 
-
-        private const float DisableAlphaValue = .3f;
-
+      
         public void ShowElement()
         {
             gameObject.SetActive(true);
-            alphaGroup.alpha = 1;
         }
-
-        public void DisableElement()
-        {
-            alphaGroup.alpha = DisableAlphaValue;
-        }
-
         public void HideElement()
         {
             gameObject.SetActive(false);
         }
 
+        public Image GetBackgroundHolder() => backgroundImage;
+        public Image GetBackgroundIconHolder() => backgroundIcon;
+        public TextMeshProUGUI GetStepTextHolder() => remainingStepsText;
 
 
         public void EntityInjection(CombatEntity entity)
@@ -63,9 +60,14 @@ namespace CombatSystem.Player.UI
             TickTempo(in TempoTickValues.ZeroValues);
         }
 
-        public void Injection(Sprite roleIcon)
+        public void Injection(Sprite roleSprite)
         {
-            this.roleIcon.sprite = roleIcon;
+            this.roleIcon.sprite = roleSprite;
+        }
+
+        public void Injection(Color roleColor)
+        {
+            _roleColor = roleColor;
         }
 
 
@@ -100,13 +102,14 @@ namespace CombatSystem.Player.UI
         {
         }
 
+        private const int CloseStepThreshold = 2;
         public void TickTempo(in TempoTickValues values)
         {
             var currentTickInitiative = values.CurrentTick;
             currentTick.text = currentTickInitiative.ToString("00");
 
             var steps = values.RemainingSteps;
-            remainingStepsText.text = steps.ToString("00");
+            UpdateStepsText(steps);
 
             entitySpeed.text = HandleSpeedText();
 
@@ -116,6 +119,45 @@ namespace CombatSystem.Player.UI
                 float initiativeSpeed = UtilsStatsFormula.CalculateInitiativeSpeed(userStats);
                 return "+" + initiativeSpeed.ToString("##");
             }
+
+            if(steps > CloseStepThreshold) return;
+
+            OnControlClose();
+        }
+
+
+        public void UpdateStepsText(int steps)
+        {
+            remainingStepsText.text = steps.ToString("00");
+        }
+
+        public void OnControlClose()
+        {
+            var onCloseColor = new Color(.1f,.1f,.1f);
+            backgroundImage.color = onCloseColor;
+
+            remainingStepsText.color = Color.white;
+        }
+
+        private const float ColorFadeDuration = .2f;
+        public void OnControlStart()
+        {
+            DOTween.Kill(backgroundIcon);
+            Color targetColor = _roleColor;
+            targetColor.a = .3f;
+            backgroundIcon.DOColor(targetColor,ColorFadeDuration);
+        }
+
+        public void OnSequenceFinish(
+            in Color initialBackgroundColor,
+            in Color initialMainColor,
+            in Color iconInitialColor)
+        {
+            DOTween.Kill(backgroundImage);
+            DOTween.Kill(backgroundIcon);
+            backgroundImage.DOColor(initialBackgroundColor, ColorFadeDuration);
+            remainingStepsText.color = initialMainColor;
+            backgroundIcon.color = iconInitialColor;
         }
     }
 }

@@ -40,6 +40,8 @@ namespace CombatSystem._Core
             PrefabInstantiationHandler = new AssetPrefabInstantiationHandler();
             EntityPrefabsPoolHandler = new EntityPrefabsPoolHandler();
 
+            var controlGainHandler = new CombatTeamControlGainHandler();
+
 
             systemEventsHolder.Subscribe(KnockOutHandler);
             systemEventsHolder.Subscribe(SkillQueuePerformer);
@@ -47,6 +49,7 @@ namespace CombatSystem._Core
             systemEventsHolder.Subscribe(CombatControllerAnimationHandler);
             systemEventsHolder.Subscribe(TeamControllers);
             systemEventsHolder.Subscribe(EntityPrefabsPoolHandler);
+            systemEventsHolder.Subscribe(controlGainHandler);
         }
         private CombatSystemSingleton() { }
         public static CombatSystemSingleton GetInstance() => Instance;

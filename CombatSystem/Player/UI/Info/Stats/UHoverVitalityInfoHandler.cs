@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UHoverVitalityInfoHandler : UCombatEventsSubscriber, ITeamElementSpawnListener<UUIHoverEntity>,
+    public class UHoverVitalityInfoHandler : UCombatEventsSubscriber, ITeamElementSpawnListener<UUIHoverEntityHolder>,
          IDamageDoneListener, IVitalityChangeListener
     {
         private Dictionary<CombatEntity, UVitalityInfo> _infoDictionary;
@@ -23,11 +23,11 @@ namespace CombatSystem.Player.UI
             _infoDictionary = new Dictionary<CombatEntity, UVitalityInfo>();
         }
 
-        public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntity> holder)
+        public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntityHolder> holder)
         {
         }
 
-        public void OnElementCreated(UUIHoverEntity element, CombatEntity entity,
+        public void OnElementCreated(UUIHoverEntityHolder element, CombatEntity entity,
             int index)
         {
             var healthInfo = element.GetHealthInfo();

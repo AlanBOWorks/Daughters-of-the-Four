@@ -8,6 +8,7 @@ using DamageNumbersPro;
 using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Utils;
 
 namespace CombatSystem.Player.UI
 {
@@ -15,15 +16,24 @@ namespace CombatSystem.Player.UI
     {
         [SerializeField] private DamageNumber numberPrefab;
         [SerializeField, Min(0), SuffixLabel("s")] private float popUpFrequency = .2f;
+        [SerializeField]
+        private EffectPopupHandler effectPopupHandler = new EffectPopupHandler();
 
-        private Queue<KeyValuePair<RectTransform, PerformEffectValues>> _popUpQueue;
+
+        private Queue<KeyValuePair<Transform, PerformEffectValues>> _popUpQueue;
 
         private void Awake()
         {
-            _popUpQueue = new Queue<KeyValuePair<RectTransform, PerformEffectValues>>(16);
+            _popUpQueue = new Queue<KeyValuePair<Transform, PerformEffectValues>>(16);
             CombatSystemSingleton.EventsHolder.Subscribe(this);
+
+            effectPopupHandler.Awake();
         }
 
+        private void Update()
+        {
+            effectPopupHandler.Tick();
+        }
 
         private void OnDestroy()
         {
@@ -78,23 +88,56 @@ namespace CombatSystem.Player.UI
 
         private void EnQueue(CombatEntity target, in PerformEffectValues values)
         {
-            var hoverDictionary = PlayerCombatSingleton.HoverEntitiesHandler.GetDictionary();
-            if (!hoverDictionary.ContainsKey(target)) return;
+            var pivot = target.Body.PivotRootType;
 
-            var hoverElement = hoverDictionary[target];
-            RectTransform targetTransform = (RectTransform) hoverElement.transform;
-
-            var queueElement = new KeyValuePair<RectTransform, PerformEffectValues>(targetTransform,values);
+            var queueElement = new KeyValuePair<Transform, PerformEffectValues>(pivot,values);
             _popUpQueue.Enqueue(queueElement);
         }
 
-        private void Spawn(RectTransform targetTransform, in PerformEffectValues queueValues)
+        private void Spawn(Transform targetTransform, in PerformEffectValues queueValues)
         {
+            return;
             var popUpText = LocalizeEffects.LocalizeEffectDigitValue(in queueValues);
             var popUpElement = numberPrefab.Spawn(Vector3.zero, popUpText);
             popUpElement.SetAnchoredPosition(targetTransform, Vector2.zero);
             var textHandler = popUpElement.GetComponent<UEffectTextHandler>();
             textHandler.HandleEffect(in queueValues);
+        }
+
+        [Serializable]
+        private sealed class EffectPopupHandler : TrackedMonoObjectPool<UEffectTextPopUp>
+        {
+            [SerializeField,SuffixLabel("%")] 
+            private AnimationCurve alphaCurve = new AnimationCurve(
+                new Keyframe(0,0), new Keyframe(.5f,1));
+            [SerializeField] private Vector2 velocity;
+
+
+            public void Tick()
+            {
+                TickAll(Time.deltaTime);
+            }
+
+            public UEffectTextPopUp DoEffect()
+            {
+                var element = GetElementSafe();
+                element.Injection(this);
+                return element;
+            }
+
+            private void TickAll(float delta)
+            {
+                var deltaVelocity = delta * velocity;
+                foreach (var element in GetActiveElements())
+                {
+                    float currentLerp = element.GetCurrentLerp();
+                    float targetLerp = currentLerp + delta;
+
+                    element.Translation(deltaVelocity);
+                    float targetAlpha = alphaCurve.Evaluate(targetLerp);
+                    element.SetAlpha(targetAlpha);
+                }
+            }
         }
     }
 }

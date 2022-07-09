@@ -43,8 +43,8 @@ namespace CombatSystem.VFX
         private const float LocalScaleOffset = .2f; 
         private void SpawnParticles(CombatEntity target, GameObject particles)
         {
-            var positions = target.Body.GetPositions();
-            var targetPosition = positions.PivotRootType;
+            var entityBody = target.Body;
+            var targetPosition = entityBody.PivotRootType;
             var particlesObject = UtilsInstantiation.InstantiationTransformRandomness(
                 particles, targetPosition,
                 LocalPositionCenterOffset, LocalScaleOffset);

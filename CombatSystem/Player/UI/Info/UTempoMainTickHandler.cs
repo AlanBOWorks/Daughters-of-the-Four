@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -11,7 +12,8 @@ namespace CombatSystem.Player.UI
 {
     public class UTempoMainTickHandler : UTeamDualAlimentHandler<UTempoTrackerHolder>, 
         ICombatStartListener, ICombatTerminationListener,
-        ITempoEntityPercentListener
+        ITempoEntityPercentListener,
+        ITempoEntityStatesExtraListener
     {
         [SerializeField]
         private PlayerPrefabHolder playerPrefabs = new PlayerPrefabHolder();
@@ -29,8 +31,18 @@ namespace CombatSystem.Player.UI
         public IReadOnlyDictionary<CombatEntity, UTempoTrackerHolder> GetDictionary() => _dictionary;
 
 
+        private Color _backgroundInitialColor;
+        private Color _stepsTextInitialColor;
+        private Color _iconInitialColor;
+
         private void Start()
         {
+            var prefab = playerPrefabs.MainRole.GetPrefab();
+            _backgroundInitialColor = prefab.GetBackgroundHolder().color;
+            _stepsTextInitialColor = prefab.GetStepTextHolder().color;
+            _iconInitialColor = prefab.GetBackgroundIconHolder().color;
+
+
             PlayerCombatSingleton.PlayerCombatEvents.Subscribe(this);
             _dictionary = new Dictionary<CombatEntity, UTempoTrackerHolder>();
             
@@ -47,7 +59,7 @@ namespace CombatSystem.Player.UI
 
         private static void HideActiveTracker(UTempoTrackerHolder holder)
         {
-            holder.DisableElement();
+            holder.HideElement();
         }
         public void OnCombatEnd()
         {
@@ -88,9 +100,12 @@ namespace CombatSystem.Player.UI
             element.OnInstantiation();
 
 
-            var rolesTheme = CombatThemeSingleton.RolesThemeHolder;
-            var roleIcon = UtilsTeam.GetElement(entityRole, rolesTheme);
-            element.Injection(roleIcon.GetThemeIcon());
+            var rolesThemes = CombatThemeSingleton.RolesThemeHolder;
+            var entityTheme = UtilsTeam.GetElement(entityRole, rolesThemes);
+            element.Injection(entityTheme.GetThemeIcon());
+            element.Injection(entityTheme.GetThemeColor());
+
+            DoFinishTempo(element);
         }
 
         private static void HandleHeight(Component element, float targetHeight)
@@ -115,6 +130,34 @@ namespace CombatSystem.Player.UI
             _dictionary[entity].TickTempo(in values);
         }
 
+        public void OnAfterEntityRequestSequence(CombatEntity entity)
+        {
+            if (!_dictionary.ContainsKey(entity)) return;
+
+            var tempoInfo = _dictionary[entity];
+            tempoInfo.OnControlStart();
+
+            int steps = UtilsCombatStats.CalculateRemainingSteps(entity.Stats);
+            tempoInfo.UpdateStepsText(steps);
+        }
+
+        public void OnAfterEntitySequenceFinish(CombatEntity entity)
+        {
+            if (!_dictionary.ContainsKey(entity)) return;
+            DoFinishTempo(_dictionary[entity]);
+        }
+
+        private void DoFinishTempo(UTempoTrackerHolder element)
+        {
+            element.OnSequenceFinish(in _backgroundInitialColor, in _stepsTextInitialColor, in _iconInitialColor);
+        }
+
+
+        public void OnNoActionsForcedFinish(CombatEntity entity)
+        {
+        }
+
+
         [Serializable]
         private class PrefabsPoolHandler : PrefabInstantiationHandlerPool<UTempoTrackerHolder>
         {
@@ -132,5 +175,6 @@ namespace CombatSystem.Player.UI
         {
             
         }
+
     }
 }

@@ -160,6 +160,13 @@ namespace CombatSystem.Stats
             public float BuffType { get; }
             public float BurstType { get; }
         }
+
+        public static float CalculateControlGain(CombatStats stats)
+        {
+            return 1 + stats.BaseStats.ControlType 
+                   + stats.BuffStats.ControlType 
+                   + stats.BurstStats.ControlType;
+        }
     }
 
 }

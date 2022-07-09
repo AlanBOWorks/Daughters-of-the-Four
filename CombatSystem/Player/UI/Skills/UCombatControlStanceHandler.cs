@@ -93,7 +93,6 @@ namespace CombatSystem.Player.UI.Skills
         public void DoSwitchStance(EnumTeam.StanceFull targetStance)
         {
             if(!enabled) return;
-
             PlayerCombatSingleton.StanceSwitcher.DoSaveStance(targetStance);
         }
 
@@ -149,6 +148,7 @@ namespace CombatSystem.Player.UI.Skills
             DisableStanceSwitching();
             var targetStance = playerTeam.DataValues.CurrentStance;
             DoSwitchStance(targetStance);
+            OnTeamStancePreviewSwitch(targetStance);
         }
 
         public void OnCombatStart()

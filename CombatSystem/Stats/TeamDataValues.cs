@@ -12,10 +12,5 @@ namespace CombatSystem.Stats
 
         [ShowInInspector]
         public EnumTeam.StanceFull CurrentStance;
-
-        public void DoRoundReset()
-        {
-            CurrentControl = 0;
-        }
     }
 }

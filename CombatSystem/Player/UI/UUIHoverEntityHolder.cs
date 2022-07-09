@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UUIHoverEntity : MonoBehaviour, IEntityExistenceElement<UUIHoverEntity>
+    public class UUIHoverEntityHolder : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityHolder>
     {
-        [Title("Refecences")]
+        [Title("References")]
         [SerializeField] private UTargetButton targetButton;
         [SerializeField] private UVitalityInfo healthInfo;
         [SerializeField] private GameObject hoverFeedbackHolder;
@@ -25,7 +25,7 @@ namespace CombatSystem.Player.UI
 
             if (entityBody != null)
             {
-                _followReference = entityBody.GetPositions();
+                _followReference = entityBody.PivotRootType;
             }
         } 
         public void OnPreStartCombat()
@@ -46,7 +46,7 @@ namespace CombatSystem.Player.UI
         private Camera _playerCamera;
         [Title("RunTime")]
         [ShowInInspector,HideInEditorMode]
-        private IHumanoidRootsStructureRead<Vector3> _followReference;
+        private Transform _followReference;
         private RectTransform _rectTransform;
 
         private void Awake()
@@ -66,7 +66,7 @@ namespace CombatSystem.Player.UI
 
         private Vector3 GetHoverPointFollow()
         {
-            return _followReference?.PivotRootType ?? transform.position;
+            return _followReference.position;
         }
 
         public void Show()

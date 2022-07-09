@@ -11,7 +11,6 @@ namespace CombatSystem.Entity
         [ShowInInspector, DisableInEditorMode] 
         private ICombatEntityAnimator _animator;
 
-        private PositionsHolder _positionsHolder;
 
         private void Awake()
         {
@@ -29,7 +28,6 @@ namespace CombatSystem.Entity
 
             if (!targetHolderForUI) targetHolderForUI = transform;
 
-            _positionsHolder = new PositionsHolder(this);
         }
 
 
@@ -49,7 +47,6 @@ namespace CombatSystem.Entity
         public Transform BaseRootType => baseRootType;
         public Transform PivotRootType => targetHolderForUI;
         public Transform HeadRootType => headRootType;
-        public IHumanoidRootsStructureRead<Vector3> GetPositions() => _positionsHolder;
 
 
 
@@ -65,35 +62,11 @@ namespace CombatSystem.Entity
 
 
 
-        private void Update()
-        {
-            _positionsHolder.Update(this);
-        }
-
-
-        private sealed class PositionsHolder : IHumanoidRootsStructureRead<Vector3>
-        {
-            public PositionsHolder(IHumanoidRootsStructureRead<Transform> transforms)
-            {
-                Update(transforms);
-            }
-            public void Update(IHumanoidRootsStructureRead<Transform> transforms)
-            {
-                BaseRootType = transforms.BaseRootType.position;
-                PivotRootType = transforms.PivotRootType.position;
-                HeadRootType = transforms.HeadRootType.position;
-            }
-
-            public Vector3 BaseRootType { get; private set; }
-            public Vector3 PivotRootType { get; private set; }
-            public Vector3 HeadRootType { get; private set; }
-        }
     }
 
 
     public interface ICombatEntityBody : IHumanoidRootsStructureRead<Transform>
     {
-        IHumanoidRootsStructureRead<Vector3> GetPositions();
         ICombatEntityAnimator GetAnimator();
         void Injection(in CombatEntity user);
         void InjectPositionReference(Transform reference);
