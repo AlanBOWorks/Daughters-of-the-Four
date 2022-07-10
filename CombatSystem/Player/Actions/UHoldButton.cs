@@ -82,6 +82,11 @@ namespace CombatSystem.Player
         private const float MinPercentHoldFillImage = .12f;
         public void OnPointerDown(PointerEventData eventData)
         {
+            OnPointerDown();
+        }
+
+        public void OnPointerDown()
+        {
             if (holdAmount <= 0)
             {
                 DoAction();
@@ -100,7 +105,7 @@ namespace CombatSystem.Player
                     yield return delta;
                     timer += delta;
 
-                    if(!percentFiller) continue;
+                    if (!percentFiller) continue;
 
                     float percent = SRange.Percent(timer, holdAmount);
                     if (percent < MinPercentHoldFillImage) percent = MinPercentHoldFillImage;
@@ -110,6 +115,11 @@ namespace CombatSystem.Player
                 FillImage(0);
                 DoAction();
             }
+        }
+
+        public void OnPointerUp()
+        {
+            ResetHoldState();
         }
 
 

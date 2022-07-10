@@ -1,13 +1,17 @@
 using System;
+using CombatSystem._Core;
+using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Skills;
+using CombatSystem.Team;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public sealed class UCombatSkillHoverFeedback : MonoBehaviour, ISkillButtonListener
+    public sealed class UCombatSkillHoverFeedback : MonoBehaviour, ISkillButtonListener,
+        ITempoControlStatesExtraListener
     {
         [Title("References")] 
         [SerializeField] private UCombatSkillButtonsHolder skillButtonsHolder;
@@ -22,19 +26,26 @@ namespace CombatSystem.Player.UI
         private Quaternion _focusInitialRotation;
         private void Start()
         {
-            PlayerCombatSingleton.PlayerCombatEvents.SubscribeAsPlayerEvent(this);
+            var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
+            playerEvents.SubscribeAsPlayerEvent(this);
+            playerEvents.SubscribeForTeamControl(this);
 
             _hoverInitialRotation = hoverHolder.localRotation;
             _focusInitialRotation = focusHolder.localRotation;
 
-            hoverHolder.gameObject.SetActive(false);
-            focusHolder.gameObject.SetActive(false);
+            ToggleElements(false);
         }
 
         private void OnDestroy()
         {
             PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
         }
+
+        private void OnDisable()
+        {
+            ToggleElements(false);
+        }
+
 
         private const float AnimationDuration = .08f;
         private static void DoAnimate(RectTransform imageHolder, UCombatSkillButton onButton, Quaternion targetRotation)
@@ -56,6 +67,19 @@ namespace CombatSystem.Player.UI
             imageHolder.gameObject.SetActive(false);
         }
 
+        private void ToggleElements(bool active)
+        {
+            hoverHolder.gameObject.SetActive(active);
+            focusHolder.gameObject.SetActive(active);
+        }
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
+        {
+        }
+
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
+        {
+            ToggleElements(false);
+        }
 
         public void OnSkillButtonHover(ICombatSkill skill)
         {
@@ -101,5 +125,6 @@ namespace CombatSystem.Player.UI
         public void OnSkillSubmit(CombatSkill skill)
         {
         }
+
     }
 }

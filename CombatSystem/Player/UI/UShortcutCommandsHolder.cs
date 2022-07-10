@@ -24,6 +24,8 @@ namespace CombatSystem.Player.UI
         [Title("Tempo Shortcuts")] 
         [SerializeField] private InputActionReference pauseTickingReference;
 
+        [SerializeField] private InputActionReference endControlReference;
+
         private void Awake()
         {
             CombatShortcutsSingleton.InputActions = this;
@@ -38,6 +40,7 @@ namespace CombatSystem.Player.UI
         public InputActionReference DefendStanceShortCutElement => defendStanceReference;
 
         public InputActionReference PauseTickingShortCutElement => pauseTickingReference;
+        public InputActionReference EndControlShortCutElement => endControlReference;
     }
 
     public interface IShortcutCommandStructureRead<out T> : 
@@ -66,5 +69,6 @@ namespace CombatSystem.Player.UI
     public interface ITempoShortcutCommandsStructureRead<out T>
     {
         T PauseTickingShortCutElement { get; }
+        T EndControlShortCutElement { get; }
     }
 }

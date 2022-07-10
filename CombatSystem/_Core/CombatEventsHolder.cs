@@ -799,6 +799,8 @@ namespace CombatSystem._Core
             => ManualSubscribe(listener);
         public void SubscribeForCombatEnd(ICombatTerminationListener listener)
             => ManualSubscribe(listener);
+        
+
 
         public void ManualSubscribe(ICombatPreparationListener preparationListener)
         {
@@ -1098,17 +1100,18 @@ namespace CombatSystem._Core
                 _vanguardEffectUsageListeners.Remove(vanguardEffectUsageListener);
         }
 
+        public void SubscribeForTeamControl(ITempoControlStatesListener listener)
+            => ManualSubscribe(listener);
 
+        public void SubscribeForTeamControl(ITempoControlStatesExtraListener lister)
+            => ManualSubscribe(lister);
 
         public void ManualSubscribe(ITempoEntityMainStatesListener tempoEntityListener)
         {
             _tempoEntityListeners.Add(tempoEntityListener);
         }
 
-        public void ManualSubscribe(ITempoControlStatesExtraListener tempoTeamStatesExtraListener)
-        {
-            _tempoExtraTeamListeners.Add(tempoTeamStatesExtraListener);
-        }
+       
         public void ManualSubscribe(ITempoEntityStatesExtraListener tempoEntityExtraListener)
         {
             _tempoEntityExtraListeners.Add(tempoEntityExtraListener);
@@ -1122,7 +1125,10 @@ namespace CombatSystem._Core
         {
             _tempoTeamListeners.Add(controlStatesListener);
         }
-
+        public void ManualSubscribe(ITempoControlStatesExtraListener tempoTeamStatesExtraListener)
+        {
+            _tempoExtraTeamListeners.Add(tempoTeamStatesExtraListener);
+        }
         public void ManualSubscribe(ISkillUsageListener skillUsageListener)
         {
             _skillUsageListeners.Add(skillUsageListener);

@@ -124,7 +124,7 @@ namespace CombatSystem.Skills.Effects
                     DoEffectOnTarget();
                     void DoEffectOnTarget()
                     {
-                        var entities = new EntityPairInteraction(performer,target);
+                        var entities = new EntityPairInteraction(performer, effectTarget);
                         preset.DoEffect(entities, effectValue);
 
                         if (isFirstEffect)

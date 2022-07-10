@@ -41,7 +41,9 @@ namespace CombatSystem.Player.UI
 
         [Serializable]
         private sealed class SkillElementsSpawner : ShortCutSkillElementsSpawner<UCombatSkillButton>
-        { }
+        {
+
+        }
 
         public IReadOnlyDictionary<ICombatSkill, UCombatSkillButton> GetDictionary() => _activeButtons;
 
@@ -153,7 +155,8 @@ namespace CombatSystem.Player.UI
         }
 
         // Safe check
-        private const int MaxSkillAmount = 12;
+        private const int MaxSkillAmount = PrimarySkillAmount + 3;
+        private const int PrimarySkillAmount = 4;
         private void HandlePool(IReadOnlyList<CombatSkill> skills)
         {
             int countThreshold = Mathf.Min(skills.Count, MaxSkillAmount);
@@ -202,6 +205,8 @@ namespace CombatSystem.Player.UI
                     entityTeamValues.CurrentControl >= 1;
             }
         }
+
+        private const float OnOffPrimarySkillAmountPassedHeightOffset = 24f;
         private void ShowSkillsAnimated(bool canAct, bool doMoveAnimation)
         {
             Timing.KillCoroutines(_animationHandle);
@@ -226,6 +231,10 @@ namespace CombatSystem.Player.UI
                 void ShowIcon(UCombatSkillButton buttonHolder)
                 {
                     Vector2 targetPoint = index * (buttonsSeparations + _buttonSizes);
+                    if (index >= PrimarySkillAmount)
+                    {
+                        targetPoint.y += OnOffPrimarySkillAmountPassedHeightOffset;
+                    }
 
                     var buttonTransform = buttonHolder.transform;
 
