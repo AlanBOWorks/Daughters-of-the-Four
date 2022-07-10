@@ -14,5 +14,11 @@ namespace CombatSystem.Player.UI
         {
             return body.BaseRootType;
         }
+
+        public override void EntityInjection(CombatEntity entity)
+        {
+            base.EntityInjection(entity);
+            healthInfo.EntityInjection(entity);
+        }
     }
 }

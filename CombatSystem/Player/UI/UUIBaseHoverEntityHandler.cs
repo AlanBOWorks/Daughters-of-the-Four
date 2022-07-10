@@ -1,14 +1,19 @@
 using CombatSystem.Entity;
 using CombatSystem.Team;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
     public class UUIBaseHoverEntityHandler : UTeamElementSpawner<UUIBaseHoverEntityHolder>
     {
+        [SerializeField,TitleGroup("References"),PropertyOrder(-10)] 
+        private UHoverVitalityInfoHandler vitalityInfoHandler;
+
         private void Start()
         {
             PlayerCombatSingleton.PlayerCombatEvents.Subscribe(this);
+            vitalityInfoHandler.Injection(GetDictionary());
         }
         private void OnDestroy()
         {
@@ -20,8 +25,9 @@ namespace CombatSystem.Player.UI
         protected override void OnCreateElement(CombatEntity entity, UUIBaseHoverEntityHolder element,
             int index)
         {
-            element.Show();
             element.EntityInjection(entity);
+            vitalityInfoHandler.UpdateEntityVitality(entity);
+            element.Show();
         }
     }
 }

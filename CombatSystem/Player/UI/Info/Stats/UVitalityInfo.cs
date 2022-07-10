@@ -83,7 +83,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        private void Injection(in CombatStats injection)
+        private void Injection(CombatStats injection)
         {
             _currentStats = injection;
             UpdateToCurrentStats();

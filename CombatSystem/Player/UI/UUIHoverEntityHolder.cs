@@ -29,7 +29,7 @@ namespace CombatSystem.Player.UI
     {
         protected abstract Transform GetFollowTransform(ICombatEntityBody body);
 
-        public void EntityInjection(CombatEntity entity)
+        public virtual void EntityInjection(CombatEntity entity)
         {
             var entityBody = entity.Body;
 

@@ -4,46 +4,43 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UHoverVitalityInfoHandler : UCombatEventsSubscriber, ITeamElementSpawnListener<UUIHoverEntityHolder>,
+    public class UHoverVitalityInfoHandler : MonoBehaviour,
          IDamageDoneListener, IVitalityChangeListener
     {
-        private Dictionary<CombatEntity, UVitalityInfo> _infoDictionary;
+        [ShowInInspector,DisableInEditorMode]
+        private IReadOnlyDictionary<CombatEntity, UUIBaseHoverEntityHolder> _infoDictionary;
 
-        protected override ICombatEventsHolder GetEventsHolder()
+
+        public void Injection(IReadOnlyDictionary<CombatEntity, UUIBaseHoverEntityHolder> dictionary)
         {
-            return PlayerCombatSingleton.PlayerCombatEvents;
+            _infoDictionary = dictionary;
+        }
+
+        public void UpdateEntityVitality(CombatEntity entity)
+        {
+            if (!_infoDictionary.ContainsKey(entity)) return;
+
+            _infoDictionary[entity].GetHealthInfo().UpdateToCurrentStats();
+        }
+
+        [Button]
+        public void UpdateAllStats()
+        {
+            foreach (var pair in _infoDictionary)
+            {
+                var info = pair.Value;
+                info.GetHealthInfo().UpdateToCurrentStats();
+            }
         }
 
         private void Awake()
         {
-            _infoDictionary = new Dictionary<CombatEntity, UVitalityInfo>();
-        }
-
-        public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntityHolder> holder)
-        {
-        }
-
-        public void OnElementCreated(UUIHoverEntityHolder element, CombatEntity entity,
-            int index)
-        {
-            var healthInfo = element.GetHealthInfo();
-            _infoDictionary.Add(entity,healthInfo);
-
-            healthInfo.EntityInjection(entity);
-        }
-
-        public void OnCombatEnd()
-        {
-            ClearEntities();
-        }
-
-        public void ClearEntities()
-        {
-            _infoDictionary.Clear();
+            CombatSystemSingleton.EventsHolder.Subscribe(this);
         }
 
         public void OnShieldLost(CombatEntity performer, CombatEntity target, float amount)
@@ -60,12 +57,12 @@ namespace CombatSystem.Player.UI
 
         public void OnDamageReceive(CombatEntity performer, CombatEntity target)
         {
-            _infoDictionary[target].UpdateToCurrentStats();
+            UpdateEntityVitality(target);
         }
 
         public void OnKnockOut(CombatEntity performer, CombatEntity target)
         {
-            _infoDictionary[target].UpdateToCurrentStats();
+            UpdateEntityVitality(target);
         }
 
         public void OnDamageBeforeDone(CombatEntity performer, CombatEntity target, float amount)
@@ -74,7 +71,7 @@ namespace CombatSystem.Player.UI
 
         public void OnRevive(CombatEntity entity, bool isHealRevive)
         {
-            _infoDictionary[entity].UpdateToCurrentStats();
+            UpdateEntityVitality(entity);
         }
 
     }
