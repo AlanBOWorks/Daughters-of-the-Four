@@ -14,7 +14,7 @@ namespace CombatSystem.Player.UI
     public class UFrontTargetButtonsHandler : MonoBehaviour, ITeamElementSpawnListener<UUIHoverEntityHolder>, 
         IPlayerCombatEventListener,ITempoControlStatesListener,
         ISkillSelectionListener, ISkillPointerListener,
-        ITargetSelectionListener
+        ITargetSelectionListener, ITargetPointerListener
     {
         [ShowInInspector,ReadOnly]
         private Dictionary<CombatEntity, UTargetButton> _buttonsDictionary;
@@ -27,14 +27,7 @@ namespace CombatSystem.Player.UI
             var playerEventsHolder = PlayerCombatSingleton.PlayerCombatEvents;
 
             playerEventsHolder.DiscriminationEventsHolder.Subscribe(this);
-
-            // This is an invoker and not a listener of (ITargetSelectionListener && ITargetPointerListener), so
-            // when subscribing as a normal listener will subscribe to those events as well and call
-            // recursively those events; creating an infinite loop of calls
-            // To solve it: manual subscription of ISKillSelection because this is its listening behaviour
-            playerEventsHolder.ManualSubscribe(this as ISkillSelectionListener);
-            playerEventsHolder.ManualSubscribe(this as IPlayerCombatEventListener);
-            playerEventsHolder.ManualSubscribe(this as ISkillPointerListener);
+            playerEventsHolder.SubscribeAsPlayerEvent(this);
         }
 
         private void DisableTargetHandling()
@@ -137,7 +130,7 @@ namespace CombatSystem.Player.UI
                 buttonHolder.Hide();
             }
             if (_hoverTarget != null)
-                DoTargetButtonExit(_hoverTarget);
+                PlayerCombatSingleton.PlayerCombatEvents.OnTargetButtonExit(_hoverTarget);
         }
 
         public void DoTargetSelect(CombatEntity target)
@@ -146,21 +139,6 @@ namespace CombatSystem.Player.UI
                 OnTargetSelect(target);
         }
 
-        private CombatEntity _hoverTarget;
-        public void DoTargetButtonHover(CombatEntity target)
-        {
-            _hoverTarget = target;
-            PlayerCombatSingleton.PlayerCombatEvents.
-                OnTargetButtonHover(target);
-        }
-
-        public void DoTargetButtonExit(CombatEntity target)
-        {
-            if (_hoverTarget == target) _hoverTarget = null;
-
-            PlayerCombatSingleton.PlayerCombatEvents.
-                OnTargetButtonExit(target);
-        }
 
         public void OnTargetSelect(CombatEntity target)
         {
@@ -208,5 +186,15 @@ namespace CombatSystem.Player.UI
 
         }
 
+        private CombatEntity _hoverTarget;
+        public void OnTargetButtonHover(CombatEntity target)
+        {
+            _hoverTarget = target;
+        }
+
+        public void OnTargetButtonExit(CombatEntity target)
+        {
+            if (_hoverTarget == target) _hoverTarget = null;
+        }
     }
 }

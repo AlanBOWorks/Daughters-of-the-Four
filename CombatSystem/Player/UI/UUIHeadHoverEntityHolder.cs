@@ -15,7 +15,6 @@ namespace CombatSystem.Player.UI
         private Transform _followReference;
 
         private RectTransform _rectTransform;
-        private Camera _playerCamera;
 
         public void Injection(CombatEntity entity)
         {
@@ -26,10 +25,6 @@ namespace CombatSystem.Player.UI
         private void Awake()
         {
             _rectTransform = (RectTransform)transform;
-        }
-        private void OnEnable()
-        {
-            _playerCamera = PlayerCombatSingleton.CamerasHolder.GetMainCameraType;
         }
         private void LateUpdate()
         {

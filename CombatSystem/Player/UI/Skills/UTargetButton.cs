@@ -36,17 +36,20 @@ namespace CombatSystem.Player.UI
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _holder.DoTargetSelect(_user);
+            PlayerCombatSingleton.PlayerCombatEvents.
+                OnTargetSelect(_user);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            _holder.DoTargetButtonHover(_user);
+            PlayerCombatSingleton.PlayerCombatEvents.
+                OnTargetButtonHover(_user);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            _holder.DoTargetButtonExit(_user);
+            PlayerCombatSingleton.PlayerCombatEvents.
+                OnTargetButtonExit(_user);
         }
     }
 }

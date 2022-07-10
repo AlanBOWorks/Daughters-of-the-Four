@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player.UI
 {
-    public class UUIHoverEntityHolder : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityHolder>
+    public class UUIHoverEntityHolder : UUIHoverEntityBase, IEntityExistenceElement<UUIHoverEntityHolder>
     {
         [Title("References")]
         [SerializeField] private UTargetButton targetButton;
@@ -18,19 +18,30 @@ namespace CombatSystem.Player.UI
         public UTargetButton GetTargetButton() => targetButton;
         public UVitalityInfo GetHealthInfo() => healthInfo;
         public GameObject GetHoverFeedbackHolder() => hoverFeedbackHolder;
-       
+
+        protected override Transform GetFollowTransform(ICombatEntityBody body)
+        {
+            return body.PivotRootType;
+        }
+    }
+
+    public abstract class UUIHoverEntityBase : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityBase>
+    {
+        protected abstract Transform GetFollowTransform(ICombatEntityBody body);
+
         public void EntityInjection(CombatEntity entity)
         {
             var entityBody = entity.Body;
 
             if (entityBody != null)
             {
-                _followReference = entityBody.PivotRootType;
+                _followReference = GetFollowTransform(entityBody);
             }
-        } 
+        }
+
         public void OnPreStartCombat()
         {
-            
+
         }
 
         public void OnInstantiation()
@@ -45,13 +56,14 @@ namespace CombatSystem.Player.UI
 
         private Camera _playerCamera;
         [Title("RunTime")]
-        [ShowInInspector,HideInEditorMode]
+        [ShowInInspector, HideInEditorMode]
         private Transform _followReference;
         private RectTransform _rectTransform;
 
+
         private void Awake()
         {
-            _rectTransform = (RectTransform) transform;
+            _rectTransform = (RectTransform)transform;
         }
         private void OnEnable()
         {
@@ -60,11 +72,11 @@ namespace CombatSystem.Player.UI
 
         private void LateUpdate()
         {
-            var targetPoint = _playerCamera.WorldToScreenPoint(GetHoverPointFollow());
+            var targetPoint = _playerCamera.WorldToScreenPoint(GetTargetPosition());
             _rectTransform.position = targetPoint;
         }
 
-        private Vector3 GetHoverPointFollow()
+        protected Vector3 GetTargetPosition()
         {
             return _followReference.position;
         }
@@ -83,6 +95,5 @@ namespace CombatSystem.Player.UI
         {
             gameObject.SetActive(false);
         }
-
     }
 }
