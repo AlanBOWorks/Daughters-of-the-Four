@@ -13,12 +13,12 @@ namespace CombatSystem.VFX
     {
         [SerializeField] private SStatsPrefabsHolder particlesHolder;
 
-        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             OnCombatSecondaryEffectPerform(entities,in values); //todo make it by animator
         }
 
-        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             var effect = values.Effect;
             var effectPrefab = effect.GetSecondaryParticlesPrefab();
@@ -34,7 +34,7 @@ namespace CombatSystem.VFX
             SpawnParticles(entities.Target,effectPrefab);
         }
 
-        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             OnCombatSecondaryEffectPerform(entities, in values);
         }

@@ -26,7 +26,7 @@ namespace CombatSystem.Skills.Effects
         }
         public override string EffectTag => _effectTag;
 
-        public override void DoEffect(EntityPairInteraction entities, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities,ref float effectValue)
         {
             entities.Extract(out var performer, out var target);
             var performerStats = performer.Stats;
@@ -34,10 +34,10 @@ namespace CombatSystem.Skills.Effects
             float bufferPower = UtilsStatsEffects.CalculateBuffPower(in performerStats);
             float receivePower = UtilsStatsEffects.CalculateBuffReceivePower(in targetStats);
 
-            float targetValue = effectValue * (bufferPower + receivePower);
+            effectValue *= (bufferPower + receivePower);
 
-            DoBuff(targetStats, targetValue);
-            CombatSystemSingleton.EventsHolder.OnBuffDone(entities,this, targetValue);
+            DoBuff(targetStats, effectValue);
+            CombatSystemSingleton.EventsHolder.OnBuffDone(entities,this, effectValue);
         }
 
         public bool IsBurstEffect() => false;

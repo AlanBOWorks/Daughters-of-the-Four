@@ -30,8 +30,24 @@ namespace CombatSystem.Skills
         {
             return new PerformEffectValues(a.Effect, a.EffectValue * modifier, a.TargetType);
         }
+    }
+
+    public readonly struct SubmitEffectValues
+    {
+        public readonly IEffect Effect;
+        public readonly float EffectValue;
+
+        public SubmitEffectValues(IEffect effect, float effectValue)
+        {
+            Effect = effect;
+            EffectValue = effectValue;
+        }
+
+        public SubmitEffectValues(PerformEffectValues values) : this(values.Effect,values.EffectValue)
+        { }
 
     }
+
 
     /// <summary>
     /// Contains important information of the [<see cref="ICombatSkill"/>] usage. (ReadOnly)

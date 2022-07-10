@@ -121,16 +121,16 @@ namespace CombatSystem.Animations
 
         }
 
-        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             PerformReceiveAnimation(values.Effect,entities.Performer, entities.Target);
         }
 
-        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
         }
 
-        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
         }
     }

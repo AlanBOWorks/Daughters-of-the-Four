@@ -31,7 +31,7 @@ namespace CombatSystem.Skills.Effects
             _effectTag = GetControlName().ToUpper() + "_" + EffectPrefix;
         }
 
-        public override void DoEffect(EntityPairInteraction entities, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
             entities.Extract(out var performer, out var target);
             var targetTeam = target.Team;

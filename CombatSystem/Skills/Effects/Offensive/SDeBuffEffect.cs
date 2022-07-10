@@ -23,7 +23,7 @@ namespace CombatSystem.Skills.Effects
         protected string GetBuffPrefix() => (isBurst) ? DeBurstPrefix : DeBuffPrefix;
         public override string EffectSmallPrefix => (isBurst) ? DeBurstSmallPrefix : DeBuffSmallPrefix;
 
-        public override void DoEffect(EntityPairInteraction entities, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
             var performer = entities.Performer;
             var target = entities.Target;
@@ -38,15 +38,17 @@ namespace CombatSystem.Skills.Effects
                 ? UtilsStats.GetBurstStats(in targetStats, in performerStats) 
                 : targetStats.BuffStats;
 
-            DoDeBuff(debuffStats, debuffPower, debuffResistance, ref effectValue);
-            CombatSystemSingleton.EventsHolder.OnDeBuffDone(entities,this,effectValue);
+            effectValue = UtilsStatsEffects.CalculateStatsDeBuffValue(
+                debuffPower, debuffResistance,
+                effectValue);
+
+            DoDeBuff(debuffStats, ref effectValue);
+            CombatSystemSingleton.EventsHolder.OnDeBuffDone(entities,this, effectValue);
         }
 
         public bool IsBurstEffect() => isBurst;
 
-        protected abstract void DoDeBuff(IBasicStats<float> buffingStats, float performerDeBuffPower,
-            float targetDeBuffResistance,
-            ref float effectValue);
+        protected abstract void DoDeBuff(IBasicStats<float> deBuffingStats, ref float debuffValue);
 
         protected string GenerateAssetName(in string statTypeName)
         {

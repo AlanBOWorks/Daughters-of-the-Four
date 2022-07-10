@@ -357,19 +357,19 @@ namespace CombatSystem._Core
                 eventsHolder.OnCombatSkillPerform(in values);
         }
 
-        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatPrimaryEffectPerform(entities,in values);
         }
 
-        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatSecondaryEffectPerform(entities,in values);
         }
 
-        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatVanguardEffectPerform(entities,in values);
@@ -1275,7 +1275,7 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             foreach (var listener in _effectUsageListeners)
             {
@@ -1283,7 +1283,7 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             foreach (var listener in _effectUsageListeners)
             {
@@ -1292,7 +1292,7 @@ namespace CombatSystem._Core
         }
 
         public void OnCombatVanguardEffectPerform(EntityPairInteraction entities,
-            in PerformEffectValues values)
+            in SubmitEffectValues values)
         {
             foreach (var listener in _effectUsageListeners)
             {

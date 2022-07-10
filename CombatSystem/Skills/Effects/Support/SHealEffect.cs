@@ -17,7 +17,7 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => HealEffectSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Heal;
 
-        public override void DoEffect(EntityPairInteraction entities, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
             entities.Extract(out var performer, out var target);
             float healAmount = effectValue;
@@ -33,6 +33,8 @@ namespace CombatSystem.Skills.Effects
             target.ProtectionReceiveTracker.DoHealth(performer, healAmount);
 
             CombatSystemSingleton.EventsHolder.OnHealthGain(performer,target, healAmount);
+
+            effectValue = healAmount;
         }
 
         private static void DoHeal(CombatStats target, float healAmount)

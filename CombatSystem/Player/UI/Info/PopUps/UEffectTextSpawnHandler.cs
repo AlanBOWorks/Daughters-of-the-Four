@@ -19,11 +19,11 @@ namespace CombatSystem.Player.UI
         private EffectPopupHandler effectPopupHandler = new EffectPopupHandler();
 
 
-        private Queue<KeyValuePair<Transform, PerformEffectValues>> _popUpQueue;
+        private Queue<KeyValuePair<Transform, SubmitEffectValues>> _popUpQueue;
 
         private void Awake()
         {
-            _popUpQueue = new Queue<KeyValuePair<Transform, PerformEffectValues>>(16);
+            _popUpQueue = new Queue<KeyValuePair<Transform, SubmitEffectValues>>(16);
             CombatSystemSingleton.EventsHolder.Subscribe(this);
 
             effectPopupHandler.Awake();
@@ -54,23 +54,23 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             OnCombatEffectPerform(entities,in values);
         }
 
-        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             OnCombatEffectPerform(entities,in values);
         }
 
-        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             OnCombatEffectPerform(entities,in values);
         }
 
 
-        public void OnCombatEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             EnQueue(entities.Target, values);
             if (_loopHandle.IsRunning) return;
@@ -84,22 +84,22 @@ namespace CombatSystem.Player.UI
             while (_popUpQueue.Count > 0)
             {
                 yield return Timing.WaitForSeconds(popUpFrequency);
-                (Transform key, PerformEffectValues value) = _popUpQueue.Dequeue();
+                (Transform key, SubmitEffectValues value) = _popUpQueue.Dequeue();
                 var popUpText = value;
 
                 Spawn(key, in popUpText);
             }
         }
 
-        private void EnQueue(CombatEntity target, in PerformEffectValues values)
+        private void EnQueue(CombatEntity target, in SubmitEffectValues values)
         {
             var pivot = target.Body.PivotRootType;
 
-            var queueElement = new KeyValuePair<Transform, PerformEffectValues>(pivot,values);
+            var queueElement = new KeyValuePair<Transform, SubmitEffectValues>(pivot,values);
             _popUpQueue.Enqueue(queueElement);
         }
 
-        private void Spawn(Transform targetTransform, in PerformEffectValues queueValues)
+        private void Spawn(Transform targetTransform, in SubmitEffectValues queueValues)
         {
             var popUpText = LocalizeEffects.LocalizeEffectDigitValue(in queueValues);
             var icon = UtilsVisual.GetEffectSprite(queueValues.Effect);

@@ -7,27 +7,8 @@ namespace CombatSystem.Stats
 {
     public static class UtilsStatsEffects
     {
-
-        public static float CalculateOffensiveStatBuffValue(in float buffPower, in float receivePower,
-            in float effectValue)
-        {
-            return effectValue * (buffPower + receivePower);
-        }
-
-        public static float CalculateSupportStatBuffValue(in float buffPower, in float receivePower,
-            in float effectValue)
-        {
-            return effectValue * (buffPower + receivePower);
-        }
-
-        public static float CalculateVitalityStatBuffValue(in float buffPower, in float receivePower,
-            in float effectValue)
-        {
-            return effectValue + (buffPower + receivePower);
-        }
-
-        public static float CalculateConcentrationStatBuffValue(in float buffPower, in float receivePower,
-            in float effectValue)
+        public static float CalculateStatsBuffValue(float buffPower, float receivePower,
+            float effectValue)
         {
             return effectValue + (buffPower + receivePower);
         }
@@ -35,8 +16,8 @@ namespace CombatSystem.Stats
         /// <summary>
         /// It calculates the final effect value for Debuffing
         /// </summary>
-        public static float CalculateStatsDeBuffValue(in float debuff, in float resistance,
-            in float effectValue)
+        public static float CalculateStatsDeBuffValue(float debuff, float resistance,
+            float effectValue)
         {
             float debuffDifference = debuff - resistance;
             if (debuffDifference <= 0) return 0;

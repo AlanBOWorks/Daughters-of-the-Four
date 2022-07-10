@@ -103,7 +103,7 @@ namespace CombatSystem.Skills.Effects
         {
             var targetType = values.TargetType;
             var targets = UtilsTarget.GetEffectTargets(targetType, performer, target);
-            var preset = values.Effect;
+            var effect = values.Effect;
             var effectValue = values.EffectValue;
 
             DoEffectsTarget();
@@ -125,15 +125,18 @@ namespace CombatSystem.Skills.Effects
                     void DoEffectOnTarget()
                     {
                         var entities = new EntityPairInteraction(performer, effectTarget);
-                        preset.DoEffect(entities, effectValue);
+                        float targetEffectValue = effectValue;
+                        effect.DoEffect(entities,ref targetEffectValue);
+
+                        var submitEffect = new SubmitEffectValues(effect ,targetEffectValue);
 
                         if (isFirstEffect)
                         {
-                            eventsHolder.OnCombatPrimaryEffectPerform(entities, in values);
+                            eventsHolder.OnCombatPrimaryEffectPerform(entities, in submitEffect);
                             isFirstEffect = false;
                         }
                         else
-                            eventsHolder.OnCombatSecondaryEffectPerform(entities, in values);
+                            eventsHolder.OnCombatSecondaryEffectPerform(entities, in submitEffect);
 
                     }
                 }

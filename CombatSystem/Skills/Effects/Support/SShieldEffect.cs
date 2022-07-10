@@ -16,7 +16,7 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => ShieldEffectSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Shielding;
 
-        public override void DoEffect(EntityPairInteraction entities, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities,ref float effectValue)
         {
             entities.Extract(out var performer, out var target);
             float addingShields = effectValue;
@@ -30,6 +30,8 @@ namespace CombatSystem.Skills.Effects
             // EVENTS
             performer.ProtectionDoneTracker.DoShields(target, addingShields);
             target.ProtectionReceiveTracker.DoShields(performer, addingShields);
+
+            effectValue = addingShields;
         }
 
 

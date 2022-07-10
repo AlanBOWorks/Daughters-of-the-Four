@@ -26,7 +26,7 @@ namespace CombatSystem.Skills.Effects
             : EnumsEffect.ConcreteType.Buff;
 
 
-        public override void DoEffect(EntityPairInteraction entities, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
             entities.Extract(out var performer, out var target);
             var performerStats = performer.Stats;
@@ -38,15 +38,21 @@ namespace CombatSystem.Skills.Effects
                 ? UtilsStats.GetBurstStats(in targetStats, in performerStats) 
                 : targetStats.BuffStats;
 
-            DoBuff(bufferPower, receivePower, buffingStats, ref effectValue);
+
+            float buffingValue = UtilsStatsEffects.CalculateStatsBuffValue(
+                bufferPower,
+                receivePower,
+                effectValue);
+            effectValue = buffingValue;
+
+            DoBuff(buffingStats, ref effectValue);
             CombatSystemSingleton.EventsHolder.OnBuffDone(entities, this,  effectValue);
         }
 
         public bool IsBurstEffect() => isBurst;
 
-        protected abstract void DoBuff(float performerBuffPower, float targetBuffReceivePower,
-            IBasicStats<float> buffingStats,
-            ref float effectValue);
+        protected abstract void DoBuff(IBasicStats<float> buffingStats,
+            ref float buffingValue);
 
         protected string GenerateAssetName(in string statTypeName)
         {

@@ -311,21 +311,21 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private EffectsSubmitLogs _effectLogs = new EffectsSubmitLogs();
 
-        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             if (!ShowEffectLogs || !_effectLogs.OnPrimary) return;
             entities.Extract(out var performer, out var target);
             Debug.Log($"Primary Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
         }
 
-        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             if (!ShowEffectLogs || !_effectLogs.OnSecondary) return;
             entities.Extract(out var performer, out var target);
             Debug.Log($"Secondary Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
         }
 
-        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in PerformEffectValues values)
+        public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
             if (!ShowEffectLogs || !_effectLogs.OnVanguardEffects) return;
             entities.Extract(out var performer, out var target);

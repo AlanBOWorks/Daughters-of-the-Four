@@ -16,7 +16,7 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => DamageSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.DamageType;
 
-        public override void DoEffect(EntityPairInteraction entities, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
             float damage = effectValue;
             entities.Extract(out var performer, out var target);
@@ -34,6 +34,8 @@ namespace CombatSystem.Skills.Effects
             {
                 UtilsCombatEffect.DoDamageTo(target, performer, in damage);
             }
+
+            effectValue = damage;
         }
     }
 

@@ -18,15 +18,9 @@ namespace CombatSystem.Skills.Effects
         } public override string EffectTag => _effectTag;
 
 
-        protected override void DoBuff(float performerBuffPower, float targetBuffReceivePower,
-            IBasicStats<float> buffingStats,
-            ref float effectValue)
+        protected override void DoBuff(IBasicStats<float> buffingStats,
+            ref float buffingValue)
         {
-            float buffingValue = UtilsStatsEffects.CalculateSupportStatBuffValue(
-                in performerBuffPower,
-                in targetBuffReceivePower,
-                in effectValue);
-
             switch (type)
             {
                 case EnumStats.SupportStatType.Heal:

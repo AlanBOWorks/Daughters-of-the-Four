@@ -26,7 +26,7 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => StanceSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Stance;
 
-        public override void DoEffect(EntityPairInteraction entities, float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
             entities.Extract(out var performer, out var target);
             var targetTeam = target.Team;

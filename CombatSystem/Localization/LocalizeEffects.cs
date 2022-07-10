@@ -15,10 +15,10 @@ namespace CombatSystem.Localization
             string localizeTargeting = LocalizeLineTargeting(targeting);
 
             localizedEffect = "[" + localizeTargeting + "]\n" + localizedName + ": ";
-             effectValueDigits= LocalizeEffectDigitValue(in values);
+             effectValueDigits= LocalizeEffectDigitValue(new SubmitEffectValues(values));
         }
 
-        public static string LocalizeEffectDigitValue(in PerformEffectValues values)
+        public static string LocalizeEffectDigitValue(in SubmitEffectValues values)
         {
             string effectValue = values.EffectValue.ToString("F1");
             return effectValue;

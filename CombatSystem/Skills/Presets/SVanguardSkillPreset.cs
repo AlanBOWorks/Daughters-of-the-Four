@@ -91,7 +91,7 @@ namespace CombatSystem.Skills
                 return null;
             }
 
-            public void DoEffect(EntityPairInteraction entities, float effectValue)
+            public void DoEffect(EntityPairInteraction entities, ref float effectValue)
             {
                 var performer = entities.Performer;
                 var vanguardEffectsHolder = performer.Team.VanguardEffectsHolder;

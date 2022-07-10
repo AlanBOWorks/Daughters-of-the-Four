@@ -20,26 +20,21 @@ namespace CombatSystem.Skills.Effects
 
 
 
-        protected override void DoDeBuff(IBasicStats<float> buffingStats, float performerDeBuffPower,
-            float targetDeBuffResistance, ref float effectValue)
+        protected override void DoDeBuff(IBasicStats<float> deBuffingStats, ref float deBuffingValue)
         {
-            float buffingValue = UtilsStatsEffects.CalculateStatsDeBuffValue(
-                in performerDeBuffPower,
-                in targetDeBuffResistance,
-                in effectValue);
             switch (type)
             {
                 case EnumStats.VitalityStatType.Health:
-                    buffingStats.HealthType += buffingValue;
+                    deBuffingStats.HealthType -= deBuffingValue;
                     break;
                 case EnumStats.VitalityStatType.Mortality:
-                    buffingStats.MortalityType += buffingValue;
+                    deBuffingStats.MortalityType -= deBuffingValue;
                     break;
                 case EnumStats.VitalityStatType.DamageReduction:
-                    buffingStats.DamageReductionType += buffingValue;
+                    deBuffingStats.DamageReductionType -= deBuffingValue;
                     break;
                 case EnumStats.VitalityStatType.DebuffResistance:
-                    buffingStats.DeBuffResistanceType += buffingValue;
+                    deBuffingStats.DeBuffResistanceType -= deBuffingValue;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
