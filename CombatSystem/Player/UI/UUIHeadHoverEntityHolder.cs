@@ -12,9 +12,21 @@ namespace CombatSystem.Player.UI
     {
         [SerializeField]
         private ActionsInfoHandler actionsInfoHandler;
-        private Transform _followReference;
 
+        [SerializeField] 
+        private LuckInfoHandler luckInfoHandler;
+
+
+        private Transform _followReference;
         private RectTransform _rectTransform;
+
+
+
+        public void Show()
+        {
+            gameObject.SetActive(true);
+        }
+
 
         public void Injection(CombatEntity entity)
         {
@@ -46,6 +58,11 @@ namespace CombatSystem.Player.UI
             actionsInfoHandler.UpdateActionAmount(speed);
         }
 
+        public void UpdateLuck(CombatEntity entity)
+        {
+            float rolledLuck = entity.DiceValuesHolder.LuckFinalRoll;
+            luckInfoHandler.UpdateLuckAmount(rolledLuck);
+        }
 
         [Serializable]
         private struct ActionsInfoHandler
@@ -58,10 +75,16 @@ namespace CombatSystem.Player.UI
                 actionsTextHolder.text = speedText;
             }
         }
-
-        public void Show()
+        [Serializable]
+        private struct LuckInfoHandler
         {
-            gameObject.SetActive(true);
+            [SerializeField] private TextMeshProUGUI luckTextHolder;
+
+            public void UpdateLuckAmount(float luckPercent)
+            {
+                string luckText = luckPercent.ToString("P1");
+                luckTextHolder.text = luckText;
+            }
         }
     }
 }

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Skills.VanguardEffects;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -97,6 +99,11 @@ namespace CombatSystem.Skills
                 var vanguardEffectsHolder = performer.Team.VanguardEffectsHolder;
 
                 vanguardEffectsHolder.AddEffect(_skill);
+            }
+
+            public string GetEffectTooltip(CombatStats performerStats, float effectValue)
+            {
+                return LocalizeEffects.LocalizeEffectDigitValue(effectValue);
             }
         }
     }

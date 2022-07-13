@@ -28,7 +28,7 @@ namespace CombatSystem.Luck
         {
             Values = UtilsLuck.RolDice();
             float rolInUnit = Values.UnitValue;
-            LuckFinalRoll = UtilsLuck.CalculateLuckInUnit(in _calculationsReference, in rolInUnit);
+            LuckFinalRoll = UtilsLuck.CalculateLuckInUnit(_calculationsReference, rolInUnit);
 
 
         }

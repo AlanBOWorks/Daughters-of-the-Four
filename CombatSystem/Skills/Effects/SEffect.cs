@@ -15,6 +15,7 @@ namespace CombatSystem.Skills.Effects
 
 
         public abstract void DoEffect(EntityPairInteraction entities,ref float effectValue);
+        public abstract string GetEffectTooltip(CombatStats performerStats, float effectValue);
         public abstract string EffectTag { get; }
         public abstract string EffectSmallPrefix { get; }
         public abstract EnumsEffect.ConcreteType EffectType { get; }

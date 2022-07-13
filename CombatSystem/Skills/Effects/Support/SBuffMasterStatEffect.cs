@@ -20,12 +20,19 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => MasterBuffEffectSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Buff;
 
+        private const string BuffValuePrefix = "%";
+
         private void OnEnable()
         {
             _effectTag = "BuffMASTER_" + type + "_" + EffectPrefix;
         }
         public override string EffectTag => _effectTag;
 
+        public override string GetEffectTooltip(CombatStats performerStats, float effectValue)
+        {
+            effectValue *= UtilsStatsFormula.CalculateBuffPower(performerStats);
+            return LocalizeEffects.LocalizeEffectDigitValue(effectValue) + BuffValuePrefix;
+        }
         public override void DoEffect(EntityPairInteraction entities,ref float effectValue)
         {
             entities.Extract(out var performer, out var target);

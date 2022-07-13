@@ -15,12 +15,13 @@ namespace CombatSystem.Skills.Effects
     public class STeamControlEffect : SEffect, ITeamEffect
     {
         private string _effectTag;
-
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.ControlGain;
 
         private const string GainName = EffectTags.GainControlEffectName;
 
-        private string GetControlName() => GainName;
+        private const string TeamControlValuePrefix = "%";
+
+        private static string GetControlName() => GainName;
         public override string EffectTag => _effectTag;
 
         private const string GainSmallPrefix = EffectTags.GainControlEffectPrefix;
@@ -30,7 +31,11 @@ namespace CombatSystem.Skills.Effects
         {
             _effectTag = GetControlName().ToUpper() + "_" + EffectPrefix;
         }
-
+        public override string GetEffectTooltip(CombatStats performerStats, float effectValue)
+        {
+            effectValue *= UtilsStatsFormula.CalculateControlGain(performerStats);
+            return LocalizeEffects.LocalizeEffectDigitValue(effectValue) + TeamControlValuePrefix;
+        }
         public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
             entities.Extract(out var performer, out var target);

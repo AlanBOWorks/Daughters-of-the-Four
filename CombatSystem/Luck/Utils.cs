@@ -16,10 +16,10 @@ namespace CombatSystem.Luck
         {
             float diceUnitValue = RollDiceInUnit();
 
-            return CalculateLuckInUnit(in entityStats, in diceUnitValue);
+            return CalculateLuckInUnit(entityStats, diceUnitValue);
         }
 
-        public static float CalculateLuckInUnit(in CombatStats entityStats, in float rollInUnit)
+        public static float CalculateLuckInUnit(CombatStats entityStats, float rollInUnit)
         {
             float luckModifier = UtilsStatsFormula.CalculateLuckAmount(entityStats);
             return luckModifier * rollInUnit;

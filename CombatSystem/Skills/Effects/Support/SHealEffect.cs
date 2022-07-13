@@ -17,6 +17,13 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => HealEffectSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Heal;
 
+        private const string HealValuePrefix = "%";
+
+        public override string GetEffectTooltip(CombatStats performerStats, float effectValue)
+        {
+            effectValue *= UtilsStatsFormula.CalculateHealPower(performerStats);
+            return LocalizeEffects.LocalizeEffectDigitValue(effectValue) + HealValuePrefix;
+        }
         public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
             entities.Extract(out var performer, out var target);

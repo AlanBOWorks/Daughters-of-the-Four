@@ -6,7 +6,7 @@ namespace CombatSystem.Localization
 {
     public static class LocalizeEffects 
     {
-        public static void LocalizeEffectTooltip(in PerformEffectValues values, out string localizedEffect, out string effectValueDigits)
+        public static void LocalizeEffectTooltip(in PerformEffectValues values, out string localizedEffect)
         {
             var effect = values.Effect;
             var targeting = values.TargetType;
@@ -14,14 +14,12 @@ namespace CombatSystem.Localization
             string localizedName = CombatLocalizations.LocalizeEffectName(localizationTag);
             string localizeTargeting = LocalizeLineTargeting(targeting);
 
-            localizedEffect = "[" + localizeTargeting + "]\n" + localizedName + ": ";
-             effectValueDigits= LocalizeEffectDigitValue(new SubmitEffectValues(values));
+            localizedEffect = "[" + localizeTargeting + "]\n" + localizedName;
         }
 
-        public static string LocalizeEffectDigitValue(in SubmitEffectValues values)
+        public static string LocalizeEffectDigitValue(float effectValue)
         {
-            string effectValue = values.EffectValue.ToString("F1");
-            return effectValue;
+            return " <b>" + effectValue.ToString("F1") + "</b>";
         }
 
         public static string LocalizeLineTargeting(EnumsEffect.TargetType targetType)

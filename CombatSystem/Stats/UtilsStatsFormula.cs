@@ -15,7 +15,7 @@ namespace CombatSystem.Stats
         private static float CalculateStatAsMultiplicative(CombatStats stats, EnumStats.StatType type)
         {
             UtilsStats.GetElements(type, stats, out var baseStats, out var buffStats, out var burstStats);
-            return (baseStats + buffStats) * (1 * burstStats);
+            return (baseStats + buffStats) * (1 + burstStats);
         }
         private static float CalculateStatAsAdditive(CombatStats stats, EnumStats.StatType type)
         {

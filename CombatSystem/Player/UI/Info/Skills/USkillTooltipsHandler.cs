@@ -13,9 +13,12 @@ namespace CombatSystem.Player.UI
 {
     public class USkillTooltipsHandler : MonoBehaviour, ISkillPointerListener
     {
-
         [SerializeField]
-        private SkillInfoHandler skillInfo = new SkillInfoHandler();
+        private SkillInfoHandler skillInfo;
+        [SerializeField]
+        private LuckInfoHandler luckInfo;
+
+        [Title("Holder")]
         [SerializeField] 
         private UEffectsTooltipWindowHandler tooltipWindow;
 
@@ -31,14 +34,18 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillButtonHover(ICombatSkill skill)
         {
-            skillInfo.HandleSkillName(skill);
+            ExtractTheme(skill,out var roleColor,out var roleIcon);
+            skillInfo.HandleSkillName(skill, roleColor, roleIcon);
+            luckInfo.HandleLuckAmount(skill, roleColor);
+
             IEnumerable<PerformEffectValues> skillEffects;
             if (skill.Preset is IVanguardSkill vanguardSkill)
                 skillEffects = vanguardSkill.GetPerformVanguardEffects();
             else
                 skillEffects = skill.GetEffects();
 
-            tooltipWindow.HandleEffects(skillEffects);
+            var performer = PlayerCombatSingleton.PlayerTeamController.GetPerformer();
+            tooltipWindow.HandleEffects(skillEffects, performer);
             tooltipWindow.Show();
 
         }
@@ -48,27 +55,53 @@ namespace CombatSystem.Player.UI
             tooltipWindow.Hide();
         }
 
+        private static void ExtractTheme(ISkill skill, out Color roleColor, out Sprite roleIcon)
+        {
+            var archetype = skill.TeamTargeting;
+            var roleThemesHolder = CombatThemeSingleton.SkillsThemeHolder;
+            var roleTheme = UtilsSkill.GetElement(archetype, roleThemesHolder);
+            roleColor = roleTheme.GetThemeColor();
+            roleIcon = roleTheme.GetThemeIcon();
+        }
 
 
         [Serializable]
-        private sealed class SkillInfoHandler
+        private struct SkillInfoHandler
         {
             [SerializeField] private TextMeshProUGUI nameHolder;
             [SerializeField] private Image roleIconHolder;
 
-            public void HandleSkillName(ICombatSkill skill)
+            public void HandleSkillName(ICombatSkill skill, Color roleColor, Sprite roleIcon)
             {
                 var skillName = LocalizeSkills.LocalizeSkill(skill);
                 nameHolder.text = skillName;
 
-                var archetype = skill.TeamTargeting;
-                var roleThemesHolder = CombatThemeSingleton.SkillsThemeHolder;
-                var roleTheme = UtilsSkill.GetElement(archetype, roleThemesHolder);
-                var roleColor = roleTheme.GetThemeColor();
-                var roleIcon = roleTheme.GetThemeIcon();
-
                 roleIconHolder.sprite = roleIcon;
                 roleIconHolder.color = roleColor;
+            }
+        }
+
+        [Serializable]
+        private struct LuckInfoHandler
+        {
+            [SerializeField] private TextMeshProUGUI luckAmountHolder;
+
+            public void HandleLuckAmount(ISkill skill, Color color)
+            {
+                var luckAmount = skill.LuckModifier;
+                HandleLuckText(luckAmount);
+                HandleLuckColor(color);
+            }
+
+            private void HandleLuckText(float luckAmount)
+            {
+                string luckAmountText = luckAmount.ToString("P0");
+                luckAmountHolder.text = luckAmountText;
+            }
+
+            private void HandleLuckColor(Color color)
+            {
+                luckAmountHolder.color = color;
             }
         }
     }

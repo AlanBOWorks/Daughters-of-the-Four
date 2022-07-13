@@ -101,7 +101,8 @@ namespace CombatSystem.Player.UI
 
         private void Spawn(Transform targetTransform, in SubmitEffectValues queueValues)
         {
-            var popUpText = LocalizeEffects.LocalizeEffectDigitValue(in queueValues);
+            var effectValue = queueValues.EffectValue;
+            var popUpText = LocalizeEffects.LocalizeEffectDigitValue(effectValue);
             var icon = UtilsVisual.GetEffectSprite(queueValues.Effect);
 
             Vector3 targetPosition = _combatCamera.WorldToScreenPoint(targetTransform.position);

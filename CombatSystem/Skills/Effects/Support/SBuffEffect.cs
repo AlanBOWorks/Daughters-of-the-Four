@@ -15,6 +15,9 @@ namespace CombatSystem.Skills.Effects
 
         private const string BuffSmallPrefix = EffectTags.BuffEffectPrefix;
         private const string BurstSmallPrefix = EffectTags.BurstEffectPrefix;
+
+        private const string BuffValuePrefix = "%";
+
         protected string GetBuffPrefix() => (isBurst) ? BurstPrefix : BuffPrefix;
         public override string EffectSmallPrefix => (isBurst) ? BurstSmallPrefix : BuffSmallPrefix;
         
@@ -25,6 +28,11 @@ namespace CombatSystem.Skills.Effects
             ? EnumsEffect.ConcreteType.Burst
             : EnumsEffect.ConcreteType.Buff;
 
+        public override string GetEffectTooltip(CombatStats performerStats, float effectValue)
+        {
+            effectValue *= UtilsStatsFormula.CalculateBuffPower(performerStats);
+            return LocalizeEffects.LocalizeEffectDigitValue(effectValue) + BuffValuePrefix;
+        }
 
         public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {

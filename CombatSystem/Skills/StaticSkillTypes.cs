@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Skills.VanguardEffects;
+using CombatSystem.Stats;
 using UnityEngine;
 
 namespace CombatSystem.Skills
@@ -122,6 +124,11 @@ namespace CombatSystem.Skills
             {
                 entities.Extract(out var performer, out var target);
                 Debug.Log(EffectTag + $" - P[{performer.CombatCharacterName}] >> T[{target.CombatCharacterName}]");
+            }
+
+            public string GetEffectTooltip(CombatStats performerStats, float effectValue)
+            {
+                return LocalizeEffects.LocalizeEffectDigitValue(effectValue);
             }
         }
     }

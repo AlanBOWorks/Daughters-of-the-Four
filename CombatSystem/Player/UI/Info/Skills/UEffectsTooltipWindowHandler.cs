@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using CombatSystem.Entity;
 using CombatSystem.Localization;
 using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
+using CombatSystem.Stats;
 using MEC;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -46,13 +48,14 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void HandleEffects(IEnumerable<PerformEffectValues> effects)
+        public void HandleEffects(IEnumerable<PerformEffectValues> effects, CombatEntity performer)
         {
             float accumulatedHeight = 0;
+            var stats = performer.Stats;
             foreach (var value in effects)
             {
                 var holder = pool.GetElementSafe();
-                UtilsEffectTooltip.HandleText(holder, in value);
+                UtilsEffectTooltip.HandleText(holder, in value, stats);
                 UtilsEffectTooltip.HandleIcon(holder, value.Effect);
 
                 UtilsEffectTooltip.HandleTextHeight(holder.GetTextHolder(), ref accumulatedHeight);
@@ -69,18 +72,30 @@ namespace CombatSystem.Player.UI
 
     public static class UtilsEffectTooltip
     {
-        public static void HandleText(UEffectTooltipHolder holder, in PerformEffectValues values)
+        public static void HandleText(UEffectTooltipHolder holder, in PerformEffectValues values, CombatStats stats = null)
         {
             var textHolder = holder.GetTextHolder();
-            LocalizeEffects.LocalizeEffectTooltip(in values, out var effectText, out var valueDigits);
-            textHolder.text = effectText + ":" + valueDigits;
+            LocalizeEffects.LocalizeEffectTooltip(in values, out var effectText);
+
+            var effect = values.Effect;
+            if (stats == null)
+            {
+                textHolder.text = effectText;
+                return;
+            }
+
+            var valueDigits = effect.GetEffectTooltip(stats, values.EffectValue);
+            if(valueDigits != null)
+                textHolder.text = effectText + ":" + valueDigits;
+            else
+                textHolder.text = effectText;
         }
 
-        public static void MultiplyEffectText(UEffectTooltipHolder holder, float modifier)
+        public static void MultiplyEffectText(UEffectTooltipHolder holder, float modifier, CombatStats stats = null)
         {
             var currentValues = holder.EffectValues;
             PerformEffectValues nextValues = currentValues * modifier;
-            HandleText(holder, nextValues);
+            HandleText(holder, nextValues, stats);
         }
 
 

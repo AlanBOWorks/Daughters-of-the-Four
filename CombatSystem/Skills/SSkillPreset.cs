@@ -67,7 +67,7 @@ namespace CombatSystem.Skills
         private int skillCost = 1;
 
         [SerializeField, Range(0, 3), SuffixLabel("%"), Tooltip("0:  crit won't be calculated")] 
-        private float luckModifier;
+        private float effectsLuckModifier = .5f;
 
         [TitleGroup("Effects")]
         [SerializeField]
@@ -110,7 +110,7 @@ namespace CombatSystem.Skills
 
         public abstract IEffect GetMainEffectArchetype();
         public abstract bool IgnoreSelf();
-        public float LuckModifier => luckModifier;
+        public float LuckModifier => effectsLuckModifier;
         public bool HasEffects() => effects.Length > 0;
 
         protected virtual string GetAssetPrefix() => " [SkillPreset]";
