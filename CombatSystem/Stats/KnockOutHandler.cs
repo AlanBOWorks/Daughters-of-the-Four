@@ -53,7 +53,7 @@ namespace CombatSystem.Stats
         private static void HealReviveEntity(CombatEntity entity, bool isHealRevive)
         {
             var entityStats = entity.Stats;
-            UtilsCombatEffect.DoHealToPercent(in entityStats, ReviveHealingPercent);
+            UtilsCombatEffect.DoHealPercent(in entityStats, ReviveHealingPercent);
             CombatSystemSingleton.EventsHolder.OnRevive(entity, isHealRevive);
         }
 

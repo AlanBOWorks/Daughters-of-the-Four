@@ -23,11 +23,16 @@ namespace CombatSystem.Skills.Effects
 
         private const string StanceSmallPrefix = EffectTags.StanceEffectPrefix;
 
+        public override bool IsPercentSuffix() => true;
+
         public override string EffectTag => _effectTag;
         public override string EffectSmallPrefix => StanceSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Stance;
 
-        public override string GetEffectTooltip(CombatStats performerStats, float effectValue) => null;
+        public override float CalculateEffectValue(CombatStats performerStats, float effectValue) 
+            => UtilsStatsFormula.CalculateControlGain(performerStats) * effectValue;
+        public override string GetEffectValueTootLip(CombatStats performerStats, float effectValue) => null;
+
         public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
             entities.Extract(out var performer, out var target);

@@ -22,6 +22,8 @@ namespace CombatSystem.Skills.Effects
         private const string TeamControlValuePrefix = "%";
 
         private static string GetControlName() => GainName;
+       
+
         public override string EffectTag => _effectTag;
 
         private const string GainSmallPrefix = EffectTags.GainControlEffectPrefix;
@@ -31,10 +33,12 @@ namespace CombatSystem.Skills.Effects
         {
             _effectTag = GetControlName().ToUpper() + "_" + EffectPrefix;
         }
-        public override string GetEffectTooltip(CombatStats performerStats, float effectValue)
+
+
+        public override bool IsPercentSuffix() => true;
+        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
         {
-            effectValue *= UtilsStatsFormula.CalculateControlGain(performerStats);
-            return LocalizeEffects.LocalizeEffectDigitValue(effectValue) + TeamControlValuePrefix;
+            return effectValue * UtilsStatsFormula.CalculateControlGain(performerStats);
         }
         public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {

@@ -20,11 +20,12 @@ namespace CombatSystem.Skills.Effects
 
         [SerializeField] protected bool isBurst;
 
-        public override string GetEffectTooltip(CombatStats performerStats, float effectValue)
+        public override bool IsPercentSuffix() => true;
+        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
         {
-            effectValue *= UtilsStatsFormula.CalculateDeBuffPower(performerStats);
-            return LocalizeEffects.LocalizeEffectDigitValue(effectValue) + DeBuffValuePrefix;
+            return effectValue * UtilsStatsFormula.CalculateDeBuffPower(performerStats);
         }
+
 
         public override EnumsEffect.ConcreteType EffectType => (isBurst) 
             ? EnumsEffect.ConcreteType.DeBurst : EnumsEffect.ConcreteType.DeBuff;

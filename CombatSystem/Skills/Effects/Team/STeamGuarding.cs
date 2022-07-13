@@ -14,19 +14,22 @@ namespace CombatSystem.Skills.Effects
 
         private const string GuardingValuePrefix = "u.";
 
+       
+
         public override string EffectTag => GuardingEffectTag;
         public override string EffectSmallPrefix => GuardingSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Guarding;
 
-        public override string GetEffectTooltip(CombatStats performerStats, float effectValue)
-        {
-            effectValue *= UtilsStatsFormula.CalculateShieldingPower(performerStats);
-            return LocalizeEffects.LocalizeEffectDigitValue(effectValue) + GuardingValuePrefix;
-        }
         public override void DoEffect(EntityPairInteraction entities,ref float effectValue)
         {
             entities.Extract(out var performer, out var target);
             performer.Team.GuardHandler.SetGuarder(target);
+        }
+
+        public override bool IsPercentSuffix() => false;
+        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
+        {
+            return effectValue * UtilsStatsFormula.CalculateShieldingPower(performerStats);
         }
     }
 }

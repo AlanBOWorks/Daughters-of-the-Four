@@ -102,7 +102,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        private const int CloseStepThreshold = 2;
+        private const int CloseStepThreshold = 1;
         public void TickTempo(in TempoTickValues values)
         {
             var currentTickInitiative = values.CurrentTick;

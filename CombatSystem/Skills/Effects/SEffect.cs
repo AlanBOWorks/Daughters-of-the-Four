@@ -1,4 +1,5 @@
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -15,7 +16,18 @@ namespace CombatSystem.Skills.Effects
 
 
         public abstract void DoEffect(EntityPairInteraction entities,ref float effectValue);
-        public abstract string GetEffectTooltip(CombatStats performerStats, float effectValue);
+        public abstract float CalculateEffectValue(CombatStats performerStats, float effectValue);
+        public virtual string GetEffectValueTootLip(CombatStats performerStats, float effectValue)
+        {
+            var calculateEffectValue = CalculateEffectValue(performerStats, effectValue);
+
+            var effectTooltip = LocalizeEffects.LocalizeMathfValue(calculateEffectValue, IsPercentSuffix());
+            return " <b>" + effectTooltip + "</b>";
+        }
+        public abstract bool IsPercentSuffix();
+
+
+
         public abstract string EffectTag { get; }
         public abstract string EffectSmallPrefix { get; }
         public abstract EnumsEffect.ConcreteType EffectType { get; }

@@ -126,10 +126,11 @@ namespace CombatSystem.Skills
                 Debug.Log(EffectTag + $" - P[{performer.CombatCharacterName}] >> T[{target.CombatCharacterName}]");
             }
 
-            public string GetEffectTooltip(CombatStats performerStats, float effectValue)
+            public string GetEffectValueTootLip(CombatStats performerStats, float effectValue)
             {
-                return LocalizeEffects.LocalizeEffectDigitValue(effectValue);
+                return LocalizeEffects.LocalizePercentValue(effectValue);
             }
+            public bool IsPercentSuffix() => true;
         }
     }
     

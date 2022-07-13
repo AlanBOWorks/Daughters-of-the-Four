@@ -1,3 +1,4 @@
+using System.Globalization;
 using CombatSystem.Entity;
 using CombatSystem.Localization;
 using CombatSystem.Stats;
@@ -12,12 +13,13 @@ namespace CombatSystem.Skills.Effects
 
         private const string DamageEffectTag = EffectTags.DamageEffectTag;
         private const string DamageSmallPrefix = EffectTags.DamageEffectPrefix;
-        private const string DamageValuePrefix = "u.";
-        public override string GetEffectTooltip(CombatStats performerStats, float effectValue)
+
+        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
         {
-            effectValue *= UtilsStatsFormula.CalculateAttackPower(performerStats);
-            return LocalizeEffects.LocalizeEffectDigitValue(effectValue) + DamageValuePrefix;
+            return effectValue * UtilsStatsFormula.CalculateAttackPower(performerStats);
         }
+        public override bool IsPercentSuffix() => false;
+
 
         public override string EffectTag => DamageEffectTag;
         public override string EffectSmallPrefix => DamageSmallPrefix;

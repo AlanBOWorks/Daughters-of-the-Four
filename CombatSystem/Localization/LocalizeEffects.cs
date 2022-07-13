@@ -1,6 +1,8 @@
 using System;
+using System.Globalization;
 using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
+using UnityEngine;
 
 namespace CombatSystem.Localization
 {
@@ -17,9 +19,77 @@ namespace CombatSystem.Localization
             localizedEffect = "[" + localizeTargeting + "]\n" + localizedName;
         }
 
-        public static string LocalizeEffectDigitValue(float effectValue)
+
+        private const string SmallValueSuffix = "";
+        public const string ThousandValueSuffix = "K";
+        public const float ThousandThreshold = 1000;
+        public const float ThousandSimplificationModifier = 0.001f;
+        public const string MillionsValueSuffix = "M";
+        public const float MillionThreshold = 1000000;
+        public const float MillionSimplificationModifier = 0.000001f;
+        public const string BillionValueSuffix = "B";
+        public const float BillionThreshold = 1000000000;
+        public const float BillionSimplificationModifier = 0.000000001f;
+
+
+        public const string PercentSuffix = "%";
+        public const string UnitSuffix = "u";
+        public const string MixUnitSuffix = "u/%";
+
+
+        public static string GetEffectValueSuffix(IEffect effect)
         {
-            return " <b>" + effectValue.ToString("F1") + "</b>";
+            return effect switch
+            {
+                IOffensiveEffect o => UnitSuffix,
+                ISupportEffect s => PercentSuffix,
+                _ => MixUnitSuffix
+            };
+        }
+
+        public static string LocalizeMathfValue(float value, bool isPercentValue)
+        {
+            return (isPercentValue) ? LocalizePercentValue(value) : LocalizeArithmeticValue(value);
+        }
+
+        /// <summary>
+        /// Check if the value is higher than 1000 and converts it to [K,M,...]
+        /// </summary>
+        public static string LocalizeArithmeticValue(float value)
+        {
+            value = GetSimplifiedValue(value, out var valueSuffix);
+            return value.ToString("####.#") + valueSuffix + UnitSuffix;
+        }
+
+        public static string LocalizePercentValue(float value)
+        {
+            value *= 100f;
+            value = GetSimplifiedValue(value, out var valueSuffix);
+            return value.ToString("####") + valueSuffix + PercentSuffix;
+        }
+
+        public static float GetSimplifiedValue(float value, out string valueSuffix)
+        {
+            if (value < ThousandThreshold)
+            {
+                valueSuffix = SmallValueSuffix;
+                return value;
+            }
+
+            if (value < MillionThreshold)
+            {
+                valueSuffix = ThousandValueSuffix;
+                return (value * ThousandSimplificationModifier);
+            }
+
+            if (value < BillionThreshold)
+            {
+                valueSuffix = MillionsValueSuffix;
+                return (value * MillionSimplificationModifier);
+            }
+
+            valueSuffix = BillionValueSuffix;
+            return (value * BillionSimplificationModifier);
         }
 
         public static string LocalizeLineTargeting(EnumsEffect.TargetType targetType)
@@ -43,18 +113,6 @@ namespace CombatSystem.Localization
             }*/
         }
 
-        public const string PercentSuffix = "%";
-        public const string UnitSuffix = "u";
-        public const string MixUnitSuffix = "u/%";
 
-        public static string GetEffectValueSuffix(IEffect effect)
-        {
-            return effect switch
-            {
-                IOffensiveEffect o => UnitSuffix,
-                ISupportEffect s => PercentSuffix,
-                _ => MixUnitSuffix
-            };
-        }
     }
 }

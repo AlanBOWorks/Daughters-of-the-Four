@@ -28,11 +28,13 @@ namespace CombatSystem.Skills.Effects
         }
         public override string EffectTag => _effectTag;
 
-        public override string GetEffectTooltip(CombatStats performerStats, float effectValue)
+        public override bool IsPercentSuffix() => true;
+        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
         {
-            effectValue *= UtilsStatsFormula.CalculateBuffPower(performerStats);
-            return LocalizeEffects.LocalizeEffectDigitValue(effectValue) + BuffValuePrefix;
+            return effectValue * UtilsStatsFormula.CalculateBuffPower(performerStats);
         }
+
+
         public override void DoEffect(EntityPairInteraction entities,ref float effectValue)
         {
             entities.Extract(out var performer, out var target);

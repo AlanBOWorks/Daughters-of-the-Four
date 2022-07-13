@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using CombatSystem.Entity;
 using CombatSystem.Localization;
 using CombatSystem.Skills.Effects;
@@ -100,11 +101,12 @@ namespace CombatSystem.Skills
 
                 vanguardEffectsHolder.AddEffect(_skill);
             }
-
-            public string GetEffectTooltip(CombatStats performerStats, float effectValue)
+            public string GetEffectValueTootLip(CombatStats performerStats, float effectValue)
             {
-                return LocalizeEffects.LocalizeEffectDigitValue(effectValue);
+                return LocalizeEffects.LocalizePercentValue(effectValue);
             }
+            public bool IsPercentSuffix() => true;
+
         }
     }
 }

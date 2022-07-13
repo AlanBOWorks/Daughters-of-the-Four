@@ -324,19 +324,32 @@ namespace CombatSystem.Skills.Effects
             mortalityLost = true;
         }
 
-        public static void DoHealTo(CombatStats target, float healAmount)
+
+
+        public static void DoHealPercent(in CombatStats target, in float healPercent, out float healedAmount)
         {
-            float targetHealth = target.CurrentHealth + healAmount;
+            if (healPercent < 0)
+            {
+                healedAmount = 0;
+                return;
+            }
+
+            float maxHeal = UtilsStatsFormula.CalculateMaxHealth(target);
+            healedAmount = maxHeal * healPercent;
+
+            float targetHealth = maxHeal + healedAmount;
             DoOverrideHealth(target, ref targetHealth);
         }
-
-        public static void DoHealToPercent(in CombatStats target, in float healPercent)
+        public static void DoHealPercent(in CombatStats target, in float healPercent)
         {
-            if(healPercent < 0) return;
-            float targetHealth = UtilsStatsFormula.CalculateMaxHealth(target) * (1 + healPercent);
-
-            DoOverrideHealth(target, ref targetHealth);
+            DoHealPercent(target,healPercent, out _);
         }
+        private static void DoOverrideHealth(CombatStats target, ref float targetHealth)
+        {
+            float maxHealth = UtilsStatsFormula.CalculateMaxHealth(target);
+            DoOverrideHealth(target, ref targetHealth, maxHealth);
+        }
+
 
         private static void DoOverrideHealth(CombatStats target, ref float targetHealth, float maxHealth)
         {
@@ -348,11 +361,6 @@ namespace CombatSystem.Skills.Effects
             }
 
             target.CurrentHealth = targetHealth;
-        }
-        private static void DoOverrideHealth(CombatStats target, ref float targetHealth)
-        {
-            float maxHealth = UtilsStatsFormula.CalculateMaxHealth(target);
-            DoOverrideHealth(target, ref targetHealth, maxHealth);
         }
     }
 

@@ -84,7 +84,7 @@ namespace CombatSystem.Player.UI
                 return;
             }
 
-            var valueDigits = effect.GetEffectTooltip(stats, values.EffectValue);
+            var valueDigits = effect.GetEffectValueTootLip(stats, values.EffectValue);
             if(valueDigits != null)
                 textHolder.text = effectText + ":" + valueDigits;
             else
