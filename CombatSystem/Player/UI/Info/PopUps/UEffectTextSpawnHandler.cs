@@ -18,7 +18,7 @@ namespace CombatSystem.Player.UI
         [SerializeField]
         private EffectPopupHandler effectPopupHandler = new EffectPopupHandler();
 
-
+        [ShowInInspector]
         private Queue<KeyValuePair<Transform, SubmitEffectValues>> _popUpQueue;
 
         private void Awake()

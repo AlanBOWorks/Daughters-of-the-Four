@@ -1,5 +1,6 @@
 using System;
 using CombatSystem.Entity;
+using CombatSystem.Localization;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Stats;
 using SCharacterCreator.Bones;
@@ -82,7 +83,7 @@ namespace CombatSystem.Player.UI
 
             public void UpdateLuckAmount(float luckPercent)
             {
-                string luckText = luckPercent.ToString("P1");
+                string luckText = LocalizeEffects.LocalizePercentValue(luckPercent);
                 luckTextHolder.text = luckText;
             }
         }

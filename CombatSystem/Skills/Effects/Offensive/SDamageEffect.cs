@@ -34,7 +34,6 @@ namespace CombatSystem.Skills.Effects
             var performerAttackPower = UtilsStatsFormula.CalculateAttackPower(performerStats);
             var targetDamageReduction = UtilsStatsFormula.CalculateDamageReduction(targetStats);
             float damage = UtilsStatsEffects.CalculateFinalDamage(effectValue, performerAttackPower, targetDamageReduction);
-
             if (damage <= 0)
             {
                 //todo call for DamageZeroEvent
@@ -43,6 +42,8 @@ namespace CombatSystem.Skills.Effects
             {
                 UtilsCombatEffect.DoDamageTo(target, performer, damage);
             }
+
+            effectValue = damage;
         }
 
     }

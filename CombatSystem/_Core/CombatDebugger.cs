@@ -316,6 +316,7 @@ namespace CombatSystem._Core
             if (!ShowEffectLogs || !_effectLogs.OnPrimary) return;
             entities.Extract(out var performer, out var target);
             Debug.Log($"Primary Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
+            Debug.Log($"VALUE: {values.EffectValue}");
         }
 
         public void OnCombatSecondaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
@@ -323,6 +324,7 @@ namespace CombatSystem._Core
             if (!ShowEffectLogs || !_effectLogs.OnSecondary) return;
             entities.Extract(out var performer, out var target);
             Debug.Log($"Secondary Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
+            Debug.Log($"VALUE: {values.EffectValue}");
         }
 
         public void OnCombatVanguardEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)

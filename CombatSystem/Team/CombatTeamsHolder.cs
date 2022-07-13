@@ -5,9 +5,9 @@ namespace CombatSystem.Team
 {
     public sealed class CombatTeamsHolder : IOppositionTeamStructureRead<CombatTeam>
     {
-        [ShowInInspector,HorizontalGroup()]
+        [ShowInInspector,TabGroup("Player Team")]
         public CombatTeam PlayerTeamType { get; internal set; }
-        [ShowInInspector,HorizontalGroup()]
+        [ShowInInspector, TabGroup("Enemy Team")]
         public CombatTeam EnemyTeamType { get; internal set; }
     }
 }

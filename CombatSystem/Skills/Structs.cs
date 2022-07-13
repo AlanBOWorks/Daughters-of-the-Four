@@ -1,6 +1,7 @@
 using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Skills.VanguardEffects;
+using Sirenix.OdinInspector;
 
 namespace CombatSystem.Skills
 {
@@ -34,7 +35,9 @@ namespace CombatSystem.Skills
 
     public readonly struct SubmitEffectValues
     {
+        [ShowInInspector]
         public readonly IEffect Effect;
+        [ShowInInspector]
         public readonly float EffectValue;
 
         public SubmitEffectValues(IEffect effect, float effectValue)
