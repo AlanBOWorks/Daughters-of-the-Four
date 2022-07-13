@@ -10,10 +10,10 @@ using UnityEngine;
 namespace CombatSystem.Skills
 {
     [CreateAssetMenu(fileName = "N" + VanguardAssetPrefix,
-        menuName = "Combat/Skill/Vanguard Preset")]
+        menuName = "Combat/Skill/Vanguard Preset", order = -10)]
     public class SVanguardSkillPreset : SSkillPresetBase, IVanguardSkill
     {
-        private const string VanguardAssetPrefix =  " [Vanguard Skill Preset]";
+        private const string VanguardAssetPrefix =  " [Vanguard Skill]";
 
         [TitleGroup("Values")]
         [SerializeField]

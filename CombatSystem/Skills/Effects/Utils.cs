@@ -4,6 +4,7 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.UI;
 using CombatSystem.Stats;
+using CombatSystem.Team;
 using UnityEngine;
 
 namespace CombatSystem.Skills.Effects
@@ -18,16 +19,21 @@ namespace CombatSystem.Skills.Effects
 
             void DoSkillOnTarget()
             {
-                DoEffectsOnTarget(performer, exclusion, onTarget, effects);
+                var actors = new EffectActors(performer, exclusion, onTarget);
+                DoEffectsOnTarget(actors, effects, skill.LuckModifier);
 
             }
         }
 
-        public static void DoVanguardSkillOnPerformer(in VanguardSkillUsageValues values, IReadOnlyDictionary<CombatEntity, int> offensiveRecords)
+        public static void DoVanguardSkillOnPerformer(
+            in VanguardSkillUsageValues values, 
+            IReadOnlyDictionary<CombatEntity, int> offensiveRecords)
         {
             var skill = values.UsedSkill;
             var performer = values.EffectsHolder.GetMainEntity();
             var iterations = values.Accumulation;
+            var luckModifier = skill.LuckModifier;
+
 
             float totalOffensiveIterations = 0;
             foreach (var offensiveRecord in offensiveRecords)
@@ -63,20 +69,22 @@ namespace CombatSystem.Skills.Effects
 
                 void DoEffectOnTarget(CombatEntity onTarget, int targetIterations)
                 {
+                    var actors = new EffectActors(performer,onTarget);
                     PerformEffectValues performValue = new PerformEffectValues(
                         effect.Effect,
                         effect.EffectValue * iterations * targetIterations,
                         effect.TargetType);
-                    DoEffect(performer, null, onTarget, performValue);
+                    DoEffect(actors, performValue, luckModifier);
                 }
 
                 void DoEffectOnPerformer()
                 {
+                    var actors = new EffectActors(performer,performer);
                     PerformEffectValues performValue = new PerformEffectValues(
                         effect.Effect,
                         totalOffensiveIterations * effect.EffectValue * iterations,
                         effectType);
-                    DoEffect(performer, null, performer, performValue);
+                    DoEffect(actors, performValue, luckModifier);
                 }
             }
 
@@ -85,22 +93,23 @@ namespace CombatSystem.Skills.Effects
 
 
         private static void DoEffectsOnTarget(
-            CombatEntity performer, CombatEntity exclusion,
-            CombatEntity target,
-            IEnumerable<PerformEffectValues> effects)
+           EffectActors actors,
+            IEnumerable<PerformEffectValues> effects,
+           float critModifier)
         {
             foreach (var effect in effects)
             {
-                DoEffect(performer, exclusion, target, effect);
+                DoEffect(actors, effect, critModifier);
             }
         }
 
         private static void DoEffect(
-            CombatEntity performer, 
-            CombatEntity exclusion, 
-            CombatEntity target,
-            PerformEffectValues values)
+            EffectActors actors,
+            PerformEffectValues values,
+            float skillLuckModifier)
         {
+            actors.Extract(out var performer, out var exclusion, out var target);
+
             var targetType = values.TargetType;
             var targets = UtilsTarget.GetEffectTargets(targetType, performer, target);
             var effect = values.Effect;
@@ -125,7 +134,7 @@ namespace CombatSystem.Skills.Effects
                     void DoEffectOnTarget()
                     {
                         var entities = new EntityPairInteraction(performer, effectTarget);
-                        float targetEffectValue = effectValue;
+                        float targetEffectValue = CalculateFinalEffectValue();
                         effect.DoEffect(entities,ref targetEffectValue);
 
                         var submitEffect = new SubmitEffectValues(effect ,targetEffectValue);
@@ -137,9 +146,56 @@ namespace CombatSystem.Skills.Effects
                         }
                         else
                             eventsHolder.OnCombatSecondaryEffectPerform(entities, in submitEffect);
+                    }
+
+                    float CalculateFinalEffectValue()
+                    {
+                        if (skillLuckModifier <= 0) return effectValue;
+
+                        float entitiesLuck = CalculateEntitiesLuck();
+                        float skillFinalLuckModifier = skillLuckModifier * entitiesLuck;
+
+                        return skillFinalLuckModifier > 0
+                            ? effectValue * (1 + skillFinalLuckModifier)
+                            : effectValue;
+                    }
+
+                    float CalculateEntitiesLuck()
+                    {
+                        float performerLuck = performer.DiceValuesHolder.LuckFinalRoll;
+                        float onTargetLuck = target.DiceValuesHolder.LuckFinalRoll;
+
+                        bool areSameTeam = performer.Team.Contains(target);
+                        if (areSameTeam)
+                            return (performerLuck + onTargetLuck) * .5f;
+                        return 1 + performerLuck - onTargetLuck;
 
                     }
                 }
+            }
+        }
+
+        private readonly struct EffectActors
+        {
+            public readonly CombatEntity Performer;
+            public readonly CombatEntity Exclusion;
+            public readonly CombatEntity Target;
+
+            public EffectActors(CombatEntity performer, CombatEntity exclusion, CombatEntity target)
+            {
+                Performer = performer;
+                Exclusion = exclusion;
+                Target = target;
+            }
+
+            public EffectActors(CombatEntity performer, CombatEntity target) : this(performer,null, target)
+            { }
+
+            public void Extract(out CombatEntity performer, out CombatEntity exclusion, out CombatEntity target)
+            {
+                performer = Performer;
+                exclusion = Exclusion;
+                target = Target;
             }
         }
     }
@@ -151,7 +207,7 @@ namespace CombatSystem.Skills.Effects
 
     public static class UtilsCombatEffect
     {
-        public static void DoDamageTo(CombatEntity target, CombatEntity performer, in float damage,
+        public static void DoDamageTo(CombatEntity target, CombatEntity performer, float damage,
             bool eventCallback = true)
         {
             if( damage <= 0) return;

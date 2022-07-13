@@ -18,13 +18,12 @@ namespace CombatSystem.Skills.Effects
 
         public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
         {
-            float damage = effectValue;
             entities.Extract(out var performer, out var target);
             var targetStats = target.Stats;
 
-            UtilsStatsEffects.CalculateDamageFromAttackAttribute(performer.Stats, ref damage);
-            UtilsStatsEffects.CalculateDamageReduction(targetStats,ref damage);
-
+            var performerAttackPower = UtilsStatsFormula.CalculateAttackPower(performer.Stats);
+            var targetDamageReduction = UtilsStatsFormula.CalculateDamageReduction(targetStats);
+            float damage = UtilsStatsEffects.CalculateFinalDamage(effectValue, performerAttackPower, targetDamageReduction);
 
             if (damage <= 0)
             {
@@ -32,7 +31,7 @@ namespace CombatSystem.Skills.Effects
             }
             else
             {
-                UtilsCombatEffect.DoDamageTo(target, performer, in damage);
+                UtilsCombatEffect.DoDamageTo(target, performer, damage);
             }
 
             effectValue = damage;

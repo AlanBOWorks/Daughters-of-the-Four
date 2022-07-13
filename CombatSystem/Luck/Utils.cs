@@ -5,10 +5,10 @@ namespace CombatSystem.Luck
 {
     public static class UtilsLuck
     {
-        public const float LuckDiceModifier = .05f;
+        public const float LuckDiceModifier = .1f;
 
         public const int LuckDiceLow = 0;
-        public const int LuckDiceHigh = 20;
+        public const int LuckDiceHigh = 10;
 
 
 
@@ -21,7 +21,7 @@ namespace CombatSystem.Luck
 
         public static float CalculateLuckInUnit(in CombatStats entityStats, in float rollInUnit)
         {
-            float luckModifier = UtilsStatsFormula.CalculateLuckAmount(in entityStats);
+            float luckModifier = UtilsStatsFormula.CalculateLuckAmount(entityStats);
             return luckModifier * rollInUnit;
         }
         
@@ -30,7 +30,7 @@ namespace CombatSystem.Luck
         public static DiceValues RolDice()
         {
             int roll = RollDice();
-            float rolInUnits = DiceRolModifiedInUnit(in roll);
+            float rolInUnits = DiceRolModifiedInUnit(roll);
 
             return new DiceValues(roll, rolInUnits);
         }
@@ -45,9 +45,9 @@ namespace CombatSystem.Luck
         public static float RollDiceInUnit()
         {
             int diceRoll = RollDice();
-            return DiceRolModifiedInUnit(in diceRoll);
+            return DiceRolModifiedInUnit(diceRoll);
         }
 
-        private static float DiceRolModifiedInUnit(in int diceRoll) => diceRoll * LuckDiceModifier;
+        private static float DiceRolModifiedInUnit(int diceRoll) => diceRoll * LuckDiceModifier;
     }
 }

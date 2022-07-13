@@ -171,13 +171,104 @@ namespace CombatSystem.Stats
             };
         }
 
+        public static void GetElements<T>(EnumStats.StatType type,
+            IStatsTypesRead<IBasicStatsRead<T>> structure,
+            out T baseElement, out T buffElement, out T burstElement)
+        {
+            switch (type)
+            {
+                case EnumStats.StatType.Attack:
+                    baseElement = structure.BaseType.AttackType;
+                    buffElement = structure.BuffType.AttackType;
+                    burstElement = structure.BurstType.AttackType;
+                    break;
+                case EnumStats.StatType.OverTime:
+                    baseElement = structure.BaseType.OverTimeType;
+                    buffElement = structure.BuffType.OverTimeType;
+                    burstElement = structure.BurstType.OverTimeType;
+                    break;
+                case EnumStats.StatType.DeBuff:
+                    baseElement = structure.BaseType.DeBuffType;
+                    buffElement = structure.BuffType.DeBuffType;
+                    burstElement = structure.BurstType.DeBuffType;
+                    break;
+                case EnumStats.StatType.FollowUp:
+                    baseElement = structure.BaseType.FollowUpType;
+                    buffElement = structure.BuffType.FollowUpType;
+                    burstElement = structure.BurstType.FollowUpType;
+                    break;
+                case EnumStats.StatType.Heal:
+                    baseElement = structure.BaseType.HealType;
+                    buffElement = structure.BuffType.HealType;
+                    burstElement = structure.BurstType.HealType;
+                    break;
+                case EnumStats.StatType.Shielding:
+                    baseElement = structure.BaseType.ShieldingType;
+                    buffElement = structure.BuffType.ShieldingType;
+                    burstElement = structure.BurstType.ShieldingType;
+                    break;
+                case EnumStats.StatType.Buff:
+                    baseElement = structure.BaseType.BuffType;
+                    buffElement = structure.BuffType.BuffType;
+                    burstElement = structure.BurstType.BuffType;
+                    break;
+                case EnumStats.StatType.ReceiveBuff:
+                    baseElement = structure.BaseType.ReceiveBuffType;
+                    buffElement = structure.BuffType.ReceiveBuffType;
+                    burstElement = structure.BurstType.ReceiveBuffType;
+                    break;
+                case EnumStats.StatType.Health:
+                    baseElement = structure.BaseType.HealthType;
+                    buffElement = structure.BuffType.HealthType;
+                    burstElement = structure.BurstType.HealthType;
+                    break;
+                case EnumStats.StatType.Mortality:
+                    baseElement = structure.BaseType.MortalityType;
+                    buffElement = structure.BuffType.MortalityType;
+                    burstElement = structure.BurstType.MortalityType;
+                    break;
+                case EnumStats.StatType.DamageReduction:
+                    baseElement = structure.BaseType.DamageReductionType;
+                    buffElement = structure.BuffType.DamageReductionType;
+                    burstElement = structure.BurstType.DamageReductionType;
+                    break;
+                case EnumStats.StatType.DebuffResistance:
+                    baseElement = structure.BaseType.DeBuffResistanceType;
+                    buffElement = structure.BuffType.DeBuffResistanceType;
+                    burstElement = structure.BurstType.DeBuffResistanceType;
+                    break;
+                case EnumStats.StatType.Speed:
+                    baseElement = structure.BaseType.SpeedType;
+                    buffElement = structure.BuffType.SpeedType;
+                    burstElement = structure.BurstType.SpeedType;
+                    break;
+                case EnumStats.StatType.Actions:
+                    baseElement = structure.BaseType.ActionsType;
+                    buffElement = structure.BuffType.ActionsType;
+                    burstElement = structure.BurstType.ActionsType;
+                    break;
+                case EnumStats.StatType.Control:
+                    baseElement = structure.BaseType.ControlType;
+                    buffElement = structure.BuffType.ControlType;
+                    burstElement = structure.BurstType.ControlType;
+                    break;
+                case EnumStats.StatType.Critical:
+                    baseElement = structure.BaseType.CriticalType;
+                    buffElement = structure.BuffType.CriticalType;
+                    burstElement = structure.BurstType.CriticalType;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
         /// <summary>
         /// Checks and returns the desired stats from [<see cref="BurstStats"/>]'s stats, depending if is self or other
         /// </summary>
         /// <param name="targetStats">The selection from do you want to extract the stats</param>
         /// <param name="controlStats">A control reference to know if the [<paramref name="targetStats"/>] is self</param>
         /// <returns></returns>
-        public static StatsBase<float> GetBurstStats(in CombatStats targetStats, in CombatStats controlStats = null)
+        public static StatsBase<float> GetBurstStats(CombatStats targetStats, CombatStats controlStats = null)
         {
             var burstStats = targetStats.BurstStats;
             return controlStats == targetStats
@@ -186,6 +277,14 @@ namespace CombatSystem.Stats
         }
     }
 
+
+    /**
+     * Offensive = (Base + Buff) * (1 * Burst)
+     * Support = (Base + Buff) * (1 * Burst)
+     * Vitality = (Base + Buff) * (1 * Burst) [Mortality Exclude > Mortality = Base]
+     *
+     * Concentration = Base + Buff + Burst)
+     */
 
     public static class UtilsCombatStats
     {

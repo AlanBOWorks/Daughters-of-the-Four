@@ -1,3 +1,4 @@
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Localization;
 using CombatSystem.Stats;
@@ -23,28 +24,26 @@ namespace CombatSystem.Skills.Effects
             var targetStats = target.Stats;
 
             UtilsStatsEffects.CalculateShieldsAmount(performer.Stats, ref addingShields);
-            UtilsStatsEffects.ClampShieldsAmount(targetStats, ref addingShields);
 
             DoShieldAddition(targetStats,addingShields);
 
             // EVENTS
             performer.ProtectionDoneTracker.DoShields(target, addingShields);
             target.ProtectionReceiveTracker.DoShields(performer, addingShields);
+            if (addingShields <= 0) return;
 
+
+            CombatSystemSingleton.EventsHolder.OnShieldGain(performer, target, addingShields);
             effectValue = addingShields;
         }
 
 
         private static void DoShieldAddition(IDamageableStats<float> target, float addingShields)
         {
-            if (addingShields > 0)
-            {
-                target.CurrentShields += addingShields;
-            }
-            else
-            {
-                //todo event of zero shields
-            }
+            var targetShields = target.CurrentShields + addingShields;
+            const float maxShields = UtilsStatsEffects.VanillaMaxShieldAmount;
+            if (targetShields > maxShields) targetShields = maxShields;
+            target.CurrentShields = targetShields;
         }
     }
 }

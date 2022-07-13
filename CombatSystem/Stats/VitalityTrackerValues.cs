@@ -65,20 +65,20 @@ namespace CombatSystem.Stats
         {
             HandleKey(in entity);
             var currentValues = _dictionary[entity];
-            currentValues.InteractShields(in amount);
+            currentValues.InteractShields(amount);
         }
         public void DoHealth(CombatEntity entity, float amount)
         {
             HandleKey(in entity);
             var currentValues = _dictionary[entity];
-            currentValues.InteractHealth(in amount);
+            currentValues.InteractHealth(amount);
         }
 
         public void DoMortality(in CombatEntity entity, in float amount)
         {
             HandleKey(in entity);
             var currentValues = _dictionary[entity];
-            currentValues.InteractMortality(in amount);
+            currentValues.InteractMortality(amount);
         }
 
 
@@ -149,16 +149,16 @@ namespace CombatSystem.Stats
             public float HealthValue => _countableValuesHolder.HealthValue.Value;
             public float MortalityValue => _countableValuesHolder.ShieldsValue.Value;
 
-            public void InteractShields(in float shieldsVariation)
+            public void InteractShields(float shieldsVariation)
             {
                 _countableValuesHolder.ShieldsValue.Interact(in shieldsVariation);
             }
-            public void InteractHealth(in float healthVariation)
+            public void InteractHealth(float healthVariation)
             {
                 _countableValuesHolder.HealthValue.Interact(in healthVariation);
             }
 
-            public void InteractMortality(in float mortalityVariation)
+            public void InteractMortality(float mortalityVariation)
             {
                 _countableValuesHolder.MortalityValue.Interact(in mortalityVariation);
             }

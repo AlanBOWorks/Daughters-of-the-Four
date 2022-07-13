@@ -31,16 +31,14 @@ namespace CombatSystem.Skills.Effects
             var performerStats = performer.Stats;
             var targetStats = target.Stats;
 
-            float debuffPower = UtilsStatsEffects.CalculateDeBuffPower(in performerStats);
-            float debuffResistance = UtilsStatsEffects.CalculateDeBuffResistance(in targetStats);
+            float debuffPower = UtilsStatsFormula.CalculateDeBuffPower(performerStats);
+            float debuffResistance = UtilsStatsFormula.CalculateDeBuffResistance(targetStats);
 
             IBasicStats<float> debuffStats = isBurst 
-                ? UtilsStats.GetBurstStats(in targetStats, in performerStats) 
+                ? UtilsStats.GetBurstStats(targetStats, performerStats) 
                 : targetStats.BuffStats;
 
-            effectValue = UtilsStatsEffects.CalculateStatsDeBuffValue(
-                debuffPower, debuffResistance,
-                effectValue);
+            effectValue = UtilsStatsEffects.CalculateStatsDeBuffValue(effectValue, debuffPower, debuffResistance);
 
             DoDeBuff(debuffStats, ref effectValue);
             CombatSystemSingleton.EventsHolder.OnDeBuffDone(entities,this, effectValue);

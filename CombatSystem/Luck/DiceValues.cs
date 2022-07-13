@@ -21,13 +21,16 @@ namespace CombatSystem.Luck
         /// For a dice value, check [<seealso cref="Values"/>]
         /// </summary>
         [ShowInInspector, SuffixLabel("%")]
-        public float CombatPercentageRoll { get; private set; }
+        public float LuckFinalRoll { get; private set; }
+
 
         public void RollDice()
         {
             Values = UtilsLuck.RolDice();
             float rolInUnit = Values.UnitValue;
-            CombatPercentageRoll = UtilsLuck.CalculateLuckInUnit(in _calculationsReference, in rolInUnit);
+            LuckFinalRoll = UtilsLuck.CalculateLuckInUnit(in _calculationsReference, in rolInUnit);
+
+
         }
 
        

@@ -46,6 +46,8 @@ namespace CombatSystem.Skills
         IEnumerable<PerformEffectValues> GetEffects();
 
         bool IgnoreSelf();
+
+        float LuckModifier { get; }
     }
 
 

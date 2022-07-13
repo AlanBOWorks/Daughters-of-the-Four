@@ -7,100 +7,46 @@ namespace CombatSystem.Stats
 {
     public static class UtilsStatsEffects
     {
-        public static float CalculateStatsBuffValue(float buffPower, float receivePower,
-            float effectValue)
+        public static float CalculateFinalDamage(float effectDamage, float performerAttackUnit, float targetDamageReductionUnit)
         {
-            return effectValue + (buffPower + receivePower);
+            // Attack Power is normally 1 or higher
+            // Damage reduction is normally 0
+            float damageModifier = performerAttackUnit - targetDamageReductionUnit;
+            float finalDamage = effectDamage * damageModifier;
+            if (finalDamage > 0) return finalDamage;
+            return 0;
         }
 
-        /// <summary>
-        /// It calculates the final effect value for Debuffing
-        /// </summary>
-        public static float CalculateStatsDeBuffValue(float debuff, float resistance,
-            float effectValue)
+        public static void CalculateHealAmount(CombatStats performerStats, ref float effectHeal)
         {
-            float debuffDifference = debuff - resistance;
-            if (debuffDifference <= 0) return 0;
-
-            return effectValue * (debuffDifference);
+            effectHeal *= UtilsStatsFormula.CalculateHealPower(performerStats);
+            if (effectHeal < 0) effectHeal = 0;
         }
 
-        public static void CalculateDamageFromAttackAttribute(CombatStats stats, ref float baseDamage)
+        public const float VanillaMaxShieldAmount = 4;
+        public static void CalculateShieldsAmount(CombatStats performerStats, ref float effectAddingShields)
         {
-            UtilsStatsFormula.CalculateValue(in stats, EnumStats.OffensiveStatType.Attack, ref baseDamage);
-
-            if (baseDamage < 0) baseDamage = 0;
+            var statsModifier = UtilsStatsFormula.CalculateShieldingPower(performerStats);
+            effectAddingShields *= statsModifier;
         }
 
-        public static void CalculateDamageReduction(CombatStats stats, ref float currentDamage)
+        public static float CalculateStatsDeBuffValue(float effectValue, float debuffPower, float debuffResistance)
         {
-            UtilsStatsFormula.ExtractStats(in stats,
-                out float baseStats, out float buffStats, out float burstStats,
-                EnumStats.VitalityStatType.DamageReduction);
-
-            float reduction = baseStats + buffStats + burstStats;
-            if (reduction <= 0) return;
-
-            currentDamage *= (1 - reduction);
-            if (currentDamage < 0) currentDamage = 0;
+            // DeBuff Power is normally 1 or higher
+            // DeBuff Resistance is normally 0
+            float effectModifier = debuffPower - debuffResistance;
+            float finalDebuffValue = effectValue * effectModifier;
+            if (finalDebuffValue > 0) return finalDebuffValue;
+            return 0;
         }
 
-        public static void CalculateHealAmount(CombatStats performerStats, ref float baseHeal)
+        public static float CalculateStatsBuffValue(float effectValue, float bufferPower, float receivePower)
         {
-            UtilsStatsFormula.CalculateValue(in performerStats, EnumStats.SupportStatType.Heal, ref baseHeal);
-
-            if (baseHeal < 0) baseHeal = 0;
+            // Both buffPower and receivePower are normally 1
+            float effectModifier = bufferPower * receivePower;
+            float finalBuffValue = effectValue * effectModifier;
+            if (finalBuffValue > 0) return finalBuffValue;
+            return 0;
         }
-
-        public static void CalculateReceiveHealAmount(CombatStats receiverStats, ref float currentHeal)
-        {
-            CalculateHealAmount(receiverStats, ref currentHeal);
-        }
-
-        public static void CalculateShieldsAmount(CombatStats performerStats, ref float desiredShields)
-        {
-            UtilsStatsFormula.ExtractStats(in performerStats,
-                out float baseStats, out float buffStats, out float burstStats,
-                EnumStats.SupportStatType.Shielding);
-            float statsModifier = (baseStats + buffStats + burstStats);
-
-            desiredShields *= statsModifier;
-        }
-
-        private const float VanillaMaxShieldAmount = 2;
-
-        public static void ClampShieldsAmount(CombatStats targetStats,
-            ref float addingShields)
-        {
-            float statsModifier = UtilsStatsFormula.CalculateStatsSum(in targetStats, EnumStats.SupportStatType.Shielding);
-            float maxShields = VanillaMaxShieldAmount * statsModifier;
-
-            float currentShields = targetStats.CurrentShields;
-            float desiredShields = currentShields + addingShields;
-
-            if (desiredShields > maxShields) desiredShields = maxShields;
-
-            addingShields = desiredShields - currentShields;
-        }
-
-        public static float CalculateBuffPower(in CombatStats performerStats) =>
-            (performerStats.BaseStats.BuffType +
-             performerStats.BuffStats.BuffType)
-            * (performerStats.BurstType.BuffType);
-
-        public static float CalculateBuffReceivePower(in CombatStats targetStats) =>
-            (targetStats.BaseStats.ReceiveBuffType +
-             targetStats.BuffStats.ReceiveBuffType)
-            * (targetStats.BurstType.ReceiveBuffType);
-
-        public static float CalculateDeBuffPower(in CombatStats performerStats) =>
-            performerStats.BaseStats.DeBuffType +
-            performerStats.BuffStats.DeBuffType +
-            performerStats.BurstStats.DeBuffType;
-
-        public static float CalculateDeBuffResistance(in CombatStats targetStats) =>
-            targetStats.BaseStats.DeBuffResistanceType +
-            targetStats.BuffStats.DeBuffResistanceType +
-            targetStats.BurstStats.DeBuffResistanceType;
     }
 }

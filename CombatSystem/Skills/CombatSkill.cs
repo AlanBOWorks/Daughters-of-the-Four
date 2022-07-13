@@ -31,7 +31,7 @@ namespace CombatSystem.Skills
 
 
         public bool IgnoreSelf() => Preset.IgnoreSelf();
-
+        public float LuckModifier => Preset.LuckModifier;
 
 
         public void IncreaseCost()

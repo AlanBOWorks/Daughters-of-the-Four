@@ -31,10 +31,10 @@ namespace CombatSystem.Skills.Effects
             entities.Extract(out var performer, out var target);
             var performerStats = performer.Stats;
             var targetStats = target.Stats;
-            float bufferPower = UtilsStatsEffects.CalculateBuffPower(in performerStats);
-            float receivePower = UtilsStatsEffects.CalculateBuffReceivePower(in targetStats);
+            float bufferPower = UtilsStatsFormula.CalculateBuffPower(performerStats);
+            float receivePower = UtilsStatsFormula.CalculateReceiveBuffPower(targetStats);
 
-            effectValue *= (bufferPower + receivePower);
+            effectValue = UtilsStatsEffects.CalculateStatsBuffValue(effectValue, bufferPower, receivePower);
 
             DoBuff(targetStats, effectValue);
             CombatSystemSingleton.EventsHolder.OnBuffDone(entities,this, effectValue);

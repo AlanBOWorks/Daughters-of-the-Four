@@ -2,90 +2,65 @@ using UnityEngine;
 
 namespace CombatSystem.Stats
 {
+
+    /**
+     * Offensive = (Base + Buff) * (1 * Burst)
+     * Support = (Base + Buff) * (1 * Burst)
+     * Vitality = (Base + Buff) * (1 * Burst) [Mortality Exclude > Mortality = Base]
+     *
+     * Concentration = Base + Buff + Burst)
+     */
     public static class UtilsStatsFormula
     {
-        private static void ExtractStats(in CombatStats stats, out StatsValues values, in EnumStats.StatType type)
+        private static float CalculateStatAsMultiplicative(CombatStats stats, EnumStats.StatType type)
         {
-            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
-            values = new StatsValues(in baseStats,in buffStats,in burstStats);
+            UtilsStats.GetElements(type, stats, out var baseStats, out var buffStats, out var burstStats);
+            return (baseStats + buffStats) * (1 * burstStats);
+        }
+        private static float CalculateStatAsAdditive(CombatStats stats, EnumStats.StatType type)
+        {
+            UtilsStats.GetElements(type, stats, out var baseStats, out var buffStats, out var burstStats);
+            return baseStats + buffStats + burstStats;
         }
 
-        public static void ExtractStats(in CombatStats stats,
-            out float baseStats, out float buffStats, out float burstStats,
-            in EnumStats.StatType type)
-        {
-            baseStats = UtilsStats.GetElement(type, stats.BaseStats);
-            buffStats = UtilsStats.GetElement(type, stats.BuffStats);
-            burstStats = UtilsStats.GetElement(type, stats.BurstStats);
-        }
-        public static void ExtractStats(in CombatStats stats,
-            out float baseStats, out float buffStats, out float burstStats,
-            in EnumStats.OffensiveStatType type)
-        {
-            baseStats = UtilsStats.GetElement(type, stats.BaseStats);
-            buffStats = UtilsStats.GetElement(type, stats.BuffStats);
-            burstStats = UtilsStats.GetElement(type, stats.BurstStats);
-        }
-        public static void ExtractStats(in CombatStats stats,
-            out float baseStats, out float buffStats, out float burstStats,
-            in EnumStats.SupportStatType type)
-        {
-            baseStats = UtilsStats.GetElement(type, stats.BaseStats);
-            buffStats = UtilsStats.GetElement(type, stats.BuffStats);
-            burstStats = UtilsStats.GetElement(type, stats.BurstStats);
-        }
-        public static void ExtractStats(in CombatStats stats,
-            out float baseStats, out float buffStats, out float burstStats,
-            in EnumStats.VitalityStatType type)
-        {
-            baseStats = UtilsStats.GetElement(type, stats.BaseStats);
-            buffStats = UtilsStats.GetElement(type, stats.BuffStats);
-            burstStats = UtilsStats.GetElement(type, stats.BurstStats);
-        }
-
-        public static float CalculateStatsSum(in CombatStats stats, in EnumStats.OffensiveStatType type)
-        {
-            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
-            return 1 + baseStats + buffStats + burstStats;
-        }
-        public static float CalculateStatsSum(in CombatStats stats, in EnumStats.SupportStatType type)
-        {
-            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
-            return 1 + baseStats + buffStats + burstStats;
-        }
-        public static float CalculateStatsSum(in CombatStats stats, in EnumStats.VitalityStatType type)
-        {
-            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
-            return 1 + baseStats + buffStats + burstStats;
-        }
-
-        private static float CalculateStatsSum(in StatsValues values)
-        {
-            return values.BaseType + values.BuffType + values.BurstType;
-        }
+        // ---- OFFENSIVE
+        public static float CalculateAttackPower(CombatStats stats) 
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.Attack);
+        public static float CalculateOverTimePower(CombatStats stats)
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.OverTime);
+        public static float CalculateDeBuffPower(CombatStats stats)
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.DeBuff);
+        public static float CalculateFollowUpPower(CombatStats stats)
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.FollowUp);
 
 
-        public static void CalculateValue(in CombatStats stats, in EnumStats.OffensiveStatType type,
-            ref float modifyValue)
-        {
-            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
+        // ---- SUPPORT
+        public static float CalculateHealPower(CombatStats stats)
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.Heal);
+        public static float CalculateShieldingPower(CombatStats stats)
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.Shielding);
+        public static float CalculateBuffPower(CombatStats stats)
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.Buff);
+        public static float CalculateReceiveBuffPower(CombatStats stats)
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.ReceiveBuff);
 
-            modifyValue *= 1 + baseStats + buffStats + burstStats;
-        }
-        public static void CalculateValue(in CombatStats stats, in EnumStats.SupportStatType type,
-            ref float modifyValue)
-        {
-            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
 
-            modifyValue *=  1+ baseStats + buffStats + burstStats;
-        }
-        public static void CalculateValue(in CombatStats stats, in EnumStats.VitalityStatType type,
-            ref float modifyValue)
-        {
-            ExtractStats(in stats, out float baseStats, out float buffStats, out float burstStats, in type);
+        // ---- Vitality
+        public static float CalculateMaxHealth(CombatStats stats) 
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.Health);
+        public static float CalculateMaxMortality(CombatStats stats) 
+            => stats.BaseStats.MortalityType; // Mortality shouldn't be modified
+        public static float CalculateDamageReduction(CombatStats stats) 
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.DamageReduction);
+        public static float CalculateDeBuffResistance(CombatStats stats)
+            => CalculateStatAsMultiplicative(stats, EnumStats.StatType.DebuffResistance);
 
-            modifyValue = (modifyValue + baseStats + buffStats + burstStats);
-        }
+
+
+        // ---- CONCENTRATION
+        /*
+         * Concentration stats are calculated more frequently, so calculations are handled more manually
+         */
 
         private const float ZeroSpeedInitiativeAmount = .5f;
         public static float CalculateInitiativeSpeed(CombatStats stats)
@@ -97,43 +72,18 @@ namespace CombatSystem.Stats
             // by design, 0 speed will be set by an skill > forcing the enemy reaching this stats.
             // the problem: the entity never will reach 100% initiative, so this should be fixed with small increments
             // NOTE: inmovil entities are the ones with speedAmount < 0
-            if (speedAmount == 0) return ZeroSpeedInitiativeAmount; 
+            if (speedAmount == 0) return ZeroSpeedInitiativeAmount;
 
             return Mathf.Round(speedAmount * 10) * .1f;
-        }
-
-        public static float CalculateLuckAmount(in CombatStats stats)
-        {
-            float luckAmount =
-                stats.BaseStats.CriticalType
-                + stats.BuffStats.CriticalType
-                + stats.BurstType.CriticalType;
-
-            return luckAmount;
-        }
-
-
-        public static float CalculateMaxHealth(CombatStats stats)
-        {
-            ExtractStats(in stats, out var values, EnumStats.StatType.Health);
-
-            float maxHealth = CalculateStatsSum(values);
-            return maxHealth;
-        }
-        public static float CalculateMaxMortality(CombatStats stats)
-        {
-            ExtractStats(in stats, out var values, EnumStats.StatType.Mortality);
-
-            float maxMortality = CalculateStatsSum(in values);
-            return maxMortality;
         }
 
         private const float MaxActionsAmount = 12f;
         public static float CalculateActionsAmount(CombatStats stats)
         {
-            ExtractStats(in stats, out var values, EnumStats.StatType.Actions);
-
-            float actionsAmount = CalculateStatsSum(values);
+            float actionsAmount =
+                stats.BaseStats.ActionsType
+                + stats.BuffStats.ActionsType
+                + stats.BurstStats.ActionsType;
 
             if (actionsAmount > MaxActionsAmount)
                 actionsAmount = MaxActionsAmount;
@@ -146,25 +96,17 @@ namespace CombatSystem.Stats
 
             return actionsAmount;
         }
-
-        private struct StatsValues : IStatsTypesRead<float>
+        public static float CalculateLuckAmount(CombatStats stats)
         {
-            public StatsValues(in float baseType,in float buffType,in float burstType)
-            {
-                BaseType = baseType;
-                BuffType = buffType;
-                BurstType = burstType;
-            }
-
-            public float BaseType { get; }
-            public float BuffType { get; }
-            public float BurstType { get; }
+            return stats.BaseStats.CriticalType
+                   + stats.BuffStats.CriticalType
+                   + stats.BurstType.CriticalType;
         }
 
         public static float CalculateControlGain(CombatStats stats)
         {
-            return 1 + stats.BaseStats.ControlType 
-                   + stats.BuffStats.ControlType 
+            return stats.BaseStats.ControlType 
+                   + stats.BuffStats.ControlType
                    + stats.BurstStats.ControlType;
         }
     }

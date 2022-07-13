@@ -54,6 +54,8 @@ namespace CombatSystem.Skills
             public IEffect GetMainEffectArchetype() => _effect;
 
             public bool IgnoreSelf() => true;
+            public float LuckModifier => -1;
+            public bool CanCrit() => false;
 
             public string GetSkillName() => "PRESET - " + TeamTargeting + " [" + TargetType + "] "+ ToString();
 
@@ -84,7 +86,10 @@ namespace CombatSystem.Skills
             public EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType() => _vanguardEffectType;
             public bool IsMultiTrigger() => false;
             public PerformEffectValues GetVanguardEffectTooltip() => new PerformEffectValues();
-           
+
+            public float LuckModifier => -1;
+            public bool CanCrit() => false;
+
         }
     }
 

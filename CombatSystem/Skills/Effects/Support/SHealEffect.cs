@@ -25,8 +25,7 @@ namespace CombatSystem.Skills.Effects
             var targetStats = target.Stats;
 
             UtilsStatsEffects.CalculateHealAmount(performerStats, ref healAmount);
-            UtilsStatsEffects.CalculateReceiveHealAmount(targetStats, ref healAmount);
-            DoHeal(targetStats, healAmount);
+            UtilsCombatEffect.DoHealTo(targetStats, healAmount);
 
             // EVENTS
             performer.ProtectionDoneTracker.DoHealth(target, healAmount);
@@ -35,11 +34,6 @@ namespace CombatSystem.Skills.Effects
             CombatSystemSingleton.EventsHolder.OnHealthGain(performer,target, healAmount);
 
             effectValue = healAmount;
-        }
-
-        private static void DoHeal(CombatStats target, float healAmount)
-        {
-           UtilsCombatEffect.DoHealTo(target, healAmount);
         }
     }
 }

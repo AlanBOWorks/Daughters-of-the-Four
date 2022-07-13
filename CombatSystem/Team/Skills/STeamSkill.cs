@@ -6,7 +6,7 @@ using Utils;
 namespace CombatSystem.Team
 {
     [CreateAssetMenu(fileName = "N" + AssetSuffix,
-        menuName = "Combat/Skill/Team Preset")]
+        menuName = "Combat/Skill/Team Preset", order = -50)]
     public class STeamSkill : ScriptableObject, ITeamSkillPreset
     {
         [Title("Info")]

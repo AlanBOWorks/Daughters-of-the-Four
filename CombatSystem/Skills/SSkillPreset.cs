@@ -10,7 +10,7 @@ using Utils;
 namespace CombatSystem.Skills
 {
     [CreateAssetMenu(fileName = "N [Skill Preset]",
-        menuName = "Combat/Skill/Single Preset")]
+        menuName = "Combat/Skill/Single Preset", order = -100)]
     public class SSkillPreset : SSkillPresetBase
     {
         [TitleGroup("Values")]
@@ -66,6 +66,9 @@ namespace CombatSystem.Skills
         [SerializeField]
         private int skillCost = 1;
 
+        [SerializeField, Range(0, 3), SuffixLabel("%"), Tooltip("0:  crit won't be calculated")] 
+        private float luckModifier;
+
         [TitleGroup("Effects")]
         [SerializeField]
         private protected PresetEffectValues[] effects = new PresetEffectValues[0];
@@ -107,6 +110,7 @@ namespace CombatSystem.Skills
 
         public abstract IEffect GetMainEffectArchetype();
         public abstract bool IgnoreSelf();
+        public float LuckModifier => luckModifier;
         public bool HasEffects() => effects.Length > 0;
 
         protected virtual string GetAssetPrefix() => " [SkillPreset]";
@@ -158,9 +162,7 @@ namespace CombatSystem.Skills
         int VanguardEffectCount { get; }
     }
 
-    public interface IAttackerSkill : ISkill
-    {
+    public interface IAttackerSkill : ISkill { }
 
-    }
-
+    public interface ISupportSkill : ISkill { }
 }

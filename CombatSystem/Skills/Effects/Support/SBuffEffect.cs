@@ -31,19 +31,15 @@ namespace CombatSystem.Skills.Effects
             entities.Extract(out var performer, out var target);
             var performerStats = performer.Stats;
             var targetStats = target.Stats;
-            float bufferPower = UtilsStatsEffects.CalculateBuffPower(in performerStats);
-            float receivePower = UtilsStatsEffects.CalculateBuffReceivePower(in targetStats);
+            float bufferPower = UtilsStatsFormula.CalculateBuffPower(performerStats);
+            float receivePower = UtilsStatsFormula.CalculateReceiveBuffPower(targetStats);
 
             IBasicStats<float> buffingStats = isBurst 
-                ? UtilsStats.GetBurstStats(in targetStats, in performerStats) 
+                ? UtilsStats.GetBurstStats(targetStats, performerStats) 
                 : targetStats.BuffStats;
 
 
-            float buffingValue = UtilsStatsEffects.CalculateStatsBuffValue(
-                bufferPower,
-                receivePower,
-                effectValue);
-            effectValue = buffingValue;
+            effectValue = UtilsStatsEffects.CalculateStatsBuffValue(effectValue, bufferPower, receivePower);
 
             DoBuff(buffingStats, ref effectValue);
             CombatSystemSingleton.EventsHolder.OnBuffDone(entities, this,  effectValue);
