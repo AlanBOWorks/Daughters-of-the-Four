@@ -15,17 +15,17 @@ namespace CombatSystem.Skills.Effects
         public GameObject GetSecondaryParticlesPrefab() => secondaryParticlePrefab;
 
 
-        public abstract void DoEffect(EntityPairInteraction entities,ref float effectValue);
+        public abstract void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier);
         public abstract float CalculateEffectValue(CombatStats performerStats, float effectValue);
-        public virtual string GetEffectValueTootLip(CombatStats performerStats, float effectValue)
+        public virtual string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
         {
-            var calculateEffectValue = CalculateEffectValue(performerStats, effectValue);
+            effectValue = CalculateEffectValue(performerStats, effectValue);
 
-            var effectTooltip = LocalizeEffects.LocalizeMathfValue(calculateEffectValue, IsPercentSuffix());
+            var effectTooltip = LocalizeEffects.LocalizeMathfValue(effectValue, IsPercentSuffix());
             return " <b>" + effectTooltip + "</b>";
         }
         public abstract bool IsPercentSuffix();
-
+        public virtual bool IsPercentTooltip() => IsPercentSuffix();
 
 
         public abstract string EffectTag { get; }

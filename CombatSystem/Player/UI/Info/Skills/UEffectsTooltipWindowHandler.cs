@@ -48,14 +48,14 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void HandleEffects(IEnumerable<PerformEffectValues> effects, CombatEntity performer)
+        public void HandleEffects(ICombatSkill skill, IEnumerable<PerformEffectValues> effects, CombatEntity performer)
         {
             float accumulatedHeight = 0;
             var stats = performer.Stats;
             foreach (var value in effects)
             {
                 var holder = pool.GetElementSafe();
-                UtilsEffectTooltip.HandleText(holder, in value, stats);
+                UtilsEffectTooltip.HandleText(holder, in value, stats, skill);
                 UtilsEffectTooltip.HandleIcon(holder, value.Effect);
 
                 UtilsEffectTooltip.HandleTextHeight(holder.GetTextHolder(), ref accumulatedHeight);
@@ -72,7 +72,7 @@ namespace CombatSystem.Player.UI
 
     public static class UtilsEffectTooltip
     {
-        public static void HandleText(UEffectTooltipHolder holder, in PerformEffectValues values, CombatStats stats = null)
+        public static void HandleText(UEffectTooltipHolder holder, in PerformEffectValues values, CombatStats stats = null, ICombatSkill skill = null)
         {
             var textHolder = holder.GetTextHolder();
             LocalizeEffects.LocalizeEffectTooltip(in values, out var effectText);
@@ -84,11 +84,29 @@ namespace CombatSystem.Player.UI
                 return;
             }
 
-            var valueDigits = effect.GetEffectValueTootLip(stats, values.EffectValue);
-            if(valueDigits != null)
-                textHolder.text = effectText + ":" + valueDigits;
-            else
-                textHolder.text = effectText;
+            float effectValue = values.EffectValue;
+            effectValue = effect.CalculateEffectValue(stats, effectValue);
+
+            HandleTextWithDigits();
+            textHolder.text = effectText;
+
+            void HandleTextWithDigits()
+            {
+                bool isPercentSuffix = effect.IsPercentTooltip();
+                if(skill == null)
+                {
+                    effectText = effectText + ":" + LocalizeEffects.LocalizeMathfValue(effectValue,isPercentSuffix);
+                }
+                else
+                {
+                    float skillLuck = skill.LuckModifier;
+                    float statsLuck = UtilsStatsFormula.CalculateLuckAmount(stats);
+                    float highValue = effectValue * (1+ skillLuck * statsLuck);
+                    effectText = effectText + ": <b>" 
+                                            + LocalizeEffects.LocalizeMathfValue(effectValue,highValue,isPercentSuffix)
+                                            + "</b>";
+                }
+            }
         }
 
         public static void MultiplyEffectText(UEffectTooltipHolder holder, float modifier, CombatStats stats = null)

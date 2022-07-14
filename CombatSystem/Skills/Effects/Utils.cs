@@ -134,9 +134,10 @@ namespace CombatSystem.Skills.Effects
                     void DoEffectOnTarget()
                     {
                         var entities = new EntityPairInteraction(performer, effectTarget);
-                        float targetEffectValue = CalculateFinalEffectValue();
-                        effect.DoEffect(entities,ref targetEffectValue);
+                        float targetEffectValue = effectValue;
+                        float luckValue = CalculateFinalLuck();
 
+                        effect.DoEffect(entities,ref targetEffectValue, ref luckValue);
                         var submitEffect = new SubmitEffectValues(effect ,targetEffectValue);
 
                         if (isFirstEffect)
@@ -148,16 +149,12 @@ namespace CombatSystem.Skills.Effects
                             eventsHolder.OnCombatSecondaryEffectPerform(entities, in submitEffect);
                     }
 
-                    float CalculateFinalEffectValue()
+                    float CalculateFinalLuck()
                     {
-                        if (skillLuckModifier <= 0) return effectValue;
+                        if (skillLuckModifier <= 0) return 1;
 
                         float entitiesLuck = CalculateEntitiesLuck();
-                        float skillFinalLuckModifier = skillLuckModifier * entitiesLuck;
-
-                        return skillFinalLuckModifier > 0
-                            ? effectValue * (1 + skillFinalLuckModifier)
-                            : effectValue;
+                        return 1 + skillLuckModifier * entitiesLuck;
                     }
 
                     float CalculateEntitiesLuck()
@@ -168,7 +165,9 @@ namespace CombatSystem.Skills.Effects
                         bool areSameTeam = performer.Team.Contains(target);
                         if (areSameTeam)
                             return (performerLuck + onTargetLuck) * .5f;
-                        return 1 + performerLuck - onTargetLuck;
+
+                        if (onTargetLuck < 0) onTargetLuck = 0;
+                        return performerLuck - onTargetLuck;
 
                     }
                 }
@@ -326,7 +325,7 @@ namespace CombatSystem.Skills.Effects
 
 
 
-        public static void DoHealPercent(in CombatStats target, in float healPercent, out float healedAmount)
+        public static void DoHealPercent(CombatStats target, float healPercent, out float healedAmount)
         {
             if (healPercent < 0)
             {
@@ -337,7 +336,7 @@ namespace CombatSystem.Skills.Effects
             float maxHeal = UtilsStatsFormula.CalculateMaxHealth(target);
             healedAmount = maxHeal * healPercent;
 
-            float targetHealth = maxHeal + healedAmount;
+            float targetHealth = target.CurrentHealth + healedAmount;
             DoOverrideHealth(target, ref targetHealth);
         }
         public static void DoHealPercent(in CombatStats target, in float healPercent)

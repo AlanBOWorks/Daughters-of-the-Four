@@ -40,7 +40,7 @@ namespace CombatSystem.Skills.Effects
         {
             return effectValue * UtilsStatsFormula.CalculateControlGain(performerStats);
         }
-        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
         {
             entities.Extract(out var performer, out var target);
             var targetTeam = target.Team;
@@ -50,6 +50,7 @@ namespace CombatSystem.Skills.Effects
                 //todo make enemy Control variation
             }
 
+            effectValue *= luckModifier;
             UtilsCombatTeam.GainControl(targetTeam, effectValue);
         }
 

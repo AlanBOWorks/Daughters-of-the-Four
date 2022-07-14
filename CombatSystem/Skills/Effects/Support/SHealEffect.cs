@@ -15,14 +15,16 @@ namespace CombatSystem.Skills.Effects
         private const string HealEffectSmallPrefix = EffectTags.DamageEffectPrefix;
 
         public override bool IsPercentSuffix() => false;
+        public override bool IsPercentTooltip() => true;
+
         public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateHealPower(performerStats);
         }
 
-        public override string GetEffectValueTootLip(CombatStats performerStats, float effectValue)
+        public override string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
         {
-            return LocalizeEffects.LocalizePercentValue(CalculateEffectValue(performerStats, effectValue));
+            return LocalizeEffects.LocalizePercentValueWithDecimals(CalculateEffectValue(performerStats, effectValue));
         }
 
 
@@ -31,7 +33,7 @@ namespace CombatSystem.Skills.Effects
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Heal;
 
 
-        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
         {
             entities.Extract(out var performer, out var target);
             float healAmount = effectValue;
@@ -39,14 +41,15 @@ namespace CombatSystem.Skills.Effects
             var targetStats = target.Stats;
 
             UtilsStatsEffects.CalculateHealAmount(performerStats, ref healAmount);
+            healAmount *= luckModifier;
             UtilsCombatEffect.DoHealPercent(targetStats, healAmount, out var healedAmount);
+            effectValue = healedAmount;
 
             // EVENTS
-            performer.ProtectionDoneTracker.DoHealth(target, healAmount);
-            target.ProtectionReceiveTracker.DoHealth(performer, healAmount);
+            performer.ProtectionDoneTracker.DoHealth(target, effectValue);
+            target.ProtectionReceiveTracker.DoHealth(performer, effectValue);
 
-            effectValue = healAmount;
-            CombatSystemSingleton.EventsHolder.OnHealthGain(performer,target, healedAmount);
+            CombatSystemSingleton.EventsHolder.OnHealthGain(performer,target, effectValue);
         }
     }
 }

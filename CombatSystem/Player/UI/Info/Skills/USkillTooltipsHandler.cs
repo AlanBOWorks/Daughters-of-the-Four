@@ -45,7 +45,7 @@ namespace CombatSystem.Player.UI
                 skillEffects = skill.GetEffects();
 
             var performer = PlayerCombatSingleton.PlayerTeamController.GetPerformer();
-            tooltipWindow.HandleEffects(skillEffects, performer);
+            tooltipWindow.HandleEffects(skill,skillEffects, performer);
             tooltipWindow.Show();
 
         }

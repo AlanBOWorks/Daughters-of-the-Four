@@ -32,7 +32,7 @@ namespace CombatSystem.Skills.Effects
         protected string GetBuffPrefix() => (isBurst) ? DeBurstPrefix : DeBuffPrefix;
         public override string EffectSmallPrefix => (isBurst) ? DeBurstSmallPrefix : DeBuffSmallPrefix;
 
-        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
         {
             var performer = entities.Performer;
             var target = entities.Target;
@@ -48,6 +48,7 @@ namespace CombatSystem.Skills.Effects
                 : targetStats.BuffStats;
 
             effectValue = UtilsStatsEffects.CalculateStatsDeBuffValue(effectValue, debuffPower, debuffResistance);
+            effectValue *= luckModifier;
 
             DoDeBuff(debuffStats, ref effectValue);
             CombatSystemSingleton.EventsHolder.OnDeBuffDone(entities,this, effectValue);

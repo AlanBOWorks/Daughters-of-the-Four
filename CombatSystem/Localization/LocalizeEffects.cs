@@ -47,9 +47,26 @@ namespace CombatSystem.Localization
             };
         }
 
+
+
+        public static string LocalizeMathfValue(float value, float highValue, bool isPercentValue)
+        {
+            if (isPercentValue)
+            {
+                return LocalizePercentValueWithDecimals(value) + " - " +
+                       LocalizePercentValueWithDecimals(highValue) +
+                       PercentSuffix;
+            }
+            else
+                return LocalizeArithmeticValue(value) + " - " +
+                       LocalizeArithmeticValue(highValue) +
+                       UnitSuffix;
+        }
         public static string LocalizeMathfValue(float value, bool isPercentValue)
         {
-            return (isPercentValue) ? LocalizePercentValue(value) : LocalizeArithmeticValue(value);
+            return (isPercentValue) 
+                ? LocalizePercentValueWithDecimals(value) + PercentSuffix
+                : LocalizeArithmeticValue(value) + UnitSuffix;
         }
 
         /// <summary>
@@ -58,15 +75,26 @@ namespace CombatSystem.Localization
         public static string LocalizeArithmeticValue(float value)
         {
             value = GetSimplifiedValue(value, out var valueSuffix);
-            return value.ToString("####.#") + valueSuffix + UnitSuffix;
+            return value.ToString("####.#") + valueSuffix;
         }
 
+        private const string ZeroPercentText = "0";
         public static string LocalizePercentValue(float value)
         {
+            if (value < .005f && value > -.005f) return ZeroPercentText;
             value *= 100f;
             value = GetSimplifiedValue(value, out var valueSuffix);
-            return value.ToString("####") + valueSuffix + PercentSuffix;
+            return value.ToString("####") + valueSuffix;
         }
+
+        public static string LocalizePercentValueWithDecimals(float value)
+        {
+            if (value < .005f && value > -.005f) return ZeroPercentText;
+            value *= 100f;
+            value = GetSimplifiedValue(value, out var valueSuffix);
+            return value.ToString("###.#") + valueSuffix;
+        }
+
 
         public static float GetSimplifiedValue(float value, out string valueSuffix)
         {

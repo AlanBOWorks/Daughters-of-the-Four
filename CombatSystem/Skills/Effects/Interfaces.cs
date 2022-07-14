@@ -14,11 +14,15 @@ namespace CombatSystem.Skills.Effects
 
     public interface IEffect : IEffectBasicInfo
     {
+        /// <param name="entities"></param>
         /// <param name="effectValue">The effect value could be modify by passives and reactive effects (thus the ref)</param>
-        void DoEffect(EntityPairInteraction entities, ref float effectValue);
+        /// <param name="luckModifier"></param>
+        void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier);
 
-        string GetEffectValueTootLip(CombatStats performerStats, float effectValue);
+        string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue);
+        float CalculateEffectValue(CombatStats performerStats, float effectValue);
         bool IsPercentSuffix();
+        bool IsPercentTooltip();
 
     }
 

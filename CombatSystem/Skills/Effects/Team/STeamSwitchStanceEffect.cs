@@ -31,9 +31,9 @@ namespace CombatSystem.Skills.Effects
 
         public override float CalculateEffectValue(CombatStats performerStats, float effectValue) 
             => UtilsStatsFormula.CalculateControlGain(performerStats) * effectValue;
-        public override string GetEffectValueTootLip(CombatStats performerStats, float effectValue) => null;
+        public override string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue) => null;
 
-        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
         {
             entities.Extract(out var performer, out var target);
             var targetTeam = target.Team;

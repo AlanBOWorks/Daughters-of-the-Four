@@ -25,7 +25,7 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => DamageSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.DamageType;
 
-        public override void DoEffect(EntityPairInteraction entities, ref float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
         {
             entities.Extract(out var performer, out var target);
             var performerStats = performer.Stats;
@@ -34,6 +34,7 @@ namespace CombatSystem.Skills.Effects
             var performerAttackPower = UtilsStatsFormula.CalculateAttackPower(performerStats);
             var targetDamageReduction = UtilsStatsFormula.CalculateDamageReduction(targetStats);
             float damage = UtilsStatsEffects.CalculateFinalDamage(effectValue, performerAttackPower, targetDamageReduction);
+            damage *= luckModifier;
             if (damage <= 0)
             {
                 //todo call for DamageZeroEvent

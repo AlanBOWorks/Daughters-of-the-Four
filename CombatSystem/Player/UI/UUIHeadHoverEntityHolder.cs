@@ -83,7 +83,7 @@ namespace CombatSystem.Player.UI
 
             public void UpdateLuckAmount(float luckPercent)
             {
-                string luckText = LocalizeEffects.LocalizePercentValue(luckPercent);
+                string luckText = LocalizeEffects.LocalizePercentValueWithDecimals(luckPercent);
                 luckTextHolder.text = luckText;
             }
         }

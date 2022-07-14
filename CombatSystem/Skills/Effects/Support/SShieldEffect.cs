@@ -26,20 +26,21 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => ShieldEffectSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Shielding;
 
-        public override void DoEffect(EntityPairInteraction entities,ref float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
         {
             entities.Extract(out var performer, out var target);
             float addingShields = effectValue;
             var targetStats = target.Stats;
 
             UtilsStatsEffects.CalculateShieldsAmount(performer.Stats, ref addingShields);
+            addingShields *= luckModifier;
+            if (addingShields <= 0) return;
 
             DoShieldAddition(targetStats,addingShields);
 
             // EVENTS
             performer.ProtectionDoneTracker.DoShields(target, addingShields);
             target.ProtectionReceiveTracker.DoShields(performer, addingShields);
-            if (addingShields <= 0) return;
 
 
             CombatSystemSingleton.EventsHolder.OnShieldGain(performer, target, addingShields);

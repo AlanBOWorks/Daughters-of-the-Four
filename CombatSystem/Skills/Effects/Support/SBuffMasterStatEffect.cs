@@ -35,7 +35,7 @@ namespace CombatSystem.Skills.Effects
         }
 
 
-        public override void DoEffect(EntityPairInteraction entities,ref float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
         {
             entities.Extract(out var performer, out var target);
             var performerStats = performer.Stats;
@@ -44,6 +44,7 @@ namespace CombatSystem.Skills.Effects
             float receivePower = UtilsStatsFormula.CalculateReceiveBuffPower(targetStats);
 
             effectValue = UtilsStatsEffects.CalculateStatsBuffValue(effectValue, bufferPower, receivePower);
+            effectValue *= luckModifier;
 
             DoBuff(targetStats, effectValue);
             CombatSystemSingleton.EventsHolder.OnBuffDone(entities,this, effectValue);

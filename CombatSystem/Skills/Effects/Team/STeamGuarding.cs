@@ -20,7 +20,7 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => GuardingSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Guarding;
 
-        public override void DoEffect(EntityPairInteraction entities,ref float effectValue)
+        public override void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
         {
             entities.Extract(out var performer, out var target);
             performer.Team.GuardHandler.SetGuarder(target);

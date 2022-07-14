@@ -120,17 +120,24 @@ namespace CombatSystem.Skills
             public Sprite GetIcon() => null;
             public GameObject GetSecondaryParticlesPrefab() => null;
 
-            public void DoEffect(EntityPairInteraction entities, ref float effectValue)
+            public void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
             {
                 entities.Extract(out var performer, out var target);
                 Debug.Log(EffectTag + $" - P[{performer.CombatCharacterName}] >> T[{target.CombatCharacterName}]");
             }
 
-            public string GetEffectValueTootLip(CombatStats performerStats, float effectValue)
+            public string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
             {
                 return LocalizeEffects.LocalizePercentValue(effectValue);
             }
+
+            public float CalculateEffectValue(CombatStats performerStats, float effectValue)
+            {
+                return 1;
+            }
+
             public bool IsPercentSuffix() => true;
+            public bool IsPercentTooltip() => true;
         }
     }
     

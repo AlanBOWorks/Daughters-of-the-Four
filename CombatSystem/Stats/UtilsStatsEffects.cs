@@ -11,6 +11,8 @@ namespace CombatSystem.Stats
         {
             // Attack Power is normally 1 or higher
             // Damage reduction is normally 0
+            if (targetDamageReductionUnit < 0) targetDamageReductionUnit = 0;
+
             float damageModifier = performerAttackUnit - targetDamageReductionUnit;
             float finalDamage = effectDamage * damageModifier;
             if (finalDamage > 0) return finalDamage;

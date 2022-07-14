@@ -94,19 +94,25 @@ namespace CombatSystem.Skills
                 return null;
             }
 
-            public void DoEffect(EntityPairInteraction entities, ref float effectValue)
+            public void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
             {
                 var performer = entities.Performer;
                 var vanguardEffectsHolder = performer.Team.VanguardEffectsHolder;
 
                 vanguardEffectsHolder.AddEffect(_skill);
             }
-            public string GetEffectValueTootLip(CombatStats performerStats, float effectValue)
+            public string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
             {
                 return LocalizeEffects.LocalizePercentValue(effectValue);
             }
-            public bool IsPercentSuffix() => true;
 
+            public float CalculateEffectValue(CombatStats performerStats, float effectValue)
+            {
+                return 1;
+            }
+
+            public bool IsPercentSuffix() => true;
+            public bool IsPercentTooltip() => true;
         }
     }
 }
