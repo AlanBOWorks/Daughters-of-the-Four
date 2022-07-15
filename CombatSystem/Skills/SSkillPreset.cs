@@ -59,15 +59,24 @@ namespace CombatSystem.Skills
         [SerializeField]
         private string skillName = "NULL";
 
-        [SerializeField, PreviewField]
+        [SerializeField, PreviewField, GUIColor(.1f,.1f,.1f,.9f)]
         private Sprite skillIcon;
 
         [TitleGroup("Values")]
         [SerializeField]
         private int skillCost = 1;
 
-        [SerializeField, Range(0, 3), SuffixLabel("%"), Tooltip("0:  crit won't be calculated")] 
-        private float effectsLuckModifier = .5f;
+        [SerializeField, SuffixLabel("%"), Tooltip("0:  crit won't be calculated")]
+        private LuckModifierType luckModifierType;
+
+        private const float LowLuckModifier = .25f;
+        private const float HighLuckModifier = .5f;
+        private enum LuckModifierType
+        {
+            NoLuck = 0,
+            Low,
+            High
+        }
 
         [TitleGroup("Effects")]
         [SerializeField]
@@ -110,7 +119,19 @@ namespace CombatSystem.Skills
 
         public abstract IEffect GetMainEffectArchetype();
         public abstract bool IgnoreSelf();
-        public float LuckModifier => effectsLuckModifier;
+
+        public float LuckModifier
+        {
+            get
+            {
+                return luckModifierType switch
+                {
+                    LuckModifierType.Low => LowLuckModifier,
+                    LuckModifierType.High => HighLuckModifier,
+                    _ => 0
+                };
+            }
+        }
         public bool HasEffects() => effects.Length > 0;
 
         protected virtual string GetAssetPrefix() => " [SkillPreset]";

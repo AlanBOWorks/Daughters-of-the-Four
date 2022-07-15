@@ -48,20 +48,34 @@ namespace CombatSystem.Localization
         }
 
 
-
+        
         public static string LocalizeMathfValue(float value, float highValue, bool isPercentValue)
         {
+            if (highValue - value < .01f)
+                return LocalizeMathfValue(value, isPercentValue);
+
+            string minValueText;
+            string highValueText;
             if (isPercentValue)
             {
-                return LocalizePercentValueWithDecimals(value) + " - " +
-                       LocalizePercentValueWithDecimals(highValue) +
-                       PercentSuffix;
+                minValueText = LocalizePercentValueWithDecimals(value);
+                highValueText = LocalizePercentValueWithDecimals(highValue);
+
+                return ConcatenateValues(PercentSuffix);
             }
-            else
-                return LocalizeArithmeticValue(value) + " - " +
-                       LocalizeArithmeticValue(highValue) +
-                       UnitSuffix;
+
+            minValueText = LocalizeArithmeticValue(value);
+            highValueText = LocalizeArithmeticValue(highValue);
+            return ConcatenateValues(UnitSuffix);
+
+
+            string ConcatenateValues(string suffix)
+            {
+                return "[" + minValueText + " - " + highValueText + "]" + suffix;
+            }
         }
+
+
         public static string LocalizeMathfValue(float value, bool isPercentValue)
         {
             return (isPercentValue) 

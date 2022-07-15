@@ -7,12 +7,15 @@ using CombatSystem.Skills.Effects;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI
 {
-    public class USkillTooltipsHandler : MonoBehaviour, ISkillPointerListener
+    public class USkillTooltipsHandler : MonoBehaviour, ISkillPointerListener,
+        ISkillSelectionListener
     {
+        [Title("References")]
         [SerializeField]
         private SkillInfoHandler skillInfo;
         [SerializeField]
@@ -25,32 +28,61 @@ namespace CombatSystem.Player.UI
         private void Awake()
         {
             PlayerCombatSingleton.PlayerCombatEvents.Subscribe(this);
+
+            var shortcutAction = 
+                CombatShortcutsSingleton.InputActions.SkillInfoShortCut.action;
+            shortcutAction.performed += ShortcutShowSkillInfo;
+            shortcutAction.canceled += ShortcutHideSkillInfo;
         }
 
         private void OnDestroy()
         {
             PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
+
+            var shortcutAction = 
+                CombatShortcutsSingleton.InputActions.SkillInfoShortCut.action;
+            shortcutAction.performed -= ShortcutShowSkillInfo;
+            shortcutAction.canceled -= ShortcutHideSkillInfo;
         }
 
+        private ICombatSkill _hoverSkill; //todo 
         public void OnSkillButtonHover(ICombatSkill skill)
         {
-            ExtractTheme(skill,out var roleColor,out var roleIcon);
+            if(_shortcutSelectedSkill != null)
+                HideSkillInfo(skill);
+            ShowSkillInfo(skill);
+        }
+
+        private void ShowSkillInfo(ICombatSkill skill)
+        {
+            ExtractTheme(skill, out var roleColor, out var roleIcon);
             skillInfo.HandleSkillName(skill, roleColor, roleIcon);
             luckInfo.HandleLuckAmount(skill, roleColor);
 
             IEnumerable<PerformEffectValues> skillEffects;
             if (skill.Preset is IVanguardSkill vanguardSkill)
+            {
                 skillEffects = vanguardSkill.GetPerformVanguardEffects();
+                tooltipWindow.HandleEffects(skill,skillEffects, null);
+            }
             else
+            {
+                var performer = PlayerCombatSingleton.PlayerTeamController.GetPerformer();
                 skillEffects = skill.GetEffects();
+                tooltipWindow.HandleEffects(skill, skillEffects, performer);
+            }
 
-            var performer = PlayerCombatSingleton.PlayerTeamController.GetPerformer();
-            tooltipWindow.HandleEffects(skill,skillEffects, performer);
             tooltipWindow.Show();
-
         }
 
         public void OnSkillButtonExit(ICombatSkill skill)
+        {
+            HideSkillInfo(skill);
+            if(_shortcutSelectedSkill != null)
+                ShowSkillInfo(_shortcutSelectedSkill);
+        }
+
+        private void HideSkillInfo(ICombatSkill skill)
         {
             tooltipWindow.Hide();
         }
@@ -63,6 +95,51 @@ namespace CombatSystem.Player.UI
             roleColor = roleTheme.GetThemeColor();
             roleIcon = roleTheme.GetThemeIcon();
         }
+
+        private ICombatSkill _shortcutSelectedSkill;
+        private void ShortcutShowSkillInfo(InputAction.CallbackContext context)
+        {
+            var skill = PlayerCombatSingleton.PlayerTeamController.GetSkill();
+            if(skill == null) return;
+            ShowSkillInfo(skill);
+            _shortcutSelectedSkill = skill;
+        }
+
+        private void ShortcutHideSkillInfo(InputAction.CallbackContext context)
+        {
+            var skill = PlayerCombatSingleton.PlayerTeamController.GetSkill();
+            if(skill == null) return;
+            HideSkillInfo(skill);
+            _shortcutSelectedSkill = null;
+        }
+        public void OnSkillSelect(CombatSkill skill)
+        {
+        }
+
+        public void OnSkillSelectFromNull(CombatSkill skill)
+        {
+        }
+
+        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        {
+            if(_shortcutSelectedSkill == null) return;
+            HideSkillInfo(_shortcutSelectedSkill);
+            _shortcutSelectedSkill = skill;
+            ShowSkillInfo(skill);
+        }
+
+        public void OnSkillDeselect(CombatSkill skill)
+        {
+        }
+
+        public void OnSkillCancel(CombatSkill skill)
+        {
+        }
+
+        public void OnSkillSubmit(CombatSkill skill)
+        {
+        }
+
 
 
         [Serializable]
