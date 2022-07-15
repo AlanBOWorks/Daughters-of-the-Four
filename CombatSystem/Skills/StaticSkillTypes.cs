@@ -12,11 +12,11 @@ namespace CombatSystem.Skills
     public static class StaticSkillTypes
     {
         public static readonly IFullSkill OffensiveSkillPreset
-            = new PresetSkill(DebugEffectTypes.OffensiveEffect, EnumsSkill.TeamTargeting.Offensive, EnumsSkill.TargetType.Direct);
+            = new PresetSkill(DebugEffectTypes.OffensiveEffect, EnumsSkill.TeamTargeting.Offensive);
         public static readonly IFullSkill SupportSkillPreset
-            = new PresetSkill(DebugEffectTypes.SupportEffect,EnumsSkill.TeamTargeting.Support,EnumsSkill.TargetType.Direct);
+            = new PresetSkill(DebugEffectTypes.SupportEffect,EnumsSkill.TeamTargeting.Support);
         public static readonly IFullSkill TeamSkillPreset
-            = new PresetSkill(DebugEffectTypes.TeamEffect,EnumsSkill.TeamTargeting.Self,EnumsSkill.TargetType.Direct);
+            = new PresetSkill(DebugEffectTypes.TeamEffect,EnumsSkill.TeamTargeting.Self);
 
         public static readonly CombatSkill OffensiveCombatSkill
         = new CombatSkill(OffensiveSkillPreset);
@@ -41,25 +41,23 @@ namespace CombatSystem.Skills
         }
         private sealed class PresetSkill : IFullSkill
         {
-            public PresetSkill(IEffect effect, EnumsSkill.TeamTargeting teamTargeting, EnumsSkill.TargetType targetType)
+            public PresetSkill(IEffect effect, EnumsSkill.TeamTargeting teamTargeting)
             {
                 _effect = effect;
                 TeamTargeting = teamTargeting;
-                TargetType = targetType;
             }
 
             private readonly IEffect _effect;
 
             public int SkillCost => 0;
             public EnumsSkill.TeamTargeting TeamTargeting { get; }
-            public EnumsSkill.TargetType TargetType { get; }
             public IEffect GetMainEffectArchetype() => _effect;
 
             public bool IgnoreSelf() => true;
             public float LuckModifier => -1;
             public bool CanCrit() => false;
 
-            public string GetSkillName() => "PRESET - " + TeamTargeting + " [" + TargetType + "] "+ ToString();
+            public string GetSkillName() => "PRESET - " + TeamTargeting;
 
             public Sprite GetSkillIcon() => null;
 
@@ -78,7 +76,6 @@ namespace CombatSystem.Skills
 
             public int SkillCost => 0;
             public EnumsSkill.TeamTargeting TeamTargeting => EnumsSkill.TeamTargeting.Self;
-            public EnumsSkill.TargetType TargetType => EnumsSkill.TargetType.Direct;
             public IEffect GetMainEffectArchetype() => null;
             public IEnumerable<PerformEffectValues> GetEffects() => null;
             public IEnumerable<PerformEffectValues> GetPerformVanguardEffects() => null;

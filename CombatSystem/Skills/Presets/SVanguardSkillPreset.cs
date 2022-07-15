@@ -58,7 +58,6 @@ namespace CombatSystem.Skills
 
 
         public override EnumsSkill.TeamTargeting TeamTargeting => EnumsSkill.TeamTargeting.Self;
-        public override EnumsSkill.TargetType TargetType => EnumsSkill.TargetType.Direct;
         public EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType() => responseType;
         
 

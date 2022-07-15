@@ -21,11 +21,7 @@ namespace CombatSystem.Skills
         private EnumsSkill.TeamTargeting teamTargeting 
             = EnumsSkill.TeamTargeting.Offensive;
 
-        [TitleGroup("Values")]
-        [SerializeField]
-        private EnumsSkill.TargetType targetType 
-            = EnumsSkill.TargetType.Direct;
-
+       
         [TitleGroup("Effects"),
          InfoBox("Null: mainEffect will be taken from [effects].first element", "IsMainEffectNull")]
         [SerializeField] private SEffect mainEffectReference;
@@ -36,7 +32,6 @@ namespace CombatSystem.Skills
 
         public override IEnumerable<PerformEffectValues> GetEffectsFeedBacks() => GetEffects();
 
-        public override EnumsSkill.TargetType TargetType => targetType;
         public override EnumsSkill.TeamTargeting TeamTargeting => teamTargeting;
         public override IEffect GetMainEffectArchetype()
         {
@@ -70,11 +65,13 @@ namespace CombatSystem.Skills
         private LuckModifierType luckModifierType;
 
         private const float LowLuckModifier = .25f;
+        private const float MidLuckModifier = .375f;
         private const float HighLuckModifier = .5f;
         private enum LuckModifierType
         {
             NoLuck = 0,
             Low,
+            Mid,
             High
         }
 
@@ -113,7 +110,6 @@ namespace CombatSystem.Skills
         public abstract IEnumerable<PerformEffectValues> GetEffectsFeedBacks();
         public int SkillCost => skillCost;
         public abstract EnumsSkill.TeamTargeting TeamTargeting { get; }
-        public abstract EnumsSkill.TargetType TargetType { get; }
 
 
 
@@ -127,6 +123,7 @@ namespace CombatSystem.Skills
                 return luckModifierType switch
                 {
                     LuckModifierType.Low => LowLuckModifier,
+                    LuckModifierType.Mid => MidLuckModifier,
                     LuckModifierType.High => HighLuckModifier,
                     _ => 0
                 };

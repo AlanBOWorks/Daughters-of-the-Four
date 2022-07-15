@@ -15,16 +15,16 @@ namespace CombatSystem.Skills.Effects
 
         public enum TargetType
         {
-            Target,
-            TargetTeam,
+            Target = 0,
+            TargetLine = 1,
+            TargetTeam = 2,
 
-            Performer,
-            PerformerTeam,
+            Performer = 10,
+            PerformerLine = 11,
+            PerformerTeam = 12,
 
-            TargetLine,
-            PerformerLine,
 
-            All
+            MostDesired = 100
         }
 
         public enum Archetype

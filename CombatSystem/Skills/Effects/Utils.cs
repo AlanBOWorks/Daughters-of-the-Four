@@ -51,8 +51,6 @@ namespace CombatSystem.Skills.Effects
                     case EnumsEffect.TargetType.TargetLine:
                         DoEffectOnTargets();
                         break;
-                    case EnumsEffect.TargetType.All:
-                        throw new ArgumentOutOfRangeException();
                     default:
                         DoEffectOnPerformer();
                         break;

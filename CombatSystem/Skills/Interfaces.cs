@@ -40,7 +40,6 @@ namespace CombatSystem.Skills
     {
         int SkillCost { get; }
         EnumsSkill.TeamTargeting TeamTargeting { get; }
-        EnumsSkill.TargetType TargetType { get; }
 
         IEffect GetMainEffectArchetype();
         IEnumerable<PerformEffectValues> GetEffects();
