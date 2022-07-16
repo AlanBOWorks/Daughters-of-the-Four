@@ -20,6 +20,7 @@ namespace CombatSystem.Localization
         public const string GainControlEffectName = StatsTags.ControlStatName;
 
         public const string StanceEffectName = "Stance";
+        public const string InitiativeEffectName = "Initiative";
 
 
         // Tags
@@ -38,7 +39,7 @@ namespace CombatSystem.Localization
         public const string GainControlEffectTag = StatsTags.ControlStatTag;
 
         public const string StanceEffectTag = "Stance_Effect";
-
+        public const string InitiativeEffectTag = "Initiative_Tag";
 
         // Prefix
 
@@ -57,5 +58,6 @@ namespace CombatSystem.Localization
         public const string GainControlEffectPrefix = StatsTags.ControlStatPrefix;
 
         public const string StanceEffectPrefix = "Stnc";
+        public const string InitiativeEffectPrefix = "Init";
     }
 }

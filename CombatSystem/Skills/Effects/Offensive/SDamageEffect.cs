@@ -14,7 +14,7 @@ namespace CombatSystem.Skills.Effects
         private const string DamageEffectTag = EffectTags.DamageEffectTag;
         private const string DamageSmallPrefix = EffectTags.DamageEffectPrefix;
 
-        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateAttackPower(performerStats);
         }

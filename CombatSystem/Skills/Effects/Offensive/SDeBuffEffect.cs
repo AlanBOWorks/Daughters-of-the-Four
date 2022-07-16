@@ -21,7 +21,7 @@ namespace CombatSystem.Skills.Effects
         [SerializeField] protected bool isBurst;
 
         public override bool IsPercentSuffix() => true;
-        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateDeBuffPower(performerStats);
         }

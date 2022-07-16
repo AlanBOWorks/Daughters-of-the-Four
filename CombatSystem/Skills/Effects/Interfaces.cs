@@ -19,8 +19,7 @@ namespace CombatSystem.Skills.Effects
         /// <param name="luckModifier"></param>
         void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier);
 
-        string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue);
-        float CalculateEffectValue(CombatStats performerStats, float effectValue);
+        float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue);
         bool IsPercentSuffix();
         bool IsPercentTooltip();
 

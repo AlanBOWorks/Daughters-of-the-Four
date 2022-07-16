@@ -14,7 +14,7 @@ namespace CombatSystem.Skills.Effects
         private const string ShieldEffectSmallPrefix = EffectTags.ShieldingEffectPrefix;
 
 
-        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
         {
             effectValue *= UtilsStatsFormula.CalculateShieldingPower(performerStats);
             return effectValue;

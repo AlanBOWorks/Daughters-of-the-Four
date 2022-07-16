@@ -19,6 +19,7 @@ namespace CombatSystem.Player.UI
         [SerializeField]
         private RectTransform resizeWindow;
         [SerializeField] private float verticalPadding;
+        [SerializeField] private GameObject ignoreSelfTextHolder;
 
         [Title("Pool References")]
         [SerializeField, PropertyOrder(10)] private ToolTipWindowPool pool = new ToolTipWindowPool();
@@ -61,6 +62,9 @@ namespace CombatSystem.Player.UI
                 UtilsEffectTooltip.HandleTextHeight(holder.GetTextHolder(), ref accumulatedHeight);
             }
             HeightResize(accumulatedHeight);
+
+            bool ignoreSelfTargetText = skill.IgnoreSelf();
+            ignoreSelfTextHolder.SetActive(ignoreSelfTargetText);
         }
 
 
@@ -93,7 +97,7 @@ namespace CombatSystem.Player.UI
                 }
                 else
                 {
-                    effectValue = effect.CalculateEffectValue(stats, effectValue);
+                    effectValue = effect.CalculateEffectTooltipValue(stats, effectValue);
 
                     float skillLuck = skill.LuckModifier;
                     float statsLuck = UtilsStatsFormula.CalculateLuckAmount(stats);

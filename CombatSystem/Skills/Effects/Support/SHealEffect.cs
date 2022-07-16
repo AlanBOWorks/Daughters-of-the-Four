@@ -17,14 +17,14 @@ namespace CombatSystem.Skills.Effects
         public override bool IsPercentSuffix() => false;
         public override bool IsPercentTooltip() => true;
 
-        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateHealPower(performerStats);
         }
 
         public override string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
         {
-            return LocalizeEffects.LocalizePercentValueWithDecimals(CalculateEffectValue(performerStats, effectValue));
+            return LocalizeEffects.LocalizePercentValueWithDecimals(CalculateEffectTooltipValue(performerStats, effectValue));
         }
 
 

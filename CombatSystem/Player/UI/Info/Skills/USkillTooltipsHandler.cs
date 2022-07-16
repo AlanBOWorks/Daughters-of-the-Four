@@ -51,6 +51,8 @@ namespace CombatSystem.Player.UI
             if(_shortcutSelectedSkill != null)
                 HideSkillInfo(skill);
             ShowSkillInfo(skill);
+
+            _hoverSkill = skill;
         }
 
         private void ShowSkillInfo(ICombatSkill skill)
@@ -80,6 +82,8 @@ namespace CombatSystem.Player.UI
             HideSkillInfo(skill);
             if(_shortcutSelectedSkill != null)
                 ShowSkillInfo(_shortcutSelectedSkill);
+
+            if (skill == _hoverSkill) _hoverSkill = null;
         }
 
         private void HideSkillInfo(ICombatSkill skill)
@@ -101,16 +105,23 @@ namespace CombatSystem.Player.UI
         {
             var skill = PlayerCombatSingleton.PlayerTeamController.GetSkill();
             if(skill == null) return;
-            ShowSkillInfo(skill);
             _shortcutSelectedSkill = skill;
+
+            if(_hoverSkill != null) return;;
+            ShowSkillInfo(skill);
+
         }
 
         private void ShortcutHideSkillInfo(InputAction.CallbackContext context)
         {
             var skill = PlayerCombatSingleton.PlayerTeamController.GetSkill();
             if(skill == null) return;
-            HideSkillInfo(skill);
+
             _shortcutSelectedSkill = null;
+
+            if(_hoverSkill != null) return;;
+            HideSkillInfo(skill);
+
         }
         public void OnSkillSelect(CombatSkill skill)
         {

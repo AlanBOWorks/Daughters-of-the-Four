@@ -59,7 +59,8 @@ namespace CombatSystem.Stats
 
         public T OffensiveEffectType => offensiveType;
         public T SupportEffectType => supportType;
-        public T TeamEffectType => vitalityType;
+        public T VanguardEffectType => vitalityType;
+        public T FlexibleEffectType => concentrationType;
 
         public T VanguardType => vitalityType;
         public T AttackerType => offensiveType;
@@ -112,7 +113,8 @@ namespace CombatSystem.Stats
 
         public T OffensiveEffectType => offensiveType;
         public T SupportEffectType => supportType;
-        public T TeamEffectType => vitalityType;
+        public T VanguardEffectType => vitalityType;
+        public T FlexibleEffectType => concentrationType;
 
         public T VanguardType => vitalityType;
         public T AttackerType => offensiveType;

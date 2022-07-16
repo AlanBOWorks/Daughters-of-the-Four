@@ -29,9 +29,9 @@ namespace CombatSystem.Player.UI
         private Vector2 _buttonSizes;
 
 
-        [ShowInInspector, DisableInEditorMode,DisableInPlayMode]
+        [ShowInInspector, HideInEditorMode,DisableInPlayMode]
         private CombatSkill _currentSelectedSkill;
-        [ShowInInspector, DisableInEditorMode,DisableInPlayMode]
+        [ShowInInspector, HideInEditorMode, DisableInPlayMode]
         private CombatEntity _currentControlEntity;
 
         [Title("Skills")] 

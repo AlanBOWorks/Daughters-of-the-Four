@@ -40,7 +40,8 @@ namespace CombatSystem.Team
 
         public T OffensiveEffectType => attackerType;
         public T SupportEffectType => supportType;
-        public T TeamEffectType => vanguardType;
+        public T VanguardEffectType => vanguardType;
+        public T FlexibleEffectType => ConcentrationStatType;
 
         public T VanguardType => vanguardType;
         public T AttackerType => attackerType;
@@ -107,7 +108,8 @@ namespace CombatSystem.Team
 
         public T OffensiveEffectType => attackerType;
         public T SupportEffectType => supportType;
-        public T TeamEffectType => vanguardType;
+        public T VanguardEffectType => vanguardType;
+        public T FlexibleEffectType => flexType;
 
         public T VanguardType => vanguardType;
         public T AttackerType => attackerType;

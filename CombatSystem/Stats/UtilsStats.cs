@@ -368,6 +368,18 @@ namespace CombatSystem.Stats
             ResetActions(stats);
         }
         // ----- INITIATIVE -----
+        private const float MaxInitiativeValue = TempoTicker.LoopThresholdAsIntended;
+        public static void TickInitiative(CombatStats stats, float addition)
+        {
+            float targetInitiative = stats.CurrentInitiative + addition;
+            if (targetInitiative >= MaxInitiativeValue)
+            {
+                targetInitiative = MaxInitiativeValue;
+            }
+
+            stats.CurrentInitiative = targetInitiative;
+        }
+
         public static void ResetInitiative(CombatStats stats)
         {
             stats.CurrentInitiative = 0;
@@ -470,7 +482,7 @@ namespace CombatSystem.Stats
         {
             stats.DamageReductionType += percentValue;
             stats.DeBuffResistanceType += percentValue;
-            //todo Health
+            stats.HealthType *= (1 + percentValue);
         }
 
         private const float ActionAmountModifier = 10;

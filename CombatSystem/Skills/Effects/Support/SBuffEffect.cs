@@ -29,7 +29,7 @@ namespace CombatSystem.Skills.Effects
             : EnumsEffect.ConcreteType.Buff;
 
         public override bool IsPercentSuffix() => true;
-        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateBuffPower(performerStats);
         }

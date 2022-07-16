@@ -80,9 +80,9 @@ namespace CombatSystem.Skills.VanguardEffects
                 {
                     //Do animation Once
                     animator.PerformActionAnimation(StaticSkillTypes.RevengeVanguardSkill, performer, performer);
-                    foreach ((IVanguardSkill vanguardSkill, var accumulation) in vanguardEffects.VanguardRevengeType)
+                    foreach ((IVanguardSkill vanguardSkill, var accumulation) in vanguardEffects.VanguardCounterType)
                     {
-                        InvokeVanguardEffect(vanguardSkill, accumulation, vanguardOffensiveRecords.VanguardRevengeType);
+                        InvokeVanguardEffect(vanguardSkill, accumulation, vanguardOffensiveRecords.VanguardCounterType);
                         yield return Timing.WaitForSeconds(WaitForNextEffect);
                     }
                 }

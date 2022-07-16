@@ -26,7 +26,7 @@ namespace CombatSystem.Skills
         = new CombatSkill(TeamSkillPreset);
 
         public static readonly IVanguardSkill RevengeVanguardSkill
-        = new VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType.Revenge);
+        = new VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType.Counter);
         public static readonly IVanguardSkill PunishVanguardSkill
         = new VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType.Punish);
 
@@ -34,7 +34,7 @@ namespace CombatSystem.Skills
         {
             return type switch
             {
-                EnumsVanguardEffects.VanguardEffectType.Revenge => RevengeVanguardSkill,
+                EnumsVanguardEffects.VanguardEffectType.Counter => RevengeVanguardSkill,
                 EnumsVanguardEffects.VanguardEffectType.Punish => PunishVanguardSkill,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
@@ -128,7 +128,7 @@ namespace CombatSystem.Skills
                 return LocalizeEffects.LocalizePercentValue(effectValue);
             }
 
-            public float CalculateEffectValue(CombatStats performerStats, float effectValue)
+            public float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
             {
                 return 1;
             }

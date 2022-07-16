@@ -6,7 +6,7 @@ namespace CombatSystem.Skills.VanguardEffects
 {
     public interface IVanguardEffectStructureRead<out T>
     {
-        T VanguardRevengeType { get; }
+        T VanguardCounterType { get; }
         T VanguardPunishType { get; }
     }
 

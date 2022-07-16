@@ -12,7 +12,6 @@ namespace CombatSystem.Skills.Effects
         private const string GuardingEffectTag = EffectTags.GuardingEffectTag;
         private const string GuardingSmallPrefix = EffectTags.GuardingEffectPrefix;
 
-        private const string GuardingValuePrefix = "u.";
 
        
 
@@ -27,7 +26,7 @@ namespace CombatSystem.Skills.Effects
         }
 
         public override bool IsPercentSuffix() => false;
-        public override float CalculateEffectValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateShieldingPower(performerStats);
         }

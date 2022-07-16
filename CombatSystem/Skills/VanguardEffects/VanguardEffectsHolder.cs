@@ -42,10 +42,10 @@ namespace CombatSystem.Skills.VanguardEffects
 
 
 
-        // Revenge effects are added in both wrappers, but if there wasn't any record of offensive
+        // Counter effects are added in both wrappers, but if there wasn't any record of offensive
         // actions, then the effects can't be invoked.
-        public bool HasRevengeEffects() => _offensiveRecordsDictionaries.VanguardRevengeType.Count > 0;
-        // Same as [Revenge];
+        public bool HasRevengeEffects() => _offensiveRecordsDictionaries.VanguardCounterType.Count > 0;
+        // Same as [Counter];
         public bool HasPunishEffects() => _offensiveRecordsDictionaries.VanguardPunishType.Count > 0;
 
         public bool IsMainEntityTurn()
@@ -65,10 +65,10 @@ namespace CombatSystem.Skills.VanguardEffects
 
         public void Clear()
         {
-            _effectDictionaries.VanguardRevengeType.Clear();
+            _effectDictionaries.VanguardCounterType.Clear();
             _effectDictionaries.VanguardPunishType.Clear();
 
-            _offensiveRecordsDictionaries.VanguardRevengeType.Clear();
+            _offensiveRecordsDictionaries.VanguardCounterType.Clear();
             _offensiveRecordsDictionaries.VanguardPunishType.Clear();
         }
 
@@ -109,10 +109,10 @@ namespace CombatSystem.Skills.VanguardEffects
                 // Problem: if there's no revenge Skill in the Collection, then accumulating
                 // revenge counts won't make sense > should accumulates if there's at least
                 // one or more Skill
-                var revengeDictionary = _effectDictionaries.VanguardRevengeType;
+                var revengeDictionary = _effectDictionaries.VanguardCounterType;
                 if(revengeDictionary.Count == 0) return;
-                HandleDictionary(_offensiveRecordsDictionaries.VanguardRevengeType);
-                HandleEvents(EnumsVanguardEffects.VanguardEffectType.Revenge);
+                HandleDictionary(_offensiveRecordsDictionaries.VanguardCounterType);
+                HandleEvents(EnumsVanguardEffects.VanguardEffectType.Counter);
             }
             else
             {
@@ -150,11 +150,11 @@ namespace CombatSystem.Skills.VanguardEffects
         {
             public VanguardEffectDictionaries()
             {
-                VanguardRevengeType = new Dictionary<TKey, TValue>();
+                VanguardCounterType = new Dictionary<TKey, TValue>();
                 VanguardPunishType = new Dictionary<TKey, TValue>();
             }
             [ShowInInspector,HorizontalGroup()]
-            public Dictionary<TKey, TValue> VanguardRevengeType { get; }
+            public Dictionary<TKey, TValue> VanguardCounterType { get; }
             [ShowInInspector,HorizontalGroup()]
             public Dictionary<TKey, TValue> VanguardPunishType { get; }
         }

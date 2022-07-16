@@ -68,7 +68,7 @@ namespace CombatSystem.Player.UI
             var type = values.Type;
             ObjectPool pool;
             GameObject holderRoot;
-            if (type == EnumsVanguardEffects.VanguardEffectType.Revenge)
+            if (type == EnumsVanguardEffects.VanguardEffectType.Counter)
             {
                 pool = revengePool;
                 holderRoot = revengeRootHolder;
@@ -114,7 +114,7 @@ namespace CombatSystem.Player.UI
 
         public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
         {
-            TriggerCountHandler handler = (type == EnumsVanguardEffects.VanguardEffectType.Revenge)
+            TriggerCountHandler handler = (type == EnumsVanguardEffects.VanguardEffectType.Counter)
                 ? revengeCountHandler
                 : punishCountHandler;
 

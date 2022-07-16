@@ -52,9 +52,12 @@ namespace CombatSystem.Skills.Effects
             Burst,
 
             Guarding,
+            Counter,
+            Revenge,
+
             ControlGain,
             Stance,
-            ControlRemove
+            Initiative
         }
 
     }

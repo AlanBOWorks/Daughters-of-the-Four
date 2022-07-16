@@ -13,7 +13,7 @@ namespace CombatSystem.Skills.VanguardEffects
         {
             return type switch
             {
-                EnumsVanguardEffects.VanguardEffectType.Revenge => structure.VanguardRevengeType,
+                EnumsVanguardEffects.VanguardEffectType.Counter => structure.VanguardCounterType,
                 EnumsVanguardEffects.VanguardEffectType.Punish => structure.VanguardPunishType,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
@@ -25,7 +25,7 @@ namespace CombatSystem.Skills.VanguardEffects
             IVanguardEffectStructureRead<TKey> keyStructure,
             IVanguardEffectStructureRead<TValue> valueStructure)
         {
-            yield return new KeyValuePair<TKey, TValue>(keyStructure.VanguardRevengeType,valueStructure.VanguardRevengeType);
+            yield return new KeyValuePair<TKey, TValue>(keyStructure.VanguardCounterType,valueStructure.VanguardCounterType);
             yield return new KeyValuePair<TKey, TValue>(keyStructure.VanguardPunishType,valueStructure.VanguardPunishType);
         }
     }

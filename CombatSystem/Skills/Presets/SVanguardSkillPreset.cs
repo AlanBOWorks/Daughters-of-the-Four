@@ -105,7 +105,7 @@ namespace CombatSystem.Skills
                 return LocalizeEffects.LocalizePercentValue(effectValue);
             }
 
-            public float CalculateEffectValue(CombatStats performerStats, float effectValue)
+            public float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
             {
                 return 1;
             }

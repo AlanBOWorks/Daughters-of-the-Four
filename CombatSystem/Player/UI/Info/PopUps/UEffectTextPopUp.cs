@@ -17,6 +17,11 @@ namespace CombatSystem.Player.UI
         [NonSerialized]
         public float LerpAmount;
 
+        private Vector3 _initialPoint;
+        private Vector3 _targetPoint;
+
+
+
         private void Awake()
         {
             _alphaGroup = GetComponent<CanvasGroup>();
@@ -45,20 +50,25 @@ namespace CombatSystem.Player.UI
             effectTextHolder.text = effectText;
         }
 
+        public void SetDestination(Vector3 offsetPoint)
+        {
+            _initialPoint = transform.localPosition;
+            _targetPoint = _initialPoint + offsetPoint;
+        }
+
         public void Injection(Sprite effectSprite)
         {
             effectIcon.sprite = effectSprite;
         }
 
-        public void Translation(Vector2 translation)
-        {
-            Vector2 lerpedTranslation = (1 - LerpAmount) * translation;
-            transform.Translate(lerpedTranslation);
-        }
-
         public void SetAlpha(float alpha)
         {
             _alphaGroup.alpha = alpha;
+        }
+
+        public void Move(float destinationLerp)
+        {
+            transform.localPosition = Vector3.LerpUnclamped(_initialPoint, _targetPoint, destinationLerp);
         }
     }
 }

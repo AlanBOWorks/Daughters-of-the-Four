@@ -75,14 +75,8 @@ namespace CombatSystem._Core
                 return;
             }
 
-            currentTickAmount = initiativeIncrement + stats.CurrentInitiative;
-
-            if (currentTickAmount >= InitiativeThreshold)
-            {
-                currentTickAmount = InitiativeThreshold;
-            }
-
-            stats.CurrentInitiative = currentTickAmount;
+            UtilsCombatStats.TickInitiative(stats, initiativeIncrement);
+            currentTickAmount = stats.CurrentInitiative;
         }
 
 

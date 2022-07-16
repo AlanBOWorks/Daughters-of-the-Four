@@ -261,11 +261,13 @@ namespace CombatSystem.Entity
     {
         public readonly CombatEntity Performer;
         public readonly CombatEntity Target;
+        public readonly bool AreAllies;
 
         public EntityPairInteraction(CombatEntity performer, CombatEntity target)
         {
             Performer = performer;
             Target = target;
+            AreAllies = performer.Team.Contains(target);
         }
 
         public void Extract(out CombatEntity performer, out CombatEntity target)
@@ -273,6 +275,7 @@ namespace CombatSystem.Entity
             performer = Performer;
             target = Target;
         }
+
     }
 
     public interface ICombatEntityProvider : ICombatEntityPreparation, ICombatEntityInfoHolder

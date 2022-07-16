@@ -7,33 +7,31 @@ using CombatSystem.Team;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CombatSystem.Player.UI
 {
     public sealed class UCombatSkillHoverFeedback : MonoBehaviour, ISkillButtonListener,
-        ITempoControlStatesExtraListener
+        ITempoControlStatesListener
     {
         [Title("References")] 
         [SerializeField] private UCombatSkillButtonsHolder skillButtonsHolder;
 
         [TitleGroup("Images")]
-        [SerializeField] private RectTransform hoverHolder;
-        [SerializeField] private RectTransform focusHolder;
+        [SerializeField] private Image hoverHolder;
+        [SerializeField] private Image focusHolder;
+        private Color _hoverInitialColor;
 
         [Title("Animation Params")] 
 
-        private Quaternion _hoverInitialRotation;
-        private Quaternion _focusInitialRotation;
         private void Start()
         {
             var playerEvents = PlayerCombatSingleton.PlayerCombatEvents;
             playerEvents.SubscribeAsPlayerEvent(this);
             playerEvents.SubscribeForTeamControl(this);
 
-            _hoverInitialRotation = hoverHolder.localRotation;
-            _focusInitialRotation = focusHolder.localRotation;
-
-            ToggleElements(false);
+            _hoverInitialColor = hoverHolder.color;
+            ToggleHoverElements(false);
         }
 
         private void OnDestroy()
@@ -43,50 +41,57 @@ namespace CombatSystem.Player.UI
 
         private void OnDisable()
         {
-            ToggleElements(false);
+            ToggleHoverElements(false);
         }
 
 
-        private const float AnimationDuration = .08f;
-        private static void DoAnimate(RectTransform imageHolder, UCombatSkillButton onButton, Quaternion targetRotation)
+        private const float ButtonAnimationDuration = .08f;
+        private const float HoverImageAnimationDuration = .16f;
+        private const float PunchScaleModifier = -.2f;
+        private static void DoAnimate(Transform imageHolder, float animationDuration)
         {
-            imageHolder.gameObject.SetActive(true);
-            var groupHolder = onButton.GetGroupHolder();
-            imageHolder.SetParent(groupHolder);
-            imageHolder.localPosition = Vector3.zero;
-
             DOTween.Kill(imageHolder);
-            imageHolder.DOLocalRotateQuaternion(targetRotation, AnimationDuration);
-            DOTween.Kill(groupHolder);
-            groupHolder.localScale = Vector3.one;
-            groupHolder.DOPunchScale(Vector3.one * -.2f, AnimationDuration);
+            imageHolder.localScale = Vector3.one;
+            Vector3 targetScale = new Vector3(PunchScaleModifier,PunchScaleModifier, 0);
+            imageHolder.DOPunchScale(targetScale, animationDuration);
         }
+        private static void DoAnimate(Transform imageHolder, Vector3 onPosition, float animationDuration)
+        {
+            imageHolder.position = onPosition;
+            DoAnimate(imageHolder, animationDuration);
+        }
+
 
         private static void Hide(Component imageHolder)
         {
             imageHolder.gameObject.SetActive(false);
         }
 
-        private void ToggleElements(bool active)
+        private void ToggleHoverElements(bool active)
         {
             hoverHolder.gameObject.SetActive(active);
             focusHolder.gameObject.SetActive(active);
-        }
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
-        {
+
+            var targetColor = new Color(_hoverInitialColor.r,_hoverInitialColor.g,_hoverInitialColor.b, .4f);
+            ToggleHoverColors(targetColor);
         }
 
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
+        private void ToggleHoverColors(Color targetColor)
         {
-            ToggleElements(false);
+            hoverHolder.color = targetColor;
+            focusHolder.color = targetColor;
         }
 
         public void OnSkillButtonHover(ICombatSkill skill)
         {
             var targetButton = skillButtonsHolder.GetDictionary()[skill];
 
-            hoverHolder.localRotation = Quaternion.AngleAxis(-10, Vector3.forward);
-            DoAnimate(hoverHolder,targetButton, _hoverInitialRotation);
+            var buttonTransform = targetButton.GetGroupHolder();
+            hoverHolder.gameObject.SetActive(true);
+
+            DoAnimate(buttonTransform, ButtonAnimationDuration);
+            DoAnimate(hoverHolder.transform,buttonTransform.position, HoverImageAnimationDuration);
+
         }
 
         public void OnSkillButtonExit(ICombatSkill skill)
@@ -108,8 +113,11 @@ namespace CombatSystem.Player.UI
         {
             var targetButton = skillButtonsHolder.GetDictionary()[skill];
 
-            focusHolder.localRotation = _hoverInitialRotation;
-            DoAnimate(focusHolder,targetButton, _focusInitialRotation);
+            var buttonTransform = targetButton.GetGroupHolder();
+            focusHolder.gameObject.SetActive(true);
+
+            DoAnimate(buttonTransform, ButtonAnimationDuration);
+            DoAnimate(focusHolder.transform, buttonTransform.position, HoverImageAnimationDuration);
         }
 
         public void OnSkillDeselect(CombatSkill skill)
@@ -126,5 +134,19 @@ namespace CombatSystem.Player.UI
         {
         }
 
+        public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
+        {
+            ToggleHoverColors(_hoverInitialColor);
+        }
+
+        public void OnAllActorsNoActions(CombatEntity lastActor)
+        {
+            ToggleHoverElements(false);
+        }
+
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
+        {
+            ToggleHoverElements(false);
+        }
     }
 }

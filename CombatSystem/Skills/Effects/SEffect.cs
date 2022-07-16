@@ -8,18 +8,21 @@ namespace CombatSystem.Skills.Effects
 {
     public abstract class SEffect : ScriptableObject, IEffect
     {
+        [InfoBox("$InfoBoxText")]
         [SerializeField, AssetsOnly] private Sprite icon;
         [SerializeField,AssetsOnly] private GameObject secondaryParticlePrefab;
+
+        private string InfoBoxText() => $"Is Percent: {IsPercentSuffix()}";
 
         public Sprite GetIcon() => icon;
         public GameObject GetSecondaryParticlesPrefab() => secondaryParticlePrefab;
 
 
         public abstract void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier);
-        public abstract float CalculateEffectValue(CombatStats performerStats, float effectValue);
+        public abstract float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue);
         public virtual string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
         {
-            effectValue = CalculateEffectValue(performerStats, effectValue);
+            effectValue = CalculateEffectTooltipValue(performerStats, effectValue);
 
             var effectTooltip = LocalizeEffects.LocalizeMathfValue(effectValue, IsPercentSuffix());
             return " <b>" + effectTooltip + "</b>";

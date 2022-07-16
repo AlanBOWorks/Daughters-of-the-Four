@@ -7,7 +7,7 @@ namespace CombatSystem.Skills.VanguardEffects
             /// <summary>
             /// Type for effects which needs the Vanguard being attacked to be trigger
             /// </summary>
-            Revenge = 1,
+            Counter = 1,
             /// <summary>
             /// Type for effects which needs the Vanguard being ignored to be trigger
             /// </summary>
