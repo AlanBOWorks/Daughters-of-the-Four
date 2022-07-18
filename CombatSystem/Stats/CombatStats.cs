@@ -76,6 +76,9 @@ namespace CombatSystem.Stats
         [ShowInInspector]
         public float CurrentInitiative { get; set; }
 
+        public float InitiativeOffset;
+        public float TotalInitiative => CurrentInitiative + InitiativeOffset;
+
 
         public bool IsAlive()
         {

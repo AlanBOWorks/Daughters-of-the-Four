@@ -7,7 +7,7 @@ namespace CombatSystem.Skills.Effects
 {
     [CreateAssetMenu(fileName = "N [Effect]",
         menuName = "Combat/Effect/DeBuff/Concentration")]
-    public class SDeBuffConcentration : SDeBuffEffect
+    public class SDeBuffConcentrationEffect : SDeBuffEffect
     {
         [SerializeField] private EnumStats.ConcentrationStatType type;
         private string _effectTag;
@@ -18,7 +18,15 @@ namespace CombatSystem.Skills.Effects
         }
         public override string EffectTag => _effectTag;
 
-
+        public override bool IsPercentSuffix()
+        {
+            return type switch
+            {
+                EnumStats.ConcentrationStatType.Actions => false,
+                EnumStats.ConcentrationStatType.Speed => false,
+                _ => true
+            };
+        }
 
         protected override void DoDeBuff(IBasicStats<float> deBuffingStats, ref float deBuffingValue)
         {

@@ -18,7 +18,16 @@ namespace CombatSystem.Skills.Effects
             _effectTag = GetBuffPrefix() + "_" + type + "_" + EffectPrefix;
         }
         public override string EffectTag => _effectTag;
-
+        
+        public override bool IsPercentSuffix()
+        {
+            return type switch
+            {
+                EnumStats.ConcentrationStatType.Actions => false,
+                EnumStats.ConcentrationStatType.Speed => false,
+                _ => true
+            };
+        }
 
         protected override void DoBuff(IBasicStats<float> buffingStats,
             ref float buffingValue)

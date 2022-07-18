@@ -208,6 +208,18 @@ namespace CombatSystem._Core
             RemainingSteps = remainingSteps;
         }
 
+        public TempoTickValues(CombatEntity entity, float entityInitiativeAmount)
+        {
+            var stats = entity.Stats;
+
+            Entity = entity;
+            CurrentTick = entityInitiativeAmount;
+            CurrentPercent = UtilsCombatStats.CalculateTempoPercent(entityInitiativeAmount);
+            RemainingSteps = UtilsCombatStats.CalculateRemainingSteps(stats);
+        }
+        public TempoTickValues(CombatEntity entity) : this(entity, entity.Stats.TotalInitiative)
+        { }
+
         public void ExtractValues(out float currentTick, out float currentPercent)
         {
             currentTick = CurrentTick;
@@ -353,7 +365,7 @@ namespace CombatSystem._Core
 
     public static class UtilsTempo
     {
-        public static bool IsInitiativeTrigger(in CombatEntity entity)
+        public static bool IsInitiativeTrigger(CombatEntity entity)
         {
             var entityInitiativeAmount = entity.Stats.CurrentInitiative;
             const float initiativeThreshold = TempoTicker.LoopThreshold;

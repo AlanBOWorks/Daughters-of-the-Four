@@ -29,12 +29,12 @@ namespace CombatSystem.Skills.Effects
     public interface ISupportEffect : IEffect { }
     public interface ITeamEffect : IEffect { }
 
-    public interface IDeBuffEffect : IOffensiveEffect
+    public interface IDeBuffEffect 
     {
         bool IsBurstEffect();
     }
 
-    public interface IBuffEffect : ISupportEffect
+    public interface IBuffEffect
     {
         bool IsBurstEffect();
     }

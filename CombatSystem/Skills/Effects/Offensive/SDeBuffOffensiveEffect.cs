@@ -5,11 +5,12 @@ using UnityEngine;
 
 namespace CombatSystem.Skills.Effects
 {
+
     [CreateAssetMenu(fileName = "N [Effect]",
-        menuName = "Combat/Effect/DeBuff/Vitality")]
-    public class SDeBuffVitality : SDeBuffEffect
+        menuName = "Combat/Effect/DeBuff/Offensive")]
+    public class SDeBuffOffensiveEffect : SDeBuffEffect
     {
-        [SerializeField] private EnumStats.VitalityStatType type;
+        [SerializeField] private EnumStats.OffensiveStatType type;
         private string _effectTag;
 
         private void OnEnable()
@@ -24,23 +25,22 @@ namespace CombatSystem.Skills.Effects
         {
             switch (type)
             {
-                case EnumStats.VitalityStatType.Health:
-                    deBuffingStats.HealthType -= deBuffingValue;
+                case EnumStats.OffensiveStatType.Attack:
+                    deBuffingStats.AttackType -= deBuffingValue;
                     break;
-                case EnumStats.VitalityStatType.Mortality:
-                    deBuffingStats.MortalityType -= deBuffingValue;
+                case EnumStats.OffensiveStatType.OverTime:
+                    deBuffingStats.OverTimeType -= deBuffingValue;
                     break;
-                case EnumStats.VitalityStatType.DamageReduction:
-                    deBuffingStats.DamageReductionType -= deBuffingValue;
+                case EnumStats.OffensiveStatType.DeBuff:
+                    deBuffingStats.DeBuffType -= deBuffingValue;
                     break;
-                case EnumStats.VitalityStatType.DebuffResistance:
-                    deBuffingStats.DeBuffResistanceType -= deBuffingValue;
+                case EnumStats.OffensiveStatType.FollowUp:
+                    deBuffingStats.FollowUpType -= deBuffingValue;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-
 
         [Button]
         private void UpdateAssetName()

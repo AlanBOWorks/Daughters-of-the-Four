@@ -5,6 +5,7 @@ using CombatSystem.Skills.Effects;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace CombatSystem.Stats
 {
@@ -155,7 +156,7 @@ namespace CombatSystem.Stats
         [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T actionsType;
         [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T speedType;
         [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T controlType;
-        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T criticalType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T luckType;
 
 
         public StatsBase()
@@ -185,7 +186,7 @@ namespace CombatSystem.Stats
             actionsType = value;
             speedType = value;
             controlType = value;
-            criticalType = value;
+            luckType = value;
         }
 
         public T AttackType
@@ -271,8 +272,8 @@ namespace CombatSystem.Stats
         }
         public T CriticalType
         {
-            get => criticalType;
-            set => criticalType = value;
+            get => luckType;
+            set => luckType = value;
         }
     }
 
@@ -300,7 +301,7 @@ namespace CombatSystem.Stats
             actionsType = new T();
             speedType = new T();
             controlType = new T();
-            criticalType = new T();
+            luckType = new T();
         }
     }
 }

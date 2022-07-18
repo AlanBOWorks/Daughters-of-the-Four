@@ -263,6 +263,13 @@ namespace CombatSystem.Entity
         public readonly CombatEntity Target;
         public readonly bool AreAllies;
 
+
+        public EntityPairInteraction(CombatEntity performer)
+        {
+            Performer = performer;
+            Target = null;
+            AreAllies = true;
+        }
         public EntityPairInteraction(CombatEntity performer, CombatEntity target)
         {
             Performer = performer;

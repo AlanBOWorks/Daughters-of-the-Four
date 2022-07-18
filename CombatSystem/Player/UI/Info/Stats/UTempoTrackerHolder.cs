@@ -125,6 +125,10 @@ namespace CombatSystem.Player.UI
             OnControlClose();
         }
 
+        public void UpdateToCurrent()
+        {
+            TickTempo(new TempoTickValues(_user));
+        }
 
         public void UpdateStepsText(int steps)
         {

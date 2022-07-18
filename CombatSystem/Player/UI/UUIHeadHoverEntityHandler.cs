@@ -22,60 +22,54 @@ namespace CombatSystem.Player.UI
         }
 
 
-        private void HandleAction(CombatEntity entity)
+        private void HandleEntity(CombatEntity entity)
         {
+            if(entity == null) return;
+
             var dictionary = GetDictionary();
             if (!dictionary.ContainsKey(entity)) return;
 
-            var stats = entity.Stats;
             var element = dictionary[entity];
-            element.UpdateActions(stats);
+            element.UpdateToCurrent();
         }
+        
 
         protected override void OnCreateElement(CombatEntity entity, UUIHeadHoverEntityHolder element, bool isPlayerElement)
         {
             element.Injection(entity);
-            element.UpdateLuck(entity);
             element.Show();
         }
 
         public void OnBuffDone(EntityPairInteraction entities, IBuffEffect buff, float effectValue)
         {
-            HandleAction(entities.Target);
+            HandleEntity(entities.Target);
         }
 
         public void OnDeBuffDone(EntityPairInteraction entities, IDeBuffEffect deBuff, float effectValue)
         {
-            HandleAction(entities.Target);
+            HandleEntity(entities.Target);
         }
 
 
-        private void HandleLuck(CombatEntity entity)
-        {
-            var dictionary = GetDictionary();
-            if (!dictionary.ContainsKey(entity)) return;
-
-            dictionary[entity].UpdateLuck(entity);
-        }
 
         public void OnAfterEntityRequestSequence(CombatEntity entity)
         {
-            HandleLuck(entity);
+            HandleEntity(entity);
         }
 
         public void OnAfterEntitySequenceFinish(CombatEntity entity)
         {
-            HandleLuck(entity);
+            HandleEntity(entity);
         }
 
         public void OnNoActionsForcedFinish(CombatEntity entity)
         {
-            HandleLuck(entity);
+            HandleEntity(entity);
         }
 
         public void OnEntityRequestAction(CombatEntity entity)
         {
-            HandleLuck(entity);
+            HandleEntity(entity);
         }
 
         public void OnEntityBeforeSkill(CombatEntity entity)

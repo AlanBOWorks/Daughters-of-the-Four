@@ -20,7 +20,7 @@ namespace CombatSystem.Player.UI
 
         private Transform _followReference;
         private RectTransform _rectTransform;
-
+        private CombatEntity _user;
 
 
         public void Show()
@@ -31,8 +31,9 @@ namespace CombatSystem.Player.UI
 
         public void Injection(CombatEntity entity)
         {
+            _user = entity;
             _followReference = entity.Body.HeadRootType;
-            UpdateActions(entity.Stats);
+            UpdateToCurrent();
         }
 
         private void Awake()
@@ -53,9 +54,14 @@ namespace CombatSystem.Player.UI
         }
 
 
+        public void UpdateToCurrent()
+        {
+            UpdateActions(_user.Stats);
+            UpdateLuck(_user);
+        }
         public void UpdateActions(CombatStats stats)
         {
-            float speed = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
+            float speed = UtilsStatsFormula.CalculateActionsAmount(stats);
             actionsInfoHandler.UpdateActionAmount(speed);
         }
 
@@ -64,6 +70,8 @@ namespace CombatSystem.Player.UI
             float rolledLuck = entity.DiceValuesHolder.LuckFinalRoll;
             luckInfoHandler.UpdateLuckAmount(rolledLuck);
         }
+
+
 
         [Serializable]
         private struct ActionsInfoHandler

@@ -8,7 +8,7 @@ using Utils;
 
 namespace CombatSystem.Skills.Effects
 {
-    public abstract class SBuffEffect : SEffect, IBuffEffect
+    public abstract class SBuffEffect : SEffect, IBuffEffect, ISupportEffect
     {
         private const string BuffPrefix = EffectTags.BuffEffectName;
         private const string BurstPrefix = EffectTags.BurstEffectName;
@@ -16,7 +16,6 @@ namespace CombatSystem.Skills.Effects
         private const string BuffSmallPrefix = EffectTags.BuffEffectPrefix;
         private const string BurstSmallPrefix = EffectTags.BurstEffectPrefix;
 
-        private const string BuffValuePrefix = "%";
 
         protected string GetBuffPrefix() => (isBurst) ? BurstPrefix : BuffPrefix;
         public override string EffectSmallPrefix => (isBurst) ? BurstSmallPrefix : BuffSmallPrefix;

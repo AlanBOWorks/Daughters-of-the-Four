@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CombatSystem.AI.Enemy;
 using CombatSystem.Entity;
+using CombatSystem.Passives;
 using CombatSystem.Player.Events;
 using CombatSystem.Player.UI;
 using CombatSystem.Skills;
@@ -334,6 +335,21 @@ namespace CombatSystem._Core
             Debug.Log($"Secondary Effect[{values.Effect} - ] performed  {performer.GetProviderEntityName()} / On target: {target.GetProviderEntityName()} ");
         }
 
+        [TitleGroup("Passives")] 
+        public bool ShowPassiveLogs = false;
+        private class PassiveLogs
+        {
+            public bool OnTrigged = true;
+        }
+        [ShowInInspector]
+        private PassiveLogs _passiveLogs = new PassiveLogs();
+
+        public void OnPassiveTrigged(CombatEntity entity, ICombatPassive passive, ref float value)
+        {
+            if(!ShowPassiveLogs || !_passiveLogs.OnTrigged) return;
+            Debug.Log($"Passive [{passive}] > Target: {entity.GetProviderEntityName()} > V: {value}");
+        }
+
 
         [Title("Damage")] 
         public bool ShowDamageLogs = false;
@@ -442,6 +458,7 @@ namespace CombatSystem._Core
             Debug.Log($"On Control Change: {teamName} >> {phasedControl}");
 
         }
+
     }
 
 

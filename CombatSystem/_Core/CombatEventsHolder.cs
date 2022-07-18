@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatSystem.AI;
 using CombatSystem.Entity;
+using CombatSystem.Passives;
 using CombatSystem.Player;
 using CombatSystem.Skills;
 using CombatSystem.Skills.Effects;
@@ -383,6 +384,16 @@ namespace CombatSystem._Core
             OnEntityFinishAction(performer);
         }
 
+
+        // ---- PASSIVES 
+        public void OnPassiveTrigged(CombatEntity entity, ICombatPassive passive, ref float value)
+        {
+            foreach (var eventHolder in _discriminatedEventsEnumerable)
+            {
+                eventHolder.OnPassiveTrigged(entity,passive, ref value);
+            }
+        }
+
         // ---- VANGUARD EFFECTS
         public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
         {
@@ -577,6 +588,7 @@ namespace CombatSystem._Core
                 UnSubscribeTempo(tickListener);
             }
         }
+
     }
 
 
@@ -1014,8 +1026,9 @@ namespace CombatSystem._Core
 
             _skillUsageListeners = new HashSet<ISkillUsageListener>();
             _effectUsageListeners = new HashSet<IEffectUsageListener>();
-            _vanguardEffectUsageListeners = new HashSet<IVanguardEffectUsageListener>();
+            _passivesListeners = new HashSet<ICombatPassiveListener>();
 
+            _vanguardEffectUsageListeners = new HashSet<IVanguardEffectUsageListener>();
             _teamEventListeners = new HashSet<ITeamEventListener>();
         }
 
@@ -1035,6 +1048,9 @@ namespace CombatSystem._Core
 
         [ShowInInspector] private readonly ICollection<ISkillUsageListener> _skillUsageListeners;
         [ShowInInspector] private readonly ICollection<IEffectUsageListener> _effectUsageListeners;
+        [ShowInInspector] private readonly ICollection<ICombatPassiveListener> _passivesListeners;
+
+
         [ShowInInspector] private readonly ICollection<IVanguardEffectUsageListener> _vanguardEffectUsageListeners;
 
         [ShowInInspector] private readonly ICollection<ITeamEventListener> _teamEventListeners;
@@ -1059,17 +1075,21 @@ namespace CombatSystem._Core
                 _tempoTeamListeners.Add(tempoTeamStatesListener);
             if(listener is ITempoControlStatesExtraListener tempoExtraStatesListener)
                 _tempoExtraTeamListeners.Add(tempoExtraStatesListener);
-            if (listener is ITeamEventListener teamEventListener)
-                _teamEventListeners.Add(teamEventListener);
+            
 
 
             if (listener is ISkillUsageListener skillUsageListener)
                 _skillUsageListeners.Add(skillUsageListener);
             if(listener is IEffectUsageListener effectUsageListener)
                 _effectUsageListeners.Add(effectUsageListener);
+            if(listener is ICombatPassiveListener passiveListener)
+                _passivesListeners.Add(passiveListener);
+
             if(listener is IVanguardEffectUsageListener vanguardEffectUsageListener)
                 _vanguardEffectUsageListeners.Add(vanguardEffectUsageListener);
 
+            if (listener is ITeamEventListener teamEventListener)
+                _teamEventListeners.Add(teamEventListener);
 
         }
 
@@ -1088,16 +1108,21 @@ namespace CombatSystem._Core
                 _tempoTeamListeners.Remove(tempoTeamStatesListener);
             if (listener is ITempoControlStatesExtraListener tempoExtraStatesListener)
                 _tempoExtraTeamListeners.Remove(tempoExtraStatesListener);
-            if (listener is ITeamEventListener teamEventListener)
-                _teamEventListeners.Remove(teamEventListener);
+            
 
 
             if (listener is ISkillUsageListener skillUsageListener)
                 _skillUsageListeners.Remove(skillUsageListener);
             if (listener is IEffectUsageListener effectUsageListener)
                 _effectUsageListeners.Remove(effectUsageListener);
+            if (listener is ICombatPassiveListener passiveListener)
+                _passivesListeners.Remove(passiveListener);
+
             if (listener is IVanguardEffectUsageListener vanguardEffectUsageListener)
                 _vanguardEffectUsageListeners.Remove(vanguardEffectUsageListener);
+
+            if (listener is ITeamEventListener teamEventListener)
+                _teamEventListeners.Remove(teamEventListener);
         }
 
         public void SubscribeForTeamControl(ITempoControlStatesListener listener)
@@ -1371,13 +1396,23 @@ namespace CombatSystem._Core
                 listener.OnVanguardEffectPerform(values);
             }
         }
+
+        public void OnPassiveTrigged(CombatEntity entity, ICombatPassive passive, ref float value)
+        {
+            foreach (var listener in _passivesListeners)
+            {
+                listener.OnPassiveTrigged(entity,passive,ref value);
+            }
+        }
     }
 
     public interface ICombatEventsHolderBase : 
         ITempoEntityMainStatesListener, ITempoEntityActionStatesListener, 
         ITempoDedicatedEntityStatesListener, ITempoEntityStatesExtraListener,
         ITempoControlStatesListener, ITempoControlStatesExtraListener,
-        ISkillUsageListener, IEffectUsageListener,
+
+        ISkillUsageListener, IEffectUsageListener, ICombatPassiveListener,
+
         IVanguardEffectUsageListener,
         ITeamEventListener
     {

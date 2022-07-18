@@ -17,9 +17,13 @@ namespace CombatSystem.Player.UI
     {
         [Title("References")]
         [SerializeField]
+        private GameObject ignoreSelfTextHolder;
+
+        [SerializeField]
         private SkillInfoHandler skillInfo;
         [SerializeField]
         private LuckInfoHandler luckInfo;
+       
 
         [Title("Holder")]
         [SerializeField] 
@@ -74,6 +78,8 @@ namespace CombatSystem.Player.UI
                 tooltipWindow.HandleEffects(skill, skillEffects, performer);
             }
 
+            bool ignoreSelfTargetText = skill.IgnoreSelf();
+            ignoreSelfTextHolder.SetActive(ignoreSelfTargetText);
             tooltipWindow.Show();
         }
 
@@ -101,9 +107,11 @@ namespace CombatSystem.Player.UI
         }
 
         private ICombatSkill _shortcutSelectedSkill;
+        private bool _isShortcutPressed;
         private void ShortcutShowSkillInfo(InputAction.CallbackContext context)
         {
             var skill = PlayerCombatSingleton.PlayerTeamController.GetSkill();
+            _isShortcutPressed = true;
             if(skill == null) return;
             _shortcutSelectedSkill = skill;
 
@@ -115,6 +123,7 @@ namespace CombatSystem.Player.UI
         private void ShortcutHideSkillInfo(InputAction.CallbackContext context)
         {
             var skill = PlayerCombatSingleton.PlayerTeamController.GetSkill();
+            _isShortcutPressed = false;
             if(skill == null) return;
 
             _shortcutSelectedSkill = null;
@@ -133,8 +142,10 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
         {
-            if(_shortcutSelectedSkill == null) return;
-            HideSkillInfo(_shortcutSelectedSkill);
+            if(!_isShortcutPressed) return;
+            if(_shortcutSelectedSkill != null)
+                HideSkillInfo(_shortcutSelectedSkill);
+
             _shortcutSelectedSkill = skill;
             ShowSkillInfo(skill);
         }
@@ -149,6 +160,7 @@ namespace CombatSystem.Player.UI
 
         public void OnSkillSubmit(CombatSkill skill)
         {
+            skillInfo.UpdateCost(skill);
         }
 
 
@@ -158,6 +170,7 @@ namespace CombatSystem.Player.UI
         {
             [SerializeField] private TextMeshProUGUI nameHolder;
             [SerializeField] private Image roleIconHolder;
+            [SerializeField] private TextMeshProUGUI skillCostHolder;
 
             public void HandleSkillName(ICombatSkill skill, Color roleColor, Sprite roleIcon)
             {
@@ -166,6 +179,14 @@ namespace CombatSystem.Player.UI
 
                 roleIconHolder.sprite = roleIcon;
                 roleIconHolder.color = roleColor;
+                skillCostHolder.text = LocalizeSkills.LocalizeSkillCost(skill);
+            }
+
+            public void UpdateCost(ISkill skill)
+            {
+                if(skill == null) return;
+
+                skillCostHolder.text = LocalizeSkills.LocalizeSkillCost(skill);
             }
         }
 

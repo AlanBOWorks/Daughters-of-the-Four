@@ -68,7 +68,7 @@ namespace Utils
             IReadOnlyDictionary<TKey, TValue> first,
             IReadOnlyDictionary<TKey, TValue> second)
         {
-            return first == second ? first : new ConcatDualDictionary<TKey, TValue>(first,second);
+            return (second == null || first == second) ? first : new ConcatDualDictionary<TKey, TValue>(first,second);
         }
     }
 }

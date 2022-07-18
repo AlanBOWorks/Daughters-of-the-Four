@@ -37,8 +37,9 @@ namespace CombatSystem.Team
         [SerializeField,HideInPlayMode]
         private PrefabReferencesHolder prefabReferences = new PrefabReferencesHolder();
 
-
+        [ShowInInspector]
         protected TeamPrefabReferences _playerTeamReferences;
+        [ShowInInspector]
         protected TeamPrefabReferences _enemyTeamReferences;
 
         [ShowInInspector, HideInEditorMode] 

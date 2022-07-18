@@ -19,7 +19,6 @@ namespace CombatSystem.Player.UI
         [SerializeField]
         private RectTransform resizeWindow;
         [SerializeField] private float verticalPadding;
-        [SerializeField] private GameObject ignoreSelfTextHolder;
 
         [Title("Pool References")]
         [SerializeField, PropertyOrder(10)] private ToolTipWindowPool pool = new ToolTipWindowPool();
@@ -62,9 +61,6 @@ namespace CombatSystem.Player.UI
                 UtilsEffectTooltip.HandleTextHeight(holder.GetTextHolder(), ref accumulatedHeight);
             }
             HeightResize(accumulatedHeight);
-
-            bool ignoreSelfTargetText = skill.IgnoreSelf();
-            ignoreSelfTextHolder.SetActive(ignoreSelfTargetText);
         }
 
 
@@ -76,7 +72,8 @@ namespace CombatSystem.Player.UI
 
     public static class UtilsEffectTooltip
     {
-        public static void HandleText(UEffectTooltipHolder holder, 
+        public static void HandleText(
+            UEffectTooltipHolder holder, 
             in PerformEffectValues values, 
             CombatStats stats = null, 
             ICombatSkill skill = null)

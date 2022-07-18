@@ -379,10 +379,34 @@ namespace CombatSystem.Stats
 
             stats.CurrentInitiative = targetInitiative;
         }
+        public static void BurstTickInitiative(CombatStats stats, float addition)
+        {
+            float targetInitiative = stats.InitiativeOffset + addition;
+            if (targetInitiative >= MaxInitiativeValue)
+            {
+                targetInitiative = MaxInitiativeValue;
+            }
+
+            stats.InitiativeOffset = targetInitiative;
+        }
+
+        private const float MinInitiativeOffsetValue = -12;
+        public static void ReduceTickInitiative(CombatStats stats, float reduction)
+        {
+            float targetInitiative = stats.InitiativeOffset - reduction;
+            if (targetInitiative < MinInitiativeOffsetValue)
+            {
+                targetInitiative = MinInitiativeOffsetValue;
+            }
+
+            stats.InitiativeOffset = targetInitiative;
+        }
+
 
         public static void ResetInitiative(CombatStats stats)
         {
             stats.CurrentInitiative = 0;
+            stats.InitiativeOffset = 0;
         }
 
         private const float InitiativeThreshold = TempoTicker.LoopThresholdAsIntended;
@@ -394,7 +418,7 @@ namespace CombatSystem.Stats
         public static bool CanTick(CombatStats stats)
         {
             float currentInitiative = stats.CurrentInitiative;
-            return currentInitiative < InitiativeThreshold;
+            return currentInitiative <= InitiativeThreshold;
         }
 
 
@@ -424,22 +448,6 @@ namespace CombatSystem.Stats
             stats.UsedActions = MaxActionAmount + 1;
         }
 
-        public static TempoTickValues CalculateTempoValues(CombatEntity entity)
-        {
-            var stats = entity.Stats;
-            float currentTickAmount = stats.CurrentInitiative;
-
-            return CalculateTempoValues(entity, currentTickAmount);
-        }
-
-        public static TempoTickValues CalculateTempoValues(CombatEntity entity, float entityInitiativeAmount)
-        {
-            var stats = entity.Stats;
-            CalculateTempoPercent(entityInitiativeAmount, out float initiativePercent);
-            int remainingSteps = CalculateRemainingSteps(stats);
-
-            return new TempoTickValues(entity, entityInitiativeAmount, initiativePercent, remainingSteps);
-        }
 
         public static int CalculateRemainingSteps(CombatStats stats)
         {
@@ -451,11 +459,10 @@ namespace CombatSystem.Stats
         }
 
 
-        public static void CalculateTempoPercent(float currentTickAmount,
-            out float initiativePercent)
+        public static float CalculateTempoPercent(float currentTickAmount)
         {
             const float initiativeThreshold = TempoTicker.LoopThreshold;
-            initiativePercent = currentTickAmount / initiativeThreshold;
+            return currentTickAmount / initiativeThreshold;
         }
 
     }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Skills.Effects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -13,7 +14,8 @@ namespace CombatSystem.Player.UI
     public class UTempoMainTickHandler : UTeamDualAlimentHandler<UTempoTrackerHolder>, 
         ICombatStartListener, ICombatTerminationListener,
         ITempoEntityPercentListener,
-        ITempoEntityStatesExtraListener
+        ITempoEntityStatesExtraListener,
+        IStatsChangeListener
     {
         [SerializeField]
         private PlayerPrefabHolder playerPrefabs = new PlayerPrefabHolder();
@@ -128,6 +130,21 @@ namespace CombatSystem.Player.UI
             if(!_dictionary.ContainsKey(entity)) return;
 
             _dictionary[entity].TickTempo(in values);
+        }
+
+        public void OnBuffDone(EntityPairInteraction entities, IBuffEffect buff, float effectValue)
+        {
+            var target = entities.Target;
+            if (!_dictionary.ContainsKey(target)) return;
+            _dictionary[target].UpdateToCurrent();
+        }
+
+        public void OnDeBuffDone(EntityPairInteraction entities, IDeBuffEffect deBuff, float effectValue)
+        {
+            var target = entities.Target;
+            if (!_dictionary.ContainsKey(target)) return;
+            _dictionary[target].UpdateToCurrent();
+
         }
 
         public void OnAfterEntityRequestSequence(CombatEntity entity)

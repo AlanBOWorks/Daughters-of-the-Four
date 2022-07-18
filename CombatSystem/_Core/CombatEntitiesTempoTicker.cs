@@ -54,29 +54,28 @@ namespace CombatSystem._Core
 
 
                 TickInitiative(stats, out var entityInitiativeAmount);
-                var tempoValues = UtilsCombatStats.CalculateTempoValues(entity, entityInitiativeAmount);
+                var tempoValues = new TempoTickValues(entity, entityInitiativeAmount);
 
                 eventsHolder.OnEntityTick(in tempoValues);
 
-                bool thresholdPassed = UtilsTempo.IsInitiativeTrigger(in entity);
+                bool thresholdPassed = UtilsTempo.IsInitiativeTrigger(entity);
                 if (!thresholdPassed) return;
 
                 bool canControl = UtilsCombatStats.CanControlRequest(entity);
                 entity.Team.AddActiveEntity(entity, canControl);
             }
         }
-        private const float InitiativeThreshold = TempoTicker.LoopThresholdAsIntended;
         public static void TickInitiative(CombatStats stats, out float currentTickAmount)
         {
             float initiativeIncrement = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
             if (initiativeIncrement <= 0)
             {
-                currentTickAmount = stats.CurrentInitiative;
+                currentTickAmount = stats.TotalInitiative;
                 return;
             }
 
             UtilsCombatStats.TickInitiative(stats, initiativeIncrement);
-            currentTickAmount = stats.CurrentInitiative;
+            currentTickAmount = stats.TotalInitiative;
         }
 
 

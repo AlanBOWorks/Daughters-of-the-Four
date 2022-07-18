@@ -5,12 +5,11 @@ using UnityEngine;
 
 namespace CombatSystem.Skills.Effects
 {
-
     [CreateAssetMenu(fileName = "N [Effect]",
-        menuName = "Combat/Effect/DeBuff/Offensive")]
-    public class SDeBuffOffensive : SDeBuffEffect
+    menuName = "Combat/Effect/DeBuff/Support")]
+    public class SDeBuffSupportEffect : SDeBuffEffect
     {
-        [SerializeField] private EnumStats.OffensiveStatType type;
+        [SerializeField] private EnumStats.SupportStatType type;
         private string _effectTag;
 
         private void OnEnable()
@@ -25,17 +24,17 @@ namespace CombatSystem.Skills.Effects
         {
             switch (type)
             {
-                case EnumStats.OffensiveStatType.Attack:
-                    deBuffingStats.AttackType -= deBuffingValue;
+                case EnumStats.SupportStatType.Heal:
+                    deBuffingStats.HealType -= deBuffingValue;
                     break;
-                case EnumStats.OffensiveStatType.OverTime:
-                    deBuffingStats.OverTimeType -= deBuffingValue;
+                case EnumStats.SupportStatType.Shielding:
+                    deBuffingStats.ShieldingType -= deBuffingValue;
                     break;
-                case EnumStats.OffensiveStatType.DeBuff:
-                    deBuffingStats.DeBuffType -= deBuffingValue;
+                case EnumStats.SupportStatType.Buff:
+                    deBuffingStats.BuffType -= deBuffingValue;
                     break;
-                case EnumStats.OffensiveStatType.FollowUp:
-                    deBuffingStats.FollowUpType -= deBuffingValue;
+                case EnumStats.SupportStatType.ReceiveBuff:
+                    deBuffingStats.ReceiveBuffType -= deBuffingValue;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

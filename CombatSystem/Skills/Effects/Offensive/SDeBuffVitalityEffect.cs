@@ -6,10 +6,10 @@ using UnityEngine;
 namespace CombatSystem.Skills.Effects
 {
     [CreateAssetMenu(fileName = "N [Effect]",
-    menuName = "Combat/Effect/DeBuff/Support")]
-    public class SDeBuffSupport : SDeBuffEffect
+        menuName = "Combat/Effect/DeBuff/Vitality")]
+    public class SDeBuffVitalityEffect : SDeBuffEffect
     {
-        [SerializeField] private EnumStats.SupportStatType type;
+        [SerializeField] private EnumStats.VitalityStatType type;
         private string _effectTag;
 
         private void OnEnable()
@@ -24,22 +24,23 @@ namespace CombatSystem.Skills.Effects
         {
             switch (type)
             {
-                case EnumStats.SupportStatType.Heal:
-                    deBuffingStats.HealType -= deBuffingValue;
+                case EnumStats.VitalityStatType.Health:
+                    deBuffingStats.HealthType -= deBuffingValue;
                     break;
-                case EnumStats.SupportStatType.Shielding:
-                    deBuffingStats.ShieldingType -= deBuffingValue;
+                case EnumStats.VitalityStatType.Mortality:
+                    deBuffingStats.MortalityType -= deBuffingValue;
                     break;
-                case EnumStats.SupportStatType.Buff:
-                    deBuffingStats.BuffType -= deBuffingValue;
+                case EnumStats.VitalityStatType.DamageReduction:
+                    deBuffingStats.DamageReductionType -= deBuffingValue;
                     break;
-                case EnumStats.SupportStatType.ReceiveBuff:
-                    deBuffingStats.ReceiveBuffType -= deBuffingValue;
+                case EnumStats.VitalityStatType.DebuffResistance:
+                    deBuffingStats.DeBuffResistanceType -= deBuffingValue;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
+
 
         [Button]
         private void UpdateAssetName()

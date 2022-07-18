@@ -1,5 +1,6 @@
 using CombatSystem._Core;
 using CombatSystem.Entity;
+using CombatSystem.Passives;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
@@ -85,6 +86,8 @@ namespace CombatSystem.Skills
             {
                 skill.ResetCost();
             }
+
+            RolePassivesHandler.ExecutePassive(entity);
 
             entity.OnSequenceFinish();
 

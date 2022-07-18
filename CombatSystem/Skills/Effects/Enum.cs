@@ -37,6 +37,7 @@ namespace CombatSystem.Skills.Effects
 
         public enum ConcreteType
         {
+            Undefined = -200,
             DefaultOffensive = -100,
             DefaultSupport,
             DefaultTeam,

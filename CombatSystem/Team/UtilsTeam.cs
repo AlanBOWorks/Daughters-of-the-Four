@@ -219,6 +219,7 @@ namespace CombatSystem.Team
             };
         }
 
+
         public static T GetElement<T>(EnumTeam.Stance stance, IStanceStructureRead<T> structure)
         {
             return stance switch
