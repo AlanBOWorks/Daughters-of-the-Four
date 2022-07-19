@@ -72,14 +72,24 @@ namespace Utils
 
         public int CountInactive => inactivePool.Count;
 
-
-        public virtual T GetElementSafe()
+        /// <summary>
+        /// Does a [<see cref="Pop"/>], but with instantiation if there's no element in the pool and
+        /// actives the element on pop
+        /// </summary>
+        /// <returns></returns>
+        public virtual T PopElementSafe(bool activeOnSpawn = true)
         {
             var element = UtilsPool.PoolElement(inactivePool,poolElement,instantiationParent);
-            element.gameObject.SetActive(true);
+            element.gameObject.SetActive(activeOnSpawn);
             return element;
         }
 
+        /// <summary>
+        /// Pops an element from [<seealso cref="inactivePool"/>], but doesn't instantiates nor
+        /// handles activation;<br></br>
+        /// This is meant for manual handling, for desired behaviour use [<see cref="PopElementSafe"/>] instead.
+        /// </summary>
+        /// <returns></returns>
         public T Pop()
         {
             return inactivePool.Dequeue();
@@ -115,9 +125,9 @@ namespace Utils
             _activePool = new HashSet<T>();
         }
 
-        public override T GetElementSafe()
+        public override T PopElementSafe(bool activeOnSpawn = true)
         {
-            var element = base.GetElementSafe();
+            var element = base.PopElementSafe();
             _activePool.Add(element);
 
             return element;

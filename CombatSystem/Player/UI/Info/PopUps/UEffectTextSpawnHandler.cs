@@ -220,7 +220,7 @@ namespace CombatSystem.Player.UI
 
             public UEffectTextPopUp GetPopUp()
             {
-                var element = GetElementSafe();
+                var element = PopElementSafe();
                 element.Injection(this);
                 return element;
             }

@@ -40,7 +40,7 @@ namespace CombatSystem.Player.UI.Skills
         }
         private void Awake()
         {
-            CombatLocalizations.LocalizeStance(stanceName.name);
+            LocalizationsCombat.LocalizeStance(stanceName.name);
             _initialColor = stanceName.color;
             _initialFontSize = stanceName.fontSize;
             _backgroundInitialColor = backgroundHolder.color;

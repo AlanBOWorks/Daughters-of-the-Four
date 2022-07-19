@@ -7,7 +7,7 @@ namespace CombatSystem.Localization
         public static string LocalizeSkill(ICombatSkill skill)
         {
             var skillTag = skill.Preset.GetSkillName();
-            return CombatLocalizations.LocalizeSkillName(skillTag);
+            return LocalizationsCombat.LocalizeSkillName(skillTag);
         }
 
         private const string TensCostText = "X";

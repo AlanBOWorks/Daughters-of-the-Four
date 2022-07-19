@@ -32,6 +32,32 @@ namespace CombatSystem.Localization
         public const string CriticalStatName = "Luck";
 
 
+        public static readonly IStatsRead<string> StatsNames = new StatsNamesHolder();
+        private sealed class StatsNamesHolder : IStatsRead<string>
+        {
+            public string OffensiveStatType { get; } = OffensiveStatName;
+            public string SupportStatType { get; } = SupportStatName;
+            public string VitalityStatType { get; } = VitalityStatName;
+            public string ConcentrationStatType { get; } = ConcentrationStatName;
+
+            public string AttackType { get; } = AttackStatName;
+            public string OverTimeType { get; } = OverTimeStatName;
+            public string DeBuffType { get; } = DeBuffStatName;
+            public string FollowUpType { get; } = FollowUpStatName;
+            public string HealType { get; } = HealStatName;
+            public string ShieldingType { get; } = ShieldingStatName;
+            public string BuffType { get; } = BuffStatName;
+            public string ReceiveBuffType { get; } = ReceiveBuffStatName;
+            public string HealthType { get; } = HealthStatName;
+            public string MortalityType { get; } = MortalityStatName;
+            public string DamageReductionType { get; } = DamageReductionStatName;
+            public string DeBuffResistanceType { get; } = DeBuffResistanceStatName;
+            public string ActionsType { get; } = ActionsStatName;
+            public string SpeedType { get; } = SpeedStatName;
+            public string ControlType { get; } = ControlStatName;
+            public string CriticalType { get; } = CriticalStatName;
+        }
+
         // Tag
         public const string OffensiveStatTag = "Offensive_Stat";
         public const string SupportStatTag = "Support_Stat";

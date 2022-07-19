@@ -54,7 +54,7 @@ namespace CombatSystem.Player.UI
             CombatStats stats = performer?.Stats;
             foreach (var value in effects)
             {
-                var holder = pool.GetElementSafe();
+                var holder = pool.PopElementSafe();
                 UtilsEffectTooltip.HandleText(holder, in value, stats, skill);
                 UtilsEffectTooltip.HandleIcon(holder, value.Effect);
 

@@ -267,7 +267,7 @@ namespace CombatSystem.Entity
         public EntityPairInteraction(CombatEntity performer)
         {
             Performer = performer;
-            Target = null;
+            Target = performer;
             AreAllies = true;
         }
         public EntityPairInteraction(CombatEntity performer, CombatEntity target)
