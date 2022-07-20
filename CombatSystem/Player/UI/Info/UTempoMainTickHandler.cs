@@ -155,7 +155,15 @@ namespace CombatSystem.Player.UI
             tempoInfo.OnControlStart();
 
             int steps = UtilsCombatStats.CalculateRemainingSteps(entity.Stats);
-            tempoInfo.UpdateStepsText(steps);
+
+            // ---- Problem:
+            // After sequenceRequest the entity requires an another tick to perform its
+            // sequence phase (this is by design), but the calculations are made as if the entity had already finished
+            // its sequence and it calculates the next tick
+            // ticking in the TempoHandler
+            // ---- Solution:
+            // Just +1 the step count so it shows the real count
+            tempoInfo.UpdateStepsText(steps + 1);
         }
 
         public void OnAfterEntitySequenceFinish(CombatEntity entity)

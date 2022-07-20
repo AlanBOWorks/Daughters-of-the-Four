@@ -115,7 +115,8 @@ namespace CombatSystem.Player.UI.Skills
 
         public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange)
         {
-           
+            if(!team.IsPlayerTeam) return;
+            DisableStanceSwitching();
         }
 
         public void OnControlChange(CombatTeam team, float phasedControl)

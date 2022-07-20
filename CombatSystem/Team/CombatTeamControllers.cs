@@ -43,8 +43,8 @@ namespace CombatSystem.Team
         public bool IsControlling() => _currentControl != null;
 
         public bool HasTeamWaiting() =>
-            _playerTeamType.ControllingTeam.IsActive() ||
-            _enemyTeamType.ControllingTeam.IsActive();
+            _playerTeamType.ControllingTeam.CanControl() ||
+            _enemyTeamType.ControllingTeam.CanControl();
 
 
         public IEnumerable<CombatTeamControllerBase> GetActiveControllers()
@@ -54,7 +54,7 @@ namespace CombatSystem.Team
             if(IsActive(_enemyTeamType))
                 yield return _enemyTeamType;
 
-            bool IsActive(CombatTeamControllerBase controller) => controller.ControllingTeam.IsActive();
+            bool IsActive(CombatTeamControllerBase controller) => controller.ControllingTeam.CanControl();
         }
 
         public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
@@ -83,7 +83,7 @@ namespace CombatSystem.Team
         public void TryInvokeControl(in CombatTeamControllerBase controller)
         {
             var team = controller.ControllingTeam;
-            bool isActive = team.IsActive();
+            bool isActive = team.CanControl();
             
             if (!isActive) return;
             

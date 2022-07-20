@@ -32,14 +32,11 @@ namespace CombatSystem.Team
         public IReadOnlyList<CombatEntity> GetControllingTrinityMembers() => _trinityControllingMembers;
         public IReadOnlyList<CombatEntity> GetControllingOffMembers() => _offControllingMembers;
 
-        /// <summary>
-        /// Check if it has entities that reach the initiative threshold (but not if can act)
-        /// </summary>
-        public bool IsActive() => _allControllingMembers.Count > 0 || _nonControllingMembers.Count > 0;
+        
         /// <summary>
         /// If has entities than can act
         /// </summary>
-        public bool CanControl() => _allControllingMembers.Count > 0;
+        public bool CanControl() => _trinityControllingMembers.Count > 0;
 
         public bool IsActive(CombatEntity member) => _allControllingMembers.Contains(member);
 

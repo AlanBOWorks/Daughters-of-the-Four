@@ -136,10 +136,7 @@ namespace CombatSystem.Team
         public ITeamFullStructureRead<CombatEntity> GetAllEntities() => _membersHolder;
 
 
-        /// <summary>
-        /// <inheritdoc cref="CombatTeamControlMembers.IsActive()"/>
-        /// </summary>
-        public bool IsActive() => _controlMembers.IsActive();
+       
         public bool IsActive(CombatEntity member) => _controlMembers.IsActive(member);
         /// <summary>
         /// <inheritdoc cref="CombatTeamControlMembers.CanControl()"/>
