@@ -58,12 +58,59 @@ namespace CombatSystem.Team
             return entity.ActiveRole == EnumTeam.ActiveRole.MainVanguard;
         }
 
-        public static IEnumerable<CombatEntity> GetMemberLine(in CombatEntity target)
+        public static EnumTeam.ActiveRole GetActiveRole(EnumTeam.Role role, EnumTeam.RolePriorityType priorityType)
         {
-            var targetTeam = target.Team.GetAllPositions();
-            var targetPositioning = target.PositioningType;
-            return GetElement(targetPositioning,targetTeam);
+            return role switch
+            {
+                EnumTeam.Role.Vanguard => GetVanguardPriorityType(priorityType),
+                EnumTeam.Role.Attacker => GetAttackerPriorityType(priorityType),
+                EnumTeam.Role.Support => GetSupportPriorityType(priorityType),
+                EnumTeam.Role.Flex => GetFlexPriorityType(priorityType),
+                _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
+            };
         }
+        public static EnumTeam.ActiveRole GetVanguardPriorityType(EnumTeam.RolePriorityType type)
+        {
+            return type switch
+            {
+                EnumTeam.RolePriorityType.MainRole => EnumTeam.ActiveRole.MainVanguard,
+                EnumTeam.RolePriorityType.SecondaryRole => EnumTeam.ActiveRole.SecondaryVanguard,
+                EnumTeam.RolePriorityType.ThirdRole => EnumTeam.ActiveRole.ThirdVanguard,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+        public static EnumTeam.ActiveRole GetAttackerPriorityType(EnumTeam.RolePriorityType type)
+        {
+            return type switch
+            {
+                EnumTeam.RolePriorityType.MainRole => EnumTeam.ActiveRole.MainAttacker,
+                EnumTeam.RolePriorityType.SecondaryRole => EnumTeam.ActiveRole.SecondaryAttacker,
+                EnumTeam.RolePriorityType.ThirdRole => EnumTeam.ActiveRole.ThirdAttacker,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+        public static EnumTeam.ActiveRole GetSupportPriorityType(EnumTeam.RolePriorityType type)
+        {
+            return type switch
+            {
+                EnumTeam.RolePriorityType.MainRole => EnumTeam.ActiveRole.MainSupport,
+                EnumTeam.RolePriorityType.SecondaryRole => EnumTeam.ActiveRole.SecondarySupport,
+                EnumTeam.RolePriorityType.ThirdRole => EnumTeam.ActiveRole.ThirdSupport,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+        
+        public static EnumTeam.ActiveRole GetFlexPriorityType(EnumTeam.RolePriorityType type)
+        {
+            return type switch
+            {
+                EnumTeam.RolePriorityType.MainRole => EnumTeam.ActiveRole.MainFlex,
+                EnumTeam.RolePriorityType.SecondaryRole => EnumTeam.ActiveRole.SecondaryFlex,
+                EnumTeam.RolePriorityType.ThirdRole => EnumTeam.ActiveRole.ThirdFlex,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
 
         public static int GetRoleIndex(ICombatEntityProvider entity)
         {
@@ -71,9 +118,9 @@ namespace CombatSystem.Team
             return (int) entityRole;
         }
 
-        public static int GetRoleIndex(in CombatEntity entity)
+        public static int GetRoleIndex(CombatEntity entity)
         {
-            return (int) entity.PositioningType;
+            return (int) entity.RoleType;
         }
 
 

@@ -52,6 +52,13 @@ namespace CombatSystem.Entity
             InjectTeam(team);
         }
 
+        
+        public void Injection(EnumTeam.RolePriorityType rolePriorityType)
+        {
+            RolePriorityType = rolePriorityType;
+            ActiveRole = UtilsTeam.GetActiveRole(RoleType, rolePriorityType);
+        }
+
         /// <summary>
         /// Localized name
         /// </summary>
@@ -84,6 +91,9 @@ namespace CombatSystem.Entity
 
         [ShowInInspector]
         public EnumTeam.Positioning PositioningType { get; private set; }
+        [ShowInInspector]
+        public EnumTeam.RolePriorityType RolePriorityType { get; private set; }
+
 
         [ShowInInspector]
         public CombatTeam Team { get; private set; }

@@ -94,7 +94,7 @@ namespace CombatSystem.Player.UI
                 }
                 else
                 {
-                    effectValue = effect.CalculateEffectTooltipValue(stats, effectValue);
+                    effectValue = effect.CalculateEffectByStatValue(stats, effectValue);
 
                     float skillLuck = skill.LuckModifier;
                     float statsLuck = UtilsStatsFormula.CalculateLuckAmount(stats);

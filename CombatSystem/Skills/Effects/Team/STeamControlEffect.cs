@@ -35,7 +35,7 @@ namespace CombatSystem.Skills.Effects
 
 
         public override bool IsPercentSuffix() => true;
-        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectByStatValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateControlGain(performerStats);
         }

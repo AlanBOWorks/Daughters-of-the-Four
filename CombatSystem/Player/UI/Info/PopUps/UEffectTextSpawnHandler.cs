@@ -111,6 +111,15 @@ namespace CombatSystem.Player.UI
             var effect = queueValues.Effect;
             var effectValue = queueValues.EffectValue;
             var popUpText = LocalizeEffects.LocalizeMathfValue(effectValue,effect.IsPercentSuffix());
+            if (effect is IBuffEffect buffEffect)
+            {
+                HandleStatVariationEffect(buffEffect, false);
+            }
+            else if(effect is IDeBuffEffect deBuffEffect)
+            {
+                HandleStatVariationEffect(deBuffEffect, true);
+            }
+
             var icon = UtilsVisual.GetEffectSprite(queueValues.Effect);
 
             CalculatePopUpsVector(effect, isPlayerEntity, 
@@ -130,10 +139,18 @@ namespace CombatSystem.Player.UI
                 popUp.SetDestination(popUpMovement);
                 popUp.gameObject.SetActive(true);
             }
+
+            void HandleStatVariationEffect(IStatVariationEffect statVariationEffect, bool negateValue)
+            {
+                string variationText = " " + statVariationEffect.GetStatVariationEffectText();
+                popUpText += variationText;
+                if (negateValue)
+                    popUpText = "-" + popUpText;
+            }
         }
 
         private const float PopUpVectorMagnitude = 72;
-        private const float PopUpPositionOffset = 50;
+        private const float PopUpPositionOffset = 10;
         private const float RandomMagnitude = 50;
         private static void CalculatePopUpsVector(IEffectBasicInfo effect, bool isPlayer, 
             out Vector3 popUpMovement,
@@ -145,6 +162,8 @@ namespace CombatSystem.Player.UI
                 case EnumsEffect.ConcreteType.DefaultOffensive:
                 case EnumsEffect.ConcreteType.DoT:
                 case EnumsEffect.ConcreteType.DamageType:
+                case EnumsEffect.ConcreteType.DeBuff:
+                case EnumsEffect.ConcreteType.DeBurst:
                     if (!isPlayer)
                     {
                         popUpOffsetPoint = CalculateRandomPointInVerticalPlane(PopUpPositionOffset);
@@ -155,25 +174,6 @@ namespace CombatSystem.Player.UI
                         popUpOffsetPoint = CalculateRandomPointInVerticalPlane(-PopUpPositionOffset);
                         popUpMovement = DoLeftMovement();
                     }
-                    break;
-                case EnumsEffect.ConcreteType.Heal:
-                case EnumsEffect.ConcreteType.Shielding:
-                case EnumsEffect.ConcreteType.Guarding:
-                    if (isPlayer)
-                    {
-                        popUpOffsetPoint = CalculateRandomPointInVerticalPlane(PopUpPositionOffset);
-                        popUpMovement = DoRightMovement();
-                    }
-                    else
-                    {
-                        popUpOffsetPoint = CalculateRandomPointInVerticalPlane(-PopUpPositionOffset);
-                        popUpMovement = DoLeftMovement();
-                    }
-                    break;
-                case EnumsEffect.ConcreteType.DeBuff:
-                case EnumsEffect.ConcreteType.DeBurst:
-                    popUpMovement = DoDownMovement();
-                    popUpOffsetPoint = CalculateRandomPointInHorizontalPlane(-PopUpPositionOffset);
                     break;
                 default:
                     popUpMovement = DoUpMovement();

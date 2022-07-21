@@ -74,11 +74,11 @@ namespace CombatSystem.Team
                 listener.OnAfterElementsCreated(this);
             }
         }
-        private void CallIterationEvents(CombatEntity entity, T element, int index)
+        private void CallIterationEvents(in CreationValues creationValues)
         {
             foreach (var listener in _listeners)
             {
-                listener.OnElementCreated(element, entity, index);
+                listener.OnElementCreated(in creationValues);
             }
         }
 
@@ -129,22 +129,25 @@ namespace CombatSystem.Team
         {
         }
 
-        private void DoCreateElement(CombatEntity entity, T element, int index, bool isPlayerElement)
+        protected virtual void OnCreateElement(in CreationValues creationValues)
         {
-            CallIterationEvents(entity, element, index);
-            OnCreateElement(entity,element, index);
-            OnCreateElement(entity, element, isPlayerElement);
+            CallIterationEvents(in creationValues);           
         }
-        
 
-        protected virtual void OnCreateElement(CombatEntity entity, T element,
-            int index)
+        public readonly struct CreationValues
         {
+            public readonly CombatEntity Entity;
+            public readonly T Element;
+            public readonly int Index;
+            public readonly bool IsPlayerElement;
 
-        }
-        protected virtual void OnCreateElement(CombatEntity entity, T element, bool isPlayerElement)
-        {
-
+            public CreationValues(CombatEntity entity,T element, int index, bool isPlayerElement)
+            {
+                Entity = entity;
+                Element = element;
+                Index = index;
+                IsPlayerElement = isPlayerElement;
+            }
         }
 
 
@@ -218,7 +221,7 @@ namespace CombatSystem.Team
             }
 
             private void HandleIterator(IEnumerable<CombatEntity> members, 
-                PrefabInstantiationHandler<T> handler, Dictionary<CombatEntity,T> dictionary, bool isPlayerTeam)
+                PrefabInstantiationHandler<T> handler, IDictionary<CombatEntity, T> dictionary, bool isPlayerTeam)
             {
                 int i = 0;
                 foreach (var member in members)
@@ -230,7 +233,8 @@ namespace CombatSystem.Team
 
                     var element = handler.SpawnElement();
                     dictionary.Add(member,element);
-                    _spawner.DoCreateElement(member,element, i, isPlayerTeam);
+                    var creationValues = new CreationValues(member,element,i, isPlayerTeam);
+                    _spawner.OnCreateElement(in creationValues);
                     i++;
                 }
             }
@@ -299,7 +303,7 @@ namespace CombatSystem.Team
     /// <typeparam name="T"></typeparam>
     public interface ITeamElementSpawnListener<T> where T : UnityEngine.Object
     {
-        void OnElementCreated(T element, CombatEntity entity, int index);
+        void OnElementCreated(in UTeamElementSpawner<T>.CreationValues creationValues);
         void OnAfterElementsCreated(UTeamElementSpawner<T> holder);
         void OnCombatEnd();
 

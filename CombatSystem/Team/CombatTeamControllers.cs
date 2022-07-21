@@ -43,8 +43,8 @@ namespace CombatSystem.Team
         public bool IsControlling() => _currentControl != null;
 
         public bool HasTeamWaiting() =>
-            _playerTeamType.ControllingTeam.CanControl() ||
-            _enemyTeamType.ControllingTeam.CanControl();
+            _playerTeamType.ControllingTeam.HasTrinityControl() ||
+            _enemyTeamType.ControllingTeam.HasTrinityControl();
 
 
         public IEnumerable<CombatTeamControllerBase> GetActiveControllers()

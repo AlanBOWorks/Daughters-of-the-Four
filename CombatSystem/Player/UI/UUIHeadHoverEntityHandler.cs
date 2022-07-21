@@ -34,8 +34,10 @@ namespace CombatSystem.Player.UI
         }
         
 
-        protected override void OnCreateElement(CombatEntity entity, UUIHeadHoverEntityHolder element, bool isPlayerElement)
+        protected override void OnCreateElement(in CreationValues creationValues)
         {
+            var element = creationValues.Element;
+            var entity = creationValues.Entity;
             element.Injection(entity);
             element.Show();
         }

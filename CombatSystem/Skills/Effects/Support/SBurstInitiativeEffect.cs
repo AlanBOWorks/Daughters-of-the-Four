@@ -13,16 +13,24 @@ namespace CombatSystem.Skills.Effects
     {
         public override void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
         {
-            var target = entities.Target;
+            entities.Extract(out var performer, out var target);
+            var performerStats = performer.Stats;
             var targetStats = target.Stats;
-            float finalInitiativeAddition = CalculateEffectTooltipValue(targetStats, effectValue);
-            UtilsCombatStats.TickInitiative(targetStats, finalInitiativeAddition);
+            float bufferPower = UtilsStatsFormula.CalculateBuffPower(performerStats);
+            float receivePower = UtilsStatsFormula.CalculateReceiveBuffPower(targetStats);
+
+            effectValue = UtilsStatsEffects.CalculateStatsBuffValue(effectValue, bufferPower, receivePower);
+
+            effectValue *= luckModifier;
+            effectValue = Mathf.Round(effectValue);
+
+            UtilsCombatStats.TickInitiative(targetStats, effectValue);
 
             var eventsHolder = CombatSystemSingleton.EventsHolder;
             eventsHolder.OnBuffDone(entities,this, effectValue);
         }
 
-        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectByStatValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateBuffPower(performerStats);
         }
@@ -33,5 +41,6 @@ namespace CombatSystem.Skills.Effects
         public override string EffectTag => EffectTags.InitiativeEffectTag;
         public override string EffectSmallPrefix => EffectTags.InitiativeEffectPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Initiative;
+        public string GetStatVariationEffectText() => LocalizeStats.LocalizeStatPrefix(StatsTags.InitiativeStatPrefix);
     }
 }

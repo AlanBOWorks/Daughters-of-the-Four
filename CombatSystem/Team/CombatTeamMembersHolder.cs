@@ -90,10 +90,12 @@ namespace CombatSystem.Team
             return group.Count > index ? group[index] : null;
         }
 
-        public bool IsMainRole(in CombatEntity entity) => _roleWrapper.IsMainRole(in entity);
-        public bool IsTrinityRole(in CombatEntity entity) => _roleWrapper.IsTrinityRole(in entity);
+        public bool IsMainRole(CombatEntity entity) => _roleWrapper.IsMainRole(entity);
+        public bool IsTrinityRole(CombatEntity entity) => _roleWrapper.IsTrinityRole(entity);
+        public bool IsSecondaryTypeRole(CombatEntity entity) => _roleWrapper.IsSecondaryTypeMember(entity);
+        public bool IsThirdTypeRole(CombatEntity entity) => _roleWrapper.IsThirdTypeMember(entity);
 
-        public void AddMember([NotNull] in CombatEntity entity)
+        public void AddMember(CombatEntity entity)
         {
             if (entity == null)
             {
@@ -197,11 +199,22 @@ namespace CombatSystem.Team
                 if(!isMainRole)
                 {
                     bool isSecondRole = roleGroupCount == 1;
-                    var offRoleList = isSecondRole 
-                        ? _offRoles.GetFirstList() 
-                        : _offRoles.GetSecondList();
+                    IList<CombatEntity> offRoleList;
+                    EnumTeam.RolePriorityType priorityType;
+                    if (isSecondRole)
+                    {
+                        offRoleList = _offRoles.GetFirstList();
+                        priorityType = EnumTeam.RolePriorityType.SecondaryRole;
+                    }
+                    else
+                    {
+                        offRoleList = _offRoles.GetSecondList();
+                        priorityType = EnumTeam.RolePriorityType.ThirdRole;
+                    }
+
 
                     offRoleList.Add(member);
+                    member.Injection(priorityType);
                     return;
                 }
 
@@ -211,16 +224,21 @@ namespace CombatSystem.Team
                     return;
                 }
                 _mainRoles.Add(member);
+                member.Injection(EnumTeam.RolePriorityType.MainRole);
             }
 
 
-            public bool IsMainRole(in CombatEntity entity) => _mainRoles.Contains(entity);
-            public bool IsTrinityRole(in CombatEntity entity)
+            public bool IsMainRole(CombatEntity entity) => _mainRoles.Contains(entity);
+            public bool IsTrinityRole(CombatEntity entity)
             {
                 var role = entity.RoleType;
                 if (role == EnumTeam.Role.Flex || role == EnumTeam.Role.InvalidRole) return false;
                 return _mainRoles.Contains(entity);
             }
+
+            public bool IsSecondaryTypeMember(CombatEntity entity) => _offRoles.GetFirstList().Contains(entity);
+            public bool IsThirdTypeMember(CombatEntity entity) => _offRoles.GetSecondList().Contains(entity);
+
 
             private sealed class OffRolesCollection : ConcatDualList<CombatEntity>
             {

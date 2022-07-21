@@ -22,9 +22,10 @@ namespace CombatSystem.Player.UI
 
 
 
-        protected override void OnCreateElement(CombatEntity entity, UUIBaseHoverEntityHolder element,
-            int index)
+        protected override void OnCreateElement(in CreationValues creationValues)
         {
+            var element = creationValues.Element;
+            var entity = creationValues.Entity;
             element.EntityInjection(entity);
             vitalityInfoHandler.UpdateEntityVitality(entity);
             element.Show();

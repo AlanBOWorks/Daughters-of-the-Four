@@ -1,4 +1,5 @@
 using System;
+using CombatSystem.Localization;
 using CombatSystem.Stats;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -40,6 +41,8 @@ namespace CombatSystem.Skills.Effects
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public override string GetStatVariationEffectText() => LocalizeStats.LocalizeStatPrefix(type);
 
         [Button]
         private void UpdateAssetName()

@@ -142,13 +142,14 @@ namespace CombatSystem.Team
         /// <inheritdoc cref="CombatTeamControlMembers.CanControl()"/>
         /// </summary>
         public bool CanControl() => _controlMembers.CanControl();
+        public bool HasTrinityControl() => _controlMembers.GetControllingTrinityMembers().Count > 0;
         public IEnumerable<CombatEntity> GetNonControllingMembers() => _controlMembers.GetNonControllingMembers();
         public IReadOnlyList<CombatEntity> GetTrinityActiveMembers() => _controlMembers.GetControllingTrinityMembers();
         public IReadOnlyList<CombatEntity> GetOffMembersActiveMembers() => _controlMembers.GetControllingOffMembers();
         public IReadOnlyList<CombatEntity> GetControllingMembers() => _controlMembers.GetAllControllingMembers();
 
-        public bool IsMainRole(in CombatEntity entity) => _membersHolder.IsMainRole(in entity);
-        public bool IsTrinityRole(in CombatEntity entity) => _membersHolder.IsTrinityRole(in entity);
+        public bool IsMainRole(in CombatEntity entity) => _membersHolder.IsMainRole(entity);
+        public bool IsTrinityRole(in CombatEntity entity) => _membersHolder.IsTrinityRole(entity);
 
         
 

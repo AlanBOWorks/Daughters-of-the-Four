@@ -199,7 +199,15 @@ namespace CombatSystem.Skills.Effects
 
     public static class UtilsEffect
     {
-        
+        /// <summary>
+        /// Rounds the effect value to snap values between [.25f] values as a Percent
+        /// </summary>
+        public static float RoundEffectValueWithHalf_Percent(float currentEffectValue)
+        {
+            // Note: by design, values snaps in 25% so it's easier for the player tracking the percentages
+            return Mathf.Round(currentEffectValue * 4) * .25f;
+        }
+
     }
 
     public static class UtilsCombatEffect

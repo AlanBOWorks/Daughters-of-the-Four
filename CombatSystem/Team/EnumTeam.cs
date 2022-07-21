@@ -137,7 +137,12 @@ namespace CombatSystem.Team
             Supporting = Stance.Supporting,
             Disrupted = -1
         }
-
+        public enum RolePriorityType
+        {
+            MainRole = 0,
+            SecondaryRole = 1,
+            ThirdRole = 2
+        }
 
 
 

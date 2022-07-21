@@ -38,19 +38,22 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntityHolder> holder)
+        public void OnElementCreated(in UTeamElementSpawner<UUIHoverEntityHolder>.CreationValues creationValues)
         {
-        }
-
-        public void OnElementCreated(UUIHoverEntityHolder element, CombatEntity entity,
-            int index)
-        {
+            var entity = creationValues.Entity;
+            var element = creationValues.Element;
             var targetButton = element.GetTargetButton();
+
             _buttonsDictionary.Add(entity, targetButton);
             targetButton.Inject(entity);
             targetButton.Inject(this);
             targetButton.HideInstantly();
         }
+
+        public void OnAfterElementsCreated(UTeamElementSpawner<UUIHoverEntityHolder> holder)
+        {
+        }
+
 
         public void OnCombatEnd()
         {

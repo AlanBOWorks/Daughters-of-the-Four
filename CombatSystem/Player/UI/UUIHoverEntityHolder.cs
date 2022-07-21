@@ -23,6 +23,20 @@ namespace CombatSystem.Player.UI
         {
             return body.PivotRootType;
         }
+
+        private const float DynamicPointPercent = .1f;
+        private Vector3 _canvasAnchorPoint;
+
+
+        public void InjectAnchorPosition(Vector2 point)
+        {
+            _canvasAnchorPoint = point;
+        }
+        protected override Vector3 CalculateScreenPoint()
+        {
+            var transformPoint = base.CalculateScreenPoint();
+            return Vector3.LerpUnclamped(_canvasAnchorPoint, transformPoint, DynamicPointPercent);
+        }
     }
 
     public abstract class UUIHoverEntityBase : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityBase>
@@ -72,13 +86,17 @@ namespace CombatSystem.Player.UI
 
         private void LateUpdate()
         {
-            var targetPoint = _playerCamera.WorldToScreenPoint(GetTargetPosition());
-            _rectTransform.position = targetPoint;
+            _rectTransform.position = CalculateScreenPoint();
         }
 
-        protected Vector3 GetTargetPosition()
+        protected virtual Vector3 GetTargetPosition()
         {
             return _followReference.position;
+        }
+
+        protected virtual Vector3 CalculateScreenPoint()
+        {
+            return _playerCamera.WorldToScreenPoint(GetTargetPosition());
         }
 
         public void Show()

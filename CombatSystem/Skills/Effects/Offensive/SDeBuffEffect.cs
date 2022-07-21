@@ -16,12 +16,11 @@ namespace CombatSystem.Skills.Effects
         private const string DeBuffSmallPrefix = EffectTags.DeBuffEffectPrefix;
         private const string DeBurstSmallPrefix = EffectTags.DeBurstEffectPrefix;
 
-        private const string DeBuffValuePrefix = "%";
 
         [SerializeField] protected bool isBurst;
 
         public override bool IsPercentSuffix() => true;
-        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectByStatValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateDeBuffPower(performerStats);
         }
@@ -50,6 +49,7 @@ namespace CombatSystem.Skills.Effects
             effectValue = UtilsStatsEffects.CalculateStatsDeBuffValue(effectValue, debuffPower, debuffResistance);
             effectValue *= luckModifier;
 
+            effectValue = UtilsEffect.RoundEffectValueWithHalf_Percent(effectValue);
             DoDeBuff(debuffStats, ref effectValue);
             CombatSystemSingleton.EventsHolder.OnDeBuffDone(entities,this, effectValue);
         }
@@ -70,6 +70,6 @@ namespace CombatSystem.Skills.Effects
             string generatedName = GenerateAssetName(in statTypeName);
             UtilsAssets.UpdateAssetName(this, generatedName);
         }
-
+        public abstract string GetStatVariationEffectText();
     }
 }

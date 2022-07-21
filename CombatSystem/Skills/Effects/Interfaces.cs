@@ -19,7 +19,7 @@ namespace CombatSystem.Skills.Effects
         /// <param name="luckModifier"></param>
         void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier);
 
-        float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue);
+        float CalculateEffectByStatValue(CombatStats performerStats, float effectValue);
         bool IsPercentSuffix();
         bool IsPercentTooltip();
 
@@ -29,14 +29,24 @@ namespace CombatSystem.Skills.Effects
     public interface ISupportEffect : IEffect { }
     public interface ITeamEffect : IEffect { }
 
-    public interface IDeBuffEffect 
+    public interface IDeBuffEffect : IStatVariationEffect
     {
         bool IsBurstEffect();
     }
 
-    public interface IBuffEffect
+    public interface IBuffEffect : IStatVariationEffect
     {
         bool IsBurstEffect();
+    }
+
+    public interface IStatVariationEffect
+    {
+        /// <summary>
+        /// Text that's implemented after the stat variation value;<br></br>
+        /// <example>E.g: +10% AttackPower [AttackPower is the Text in specific]</example> 
+        /// </summary>
+        /// <returns></returns>
+        string GetStatVariationEffectText();
     }
 
 

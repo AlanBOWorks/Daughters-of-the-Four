@@ -19,10 +19,10 @@ namespace CombatSystem.Skills.Effects
 
 
         public abstract void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier);
-        public abstract float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue);
+        public abstract float CalculateEffectByStatValue(CombatStats performerStats, float effectValue);
         public virtual string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
         {
-            effectValue = CalculateEffectTooltipValue(performerStats, effectValue);
+            effectValue = CalculateEffectByStatValue(performerStats, effectValue);
 
             var effectTooltip = LocalizeEffects.LocalizeMathfValue(effectValue, IsPercentSuffix());
             return " <b>" + effectTooltip + "</b>";

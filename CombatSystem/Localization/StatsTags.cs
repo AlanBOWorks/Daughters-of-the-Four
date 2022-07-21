@@ -32,7 +32,10 @@ namespace CombatSystem.Localization
         public const string CriticalStatName = "Luck";
 
 
-        public static readonly IStatsRead<string> StatsNames = new StatsNamesHolder();
+        public const string InitiativeStatName = "Initiative";
+
+
+        public static readonly IStatsRead<string> HolderStatsNames = new StatsNamesHolder();
         private sealed class StatsNamesHolder : IStatsRead<string>
         {
             public string OffensiveStatType { get; } = OffensiveStatName;
@@ -84,6 +87,36 @@ namespace CombatSystem.Localization
         public const string ControlStatTag = "Control_Stat";
         public const string CriticalStatTag = "Luck_Stat";
 
+
+        public const string InitiativeStatTag = "Initiative_Stat";
+
+        public static readonly IStatsRead<string> HolderStatsTags = new StatsTagsHolder();
+        private sealed class StatsTagsHolder : IStatsRead<string>
+        {
+            public string OffensiveStatType { get; } = OffensiveStatTag;
+            public string SupportStatType { get; } = SupportStatTag;
+            public string VitalityStatType { get; } = VitalityStatTag;
+            public string ConcentrationStatType { get; } = ConcentrationStatTag;
+
+            public string AttackType { get; } = AttackStatTag;
+            public string OverTimeType { get; } = OverTimeStatTag;
+            public string DeBuffType { get; } = DeBuffStatTag;
+            public string FollowUpType { get; } = FollowUpStatTag;
+            public string HealType { get; } = HealStatTag;
+            public string ShieldingType { get; } = ShieldingStatTag;
+            public string BuffType { get; } = BuffStatTag;
+            public string ReceiveBuffType { get; } = ReceiveBuffStatTag;
+            public string HealthType { get; } = HealthStatTag;
+            public string MortalityType { get; } = MortalityStatTag;
+            public string DamageReductionType { get; } = DamageReductionStatTag;
+            public string DeBuffResistanceType { get; } = DeBuffResistanceStatTag;
+            public string ActionsType { get; } = ActionsStatTag;
+            public string SpeedType { get; } = SpeedStatTag;
+            public string ControlType { get; } = ControlStatTag;
+            public string CriticalType { get; } = CriticalStatTag;
+        }
+
+
         // Prefix
         public const string OffensiveStatPrefix = "Off";
         public const string SupportStatPrefix = "Supp";
@@ -109,5 +142,35 @@ namespace CombatSystem.Localization
         public const string SpeedStatPrefix = "Spd";
         public const string ControlStatPrefix = "Ctrl";
         public const string CriticalStatPrefix = "Luck";
+
+
+        public const string InitiativeStatPrefix = "Init";
+
+
+        public static readonly IStatsRead<string> HolderStatsPrefix = new StatsPrefixHolder();
+        private sealed class StatsPrefixHolder : IStatsRead<string>
+        {
+            public string OffensiveStatType { get; } = OffensiveStatPrefix;
+            public string SupportStatType { get; } = SupportStatPrefix;
+            public string VitalityStatType { get; } = VitalityStatPrefix;
+            public string ConcentrationStatType { get; } = ConcentrationStatPrefix;
+
+            public string AttackType { get; } = AttackStatPrefix;
+            public string OverTimeType { get; } = OverTimeStatPrefix;
+            public string DeBuffType { get; } = DeBuffStatPrefix;
+            public string FollowUpType { get; } = FollowUpStatPrefix;
+            public string HealType { get; } = HealStatPrefix;
+            public string ShieldingType { get; } = ShieldingStatPrefix;
+            public string BuffType { get; } = BuffStatPrefix;
+            public string ReceiveBuffType { get; } = ReceiveBuffStatPrefix;
+            public string HealthType { get; } = HealthStatPrefix;
+            public string MortalityType { get; } = MortalityStatPrefix;
+            public string DamageReductionType { get; } = DamageReductionStatPrefix;
+            public string DeBuffResistanceType { get; } = DeBuffResistanceStatPrefix;
+            public string ActionsType { get; } = ActionsStatPrefix;
+            public string SpeedType { get; } = SpeedStatPrefix;
+            public string ControlType { get; } = ControlStatPrefix;
+            public string CriticalType { get; } = CriticalStatPrefix;
+        }
     }
 }

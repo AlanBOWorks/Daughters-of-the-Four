@@ -28,7 +28,7 @@ namespace CombatSystem.Skills.Effects
             : EnumsEffect.ConcreteType.Buff;
 
         public override bool IsPercentSuffix() => true;
-        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectByStatValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateBuffPower(performerStats);
         }
@@ -49,7 +49,7 @@ namespace CombatSystem.Skills.Effects
 
             effectValue = UtilsStatsEffects.CalculateStatsBuffValue(effectValue, bufferPower, receivePower);
             effectValue *= luckModifier;
-
+            effectValue = UtilsEffect.RoundEffectValueWithHalf_Percent(effectValue);
             DoBuff(buffingStats, ref effectValue);
             CombatSystemSingleton.EventsHolder.OnBuffDone(entities, this,  effectValue);
         }
@@ -72,6 +72,8 @@ namespace CombatSystem.Skills.Effects
             string generatedName = GenerateAssetName(in statTypeName);
             UtilsAssets.UpdateAssetName(this, generatedName);
         }
+
+        public abstract string GetStatVariationEffectText();
     }
 
 }

@@ -29,7 +29,7 @@ namespace CombatSystem.Skills.Effects
         public override string EffectSmallPrefix => StanceSmallPrefix;
         public override EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.Stance;
 
-        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue) 
+        public override float CalculateEffectByStatValue(CombatStats performerStats, float effectValue) 
             => UtilsStatsFormula.CalculateControlGain(performerStats) * effectValue;
         public override string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue) => null;
 

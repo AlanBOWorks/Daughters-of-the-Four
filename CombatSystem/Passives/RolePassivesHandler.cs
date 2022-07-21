@@ -29,7 +29,13 @@ namespace CombatSystem.Passives
         private abstract class RolePassiveBase : ICombatPassive, IBuffEffect
         {
             public EnumsEffect.ConcreteType GetEffectType() => EnumsEffect.ConcreteType.Buff;
-            public abstract string GetPassiveEffectText();
+
+            public string GetPassiveEffectText()
+            {
+                return GetStatVariationEffectText() + ": " + GetValueEffectText();
+            }
+            public abstract string GetStatVariationEffectText();
+            protected abstract string GetValueEffectText();
 
             public void DoPassive(CombatEntity onEntity)
             {
@@ -44,9 +50,10 @@ namespace CombatSystem.Passives
             protected abstract void DoPassiveBuff(StatsBase<float> stats, out float effectValue);
             public bool IsBurstEffect() => true;
 
-            protected string LocalizeStat(EnumStats.StatType stats, string valueText)
+           
+            protected static string LocalizeStat(EnumStats.StatType stats)
             {
-                return LocalizationsCombat.LocalizeStatName(stats) + " +" + valueText;
+                return LocalizeStats.LocalizeStatPrefix(stats);
             }
         }
 
@@ -54,10 +61,9 @@ namespace CombatSystem.Passives
         {
             private const float PassiveIncrement = .25f;
             private static readonly string PassiveValueText = PassiveIncrement.ToString("P0");
-            public override string GetPassiveEffectText()
-            {
-                return LocalizeStat(EnumStats.StatType.Health, PassiveValueText);
-            }
+           
+            public override string GetStatVariationEffectText() => LocalizeStat(EnumStats.StatType.Health);
+            protected override string GetValueEffectText() => PassiveValueText;
 
             protected override void DoPassiveBuff(StatsBase<float> stats, out float effectValue)
             {
@@ -69,11 +75,16 @@ namespace CombatSystem.Passives
         {
             private const float PassiveIncrement = .1f;
             private static readonly string PassiveValueText = PassiveIncrement.ToString("P0");
-            public override string GetPassiveEffectText()
+         
+
+            public override string GetStatVariationEffectText()
             {
-                return LocalizeStat(EnumStats.StatType.Attack, PassiveValueText) + "\n" +
-                LocalizeStat(EnumStats.StatType.OverTime, PassiveValueText);
+                return LocalizeStat(EnumStats.StatType.Attack) + " &\n " +
+                       LocalizeStat(EnumStats.StatType.OverTime);
             }
+
+            protected override string GetValueEffectText() => PassiveValueText;
+
             protected override void DoPassiveBuff(StatsBase<float> stats, out float effectValue)
             {
                 effectValue = PassiveIncrement;
@@ -85,10 +96,10 @@ namespace CombatSystem.Passives
         {
             private const float PassiveIncrement = .1f;
             private static readonly string PassiveValueText = PassiveIncrement.ToString("P0");
-            public override string GetPassiveEffectText()
-            {
-                return LocalizeStat(EnumStats.StatType.Buff, PassiveValueText);
-            }
+
+            public override string GetStatVariationEffectText() => LocalizeStat(EnumStats.StatType.Buff);
+            protected override string GetValueEffectText() => PassiveValueText;
+
             protected override void DoPassiveBuff(StatsBase<float> stats, out float effectValue)
             {
                 effectValue = PassiveIncrement;
@@ -99,10 +110,10 @@ namespace CombatSystem.Passives
         {
             private const float PassiveIncrement = .25f;
             private static readonly string PassiveValueText = PassiveIncrement.ToString("P0");
-            public override string GetPassiveEffectText()
-            {
-                return LocalizeStat(EnumStats.StatType.Control, PassiveValueText);
-            }
+
+            public override string GetStatVariationEffectText() => LocalizeStat(EnumStats.StatType.Control);
+            protected override string GetValueEffectText() => PassiveValueText;
+
             protected override void DoPassiveBuff(StatsBase<float> stats, out float effectValue)
             {
                 effectValue = PassiveIncrement;

@@ -13,7 +13,7 @@ namespace CombatSystem.Localization
             var effect = values.Effect;
             var targeting = values.TargetType;
             string localizationTag = effect.EffectTag;
-            string localizedName = LocalizationsCombat.LocalizeEffectName(localizationTag);
+            string localizedName = LocalizationsCombat.LocalizeEffectTag(localizationTag);
             string localizeTargeting = LocalizeLineTargeting(targeting);
 
             localizedEffect = "[" + localizeTargeting + "]\n" + localizedName;

@@ -29,7 +29,7 @@ namespace CombatSystem.Skills.Effects
         public override string EffectTag => _effectTag;
 
         public override bool IsPercentSuffix() => true;
-        public override float CalculateEffectTooltipValue(CombatStats performerStats, float effectValue)
+        public override float CalculateEffectByStatValue(CombatStats performerStats, float effectValue)
         {
             return effectValue * UtilsStatsFormula.CalculateBuffPower(performerStats);
         }
@@ -88,5 +88,7 @@ namespace CombatSystem.Skills.Effects
             string generatedName = GenerateAssetName(type.ToString());
             UtilsAssets.UpdateAssetName(this, generatedName);
         }
+
+        public string GetStatVariationEffectText() => LocalizeStats.LocalizeStatPrefix(type);
     }
 }
