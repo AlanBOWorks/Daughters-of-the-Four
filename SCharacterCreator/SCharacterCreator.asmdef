@@ -1,3 +1,16 @@
 {
-	"name": "SCharacterCreator"
+    "name": "SCharacterCreator",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d575583de377ae84f80ab10310141b42"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
