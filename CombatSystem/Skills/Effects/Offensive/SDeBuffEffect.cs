@@ -43,7 +43,7 @@ namespace CombatSystem.Skills.Effects
             float debuffResistance = UtilsStatsFormula.CalculateDeBuffResistance(targetStats);
 
             IBasicStats<float> debuffStats = isBurst 
-                ? UtilsStats.GetBurstStats(targetStats, performerStats) 
+                ? UtilsCombatStats.GetBurstStats(targetStats, performerStats) 
                 : targetStats.BuffStats;
 
             effectValue = UtilsStatsEffects.CalculateStatsDeBuffValue(effectValue, debuffPower, debuffResistance);

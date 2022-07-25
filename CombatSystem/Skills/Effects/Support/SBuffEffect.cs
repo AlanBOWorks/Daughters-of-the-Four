@@ -43,7 +43,7 @@ namespace CombatSystem.Skills.Effects
             float receivePower = UtilsStatsFormula.CalculateReceiveBuffPower(targetStats);
 
             IBasicStats<float> buffingStats = isBurst 
-                ? UtilsStats.GetBurstStats(targetStats, performerStats) 
+                ? UtilsCombatStats.GetBurstStats(targetStats, performerStats) 
                 : targetStats.BuffStats;
 
 
