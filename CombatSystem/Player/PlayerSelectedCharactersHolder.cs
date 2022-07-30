@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using CombatSystem.Entity;
+using CombatSystem.Skills;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -13,78 +15,97 @@ namespace CombatSystem.Player
         public PlayerSelectedCharactersHolder()
         {
             int rolesAmount = EnumTeam.RoleTypesCount;
-            _characters = new List<ICombatEntityProvider>(rolesAmount);
-            for (int i = 0; i < rolesAmount; i++)
-            {
-                _characters.Add(null);
-            }
-
-            _teamSkills = new List<ITeamSkillPreset>();
+            _runTimeCharacters = new List<ICombatEntityProvider>(rolesAmount);
+            _characterReferences = new HashSet<ICombatEntityProvider>();
         }
 
         [ShowInInspector,DisableInEditorMode,DisableInPlayMode]
-        private readonly List<ICombatEntityProvider> _characters;
+        private readonly List<ICombatEntityProvider> _runTimeCharacters;
+        private readonly HashSet<ICombatEntityProvider> _characterReferences;
 
-        [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
-        private readonly List<ITeamSkillPreset> _teamSkills;
 
         [Button]
         private void DebugCount()
         {
-            Debug.Log($"List Length: {_characters.Capacity} - Characters Amount :" + Count);
+            Debug.Log($"List Length: {_runTimeCharacters.Capacity} - Characters Amount :" + Count);
         }
 
         [Button]
-        public void AddTeam(SPlayerPresetTeam predefinedTeam)
+        public void AddPredefinedTeam(SPlayerPresetTeam predefinedTeam) => AddTeam(predefinedTeam);
+
+        public void AddTeam(ICombatTeamProvider predefinedTeam)
         {
-            _characters.Clear();
-            var teamMembers = predefinedTeam.GetPresetCharacters();
-            _characters.AddRange(teamMembers);
-            var teamSkills = predefinedTeam.GetTeamSkills();
-            _teamSkills.AddRange(teamSkills);
+            Clear();
+
+            var teamMembers = predefinedTeam.GetSelectedCharacters();
+            foreach (var preset in teamMembers)
+            {
+                var runTimeCharacter = UtilsPlayerTeam.GenerateRunTimeEntity(preset);
+                AddUnSafeSelected(preset,runTimeCharacter);
+            }
+        }
+        public void AddTeam(IEnumerable<SelectedCharacterPair> characters)
+        {
+            Clear();
+
+            foreach (SelectedCharacterPair pair in characters)
+            {
+                AddUnSafeSelected(pair.Preset,pair.RunTimeEntity);
+            }
+        }
+        private void AddUnSafeSelected(ICombatEntityProvider preset, ICombatEntityProvider runTimeCharacter)
+        {
+            _characterReferences.Add(preset);
+            _runTimeCharacters.Add(runTimeCharacter);
+        }
+
+        public void AddSelectedCharacter(SelectedCharacterPair selectedCharacter)
+        {
+            var preset = selectedCharacter.Preset;
+            if(Contains(preset)) return;
+
+            AddUnSafeSelected(preset,selectedCharacter.RunTimeEntity);
         }
 
 
-        [Button]
-        private void AddCharacter(SPlayerPreparationEntity selectedCharacter)
-        => Add(selectedCharacter);
-
-        [Button]
-        private void TryRemove(SPlayerPreparationEntity selectedCharacter)
-            => TryRemove(selectedCharacter as ICombatEntityProvider);
-
-        public void Add(ICombatEntityProvider selectedCharacter)
+        /// <summary>
+        /// Used when the player does a quick "Run Reset" > re-instantiates the entities
+        /// to their initial state removing skills and modified stats.
+        /// </summary>
+        public void ResetToInitialReferences()
         {
-            TryRemove(selectedCharacter);
+            if(_characterReferences.Count == 0) return;
 
-            int roleIndex = UtilsTeam.GetRoleIndex(selectedCharacter);
-            _characters[roleIndex] = selectedCharacter;
+            _runTimeCharacters.Clear();
+            foreach (var preset in _characterReferences)
+            {
+                var runTimeEntity = UtilsPlayerTeam.GenerateRunTimeEntity(preset);
+                _runTimeCharacters.Add(runTimeEntity);
+            }
         }
 
-        public void TryRemove(ICombatEntityProvider selectedCharacter)
+        public void Clear()
         {
-            if (!_characters.Contains(selectedCharacter)) return;
-
-            int roleIndex = UtilsTeam.GetRoleIndex(selectedCharacter);
-            _characters[roleIndex] = null;
+            _runTimeCharacters.Clear();
+            _characterReferences.Clear();
         }
 
-        public void Add(ITeamSkillPreset teamSkill)
-        {
-            _teamSkills.Add(teamSkill);
-        }
-
-        public void TryRemove(ITeamSkillPreset teamSkill)
-        {
-            if (_teamSkills.Contains(teamSkill)) return;
-            _teamSkills.Remove(teamSkill);
-        }
-
-        public int Count => _characters.Count;
-        public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => _characters;
-        public IEnumerable<ITeamSkillPreset> GetTeamSkills() => _teamSkills;
-
+        public int Count => _runTimeCharacters.Count;
         public bool IsValid() => Count > 0;
+        public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => _runTimeCharacters;
+        public bool Contains(ICombatEntityProvider key) => _characterReferences.Contains(key);
+    }
 
+
+    public readonly struct SelectedCharacterPair
+    {
+        public readonly ICombatEntityProvider Preset;
+        public readonly ICombatEntityProvider RunTimeEntity;
+
+        public SelectedCharacterPair(ICombatEntityProvider preset, ICombatEntityProvider runTimeEntity)
+        {
+            Preset = preset;
+            RunTimeEntity = runTimeEntity;
+        }
     }
 }

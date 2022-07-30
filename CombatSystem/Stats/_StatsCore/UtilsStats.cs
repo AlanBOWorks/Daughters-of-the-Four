@@ -17,7 +17,7 @@ namespace CombatSystem.Stats
         /// Copies all values except those which correspond to [<see cref="IMainStats{T}"/>];<br></br>
         /// For that use [<seealso cref="DoCopyFull{T}"/>] instead which copies all values
         /// </summary>
-        public static void DoCopyBasics<T>(IStatsInject<T> inject, IStatsRead<T> copyFrom)
+        public static void DoCopyBasics<T>(IBasicStatsInject<T> inject, IBasicStatsRead<T> copyFrom)
         {
             inject.AttackType = copyFrom.AttackType;
             inject.OverTimeType = copyFrom.OverTimeType;

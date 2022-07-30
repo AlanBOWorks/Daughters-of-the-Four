@@ -15,7 +15,9 @@ namespace CombatSystem.Player.UI
         public static readonly CombatThemeSingleton Instance = new CombatThemeSingleton();
 
         static CombatThemeSingleton()
-        { }
+        {
+            SCombatThemeHolder.LoadAsset();
+        }
 
         [ShowInInspector, InlineEditor(InlineEditorObjectFieldModes.Foldout)]
         public static ClassTeamRolesStructure<CombatThemeHolder> RolesThemeHolder { get; internal set; }
@@ -27,4 +29,6 @@ namespace CombatSystem.Player.UI
         public static IFullEffectStructureRead<Sprite> EffectsIconsHolder { get; internal set; }
         public static IFullEffectStructureRead<Color> EffectsColorsHolder { get; internal set; }
     }
+
+
 }

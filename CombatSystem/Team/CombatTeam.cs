@@ -19,7 +19,6 @@ namespace CombatSystem.Team
 
             DataValues = new TeamDataValues();
             GuardHandler = new TeamLineBlockerHandler();
-            _teamSkills = new List<CombatTeamSkill>();
 
 
             _membersHolder = new CombatTeamMembersHolder();
@@ -48,13 +47,7 @@ namespace CombatSystem.Team
         }
 
         public CombatTeam(bool isPlayerTeam, ICombatTeamProvider provider) : this(isPlayerTeam,provider.GetSelectedCharacters())
-        {
-            var skills = provider.GetTeamSkills();
-            foreach (var skillPreset in skills)
-            {
-                GenerateSkillAndAdd(skillPreset);
-            }
-        }
+        { }
 
 
         [Title("Team Data")]
@@ -66,37 +59,13 @@ namespace CombatSystem.Team
         public readonly TeamDataValues DataValues;
         public readonly TeamLineBlockerHandler GuardHandler;
         [ShowInInspector]
-        private readonly List<CombatTeamSkill> _teamSkills;
-        [ShowInInspector]
         public readonly VanguardEffectsHolder VanguardEffectsHolder;
 
 
-        public IReadOnlyList<CombatTeamSkill> GetTeamSkills() => _teamSkills;
-
-        public void InstantiationSkill(IEnumerable<ITeamSkillPreset> skills)
-        {
-            _teamSkills.Clear();
-            foreach (var preset in skills)
-            {
-                CombatTeamSkill skill = new CombatTeamSkill(preset);
-                _teamSkills.Add(skill);
-            }
-        }
 
 
-        private void GenerateSkillAndAdd(ITeamSkillPreset preset)
-        {
-            if (preset == null) return;
-
-            CombatTeamSkill skill = new CombatTeamSkill(preset);
-            Add(skill);
-        }
 
 
-        private void Add(CombatTeamSkill skill)
-        {
-            _teamSkills.Add(skill);
-        }
 
 
 

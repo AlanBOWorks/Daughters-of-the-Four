@@ -94,4 +94,29 @@ namespace CombatSystem.Team
         public T[] BackLineType => backAliment.Members;
         public T[] FlexLineType => flexAliment.Members;
     }
+
+    [Serializable]
+    public abstract class UTeamStructure<T> : MonoBehaviour, ITeamFlexPositionStructureRead<T>, ITeamFlexStructureRead<T>
+    {
+        [SerializeField] private T frontLineType;
+        [SerializeField] private T midLineType;
+        [SerializeField] private T backLineType;
+        [SerializeField] private T flexLineType;
+
+
+        public T FrontLineType => frontLineType;
+        public T MidLineType => midLineType;
+        public T BackLineType => backLineType;
+        public T FlexLineType => flexLineType;
+
+        public T VanguardType => frontLineType;
+        public T AttackerType => midLineType;
+        public T SupportType => backLineType;
+        public T FlexType => flexLineType;
+
+        public T GetElement(EnumTeam.Role role)
+        {
+            return UtilsTeam.GetElement(role, this);
+        }
+    } 
 }

@@ -87,7 +87,8 @@ namespace CombatSystem.Player.UI
         private const float IterationHeight = 70 + 6;
         private void OnInstantiation()
         {
-            var feedBacks = CombatThemeSingleton.RolesThemeHolder;
+            ITeamFlexStructureRead<CombatThemeHolder> feedBacks 
+                = CombatThemeSingleton.RolesThemeHolder;
             var enumerable = UtilsTeam.GetEnumerable(references, feedBacks);
             int i = references.activeCount;
             foreach ((UCombatEntitySwitchButton button, CombatThemeHolder value) in enumerable)

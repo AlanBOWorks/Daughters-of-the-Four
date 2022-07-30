@@ -157,7 +157,7 @@ namespace CombatSystem._Core
 
         private static void TestStartCombat(SPlayerPresetTeam playerTeam, SEnemyPredefinedTeam enemyTeam)
         {
-            PlayerCombatSingleton.SelectedCharactersHolder.AddTeam(playerTeam);
+            PlayerCombatSingleton.SelectedCharactersHolder.AddPredefinedTeam(playerTeam);
             TestStartCombat(enemyTeam);
         }
         private static void TestStartCombat(SEnemyPredefinedTeam enemyTeam)

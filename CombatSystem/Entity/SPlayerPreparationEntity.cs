@@ -13,12 +13,15 @@ namespace CombatSystem.Entity
         AssetSelector(Paths = AssetPathFolderRoot + "/Players/")]
         private GameObject instantiationObject;
 
-        [SerializeField, InlineEditor()] private SCharacterLoreHolder loreHolder;
+        [SerializeField, InlineEditor()] 
+        private SCharacterLoreHolder loreHolder;
 
         private const string PlayerAssetPrefixName = "[PLAYER Preparation Entity]";
         public override string GetProviderEntityName() => loreHolder.CharacterNameType;
         public override string GetProviderEntityFullName() => loreHolder.CharacterFullNameType;
         public override string GetProviderShorterName() => loreHolder.CharacterShorterNameType;
+
+        public ICharacterPortraitHolder GetPortraitHolder() => loreHolder.GetPortraitHolder();
 
         protected override string AssetPrefix()
         {

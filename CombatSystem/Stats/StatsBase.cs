@@ -36,7 +36,10 @@ namespace CombatSystem.Stats
             concentrationType = masterDefaultValue;
         }
 
-
+        public Stats(IStatsRead<T> stats) : base()
+        {
+            UtilsStats.DoCopyFull(this, stats);
+        }
         public T OffensiveStatType
         {
             get => offensiveType;
@@ -158,9 +161,12 @@ namespace CombatSystem.Stats
         [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T controlType;
         [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T luckType;
 
-
         public StatsBase()
         { }
+        public StatsBase(IBasicStatsRead<T> stats)
+        {
+            UtilsStats.DoCopyBasics(this, stats);
+        }
         public StatsBase(T defaultValue)
         {
             OverrideByValue(in defaultValue);

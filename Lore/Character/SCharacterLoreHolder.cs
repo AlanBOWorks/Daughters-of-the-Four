@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Utils;
@@ -15,9 +16,15 @@ namespace Lore.Character
         [SerializeField] private string entityFullName = NullName;
         [SerializeField] private string shorterName = NullName;
 
+        [Title("Images")]
+        [SerializeField]
+        private PortraitHolder portraitHolder = new PortraitHolder();
+
         public string CharacterNameType => entityName;
         public string CharacterFullNameType => entityFullName;
         public string CharacterShorterNameType => shorterName;
+
+        public ICharacterPortraitHolder GetPortraitHolder() => portraitHolder;
 
         [Button]
         private void UpdateAssetName()
@@ -25,5 +32,35 @@ namespace Lore.Character
             string assetName = entityName + " " + AssetPrefix;
             UtilsAssets.UpdateAssetNameWithID(this, assetName);
         }
+
+
+        [Serializable]
+        private sealed class PortraitHolder : ICharacterPortraitHolder
+        {
+            [SerializeField, PreviewField] private Sprite portraitImage;
+            [SerializeField] private Vector2 selectCharacterPivotPoint;
+            [SerializeField] private Vector2 faceIconPivotPoint;
+
+            public Sprite GetCharacterPortraitImage() => portraitImage;
+
+            public Vector2 SelectCharacterPivotPosition
+            {
+                get => selectCharacterPivotPoint;
+                set => selectCharacterPivotPoint = value;
+            }
+
+            public Vector2 FacePivotPosition
+            {
+                get => faceIconPivotPoint;
+                set => faceIconPivotPoint = value;
+            }
+        }
+    }
+
+    public interface ICharacterPortraitHolder
+    {
+        Sprite GetCharacterPortraitImage();
+        Vector2 SelectCharacterPivotPosition { get; set; }
+        Vector2 FacePivotPosition { get; set; }
     }
 }

@@ -17,16 +17,20 @@ namespace CombatSystem.Team
         [ReadOnly]
         public int activeCount;
 
-        public void InstantiateElements()
+        public virtual void InstantiateElements()
         {
             if(!instantiationParent || !instantiationPrefab) return;
 
-            VanguardType = Instantiate();
-            AttackerType = Instantiate();
-            SupportType = Instantiate();
-            FlexType = Instantiate();
+            VanguardType = OnInstantiation(0);
+            AttackerType = OnInstantiation(1);
+            SupportType = OnInstantiation(2);
+            FlexType = OnInstantiation(3);
 
-            T Instantiate() => UnityEngine.Object.Instantiate(instantiationPrefab, instantiationParent);
+        }
+
+        protected virtual T OnInstantiation(int index)
+        {
+            return UnityEngine.Object.Instantiate(instantiationPrefab, instantiationParent);
         }
 
         public void HidePrefab()

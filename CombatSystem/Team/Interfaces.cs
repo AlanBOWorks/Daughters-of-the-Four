@@ -8,7 +8,6 @@ namespace CombatSystem.Team
     public interface ICombatTeamProvider
     {
         IEnumerable<ICombatEntityProvider> GetSelectedCharacters();
-        IEnumerable<ITeamSkillPreset> GetTeamSkills();
     }
 
     public interface IOppositionTeamStructureRead<out T>

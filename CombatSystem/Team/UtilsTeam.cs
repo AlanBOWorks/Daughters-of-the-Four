@@ -513,7 +513,14 @@ namespace CombatSystem.Team
             yield return new KeyValuePair<TKey, TValue>(keys.BackLineType, values.BackLineType);
             yield return new KeyValuePair<TKey, TValue>(keys.FlexLineType, values.FlexLineType);
         }
-
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
+            ITeamFlexStructureRead<TKey> keys, ITeamFlexStructureRead<TValue> values)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.VanguardType, values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.AttackerType, values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SupportType, values.SupportType);
+            yield return new KeyValuePair<TKey, TValue>(keys.FlexType, values.FlexType);
+        }
 
         public static IEnumerable<T> GetEnumerable<T>(ITeamOffStructureRead<T> structure)
         {
