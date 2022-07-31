@@ -6,9 +6,9 @@ namespace CharacterSelector
 {
     public class UReturnToMainMenu : UHoldButton
     {
-        private void ReturnToMainMenu()
+        private static void ReturnToMainMenu()
         {
-            Debug.Log("Return to MAIN");
+            Utils_Project.UtilsScene.LoadMainMenuScene();
         }
 
         protected override void DoAction()
