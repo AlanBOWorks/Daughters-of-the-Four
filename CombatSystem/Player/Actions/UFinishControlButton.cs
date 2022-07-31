@@ -1,7 +1,7 @@
 
 namespace CombatSystem.Player
 {
-    public class UFinishControlButton : UHoldButton
+    public class UFinishControlButton : UCombatHoldButton
     {
         private static void PassTurn()
         {

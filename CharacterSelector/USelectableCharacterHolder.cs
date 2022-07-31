@@ -35,6 +35,7 @@ namespace CharacterSelector
             var portrait = loreHolder.GetPortraitHolder();
             InjectPortrait(portrait.GetCharacterPortraitImage(),portrait.SelectCharacterPivotPosition);
 
+
             int loopThreshold = Mathf.Min(roles.Length, roleHolders.Length);
             for (var i = 0; i < loopThreshold; i++)
             {

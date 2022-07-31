@@ -118,5 +118,14 @@ namespace CombatSystem.Team
         {
             return UtilsTeam.GetElement(role, this);
         }
+
+        public IEnumerable<T> GetEnumerable()
+        {
+            yield return frontLineType;
+            yield return midLineType;
+            yield return backLineType;
+            yield return flexLineType;
+        }
+
     } 
 }

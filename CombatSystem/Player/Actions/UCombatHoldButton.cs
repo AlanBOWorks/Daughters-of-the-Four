@@ -13,7 +13,7 @@ using Utils;
 
 namespace CombatSystem.Player
 {
-    public abstract class UHoldButton : MonoBehaviour,
+    public abstract class UCombatHoldButton : MonoBehaviour,
         IPointerDownHandler, IPointerUpHandler,
         ITempoControlStatesListener,
         IOverridePauseElement

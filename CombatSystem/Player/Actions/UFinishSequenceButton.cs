@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CombatSystem.Player
 {
-    public class UFinishSequenceButton : UHoldButton
+    public class UFinishSequenceButton : UCombatHoldButton
     {
         [SerializeField] private CanvasGroup alphaGroup;
 

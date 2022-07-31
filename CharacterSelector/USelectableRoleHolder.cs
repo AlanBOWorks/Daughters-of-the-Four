@@ -4,6 +4,7 @@ using CombatSystem.Player.UI;
 using CombatSystem.Team;
 using DG.Tweening;
 using Lore.Character;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -13,6 +14,7 @@ namespace CharacterSelector
     public class USelectableRoleHolder : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
          IPointerClickHandler
     {
+        [ShowInInspector, HideInEditorMode]
         private SPlayerPreparationEntity _entity;
         private SCharacterLoreHolder _entityKey;
 
@@ -24,9 +26,13 @@ namespace CharacterSelector
 
         private void Awake()
         {
-            Hide();
+            if(_entity == null)
+                Hide();
             selectedImage.gameObject.SetActive(false);
         }
+
+        public SCharacterLoreHolder GetCurrentKey() => _entityKey;
+        public SPlayerPreparationEntity GetCurrentPreset() => _entity;
 
         public void Injection(USelectedCharactersHolder holder) => _selectedCharactersHolder = holder;
 
@@ -92,12 +98,13 @@ namespace CharacterSelector
 
         public void Hide()
         {
-            transform.parent.gameObject.SetActive(false);
-
+            var parent = transform.parent;
+            parent.gameObject.SetActive(false);
         }
         public void Show()
         {
-            transform.parent.gameObject.SetActive(true);
+            var parent = transform.parent;
+            parent.gameObject.SetActive(true);
         }
     }
 }
