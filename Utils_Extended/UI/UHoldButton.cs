@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MEC;
 using MPUIKIT;
@@ -25,6 +26,12 @@ namespace Utils_Extended.UI
         {
             FillImage(0);
         }
+
+        private void OnDestroy()
+        {
+            Timing.KillCoroutines(_pointerHandle);
+        }
+
 
         private void OnDisable()
         {

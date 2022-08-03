@@ -2,9 +2,13 @@
     "name": "sUtils_Project",
     "rootNamespace": "",
     "references": [
+        "DOTweenPro.Scripts",
         "Timing",
         "MPUIKit",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "ProjectUtils",
+        "ProjectUtils_Extended",
+        ""
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
