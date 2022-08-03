@@ -8,7 +8,7 @@ namespace MainMenu
     {
         public void OnPointerDown(PointerEventData eventData)
         {
-            UtilsScene.LoadMainCharacterSelectionScene();
+            UtilsScene.LoadMainCharacterSelectionScene(true);
         }
     }
 }

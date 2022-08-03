@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Utils.Maths;
 using Object = UnityEngine.Object;
 
@@ -28,8 +29,9 @@ namespace Utils_Project.Scene
 
         private void Awake()
         {
-
             gameObject.SetActive(false);
+            HandleFillFromLeft(true);
+            fillerImageMask.fillAmount = 0;
             LoadSceneManagerSingleton.Injection(this);
         }
 
@@ -54,10 +56,14 @@ namespace Utils_Project.Scene
         }
 
 
+        public bool IsLoadingScene() => _fillingCoroutineHandle.IsRunning;
         private CoroutineHandle _fillingCoroutineHandle;
-        public void DoSceneTransition(bool showLoadScreenFromLeft, float deltaModifier = 1)
+        public void DoSceneTransition(string sceneName, bool showLoadScreenFromLeft, float deltaModifier = 1)
         {
+            if(IsLoadingScene()) return;
 
+            _fillingCoroutineHandle =
+                Timing.RunCoroutine(_SceneSwapSequence(sceneName, showLoadScreenFromLeft, deltaModifier));
         }
 
         private const float FillThreshold = .98f;
@@ -120,6 +126,17 @@ namespace Utils_Project.Scene
 
             fillerImageMask.fillAmount = 0;
 
+        }
+
+        private IEnumerator<float> _SceneSwapSequence(string sceneName, bool fillFromLeft, float deltaModifier)
+        {
+            gameObject.SetActive(true);
+            yield return Timing.WaitForOneFrame;
+            yield return Timing.WaitUntilDone(_FadeInLoadScreen(fillFromLeft,deltaModifier));
+            var sceneAsync = SceneManager.LoadSceneAsync(sceneName);
+            yield return Timing.WaitUntilDone(sceneAsync);
+            yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fillFromLeft,deltaModifier));
+            gameObject.SetActive(false);
         }
 
         [Button,DisableInEditorMode]

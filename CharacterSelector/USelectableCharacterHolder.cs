@@ -21,6 +21,11 @@ namespace CharacterSelector
             _originalSizeDelta = _rectTransform.sizeDelta;
         }
 
+        private void OnDestroy()
+        {
+            DOTween.Kill(_rectTransform);
+        }
+
         private Vector2 _originalSizeDelta;
 
         public void InjectPortrait(Sprite portrait, Vector2 offset)

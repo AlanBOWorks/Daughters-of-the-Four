@@ -8,7 +8,7 @@ namespace CharacterSelector
     {
         private static void ReturnToMainMenu()
         {
-            Utils_Project.UtilsScene.LoadMainMenuScene();
+            Utils_Project.UtilsScene.LoadMainMenuScene(false);
         }
 
         protected override void DoAction()

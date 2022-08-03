@@ -1,22 +1,24 @@
 using UnityEngine.SceneManagement;
+using Utils_Project.Scene;
 
 namespace Utils_Project
 {
     public static class UtilsScene
     {
-        public const string MainMenuSceneName = "MainMenu_Scene";
-        public const string MainCharacterSelectionSceneName = "MainCharacterSelection_Scene";
-
-       
-
-        public static void LoadMainMenuScene()
+        private static void DoSceneTransition(string sceneName, bool showLoadScreenFromLeft, float deltaModifier = 1)
         {
-            SceneManager.LoadSceneAsync(MainMenuSceneName);
+            var sceneManager = LoadSceneManagerSingleton.ManagerInstance;
+            sceneManager.DoSceneTransition(sceneName, showLoadScreenFromLeft, deltaModifier);
         }
 
-        public static void LoadMainCharacterSelectionScene()
+        public static void LoadMainMenuScene(bool showLoadScreenFromLeft, float deltaModifier = 1)
         {
-            SceneManager.LoadSceneAsync(MainCharacterSelectionSceneName);
+            DoSceneTransition(SceneStructures.MainMenuSceneName, showLoadScreenFromLeft, deltaModifier);
+        }
+
+        public static void LoadMainCharacterSelectionScene(bool showLoadScreenFromLeft, float deltaModifier = 1)
+        {
+            DoSceneTransition(SceneStructures.CharacterSelectionSceneName, showLoadScreenFromLeft, deltaModifier);
         }
 
 

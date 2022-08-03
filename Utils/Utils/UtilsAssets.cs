@@ -23,6 +23,12 @@ namespace Utils
             AssetDatabase.RenameAsset(path, asset.name);
         }
 
+        public static void UpdateAssetName(SceneAsset asset)
+        {
+            var path = AssetDatabase.GetAssetPath(asset);
+            AssetDatabase.RenameAsset(path, asset.name);
+        }
+
         /// <summary>
         /// [.asset]
         /// </summary>

@@ -44,8 +44,7 @@ namespace CombatSystem.Player.UI
 
         public static void LoadAsset()
         {
-            var themeHolder = AssetDatabase.LoadAssetAtPath<SCombatThemeHolder>(AssetPath);
-            themeHolder.Awake();
+            AssetDatabase.LoadAssetAtPath<SCombatThemeHolder>(AssetPath);
         }
     }
 }
