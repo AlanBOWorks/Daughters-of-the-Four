@@ -307,6 +307,11 @@ namespace CombatSystem.Entity
         TeamAreaData GetAreaData();
     }
 
+    public interface ICombatEntityProviderHolder
+    {
+        ICombatEntityProvider GetEntityProvider();
+    }
+
 
     public interface ICombatEntityInfoHolder
     {

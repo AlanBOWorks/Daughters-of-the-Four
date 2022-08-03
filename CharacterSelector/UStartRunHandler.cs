@@ -13,6 +13,8 @@ namespace CharacterSelector
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private MPImage fillerImage;
 
+        private USelectedCharactersHolder _holder;
+        public void Injection(USelectedCharactersHolder holder) => _holder = holder;
 
         private bool _isReady;
         private const float OnDisableAlpha = .3f;
@@ -84,6 +86,7 @@ namespace CharacterSelector
         private void DoConfirmation()
         {
             fillerImage.fillAmount = 1;
+            _holder.ConfirmTeamAndSendToSingleton();
         }
 
     }

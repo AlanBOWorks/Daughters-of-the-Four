@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Player.UI;
 using CombatSystem.Team;
+using ExplorationSystem;
 using Lore.Character;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -36,6 +37,7 @@ namespace CharacterSelector
 
             _tracker = new Dictionary<USelectedCharacterHolder, USelectableRoleHolder>();
             _characterRepetitionTracker = new Dictionary<SCharacterLoreHolder, int>();
+            startRunHandler.Injection(this);
         }
 
         private void Start()
@@ -162,6 +164,15 @@ namespace CharacterSelector
             {
                 startRunHandler.DisableControl();
             }
+        }
+
+
+        public void ConfirmTeamAndSendToSingleton()
+        {
+            if (!IsTeamReady())
+                throw new AccessViolationException($"Team wasn't ready - Count: [{_selectedCharactersCount}]");
+
+            PlayerExplorationSingleton.Instance.InjectTeam(this);
         }
 
 

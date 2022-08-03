@@ -9,7 +9,8 @@ using UnityEngine.UI;
 
 namespace CharacterSelector
 {
-    public class USelectedCharacterHolder : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+    public class USelectedCharacterHolder : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler,
+        ICombatEntityProviderHolder
     {
         [SerializeField] private Image characterPortraitHolder;
         [SerializeField] private Image roleIconHolder;
@@ -60,6 +61,7 @@ namespace CharacterSelector
         {
             _entity = entity;
         }
+        public ICombatEntityProvider GetEntityProvider() => _entity;
 
         public void ShowPortrait()
         {
@@ -92,5 +94,6 @@ namespace CharacterSelector
             _charactersHolder.DisableEntity(this);
             _entity = null;
         }
+
     }
 }
