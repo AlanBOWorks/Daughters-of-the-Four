@@ -16,7 +16,8 @@ namespace CharacterSelector
 
         private void Start()
         {
-            holder.SelectCharacter(fifthLore,fifthCharacterPreset);
+            var values = new USelectedCharactersHolder.SelectedCharacterValues(fifthCharacterPreset, fifthLore, null);
+            holder.SelectCharacter(values);
         }
     }
 }

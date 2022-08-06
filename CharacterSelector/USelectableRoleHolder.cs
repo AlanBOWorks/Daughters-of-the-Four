@@ -76,7 +76,7 @@ namespace CharacterSelector
 
         private void HandleSelection()
         {
-            var selectionValues = new USelectedCharactersHolder.SelectedCharacterValues(_entityKey, _entity, this);
+            var selectionValues = new USelectedCharactersHolder.SelectedCharacterValues(_entity, _entityKey, this);
             _selectedCharactersHolder.SelectCharacter(selectionValues);
 
 

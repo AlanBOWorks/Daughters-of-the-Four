@@ -17,7 +17,8 @@ namespace CharacterSelector
         private UStartRunHandler startRunHandler;
 
         [ShowInInspector,HideInEditorMode]
-        private Dictionary<USelectedCharacterHolder, USelectableRoleHolder> _tracker;
+
+        private Dictionary<SPlayerPreparationEntity, CharacterKeys> _characterKeys;
 
         public bool AllowRepetition { get; private set; }
         [ShowInInspector,HideInEditorMode]
@@ -30,13 +31,16 @@ namespace CharacterSelector
             HandleForTeamReady();
         }
 
+
+        private const int CollectionSize = EnumTeam.RoleTypesCount;
         private void Awake()
         {
             var theme = CombatThemeSingleton.RolesThemeHolder;
             Injections(theme);
 
-            _tracker = new Dictionary<USelectedCharacterHolder, USelectableRoleHolder>();
-            _characterRepetitionTracker = new Dictionary<SCharacterLoreHolder, int>();
+            _characterKeys = new Dictionary<SPlayerPreparationEntity, CharacterKeys>(CollectionSize);
+            _characterRepetitionTracker = new Dictionary<SCharacterLoreHolder, int>(CollectionSize);
+
             startRunHandler.Injection(this);
         }
 
@@ -44,18 +48,6 @@ namespace CharacterSelector
         {
             HandleForTeamReady();
         }
-
-        [ShowInInspector,DisableInEditorMode]
-        private int _selectedCharactersCount;
-        private const int SelectedCharacterCheckAmount = 4;
-        private bool IsTeamReady()
-        {
-            if (_selectedCharactersCount == SelectedCharacterCheckAmount && AllowRepetition) return true;
-
-            return _characterRepetitionTracker.Count == SelectedCharacterCheckAmount;
-        }
-
-
         private void Injections(ITeamFlexStructureRead<CombatThemeHolder> theme)
         {
             var enumerable = UtilsTeam.GetEnumerable(theme, this);
@@ -67,92 +59,137 @@ namespace CharacterSelector
         }
 
 
+
+
         public void SelectCharacter(SelectedCharacterValues values)
         {
-            var characterLore = values.Key;
-            var characterPreset = values.CombatPreset;
-            var roleButton = values.Button;
+            SPlayerPreparationEntity characterPreset = values.CombatPreset;
+            SCharacterLoreHolder characterLore = values.LoreKey;
+            USelectableRoleHolder selectableButton = values.Button;
 
-            var selectionHolder = GetElement(characterPreset.GetAreaData().RoleType);
+            USelectedCharacterHolder selectedButton = GetElement(characterPreset.GetAreaData().RoleType);
+            var selectedButtonEntity = selectedButton.GetPreset();
 
-            if (_tracker.ContainsKey(selectionHolder))
+            bool isRoleAlreadySelected = selectedButtonEntity != null;
+            if (isRoleAlreadySelected)
             {
-                USelectableRoleHolder holderValue = _tracker[selectionHolder];
-                var previousKey = holderValue.GetCurrentKey();
-                TryRemoveKey(previousKey);
-                _selectedCharactersCount--;
+                RemoveCharacter(selectedButtonEntity);
 
-                holderValue.HideSelected();
-                _tracker.Remove(selectionHolder);
-
-                if (holderValue == roleButton)
-                {
-                    selectionHolder.HidePortrait();
+                bool isTheSameCharacterSelected = selectedButtonEntity == characterPreset;
+                if (isTheSameCharacterSelected)
                     return;
-                }
             }
 
-            _tracker.Add(selectionHolder, roleButton);
-            roleButton.ShowSelected();
-            SelectCharacter(selectionHolder, characterLore, characterPreset);
-        }
+            if(selectableButton) selectableButton.ShowSelected();
+            AddKeys(characterPreset, selectedButton, selectableButton, characterLore);
+            InjectCharacterInHolders(selectedButton, characterLore, characterPreset);
 
-        public void SelectCharacter(SCharacterLoreHolder key, SPlayerPreparationEntity combatPreset)
+            HandleForTeamReady();
+        }
+        private void AddKeys(
+            SPlayerPreparationEntity combatPreset,
+            USelectedCharacterHolder selectedButton,
+            USelectableRoleHolder selectableButton,
+            SCharacterLoreHolder loreKey
+        )
         {
-            var selectionHolder = GetElement(combatPreset.GetAreaData().RoleType);
-            SelectCharacter(selectionHolder,key,combatPreset);
+            var keys = new CharacterKeys(loreKey, selectableButton, selectedButton);
+            _characterKeys.Add(combatPreset, keys);
+
+            if (_characterRepetitionTracker.ContainsKey(loreKey))
+                _characterRepetitionTracker[loreKey]++;
+            else
+                _characterRepetitionTracker.Add(loreKey, 1);
         }
 
-        private void SelectCharacter(
-            USelectedCharacterHolder selectionHolder, 
+
+        private static void InjectCharacterInHolders(
+            USelectedCharacterHolder selectionHolder,
             SCharacterLoreHolder key,
             SPlayerPreparationEntity combatPreset)
         {
             selectionHolder.InjectPortrait(key.GetPortraitHolder());
             selectionHolder.InjectionEntity(combatPreset);
             selectionHolder.ShowPortrait();
+        }
 
-            AddKey(key);
-            _selectedCharactersCount++;
+
+        public void RemoveCharacter(SPlayerPreparationEntity key)
+        {
+            if(!_characterKeys.ContainsKey(key)) return;
+
+            RemoveKeys(key, out var keys);
+            var selectableHolder = keys.SelectableButtonKey;
+            var selectedHolder = keys.SelectedButtonKey;
+            RemoveCharacterInHolders(key, selectableHolder, selectedHolder);
+
             HandleForTeamReady();
         }
-
-        private void AddKey(SCharacterLoreHolder key)
+        private void RemoveKeys(SPlayerPreparationEntity preset, out CharacterKeys keys)
         {
-            if (_characterRepetitionTracker.ContainsKey(key))
+            keys = _characterKeys[preset];
+            var loreKey = keys.LoreKey;
+            _characterKeys.Remove(preset);
+            TryRemoveLoreKey();
+
+            void TryRemoveLoreKey()
             {
-                _characterRepetitionTracker[key]++;
-                return;
+                if (!_characterRepetitionTracker.ContainsKey(loreKey)) return;
+
+
+                int selectedAmount = _characterRepetitionTracker[loreKey];
+                var shouldRemove = selectedAmount <= 1;
+
+                if (shouldRemove)
+                    _characterRepetitionTracker.Remove(loreKey);
+                else
+                    _characterRepetitionTracker[loreKey]--;
+
+                startRunHandler.DisableControl();
             }
-            _characterRepetitionTracker.Add(key,1);
         }
-
-        private void TryRemoveKey(SCharacterLoreHolder key)
+        private static void RemoveCharacterInHolders(
+            SPlayerPreparationEntity combatPreset,
+            USelectableRoleHolder selectableHolder,
+            USelectedCharacterHolder selectionHolder
+            )
         {
-            if (!_characterRepetitionTracker.ContainsKey(key)) return;
-
-
-            int selectedAmount = _characterRepetitionTracker[key];
-            var shouldRemove = selectedAmount <= 1;
-
-            if (shouldRemove)
-                _characterRepetitionTracker.Remove(key);
-            else
-                _characterRepetitionTracker[key]--;
-
-            startRunHandler.DisableControl();
+            selectableHolder.HideSelected();
+            selectionHolder.RemoveEntity(combatPreset);
         }
 
 
-        public void DisableEntity(USelectedCharacterHolder button)
+
+
+
+
+
+        private int CalculateTrueSelectedCharactersCount()
         {
-            if(!_tracker.ContainsKey(button)) return;
+            var selectedCharactersCount = 0;
+            foreach (var pair in _characterRepetitionTracker)
+            {
+                selectedCharactersCount += pair.Value;
+            }
 
-            var key = _tracker[button];
-            key.HideSelected();
-            _tracker.Remove(button);
-            button.HidePortrait();
+            return selectedCharactersCount;
         }
+
+
+        private const int SelectedCharacterCheckAmount = 4;
+        private bool IsTeamReady()
+        {
+            if (!AllowRepetition)
+            {
+                var countWithoutRepetition = _characterRepetitionTracker.Count;
+                return countWithoutRepetition == SelectedCharacterCheckAmount;
+            }
+
+            var countWithRepetition = CalculateTrueSelectedCharactersCount();
+            return (countWithRepetition == SelectedCharacterCheckAmount);
+
+        }
+
 
         private void HandleForTeamReady()
         {
@@ -170,7 +207,7 @@ namespace CharacterSelector
         public void ConfirmTeamAndSendToSingleton()
         {
             if (!IsTeamReady())
-                throw new AccessViolationException($"Team wasn't ready - Count: [{_selectedCharactersCount}]");
+                throw new AccessViolationException($"Team wasn't ready - Count: [{CalculateTrueSelectedCharactersCount()}]");
 
             PlayerExplorationSingleton.Instance.InjectTeam(this);
         }
@@ -178,15 +215,41 @@ namespace CharacterSelector
 
         public readonly struct SelectedCharacterValues
         {
-            public readonly SCharacterLoreHolder Key;
             public readonly SPlayerPreparationEntity CombatPreset;
+            public readonly SCharacterLoreHolder LoreKey;
             public readonly USelectableRoleHolder Button;
 
-            public SelectedCharacterValues(SCharacterLoreHolder key, SPlayerPreparationEntity combatPreset, USelectableRoleHolder button)
+            public SelectedCharacterValues(
+                SPlayerPreparationEntity combatPreset, 
+                SCharacterLoreHolder loreKey,
+                USelectableRoleHolder selectableButton)
             {
-                Key = key;
                 CombatPreset = combatPreset;
-                Button = button;
+                LoreKey = loreKey;
+                Button = selectableButton;
+            }
+        }
+        private readonly struct CharacterKeys
+        {
+            public readonly SCharacterLoreHolder LoreKey;
+            public readonly USelectableRoleHolder SelectableButtonKey;
+            public readonly USelectedCharacterHolder SelectedButtonKey;
+
+
+            public CharacterKeys(SelectedCharacterValues values, USelectedCharacterHolder selectedButtonKey)
+            {
+                LoreKey = values.LoreKey;
+                SelectableButtonKey = values.Button;
+                SelectedButtonKey = selectedButtonKey;
+            }
+            public CharacterKeys(
+                SCharacterLoreHolder loreKey, 
+                USelectableRoleHolder selectableButtonKey, 
+                USelectedCharacterHolder selectedButtonKey)
+            {
+                LoreKey = loreKey;
+                SelectableButtonKey = selectableButtonKey;
+                SelectedButtonKey = selectedButtonKey;
             }
         }
     }

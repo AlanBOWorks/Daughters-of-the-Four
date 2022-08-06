@@ -21,7 +21,10 @@ namespace Utils_Project
             DoSceneTransition(SceneStructures.CharacterSelectionSceneName, showLoadScreenFromLeft, deltaModifier);
         }
 
-
+        public static void LoadExplorationScene(bool showLoadScreenFromLeft, float deltaModifier = 1)
+        {
+            DoSceneTransition(SceneStructures.MainExplorationSceneName,showLoadScreenFromLeft, deltaModifier);
+        }
 
     }
 }

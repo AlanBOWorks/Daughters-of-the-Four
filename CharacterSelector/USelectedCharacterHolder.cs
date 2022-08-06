@@ -15,7 +15,10 @@ namespace CharacterSelector
         [SerializeField] private Image characterPortraitHolder;
         [SerializeField] private Image roleIconHolder;
 
+        private USelectedCharactersHolder _holder;
+
         public void InjectIcon(Sprite icon) => roleIconHolder.sprite = icon;
+        public void Injection(USelectedCharactersHolder holder) => _holder = holder;
 
         private void Awake()
         {
@@ -52,8 +55,6 @@ namespace CharacterSelector
         }
 
 
-        private USelectedCharactersHolder _charactersHolder;
-        public void Injection(USelectedCharactersHolder holder) => _charactersHolder = holder;
 
         [ShowInInspector,InlineEditor(), HideInEditorMode]
         private SPlayerPreparationEntity _entity;
@@ -61,14 +62,23 @@ namespace CharacterSelector
         {
             _entity = entity;
         }
+
+        public void RemoveEntity(SPlayerPreparationEntity entity)
+        {
+            if (_entity != entity) throw new ArgumentException($"Removing an incorrect entity {entity}");
+            _entity = null;
+            HidePortrait();
+        }
+
         public ICombatEntityProvider GetEntityProvider() => _entity;
+        public SPlayerPreparationEntity GetPreset() => _entity;
 
         public void ShowPortrait()
         {
             characterPortraitHolder.enabled = true;
         }
 
-        public void HidePortrait()
+        private void HidePortrait()
         {
             characterPortraitHolder.enabled = false;
         }
@@ -91,7 +101,7 @@ namespace CharacterSelector
         public void OnPointerClick(PointerEventData eventData)
         {
             if(_entity == null) return;
-            _charactersHolder.DisableEntity(this);
+            _holder.RemoveCharacter(_entity);
             _entity = null;
         }
 

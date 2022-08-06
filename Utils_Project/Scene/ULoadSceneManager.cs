@@ -27,6 +27,8 @@ namespace Utils_Project.Scene
         [Title("Listeners"), ShowIf("_percentListeners")] 
         private List<IScreenLoadListener> _percentListeners;
 
+        private List<ILoadPercentListener> _loadPercentListeners;
+
         private void Awake()
         {
             gameObject.SetActive(false);
@@ -47,7 +49,17 @@ namespace Utils_Project.Scene
             _percentListeners?.Remove(listener);
         }
 
+        public void SubscribeListener(ILoadPercentListener listener)
+        {
+            if (_percentListeners == null)
+                _loadPercentListeners= new List<ILoadPercentListener>(4);
+            _loadPercentListeners.Add(listener);
+        }
 
+        public void UnSubscribeListener(ILoadPercentListener listener)
+        {
+            _loadPercentListeners?.Remove(listener);
+        }
 
         private void HandleFillFromLeft(bool isLeftFill)
         {
@@ -134,7 +146,15 @@ namespace Utils_Project.Scene
             yield return Timing.WaitForOneFrame;
             yield return Timing.WaitUntilDone(_FadeInLoadScreen(fillFromLeft,deltaModifier));
             var sceneAsync = SceneManager.LoadSceneAsync(sceneName);
-            yield return Timing.WaitUntilDone(sceneAsync);
+            while (!sceneAsync.isDone)
+            {
+                yield return Timing.WaitForOneFrame;
+                var currentLoad = sceneAsync.progress;
+                foreach (var listener in _loadPercentListeners)
+                {
+                    listener.OnPercentTick(currentLoad);
+                }
+            }
             yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fillFromLeft,deltaModifier));
             gameObject.SetActive(false);
         }
@@ -166,6 +186,10 @@ namespace Utils_Project.Scene
         void OnFillOutLoadScreenPercent(float fillPercent);
     }
 
+    public interface ILoadPercentListener
+    {
+        void OnPercentTick(float loadPercent);
+    }
 
     internal static class LoadSceneManagerSingleton
     {

@@ -8,25 +8,23 @@ using UnityEngine;
 
 namespace Utils_Project.Scene
 {
-    public class ULoadingIcon : MonoBehaviour
+    public class ULoadingIcon : MonoBehaviour, ILoadPercentListener
     {
-        [Title("Icon")]
-        [SerializeField] private MPImage loadingIcon;
-        [SerializeField, SuffixLabel("deltas")] private float iconSpeed = 2f;
+        [Title("References")] 
+        [SerializeField]private ULoadSceneManager manager;
 
-        private float _lerpAmount;
-        private bool _reverseIcon;
+        [Title("Loading")]
+        [SerializeField] private MPImage loadingIcon;
+
+        private void Awake()
+        {
+            manager.SubscribeListener(this);
+        }
+
         private IEnumerator<float> _Ticking()
         {
             while (enabled)
             {
-                if (_reverseIcon)
-                    DoDecrementAnimation();
-                else
-                    DoIncrementAnimation();
-
-                loadingIcon.fillAmount = _lerpAmount;
-
                 UpdateDotsText();
 
                 yield return Timing.WaitForOneFrame;
@@ -35,43 +33,19 @@ namespace Utils_Project.Scene
 
         private void OnEnable()
         {
-            ResetIconState();
-
             _dotsCounter = 0;
             _dotsTextCounter = 0;
+            loadingIcon.fillAmount = 0;
 
             Timing.RunCoroutine(_Ticking(), Segment.SlowUpdate);
         }
 
-        private void DoIncrementAnimation()
-        {
-            _lerpAmount += Time.deltaTime * iconSpeed;
-            if (_lerpAmount < 1) return;
 
-            FullIconState();
+        public void OnPercentTick(float loadPercent)
+        {
+            loadingIcon.fillAmount = loadPercent;
         }
 
-        private void FullIconState()
-        {
-            _lerpAmount = 1;
-            _reverseIcon = true;
-            loadingIcon.fillClockwise = false;
-        }
-
-        private void DoDecrementAnimation()
-        {
-            _lerpAmount -= Time.deltaTime * iconSpeed;
-            if (_lerpAmount > 0) return;
-
-            ResetIconState();
-        }
-
-        private void ResetIconState()
-        {
-            _lerpAmount = 0;
-            _reverseIcon = false;
-            loadingIcon.fillClockwise = true;
-        }
 
 
         [Title("Text")]
@@ -113,5 +87,6 @@ namespace Utils_Project.Scene
 
             dotsTextHolder.text = targetDotsText;
         }
+
     }
 }

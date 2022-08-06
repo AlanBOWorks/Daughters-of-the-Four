@@ -12,6 +12,7 @@ namespace Utils_Project.Scene
 #if UNITY_EDITOR
         [SerializeField] private SceneAsset mainMenuSceneAsset;
         [SerializeField] private SceneAsset characterSelectionAsset;
+        [SerializeField] private SceneAsset explorationSceneAsset;
 
 
         private static void UpdateName(SceneAsset asset, string targetName)
@@ -25,6 +26,7 @@ namespace Utils_Project.Scene
         {
             UpdateName(mainMenuSceneAsset, SceneStructures.MainMenuSceneName);
             UpdateName(characterSelectionAsset, SceneStructures.CharacterSelectionSceneName);
+            UpdateName(explorationSceneAsset, SceneStructures.MainExplorationSceneName);
         }
 #endif
     }
