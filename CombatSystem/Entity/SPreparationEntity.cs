@@ -9,25 +9,20 @@ using Utils;
 
 namespace CombatSystem.Entity
 {
-    public abstract class SPreparationEntity : ScriptableObject, ICombatEntityProvider
+    public abstract class SPreparationEntity : SPreparationEntityBase
     {
         protected const string AssetPathFolderRoot = "Assets/Prefabs/Characters";
         [SerializeField]
         private PreparationEntity preparationData = new PreparationEntity();
         internal PreparationEntity GetPreparationEntity() => preparationData;
-
-
-        public abstract string GetProviderEntityName();
-        public abstract string GetProviderEntityFullName();
-        public abstract string GetProviderShorterName();
-
+        
         public string GetLocalizableCharactersName() => GetProviderEntityName();
 
-        public abstract GameObject GetVisualPrefab();
 
-        public IBasicStatsRead<float> GetBaseStats() => preparationData.GetBaseStats();
-        public TeamAreaData GetAreaData() => preparationData.GetAreaData();
-        public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => preparationData.GetPresetSkills();
+        public override IBasicStatsRead<float> GetBaseStats() => preparationData.GetBaseStats();
+        internal BaseStats GetStats() => preparationData.GetStats();
+        public override TeamAreaData GetAreaData() => preparationData.GetAreaData();
+        public override IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => preparationData.GetPresetSkills();
 
         protected virtual string AssetPrefix() => AssetPrefixName;
         private const string AssetPrefixName = "[BASIC Preparation Entity]";
@@ -42,6 +37,17 @@ namespace CombatSystem.Entity
 
             UtilsAssets.UpdateAssetNameWithID(this,finalName);
         }
+    }
+
+    public abstract class SPreparationEntityBase : ScriptableObject, ICombatEntityProvider
+    {
+        public abstract IBasicStatsRead<float> GetBaseStats();
+        public abstract TeamAreaData GetAreaData();
+        public abstract string GetProviderEntityName();
+        public abstract string GetProviderEntityFullName();
+        public abstract string GetProviderShorterName();
+        public abstract GameObject GetVisualPrefab();
+        public abstract IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills();
     }
 
     [Serializable]
@@ -61,18 +67,12 @@ namespace CombatSystem.Entity
 
 
         public IBasicStatsRead<float> GetBaseStats() => baseStats;
+        internal BaseStats GetStats() => baseStats;
         public TeamAreaData GetAreaData() => Team.UtilsTeam.GenerateAreaData(role);
         public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => skills;
 
 
-        [Serializable]
-        private class BaseStats : StatsBase<float>
-        {
-            public BaseStats() : base(0)
-            {
-                
-            }
-        }
+        
         [Serializable]
         private sealed class EntitySkills : IStanceStructureRead<IReadOnlyCollection<IFullSkill>>
         {

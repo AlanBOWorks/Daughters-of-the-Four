@@ -19,12 +19,15 @@ namespace CombatSystem.Stats
     public interface IStatsRead<out T> : IMainStatsRead<T>, IBasicStatsRead<T>
     { }
 
+    public interface IBasicStats : IBasicStats<float>, 
+        IOffensiveStats, ISupportStats,
+        IVitalityStats, IConcentrationStats
+    { }
+
     public interface IBasicStats<T> : IBasicStatsInject<T>, IBasicStatsRead<T>, 
         IOffensiveStats<T>, ISupportStats<T>,
         IVitalityStats<T>, IConcentrationStats<T>
-    {
-
-    }
+    { }
 
     public interface IBasicStatsRead<out T> : 
         IOffensiveStatsRead<T>, ISupportStatsRead<T>,
@@ -45,6 +48,8 @@ namespace CombatSystem.Stats
         new T ConcentrationStatType { get; set; }
     }
 
+
+    public interface IOffensiveStats : IOffensiveStats<float> { }
     public interface IOffensiveStats<T> : IOffensiveStatsRead<T>, IOffensiveStatsInject<T>
     {
         new T AttackType { get; set; }
@@ -53,6 +58,7 @@ namespace CombatSystem.Stats
         new T FollowUpType { get; set; }
     }
 
+    public interface ISupportStats : ISupportStats<float> { }
     public interface ISupportStats<T> : ISupportStatsRead<T>, ISupportStatsInject<T>
     {
         new T HealType { get; set; }
@@ -61,6 +67,7 @@ namespace CombatSystem.Stats
         new T ReceiveBuffType { get; set; }
     }
 
+    public interface IVitalityStats : IVitalityStats<float>{ }
     public interface IVitalityStats<T> : IVitalityStatsRead<T>, IVitalityStatsInject<T>
     {
         new T HealthType { get; set; }
@@ -69,6 +76,7 @@ namespace CombatSystem.Stats
         new T DeBuffResistanceType { get; set; }
     }
 
+    public interface IConcentrationStats : IConcentrationStats<float> { }
     public interface IConcentrationStats<T> : IConcentrationStatsRead<T>, IConcentrationStatsInject<T>
     {
         new T ActionsType { get; set; }

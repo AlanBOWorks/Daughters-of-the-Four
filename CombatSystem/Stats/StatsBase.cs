@@ -310,4 +310,190 @@ namespace CombatSystem.Stats
             luckType = new T();
         }
     }
+
+    [Serializable]
+    public class ReferencedMainStatsBase : IBasicStats
+    {
+        [SerializeReference] private IOffensiveStats offensiveStats;
+        [SerializeReference] private ISupportStats supportStats;
+        [SerializeReference] private IVitalityStats vitalityStats;
+        [SerializeReference] private IConcentrationStats concentrationStats;
+
+        public IOffensiveStats OffensiveStats
+        {
+            get => offensiveStats;
+            set => offensiveStats = value;
+        }
+
+        public ISupportStats SupportStats
+        {
+            get => supportStats;
+            set => supportStats = value;
+        }
+
+        public IVitalityStats VitalityStats
+        {
+            get => vitalityStats;
+            set => vitalityStats = value;
+        }
+
+        public IConcentrationStats ConcentrationStats
+        {
+            get => concentrationStats;
+            set => concentrationStats = value;
+        }
+
+        public float AttackType { get => offensiveStats.AttackType; set => offensiveStats.AttackType = value; }
+        public float OverTimeType { get => offensiveStats.OverTimeType; set => offensiveStats.OverTimeType = value; }
+        public float DeBuffType { get => offensiveStats.DeBuffType; set => offensiveStats.DeBuffType = value; }
+        public float FollowUpType { get => offensiveStats.FollowUpType; set => offensiveStats.FollowUpType = value; }
+
+        public float HealType { get => supportStats.HealType; set => supportStats.HealType = value; }
+        public float ShieldingType { get => supportStats.ShieldingType; set => supportStats.ShieldingType = value; }
+        public float BuffType { get => supportStats.BuffType; set => supportStats.BuffType = value; }
+        public float ReceiveBuffType { get => supportStats.ReceiveBuffType; set => supportStats.ReceiveBuffType = value; }
+
+        public float HealthType { get => vitalityStats.HealthType; set => vitalityStats.HealthType = value; }
+        public float MortalityType { get => vitalityStats.MortalityType; set => vitalityStats.MortalityType = value; }
+        public float DamageReductionType { get => vitalityStats.DamageReductionType; set => vitalityStats.DamageReductionType = value; }
+        public float DeBuffResistanceType { get => vitalityStats.DeBuffResistanceType; set => vitalityStats.DeBuffResistanceType = value; }
+
+        public float ActionsType { get => concentrationStats.ActionsType; set => concentrationStats.ActionsType= value; }
+        public float SpeedType { get => concentrationStats.SpeedType; set => concentrationStats.SpeedType = value; }
+        public float ControlType { get => concentrationStats.ControlType; set => concentrationStats.ControlType = value; }
+        public float CriticalType { get => concentrationStats.CriticalType; set => concentrationStats.CriticalType = value; }
+    }
+
+    [Serializable]
+    public class BaseStats : StatsBase<float>, IBasicStats
+    {
+        public BaseStats() : base(0)
+        {
+
+        }
+    }
+
+    public class OffensiveStats<T> : IOffensiveStats<T>
+    {
+        [SerializeField, LabelWidth(100)] protected T attackType;
+        [SerializeField, LabelWidth(100)] protected T overTimeType;
+        [SerializeField, LabelWidth(100)] protected T deBuffType;
+        [SerializeField, LabelWidth(100)] protected T followUpType;
+
+        public T AttackType
+        {
+            get => attackType;
+            set => attackType = value;
+        }
+        public T OverTimeType
+        {
+            get => overTimeType;
+            set => overTimeType = value;
+        }
+        public T DeBuffType
+        {
+            get => deBuffType;
+            set => deBuffType = value;
+        }
+        public T FollowUpType
+        {
+            get => followUpType;
+            set => followUpType = value;
+        }
+    }
+    [Serializable]
+    public class OffensiveStats : OffensiveStats<float>, IOffensiveStats { }
+
+    public class SupportStats<T> : ISupportStats<T>
+    {
+        [SerializeField, LabelWidth(100)] protected T healType;
+        [SerializeField, LabelWidth(100)] protected T shieldingType;
+        [SerializeField, LabelWidth(100)] protected T buffType;
+        [SerializeField, LabelWidth(100)] protected T receiveBuffType;
+
+        public T HealType
+        {
+            get => healType;
+            set => healType = value;
+        }
+        public T ShieldingType
+        {
+            get => shieldingType;
+            set => shieldingType = value;
+        }
+        public T BuffType
+        {
+            get => buffType;
+            set => buffType = value;
+        }
+        public T ReceiveBuffType
+        {
+            get => receiveBuffType;
+            set => receiveBuffType = value;
+        }
+    }
+    [Serializable]
+    public class SupportStats : SupportStats<float>, ISupportStats { }
+
+
+    public class VitalityStats<T> : IVitalityStats<T>
+    {
+        [SerializeField, LabelWidth(100)] protected T healthType;
+        [SerializeField, LabelWidth(100)] protected T mortalityType;
+        [SerializeField, LabelWidth(100)] protected T damageReductionType;
+        [SerializeField, LabelWidth(100)] protected T deBuffResistanceType;
+        public T HealthType
+        {
+            get => healthType;
+            set => healthType = value;
+        }
+        public T MortalityType
+        {
+            get => mortalityType;
+            set => mortalityType = value;
+        }
+        public T DamageReductionType
+        {
+            get => damageReductionType;
+            set => damageReductionType = value;
+        }
+        public T DeBuffResistanceType
+        {
+            get => deBuffResistanceType;
+            set => deBuffResistanceType = value;
+        }
+    }
+    [Serializable]
+    public class VitalityStats : VitalityStats<float>, IVitalityStats { }
+
+    public class ConcentrationStats<T> : IConcentrationStats<T>
+    {
+
+        [SerializeField, LabelWidth(100)] protected T actionsType;
+        [SerializeField, LabelWidth(100)] protected T speedType;
+        [SerializeField, LabelWidth(100)] protected T controlType;
+        [SerializeField, LabelWidth(100)] protected T luckType;
+        public T ActionsType
+        {
+            get => actionsType;
+            set => actionsType = value;
+        }
+        public T SpeedType
+        {
+            get => speedType;
+            set => speedType = value;
+        }
+        public T ControlType
+        {
+            get => controlType;
+            set => controlType = value;
+        }
+        public T CriticalType
+        {
+            get => luckType;
+            set => luckType = value;
+        }
+    }
+    [Serializable]
+    public class ConcentrationStats : ConcentrationStats<float>, IConcentrationStats { }
 }

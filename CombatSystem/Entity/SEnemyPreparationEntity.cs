@@ -7,11 +7,13 @@ namespace CombatSystem.Entity
         fileName = "N " + AssetPrefixName)]
     public class SEnemyPreparationEntity : SPreparationEntity
     {
-        private const string AssetPrefixName = "[ENEMY Preparation Entity]";
+        public const string AssetPrefixName = "[ENEMY Preparation Entity]";
         private const string NullName = "NULL";
+        public const string EnemiesAssetPathFolder = AssetPathFolderRoot + "/Enemies/";
+
         [Title("Prefabs")]
         [SerializeField, AssetsOnly, PreviewField(ObjectFieldAlignment.Left),
-         AssetSelector(Paths = AssetPathFolderRoot + "/Enemies/")]
+         AssetSelector(Paths = EnemiesAssetPathFolder)]
         private GameObject instantiationObject;
 
         [Title("Names")]
@@ -22,5 +24,7 @@ namespace CombatSystem.Entity
         public override string GetProviderEntityFullName() => entityFullName;
         public override string GetProviderShorterName() => shorterName;
         public override GameObject GetVisualPrefab() => instantiationObject;
+
+
     }
 }

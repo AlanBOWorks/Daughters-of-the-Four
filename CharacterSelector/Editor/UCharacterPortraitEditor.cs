@@ -9,39 +9,54 @@ namespace CharacterSelector.Editor
 {
     public class UCharacterPortraitEditor : MonoBehaviour
     {
+#if UNITY_EDITOR
         [SerializeField] private USelectableCharacterHolder selectableHolder;
         [SerializeField] private USelectedCharacterHolder facePortraitHolder;
 
         [Title("Asset")]
-        [SerializeField, InlineEditor()] 
+        [SerializeField, InlineEditor()]
         private SCharacterLoreHolder preset;
 
-        [ShowInInspector, ShowIf("_presetHolder")]
-        private ICharacterPortraitHolder _presetHolder;
+        [SerializeReference]
+        private ICharacterPortraitHolder _portraitReference = null;
+
 
         private void OnValidate()
         {
-            if(preset == null) return;
-            _presetHolder = preset.GetPortraitHolder();
+            if (preset == null) return;
 
-            if(!_presetHolder.GetCharacterPortraitImage()) return;
+            var presetReference = preset.GetPortraitHolder();
+            if (presetReference != null && _portraitReference != presetReference) 
+                _portraitReference = presetReference;
 
-            HandleSelectedCharacterPortrait(_presetHolder);
-            HandleSelectableCharacterPortrait(_presetHolder);
+            if (!_portraitReference.GetCharacterPortraitImage()) return;
+
+            HandleSelectedCharacterPortrait(_portraitReference);
+            HandleSelectableCharacterPortrait(_portraitReference);
         }
 
         private void HandleSelectedCharacterPortrait(ICharacterPortraitHolder holder)
         {
             var portrait = holder.GetCharacterPortraitImage();
             var point = holder.FacePivotPosition;
-            facePortraitHolder.InjectPortrait(portrait,point);
+            facePortraitHolder.InjectPortrait(portrait, point);
         }
 
         private void HandleSelectableCharacterPortrait(ICharacterPortraitHolder holder)
         {
+            if (selectableHolder == null) return;
+
             var portrait = holder.GetCharacterPortraitImage();
             var point = holder.SelectCharacterPivotPosition;
-            selectableHolder.InjectPortrait(portrait,point);
+                selectableHolder.InjectPortrait(portrait, point);
         }
+
+        [Button, ShowIf("_portraitReference")]
+        private void ReferenceToNull()
+        {
+            _portraitReference = null;
+        }
+
+#endif    
     }
 }
