@@ -6,6 +6,7 @@ using CombatSystem.Stats;
 using SCharacterCreator.Bones;
 using TMPro;
 using UnityEngine;
+using Utils_Project;
 
 namespace CombatSystem.Player.UI
 {
@@ -91,7 +92,7 @@ namespace CombatSystem.Player.UI
 
             public void UpdateLuckAmount(float luckPercent)
             {
-                string luckText = LocalizeEffects.LocalizePercentValueWithDecimals(luckPercent);
+                string luckText = LocalizeMath.LocalizePercentValueWithDecimals(luckPercent);
                 luckTextHolder.text = luckText;
             }
         }

@@ -10,6 +10,7 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using Utils;
+using Utils_Project;
 
 namespace CombatSystem.Player.UI
 {
@@ -90,7 +91,7 @@ namespace CombatSystem.Player.UI
             {
                 if(skill == null || stats == null)
                 {
-                    digitText = LocalizeEffects.LocalizeMathfValue(effectValue,isPercentSuffix);
+                    digitText = LocalizeMath.LocalizeMathfValue(effectValue,isPercentSuffix);
                 }
                 else
                 {
@@ -99,7 +100,7 @@ namespace CombatSystem.Player.UI
                     float skillLuck = skill.LuckModifier;
                     float statsLuck = UtilsStatsFormula.CalculateLuckAmount(stats);
                     float highValue = effectValue * (1+ skillLuck * statsLuck);
-                    digitText = LocalizeEffects.LocalizeMathfValue(effectValue,highValue,isPercentSuffix);
+                    digitText = LocalizeMath.LocalizeMathfValue(effectValue,highValue,isPercentSuffix);
                 }
             }
 

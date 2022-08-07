@@ -11,7 +11,7 @@ namespace CombatSystem.Player.Handlers
     public sealed class PlayerPerformerSwitcher : 
         ICombatPreparationListener, 
         ITempoEntityMainStatesListener, ITempoEntityActionStatesListener ,
-        ITempoControlStatesListener, ITempoControlStatesExtraListener
+        ITempoControlStatesListener
     {
         private IReadOnlyList<CombatEntity> _allEntities;
         private CombatEntity _lastPerformer;
@@ -157,15 +157,6 @@ namespace CombatSystem.Player.Handlers
         }
 
         public void OnEntityFinishSequence(CombatEntity entity, bool isForcedByController)
-        {
-        }
-
-        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
-        {
-            
-        }
-
-        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
         }
 

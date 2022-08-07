@@ -9,6 +9,7 @@ using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Utils_Project;
 
 namespace CombatSystem.Skills
 {
@@ -102,7 +103,7 @@ namespace CombatSystem.Skills
             }
             public string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
             {
-                return LocalizeEffects.LocalizePercentValue(effectValue);
+                return LocalizeMath.LocalizePercentValue(effectValue);
             }
 
             public float CalculateEffectByStatValue(CombatStats performerStats, float effectValue)

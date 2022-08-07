@@ -1,4 +1,5 @@
 using System;
+using Utils.Maths;
 
 namespace CombatSystem.Stats
 {
@@ -295,5 +296,23 @@ namespace CombatSystem.Stats
             stats.ActionsType += percentValue * ActionAmountModifier;
         }
 
+    }
+
+
+    public static class UtilsVitality
+    {
+        public static void ExtractVitalityValues(CombatStats stats, 
+            out PercentValue health,
+            out PercentValue mortality)
+        {
+            var currentHealth = stats.CurrentHealth;
+            var currentMortality = stats.CurrentMortality;
+
+            float maxHealth = UtilsStatsFormula.CalculateMaxHealth(stats);
+            float maxMortality = UtilsStatsFormula.CalculateMaxMortality(stats);
+
+            health = new PercentValue(currentHealth, maxHealth);
+            mortality = new PercentValue(currentMortality, maxMortality);
+        }
     }
 }

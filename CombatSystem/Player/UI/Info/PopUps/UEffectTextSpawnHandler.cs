@@ -9,6 +9,7 @@ using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Utils;
+using Utils_Project;
 using Random = UnityEngine.Random;
 
 namespace CombatSystem.Player.UI
@@ -110,7 +111,7 @@ namespace CombatSystem.Player.UI
         {
             var effect = queueValues.Effect;
             var effectValue = queueValues.EffectValue;
-            var popUpText = LocalizeEffects.LocalizeMathfValue(effectValue,effect.IsPercentSuffix());
+            var popUpText = LocalizeMath.LocalizeMathfValue(effectValue,effect.IsPercentSuffix());
             if (effect is IBuffEffect buffEffect)
             {
                 HandleStatVariationEffect(buffEffect, false);

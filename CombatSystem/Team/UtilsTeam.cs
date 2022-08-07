@@ -671,6 +671,35 @@ namespace CombatSystem.Team
             yield return new KeyValuePair<TKey, TValue>(keys.AttackingStance,values.AttackingStance);
             yield return new KeyValuePair<TKey, TValue>(keys.SupportingStance,values.SupportingStance);
         }
+
+
+
+
+
+
+
+        //////////////// SETTERS /////////////////
+
+        public static void Injection<T>(ITeamFlexStructureInject<T> structure, T element, EnumTeam.Role type)
+        {
+            switch (type)
+            {
+                case EnumTeam.Role.Vanguard:
+                    structure.VanguardType = element;
+                    break;
+                case EnumTeam.Role.Attacker:
+                    structure.AttackerType = element;
+                    break;
+                case EnumTeam.Role.Support:
+                    structure.SupportType = element;
+                    break;
+                case EnumTeam.Role.Flex:
+                    structure.FlexType = element;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
     }
 
     public static class UtilsCombatTeam

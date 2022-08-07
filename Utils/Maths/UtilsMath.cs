@@ -28,4 +28,23 @@ namespace Utils.Maths
         }
 
     }
+
+
+    public readonly struct PercentValue
+    {
+        public readonly float MaxValue;
+        public readonly float CurrentValue;
+        public readonly float UnitPercentValue;
+
+        public PercentValue(float currentValue, float maxValue)
+        {
+            MaxValue = maxValue;
+            CurrentValue = currentValue;
+
+            if (maxValue != 0)
+                UnitPercentValue = currentValue / maxValue;
+            else
+                UnitPercentValue = 0;
+        }
+    }
 }

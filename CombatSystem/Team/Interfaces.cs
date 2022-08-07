@@ -16,6 +16,14 @@ namespace CombatSystem.Team
         T EnemyTeamType { get; }
     }
 
+    public interface ITeamFlexStructure<T> : ITeamFlexStructureRead<T>, ITeamFlexStructureInject<T>
+    {
+        new T VanguardType { get; set; }
+        new T AttackerType { get; set; }
+        new T SupportType { get; set; }
+        new T FlexType { get; set; }
+    }
+
     public interface ITeamFullStructureRead<out T> : ITeamFlexStructureRead<T>, ITeamOffStructureRead<T> 
     { }
 

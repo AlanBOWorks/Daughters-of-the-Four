@@ -5,18 +5,18 @@ using MEC;
 using SCharacterCreator.Bones;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace CombatSystem.Player.UI
 {
-    public class UUIHoverEntityHolder : UUIHoverEntityBase, IEntityExistenceElement<UUIHoverEntityHolder>
+    public sealed class UUIHoverEntityHolder : UUIHoverEntityBase, IEntityExistenceElement<UUIHoverEntityHolder>,
+        IPointerEnterHandler, IPointerExitHandler
     {
         [Title("References")]
         [SerializeField] private UTargetButton targetButton;
-        [SerializeField] private UVitalityInfo healthInfo;
         [SerializeField] private GameObject hoverFeedbackHolder;
 
         public UTargetButton GetTargetButton() => targetButton;
-        public UVitalityInfo GetHealthInfo() => healthInfo;
         public GameObject GetHoverFeedbackHolder() => hoverFeedbackHolder;
 
         protected override Transform GetFollowTransform(ICombatEntityBody body)
@@ -24,24 +24,23 @@ namespace CombatSystem.Player.UI
             return body.PivotRootType;
         }
 
-        private const float DynamicPointPercent = .1f;
-        private Vector3 _canvasAnchorPoint;
-
-
-        public void InjectAnchorPosition(Vector2 point)
+        public void OnPointerEnter(PointerEventData eventData)
         {
-            _canvasAnchorPoint = point;
+            KeepTrackPosition = false;
         }
-        protected override Vector3 CalculateScreenPoint()
+
+        public void OnPointerExit(PointerEventData eventData)
         {
-            var transformPoint = base.CalculateScreenPoint();
-            return Vector3.LerpUnclamped(_canvasAnchorPoint, transformPoint, DynamicPointPercent);
+            KeepTrackPosition = true;
         }
     }
 
     public abstract class UUIHoverEntityBase : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityBase>
     {
         protected abstract Transform GetFollowTransform(ICombatEntityBody body);
+
+        [NonSerialized]
+        public bool KeepTrackPosition;
 
         public virtual void EntityInjection(CombatEntity entity)
         {
@@ -78,6 +77,7 @@ namespace CombatSystem.Player.UI
         private void Awake()
         {
             _rectTransform = (RectTransform)transform;
+            KeepTrackPosition = true;
         }
         private void OnEnable()
         {
@@ -86,7 +86,8 @@ namespace CombatSystem.Player.UI
 
         private void LateUpdate()
         {
-            _rectTransform.position = CalculateScreenPoint();
+            if(KeepTrackPosition)
+                _rectTransform.position = CalculateScreenPoint();
         }
 
         protected virtual Vector3 GetTargetPosition()

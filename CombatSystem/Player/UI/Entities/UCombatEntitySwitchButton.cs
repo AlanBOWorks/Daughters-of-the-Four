@@ -17,6 +17,7 @@ namespace CombatSystem.Player.UI
         [ShowInInspector,HideInEditorMode]
         private CombatEntity _user;
 
+        public Image GetIconHolder() => iconHolder;
 
         public void Injection(in CombatEntity entity) => _user = entity;
 

@@ -46,7 +46,6 @@ namespace CombatSystem.Player.UI
 
             _buttonsDictionary.Add(entity, targetButton);
             targetButton.Inject(entity);
-            targetButton.Inject(this);
             targetButton.HideInstantly();
         }
 

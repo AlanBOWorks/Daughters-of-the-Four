@@ -301,6 +301,12 @@ namespace CombatSystem._Core
             OnTempoStartControl(controller, firstEntity);
         }
 
+        public void LateOnAllActorsNoActions(CombatEntity lastActor)
+        {
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+                eventsHolder.LateOnAllActorsNoActions(lastActor);
+        }
+
         public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable) 
@@ -311,6 +317,8 @@ namespace CombatSystem._Core
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnAllActorsNoActions(lastActor);
+
+            LateOnAllActorsNoActions(lastActor);
         }
 
 
@@ -1247,6 +1255,14 @@ namespace CombatSystem._Core
             foreach (var listener in _tempoExtraTeamListeners)
             {
                 listener.OnTempoPreStartControl(controller, firstEntity);
+            }
+        }
+
+        public void LateOnAllActorsNoActions(CombatEntity lastActor)
+        {
+            foreach (var listener in _tempoExtraTeamListeners)
+            {
+                listener.LateOnAllActorsNoActions(lastActor);
             }
         }
 

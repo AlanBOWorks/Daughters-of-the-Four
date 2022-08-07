@@ -3,6 +3,7 @@ using CombatSystem.Localization;
 using CombatSystem.Stats;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Utils_Project;
 
 namespace CombatSystem.Skills.Effects
 {
@@ -24,7 +25,7 @@ namespace CombatSystem.Skills.Effects
         {
             effectValue = CalculateEffectByStatValue(performerStats, effectValue);
 
-            var effectTooltip = LocalizeEffects.LocalizeMathfValue(effectValue, IsPercentSuffix());
+            var effectTooltip = LocalizeMath.LocalizeMathfValue(effectValue, IsPercentSuffix());
             return " <b>" + effectTooltip + "</b>";
         }
         public abstract bool IsPercentSuffix();

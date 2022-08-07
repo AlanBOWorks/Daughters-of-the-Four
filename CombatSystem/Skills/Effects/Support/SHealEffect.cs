@@ -4,6 +4,7 @@ using CombatSystem.Entity;
 using CombatSystem.Localization;
 using CombatSystem.Stats;
 using UnityEngine;
+using Utils_Project;
 
 namespace CombatSystem.Skills.Effects
 {
@@ -24,7 +25,7 @@ namespace CombatSystem.Skills.Effects
 
         public override string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
         {
-            return LocalizeEffects.LocalizePercentValueWithDecimals(CalculateEffectByStatValue(performerStats, effectValue));
+            return LocalizeMath.LocalizePercentValueWithDecimals(CalculateEffectByStatValue(performerStats, effectValue));
         }
 
 

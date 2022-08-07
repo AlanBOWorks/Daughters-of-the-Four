@@ -145,6 +145,11 @@ namespace CombatSystem.Player.UI
             if(controller.ControllingTeam.VanguardEffectsHolder.IsMainEntityTurn())
                 ResetHandlerStates();
         }
+
+        public void LateOnAllActorsNoActions(CombatEntity lastActor)
+        {
+        }
+
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
         }

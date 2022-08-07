@@ -2,6 +2,7 @@ using System;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Stats;
 using Sirenix.OdinInspector;
+using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
 using Utils;
@@ -11,10 +12,11 @@ namespace CombatSystem.Player.UI
     [CreateAssetMenu(fileName = AssetName, menuName = "Combat/Holders/Combat Theme")]
     public class SCombatThemeHolder : ScriptableObject
     {
-        private const string Path = "Assets/ScriptableObjects/Globals/Theme/";
+        private const string Path = GlobalThemeAssets.AssetFolderPath;
         private const string AssetName = "MainTheme [Theme Holder]";
-        private const string AssetPath = Path + AssetName + ".asset";
+        private const string AssetPath = Path + EditorsName;
 
+        public const string EditorsName = AssetName + ".asset";
 
         [SerializeField, InlineEditor()] private SCombatRolesThemesHolder rolesThemesHolder;
         [SerializeField, InlineEditor()] private SStatsThemeHolder statsThemeHolder;
@@ -47,4 +49,5 @@ namespace CombatSystem.Player.UI
             AssetDatabase.LoadAssetAtPath<SCombatThemeHolder>(AssetPath);
         }
     }
+
 }

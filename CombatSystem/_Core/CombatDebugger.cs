@@ -86,6 +86,12 @@ namespace CombatSystem._Core
         {
         }
 
+        public void LateOnAllActorsNoActions(CombatEntity lastActor)
+        {
+            if (!ShowTeamLogs || !_teamLogs.OnFinishActors) return;
+            Debug.Log($"Finish all Actors: {lastActor.CombatCharacterName}");
+        }
+
         public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
             if (!ShowTeamLogs || !_teamLogs.OnStartControl) return;
@@ -99,12 +105,6 @@ namespace CombatSystem._Core
             Debug.Log($"Pre-Finish all Actors: {lastActor.CombatCharacterName}");
         }
 
-        public void OnControlFinishAllActors(CombatEntity lastActor)
-        {
-            if (!ShowTeamLogs || !_teamLogs.OnFinishActors) return;
-            Debug.Log($"Finish all Actors: {lastActor.CombatCharacterName}");
-
-        }
 
         public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {

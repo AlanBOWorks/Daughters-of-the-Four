@@ -138,6 +138,11 @@ namespace CombatSystem.Player
         {
         }
 
+        public void LateOnAllActorsNoActions(CombatEntity lastActor)
+        {
+            
+        }
+
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             OnControlFinish();

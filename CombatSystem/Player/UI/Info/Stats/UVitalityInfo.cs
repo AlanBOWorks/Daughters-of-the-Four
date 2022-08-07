@@ -19,21 +19,12 @@ namespace CombatSystem.Player.UI
         [SerializeField] private TextMeshProUGUI entityNameText;
         [InfoBox("Shield text parent will be deActivated", InfoMessageType.Warning)]
         [SerializeField] private TextMeshProUGUI shieldsText;
-        [SerializeField] private VitalityInfoHolder healthInfoHolder = new VitalityInfoHolder();
-        [SerializeField] private VitalityInfoHolder mortalityInfoHolder = new VitalityInfoHolder();
+        [SerializeField] private UPercentBarInfo healthInfoHolder;
+        [SerializeField] private UPercentBarInfo mortalityInfoHolder;
         [Title("KnockOut")]
-        [SerializeField] private VitalityInfoHolder knockOutInfoHolder = new VitalityInfoHolder();
+        [SerializeField] private UPercentBarInfo knockOutInfoHolder;
         [SerializeField] private GameObject knockOutHolder;
-
-
-        private void Awake()
-        {
-            healthInfoHolder.Awake();
-            mortalityInfoHolder.Awake();
-            knockOutInfoHolder.Awake();
-        }
-
-
+        
         private CombatStats _currentStats;
 
         public void EntityInjection(CombatEntity entity)
@@ -150,12 +141,12 @@ namespace CombatSystem.Player.UI
 
         public void UpdateHealth(float amount, float max)
         {
-            healthInfoHolder.UpdateHealth(amount, max);
+            healthInfoHolder.UpdateInfo(amount, max);
         }
 
         public void UpdateMortality(float amount, float max)
         {
-            mortalityInfoHolder.UpdateHealth(amount, max);
+            mortalityInfoHolder.UpdateInfo(amount, max);
         }
 
 
@@ -177,52 +168,10 @@ namespace CombatSystem.Player.UI
             if(!knockOutHolder) return;
 
             float tick = KnockOutThreshold - currentTick;
-            knockOutInfoHolder.UpdateHealth(tick, KnockOutThreshold);
+            knockOutInfoHolder.UpdateInfo(tick, KnockOutThreshold);
         }
 
 
-        [Serializable]
-        private sealed class VitalityInfoHolder
-        {
-            [SerializeField] private TextMeshProUGUI currentValueText;
-            [SerializeField] private TextMeshProUGUI maxValueText;
-            [SerializeField] private RectTransform percentBar;
-
-            private float _barMaxWidth;
-
-          
-
-            public void Awake()
-            {
-                if(!percentBar) return;
-                _barMaxWidth = percentBar.sizeDelta.x;
-            }
-
-            public void UpdateHealth(float customAmountText, float amount, float max)
-            {
-                float percent = amount / max;
-                UpdatePercentBar(percent);
-
-                if (currentValueText)
-                    currentValueText.text = customAmountText.ToString("####");
-                if (maxValueText)
-                    maxValueText.text = max.ToString("####");
-            }
-
-            public void UpdateHealth(float amount, float max)
-            {
-                UpdateHealth(amount,amount,max);
-            }
-            private void UpdatePercentBar(float percent)
-            {
-                if(!percentBar) return;
-
-                var sizeDelta = percentBar.sizeDelta;
-                sizeDelta.x = _barMaxWidth * percent;
-                percentBar.sizeDelta = sizeDelta;
-            }
-
-        }
 
     }
 }

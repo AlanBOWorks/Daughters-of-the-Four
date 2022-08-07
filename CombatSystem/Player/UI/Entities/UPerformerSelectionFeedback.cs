@@ -36,18 +36,18 @@ namespace CombatSystem.Player.UI
             Show();
 
             var buttons = switcherHandler.GetDictionary();
-            ;
-            var targetButton = buttons[performer];
-            SwitchFocus(focusIcon,targetButton);
+            
+            UCombatEntitySwitchButton targetButton = buttons[performer];
+            DoIconAnimation(focusIcon,targetButton.GetIconHolder());
         }
 
         public void OnTeamStancePreviewSwitch(EnumTeam.StanceFull targetStance)
         {
         }
 
-        public void OnSwitchButtonHover(Image onIcon)
+        public void OnSwitchButtonHover(Transform onIcon)
         {
-            hoverIcon.position = onIcon.transform.position;
+            DoIconAnimation(hoverIcon,onIcon);
             hoverIcon.gameObject.SetActive(true);
         }
 
@@ -56,14 +56,14 @@ namespace CombatSystem.Player.UI
             hoverIcon.gameObject.SetActive(false);
         }
 
-        private static void SwitchFocus(RectTransform hoverElement, Component targetButton)
+        private static void DoIconAnimation(Transform hoverElement, Component targetButton)
         {
             hoverElement.position = targetButton.transform.position;
             DoAnimation(hoverElement);
         }
 
         private const float AnimationDuration = .2f;
-        private static void DoAnimation(RectTransform hoverElement)
+        private static void DoAnimation(Transform hoverElement)
         {
             DOTween.Kill(hoverElement);
             

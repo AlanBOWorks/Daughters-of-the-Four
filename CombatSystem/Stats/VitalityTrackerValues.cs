@@ -235,7 +235,8 @@ namespace CombatSystem.Stats
         public T HealthValue => Health;
         public T MortalityValue => Mortality;
     }
-    
+
+
 
     public interface IVitalityValues<out T>
     {

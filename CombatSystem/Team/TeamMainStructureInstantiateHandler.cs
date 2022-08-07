@@ -11,6 +11,7 @@ namespace CombatSystem.Team
     [Serializable]
     public class TeamMainStructureInstantiateHandler<T> : FlexPositionMainGroupStructure<T> where T : MonoBehaviour
     {
+        [InfoBox("Listeners will be called in this parent")]
         [SerializeField] private Transform instantiationParent;
         [SerializeField] private T instantiationPrefab;
 
@@ -26,6 +27,21 @@ namespace CombatSystem.Team
             SupportType = OnInstantiation(2);
             FlexType = OnInstantiation(3);
 
+            var listeners
+                = instantiationParent.GetComponents<ITeamMainStructureInstantiationListener<T>>();
+            if (listeners == null) return;
+            CallListeners(VanguardType, EnumTeam.Role.Vanguard);
+            CallListeners(AttackerType, EnumTeam.Role.Attacker);
+            CallListeners(SupportType, EnumTeam.Role.Support);
+            CallListeners(FlexType, EnumTeam.Role.Flex);
+
+            void CallListeners(T element, EnumTeam.Role role)
+            {
+                foreach (var listener in listeners)
+                {
+                    listener.OnInstantiateElement(element, role);
+                }
+            }
         }
 
         protected virtual T OnInstantiation(int index)
@@ -40,4 +56,11 @@ namespace CombatSystem.Team
         }
     }
 
+    /// <summary>
+    /// Event listener called in [<see cref="TeamMainStructureInstantiateHandler{T}.InstantiateElements"/>];
+    /// </summary>
+    public interface ITeamMainStructureInstantiationListener<in T>
+    {
+        void OnInstantiateElement(T element, EnumTeam.Role role);
+    }
 }

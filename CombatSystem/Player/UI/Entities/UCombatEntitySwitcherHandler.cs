@@ -84,27 +84,35 @@ namespace CombatSystem.Player.UI
             previousShortCutAction.action.performed -= DoPerformPreviousSwitchShortcut;
         }
 
-        private const float IterationHeight = 70 + 6;
+        private const float ButtonsSeparation = 8;
         private void OnInstantiation()
         {
             ITeamFlexStructureRead<CombatThemeHolder> feedBacks 
                 = CombatThemeSingleton.RolesThemeHolder;
             var enumerable = UtilsTeam.GetEnumerable(references, feedBacks);
             int i = references.activeCount;
+
+            float iterationHeight = 0;
             foreach ((UCombatEntitySwitchButton button, CombatThemeHolder value) in enumerable)
             {
+                if (iterationHeight == 0)
+                {
+                    var buttonRectTransform = (RectTransform) button.transform;
+                    iterationHeight = buttonRectTransform.rect.height + ButtonsSeparation;
+                }
+
                 var icon = value.GetThemeIcon();
-                OnInstantiateButton(in button);
+                OnInstantiateButton(button);
                 button.Injection(in icon);
                 i--;
             }
 
-            void OnInstantiateButton(in UCombatEntitySwitchButton button)
+            void OnInstantiateButton(Component button)
             {
                 var buttonTransform = button.transform;
                 var position =
                     buttonTransform.localPosition;
-                position.y = i * IterationHeight;
+                position.y = i * iterationHeight;
                 buttonTransform.localPosition = position;
             }
         }
@@ -143,7 +151,7 @@ namespace CombatSystem.Player.UI
 
         public void OnHoverEnter(Image button)
         {
-            selectionFeedback.OnSwitchButtonHover(button);
+            selectionFeedback.OnSwitchButtonHover(button.transform);
         }
         public void OnHoverExit()
         {
@@ -253,6 +261,6 @@ namespace CombatSystem.Player.UI
        {
 
        }
-
     }
+
 }

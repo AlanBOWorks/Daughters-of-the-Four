@@ -180,6 +180,8 @@ namespace CombatSystem.Player.UI
 
         public void OnNoActionsForcedFinish(CombatEntity entity)
         {
+            if (!_dictionary.ContainsKey(entity)) return;
+            DoFinishTempo(_dictionary[entity]);
         }
 
 

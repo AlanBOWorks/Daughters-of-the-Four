@@ -6,6 +6,7 @@ using CombatSystem.Skills.Effects;
 using CombatSystem.Skills.VanguardEffects;
 using CombatSystem.Stats;
 using UnityEngine;
+using Utils_Project;
 
 namespace CombatSystem.Skills
 {
@@ -125,7 +126,7 @@ namespace CombatSystem.Skills
 
             public string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
             {
-                return LocalizeEffects.LocalizePercentValue(effectValue);
+                return LocalizeMath.LocalizePercentValue(effectValue);
             }
 
             public float CalculateEffectByStatValue(CombatStats performerStats, float effectValue)

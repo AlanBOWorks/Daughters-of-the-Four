@@ -351,6 +351,10 @@ namespace CombatSystem._Core
         /// and [<seealso cref="ITempoControlStatesListener.OnTempoStartControl"/>]
         /// </summary>
         void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity);
+
+
+        void LateOnAllActorsNoActions(CombatEntity lastActor);
+
         /// <summary>
         /// The very last call of this events; when everything was removed and invoked
         /// </summary>

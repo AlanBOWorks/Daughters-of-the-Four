@@ -6,18 +6,24 @@ using CombatSystem.Entity;
 using CombatSystem.Skills;
 using CombatSystem.Stats;
 using CombatSystem.Team;
+using MEC;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace CombatSystem.AI
 {
-    public class EnemyTeamController : CombatTeamControllerBase, ISkillUsageListener
+    public class EnemyTeamController : CombatTeamControllerBase, ISkillUsageListener,
+        ITempoControlStatesExtraListener
        
     {
         private static readonly IControllerHandler OnNullController = new RandomController();
 
         internal IControllerHandler DedicatedTeamController { set; private get; }
         private IControllerHandler GetEnemyController() => DedicatedTeamController ?? OnNullController;
+
+       
+
+
 
         public override void InvokeStartControl()
         {
@@ -57,15 +63,46 @@ namespace CombatSystem.AI
 
         public void OnCombatSkillPerform(in SkillUsageValues values)
         {
+            
         }
 
         public void OnCombatSkillFinish(CombatEntity performer)
         {
-            if(ControllingTeam.CanControl())
-                DoNextControl();
-            else
-                InvokeFinishControl();
+            Timing.RunCoroutine(_WaitForNextAction());
         }
+
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
+        {
+        }
+
+        public void LateOnAllActorsNoActions(CombatEntity lastActor)
+        {
+            Timing.RunCoroutine(_WaitForFinishAction());
+        }
+
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
+        {
+        }
+
+        // Problem: there's invoke racing with the AI submitting speed
+        // Solution: wait until is ready
+        private IEnumerator<float> _WaitForNextAction()
+        {
+            yield return Timing.WaitForOneFrame;
+            if (ControllingTeam.CanControl())
+                DoNextControl();
+        }
+        private IEnumerator<float> _WaitForFinishAction()
+        {
+            do
+            {
+                yield return Timing.WaitForOneFrame;
+
+            } while (CombatSystemSingleton.SkillQueuePerformer.IsActing());
+            
+            InvokeFinishControl();
+        }
+
 
 
 

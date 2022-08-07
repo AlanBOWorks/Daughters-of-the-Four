@@ -1,6 +1,8 @@
 using System;
 using CombatSystem.Skills.Effects;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using Utils;
 
 namespace CombatSystem.Stats
 {
@@ -20,6 +22,14 @@ namespace CombatSystem.Stats
         internal sealed class ReferenceHolder : MonoEffectStructure<GameObject>
         {
             
+        }
+
+        private const string AssetName = "PREFAB PARTICLES - Player [StatsType Holder]";
+        public const string EditorsName = AssetName + ".asset";
+        [Button]
+        private void UpdateAssetNameToEditorsName()
+        {
+            UtilsAssets.UpdateAssetName(this, AssetName);
         }
     }
 }

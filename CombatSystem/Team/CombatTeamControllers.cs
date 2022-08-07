@@ -62,6 +62,10 @@ namespace CombatSystem.Team
             _currentControl = controller;
         }
 
+        public void LateOnAllActorsNoActions(CombatEntity lastActor)
+        {
+        }
+
         public void OnTempoStartControl(CombatTeamControllerBase controller, CombatEntity firstControl)
         {
         }
