@@ -67,6 +67,14 @@ namespace Utils_Project
             value = UtilsMath.GetSimplifiedValue(value, out var valueSuffix);
             return value.ToString("####.#") + valueSuffix;
         }
+        /// <summary>
+        /// <inheritdoc cref="LocalizeArithmeticValue"/>
+        /// </summary>
+        public static string LocalizeArithmeticIntegerValue(float value)
+        {
+            value = UtilsMath.GetSimplifiedValue(value, out var valueSuffix);
+            return value.ToString("####") + valueSuffix;
+        }
 
         private const string ZeroPercentText = "0";
 

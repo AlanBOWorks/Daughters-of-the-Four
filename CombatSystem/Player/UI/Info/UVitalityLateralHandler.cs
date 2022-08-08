@@ -114,7 +114,15 @@ namespace CombatSystem.Player.UI
             var team = isPlayerHandler ? playerTeam : enemyTeam;
             foreach (var member in team.GetAllMembers())
             {
-                UpdateTarget(member);
+                FirstUpdate(member);
+            }
+
+            void FirstUpdate(CombatEntity target)
+            {
+                if (target.Team.IsPlayerTeam != isPlayerHandler) return;
+
+                var targetElement = UtilsTeam.GetElement(target.RoleType, this);
+                targetElement.FirstInjectionHealth(target);
             }
         }
 

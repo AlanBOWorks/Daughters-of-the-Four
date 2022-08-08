@@ -21,7 +21,7 @@ namespace CombatSystem.Team
     /// >>>> By adding [<seealso cref="ITeamElementSpawnListener{T}"/>] listeners will be called during elements spawning.
     /// </summary>
     public abstract class UTeamElementSpawner<T> : MonoBehaviour, ICombatStartListener, ICombatTerminationListener
-        where T: Object
+        where T: Component
 
     {
         [TitleGroup("Params")] 
@@ -168,14 +168,18 @@ namespace CombatSystem.Team
                 _offMembersDictionary = new PrefabDictionary<CombatEntity, T>();
                 _dualDictionary = new ConcatDualDictionary<CombatEntity, T>(_mainMembersDictionary,_offMembersDictionary);
 
+                _pool = new Queue<T>();
+
             }
 
+            private readonly Queue<T> _pool;
             private readonly UTeamElementSpawner<T> _spawner;
             public readonly PrefabInstantiationHandler<T> MainMembersPrefab;
             public readonly PrefabInstantiationHandler<T> OffMembersPrefab;
 
             [ShowInInspector,HideInEditorMode]
             private readonly PrefabDictionary<CombatEntity, T> _mainMembersDictionary;
+            [ShowInInspector,HideInEditorMode]
             private readonly PrefabDictionary<CombatEntity, T> _offMembersDictionary;
             private readonly ConcatDualDictionary<CombatEntity, T> _dualDictionary;
 
@@ -186,8 +190,18 @@ namespace CombatSystem.Team
 
             public void DeSpawn()
             {
-                _mainMembersDictionary.ClearDestroy();
-                _offMembersDictionary.ClearDestroy();
+                HandleDictionary(_mainMembersDictionary);
+                HandleDictionary(_offMembersDictionary);
+
+                void HandleDictionary(Dictionary<CombatEntity, T> dictionary)
+                {
+                    foreach (T element in dictionary.Values)
+                    {
+                        _pool.Enqueue(element);
+                        element.gameObject.SetActive(false);
+                    }
+                    dictionary.Clear();
+                }
             }
 
             public void HandleTeam(CombatTeam team, bool isFlexMainRole)
@@ -230,8 +244,10 @@ namespace CombatSystem.Team
                     {
                         continue;
                     }
+                    T element = _pool.Count > 0 
+                        ? _pool.Dequeue() 
+                        : handler.SpawnElement();
 
-                    var element = handler.SpawnElement();
                     dictionary.Add(member,element);
                     var creationValues = new CreationValues(member,element,i, isPlayerTeam);
                     _spawner.OnCreateElement(in creationValues);
@@ -301,7 +317,7 @@ namespace CombatSystem.Team
     /// Interfaces for being called during [<see cref="UTeamElementSpawner{T}.OnCombatPreStarts"/>]
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface ITeamElementSpawnListener<T> where T : UnityEngine.Object
+    public interface ITeamElementSpawnListener<T> where T : UnityEngine.Component
     {
         void OnElementCreated(in UTeamElementSpawner<T>.CreationValues creationValues);
         void OnAfterElementsCreated(UTeamElementSpawner<T> holder);

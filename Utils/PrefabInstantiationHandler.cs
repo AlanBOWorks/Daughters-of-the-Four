@@ -100,7 +100,7 @@ namespace Utils
 
     }
 
-    public class PrefabDictionary<TKey, TValue> : Dictionary<TKey, TValue> where TValue : Object
+    public class PrefabDictionary<TKey, TValue> : Dictionary<TKey, TValue> where TValue : Component
     {
         public void SafeRemoveKey(TKey key)
         {
@@ -113,11 +113,19 @@ namespace Utils
             Object.Destroy(element);
         }
 
-        public void ClearDestroy()
+        public void ClearDestroyGameObjects()
         {
             foreach (var element in Values)
             {
-                Object.Destroy(element);
+                string log = element.name;
+                Object.Destroy(element.gameObject);
+                if (!element)
+                    log += "removed";
+                else
+                {
+                    log += "Cant Removed";
+                }
+                Debug.Log(log);
             }
             Clear();
         }
