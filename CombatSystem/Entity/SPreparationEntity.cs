@@ -11,7 +11,7 @@ namespace CombatSystem.Entity
 {
     public abstract class SPreparationEntity : SPreparationEntityBase
     {
-        protected const string AssetPathFolderRoot = "Assets/Prefabs/Characters";
+        public const string AssetPathFolderRoot = "Assets/Prefabs/Characters";
         [SerializeField]
         private PreparationEntity preparationData = new PreparationEntity();
         internal PreparationEntity GetPreparationEntity() => preparationData;
@@ -24,9 +24,31 @@ namespace CombatSystem.Entity
         public override TeamAreaData GetAreaData() => preparationData.GetAreaData();
         public override IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => preparationData.GetPresetSkills();
 
+
+        
+    }
+
+    public abstract class SPreparationEntityBase : ScriptableObject, ICombatEntityProvider
+    {
+#if UNITY_EDITOR
+        [InfoBox("Offensive: %; %; %; %; \n" +
+                 "Support: %; %; %; %;\n" +
+                 "Vitality: u; u; %; %;\n " +
+                 "Concentration: u; u; %; %;", 
+            "_showStatsTooltips")]
+        [ShowInInspector, NonSerialized]
+        private bool _showStatsTooltips; 
+#endif
+
+
+        public abstract IBasicStatsRead<float> GetBaseStats();
+        public abstract TeamAreaData GetAreaData();
+        public abstract string GetProviderEntityName();
+        public abstract GameObject GetVisualPrefab();
+        public abstract IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills();
+
         protected virtual string AssetPrefix() => AssetPrefixName;
         private const string AssetPrefixName = "[BASIC Preparation Entity]";
-
         [Button]
         private void UpdateAssetWithRoleAndID()
         {
@@ -35,17 +57,36 @@ namespace CombatSystem.Entity
             finalName += $" - {areaData.RoleType.ToString().ToUpper()} ";
             finalName += AssetPrefix();
 
-            UtilsAssets.UpdateAssetNameWithID(this,finalName);
+            UtilsAssets.UpdateAssetNameWithID(this, finalName);
         }
-    }
 
-    public abstract class SPreparationEntityBase : ScriptableObject, ICombatEntityProvider
-    {
-        public abstract IBasicStatsRead<float> GetBaseStats();
-        public abstract TeamAreaData GetAreaData();
-        public abstract string GetProviderEntityName();
-        public abstract GameObject GetVisualPrefab();
-        public abstract IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills();
+        protected interface IEntitySkills : IStanceStructureRead<IReadOnlyCollection<IFullSkill>>
+        { }
+
+        [Serializable]
+        protected sealed class SkillsHolder : IEntitySkills
+        {
+            [SerializeField] private SSkillPreset[] attackingSkills = new SSkillPreset[0];
+            [SerializeField] private SSkillPreset[] supportingSkills = new SSkillPreset[0];
+            [SerializeField] private SSkillPreset[] defendingSkills = new SSkillPreset[0];
+
+
+            public IReadOnlyCollection<IFullSkill> AttackingStance => attackingSkills;
+            public IReadOnlyCollection<IFullSkill> SupportingStance => supportingSkills;
+            public IReadOnlyCollection<IFullSkill> DefendingStance => defendingSkills;
+        }
+
+        [Serializable]
+        protected sealed class ReferencedSkillsHolder : IEntitySkills
+        {
+            [SerializeReference] private IEntitySkills attackingSkills;
+            [SerializeReference] private IEntitySkills supportingSkills;
+            [SerializeReference] private IEntitySkills defendingSkills;
+
+            public IReadOnlyCollection<IFullSkill> AttackingStance => attackingSkills.AttackingStance;
+            public IReadOnlyCollection<IFullSkill> SupportingStance => supportingSkills.SupportingStance;
+            public IReadOnlyCollection<IFullSkill> DefendingStance => defendingSkills.DefendingStance;
+        }
     }
 
     [Serializable]
@@ -84,4 +125,6 @@ namespace CombatSystem.Entity
             public IReadOnlyCollection<IFullSkill> DefendingStance => defendingSkills;
         }
     }
+
+    
 }

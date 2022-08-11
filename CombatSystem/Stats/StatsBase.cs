@@ -314,10 +314,10 @@ namespace CombatSystem.Stats
     [Serializable]
     public class ReferencedMainStatsBase : IBasicStats
     {
-        [SerializeReference] private IOffensiveStats offensiveStats;
-        [SerializeReference] private ISupportStats supportStats;
-        [SerializeReference] private IVitalityStats vitalityStats;
-        [SerializeReference] private IConcentrationStats concentrationStats;
+        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100)] private IOffensiveStats offensiveStats;
+        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100)] private ISupportStats supportStats;
+        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100)] private IVitalityStats vitalityStats;
+        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100)] private IConcentrationStats concentrationStats;
 
         public IOffensiveStats OffensiveStats
         {

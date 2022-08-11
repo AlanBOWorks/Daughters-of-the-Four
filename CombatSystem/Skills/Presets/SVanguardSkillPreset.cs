@@ -17,7 +17,7 @@ namespace CombatSystem.Skills
         menuName = "Combat/Skill/Vanguard Preset", order = -10)]
     public class SVanguardSkillPreset : SSkillPresetBase, IVanguardSkill
     {
-        private const string VanguardAssetPrefix =  " [Vanguard Skill]";
+        protected const string VanguardAssetPrefix =  " [Vanguard Skill]";
 
         [TitleGroup("Values")]
         [SerializeField]

@@ -6,7 +6,7 @@ namespace CombatSystem.Skills
         menuName = "Combat/Skill/Support Preset", order = -8)]
     public class SSupportSkillPreset : SSkillPreset, ISupportSkill
     {
-        private const string AttackerAssetPrefix = "[Support Skill]";
+        protected const string AttackerAssetPrefix = " [Support Skill]";
         protected override string GetAssetPrefix() => AttackerAssetPrefix;
     }
 }
