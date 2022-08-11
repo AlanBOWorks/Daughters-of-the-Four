@@ -51,8 +51,6 @@ namespace CombatSystem.Player
             public IBasicStatsRead<float> GetBaseStats() => _runtimeStats;
             public TeamAreaData GetAreaData() => _preset.GetAreaData();
             public string GetProviderEntityName() => _preset.GetProviderEntityName();
-            public string GetProviderEntityFullName() => _preset.GetProviderEntityFullName();
-            public string GetProviderShorterName() => _preset.GetProviderShorterName();
             public GameObject GetVisualPrefab() => _preset.GetVisualPrefab();
             public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => this;
 

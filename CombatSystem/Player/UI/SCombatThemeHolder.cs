@@ -28,7 +28,7 @@ namespace CombatSystem.Player.UI
             UtilsAssets.UpdateAssetName(this, AssetName);
         }
 
-        private void Awake()
+        private void DoInjections()
         {
             var rolesHolder = rolesThemesHolder.GetHolder();
             CombatThemeSingleton.RolesThemeHolder = rolesHolder;
@@ -46,7 +46,8 @@ namespace CombatSystem.Player.UI
 
         public static void LoadAsset()
         {
-            AssetDatabase.LoadAssetAtPath<SCombatThemeHolder>(AssetPath);
+            var asset = AssetDatabase.LoadAssetAtPath<SCombatThemeHolder>(AssetPath);
+            asset.DoInjections();
         }
     }
 

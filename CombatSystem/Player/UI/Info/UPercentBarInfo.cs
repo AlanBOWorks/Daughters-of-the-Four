@@ -57,6 +57,7 @@ namespace CombatSystem.Player.UI
         private void OnDisable()
         {
             Timing.PauseCoroutines(_animationHandle);
+            currentValueText.text = null;
         }
 
         private void OnDestroy()

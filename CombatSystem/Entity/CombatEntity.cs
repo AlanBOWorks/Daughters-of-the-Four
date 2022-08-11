@@ -38,10 +38,6 @@ namespace CombatSystem.Entity
             // PLAYER's essentials
             CombatCharacterName = 
                 LocalizationPlayerCharacters.LocalizeCharactersName(Provider.GetProviderEntityName());
-            CombatCharacterFullName = 
-                LocalizationPlayerCharacters.LocalizeCharactersName(Provider.GetProviderEntityFullName());
-            CombatCharacterShorterName =
-                LocalizationPlayerCharacters.LocalizeCharactersName(Provider.GetProviderShorterName());
 
             // COMBAT's others
             DiceValuesHolder.RollDice();
@@ -63,8 +59,6 @@ namespace CombatSystem.Entity
         /// Localized name
         /// </summary>
         public string CombatCharacterName;
-        public string CombatCharacterFullName;
-        public string CombatCharacterShorterName;
 
         [ShowInInspector, InlineEditor()] 
         public readonly ICombatEntityProvider Provider;
@@ -316,7 +310,5 @@ namespace CombatSystem.Entity
     public interface ICombatEntityInfoHolder
     {
         string GetProviderEntityName();
-        string GetProviderEntityFullName();
-        string GetProviderShorterName();
     }
 }

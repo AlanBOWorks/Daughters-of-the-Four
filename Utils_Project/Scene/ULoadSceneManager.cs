@@ -70,12 +70,13 @@ namespace Utils_Project.Scene
 
         public bool IsLoadingScene() => _fillingCoroutineHandle.IsRunning;
         private CoroutineHandle _fillingCoroutineHandle;
-        public void DoSceneTransition(string sceneName, bool showLoadScreenFromLeft, float deltaModifier = 1)
+        public void DoSceneTransition(string sceneName, bool showLoadScreenFromLeft, bool keepAliveFromLoad = false, float deltaModifier = 1)
         {
             if(IsLoadingScene()) return;
 
+            var parameters = new LoadSceneParameters(sceneName,showLoadScreenFromLeft, keepAliveFromLoad, deltaModifier);
             _fillingCoroutineHandle =
-                Timing.RunCoroutine(_SceneSwapSequence(sceneName, showLoadScreenFromLeft, deltaModifier));
+                Timing.RunCoroutine(_SceneSwapSequence(parameters));
         }
 
         private const float FillThreshold = .98f;
@@ -140,12 +141,20 @@ namespace Utils_Project.Scene
 
         }
 
-        private IEnumerator<float> _SceneSwapSequence(string sceneName, bool fillFromLeft, float deltaModifier)
+        private IEnumerator<float> _SceneSwapSequence(LoadSceneParameters loadParameters)
         {
+            loadParameters.ExtractValues(
+                out var sceneName,
+                out var fillFromLeft, 
+                out var isAdditive,out var deltaModifier);
+
             gameObject.SetActive(true);
+
             yield return Timing.WaitForOneFrame;
             yield return Timing.WaitUntilDone(_FadeInLoadScreen(fillFromLeft,deltaModifier));
-            var sceneAsync = SceneManager.LoadSceneAsync(sceneName);
+
+            var loadSceneMode = isAdditive ? LoadSceneMode.Additive : LoadSceneMode.Single;
+            var sceneAsync = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
             while (!sceneAsync.isDone)
             {
                 yield return Timing.WaitForOneFrame;
@@ -201,6 +210,34 @@ namespace Utils_Project.Scene
             if(currentInstance) Object.Destroy(currentInstance);
 
             ManagerInstance = manager;
+        }
+    }
+
+    public readonly struct LoadSceneParameters
+    {
+        public readonly string SceneName;
+        public readonly bool ShowLoadScreenFromLeft;
+        public readonly bool IsAdditive;
+        public readonly float DeltaModifier;
+
+        public LoadSceneParameters(string sceneName, bool showLoadScreenFromLeft, bool isAdditive = false, float deltaModifier = 1)
+        {
+            SceneName = sceneName;
+            ShowLoadScreenFromLeft = showLoadScreenFromLeft;
+            IsAdditive = isAdditive;
+            DeltaModifier = deltaModifier;
+        }
+
+        public void ExtractValues(
+            out string sceneName, 
+            out bool showLoadFromLeft, 
+            out bool isAdditive,
+            out float deltaModifier)
+        {
+            sceneName = SceneName;
+            showLoadFromLeft = ShowLoadScreenFromLeft;
+            isAdditive = IsAdditive;
+            deltaModifier = DeltaModifier;
         }
     }
 }

@@ -8,7 +8,11 @@ using UnityEngine;
 
 namespace ExplorationSystem
 {
-    public sealed class PlayerRunTimeEntity : ICombatEntityProvider, IStanceStructureRead<IReadOnlyCollection<IFullSkill>>
+    public sealed class PlayerRunTimeEntity : 
+        ICombatEntityProvider, 
+        IStanceStructureRead<IReadOnlyCollection<IFullSkill>>,
+        IDamageableStats<float>,
+        IVitalityStatsRead<float>
     {
         public PlayerRunTimeEntity(ICombatEntityProvider preset)
         {
@@ -19,6 +23,10 @@ namespace ExplorationSystem
             AttackingSkills = new List<IFullSkill>(presetSkills.AttackingStance);
             SupportSkills = new List<IFullSkill>(presetSkills.SupportingStance);
             DefendingSkills = new List<IFullSkill>(presetSkills.DefendingStance);
+
+            CurrentHealth = HealthType;
+            CurrentMortality = MortalityType;
+            CurrentShields = 0;
         }
 
         [ShowInInspector]
@@ -31,8 +39,6 @@ namespace ExplorationSystem
         public TeamAreaData GetAreaData() => Preset.GetAreaData();
 
         public string GetProviderEntityName() => Preset.GetProviderEntityName();
-        public string GetProviderEntityFullName() => Preset.GetProviderEntityFullName();
-        public string GetProviderShorterName() => Preset.GetProviderShorterName();
 
         public GameObject GetVisualPrefab() => Preset.GetVisualPrefab();
 
@@ -46,5 +52,14 @@ namespace ExplorationSystem
         public IReadOnlyCollection<IFullSkill> SupportingStance => SupportSkills;
         public IReadOnlyCollection<IFullSkill> DefendingStance => DefendingSkills;
 
+
+
+        public float CurrentHealth { get; set; }
+        public float CurrentMortality { get; set; }
+        public float CurrentShields { get; set; }
+        public float HealthType => _statsBase.HealthType;
+        public float MortalityType => _statsBase.MortalityType;
+        public float DamageReductionType => _statsBase.DamageReductionType;
+        public float DeBuffResistanceType => _statsBase.DeBuffResistanceType;
     }
 }

@@ -18,11 +18,7 @@ namespace CombatSystem.Entity
 
         [Title("Names")]
         [SerializeField] private string entityName = NullName;
-        [SerializeField] private string entityFullName = NullName;
-        [SerializeField] private string shorterName = NullName;
         public override string GetProviderEntityName() => entityName;
-        public override string GetProviderEntityFullName() => entityFullName;
-        public override string GetProviderShorterName() => shorterName;
         public override GameObject GetVisualPrefab() => instantiationObject;
 
 

@@ -18,8 +18,6 @@ namespace CombatSystem.Entity
 
         private const string PlayerAssetPrefixName = "[PLAYER Preparation Entity]";
         public override string GetProviderEntityName() => loreHolder.CharacterNameType;
-        public override string GetProviderEntityFullName() => loreHolder.CharacterFullNameType;
-        public override string GetProviderShorterName() => loreHolder.CharacterShorterNameType;
 
         public ICharacterPortraitHolder GetPortraitHolder() => loreHolder.GetPortraitHolder();
 

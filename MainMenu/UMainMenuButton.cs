@@ -21,7 +21,7 @@ namespace MainMenu
         private const float ClickDeltaSpeed = 8f;
 
 
-        [ShowInInspector]
+        [ShowInInspector, HideInEditorMode]
         private float _lerpAmount;
         private void LateUpdate()
         {

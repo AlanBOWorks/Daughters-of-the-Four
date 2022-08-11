@@ -7,6 +7,7 @@ using ExplorationSystem;
 using Lore.Character;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Utils_Project;
 
 namespace CharacterSelector
 {
@@ -210,6 +211,7 @@ namespace CharacterSelector
                 throw new AccessViolationException($"Team wasn't ready - Count: [{CalculateTrueSelectedCharactersCount()}]");
 
             PlayerExplorationSingleton.Instance.InjectTeam(this);
+            UtilsScene.LoadExplorationScene(true, false);
         }
 
 

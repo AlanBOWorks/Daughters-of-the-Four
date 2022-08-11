@@ -44,8 +44,6 @@ namespace CombatSystem.Entity
         public abstract IBasicStatsRead<float> GetBaseStats();
         public abstract TeamAreaData GetAreaData();
         public abstract string GetProviderEntityName();
-        public abstract string GetProviderEntityFullName();
-        public abstract string GetProviderShorterName();
         public abstract GameObject GetVisualPrefab();
         public abstract IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills();
     }

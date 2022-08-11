@@ -418,7 +418,7 @@ namespace CombatSystem._Core
         public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
         {
             if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnEffectIncrement) return;
-            Debug.Log($"Vanguard Increment [{type}] <<<< {attacker.CombatCharacterShorterName}");
+            Debug.Log($"Vanguard Increment [{type}] <<<< {attacker.CombatCharacterName}");
         }
 
         public void OnVanguardEffectPerform(VanguardSkillUsageValues values)

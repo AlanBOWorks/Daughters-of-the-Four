@@ -1,4 +1,5 @@
 using System;
+using CombatSystem.Entity;
 using Utils.Maths;
 
 namespace CombatSystem.Stats
@@ -314,5 +315,15 @@ namespace CombatSystem.Stats
             health = new PercentValue(currentHealth, maxHealth);
             mortality = new PercentValue(currentMortality, maxMortality);
         }
+
+        public static void ExtractVitalityValues(
+            IDamageableStats<float> currentHealthHolder, IVitalityStatsRead<float> maxHealthHolder,
+            out PercentValue health,
+            out PercentValue mortality)
+        {
+            health = new PercentValue(currentHealthHolder.CurrentHealth, maxHealthHolder.HealthType);
+            mortality = new PercentValue(currentHealthHolder.CurrentMortality, maxHealthHolder.MortalityType);
+        }
+
     }
 }

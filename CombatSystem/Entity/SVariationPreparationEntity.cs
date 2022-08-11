@@ -30,8 +30,6 @@ namespace CombatSystem.Entity
 
         private string GenerateEntityName (string referencedName) => referencedName + " - " + variationName;
         public override string GetProviderEntityName() => GenerateEntityName(presetReference.GetProviderEntityName());
-        public override string GetProviderEntityFullName() => GenerateEntityName(presetReference.GetProviderEntityFullName());
-        public override string GetProviderShorterName() => GenerateEntityName(presetReference.GetProviderShorterName());
         public override GameObject GetVisualPrefab() => instantiationObject ? instantiationObject : presetReference.GetVisualPrefab();
 
         [Title("Stats")]
