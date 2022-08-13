@@ -13,14 +13,9 @@ namespace Utils
 
         public static void UpdateAssetName(ScriptableObject asset, string name)
         {
-            asset.name = name;
-            UpdateAssetName(asset);
-        }
-
-        public static void UpdateAssetName(ScriptableObject asset)
-        {
             var path = AssetDatabase.GetAssetPath(asset);
-            AssetDatabase.RenameAsset(path, asset.name);
+            AssetDatabase.RenameAsset(path, name);
+            asset.name = name;
         }
 
         public static void UpdateAssetName(SceneAsset asset)

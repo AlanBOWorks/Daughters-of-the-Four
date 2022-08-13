@@ -22,12 +22,12 @@ namespace CombatSystem.Skills
             = EnumsSkill.TeamTargeting.Offensive;
 
        
-        [TitleGroup("Effects"),
-         InfoBox("Null: mainEffect will be taken from [effects].first element", "IsMainEffectNull")]
+        [Title("References"),
+         InfoBox("Main Effect Reference (Null): mainEffect will be taken from effects", 
+             "IsMainEffectNull", 
+             InfoMessageType = InfoMessageType.Warning)]
         [SerializeField] private SEffect mainEffectReference;
-
-
-
+        private bool IsMainEffectNull() => !mainEffectReference;
         
 
         public override IEnumerable<PerformEffectValues> GetEffectsFeedBacks() => GetEffects();
@@ -37,7 +37,9 @@ namespace CombatSystem.Skills
         {
             IEffect mainEffect = mainEffectReference;
             if (mainEffect == null && HasEffects())
-                mainEffect = effects[0].GetPreset();
+            {
+                mainEffect = sharedTargetingEffects[0].GetPreset() ?? effects[0].GetPreset();
+            }
 
 
             return mainEffect;
@@ -54,11 +56,15 @@ namespace CombatSystem.Skills
         [SerializeField]
         private string skillName = "NULL";
 
+        [SerializeField] 
+        private EnumCombat.QualityTier quality;
+
+
         [SerializeField, PreviewField, GUIColor(.1f,.1f,.1f,.9f)]
         private Sprite skillIcon;
 
-        [TitleGroup("Values")]
-        [SerializeField]
+        [TitleGroup("Values")] 
+        [SerializeField, Range(-10,10)]
         private int skillCost = 1;
 
         [SerializeField, SuffixLabel("%"), Tooltip("0:  crit won't be calculated")]
@@ -76,6 +82,13 @@ namespace CombatSystem.Skills
         }
 
         [TitleGroup("Effects")]
+        [SerializeField] 
+        private EnumsEffect.TargetType sharedTargeting = EnumsEffect.TargetType.Target;
+        
+        [TitleGroup("Effects")]
+        [SerializeField, DisableIf("IsMostDesired")]
+        private protected SharedTargetPresetEffectValues[] sharedTargetingEffects = new SharedTargetPresetEffectValues[0];
+        [TitleGroup("Effects")]
         [SerializeField]
         private protected PresetEffectValues[] effects = new PresetEffectValues[0];
 
@@ -86,8 +99,16 @@ namespace CombatSystem.Skills
         {
             _combatEffects = GetEffects();
 
+
             IEnumerable<PerformEffectValues> GetEffects()
             {
+                if (!IsMostDesired())
+                {
+                    foreach (var effect in sharedTargetingEffects)
+                    {
+                        yield return effect.GenerateValues(sharedTargeting);
+                    }
+                }
                 foreach (var effect in effects)
                 {
                     yield return effect.GenerateValues();
@@ -103,6 +124,7 @@ namespace CombatSystem.Skills
 
 
         public string GetSkillName() => skillName;
+        public EnumCombat.QualityTier GetSkillQuality() => quality;
         public Sprite GetSkillIcon() => skillIcon;
         public virtual IEnumerable<PerformEffectValues> GetEffects() => _combatEffects;
 
@@ -129,14 +151,16 @@ namespace CombatSystem.Skills
                 };
             }
         }
-        public bool HasEffects() => effects.Length > 0;
+        public bool HasEffects() => sharedTargetingEffects.Length > 0 || effects.Length > 0;
 
         protected virtual string GetAssetPrefix() => " [SkillPreset]";
 
+        private bool IsMostDesired() => sharedTargeting == EnumsEffect.TargetType.MostDesired;
         protected virtual string GenerateAssetName()
         {
             string generatedName = skillName;
-            generatedName = TeamTargeting.ToString().ToUpper() + " - " + generatedName;
+            string skillTargetingText = (IsMostDesired()) ? null : sharedTargeting.ToString();
+            generatedName = $"#{TeamTargeting.ToString().ToUpper()} - {generatedName} - #{skillTargetingText} #{quality} -";
             generatedName += GetAssetPrefix();
             return generatedName;
         }
@@ -148,7 +172,26 @@ namespace CombatSystem.Skills
             UtilsAssets.UpdateAssetNameWithID(this, generatedName);
         }
 
+        [Serializable]
+        protected struct SharedTargetPresetEffectValues : IEffectPreset
+        {
+            [SerializeField]
+            private SEffect effect;
+            [SerializeField, SuffixLabel("$SuffixByType")]
+            private float effectValue;
 
+            public IEffect GetPreset() => effect;
+            public float GetValue() => effectValue;
+            public EnumsEffect.TargetType TargetType => EnumsEffect.TargetType.MostDesired;
+            
+            public readonly PerformEffectValues GenerateValues(EnumsEffect.TargetType targetType) 
+                => new PerformEffectValues(effect, effectValue, targetType);
+
+            private string SuffixByType()
+            {
+                return LocalizeEffects.GetEffectValueSuffix(effect);
+            }
+        }
         [Serializable]
         internal struct PresetEffectValues : IEffectPreset
         {
@@ -163,7 +206,8 @@ namespace CombatSystem.Skills
             public EnumsEffect.TargetType TargetType => targetType;
             public float GetValue() => effectValue;
 
-            public readonly PerformEffectValues GenerateValues() => new PerformEffectValues(effect, effectValue, targetType);
+            public readonly PerformEffectValues GenerateValues() 
+                => new PerformEffectValues(effect, effectValue, targetType);
 
             private string SuffixByType()
             {

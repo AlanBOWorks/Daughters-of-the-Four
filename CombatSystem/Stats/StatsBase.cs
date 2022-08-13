@@ -314,10 +314,33 @@ namespace CombatSystem.Stats
     [Serializable]
     public class ReferencedMainStatsBase : IBasicStats
     {
-        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100)] private IOffensiveStats offensiveStats;
-        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100)] private ISupportStats supportStats;
-        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100)] private IVitalityStats vitalityStats;
-        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100)] private IConcentrationStats concentrationStats;
+        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100), DisableIf("DisableOffensive")] 
+        private IOffensiveStats offensiveStats;
+        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100), DisableIf("DisableSupport")] 
+        private ISupportStats supportStats;
+        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100), DisableIf("DisableVitality")] 
+        private IVitalityStats vitalityStats;
+        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100), DisableIf("DisableConcentration")] 
+        private IConcentrationStats concentrationStats;
+
+#if UNITY_EDITOR
+        protected virtual bool DisableOffensive() => false;
+        protected virtual bool DisableSupport() => false;
+        protected virtual bool DisableVitality() => false;
+        protected virtual bool DisableConcentration() => false;
+#endif
+
+        public ReferencedMainStatsBase()
+        { }
+
+        public ReferencedMainStatsBase(IOffensiveStats offensive, ISupportStats support, 
+            IVitalityStats vitality, IConcentrationStats concentration)
+        {
+            offensiveStats = offensive;
+            supportStats = support;
+            vitalityStats = vitality;
+            concentrationStats = concentration;
+        }
 
         public IOffensiveStats OffensiveStats
         {
@@ -400,9 +423,27 @@ namespace CombatSystem.Stats
             get => followUpType;
             set => followUpType = value;
         }
+
+        public OffensiveStats()
+        { }
+
+        public OffensiveStats(T defaultValue)
+        {
+            attackType = defaultValue;
+            overTimeType = defaultValue;
+            deBuffType = defaultValue;
+            followUpType = defaultValue;
+        }
+
     }
+
     [Serializable]
-    public class OffensiveStats : OffensiveStats<float>, IOffensiveStats { }
+    public class OffensiveStats : OffensiveStats<float>, IOffensiveStats
+    {
+        public static readonly OffensiveStats One = new OffensiveStats(1);
+        public OffensiveStats(float defaultValue) : base(defaultValue)
+        { }
+    }
 
     public class SupportStats<T> : ISupportStats<T>
     {
@@ -431,9 +472,29 @@ namespace CombatSystem.Stats
             get => receiveBuffType;
             set => receiveBuffType = value;
         }
+
+        public SupportStats()
+        {
+            
+        }
+
+        public SupportStats(T defaultValue)
+        {
+            healType = defaultValue;
+            shieldingType = defaultValue;
+            buffType = defaultValue;
+            receiveBuffType = defaultValue;
+        }
     }
+
     [Serializable]
-    public class SupportStats : SupportStats<float>, ISupportStats { }
+    public class SupportStats : SupportStats<float>, ISupportStats
+    {
+        public static readonly SupportStats One = new SupportStats(1);
+
+        public SupportStats(float defaultValue) : base(defaultValue)
+        { }
+    }
 
 
     public class VitalityStats<T> : IVitalityStats<T>
@@ -462,9 +523,32 @@ namespace CombatSystem.Stats
             get => deBuffResistanceType;
             set => deBuffResistanceType = value;
         }
+
+
+        public VitalityStats(T defaultValue) : this(defaultValue,defaultValue,defaultValue)
+        { }
+
+        public VitalityStats(T healthValue, T mortalityValue, T percentValue)
+        {
+            healthType = healthValue;
+            mortalityType = mortalityValue;
+            damageReductionType = percentValue;
+            deBuffResistanceType = percentValue;
+        }
     }
+
     [Serializable]
-    public class VitalityStats : VitalityStats<float>, IVitalityStats { }
+    public class VitalityStats : VitalityStats<float>, IVitalityStats
+    {
+        public static readonly VitalityStats One = new VitalityStats(1);
+
+        public VitalityStats(float defaultValue) : base(defaultValue)
+        { }
+
+        public VitalityStats(float healthValue, float mortalityValue, float percentValue) 
+            : base(healthValue,mortalityValue, percentValue)
+        { }
+    }
 
     public class ConcentrationStats<T> : IConcentrationStats<T>
     {
@@ -493,7 +577,30 @@ namespace CombatSystem.Stats
             get => luckType;
             set => luckType = value;
         }
+
+        public ConcentrationStats()
+        {
+            
+        }
+
+        public ConcentrationStats(T defaultValue)
+        {
+            actionsType = defaultValue;
+            speedType = defaultValue;
+            controlType = defaultValue;
+            luckType = defaultValue;
+        }
+
     }
+
     [Serializable]
-    public class ConcentrationStats : ConcentrationStats<float>, IConcentrationStats { }
+    public class ConcentrationStats : ConcentrationStats<float>, IConcentrationStats
+    {
+        public static readonly ConcentrationStats One = new ConcentrationStats(1);
+
+        public ConcentrationStats(float defaultValue) : base(defaultValue)
+        {
+            
+        }
+    }
 }

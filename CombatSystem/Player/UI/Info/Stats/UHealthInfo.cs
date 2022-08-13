@@ -12,6 +12,8 @@ namespace CombatSystem.Player.UI
 
         public void UpdateHealth(IDamageableStats<float> currentHealthHolder, IVitalityStatsRead<float> maxHealthHolder)
         {
+            if(currentHealthHolder == null) return;
+
             UtilsVitality.ExtractVitalityValues(
                 currentHealthHolder,maxHealthHolder, 
                 out var health, out var mortality);

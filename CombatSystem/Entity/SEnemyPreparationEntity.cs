@@ -33,9 +33,14 @@ namespace CombatSystem.Entity
 
         [Title("Stats")]
         [SerializeReference]
-        private IBasicStats stats = new BaseStats();
+        private IBasicStats stats = new EnemyEntityBasicStats();
         public override IBasicStatsRead<float> GetBaseStats() => stats;
         public IBasicStats GetStats() => stats;
+
+        private bool IsDefaultStats()
+        {
+            return stats is EnemyEntityBasicStats;
+        }
 
         [Title("Skills")]
         [SerializeReference] 
@@ -47,7 +52,18 @@ namespace CombatSystem.Entity
         public override GameObject GetVisualPrefab() => instantiationObject;
         public override IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => skillsHolder;
 
+        [Serializable]
+        private sealed class EnemyEntityBasicStats : ReferencedMainStatsBase
+        {
+            public EnemyEntityBasicStats() : base(Stats.OffensiveStats.One, Stats.SupportStats.One, 
+                new VitalityStats(10,500,0), new ConcentrationStats(1))
+            { }
 
-        
+#if UNITY_EDITOR
+            protected override bool DisableOffensive() => true;
+            protected override bool DisableSupport() => true;
+#endif
+
+        }
     }
 }

@@ -71,7 +71,11 @@ namespace CharacterSelector
         {
             DOTween.Kill(transform);
             Animate();
-            HandleSelection();
+
+            var button = eventData.button;
+
+            if(button == PointerEventData.InputButton.Left)
+                HandleSelection();
         }
 
         private void HandleSelection()

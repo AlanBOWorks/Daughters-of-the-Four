@@ -23,6 +23,9 @@ namespace CombatSystem.Skills.Effects
             PerformerLine = 11,
             PerformerTeam = 12,
 
+            /// <summary>
+            /// It leaved to higher level logic (Skill or AI)
+            /// </summary>
 
             MostDesired = 100
         }

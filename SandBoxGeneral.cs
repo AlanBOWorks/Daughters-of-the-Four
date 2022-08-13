@@ -8,18 +8,12 @@ using UnityEngine.SceneManagement;
 public class SandBoxGeneral : MonoBehaviour
 {
 
-    private GameObject[] _cached;
 
     [Button]
-    private void HideScene()
+    private void Test()
     {
-        var currentScene = SceneManager.GetActiveScene();
-        if(_cached == null)
-            _cached = currentScene.GetRootGameObjects();
-        foreach (var objectRoot in _cached)
-        {
-            objectRoot.SetActive(!objectRoot.activeSelf);
-        }
+        var components = GetComponents<SandBoxGeneral>();
+        Debug.Log(components.Length);
     }
 
 }

@@ -118,51 +118,38 @@ namespace CharacterSelector
         public void RemoveCharacter(SPlayerPreparationEntity key)
         {
             if(!_characterKeys.ContainsKey(key)) return;
+            var keys = _characterKeys[key];
+            if(!keys.IsValid()) return;
 
-            RemoveKeys(key, out var keys);
-            var selectableHolder = keys.SelectableButtonKey;
-            var selectedHolder = keys.SelectedButtonKey;
-            RemoveCharacterInHolders(key, selectableHolder, selectedHolder);
+
+            TryRemoveLoreKey(key, keys);
+            RemoveCharacterInHolders(keys, key);
 
             HandleForTeamReady();
         }
-        private void RemoveKeys(SPlayerPreparationEntity preset, out CharacterKeys keys)
+        private void TryRemoveLoreKey(SPlayerPreparationEntity key, CharacterKeys keys)
         {
-            keys = _characterKeys[preset];
+            _characterKeys.Remove(key);
+
             var loreKey = keys.LoreKey;
-            _characterKeys.Remove(preset);
-            TryRemoveLoreKey();
-
-            void TryRemoveLoreKey()
-            {
-                if (!_characterRepetitionTracker.ContainsKey(loreKey)) return;
+            if (!_characterRepetitionTracker.ContainsKey(loreKey)) return;
 
 
-                int selectedAmount = _characterRepetitionTracker[loreKey];
-                var shouldRemove = selectedAmount <= 1;
+            int selectedAmount = _characterRepetitionTracker[loreKey];
+            var shouldRemove = selectedAmount <= 1;
 
-                if (shouldRemove)
-                    _characterRepetitionTracker.Remove(loreKey);
-                else
-                    _characterRepetitionTracker[loreKey]--;
+            if (shouldRemove)
+                _characterRepetitionTracker.Remove(loreKey);
+            else
+                _characterRepetitionTracker[loreKey]--;
 
-                startRunHandler.DisableControl();
-            }
+            startRunHandler.DisableControl();
         }
-        private static void RemoveCharacterInHolders(
-            SPlayerPreparationEntity combatPreset,
-            USelectableRoleHolder selectableHolder,
-            USelectedCharacterHolder selectionHolder
-            )
+        private static void RemoveCharacterInHolders(CharacterKeys keys, SPlayerPreparationEntity key)
         {
-            selectableHolder.HideSelected();
-            selectionHolder.RemoveEntity(combatPreset);
+            keys.SelectableButtonKey.HideSelected();
+            keys.SelectedButtonKey.RemoveEntity(key);
         }
-
-
-
-
-
 
 
         private int CalculateTrueSelectedCharactersCount()
@@ -233,10 +220,11 @@ namespace CharacterSelector
         }
         private readonly struct CharacterKeys
         {
+            public static CharacterKeys NullKeys = new CharacterKeys(null,null, null);
+
             public readonly SCharacterLoreHolder LoreKey;
             public readonly USelectableRoleHolder SelectableButtonKey;
             public readonly USelectedCharacterHolder SelectedButtonKey;
-
 
             public CharacterKeys(SelectedCharacterValues values, USelectedCharacterHolder selectedButtonKey)
             {
@@ -253,6 +241,8 @@ namespace CharacterSelector
                 SelectableButtonKey = selectableButtonKey;
                 SelectedButtonKey = selectedButtonKey;
             }
+
+            public bool IsValid() => SelectableButtonKey && SelectedButtonKey && LoreKey;
         }
     }
 }

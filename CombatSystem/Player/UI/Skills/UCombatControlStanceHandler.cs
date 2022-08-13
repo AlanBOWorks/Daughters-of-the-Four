@@ -52,7 +52,7 @@ namespace CombatSystem.Player.UI.Skills
             playerEvents.DiscriminationEventsHolder.UnSubscribe(this);
             UnSubscribeFromShortcuts();
         }
-
+        [Button]
         private void HandleStanceInitializations()
         {
             var stanceTheme = CombatThemeSingleton.RolesThemeHolder;
