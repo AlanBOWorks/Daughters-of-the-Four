@@ -26,7 +26,8 @@ namespace CombatSystem.Skills
         [TitleGroup("Values")]
         [InfoBox("Target Type [Target]: enemy who did the Offensive is the Target\n" +
                  "Target Type [Performer]: the main vanguard is the Performer")]
-        [SerializeField]
+        [SerializeField, Tooltip("Counter: increases when Vanguard is hit;\n" +
+                                 "Punish: increases when Vanguard is ignored")]
         private EnumsVanguardEffects.VanguardEffectType responseType;
         private VanguardEffect _vanguardEffectPreset;
 
@@ -65,7 +66,7 @@ namespace CombatSystem.Skills
 
         protected override string GenerateAssetName()
         {
-            return responseType.ToString().ToUpper() + " - " + base.GenerateAssetName();
+            return "#VANGUARD " +responseType.ToString().ToUpper() + " - " + base.GenerateAssetName();
         }
 
         private sealed class VanguardEffect : IEffect

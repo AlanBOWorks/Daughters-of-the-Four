@@ -48,13 +48,14 @@ namespace CombatSystem.Entity
         public abstract IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills();
 
         protected virtual string AssetPrefix() => AssetPrefixName;
-        private const string AssetPrefixName = "[BASIC Preparation Entity]";
+        private const string AssetPrefixName = " [BASIC Preparation Entity]";
         [Button]
         private void UpdateAssetWithRoleAndID()
         {
-            string finalName = GetProviderEntityName();
             var areaData = GetAreaData();
-            finalName += $" - {areaData.RoleType.ToString().ToUpper()} ";
+            string finalName = $"{areaData.RoleType.ToString().ToUpper()} - ";
+
+            finalName += GetProviderEntityName();
             finalName += AssetPrefix();
 
             UtilsAssets.UpdateAssetNameWithID(this, finalName);
@@ -66,9 +67,9 @@ namespace CombatSystem.Entity
         [Serializable]
         protected sealed class SkillsHolder : IEntitySkills
         {
-            [SerializeField] private SSkillPreset[] attackingSkills = new SSkillPreset[0];
-            [SerializeField] private SSkillPreset[] supportingSkills = new SSkillPreset[0];
-            [SerializeField] private SSkillPreset[] defendingSkills = new SSkillPreset[0];
+            [SerializeField] private SSkillPresetBase[] attackingSkills = new SSkillPresetBase[0];
+            [SerializeField] private SSkillPresetBase[] supportingSkills = new SSkillPresetBase[0];
+            [SerializeField] private SSkillPresetBase[] defendingSkills = new SSkillPresetBase[0];
 
 
             public IReadOnlyCollection<IFullSkill> AttackingStance => attackingSkills;

@@ -118,10 +118,17 @@ namespace CombatSystem.Team
 
         public enum Positioning
         {
+            /// <summary>
+            /// Indicated by the role
+            /// </summary>
+            ByRolePosition = -1,
+
+
             FrontLine = FrontLineIndex,
             MidLine = MidLineIndex,
             BackLine = BackLineIndex,
-            FlexLine = FlexLineIndex
+            FlexLine = FlexLineIndex,
+
         }
 
         public enum Stance

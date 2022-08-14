@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -167,32 +168,60 @@ namespace CombatSystem.Stats
         {
             UtilsStats.DoCopyBasics(this, stats);
         }
-        public StatsBase(T defaultValue)
+        public StatsBase(T defaultValue) 
+            : this(defaultValue,defaultValue,defaultValue,defaultValue)
         {
-            OverrideByValue(in defaultValue);
         }
 
-        public void OverrideByValue(in T value)
+        public StatsBase
+            (T defaultOffensiveValue, T defaultSupportValue, T defaultVitalityValue, T defaultConcentrationValue)
         {
-            attackType = value;
-            overTimeType = value;
-            deBuffType = value;
-            followUpType = value;
+            attackType = defaultOffensiveValue;
+            overTimeType = defaultOffensiveValue;
+            deBuffType = defaultOffensiveValue;
+            followUpType = defaultOffensiveValue;
 
-            healType = value;
-            shieldingType = value;
-            buffType = value;
-            receiveBuffType = value;
+            healType = defaultSupportValue;
+            shieldingType = defaultSupportValue;
+            buffType = defaultSupportValue;
+            receiveBuffType = defaultSupportValue;
 
-            healthType = value;
-            mortalityType = value;
-            damageReductionType = value;
-            deBuffResistanceType = value;
+            healthType = defaultVitalityValue;
+            mortalityType = defaultVitalityValue;
+            damageReductionType = defaultVitalityValue;
+            deBuffResistanceType = defaultVitalityValue;
 
-            actionsType = value;
-            speedType = value;
-            controlType = value;
-            luckType = value;
+            actionsType = defaultConcentrationValue;
+            speedType = defaultConcentrationValue;
+            controlType = defaultConcentrationValue;
+            luckType = defaultConcentrationValue;
+        }
+
+        public void OverrideByValue(T value) 
+            => OverrideByValue(value, value, value, value);
+
+        public void OverrideByValue
+            (T defaultOffensiveValue, T defaultSupportValue, T defaultVitalityValue, T defaultConcentrationValue)
+        {
+            attackType = defaultOffensiveValue;
+            overTimeType = defaultOffensiveValue;
+            deBuffType = defaultOffensiveValue;
+            followUpType = defaultOffensiveValue;
+
+            healType = defaultSupportValue;
+            shieldingType = defaultSupportValue;
+            buffType = defaultSupportValue;
+            receiveBuffType = defaultSupportValue;
+
+            healthType = defaultVitalityValue;
+            mortalityType = defaultVitalityValue;
+            damageReductionType = defaultVitalityValue;
+            deBuffResistanceType = defaultVitalityValue;
+
+            actionsType = defaultConcentrationValue;
+            speedType = defaultConcentrationValue;
+            controlType = defaultConcentrationValue;
+            luckType = defaultConcentrationValue;
         }
 
         public T AttackType
@@ -314,20 +343,24 @@ namespace CombatSystem.Stats
     [Serializable]
     public class ReferencedMainStatsBase : IBasicStats
     {
-        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100), DisableIf("DisableOffensive")] 
+        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100),
+         InfoBox("Using Static.One", "OffensiveStatsNull")]
         private IOffensiveStats offensiveStats;
-        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100), DisableIf("DisableSupport")] 
+        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100),
+         InfoBox("Using Static.One", "SupportStatsNull")]
         private ISupportStats supportStats;
-        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100), DisableIf("DisableVitality")] 
+        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100),
+         InfoBox("Using Static.OneThousand", "VitalityStatsNull")]
         private IVitalityStats vitalityStats;
-        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100), DisableIf("DisableConcentration")] 
+        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100),
+         InfoBox("Using Static.One", "ConcentrationStatsNull")]
         private IConcentrationStats concentrationStats;
 
 #if UNITY_EDITOR
-        protected virtual bool DisableOffensive() => false;
-        protected virtual bool DisableSupport() => false;
-        protected virtual bool DisableVitality() => false;
-        protected virtual bool DisableConcentration() => false;
+        private bool OffensiveStatsNull() => offensiveStats == null;
+        private bool SupportStatsNull() => supportStats == null;
+        private bool VitalityStatsNull() => vitalityStats == null;
+        private bool ConcentrationStatsNull() => concentrationStats == null;
 #endif
 
         public ReferencedMainStatsBase()
@@ -366,34 +399,80 @@ namespace CombatSystem.Stats
             set => concentrationStats = value;
         }
 
-        public float AttackType { get => offensiveStats.AttackType; set => offensiveStats.AttackType = value; }
-        public float OverTimeType { get => offensiveStats.OverTimeType; set => offensiveStats.OverTimeType = value; }
-        public float DeBuffType { get => offensiveStats.DeBuffType; set => offensiveStats.DeBuffType = value; }
-        public float FollowUpType { get => offensiveStats.FollowUpType; set => offensiveStats.FollowUpType = value; }
+        public float AttackType { get => offensiveStats?.AttackType ?? Stats.OffensiveStats.One.AttackType; set => offensiveStats.AttackType = value; }
+        public float OverTimeType { get => offensiveStats?.OverTimeType ?? Stats.OffensiveStats.One.OverTimeType; set => offensiveStats.OverTimeType = value; }
+        public float DeBuffType { get => offensiveStats?.DeBuffType ?? Stats.OffensiveStats.One.DeBuffType; set => offensiveStats.DeBuffType = value; }
+        public float FollowUpType { get => offensiveStats?.FollowUpType ?? Stats.OffensiveStats.One.FollowUpType; set => offensiveStats.FollowUpType = value; }
 
-        public float HealType { get => supportStats.HealType; set => supportStats.HealType = value; }
-        public float ShieldingType { get => supportStats.ShieldingType; set => supportStats.ShieldingType = value; }
-        public float BuffType { get => supportStats.BuffType; set => supportStats.BuffType = value; }
-        public float ReceiveBuffType { get => supportStats.ReceiveBuffType; set => supportStats.ReceiveBuffType = value; }
+        public float HealType { get => supportStats?.HealType ?? Stats.SupportStats.One.HealType; set => supportStats.HealType = value; }
+        public float ShieldingType { get => supportStats?.ShieldingType ?? Stats.SupportStats.One.ShieldingType; set => supportStats.ShieldingType = value; }
+        public float BuffType { get => supportStats?.BuffType ?? Stats.SupportStats.One.BuffType; set => supportStats.BuffType = value; }
+        public float ReceiveBuffType { get => supportStats?.ReceiveBuffType ?? Stats.SupportStats.One.ReceiveBuffType; set => supportStats.ReceiveBuffType = value; }
 
-        public float HealthType { get => vitalityStats.HealthType; set => vitalityStats.HealthType = value; }
-        public float MortalityType { get => vitalityStats.MortalityType; set => vitalityStats.MortalityType = value; }
-        public float DamageReductionType { get => vitalityStats.DamageReductionType; set => vitalityStats.DamageReductionType = value; }
-        public float DeBuffResistanceType { get => vitalityStats.DeBuffResistanceType; set => vitalityStats.DeBuffResistanceType = value; }
+        public float HealthType { get => vitalityStats?.HealthType ?? Stats.VitalityStats.OneThousand.HealthType; set => vitalityStats.HealthType = value; }
+        public float MortalityType { get => vitalityStats?.MortalityType ?? Stats.VitalityStats.OneThousand.MortalityType; set => vitalityStats.MortalityType = value; }
+        public float DamageReductionType { get => vitalityStats?.DamageReductionType ?? Stats.VitalityStats.OneThousand.DamageReductionType; set => vitalityStats.DamageReductionType = value; }
+        public float DeBuffResistanceType { get => vitalityStats?.DeBuffResistanceType ?? Stats.VitalityStats.OneThousand.DeBuffResistanceType; set => vitalityStats.DeBuffResistanceType = value; }
 
-        public float ActionsType { get => concentrationStats.ActionsType; set => concentrationStats.ActionsType= value; }
-        public float SpeedType { get => concentrationStats.SpeedType; set => concentrationStats.SpeedType = value; }
-        public float ControlType { get => concentrationStats.ControlType; set => concentrationStats.ControlType = value; }
-        public float CriticalType { get => concentrationStats.CriticalType; set => concentrationStats.CriticalType = value; }
+        public float ActionsType { get => concentrationStats?.ActionsType ?? Stats.ConcentrationStats.One.ActionsType; set => concentrationStats.ActionsType = value; }
+        public float SpeedType { get => concentrationStats?.SpeedType ?? Stats.ConcentrationStats.One.SpeedType; set => concentrationStats.SpeedType = value; }
+        public float ControlType { get => concentrationStats?.ControlType ?? Stats.ConcentrationStats.One.ControlType; set => concentrationStats.ControlType = value; }
+        public float CriticalType { get => concentrationStats?.CriticalType ?? Stats.ConcentrationStats.One.CriticalType; set => concentrationStats.CriticalType = value; }
+    }
+
+    [Serializable]
+    public class ReferencedPresetStats : IBasicStats
+    {
+        [SerializeField] private SPreparationEntityBase referencedEntity;
+
+        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100),
+         InfoBox("Using Preset reference", "OffensiveStatsNull")]
+        private IOffensiveStats offensiveStats;
+        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100),
+         InfoBox("Using Preset reference", "SupportStatsNull")]
+        private ISupportStats supportStats;
+        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100),
+         InfoBox("Using Preset reference", "VitalityStatsNull")]
+        private IVitalityStats vitalityStats;
+        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100),
+         InfoBox("Using Preset reference", "ConcentrationStatsNull")]
+        private IConcentrationStats concentrationStats;
+
+
+
+#if UNITY_EDITOR
+        private bool OffensiveStatsNull() => offensiveStats == null;
+        private bool SupportStatsNull() => supportStats == null;
+        private bool VitalityStatsNull() => vitalityStats == null;
+        private bool ConcentrationStatsNull() => concentrationStats == null;
+#endif
+
+        public float AttackType { get => offensiveStats?.AttackType ?? referencedEntity.GetBaseStats().AttackType; set => offensiveStats.AttackType = value; }
+        public float OverTimeType { get => offensiveStats?.OverTimeType ?? referencedEntity.GetBaseStats().OverTimeType; set => offensiveStats.OverTimeType = value; }
+        public float DeBuffType { get => offensiveStats?.DeBuffType ?? referencedEntity.GetBaseStats().DeBuffType; set => offensiveStats.DeBuffType = value; }
+        public float FollowUpType { get => offensiveStats?.FollowUpType ?? referencedEntity.GetBaseStats().FollowUpType; set => offensiveStats.FollowUpType = value; }
+
+        public float HealType { get => supportStats?.HealType ?? referencedEntity.GetBaseStats().HealType; set => supportStats.HealType = value; }
+        public float ShieldingType { get => supportStats?.ShieldingType ?? referencedEntity.GetBaseStats().ShieldingType; set => supportStats.ShieldingType = value; }
+        public float BuffType { get => supportStats?.BuffType ?? referencedEntity.GetBaseStats().BuffType; set => supportStats.BuffType = value; }
+        public float ReceiveBuffType { get => supportStats?.ReceiveBuffType ?? referencedEntity.GetBaseStats().ReceiveBuffType; set => supportStats.ReceiveBuffType = value; }
+
+        public float HealthType { get => vitalityStats?.HealthType ?? referencedEntity.GetBaseStats().HealthType; set => vitalityStats.HealthType = value; }
+        public float MortalityType { get => vitalityStats?.MortalityType ?? referencedEntity.GetBaseStats().MortalityType; set => vitalityStats.MortalityType = value; }
+        public float DamageReductionType { get => vitalityStats?.DamageReductionType ?? referencedEntity.GetBaseStats().DamageReductionType; set => vitalityStats.DamageReductionType = value; }
+        public float DeBuffResistanceType { get => vitalityStats?.DeBuffResistanceType ?? referencedEntity.GetBaseStats().DeBuffResistanceType; set => vitalityStats.DeBuffResistanceType = value; }
+
+        public float ActionsType { get => concentrationStats?.ActionsType ?? referencedEntity.GetBaseStats().ActionsType; set => concentrationStats.ActionsType = value; }
+        public float SpeedType { get => concentrationStats?.SpeedType ?? referencedEntity.GetBaseStats().SpeedType; set => concentrationStats.SpeedType = value; }
+        public float ControlType { get => concentrationStats?.ControlType ?? referencedEntity.GetBaseStats().ControlType; set => concentrationStats.ControlType = value; }
+        public float CriticalType { get => concentrationStats?.CriticalType ?? referencedEntity.GetBaseStats().CriticalType; set => concentrationStats.CriticalType = value; }
     }
 
     [Serializable]
     public class BaseStats : StatsBase<float>, IBasicStats
     {
-        public BaseStats() : base(0)
-        {
-
-        }
+        public BaseStats() : base(1,1,0,1)
+        { }
     }
 
     public class OffensiveStats<T> : IOffensiveStats<T>
@@ -443,6 +522,11 @@ namespace CombatSystem.Stats
         public static readonly OffensiveStats One = new OffensiveStats(1);
         public OffensiveStats(float defaultValue) : base(defaultValue)
         { }
+
+        public OffensiveStats() : this(1)
+        {
+            
+        }
     }
 
     public class SupportStats<T> : ISupportStats<T>
@@ -494,6 +578,8 @@ namespace CombatSystem.Stats
 
         public SupportStats(float defaultValue) : base(defaultValue)
         { }
+        public SupportStats() : this(1)
+        { }
     }
 
 
@@ -541,12 +627,19 @@ namespace CombatSystem.Stats
     public class VitalityStats : VitalityStats<float>, IVitalityStats
     {
         public static readonly VitalityStats One = new VitalityStats(1);
+        /// <summary>
+        /// Similar than [<seealso cref="One"/>] but with (100HP / 1000 Mortality)
+        /// </summary>
+        public static readonly VitalityStats OneThousand = new VitalityStats(100,1000,1);
 
         public VitalityStats(float defaultValue) : base(defaultValue)
         { }
 
         public VitalityStats(float healthValue, float mortalityValue, float percentValue) 
             : base(healthValue,mortalityValue, percentValue)
+        { }
+
+        public VitalityStats() : this(100,1000,1)
         { }
     }
 
@@ -599,8 +692,9 @@ namespace CombatSystem.Stats
         public static readonly ConcentrationStats One = new ConcentrationStats(1);
 
         public ConcentrationStats(float defaultValue) : base(defaultValue)
-        {
-            
-        }
+        { }
+
+        public ConcentrationStats() : this(1)
+        { }
     }
 }

@@ -194,6 +194,7 @@ namespace CombatSystem.Team
         [SerializeField] private EnumTeam.Positioning positioning;
 
         public EnumTeam.Role RoleType => role;
-        public EnumTeam.Positioning PositioningType => positioning;
+        public EnumTeam.Positioning PositioningType => (positioning == EnumTeam.Positioning.ByRolePosition)
+        ? UtilsTeam.GetEquivalent(role) : positioning;
     }
 }
