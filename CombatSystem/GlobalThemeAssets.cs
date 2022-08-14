@@ -8,7 +8,7 @@ namespace CombatSystem
 {
     public static class GlobalThemeAssets 
     {
-        public const string AssetFolderPath = "Assets/ScriptableObjects/Globals/Theme/";
+        public const string AssetFolderPath = "Assets/ScriptableObjects/Globals/Theme/Combat/";
         public const string ThemeAssetPath = AssetFolderPath + SCombatThemeHolder.EditorsName;
         public const string ParticlesPrefabAssetPath = AssetFolderPath + SStatsPrefabsHolder.EditorsName;
 

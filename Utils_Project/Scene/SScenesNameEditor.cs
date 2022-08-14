@@ -6,7 +6,7 @@ using Utils;
 
 namespace Utils_Project.Scene
 {
-    [CreateAssetMenu(fileName = "Scene Name", menuName = "Editor/Scene Name Editor")]
+    [CreateAssetMenu(fileName = "Scene Name", menuName = "Editor/Scenes/Scene Names Holder", order = -100)]
     internal class SScenesNameEditor : ScriptableObject
     {
 #if UNITY_EDITOR

@@ -1,5 +1,6 @@
 using CombatSystem.Entity;
 using CombatSystem.Team;
+using Common;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -15,6 +16,9 @@ namespace ExplorationSystem
         static PlayerExplorationSingleton()
         {
             Instance = new PlayerExplorationSingleton();
+           var themeAsset =
+                AssetDatabase.LoadAssetAtPath<SExplorationThemeHolder>(SExplorationThemeHolder.AssetPath);
+           ExplorationThemeHolder = themeAsset.GetDataHolder();
         }
 
         public void InjectTeam(ITeamFlexStructureRead<ICombatEntityProviderHolder> team)
@@ -36,6 +40,9 @@ namespace ExplorationSystem
         public PlayerRunTimeEntity SupportType { get; private set; }
         [ShowInInspector, ShowIf("FlexType")]
         public PlayerRunTimeEntity FlexType { get; private set; }
+
+        [Title("Theme")] [ShowInInspector, InlineEditor()]
+        public static readonly IExplorationTypesStructureRead<IThemeHolder> ExplorationThemeHolder;
 
         private static PlayerRunTimeEntity HandleInstantiation(ICombatEntityProvider preset)
         {

@@ -12,9 +12,9 @@ namespace CombatSystem.Player.UI
     [CreateAssetMenu(fileName = AssetName, menuName = "Combat/Holders/Combat Theme")]
     public class SCombatThemeHolder : ScriptableObject
     {
-        private const string Path = GlobalThemeAssets.AssetFolderPath;
+        private const string Path = GlobalThemeAssets.AssetFolderPath + "/Combat/";
         private const string AssetName = "MainTheme [Theme Holder]";
-        private const string AssetPath = Path + EditorsName;
+        public const string AssetPath = Path + EditorsName;
 
         public const string EditorsName = AssetName + ".asset";
 

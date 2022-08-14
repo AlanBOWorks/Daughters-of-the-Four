@@ -1,4 +1,5 @@
 using System;
+using Common;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -20,10 +21,4 @@ namespace CombatSystem.Player.UI
         public Color GetThemeColor() => themeColor;
     }
 
-    public interface IThemeHolder
-    {
-        string GetThemeName();
-        Sprite GetThemeIcon();
-        Color GetThemeColor();
-    }
 }

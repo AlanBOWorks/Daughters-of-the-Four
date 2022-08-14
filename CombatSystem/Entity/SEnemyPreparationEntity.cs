@@ -146,6 +146,8 @@ namespace CombatSystem.Entity
             variationEntities.Add(addingEntity);
         }
 
+        public bool HasVariationEntities() => variationEntities.Count > 0;
+        public ICombatEntityPreparation GetFirstVariationEntity() => variationEntities[0];
         public ICombatEntityPreparation WeakType => variationEntities.Count > 0 ? variationEntities[0] : null;
         public ICombatEntityPreparation CorruptedType => variationEntities.Count > 1 ? variationEntities[1] : WeakType;
     }

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Common
 {
     [CreateAssetMenu(fileName = "N [Fonts Holder]",
-        menuName = "Commons/Fonts Holder")]
+        menuName = "Editor/Visuals/Fonts Holder")]
     public class SFontsHolder : ScriptableObject, IFontsHolder
     {
         [SerializeField] private TMP_Asset mainFont;
