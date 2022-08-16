@@ -3,6 +3,7 @@ using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Player.Events;
 using CombatSystem.Team;
+using MPUIKIT;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace CombatSystem.Player.UI.Skills
     {
         [SerializeField] private TextMeshProUGUI currentControlText;
         [SerializeField] private CanvasGroup canvasGroup;
+        [SerializeField] private MPImage percentImage;
 
         [Title("Stance References")] 
         [SerializeField] private UCombatStanceButton attackerButton;
@@ -121,10 +123,11 @@ namespace CombatSystem.Player.UI.Skills
 
         public void OnControlChange(CombatTeam team, float phasedControl)
         {
-            var teamControl = team.DataValues.CurrentControl;
-            currentControlText.text = teamControl.ToString("P0");
+            var teamPercentControl = team.DataValues.CurrentControl;
+            currentControlText.text = teamPercentControl.ToString("P0");
+            percentImage.fillAmount = teamPercentControl;
             
-            if (teamControl < 1) return;
+            if (teamPercentControl < 1) return;
             EnableStanceSwitching();
         }
 

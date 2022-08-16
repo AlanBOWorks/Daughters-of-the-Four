@@ -14,11 +14,13 @@ namespace ExplorationSystem
         public static ITeamFlexStructureRead<PlayerRunTimeEntity> GetCurrentSelectedTeam() => Instance;
 
         static PlayerExplorationSingleton()
-        {
+        { 
             Instance = new PlayerExplorationSingleton();
-           var themeAsset =
+            EventsHolder = new ExplorationEventsHolder();
+
+            var themeAsset =
                 AssetDatabase.LoadAssetAtPath<SExplorationThemeHolder>(SExplorationThemeHolder.AssetPath);
-           ExplorationThemeHolder = themeAsset.GetDataHolder();
+            ExplorationThemeHolder = themeAsset.GetDataHolder();
         }
 
         public void InjectTeam(ITeamFlexStructureRead<ICombatEntityProviderHolder> team)
@@ -29,16 +31,19 @@ namespace ExplorationSystem
             FlexType = HandleInstantiation(team.FlexType.GetEntityProvider());
         }
 
+        [Title("Events")]
+        [ShowInInspector] 
+        public static readonly ExplorationEventsHolder EventsHolder;
 
 
-
-        [ShowInInspector, ShowIf("VanguardType")]
+        [Title("Entities")]
+        [ShowInInspector, ShowIf("VanguardType"), HorizontalGroup("FrontLine")]
         public PlayerRunTimeEntity VanguardType { get; private set; }
-        [ShowInInspector, ShowIf("AttackerType")]
+        [ShowInInspector, ShowIf("AttackerType"), HorizontalGroup("FrontLine")]
         public PlayerRunTimeEntity AttackerType { get; private set; }
-        [ShowInInspector, ShowIf("SupportType")]
+        [ShowInInspector, ShowIf("SupportType"), HorizontalGroup("BackLine")]
         public PlayerRunTimeEntity SupportType { get; private set; }
-        [ShowInInspector, ShowIf("FlexType")]
+        [ShowInInspector, ShowIf("FlexType"), HorizontalGroup("BackLine")]
         public PlayerRunTimeEntity FlexType { get; private set; }
 
         [Title("Theme")] [ShowInInspector, InlineEditor()]

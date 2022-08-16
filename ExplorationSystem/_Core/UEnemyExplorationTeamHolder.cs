@@ -17,6 +17,7 @@ namespace ExplorationSystem
         private void Awake()
         {
             _teamWrapper = new EnemyTeamWrapper();
+            PlayerExplorationSingleton.EventsHolder.Subscribe(this);
         }
 
         private sealed class EnemyTeamWrapper : IExplorationThreatsStructureRead<ICombatTeamProvider>

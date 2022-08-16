@@ -2,6 +2,7 @@
     "name": "Dotf_ExplorationSystem",
     "rootNamespace": "",
     "references": [
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:87fd9a71d0e81d643aa5b23f99b71b96",
         "GUID:48ac1fc174448a74b8792bf80c74ddb7",
         "GUID:1c543dec6154b7241809187723ffc905",
