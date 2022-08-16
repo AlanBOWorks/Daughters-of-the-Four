@@ -37,7 +37,7 @@ namespace ExplorationSystem.UI
             var prefabTransform = (RectTransform) prefab.transform;
             var elementHeight = prefabTransform.rect.height;
 
-            int i = 0;
+            int i = EnumTeam.RoleTypesCount -1;
             foreach ((UHealthInfo component, CombatThemeHolder theme) in enumerable)
             {
                 var componentTransform = (RectTransform) component.transform;
@@ -49,7 +49,7 @@ namespace ExplorationSystem.UI
                 Vector2 localPosition = new Vector2(0, heightPosition);
 
                 componentTransform.anchoredPosition = localPosition;
-                i++;
+                i--;
             }
         }
 

@@ -12,6 +12,8 @@ namespace ExplorationSystem
         [SerializeField]
         private LevelGroupValues[] worldGroups = new LevelGroupValues[0];
 
+        internal LevelGroupValues[] GetWorld() => worldGroups;
+
 #if UNITY_EDITOR
         [Button]
         private void TestNotNull()

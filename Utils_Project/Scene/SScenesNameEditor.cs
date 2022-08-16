@@ -35,7 +35,7 @@ namespace Utils_Project.Scene
     {
         [ShowInInspector, InlineEditor()] private SScenesNameEditor _assetHolder;
 
-        [MenuItem("Game/Editor/Scene Holder [WINDOW]", priority = -1)]
+        [MenuItem("Game/Editor/Scene Holder [WINDOW]", priority = -100)]
         private static void OpenWindow()
         {
             var window = GetWindow<ScenesHolderEditorWindow>();

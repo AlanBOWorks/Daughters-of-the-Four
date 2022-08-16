@@ -23,12 +23,14 @@ namespace CombatSystem
             [ShowInInspector, InlineEditor()]
             private SStatsPrefabsHolder _prefabsHolder;
 
-            [MenuItem("Game/Editor/Theme Holder [WINDOW]", priority = -1)]
+            [MenuItem("Game/Editor/Combat Theme Holder [WINDOW]", priority = -1)]
             public static void OpenWindow()
             {
                 var window = GetWindow<CombatThemeEditorWindow>();
-                window._themeHolder = AssetDatabase.LoadAssetAtPath<SCombatThemeHolder>(GlobalThemeAssets.ThemeAssetPath);
-                window._prefabsHolder = AssetDatabase.LoadAssetAtPath<SStatsPrefabsHolder>(GlobalThemeAssets.ParticlesPrefabAssetPath);
+                window._themeHolder 
+                    = AssetDatabase.LoadAssetAtPath<SCombatThemeHolder>(ThemeAssetPath);
+                window._prefabsHolder 
+                    = AssetDatabase.LoadAssetAtPath<SStatsPrefabsHolder>(ParticlesPrefabAssetPath);
             }
         }
 #endif

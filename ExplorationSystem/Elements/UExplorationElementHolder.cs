@@ -1,5 +1,6 @@
 using System;
 using MEC;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -16,9 +17,13 @@ namespace ExplorationSystem.Elements
         private static readonly Color DefaultColor = new Color(.1f,.1f,.1f);
         private Color _dedicatedColor;
 
+        [HideInEditorMode,ShowInInspector]
+        private EnumExploration.ExplorationType _currentBehaviour;
+
 
         private void OnDisable()
         {
+            _currentBehaviour = EnumExploration.ExplorationType.Undefined;
             _elementSelected = false;
             HandleVisuals();
             Timing.PauseCoroutines(iconHolder.CurrentHandle);
@@ -32,6 +37,11 @@ namespace ExplorationSystem.Elements
         private void OnDestroy()
         {
             Timing.KillCoroutines(iconHolder.CurrentHandle);
+        }
+
+        public void Injection(EnumExploration.ExplorationType type)
+        {
+            _currentBehaviour = type;
         }
 
         public void Injection(Sprite elementIcon)

@@ -70,14 +70,16 @@ namespace Utils_Project.Scene
 
         public bool IsLoadingScene() => _fillingCoroutineHandle.IsRunning;
         private CoroutineHandle _fillingCoroutineHandle;
-        public void DoSceneTransition(string sceneName, bool showLoadScreenFromLeft, bool keepAliveFromLoad = false, float deltaModifier = 1)
+        public void DoSceneTransition(LoadSceneParameters parameters,
+            Action onFinishLoad = null, Action onAfterFinishLoadScreen = null)
         {
             if(IsLoadingScene()) return;
 
-            var parameters = new LoadSceneParameters(sceneName,showLoadScreenFromLeft, keepAliveFromLoad, deltaModifier);
             _fillingCoroutineHandle =
-                Timing.RunCoroutine(_SceneSwapSequence(parameters));
+                Timing.RunCoroutine(_SceneSwapSequence(parameters, onFinishLoad, onAfterFinishLoadScreen));
         }
+
+
 
         private const float FillThreshold = .98f;
         private IEnumerator<float> _FadeInLoadScreen(bool isLeftFill, float deltaModifier = 1)
@@ -141,7 +143,8 @@ namespace Utils_Project.Scene
 
         }
 
-        private IEnumerator<float> _SceneSwapSequence(LoadSceneParameters loadParameters)
+        private IEnumerator<float> _SceneSwapSequence(LoadSceneParameters loadParameters,
+            Action onFinishLoad = null, Action onAfterFinishLoadScreen = null)
         {
             loadParameters.ExtractValues(
                 out var sceneName,
@@ -164,24 +167,74 @@ namespace Utils_Project.Scene
                     listener.OnPercentTick(currentLoad);
                 }
             }
+            onFinishLoad?.Invoke();
             yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fillFromLeft,deltaModifier));
+            onAfterFinishLoadScreen?.Invoke();
             gameObject.SetActive(false);
         }
 
-        [Button,DisableInEditorMode]
-        private void DebugAnimation(float timeWaitSimulation = 1, bool fillFromLeft = true)
+        public void DoJustScreenTransition(float waitUntilHide, bool fromLeft,
+            Action<bool> screenShowsFeedback = null, float deltaModifier = 1)
         {
             Timing.KillCoroutines(_fillingCoroutineHandle);
-            fillerImageMask.fillAmount = 0;
-            _fillingCoroutineHandle = Timing.RunCoroutine(_Steps());
+            _fillingCoroutineHandle = Timing.RunCoroutine(_DoScreenTransition(), Segment.RealtimeUpdate);
 
-            IEnumerator<float> _Steps()
+            IEnumerator<float> _DoScreenTransition()
             {
                 gameObject.SetActive(true);
+                yield return Timing.WaitUntilDone(_FadeInLoadScreen(fromLeft, deltaModifier));
                 yield return Timing.WaitForOneFrame;
-                yield return Timing.WaitUntilDone(_FadeInLoadScreen(fillFromLeft));
-                yield return Timing.WaitForSeconds(timeWaitSimulation);
-                yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fillFromLeft));
+                float timer = 0;
+                if (waitUntilHide > 0)
+                {
+                    while (timer < waitUntilHide)
+                    {
+                        yield return Timing.DeltaTime;
+                        timer += Timing.DeltaTime;
+                        float currentLoad = timer / waitUntilHide;
+
+                        CallEvents(currentLoad);
+                    }
+                }
+                else CallEvents(1);
+
+
+                screenShowsFeedback?.Invoke(true);
+                yield return Timing.WaitForOneFrame;
+                yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fromLeft, deltaModifier));
+                screenShowsFeedback?.Invoke(false);
+                gameObject.SetActive(false);
+            }
+
+            void CallEvents(float currentLoad)
+            {
+                foreach (var listener in _loadPercentListeners)
+                {
+                    listener.OnPercentTick(currentLoad);
+                }
+            }
+        }
+
+        public void DoJustScreenTransition(Func<bool> isFinishCheck, bool fromLeft,
+            Action<bool> screenShowsFeedback = null, float deltaModifier = 1)
+        {
+            Timing.KillCoroutines(_fillingCoroutineHandle);
+            _fillingCoroutineHandle = Timing.RunCoroutine(_DoScreenTransition(), Segment.RealtimeUpdate);
+
+            IEnumerator<float> _DoScreenTransition()
+            {
+                gameObject.SetActive(true);
+                yield return Timing.WaitUntilDone(_FadeInLoadScreen(fromLeft, deltaModifier));
+                
+                do
+                {
+                    yield return Timing.WaitForOneFrame;
+                } while (!isFinishCheck());
+
+                screenShowsFeedback?.Invoke(true);
+                yield return Timing.WaitForOneFrame;
+                yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fromLeft, deltaModifier));
+                screenShowsFeedback?.Invoke(false);
                 gameObject.SetActive(false);
             }
         }
@@ -213,31 +266,5 @@ namespace Utils_Project.Scene
         }
     }
 
-    public readonly struct LoadSceneParameters
-    {
-        public readonly string SceneName;
-        public readonly bool ShowLoadScreenFromLeft;
-        public readonly bool IsAdditive;
-        public readonly float DeltaModifier;
-
-        public LoadSceneParameters(string sceneName, bool showLoadScreenFromLeft, bool isAdditive = false, float deltaModifier = 1)
-        {
-            SceneName = sceneName;
-            ShowLoadScreenFromLeft = showLoadScreenFromLeft;
-            IsAdditive = isAdditive;
-            DeltaModifier = deltaModifier;
-        }
-
-        public void ExtractValues(
-            out string sceneName, 
-            out bool showLoadFromLeft, 
-            out bool isAdditive,
-            out float deltaModifier)
-        {
-            sceneName = SceneName;
-            showLoadFromLeft = ShowLoadScreenFromLeft;
-            isAdditive = IsAdditive;
-            deltaModifier = DeltaModifier;
-        }
-    }
+    
 }

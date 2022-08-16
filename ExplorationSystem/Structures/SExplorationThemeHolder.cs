@@ -10,7 +10,7 @@ namespace ExplorationSystem
     public class SExplorationThemeHolder : ScriptableObject
     {
         private const string MainThemeAssetName = "MainTheme [ExplorationTheme]";
-        public const string AssetFolder = "Assets/ScriptableObjects/Globals/Theme/Exploration/";
+        public const string AssetFolder = GlobalThemeAssets.AssetFolder;
         public const string AssetPath = AssetFolder + MainThemeAssetName + ".asset";
 
         [SerializeField] private ExplorationThemeHolder dataHolder = new ExplorationThemeHolder();
@@ -64,15 +64,4 @@ namespace ExplorationSystem
         public T ShopType => shopType;
     }
 
-    public interface IExplorationTypesStructureRead<out T>
-    {
-        T BasicThreatType { get; }
-        T EliteThreatType { get; }
-        T BossThreatType { get; }
-
-        T CombinationType { get; }
-        T AwakeningType { get; }
-        T TreasureType { get; }
-        T ShopType { get; }
-    }
 }
