@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ExplorationSystem
 {
     [CreateAssetMenu(fileName = "N " + AssetPrefix, menuName = "Editor/Scenes/Global ExplorationScenes", order = -4)]
-    public class SExplorationLevelGroupsHolder : ScriptableObject
+    public class SExplorationWorldLevelsHolder : ScriptableObject
     {
         private const string AssetPrefix = "[Global ExplorationScenes]";
 

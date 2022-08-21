@@ -4,17 +4,17 @@ using Random = UnityEngine.Random;
 
 namespace ExplorationSystem
 {
-    public class UExplorationLevelDataHolder : MonoBehaviour
+    public class UWorldExplorationDataHolder : MonoBehaviour
     {
         [Title("References")] 
         [SerializeField, InlineEditor()] 
-        private SExplorationLevelGroupsHolder sceneGroupHolder;
+        private SExplorationWorldLevelsHolder sceneGroupHolder;
         
         [Title("Scene")] 
         [ShowInInspector,DisableInEditorMode]
         private IExplorationSceneDataHolder _currentExplorationSceneData;
 
-
+        public SExplorationWorldLevelsHolder GetWorldDataHolder() => sceneGroupHolder;
 
         [Button,DisableInEditorMode]
         private void TestRandomWorld(int targetGroupIndex)

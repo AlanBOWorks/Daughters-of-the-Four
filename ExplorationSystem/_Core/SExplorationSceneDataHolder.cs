@@ -17,7 +17,11 @@ namespace ExplorationSystem
     {
         private const string AssetPrefix = "[ExplorationScene Data]";
 
-        [Title("Visuals")]
+        [Title("Info")] 
+        [SerializeField] private string sceneName = "NULL";
+        [SerializeField] private Sprite sceneIcon;
+
+        [Title("Scenes")]
         [SerializeField] private SceneAsset backgroundScene;
         [SerializeField] private SceneAsset fightScene;
 
@@ -37,6 +41,8 @@ namespace ExplorationSystem
         [SerializeField, Tooltip("How many weak entities are added to normal entities")]
         private SRange eliteWeakEntitiesAddition = new SRange(0, 1);
 
+        public string GetSceneName() => sceneName;
+        public Sprite GetSceneIcon() => sceneIcon;
         public SceneAsset GetBackgroundSceneAsset() => backgroundScene;
         public SceneAsset GetFightSceneAsset() => fightScene;
         public ISceneEntitiesHolder GetBasicEntities() => basicEntities;
@@ -145,6 +151,8 @@ namespace ExplorationSystem
 
     public interface IExplorationSceneDataHolder : IExplorationEntitiesSpawnRateHolder
     {
+        string GetSceneName();
+        Sprite GetSceneIcon();
         SceneAsset GetBackgroundSceneAsset();
         SceneAsset GetFightSceneAsset();
         ISceneEntitiesHolder GetBasicEntities();

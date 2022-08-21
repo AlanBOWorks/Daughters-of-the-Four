@@ -35,6 +35,9 @@ namespace Utils_Project.Scene
             HandleFillFromLeft(true);
             fillerImageMask.fillAmount = 0;
             LoadSceneManagerSingleton.Injection(this);
+
+            DoAsyncFuncInitializations();
+            DoSimpleTransitionInitializations();
         }
 
         public void SubscribeListener(IScreenLoadListener listener)
@@ -70,17 +73,18 @@ namespace Utils_Project.Scene
 
         public bool IsLoadingScene() => _fillingCoroutineHandle.IsRunning;
         private CoroutineHandle _fillingCoroutineHandle;
-        public void DoSceneTransition(LoadSceneParameters parameters,
-            Action onFinishLoad = null, Action onAfterFinishLoadScreen = null)
+        public void DoSceneTransition(
+            LoadSceneParameters parameters,
+            LoadSceneParameters.ISceneLoadListener listener)
         {
             if(IsLoadingScene()) return;
 
             _fillingCoroutineHandle =
-                Timing.RunCoroutine(_SceneSwapSequence(parameters, onFinishLoad, onAfterFinishLoadScreen));
+                Timing.RunCoroutine(_SceneSwapSequence(parameters, listener));
         }
 
 
-
+        #region Transition Tweens
         private const float FillThreshold = .98f;
         private IEnumerator<float> _FadeInLoadScreen(bool isLeftFill, float deltaModifier = 1)
         {
@@ -142,69 +146,61 @@ namespace Utils_Project.Scene
             fillerImageMask.fillAmount = 0;
 
         }
+        #endregion
+        #region Transition Operation
 
-        private IEnumerator<float> _SceneSwapSequence(LoadSceneParameters loadParameters,
-            Action onFinishLoad = null, Action onAfterFinishLoadScreen = null)
+        private static void ExtractValues(LoadSceneParameters.ISceneLoadListener listener,
+            out ISceneLoadFirstLastCallListener firstLastListener,
+            out ISceneHiddenListener hiddenListener,
+            out ISceneLoadingListener tickingListener)
         {
-            loadParameters.ExtractValues(
-                out var sceneName,
-                out var fillFromLeft, 
-                out var isAdditive,out var deltaModifier);
+            firstLastListener = null;
+            hiddenListener = null;
+            tickingListener = null;
 
-            gameObject.SetActive(true);
+            if (listener == null) return;
 
-            yield return Timing.WaitForOneFrame;
-            yield return Timing.WaitUntilDone(_FadeInLoadScreen(fillFromLeft,deltaModifier));
-
-            var loadSceneMode = isAdditive ? LoadSceneMode.Additive : LoadSceneMode.Single;
-            var sceneAsync = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
-            while (!sceneAsync.isDone)
-            {
-                yield return Timing.WaitForOneFrame;
-                var currentLoad = sceneAsync.progress;
-                foreach (var listener in _loadPercentListeners)
-                {
-                    listener.OnPercentTick(currentLoad);
-                }
-            }
-            onFinishLoad?.Invoke();
-            yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fillFromLeft,deltaModifier));
-            onAfterFinishLoadScreen?.Invoke();
-            gameObject.SetActive(false);
+            if (listener is ISceneLoadFirstLastCallListener firstLastCall)
+                firstLastListener = firstLastCall;
+            if (listener is ISceneHiddenListener transition)
+                hiddenListener = transition;
+            if (listener is ISceneLoadingListener loadingListener)
+                tickingListener = loadingListener;
         }
 
-        public void DoJustScreenTransition(float waitUntilHide, bool fromLeft,
-            Action<bool> screenShowsFeedback = null, float deltaModifier = 1)
+        private IEnumerator<float> _TransitionSequence(
+            bool fillFromLeft, float deltaModifier,
+            AsyncActions feedback,
+            LoadSceneParameters.ISceneLoadListener feedbackListener
+            )
         {
-            Timing.KillCoroutines(_fillingCoroutineHandle);
-            _fillingCoroutineHandle = Timing.RunCoroutine(_DoScreenTransition(), Segment.RealtimeUpdate);
+            ExtractValues(feedbackListener,
+                out var firstLastListener,
+                out var hiddenListener,
+                out var tickingListener);
+            var onHideAction = feedback.OnHideSceneFeedback;
+            var isFinishFunc = feedback.IsFinishFunc;
+            var currentPercentFunc = feedback.CurrentPercent;
 
-            IEnumerator<float> _DoScreenTransition()
+
+            gameObject.SetActive(true);
+            yield return Timing.WaitForOneFrame;
+            firstLastListener?.OnStartTransition();
+            yield return Timing.WaitUntilDone(_FadeInLoadScreen(fillFromLeft, deltaModifier));
+            hiddenListener?.OnStartLoading();
+            onHideAction?.Invoke();
+
+            while (!isFinishFunc())
             {
-                gameObject.SetActive(true);
-                yield return Timing.WaitUntilDone(_FadeInLoadScreen(fromLeft, deltaModifier));
                 yield return Timing.WaitForOneFrame;
-                float timer = 0;
-                if (waitUntilHide > 0)
-                {
-                    while (timer < waitUntilHide)
-                    {
-                        yield return Timing.DeltaTime;
-                        timer += Timing.DeltaTime;
-                        float currentLoad = timer / waitUntilHide;
-
-                        CallEvents(currentLoad);
-                    }
-                }
-                else CallEvents(1);
-
-
-                screenShowsFeedback?.Invoke(true);
-                yield return Timing.WaitForOneFrame;
-                yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fromLeft, deltaModifier));
-                screenShowsFeedback?.Invoke(false);
-                gameObject.SetActive(false);
+                var currentLoad = currentPercentFunc.Invoke();
+                CallEvents(currentLoad);
             }
+            hiddenListener?.OnLoadingFinish();
+            yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fillFromLeft, deltaModifier));
+            firstLastListener?.OnFinishTransition();
+            gameObject.SetActive(false);
+
 
             void CallEvents(float currentLoad)
             {
@@ -212,32 +208,106 @@ namespace Utils_Project.Scene
                 {
                     listener.OnPercentTick(currentLoad);
                 }
+                tickingListener?.OnLoadSceneTick(currentLoad);
+            }
+        }
+        private readonly struct AsyncActions
+        {
+            public readonly Action OnHideSceneFeedback;
+            public readonly Func<bool> IsFinishFunc;
+            public readonly Func<float> CurrentPercent;
+
+            public AsyncActions(Action onHideAction, Func<bool> isFinishFunc, Func<float> currentPercentFunc)
+            {
+                OnHideSceneFeedback = onHideAction;
+                IsFinishFunc = isFinishFunc;
+                CurrentPercent = currentPercentFunc;
             }
         }
 
-        public void DoJustScreenTransition(Func<bool> isFinishCheck, bool fromLeft,
-            Action<bool> screenShowsFeedback = null, float deltaModifier = 1)
+        #endregion
+
+
+
+        //// LOAD SCENE SEGMENT
+        #region LOAD SCENE
+        private AsyncOperation _currentLoadingAsyncOperation;
+        private Func<bool> _isFinishAsyncOperation;
+        private Func<float> _asyncOperationPercent;
+
+        private IEnumerator<float> _SceneSwapSequence(
+            LoadSceneParameters loadParameters,
+            LoadSceneParameters.ISceneLoadListener feedbackListener)
+        {
+            loadParameters.ExtractValues(
+                out var sceneName,
+                out var fillFromLeft,
+                out var isAdditive, out var deltaModifier);
+
+            var actions = new AsyncActions(DoLoadAsync, _isFinishAsyncOperation, _asyncOperationPercent);
+            return _TransitionSequence(fillFromLeft, deltaModifier, actions, feedbackListener);
+
+            void DoLoadAsync()
+            {
+                var loadSceneMode = isAdditive ? LoadSceneMode.Additive : LoadSceneMode.Single;
+                _currentLoadingAsyncOperation = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
+            }
+        }
+
+        private void DoAsyncFuncInitializations()
+        {
+            if (_isFinishAsyncOperation == null) _isFinishAsyncOperation = IsFinish;
+            if (_asyncOperationPercent == null) _asyncOperationPercent = CurrentPercent;
+
+
+            bool IsFinish() => _currentLoadingAsyncOperation.isDone;
+            float CurrentPercent() => _currentLoadingAsyncOperation.progress;
+        }
+        #endregion
+
+
+
+        //// JUST SIMPLE TRANSITION SEGMENT
+        private Func<bool> _isSimpleTransitionFinish;
+        private Func<float> _simpleTransitionPercent;
+        private float _currentSimpleTransitionTimerThreshold;
+        private float _currentSimpleTransitionTimer;
+
+        private void DoSimpleTransitionInitializations()
+        {
+            _isSimpleTransitionFinish = IsWaitFinish;
+            _simpleTransitionPercent = CurrentLoad;
+
+            bool IsWaitFinish()
+            {
+                _currentSimpleTransitionTimer += Time.deltaTime;
+                return _currentSimpleTransitionTimer > _currentSimpleTransitionTimerThreshold;
+            }
+
+            float CurrentLoad() => _currentSimpleTransitionTimer / _currentSimpleTransitionTimerThreshold;
+        }
+
+        public void DoJustScreenTransition(
+            float waitUntilHide, bool fromLeft, float deltaModifier = 1,
+            LoadSceneParameters.ISceneLoadListener feedbackListener = null)
         {
             Timing.KillCoroutines(_fillingCoroutineHandle);
+
+            const float minTimerThreshold = .2f;
+
+            _currentSimpleTransitionTimer = 0;
+            _currentSimpleTransitionTimerThreshold = (waitUntilHide > minTimerThreshold) 
+                ? waitUntilHide 
+                : minTimerThreshold;
             _fillingCoroutineHandle = Timing.RunCoroutine(_DoScreenTransition(), Segment.RealtimeUpdate);
 
             IEnumerator<float> _DoScreenTransition()
             {
-                gameObject.SetActive(true);
-                yield return Timing.WaitUntilDone(_FadeInLoadScreen(fromLeft, deltaModifier));
-                
-                do
-                {
-                    yield return Timing.WaitForOneFrame;
-                } while (!isFinishCheck());
-
-                screenShowsFeedback?.Invoke(true);
-                yield return Timing.WaitForOneFrame;
-                yield return Timing.WaitUntilDone(_FadeOutLoadScreen(fromLeft, deltaModifier));
-                screenShowsFeedback?.Invoke(false);
-                gameObject.SetActive(false);
+                var actions = new AsyncActions(null, _isSimpleTransitionFinish, _simpleTransitionPercent);
+                return _TransitionSequence(fromLeft, deltaModifier, actions, feedbackListener);
             }
         }
+
     }
 
     public interface IScreenLoadListener

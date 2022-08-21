@@ -198,7 +198,7 @@ namespace CharacterSelector
                 throw new AccessViolationException($"Team wasn't ready - Count: [{CalculateTrueSelectedCharactersCount()}]");
 
             PlayerExplorationSingleton.Instance.InjectTeam(this);
-            UtilsScene.LoadExplorationScene(true, false);
+            UtilsScene.LoadWorldMapScene(true, false);
         }
 
 
