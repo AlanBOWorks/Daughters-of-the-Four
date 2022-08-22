@@ -2,12 +2,12 @@ using System;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using Utils_Project;
 
 namespace ExplorationSystem.Elements
 {
-    public class UWorldElementHolder : MonoBehaviour
+    public class UWorldElementHolder : MonoBehaviour, IPointerClickHandler
     {
         [Title("Injections")] 
         [SerializeField] private SExplorationSceneDataHolder targetScene;
@@ -51,10 +51,12 @@ namespace ExplorationSystem.Elements
             iconHolder.sprite = icon;
         }
 
-        public void GoToWorld()
+        public void OnPointerClick(PointerEventData eventData)
         {
-            if(_currentScene == null)
-                throw new NullReferenceException("Sending NULL Scene");
+            PlayerExplorationSingleton.WorldExplorationHandler.LoadExplorationScene(_currentScene);
+
         }
+        
+
     }
 }

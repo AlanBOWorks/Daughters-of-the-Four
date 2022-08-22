@@ -16,11 +16,17 @@ namespace ExplorationSystem
         static PlayerExplorationSingleton()
         { 
             Instance = new PlayerExplorationSingleton();
+            WorldExplorationHandler = new WorldExplorationHandler();
             EventsHolder = new ExplorationEventsHolder();
 
             var themeAsset =
                 AssetDatabase.LoadAssetAtPath<SExplorationThemeHolder>(SExplorationThemeHolder.AssetPath);
             ExplorationThemeHolder = themeAsset.GetDataHolder();
+
+#if UNITY_EDITOR
+            ExplorationEventsDebugLogs = new ExplorationEventsDebugLogs();
+            EventsHolder.Subscribe(ExplorationEventsDebugLogs);
+#endif
         }
 
         public void InjectTeam(ITeamFlexStructureRead<ICombatEntityProviderHolder> team)
@@ -31,6 +37,9 @@ namespace ExplorationSystem
             FlexType = HandleInstantiation(team.FlexType.GetEntityProvider());
         }
 
+        [Title("Core")] 
+        [ShowInInspector] 
+        public static readonly WorldExplorationHandler WorldExplorationHandler;
         [Title("Events")]
         [ShowInInspector] 
         public static readonly ExplorationEventsHolder EventsHolder;
@@ -63,13 +72,17 @@ namespace ExplorationSystem
             private PlayerExplorationSingleton _explorationSingleton;
 
 
-            [MenuItem("Game/Debug/Player Exploration [Singleton]")]
+            [MenuItem("Game/Debug/Player Exploration [Singleton]", priority = -100)]
             private static void ShowWindow()
             {
                 var window = GetWindow<PlayerExplorationSingletonWindow>();
                 window._explorationSingleton = Instance;
             }
         }
+
+#if UNITY_EDITOR
+        internal static readonly ExplorationEventsDebugLogs ExplorationEventsDebugLogs;
+#endif
     }
 
 }

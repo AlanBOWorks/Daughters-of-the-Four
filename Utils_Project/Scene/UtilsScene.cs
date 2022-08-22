@@ -36,13 +36,16 @@ namespace Utils_Project
             DoSceneTransition(parameters);
         }
 
-        public static void DoTransitionExplorationScene(bool showLoadScreenFromLeft, float deltaModifier)
+        public static void DoTransitionExplorationScene(string explorationSceneName, bool showLoadScreenFromLeft,
+            LoadSceneParameters.ISceneLoadListener listener = null,
+            float deltaModifier = 1)
         {
-
+            LoadSceneParameters parameters = new LoadSceneParameters(
+                explorationSceneName, showLoadScreenFromLeft, true, deltaModifier);
+            DoSceneTransition(parameters,listener);
         }
 
 
-        /// <param name="onLoadFinish">Action fired after loading the scene</param>
         public static void LoadBattleScene(string sceneName, float deltaModifier = 1, 
             LoadSceneParameters.ISceneLoadListener listener = null)
         {
