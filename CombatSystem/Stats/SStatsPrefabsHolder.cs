@@ -1,5 +1,5 @@
 using System;
-using CombatSystem.Skills.Effects;
+using CombatSystem.Skills;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Utils;

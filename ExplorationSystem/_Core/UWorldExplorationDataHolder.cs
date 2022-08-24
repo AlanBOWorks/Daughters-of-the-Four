@@ -1,10 +1,12 @@
+using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace ExplorationSystem
 {
-    public class UWorldExplorationDataHolder : MonoBehaviour
+    public class UWorldExplorationDataHolder : MonoBehaviour, ISceneChangeListener
     {
         [Title("References")] 
         [SerializeField, InlineEditor()] 
@@ -14,31 +16,35 @@ namespace ExplorationSystem
         [ShowInInspector,DisableInEditorMode]
         private IExplorationSceneDataHolder _currentExplorationSceneData;
 
-        public SExplorationWorldLevelsHolder GetWorldDataHolder() => sceneGroupHolder;
+        private int _currentWorldLevelIndex;
 
-        [Button,DisableInEditorMode]
-        private void TestRandomWorld(int targetGroupIndex)
+        private void Awake()
         {
-            var group = sceneGroupHolder.GetWorld()[targetGroupIndex];
-            var targetScenes = group.GetScenes();
-            var targetScene = targetScenes[Random.Range(0, targetScenes.Length)];
-            Injection(targetScene);
+            PlayerExplorationSingleton.EventsHolder.Subscribe(this);
+        }
+        private void OnDestroy()
+        {
+            PlayerExplorationSingleton.EventsHolder.UnSubscribe(this);
         }
 
 
-
-        private void Injection(IExplorationSceneDataHolder dataHolder)
+        public void OnSceneChange(IExplorationSceneDataHolder sceneData)
         {
-            if(_currentExplorationSceneData == dataHolder) return;
-
-            _currentExplorationSceneData = dataHolder;
-            PlayerExplorationSingleton.EventsHolder.OnSceneChange(dataHolder);
+            _currentExplorationSceneData = sceneData;
         }
-
     }
 
     internal interface ISceneChangeListener : IExplorationEventListener
     {
         void OnSceneChange(IExplorationSceneDataHolder sceneData);
+    }
+
+
+    [Serializable]
+    internal struct LevelGroupValues
+    {
+        [SerializeField] private SExplorationSceneDataHolder[] scenes;
+
+        public SExplorationSceneDataHolder[] GetScenes() => scenes;
     }
 }

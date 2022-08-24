@@ -2,7 +2,7 @@ using CombatSystem.Entity;
 using CombatSystem.Stats;
 using UnityEngine;
 
-namespace CombatSystem.Skills.Effects
+namespace CombatSystem.Skills
 {
 
     public interface IEffectPreset

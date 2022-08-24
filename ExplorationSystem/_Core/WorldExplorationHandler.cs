@@ -8,7 +8,7 @@ using Utils_Project.Scene;
 
 namespace ExplorationSystem
 {
-    public sealed class WorldExplorationHandler : ISceneHiddenListener
+    internal sealed class WorldExplorationHandler : ISceneHiddenListener, IWorldSceneListener
     {
         [Title("Current")]
         [ShowInInspector]
@@ -19,9 +19,39 @@ namespace ExplorationSystem
         [ShowInInspector]
         private string _lastSceneName;
 
+        public int CurrentWorldIndex;
 
         public ref IExplorationSceneDataHolder GetDataHolder() => ref _currentSceneHolder;
 
+        private bool IsTheSameSceneLoad() => _lastSceneName == _currentSceneName;
+        public void OnStartLoading()
+        {
+            PlayerExplorationSingleton.EventsHolder.OnWorldMapClose(_currentSceneHolder);
+            if (IsTheSameSceneLoad() || _lastSceneName == null) return;
+
+            SceneManager.UnloadSceneAsync(_lastSceneName);
+        }
+
+        public void OnLoadingFinish()
+        {
+        }
+        public void OnWorldSceneOpen(IExplorationSceneDataHolder lastMap)
+        {
+            /*
+             * VVVVVVVVVV THIS SHOULDN'T BE DONE VVVVVVVVVVVVV
+             *  if (lastMap == null) CurrentWorldIndex = 0;
+             * VVVVVVVVVV WARNING: VVVVVVVVVVVVV
+             *
+             * This should not be done because could do a [value racing] onLoadingPlayState:
+             * The load could have another index value but be overriden to 0 instead its intended value  
+             */
+        }
+
+        public void OnWorldMapClose(IExplorationSceneDataHolder targetMap)
+        {
+            if (targetMap == null)
+                CurrentWorldIndex = 0; // this is a safe value override (in case this object is used outside of its Mono
+        }
 
         public void LoadExplorationScene(IExplorationSceneDataHolder targetScene)
         {
@@ -33,9 +63,15 @@ namespace ExplorationSystem
             if (targetScene == null)
             {
                 loadFromBackUp = true;
-                var backUpSceneAsset = AssetDatabase.LoadAssetAtPath<SExplorationSceneDataHolder>(
-                    NullReferenceAssetPaths.ExplorationSceneAssetPath);
-                targetScene = backUpSceneAsset;
+                const string folderPath = AssetPaths.ExplorationScenesScriptablesFolderPath;
+                var assetPath = folderPath + GetNullReferenceLevelPathByLevel();
+                var backUpSceneAsset = AssetDatabase.LoadAssetAtPath<SExplorationSceneDataHolder>(assetPath);
+                _currentSceneHolder = backUpSceneAsset;
+
+                string GetNullReferenceLevelPathByLevel()
+                {
+                    return SExplorationSceneDataHolder.NullReferencePath_EarlyLevel; //todo check currentLevel index
+                }
             }
             else
             {
@@ -56,25 +92,11 @@ namespace ExplorationSystem
 
             _currentSceneName = targetSceneName;
 
-            // Event Call in here
-            PlayerExplorationSingleton.EventsHolder.OnWorldMapClose(targetScene);
-            // Event Call in here
-
             if (IsTheSameSceneLoad()) return;
             UtilsScene.DoTransitionExplorationScene(targetSceneName, true, this, 2);
         }
 
-        private bool IsTheSameSceneLoad() => _lastSceneName == _currentSceneName;
-        public void OnStartLoading()
-        {
-            if(IsTheSameSceneLoad() || _lastSceneName == null) return;
 
-            SceneManager.UnloadSceneAsync(_lastSceneName);
-        }
-
-        public void OnLoadingFinish()
-        {
-        }
     }
 
     public interface IWorldSceneListener : IExplorationEventListener

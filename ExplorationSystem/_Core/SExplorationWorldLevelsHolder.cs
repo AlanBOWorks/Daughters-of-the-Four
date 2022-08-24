@@ -27,14 +27,6 @@ namespace ExplorationSystem
             Debug.Log("All fine");
         } 
 #endif
-
-
-        [Serializable]
-        internal struct LevelGroupValues
-        {
-            [SerializeField] private SExplorationSceneDataHolder[] scenes;
-
-            public SExplorationSceneDataHolder[] GetScenes() => scenes;
-        }
     }
+
 }

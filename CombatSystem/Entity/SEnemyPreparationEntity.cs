@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using CombatSystem.Skills;
-using CombatSystem.Skills.Presets;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -11,8 +10,7 @@ namespace CombatSystem.Entity
 {
     [CreateAssetMenu(menuName = "Combat/Entities/[Enemy] Preparation",
         fileName = "N " + AssetPrefixName)]
-    public class SEnemyPreparationEntity : SPreparationEntityBase,
-        IEnemyEntityVariationStructureRead<ICombatEntityPreparation>
+    public class SEnemyPreparationEntity : SPreparationEntityBase
     {
         public const string AssetPrefixName = " [ENEMY Preparation Entity]";
         private const string NullName = "NULL";
@@ -23,7 +21,7 @@ namespace CombatSystem.Entity
          AssetSelector(Paths = EnemiesAssetPathFolder)]
         private GameObject instantiationObject;
 
-        [Title("Names")]
+        [Title("Info")]
         [SerializeField] 
         private SEnemyPreparationEntity variateFromPreset;
         [SerializeField, InfoBox("Name will be added to the end of the preset above", 
@@ -31,6 +29,7 @@ namespace CombatSystem.Entity
              InfoMessageType = InfoMessageType.Warning)] 
         private string entityName = NullName;
 
+        [SerializeField] private EnumCombat.RankingTier dangerTier;
 
 
 
@@ -148,13 +147,11 @@ namespace CombatSystem.Entity
 
         public bool HasVariationEntities() => variationEntities.Count > 0;
         public ICombatEntityPreparation GetFirstVariationEntity() => variationEntities[0];
-        public ICombatEntityPreparation WeakType => variationEntities.Count > 0 ? variationEntities[0] : null;
-        public ICombatEntityPreparation CorruptedType => variationEntities.Count > 1 ? variationEntities[1] : WeakType;
-    }
 
-    public interface IEnemyEntityVariationStructureRead<out T>
-    {
-        T WeakType { get; }
-        T CorruptedType { get; }
+
+        protected override string GetEntityFrontAssetName()
+        {
+            return base.GetEntityFrontAssetName() + $"({dangerTier}) ";
+        }
     }
 }

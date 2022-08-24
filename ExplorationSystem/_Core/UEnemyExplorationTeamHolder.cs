@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ExplorationSystem
 {
-    public class UEnemyExplorationTeamHolder : MonoBehaviour, ISceneChangeListener
+    public class UEnemyExplorationTeamHolder : MonoBehaviour, ISceneChangeListener, IWorldSceneListener
     {
 
         [Title("Behaviour")]
@@ -19,23 +19,58 @@ namespace ExplorationSystem
             _teamWrapper = new EnemyTeamWrapper();
             PlayerExplorationSingleton.EventsHolder.Subscribe(this);
         }
+        private void OnDestroy()
+        {
+            PlayerExplorationSingleton.EventsHolder.UnSubscribe(this);
+        }
+        public void OnSceneChange(IExplorationSceneDataHolder sceneData)
+        {
+            _teamWrapper.Injection(sceneData);
+        }
+
+        public void OnWorldSceneOpen(IExplorationSceneDataHolder lastMap)
+        {
+            _teamWrapper.ResetState();
+        }
+
+        public void OnWorldMapClose(IExplorationSceneDataHolder targetMap)
+        {
+            if (targetMap == null)
+                _teamWrapper.ResetState();
+        }
+
+
 
         private sealed class EnemyTeamWrapper : IExplorationThreatsStructureRead<ICombatTeamProvider>
         {
-            [ShowInInspector, HorizontalGroup("Basic enemies")]
-            private readonly BasicEntitiesWrapper _basicEnemies;
-            [ShowInInspector, HorizontalGroup("Basic enemies")]
-            private readonly HashSet<ICombatEntityProvider> _weakEntities;
-
+            [ShowInInspector]
+            private IExplorationSceneEntitiesHolder _entitiesHolder;
+            private IExplorationSceneEntitiesHolder _halfMapEntitiesHolder;
             private IExplorationEntitiesSpawnRateHolder _spawnRates;
-            private readonly TeamWrapper _selectedEntities;
+            private readonly CombatTeamProviderWrapper _selectedEntities;
+
+
+            public bool IsHalfMapReached;
+
             public EnemyTeamWrapper()
             {
-                _weakEntities = new HashSet<ICombatEntityProvider>();
-                _basicEnemies = new BasicEntitiesWrapper();
-
-                _selectedEntities = new TeamWrapper();
+                _selectedEntities = new CombatTeamProviderWrapper();
             }
+
+
+            public void ResetState()
+            {
+                _selectedEntities.Clear();
+                IsHalfMapReached = false;
+            }
+            public void Injection(IExplorationSceneDataHolder dataHolder)
+            {
+                ResetState();
+                _entitiesHolder = dataHolder.GetEntities();
+                _halfMapEntitiesHolder = dataHolder.GetHalfMapEntities();
+                _spawnRates = dataHolder.GetSpawnRates();
+            }
+
 
             public ICombatTeamProvider BasicThreatType => DoBossTeamSelection();
             private ICombatTeamProvider DoBasicTeamSelection()
@@ -58,81 +93,15 @@ namespace ExplorationSystem
                 throw new NotImplementedException();
             }
 
-
-
-
-
-
             public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => _selectedEntities;
 
 
-            public void Injection(IExplorationSceneDataHolder dataHolder)
-            {
-                ResetState();
-                _spawnRates = dataHolder;
-
-                var basicEntities = dataHolder.GetBasicEntities();
-                var basicEntitiesEnumerable = UtilsTeam.GetEnumerable(_basicEnemies, basicEntities);
-                foreach (var (collection, sceneEntities) in basicEntitiesEnumerable)
-                {
-                    Injection(collection, sceneEntities);
-                }
-            }
-
-            private void ResetState()
-            {
-                _selectedEntities.Clear();
-
-                _basicEnemies.Clear();
-                _weakEntities.Clear();
-            }
-
-            private void Injection(ISet<ICombatEntityProvider> collection,
-                IEnumerable<SceneEntitiesData> basicEntities)
-            {
-                foreach (var data in basicEntities)
-                {
-                    var entity = data.GetEntityPreset();
-                    collection.Add(entity);
-                    if (data.IgnoreVariations()) continue;
-                    _weakEntities.Add(entity);
-                }
-            }
 
 
-            private sealed class BasicEntitiesWrapper : ITeamFlexStructureRead<HashSet<ICombatEntityProvider>>
-            {
-                public BasicEntitiesWrapper()
-                {
-                    VanguardType = new HashSet<ICombatEntityProvider>();
-                    AttackerType = new HashSet<ICombatEntityProvider>();
-                    SupportType = new HashSet<ICombatEntityProvider>();
-                    FlexType = new HashSet<ICombatEntityProvider>();
-                }
-
-                public void Clear()
-                {
-                    VanguardType.Clear();
-                    AttackerType.Clear();
-                    SupportType.Clear();
-                    FlexType.Clear();
-                }
-
-                public HashSet<ICombatEntityProvider> VanguardType { get; }
-                public HashSet<ICombatEntityProvider> AttackerType { get; }
-                public HashSet<ICombatEntityProvider> SupportType { get; }
-                public HashSet<ICombatEntityProvider> FlexType { get; }
-            }
-
-            private sealed class TeamWrapper : List<ICombatEntityProvider>, ICombatTeamProvider
+            private sealed class CombatTeamProviderWrapper : List<ICombatEntityProvider>, ICombatTeamProvider
             {
                 public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => this;
             }
-        }
-
-        public void OnSceneChange(IExplorationSceneDataHolder sceneData)
-        {
-            _teamWrapper.Injection(sceneData);
         }
     }
 }

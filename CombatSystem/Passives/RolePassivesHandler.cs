@@ -1,7 +1,7 @@
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Localization;
-using CombatSystem.Skills.Effects;
+using CombatSystem.Skills;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using UnityEngine;

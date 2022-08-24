@@ -1,6 +1,6 @@
 using CombatSystem._Core;
 using CombatSystem.Entity;
-using CombatSystem.Skills.Effects;
+using CombatSystem.Skills;
 using UnityEngine;
 
 namespace CombatSystem.Passives

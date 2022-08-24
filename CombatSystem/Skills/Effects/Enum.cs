@@ -1,6 +1,6 @@
 using System;
 
-namespace CombatSystem.Skills.Effects
+namespace CombatSystem.Skills
 {
     public static class EnumsEffect
     {

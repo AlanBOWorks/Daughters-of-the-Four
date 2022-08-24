@@ -7,7 +7,7 @@ using CombatSystem.Stats;
 using CombatSystem.Team;
 using UnityEngine;
 
-namespace CombatSystem.Skills.Effects
+namespace CombatSystem.Skills
 {
     public static class UtilsCombatSkill
     {

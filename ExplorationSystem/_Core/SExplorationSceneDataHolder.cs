@@ -17,43 +17,51 @@ namespace ExplorationSystem
         IExplorationSceneDataHolder
     {
         private const string AssetPrefix = "[ExplorationScene Data]";
+        public const string NullReferencePath_EarlyLevel = "[BG_Level] -0.0 NULL BACKUP [ExplorationScene Data].asset";
+        public const string NullReferencePath_MidLevel = NullReferencePath_EarlyLevel; //todo new Asset
+        public const string NullReferencePath_LateLevel = NullReferencePath_MidLevel; //todo new Asset
+
 
 
         [Title("Info")] 
         [SerializeField] private string sceneName = "NULL";
-        [SerializeField] private Sprite sceneIcon;
+        [SerializeField, PreviewField, GUIColor(.4f,.4f,.4f)] private Sprite sceneIcon;
 
         [Title("Scenes")]
         [SerializeField] private SceneAsset backgroundScene;
         [SerializeField] private SceneAsset fightScene;
 
-        [Title("Basic Entities")] 
-        [SerializeField, Range(1,12)] private int maxEntitiesAllow = 4;
-
-        [SerializeField] private SRange basicEntitiesProportion = new SRange(2, 3);
-        [SerializeField] private SRange weakEntitiesProportion = new SRange(2, 3);
+        [Title("Entities")] 
         [SerializeReference]
-        private ISceneEntitiesHolder basicEntities;
+        private IExplorationSceneEntitiesHolder entitiesHolder;
+        [SerializeReference, Tooltip("This entities will be used only after the Half Map is explored " +
+                                     "(this is for difficulty curve reason")]
+        private IExplorationSceneEntitiesHolder halfMapEntitiesHolder;
 
-        [Title("Elite Entities")] 
-        [SerializeField, Range(1, 12)] private int minEliteAmount = 4;
+        [TitleGroup("Rates")]
+        [SerializeField, Range(0, 1), SuffixLabel("00%"), ShowIf("halfMapEntitiesHolder"),
+         Tooltip("The probability of spawning entities from this collection;\n" +
+                 "Note: 1 means only this group will be spawned")]
+        private float halfMapEntitiesSpawnChance = 1;
+        [TitleGroup("Rates")]
+        [SerializeReference]
+        private IExplorationEntitiesSpawnRateHolder spawnRates;
 
-        [SerializeField, Tooltip("How many default entities are added to normal entities")] 
-        private SRange eliteEntitiesAddition = new SRange(0, 1);
-        [SerializeField, Tooltip("How many weak entities are added to normal entities")]
-        private SRange eliteWeakEntitiesAddition = new SRange(0, 1);
 
+
+
+        // Getters
         public string GetSceneName() => sceneName;
         public Sprite GetSceneIcon() => sceneIcon;
         public SceneAsset GetBackgroundSceneAsset() => backgroundScene;
         public SceneAsset GetFightSceneAsset() => fightScene;
-        public ISceneEntitiesHolder GetBasicEntities() => basicEntities;
-        public SRange BasicCombatEntitiesProportion => basicEntitiesProportion;
-        public SRange WeakCombatEntitiesProportion => weakEntitiesProportion;
-        public float MaxBasicEntitiesAmount => maxEntitiesAllow;
-        public SRange EliteEntitiesAddition => eliteEntitiesAddition;
-        public SRange EliteWeakEntitiesAddition => eliteWeakEntitiesAddition;
-        public float MinEliteEntitiesAmount => minEliteAmount;
+
+
+        public IExplorationSceneEntitiesHolder GetEntities() => entitiesHolder;
+        public IExplorationSceneEntitiesHolder GetHalfMapEntities() => halfMapEntitiesHolder;
+        public IExplorationEntitiesSpawnRateHolder GetSpawnRates() => spawnRates;
+
+        public float HalfMapEntitiesChance => halfMapEntitiesSpawnChance;
 
 
         [Button]
@@ -65,117 +73,59 @@ namespace ExplorationSystem
                 return;
             }
 
-            var targetName = backgroundScene.name;
+            var targetName = backgroundScene.name + $" - {sceneName}";
             UtilsAssets.UpdateAssetName(this, targetName + $" {AssetPrefix}");
         }
 
-        [Serializable]
-        private sealed class EntitiesHolder : ISceneEntitiesHolder
-        {
-            [SerializeField,HorizontalGroup("FrontLine")] 
-            private SceneEntitiesData[] vanguardType = new SceneEntitiesData[0];
-            [SerializeField,HorizontalGroup("FrontLine")]
-            private SceneEntitiesData[] attackerType = new SceneEntitiesData[0];
-            [SerializeField,HorizontalGroup("BackLine")]
-            private SceneEntitiesData[] supportType = new SceneEntitiesData[0];
-            [SerializeField,HorizontalGroup("BackLine")] 
-            private SceneEntitiesData[] flexType = new SceneEntitiesData[0];
 
 
-            public IEnumerable<SceneEntitiesData> VanguardType => vanguardType;
-            public IEnumerable<SceneEntitiesData> AttackerType => attackerType;
-            public IEnumerable<SceneEntitiesData> SupportType => supportType;
-            public IEnumerable<SceneEntitiesData> FlexType => flexType;
-            public int TotalCount => vanguardType.Length + attackerType.Length + supportType.Length + flexType.Length;
-            public SceneEntitiesData GetAnyEntity(bool includeFlexType, int maxRandomTries = 2)
-            {
-                SceneEntitiesData[] collection;
-                bool isValid;
-
-                var maxRandom = includeFlexType ? 3 : 2;
-                for (int i = 0; i < maxRandomTries; i++)
-                {
-                    int random = Random.Range(0, maxRandom);
-                    HandleValues(random);
-                    if (isValid)
-                        return GetEntity();
-                }
-                
-                // if maxRandom surpassed > then iterate until has one entity
-                for (int i = 0; i < 3; i++)
-                {
-                    HandleValues(i);
-                    if (isValid)
-                        return GetEntity();
-                }
-
-
-                throw new NoNullAllowedException("There aren't any entities in this EntitiesHolder");
-
-                void HandleValues(int targetCollectionIndex)
-                {
-                    collection = GetCollection(targetCollectionIndex);
-                    isValid = collection != null && collection.Length > 0;
-                }
-
-                SceneEntitiesData GetEntity()
-                {
-                    return collection[Random.Range(0, collection.Length)];
-                }
-            }
-
-
-
-            private SceneEntitiesData[] GetCollection(int index)
-            {
-                return index switch
-                {
-                    // order is the spawn preference
-                    0 => attackerType,
-                    1 => supportType,
-                    2 => vanguardType,
-                    3 => flexType,
-                    _ => null
-                };
-            }
-        }
     }
 
-    [Serializable]
-    public struct SceneEntitiesData
+
+    public interface IExplorationSceneDataHolder :
+        IExplorationInfoHolder,
+        IExplorationSceneAssetsHolder
     {
-        [SerializeField] private SEnemyPreparationEntity preset;
-        [SerializeField] private bool forceIgnoreVariationEntities;
 
-        public SEnemyPreparationEntity GetEntityPreset() => preset;
-        public bool IgnoreVariations() => forceIgnoreVariationEntities;
+        IExplorationSceneEntitiesHolder GetEntities();
+
+        /// <summary>
+        /// The chance of [Half Map Entities] spawning instead of the initial ones (in Unit[0,1]); <br></br>
+        /// 1 == Override type
+        /// </summary>
+        float HalfMapEntitiesChance { get; }
+        IExplorationSceneEntitiesHolder GetHalfMapEntities();
+        IExplorationEntitiesSpawnRateHolder GetSpawnRates();
     }
 
-    public interface IExplorationSceneDataHolder : IExplorationEntitiesSpawnRateHolder
+    public interface IExplorationInfoHolder
     {
         string GetSceneName();
         Sprite GetSceneIcon();
+    }
+
+    public interface IExplorationSceneAssetsHolder
+    {
         SceneAsset GetBackgroundSceneAsset();
         SceneAsset GetFightSceneAsset();
-        ISceneEntitiesHolder GetBasicEntities();
+    }
 
-        
+    public interface IExplorationSceneEntitiesHolder
+    {
+        ISceneEntitiesHolder GetBasicEntities();
+        ISceneEntitiesHolder GetWeakBasicEntities();
+        ISceneEntitiesHolder GetEliteEntities();
     }
 
     public interface IExplorationEntitiesSpawnRateHolder
     {
-        SRange BasicCombatEntitiesProportion { get; }
-        SRange WeakCombatEntitiesProportion { get; }
-        float MaxBasicEntitiesAmount { get; }
+        SRange BasicCombatWeakEntitiesAddition { get; }
 
         SRange EliteEntitiesAddition { get; }
-        SRange EliteWeakEntitiesAddition { get; }
-        float MinEliteEntitiesAmount { get; }
     }
 
-    public interface ISceneEntitiesHolder : ITeamFlexStructureRead<IEnumerable<SceneEntitiesData>>
+    public interface ISceneEntitiesHolder : ICombatTeamProvider
     {
-        public int TotalCount { get; }
-        SceneEntitiesData GetAnyEntity(bool includeFlexType, int maxRandomTries = 2);
+        bool IsValid();
     }
 }

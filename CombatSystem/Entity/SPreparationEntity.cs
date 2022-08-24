@@ -52,14 +52,20 @@ namespace CombatSystem.Entity
         [Button]
         private void UpdateAssetWithRoleAndID()
         {
-            var areaData = GetAreaData();
-            string finalName = $"{areaData.RoleType.ToString().ToUpper()} - ";
+            string finalName = GetEntityFrontAssetName();
 
             finalName += GetProviderEntityName();
             finalName += AssetPrefix();
 
             UtilsAssets.UpdateAssetNameWithID(this, finalName);
         }
+
+        protected virtual string GetEntityFrontAssetName()
+        {
+            var areaData = GetAreaData();
+            return $"{areaData.RoleType.ToString().ToUpper()} - ";
+        }
+
 
         protected interface IEntitySkills : IStanceStructureRead<IReadOnlyCollection<IFullSkill>>
         { }

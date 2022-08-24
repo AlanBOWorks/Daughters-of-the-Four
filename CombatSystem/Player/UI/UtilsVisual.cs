@@ -1,4 +1,4 @@
-using CombatSystem.Skills.Effects;
+using CombatSystem.Skills;
 using CombatSystem.Stats;
 using UnityEngine;
 

@@ -34,16 +34,9 @@ namespace ExplorationSystem.Elements
         {
             _initialSize = iconHolder.sizeDelta;
             _targetSize = _initialSize * IncrementPercent;
+            VariateDeltas();
         }
-
-        private void Update()
-        {
-            TickIcon();
-            TickRotations();
-            TickHover();
-        }
-
-        private void OnEnable()
+        private void VariateDeltas()
         {
             float randomUnit = Random.value;
             _currentIconLerp = randomUnit;
@@ -55,6 +48,15 @@ namespace ExplorationSystem.Elements
             deltaRotationSpeed *= randomUnit;
             deltaPulsationSpeed *= randomUnit;
         }
+
+
+        private void Update()
+        {
+            TickIcon();
+            TickRotations();
+            TickHover();
+        }
+
 
         private void TickIcon()
         {
