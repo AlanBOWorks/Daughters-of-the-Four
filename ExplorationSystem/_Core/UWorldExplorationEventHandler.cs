@@ -14,18 +14,18 @@ namespace ExplorationSystem._Core
 
         private void Awake()
         {
-            _handler = PlayerExplorationSingleton.WorldExplorationHandler;
-            PlayerExplorationSingleton.EventsHolder.Subscribe(this);
+            _handler = ExplorationSingleton.WorldExplorationHandler;
+            ExplorationSingleton.EventsHolder.Subscribe(this);
         }
         private void OnDestroy()
         {
-            PlayerExplorationSingleton.EventsHolder.UnSubscribe(this);
+            ExplorationSingleton.EventsHolder.UnSubscribe(this);
         }
 
 
         private void OnEnable()
         {
-            PlayerExplorationSingleton.EventsHolder.OnWorldSceneOpen(GetCurrentScene());
+            ExplorationSingleton.EventsHolder.OnWorldSceneOpen(GetCurrentScene());
         }
 
 
@@ -39,7 +39,7 @@ namespace ExplorationSystem._Core
         {
             _handler.OnWorldMapClose(targetMap);
             hideOnGameWorldUnloaded.SetActive(false);
-            PlayerExplorationSingleton.EventsHolder.OnSceneChange(targetMap);
+            ExplorationSingleton.EventsHolder.OnSceneChange(targetMap);
         }
     }
 }

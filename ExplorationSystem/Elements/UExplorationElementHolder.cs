@@ -3,11 +3,10 @@ using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using Utils_Extended.UI;
 using Utils_Project.UI;
 
-namespace ExplorationSystem.Elements
+namespace ExplorationSystem
 {
     [RequireComponent(typeof(UButtonVisualEventsHolder))]
     public class UExplorationElementHolder : MonoBehaviour, IPointerClickHandler
@@ -59,8 +58,8 @@ namespace ExplorationSystem.Elements
         {
             _elementSelected = !_elementSelected;
             HandleVisuals();
+            ExplorationSingleton.EventsHolder.OnExplorationRequest(_currentBehaviour);
         }
-
         private void HandleVisuals()
         {
             if (_elementSelected)
@@ -73,4 +72,5 @@ namespace ExplorationSystem.Elements
             }
         }
     }
+
 }

@@ -5,6 +5,7 @@ using CombatSystem.Entity;
 using CombatSystem.Stats;
 using UnityEngine;
 using Utils;
+using Random = UnityEngine.Random;
 
 namespace CombatSystem.Team
 {
@@ -353,7 +354,17 @@ namespace CombatSystem.Team
         }
 
 
-
+        public static T GetElement<T>(int index, ITeamFlexStructureRead<T> structure)
+        {
+            return index switch
+            {
+                EnumTeam.VanguardIndex => structure.VanguardType,
+                EnumTeam.AttackerIndex => structure.AttackerType,
+                EnumTeam.SupportIndex => structure.SupportType,
+                EnumTeam.FlexIndex => structure.FlexType,
+                _ => throw new ArgumentOutOfRangeException(nameof(index), index, null)
+            };
+        }
         public static T GetElement<T>(int index, ITeamFullStructureRead<T> structure)
         {
             return index switch
@@ -466,13 +477,25 @@ namespace CombatSystem.Team
             }
         }
 
-
-
         public static IEnumerable<T> GetEnumerable<T>(ITeamTrinityStructureRead<T> structure)
         {
             yield return structure.VanguardType;
             yield return structure.AttackerType;
             yield return structure.SupportType;
+        }
+        public static IEnumerable<KeyValuePair<TKey,TValue>> GetEnumerable<TKey,TValue>(
+            ITeamTrinityStructureRead<TKey> keys, ITeamTrinityStructureRead<TValue> values)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.VanguardType,values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.AttackerType,values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SupportType,values.SupportType);
+        }
+        public static IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerable<TKey, TValue>(
+            FlexTeamStruct<TKey> keys, FlexTeamStruct<TValue> values)
+        {
+            yield return new KeyValuePair<TKey, TValue>(keys.VanguardType, values.VanguardType);
+            yield return new KeyValuePair<TKey, TValue>(keys.AttackerType, values.AttackerType);
+            yield return new KeyValuePair<TKey, TValue>(keys.SupportType, values.SupportType);
         }
         public static IEnumerable<T> GetEnumerable<T>(ITeamPositionStructureRead<T> structure)
         {

@@ -53,8 +53,7 @@ namespace ExplorationSystem.Elements
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            PlayerExplorationSingleton.WorldExplorationHandler.LoadExplorationScene(_currentScene);
-
+            ExplorationSingleton.WorldExplorationHandler.LoadExplorationScene(_currentScene);
         }
         
 

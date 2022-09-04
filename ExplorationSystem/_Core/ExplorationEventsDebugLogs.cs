@@ -61,18 +61,33 @@ namespace ExplorationSystem
             Debug.Log(targetLog);
         }
 
+        [Serializable]
+        private sealed class ExplorationSubmitLogs
+        {
+            public bool onExplorationRequest = true;
+        }
+
+        [ShowInInspector] private bool _showOnExplorationSubmitLogs = false;
+        [ShowInInspector, ShowIf("_showOnExplorationSubmitLogs")]
+        private ExplorationSubmitLogs _explorationSubmitLogs = new ExplorationSubmitLogs();
+        public void OnExplorationRequest(EnumExploration.ExplorationType type)
+        {
+            if(!_showOnExplorationSubmitLogs || !_explorationSubmitLogs.onExplorationRequest) return;
+            Debug.Log($"Exploration Submit: {type}");
+        }
 
         private sealed class ExplorationEventsDebugWindow : OdinEditorWindow
         {
             [ShowInInspector]
             private ExplorationEventsDebugLogs _debugLogs;
 
-            [MenuItem("Game/Debug/Player Exploration [EVENTS]", priority =  2)]
+            [MenuItem("Game/Debug/Exploration DeLogs [EVENTS]", priority =  2)]
             private static void OpenWindow()
             {
                 var window = GetWindow<ExplorationEventsDebugWindow>();
-                window._debugLogs = PlayerExplorationSingleton.ExplorationEventsDebugLogs;
+                window._debugLogs = ExplorationSingleton.ExplorationEventsDebugLogs;
             }
         }
+
     }
 }

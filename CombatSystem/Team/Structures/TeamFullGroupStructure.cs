@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace CombatSystem.Team
 {
-    public class TeamFullGroupStructure<T> : TeamMainGroupStructure<T>, ITeamFullStructureRead<T>
+    public class TeamFullGroupStructure<T> : TeamRolesStructure<T>, ITeamFullStructureRead<T>
     {
         [ShowInInspector, TitleGroup("Vanguard")]
         public T SecondaryVanguardElement { get; set; }
@@ -25,6 +26,52 @@ namespace CombatSystem.Team
         public T ThirdSupportElement { get; set; }
         [ShowInInspector, TitleGroup("Flex")]
         public T ThirdFlexElement { get; set; }
+    }
+
+    [Serializable]
+    public class TeamFullGroupArrayStructure<T> : ITeamFullStructureRead<T>
+    {
+        [SerializeField]
+        private T[] vanguards = new T[2];
+        [SerializeField]
+        private T[] attackers = new T[2];
+        [SerializeField]
+        private T[] supports = new T[2];
+        [SerializeField]
+        private T[] flexers = new T[2];
+
+        public T VanguardType { get => vanguards[0]; set => vanguards[0] = value; }
+        public T AttackerType { get => attackers[0]; set => attackers[0] = value; }
+        public T SupportType { get => supports[0]; set => supports[0] = value; }
+        public T FlexType { get => flexers[0]; set => flexers[0] = value; }
+
+        public T SecondaryVanguardElement { get => vanguards[1]; set => vanguards[1] = value; }
+        public T SecondaryAttackerElement { get => attackers[1]; set => attackers[1] = value; }
+        public T SecondarySupportElement { get => supports[1]; set => supports[1] = value; }
+        public T SecondaryFlexElement { get => flexers[1]; set => flexers[1] = value; }
+
+        public T ThirdVanguardElement { get => vanguards[2]; set => vanguards[2] = value; }
+        public T ThirdAttackerElement { get => attackers[2]; set => attackers[2] = value; }
+        public T ThirdSupportElement { get => supports[2]; set => supports[2] = value; }
+        public T ThirdFlexElement { get => flexers[2]; set => flexers[2] = value; }
+
+        public static void Clear<TType>(TeamFullGroupStructure<TType> structure) where TType : Object
+        {
+            structure.VanguardType = null;
+            structure.AttackerType = null;
+            structure.SupportType = null;
+            structure.FlexType = null;
+
+            structure.SecondaryVanguardElement = null;
+            structure.SecondaryAttackerElement = null;
+            structure.SecondarySupportElement = null;
+            structure.SecondaryFlexElement = null;
+
+            structure.ThirdVanguardElement = null;
+            structure.ThirdAttackerElement = null;
+            structure.ThirdSupportElement = null;
+            structure.ThirdFlexElement = null;
+        }
     }
 
 

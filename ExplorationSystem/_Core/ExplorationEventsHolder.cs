@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using Sirenix.OdinInspector.Editor;
 
 namespace ExplorationSystem
 {
@@ -10,6 +9,7 @@ namespace ExplorationSystem
         {
             _worldSceneListeners = new HashSet<IWorldSceneListener>();
             _sceneChangeListeners = new HashSet<ISceneChangeListener>();
+            _explorationSubmitListeners = new HashSet<IExplorationSubmitListener>();
         }
 
         [ShowInInspector] 
@@ -17,6 +17,8 @@ namespace ExplorationSystem
         [ShowInInspector]
         private readonly HashSet<ISceneChangeListener> _sceneChangeListeners;
 
+        [ShowInInspector] 
+        private readonly HashSet<IExplorationSubmitListener> _explorationSubmitListeners;
        
 
         public void Subscribe(IExplorationEventListener listener)
@@ -25,6 +27,8 @@ namespace ExplorationSystem
                 _sceneChangeListeners.Add(sceneChangeListener);
             if (listener is IWorldSceneListener worldSceneListener)
                 _worldSceneListeners.Add(worldSceneListener);
+            if (listener is IExplorationSubmitListener submitListener)
+                _explorationSubmitListeners.Add(submitListener);
         }
         public void UnSubscribe(IExplorationEventListener listener)
         {
@@ -32,6 +36,8 @@ namespace ExplorationSystem
                 _sceneChangeListeners.Remove(sceneChangeListener);
             if (listener is IWorldSceneListener worldSceneListener)
                 _worldSceneListeners.Remove(worldSceneListener);
+            if (listener is IExplorationSubmitListener submitListener)
+                _explorationSubmitListeners.Remove(submitListener);
         }
 
         public void OnSceneChange(IExplorationSceneDataHolder sceneData)
@@ -51,9 +57,26 @@ namespace ExplorationSystem
             foreach (var listener in _worldSceneListeners) 
                 listener.OnWorldMapClose(targetMap);
         }
+
+        public void OnExplorationRequest(EnumExploration.ExplorationType type)
+        {
+            foreach (var listener in _explorationSubmitListeners)
+                listener.OnExplorationRequest(type);
+
+            UtilsExplorationMechanics.InvokeExplorationBehaviourType(type);
+        }
     }
 
 
-    internal interface IExplorationEventsHolder : ISceneChangeListener, IWorldSceneListener{}    
+    internal interface IExplorationEventsHolder : ISceneChangeListener, IWorldSceneListener,
+        IExplorationSubmitListener
+    {}    
     public interface IExplorationEventListener { }
+
+
+    public interface IExplorationSubmitListener : IExplorationEventListener
+    {
+        void OnExplorationRequest(EnumExploration.ExplorationType type);
+
+    }
 }

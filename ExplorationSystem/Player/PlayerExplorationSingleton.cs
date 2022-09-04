@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Team;
 using Common;
@@ -8,25 +9,21 @@ using UnityEngine;
 
 namespace ExplorationSystem
 {
-    public sealed class PlayerExplorationSingleton : ITeamFlexStructureRead<PlayerRunTimeEntity>
+    public sealed class PlayerExplorationSingleton : ITeamFlexStructureRead<PlayerRunTimeEntity>,
+        ICombatTeamProvider
     {
         public static readonly PlayerExplorationSingleton Instance;
         public static ITeamFlexStructureRead<PlayerRunTimeEntity> GetCurrentSelectedTeam() => Instance;
+        public static ICombatTeamProvider GetPlayerTeamProvider() => Instance;
 
         static PlayerExplorationSingleton()
         { 
             Instance = new PlayerExplorationSingleton();
-            WorldExplorationHandler = new WorldExplorationHandler();
-            EventsHolder = new ExplorationEventsHolder();
 
             var themeAsset =
                 AssetDatabase.LoadAssetAtPath<SExplorationThemeHolder>(SExplorationThemeHolder.AssetPath);
             ExplorationThemeHolder = themeAsset.GetDataHolder();
 
-#if UNITY_EDITOR
-            ExplorationEventsDebugLogs = new ExplorationEventsDebugLogs();
-            EventsHolder.Subscribe(ExplorationEventsDebugLogs);
-#endif
         }
 
         public void InjectTeam(ITeamFlexStructureRead<ICombatEntityProviderHolder> team)
@@ -37,15 +34,10 @@ namespace ExplorationSystem
             FlexType = HandleInstantiation(team.FlexType.GetEntityProvider());
         }
 
-        [Title("Core")] 
-        [ShowInInspector] 
-        public static readonly WorldExplorationHandler WorldExplorationHandler;
-        [Title("Events")]
-        [ShowInInspector] 
-        public static readonly ExplorationEventsHolder EventsHolder;
+        
 
 
-        [Title("Entities")]
+        [Title("Player Entities")]
         [ShowInInspector, ShowIf("VanguardType"), HorizontalGroup("FrontLine")]
         public PlayerRunTimeEntity VanguardType { get; private set; }
         [ShowInInspector, ShowIf("AttackerType"), HorizontalGroup("FrontLine")]
@@ -54,15 +46,21 @@ namespace ExplorationSystem
         public PlayerRunTimeEntity SupportType { get; private set; }
         [ShowInInspector, ShowIf("FlexType"), HorizontalGroup("BackLine")]
         public PlayerRunTimeEntity FlexType { get; private set; }
-
-        [Title("Theme")] [ShowInInspector, InlineEditor()]
-        public static readonly IExplorationTypesStructureRead<IThemeHolder> ExplorationThemeHolder;
-
+        public IEnumerable<ICombatEntityProvider> GetSelectedCharacters()
+        {
+            yield return VanguardType;
+            yield return AttackerType;
+            yield return SupportType;
+            yield return FlexType;
+        }
         private static PlayerRunTimeEntity HandleInstantiation(ICombatEntityProvider preset)
         {
             return preset == null ? null : new PlayerRunTimeEntity(preset);
         }
 
+        [Title("Theme")]
+        [ShowInInspector, InlineEditor()]
+        public static readonly IExplorationTypesStructureRead<IThemeHolder> ExplorationThemeHolder;
 
 
 
@@ -80,9 +78,7 @@ namespace ExplorationSystem
             }
         }
 
-#if UNITY_EDITOR
-        internal static readonly ExplorationEventsDebugLogs ExplorationEventsDebugLogs;
-#endif
+       
     }
 
 }

@@ -20,11 +20,11 @@ namespace ExplorationSystem
 
         private void Awake()
         {
-            PlayerExplorationSingleton.EventsHolder.Subscribe(this);
+            ExplorationSingleton.EventsHolder.Subscribe(this);
         }
         private void OnDestroy()
         {
-            PlayerExplorationSingleton.EventsHolder.UnSubscribe(this);
+            ExplorationSingleton.EventsHolder.UnSubscribe(this);
         }
 
 

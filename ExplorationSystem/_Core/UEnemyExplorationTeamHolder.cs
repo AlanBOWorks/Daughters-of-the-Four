@@ -7,25 +7,38 @@ using UnityEngine;
 
 namespace ExplorationSystem
 {
+    // todo make it to a normal Object and use it in the ExplorationSystem
     public class UEnemyExplorationTeamHolder : MonoBehaviour, ISceneChangeListener, IWorldSceneListener
     {
 
         [Title("Behaviour")]
-        [ShowInInspector, DisableIf("_teamWrapper"), DisableInEditorMode]
+        [ShowInInspector, EnableIf("_teamWrapper"), DisableInEditorMode]
         private EnemyTeamWrapper _teamWrapper;
+
+#if UNITY_EDITOR
+        [ShowInInspector, ShowIf("_dataHolder")] 
+        private SExplorationSceneDataHolder _dataHolder;
+#endif
 
         private void Awake()
         {
             _teamWrapper = new EnemyTeamWrapper();
-            PlayerExplorationSingleton.EventsHolder.Subscribe(this);
+            ExplorationSingleton.EventsHolder.Subscribe(this);
+            ExplorationSingleton.SceneEnemyTeamsHolder = _teamWrapper;
         }
         private void OnDestroy()
         {
-            PlayerExplorationSingleton.EventsHolder.UnSubscribe(this);
+            ExplorationSingleton.EventsHolder.UnSubscribe(this);
         }
         public void OnSceneChange(IExplorationSceneDataHolder sceneData)
         {
             _teamWrapper.Injection(sceneData);
+
+#if UNITY_EDITOR
+            if (sceneData is SExplorationSceneDataHolder assetDataHolder)
+                _dataHolder = assetDataHolder;
+#endif
+
         }
 
         public void OnWorldSceneOpen(IExplorationSceneDataHolder lastMap)
@@ -39,14 +52,16 @@ namespace ExplorationSystem
                 _teamWrapper.ResetState();
         }
 
-
+        
 
         private sealed class EnemyTeamWrapper : IExplorationThreatsStructureRead<ICombatTeamProvider>
         {
-            [ShowInInspector]
+            [ShowInInspector,HorizontalGroup]
             private IExplorationSceneEntitiesHolder _entitiesHolder;
+            [ShowInInspector,HorizontalGroup, ShowIf("_halfMapEntitiesHolder")]
             private IExplorationSceneEntitiesHolder _halfMapEntitiesHolder;
-            private IExplorationEntitiesSpawnRateHolder _spawnRates;
+
+            [ShowInInspector]
             private readonly CombatTeamProviderWrapper _selectedEntities;
 
 
@@ -68,30 +83,47 @@ namespace ExplorationSystem
                 ResetState();
                 _entitiesHolder = dataHolder.GetEntities();
                 _halfMapEntitiesHolder = dataHolder.GetHalfMapEntities();
-                _spawnRates = dataHolder.GetSpawnRates();
             }
 
 
-            public ICombatTeamProvider BasicThreatType => DoBossTeamSelection();
-            private ICombatTeamProvider DoBasicTeamSelection()
+            private IExplorationSceneEntitiesHolder GetCurrentEntitiesHolder()
+            {
+                return (_halfMapEntitiesHolder == null || !IsHalfMapReached) 
+                    ? _entitiesHolder 
+                    : _halfMapEntitiesHolder;
+            }
+
+            // Selector
+            private void DoSelection(IEnumerable<ICombatEntityProvider> team)
             {
                 _selectedEntities.Clear();
+               _selectedEntities.HandleMembers(team);
+            }
+
+            // Getters
+            public ICombatTeamProvider BasicThreatType => DoBasicTeamSelection();
+            [Button]
+            private ICombatTeamProvider DoBasicTeamSelection()
+            {
+                var currentHolder = GetCurrentEntitiesHolder();
+                DoSelection(currentHolder.GetBasicEntities());
                 return _selectedEntities;
             }
 
             public ICombatTeamProvider EliteThreatType => DoEliteTeamSelection();
             private ICombatTeamProvider DoEliteTeamSelection()
             {
-                _selectedEntities.Clear();
-                throw new NotImplementedException();
+                var currentHolder = GetCurrentEntitiesHolder();
+                DoSelection(currentHolder.GetBasicEntities());
+                return _selectedEntities;
             }
 
             public ICombatTeamProvider BossThreatType => DoBossTeamSelection();
             private ICombatTeamProvider DoBossTeamSelection()
             {
-                _selectedEntities.Clear();
                 throw new NotImplementedException();
             }
+
 
             public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => _selectedEntities;
 
@@ -101,6 +133,15 @@ namespace ExplorationSystem
             private sealed class CombatTeamProviderWrapper : List<ICombatEntityProvider>, ICombatTeamProvider
             {
                 public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => this;
+
+                public void HandleMembers(IEnumerable<ICombatEntityProvider> members)
+                {
+                    foreach (var entityProvider in members)
+                    {
+                        if(entityProvider == null) continue;
+                        Add(entityProvider);
+                    }
+                }
             }
         }
     }

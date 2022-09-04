@@ -8,7 +8,7 @@ using Utils_Project.Scene;
 
 namespace ExplorationSystem
 {
-    internal sealed class WorldExplorationHandler : ISceneHiddenListener, IWorldSceneListener
+    public sealed class WorldExplorationHandler : ISceneHiddenListener, IWorldSceneListener
     {
         [Title("Current")]
         [ShowInInspector]
@@ -26,7 +26,7 @@ namespace ExplorationSystem
         private bool IsTheSameSceneLoad() => _lastSceneName == _currentSceneName;
         public void OnStartLoading()
         {
-            PlayerExplorationSingleton.EventsHolder.OnWorldMapClose(_currentSceneHolder);
+            ExplorationSingleton.EventsHolder.OnWorldMapClose(_currentSceneHolder);
             if (IsTheSameSceneLoad() || _lastSceneName == null) return;
 
             SceneManager.UnloadSceneAsync(_lastSceneName);
@@ -59,7 +59,7 @@ namespace ExplorationSystem
             _currentSceneHolder = targetScene;
 
             string targetSceneName = null;
-            bool loadFromBackUp;
+            bool loadFromBackUp = false;
             if (targetScene == null)
             {
                 loadFromBackUp = true;
@@ -75,9 +75,15 @@ namespace ExplorationSystem
             }
             else
             {
-                targetSceneName = targetScene.GetBackgroundSceneAsset().name;
-                bool isInvalidScenePath = SceneUtility.GetBuildIndexByScenePath(targetSceneName) < 0;
-                loadFromBackUp = isInvalidScenePath;
+                var backgroundAsset = targetScene.GetBackgroundSceneAsset();
+                if (backgroundAsset != null)
+                {
+                    targetSceneName = backgroundAsset.name;
+                    bool isInvalidScenePath = SceneUtility.GetBuildIndexByScenePath(targetSceneName) < 0;
+                    loadFromBackUp = isInvalidScenePath;
+                }
+                else
+                    loadFromBackUp = true;
             }
 
             if (loadFromBackUp)

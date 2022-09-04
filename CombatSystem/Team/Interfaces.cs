@@ -23,9 +23,23 @@ namespace CombatSystem.Team
         new T SupportType { get; set; }
         new T FlexType { get; set; }
     }
+    public interface ITeamOffStructureRead<out T>
+    {
+        T SecondaryVanguardElement { get; }
+        T SecondaryAttackerElement { get; }
+        T SecondarySupportElement { get; }
+        T SecondaryFlexElement { get; }
+
+        T ThirdVanguardElement { get; }
+        T ThirdAttackerElement { get; }
+        T ThirdSupportElement { get; }
+        T ThirdFlexElement { get; }
+    }
+
 
     public interface ITeamFullStructureRead<out T> : ITeamFlexStructureRead<T>, ITeamOffStructureRead<T> 
     { }
+
 
     public interface ITeamFlexStructureInject<in T> : ITeamTrinityStructureInject<T>
     {

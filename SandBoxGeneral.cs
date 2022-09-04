@@ -1,28 +1,20 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using Utils_Project;
+using Utils.Maths;
 
-public class SandBoxGeneral : MonoBehaviour, ISceneLoadFirstLastCallListener
+public class SandBoxGeneral : MonoBehaviour
 {
 
 
-    [Button, DisableInEditorMode]
-    private void Test(float timer = 1)
+    [Button]
+    private void Test(int randomUpToSixteen =8)
     {
-        UtilsScene.DoJustVisualTransition(timer, true, 1, this);
+        var generator = UtilsRandom.EightSizeNonConsecutiveRandomNumbersGenerator;
+        var list = generator.CalculateNonConsecutiveRandoms(randomUpToSixteen);
+        foreach (var i in list)
+        {
+            Debug.Log(i);
+        }
     }
 
-    public void OnStartTransition()
-    {
-        Debug.Log("Screen was shown");
-    }
-
-    public void OnFinishTransition()
-    {
-        Debug.Log("Finish animations");
-    }
 }

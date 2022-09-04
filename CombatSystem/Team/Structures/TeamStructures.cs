@@ -1,13 +1,69 @@
 using System;
 using System.Collections.Generic;
 using CombatSystem.Skills;
-using CombatSystem.Skills.Effects;
 using CombatSystem.Stats;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace CombatSystem.Team
 {
+    public readonly struct FlexTeamStruct<T>
+    {
+        public FlexTeamStruct(T vanguard,T attacker,T support,T flex)
+        {
+            VanguardType = vanguard;
+            AttackerType = attacker;
+            SupportType = support;
+            FlexType = flex;
+        }
+
+        [field: HorizontalGroup("FrontLine")]
+        public T VanguardType { get; }
+
+        [field: HorizontalGroup("FrontLine")]
+        public T AttackerType { get; }
+
+        [field: HorizontalGroup("BackLine")]
+        public T SupportType { get; }
+
+        [field: HorizontalGroup("BackLine")]
+        public T FlexType { get; }
+
+        public T GetByIndex(int roleIndex)
+        {
+            return roleIndex switch
+            {
+                EnumTeam.VanguardIndex => VanguardType,
+                EnumTeam.SupportIndex => SupportType,
+                EnumTeam.FlexIndex => FlexType,
+                _ => AttackerType
+            };
+        }
+
+        public IEnumerable<T> GetEnumerable()
+        {
+            yield return VanguardType;
+            yield return AttackerType;
+            yield return SupportType;
+            yield return FlexType;
+        }
+
+        public IEnumerable<T> GenerateConcatenation(FlexTeamStruct<T> secondary)
+        {
+            yield return VanguardType;
+            yield return secondary.VanguardType;
+
+            yield return AttackerType;
+            yield return secondary.AttackerType;
+
+            yield return SupportType;
+            yield return secondary.SupportType;
+
+            yield return FlexType;
+            yield return secondary.FlexType;
+        }
+    }
+
     public class TeamPosition<T> : ITeamPositionStructureRead<T>
     {
         public TeamPosition(ITeamPositionStructureRead<T> copyFrom)
@@ -23,15 +79,15 @@ namespace CombatSystem.Team
 
     [Serializable]
     public class TeamRolesStructure<T> : 
-        ITeamFlexStructureRead<T>, ITeamFlexPositionStructureRead<T>, 
+        ITeamFlexStructure<T>, ITeamFlexPositionStructureRead<T>, 
         IMainStatsRead<T>, IEffectTypeStructureRead<T>,
         IStanceStructureRead<T>,
         ISkillArchetypeStructureRead<T>
     {
-        [SerializeField] protected T vanguardType;
-        [SerializeField] protected T attackerType;
-        [SerializeField] protected T supportType;
-        [SerializeField] protected T flexType;
+        [SerializeField, HorizontalGroup("FrontLine")] protected T vanguardType;
+        [SerializeField, HorizontalGroup("FrontLine")] protected T attackerType;
+        [SerializeField, HorizontalGroup("BackLine")] protected T supportType;
+        [SerializeField, HorizontalGroup("BackLine")] protected T flexType;
 
         public T OffensiveStatType => attackerType;
         public T SupportStatType => supportType;
@@ -43,10 +99,29 @@ namespace CombatSystem.Team
         public T VanguardEffectType => vanguardType;
         public T FlexibleEffectType => ConcentrationStatType;
 
-        public T VanguardType => vanguardType;
-        public T AttackerType => attackerType;
-        public T SupportType => supportType;
-        public T FlexType => flexType;
+        public T VanguardType
+        {
+            get => vanguardType;
+            set => vanguardType = value;
+        }
+
+        public T AttackerType
+        {
+            get => attackerType;
+            set => attackerType = value;
+        }
+
+        public T SupportType
+        {
+            get => supportType;
+            set => supportType = value;
+        }
+
+        public T FlexType
+        {
+            get => flexType;
+            set => flexType = value;
+        }
 
         public T FrontLineType => vanguardType;
         public T MidLineType => attackerType;
