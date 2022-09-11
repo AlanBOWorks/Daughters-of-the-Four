@@ -10,15 +10,12 @@ namespace Utils_Project.Scene
 {
     public class ULoadingIcon : MonoBehaviour, ILoadPercentListener
     {
-        [Title("References")] 
-        [SerializeField]private ULoadSceneManager manager;
-
         [Title("Loading")]
         [SerializeField] private MPImage loadingIcon;
 
         private void Awake()
         {
-            manager.SubscribeListener(this);
+            LoadSceneManagerSingleton.LoadPercentListeners.Add(this);
         }
 
         private IEnumerator<float> _Ticking()

@@ -37,7 +37,6 @@ namespace ExplorationSystem.Structures
                 instantiatedElements.Add(spawnElement);
 
                 spawnElement.Injection(themeElement.GetThemeIcon());
-                spawnElement.Injection(themeElement.GetThemeColor());
                 spawnElement.Injection(explorationType);
 
                 var elementTransform = spawnElement.transform;

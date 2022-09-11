@@ -93,6 +93,7 @@ namespace CombatSystem.Player
         public int Count => _runTimeCharacters.Count;
         public bool IsValid() => Count > 0;
         public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => _runTimeCharacters;
+        public int MembersCount => Count;
         public bool Contains(ICombatEntityProvider key) => _characterReferences.Contains(key);
     }
 

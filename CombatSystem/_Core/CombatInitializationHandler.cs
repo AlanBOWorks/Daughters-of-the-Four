@@ -2,22 +2,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using CombatSystem.AI;
 using CombatSystem.Entity;
 using CombatSystem.Player;
 using CombatSystem.Team;
+using MEC;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
+using Utils_Project;
 
 namespace CombatSystem._Core
 {
     public static class CombatInitializationHandler
     {
 
-
+        private const string OnNullPlayerTeamAsset = AssetPaths.ScriptablesPlayerTeams + 
+                                                "OnNull[Player Predefined Team].asset";
         public static void StartCombat(
             ICombatTeamProvider playerTeam,
             ICombatTeamProvider enemyTeam)
@@ -25,18 +27,31 @@ namespace CombatSystem._Core
             if(CombatSystemSingleton.GetIsCombatActive())
                 throw new AccessViolationException("Trying to access combat while mid Combat");
 
+            if (playerTeam == null || playerTeam.MembersCount < 1)
+            {
+                playerTeam = AssetDatabase.LoadAssetAtPath<SPlayerPresetTeam>(OnNullPlayerTeamAsset);
+            }
 
-            // This is just in case these weren't instantiated
-            var playerSingleton = PlayerCombatSingleton.Instance;
-            var enemySingleton = EnemyCombatSingleton.Instance;
-            AssetPrefabInstantiationHandler.FirstCombatObjectsInstantiation();
+            Timing.RunCoroutine(_InstantiationCoroutine());
+            //Made into a coroutine so instantiation racing is less troublesome
+            IEnumerator<float> _InstantiationCoroutine() 
+            {
+                // This is just in case these weren't instantiated
+                var playerSingleton = PlayerCombatSingleton.Instance;
+                var enemySingleton = EnemyCombatSingleton.Instance;
+                yield return Timing.WaitForOneFrame;
+                AssetPrefabInstantiationHandler.FirstCombatObjectsInstantiation();
+                yield return Timing.WaitForOneFrame;
 
-            PrepareTeams(
-                playerTeam,
-                enemyTeam);
+                PrepareTeams(
+                    playerTeam,
+                    enemyTeam);
+                yield return Timing.WaitForOneFrame;
 
-            PrepareTeamControllers();
-            //InitialStatsPreparations();
+                PrepareTeamControllers();
+                //InitialStatsPreparations();
+            }
+
         }
 
 

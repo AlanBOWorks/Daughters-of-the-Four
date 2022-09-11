@@ -9,12 +9,11 @@ using UnityEngine;
 
 namespace ExplorationSystem
 {
-    public sealed class PlayerExplorationSingleton : ITeamFlexStructureRead<PlayerRunTimeEntity>,
-        ICombatTeamProvider
+    public sealed class PlayerExplorationSingleton 
     {
         public static readonly PlayerExplorationSingleton Instance;
-        public static ITeamFlexStructureRead<PlayerRunTimeEntity> GetCurrentSelectedTeam() => Instance;
-        public static ICombatTeamProvider GetPlayerTeamProvider() => Instance;
+        public static ITeamFlexStructureRead<PlayerRunTimeEntity> GetCurrentSelectedTeam() => Instance._playerTeam;
+        public static ICombatTeamProvider GetPlayerTeamProvider() => Instance._playerTeam;
 
         static PlayerExplorationSingleton()
         { 
@@ -28,35 +27,15 @@ namespace ExplorationSystem
 
         public void InjectTeam(ITeamFlexStructureRead<ICombatEntityProviderHolder> team)
         {
-            VanguardType = HandleInstantiation(team.VanguardType.GetEntityProvider());
-            AttackerType = HandleInstantiation(team.AttackerType.GetEntityProvider());
-            SupportType = HandleInstantiation(team.SupportType.GetEntityProvider());
-            FlexType = HandleInstantiation(team.FlexType.GetEntityProvider());
+            _playerTeam = new PlayerRunTimeTeam(team);
         }
 
-        
 
 
-        [Title("Player Entities")]
-        [ShowInInspector, ShowIf("VanguardType"), HorizontalGroup("FrontLine")]
-        public PlayerRunTimeEntity VanguardType { get; private set; }
-        [ShowInInspector, ShowIf("AttackerType"), HorizontalGroup("FrontLine")]
-        public PlayerRunTimeEntity AttackerType { get; private set; }
-        [ShowInInspector, ShowIf("SupportType"), HorizontalGroup("BackLine")]
-        public PlayerRunTimeEntity SupportType { get; private set; }
-        [ShowInInspector, ShowIf("FlexType"), HorizontalGroup("BackLine")]
-        public PlayerRunTimeEntity FlexType { get; private set; }
-        public IEnumerable<ICombatEntityProvider> GetSelectedCharacters()
-        {
-            yield return VanguardType;
-            yield return AttackerType;
-            yield return SupportType;
-            yield return FlexType;
-        }
-        private static PlayerRunTimeEntity HandleInstantiation(ICombatEntityProvider preset)
-        {
-            return preset == null ? null : new PlayerRunTimeEntity(preset);
-        }
+
+        [Title("Entities")]
+        [ShowInInspector, DisableInEditorMode]
+        private PlayerRunTimeTeam _playerTeam;
 
         [Title("Theme")]
         [ShowInInspector, InlineEditor()]

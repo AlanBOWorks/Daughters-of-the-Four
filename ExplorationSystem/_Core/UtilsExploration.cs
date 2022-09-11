@@ -31,38 +31,4 @@ namespace ExplorationSystem
         }
 
     }
-
-    public static class UtilsExplorationMechanics
-    {
-        public static void InvokeExplorationBehaviourType(EnumExploration.ExplorationType type)
-        {
-            switch (type)
-            {
-                default:
-                    return;
-                case EnumExploration.ExplorationType.BasicThreat:
-                    InvokeBasicCombat();
-                    return;
-                case EnumExploration.ExplorationType.EliteThreat:
-                    InvokeEliteCombat();
-                    return;
-                case EnumExploration.ExplorationType.BossThreat:
-                    InvokeBossCombat();
-                    return;
-            }
-        }
-
-        public static void InvokeBasicCombat()
-        {
-            var playerTeam = PlayerExplorationSingleton.GetPlayerTeamProvider();
-        }
-        public static void InvokeEliteCombat()
-        {
-
-        }
-        public static void InvokeBossCombat()
-        {
-
-        }
-    }
 }

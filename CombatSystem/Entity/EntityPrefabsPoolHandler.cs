@@ -24,13 +24,19 @@ namespace CombatSystem.Entity
         public ITeamFullStructureRead<Transform> PlayerTeamType => _playerTeamType;
         public ITeamFullStructureRead<Transform> EnemyTeamType => _enemyTeamType;
 
+        public ITeamFullStructureRead<Transform> PlayerOnNullPositionReference;
+        public ITeamFullStructureRead<Transform> EnemyOnNullPositionReference;
 
         public void HandleTeams(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            var playerPositions = CombatSystemSingleton.PlayerPositionTransformReferences;
+            var playerPositions = CombatSystemSingleton.PlayerPositionTransformReferences 
+                ? CombatSystemSingleton.PlayerPositionTransformReferences 
+                : PlayerOnNullPositionReference;
             _playerTeamType.PoolMembers(playerTeam, playerPositions);
 
-            var enemyPositions = CombatSystemSingleton.EnemyPositionTransformReferences;
+            var enemyPositions = CombatSystemSingleton.EnemyPositionTransformReferences 
+                ? CombatSystemSingleton.EnemyPositionTransformReferences 
+                : EnemyOnNullPositionReference;
             _enemyTeamType.PoolMembers(enemyTeam, enemyPositions);
         }
 

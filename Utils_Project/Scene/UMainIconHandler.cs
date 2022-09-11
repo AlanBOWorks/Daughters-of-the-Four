@@ -21,24 +21,35 @@ namespace Utils_Project.Scene
 
         private void Start()
         {
-            LoadSceneManagerSingleton.ManagerInstance.SubscribeListener(this);
+            LoadSceneManagerSingleton.ScreenLoadListeners.Add(this);
         }
 
         private const float ShowAnimationDuration = .4f;
         private Vector3 _initialPosition;
-        public void OnShowLoadScreen(bool isFillFromLeft)
+        public void OnShowLoadScreen(LoadSceneParameters.LoadType type)
         {
-            float lateralPunch = isFillFromLeft ? -lateralOffset : lateralOffset;
-            DoAnimation(lateralPunch, ShowAnimationDuration);
+            bool isLeft = type == LoadSceneParameters.LoadType.MainLoadFromLeft;
+            CallPunchAnimation(isLeft);
         }
 
-        public void OnHideLoadScreen(bool wasFillFromLeft)
+        public void OnHideLoadScreen(LoadSceneParameters.LoadType type)
         {
             
         }
 
+        private void CallPunchAnimation(bool isLeftAnimation)
+        {
+            float lateralPunch = isLeftAnimation
+                ? lateralOffset
+                : -lateralOffset;
+            DoAnimation(lateralPunch, ShowAnimationDuration);
+        }
+
+
         private void DoAnimation(float lateralPunch, float animationDuration)
         {
+            if(!enabled) return;
+
             DOTween.Kill(_rectTransform);
             _rectTransform.localPosition = _initialPosition;
             _rectTransform.DOPunchPosition(new Vector3(lateralPunch, 0), animationDuration, 0);

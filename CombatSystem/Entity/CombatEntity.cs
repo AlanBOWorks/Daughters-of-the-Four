@@ -189,6 +189,8 @@ namespace CombatSystem.Entity
             {
                 _user = user;
                 DisruptionStance = new List<CombatSkill>();
+                if(skills == null) return;
+
                 AttackingStance = GenerateSkills(skills.AttackingStance);
                 SupportingStance = GenerateSkills(skills.SupportingStance);
                 DefendingStance = GenerateSkills(skills.DefendingStance);

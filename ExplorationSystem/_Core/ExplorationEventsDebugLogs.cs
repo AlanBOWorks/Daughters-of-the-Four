@@ -18,7 +18,7 @@ namespace ExplorationSystem
         [ShowInInspector, ShowIf("_showOnSceneChangeLogs")] 
         private ExplorationSceneChangeLogs _explorationSceneChangeLogs = new ExplorationSceneChangeLogs();
 
-        public void OnSceneChange(IExplorationSceneDataHolder sceneData)
+        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)
         {
             if(!_showOnSceneChangeLogs || !_explorationSceneChangeLogs.onSceneChange) return;
             Debug.Log("Scene changes towards: " +sceneData.GetSceneName());
@@ -65,6 +65,8 @@ namespace ExplorationSystem
         private sealed class ExplorationSubmitLogs
         {
             public bool onExplorationRequest = true;
+            public bool onCombatRequest = true;
+            public bool onReturnFromCombat = true;
         }
 
         [ShowInInspector] private bool _showOnExplorationSubmitLogs = false;
@@ -75,6 +77,19 @@ namespace ExplorationSystem
             if(!_showOnExplorationSubmitLogs || !_explorationSubmitLogs.onExplorationRequest) return;
             Debug.Log($"Exploration Submit: {type}");
         }
+
+        public void OnExplorationCombatLoadFinish(EnumExploration.ExplorationType type)
+        {
+            if(!_showOnExplorationSubmitLogs || !_explorationSubmitLogs.onCombatRequest) return;
+            Debug.Log($"Combat type: {type}");
+        }
+
+        public void OnExplorationReturnFromCombat(EnumExploration.ExplorationType fromCombatType)
+        {
+            if(!_showOnExplorationSubmitLogs || !_explorationSubmitLogs.onReturnFromCombat) return;
+            Debug.Log($"From combat type: {fromCombatType}");
+        }
+
 
         private sealed class ExplorationEventsDebugWindow : OdinEditorWindow
         {

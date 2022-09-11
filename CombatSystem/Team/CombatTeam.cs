@@ -40,6 +40,8 @@ namespace CombatSystem.Team
             IReadOnlyList<CombatEntity> mainVanguards = UtilsTeam.GetFrontMostElement(_membersHolder as
                 ITeamFlexStructureRead<IReadOnlyList<CombatEntity>>);
             
+            if(mainVanguards == null || mainVanguards.Count == 0) return;
+
             var mainVanguardResponsible = mainVanguards[0];
             if(mainVanguardResponsible == null) return;
 

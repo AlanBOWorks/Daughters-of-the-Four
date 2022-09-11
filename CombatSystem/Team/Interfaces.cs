@@ -8,6 +8,7 @@ namespace CombatSystem.Team
     public interface ICombatTeamProvider
     {
         IEnumerable<ICombatEntityProvider> GetSelectedCharacters();
+        int MembersCount { get; }
     }
 
     public interface IOppositionTeamStructureRead<out T>

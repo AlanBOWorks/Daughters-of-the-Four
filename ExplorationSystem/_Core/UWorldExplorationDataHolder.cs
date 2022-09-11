@@ -28,7 +28,7 @@ namespace ExplorationSystem
         }
 
 
-        public void OnSceneChange(IExplorationSceneDataHolder sceneData)
+        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)
         {
             _currentExplorationSceneData = sceneData;
         }
@@ -36,7 +36,7 @@ namespace ExplorationSystem
 
     internal interface ISceneChangeListener : IExplorationEventListener
     {
-        void OnSceneChange(IExplorationSceneDataHolder sceneData);
+        void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData);
     }
 
 

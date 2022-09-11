@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
+using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Utils_Project;
 
 namespace ExplorationSystem
 {
     // todo make it to a normal Object and use it in the ExplorationSystem
-    public class UEnemyExplorationTeamHolder : MonoBehaviour, ISceneChangeListener, IWorldSceneListener
+    public class UEnemyExplorationTeamHolder : MonoBehaviour, 
+        ISceneChangeListener, IWorldSceneListener, 
+        IExplorationOnCombatListener
     {
 
         [Title("Behaviour")]
@@ -30,7 +34,7 @@ namespace ExplorationSystem
         {
             ExplorationSingleton.EventsHolder.UnSubscribe(this);
         }
-        public void OnSceneChange(IExplorationSceneDataHolder sceneData)
+        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)
         {
             _teamWrapper.Injection(sceneData);
 
@@ -52,7 +56,25 @@ namespace ExplorationSystem
                 _teamWrapper.ResetState();
         }
 
-        
+        public ICombatTeamProvider OnExplorationRequest(EnumExploration.ExplorationType type)
+        {
+            return type switch
+            {
+                EnumExploration.ExplorationType.EliteThreat => _teamWrapper.BasicThreatType,
+                EnumExploration.ExplorationType.BossThreat => _teamWrapper.BasicThreatType,
+                _ => _teamWrapper.BasicThreatType
+            };
+        }
+
+        public void OnExplorationCombatLoadFinish(EnumExploration.ExplorationType type)
+        {
+            var team = OnExplorationRequest(type);
+            CombatInitializationHandler.StartCombat(PlayerExplorationSingleton.GetPlayerTeamProvider(),team);
+        }
+
+        public void OnExplorationReturnFromCombat(EnumExploration.ExplorationType fromCombatType)
+        {
+        }
 
         private sealed class EnemyTeamWrapper : IExplorationThreatsStructureRead<ICombatTeamProvider>
         {
@@ -133,6 +155,7 @@ namespace ExplorationSystem
             private sealed class CombatTeamProviderWrapper : List<ICombatEntityProvider>, ICombatTeamProvider
             {
                 public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => this;
+                public int MembersCount => Count;
 
                 public void HandleMembers(IEnumerable<ICombatEntityProvider> members)
                 {
@@ -144,5 +167,7 @@ namespace ExplorationSystem
                 }
             }
         }
+
+        
     }
 }

@@ -62,4 +62,45 @@ namespace ExplorationSystem
         public float DamageReductionType => _statsBase.DamageReductionType;
         public float DeBuffResistanceType => _statsBase.DeBuffResistanceType;
     }
+
+    public sealed class PlayerRunTimeTeam : ITeamFlexStructureRead<PlayerRunTimeEntity>,
+        ICombatTeamProvider
+    {
+        public PlayerRunTimeTeam(ITeamFlexStructureRead<ICombatEntityProviderHolder> team)
+        {
+            VanguardType = HandleInstantiation(team.VanguardType.GetEntityProvider());
+            AttackerType = HandleInstantiation(team.AttackerType.GetEntityProvider());
+            SupportType = HandleInstantiation(team.SupportType.GetEntityProvider());
+            FlexType = HandleInstantiation(team.FlexType.GetEntityProvider());
+        }
+
+
+        [ShowInInspector, EnableIf("VanguardType"), HorizontalGroup("FrontLine")]
+        public PlayerRunTimeEntity VanguardType { get; }
+        [ShowInInspector, EnableIf("AttackerType"), HorizontalGroup("FrontLine")]
+        public PlayerRunTimeEntity AttackerType { get; }
+        [ShowInInspector, EnableIf("SupportType"), HorizontalGroup("BackLine")]
+        public PlayerRunTimeEntity SupportType { get; }
+        [ShowInInspector, EnableIf("FlexType"), HorizontalGroup("BackLine")]
+        public PlayerRunTimeEntity FlexType { get; }
+        public IEnumerable<ICombatEntityProvider> GetSelectedCharacters()
+        {
+            yield return VanguardType;
+            yield return AttackerType;
+            yield return SupportType;
+            yield return FlexType;
+        }
+
+        public int MembersCount { get; private set; }
+
+
+        private PlayerRunTimeEntity HandleInstantiation(ICombatEntityProvider preset)
+        {
+            if (preset == null)
+                return null;
+
+            MembersCount++;
+            return new PlayerRunTimeEntity(preset);
+        }
+    }
 }

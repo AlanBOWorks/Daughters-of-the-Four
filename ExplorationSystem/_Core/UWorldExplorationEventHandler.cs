@@ -39,7 +39,7 @@ namespace ExplorationSystem._Core
         {
             _handler.OnWorldMapClose(targetMap);
             hideOnGameWorldUnloaded.SetActive(false);
-            ExplorationSingleton.EventsHolder.OnSceneChange(targetMap);
+            ExplorationSingleton.EventsHolder.OnWorldSelectSceneLoad(targetMap);
         }
     }
 }

@@ -24,6 +24,7 @@ namespace CombatSystem.Player
         internal SPlayerPreparationEntity[] GetPresetCharacters() => characters;
 
         public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => characters;
+        public int MembersCount => characters.Length;
         public IEnumerable<ITeamSkillPreset> GetTeamSkills() => teamSkills;
 
 

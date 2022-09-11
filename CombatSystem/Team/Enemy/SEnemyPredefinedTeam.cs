@@ -22,6 +22,7 @@ namespace CombatSystem.Team
 
 
         public IEnumerable<ICombatEntityProvider> GetSelectedCharacters() => characters;
+        public int MembersCount => characters.Length;
         public IEnumerable<ITeamSkillPreset> GetTeamSkills() => teamSkills;
 
         [Button]

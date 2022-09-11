@@ -7,6 +7,7 @@ namespace CombatSystem.Team
 {
     public class UTeamTransformPositionsHandler : UTeamFullGroupStructure<Transform>
     {
+        [SerializeField] private bool isNullTypeBackUp;
         [SerializeField] private bool isPlayer;
 
         private void Start()
@@ -16,6 +17,17 @@ namespace CombatSystem.Team
 
         private void HandleSingleton()
         {
+            if (isNullTypeBackUp)
+            {
+                var prefabPool = CombatSystemSingleton.EntityPrefabsPoolHandler;
+
+                if (isPlayer)
+                    prefabPool.PlayerOnNullPositionReference = this;
+                else
+                    prefabPool.EnemyOnNullPositionReference = this;
+                return;
+            }
+
             HandleExistingReference();
             DoInjection();
 
