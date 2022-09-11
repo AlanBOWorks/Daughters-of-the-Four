@@ -37,7 +37,7 @@ namespace CombatSystem.Player.UI
         public void Hide()
         {
             gameObject.SetActive(false);
-            pool.ReturnToElementsToPool();
+            pool.ReturnElementsToPool();
         }
 
         public void Show()

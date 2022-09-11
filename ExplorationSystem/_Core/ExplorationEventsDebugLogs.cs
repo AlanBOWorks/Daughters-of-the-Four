@@ -9,33 +9,18 @@ namespace ExplorationSystem
     public sealed class ExplorationEventsDebugLogs : IExplorationEventsHolder
     {
         [Serializable]
-        private sealed class ExplorationSceneChangeLogs
-        {
-            public bool onSceneChange = true;
-        }
-
-        [ShowInInspector] private bool _showOnSceneChangeLogs = false;
-        [ShowInInspector, ShowIf("_showOnSceneChangeLogs")] 
-        private ExplorationSceneChangeLogs _explorationSceneChangeLogs = new ExplorationSceneChangeLogs();
-
-        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)
-        {
-            if(!_showOnSceneChangeLogs || !_explorationSceneChangeLogs.onSceneChange) return;
-            Debug.Log("Scene changes towards: " +sceneData.GetSceneName());
-        }
-
-        [Serializable]
         private sealed class WorldSceneLogs
         {
             public bool onWorldSceneOpen = true;
             public bool onWorldSceneClose = true;
+            public bool onWorldLoads = true;
         }
 
         [ShowInInspector] private bool _showOnWorldSceneLogs = false;
         [ShowInInspector,ShowIf("_showOnWorldSceneLogs")]
         private WorldSceneLogs _worldSceneLogs = new WorldSceneLogs();
 
-        public void OnWorldSceneOpen(IExplorationSceneDataHolder lastMap)
+        public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
         {
             if(!_showOnWorldSceneLogs || !_worldSceneLogs.onWorldSceneOpen) return;
 
@@ -48,7 +33,7 @@ namespace ExplorationSystem
             Debug.Log(targetLog);
         }
 
-        public void OnWorldMapClose(IExplorationSceneDataHolder targetMap)
+        public void OnWorldSceneSubmit(IExplorationSceneDataHolder targetMap)
         {
             if (!_showOnWorldSceneLogs || !_worldSceneLogs.onWorldSceneClose) return;
 
@@ -59,6 +44,11 @@ namespace ExplorationSystem
                 targetLog = "Closing the World Map and returning towards Main Menu";
 
             Debug.Log(targetLog);
+        }
+        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)
+        {
+            if (!_showOnWorldSceneLogs || !_worldSceneLogs.onWorldLoads) return;
+            Debug.Log("Scene changes towards: " + sceneData.GetSceneName());
         }
 
         [Serializable]

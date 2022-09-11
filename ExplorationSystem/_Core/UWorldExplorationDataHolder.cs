@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 namespace ExplorationSystem
 {
-    public class UWorldExplorationDataHolder : MonoBehaviour, ISceneChangeListener
+    public class UWorldExplorationDataHolder : MonoBehaviour, IWorldSceneChangeListener
     {
         [Title("References")] 
         [SerializeField, InlineEditor()] 
@@ -30,14 +30,20 @@ namespace ExplorationSystem
 
         public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)
         {
-            _currentExplorationSceneData = sceneData;
+
+        }
+
+        public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
+        {
+
+        }
+
+        public void OnWorldSceneSubmit(IExplorationSceneDataHolder targetMap)
+        {
+            _currentExplorationSceneData = targetMap;
         }
     }
 
-    internal interface ISceneChangeListener : IExplorationEventListener
-    {
-        void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData);
-    }
 
 
     [Serializable]

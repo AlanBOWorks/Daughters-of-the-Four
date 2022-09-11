@@ -154,7 +154,7 @@ namespace Utils
             _activePool.Clear();
         }
 
-        public void ReturnToElementsToPool()
+        public void ReturnElementsToPool()
         {
             foreach (T element in _activePool)
             {
@@ -183,7 +183,7 @@ namespace Utils
         bool IsActive();
         int CountActive { get; }
         IEnumerable<T> GetActiveElements();
-        void ReturnToElementsToPool();
+        void ReturnElementsToPool();
     }
 
     public interface IObjectPoolBasic

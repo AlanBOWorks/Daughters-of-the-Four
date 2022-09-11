@@ -24,12 +24,12 @@ namespace ExplorationSystem.Elements
 
         [Title("Debug")]
         [ShowInInspector,HideInEditorMode, InlineEditor()]
-        private IExplorationSceneDataHolder _currentScene;
+        private IExplorationSceneDataHolder _targetScene;
 
-        [Button, ShowIf("_currentScene")]
+        [Button, ShowIf("_targetScene")]
         private void UpdateStateToCurrent()
         {
-            DoInjection(_currentScene);
+            DoInjection(_targetScene);
         }
         public void DoInjection(IExplorationSceneDataHolder dataHolder)
         {
@@ -39,7 +39,7 @@ namespace ExplorationSystem.Elements
             var sceneIcon = dataHolder.GetSceneIcon();
             Injection(sceneIcon);
 
-            _currentScene = dataHolder;
+            _targetScene = dataHolder;
         }
 
         private void Injection(string worldName)
@@ -53,7 +53,7 @@ namespace ExplorationSystem.Elements
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            ExplorationSingleton.WorldExplorationHandler.LoadExplorationScene(_currentScene);
+            ExplorationSingleton.WorldExplorationHandler.LoadExplorationScene(_targetScene);
         }
         
 

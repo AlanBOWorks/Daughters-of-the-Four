@@ -7,16 +7,13 @@ namespace ExplorationSystem
     {
         public ExplorationEventsHolder()
         {
-            _worldSceneListeners = new HashSet<IWorldSceneListener>();
-            _sceneChangeListeners = new HashSet<ISceneChangeListener>();
+            _worldSceneListeners = new HashSet<IWorldSceneChangeListener>();
             _explorationSubmitListeners = new HashSet<IExplorationSubmitListener>();
             _onCombatListeners = new HashSet<IExplorationOnCombatListener>();
         }
 
         [ShowInInspector,HorizontalGroup("Scene Listeners")] 
-        private readonly HashSet<IWorldSceneListener> _worldSceneListeners;
-        [ShowInInspector,HorizontalGroup("Scene Listeners")] 
-        private readonly HashSet<ISceneChangeListener> _sceneChangeListeners;
+        private readonly HashSet<IWorldSceneChangeListener> _worldSceneListeners;
 
         [ShowInInspector,HorizontalGroup("Element Listeners")] 
         private readonly HashSet<IExplorationSubmitListener> _explorationSubmitListeners;
@@ -26,9 +23,7 @@ namespace ExplorationSystem
 
         public void Subscribe(IExplorationEventListener listener)
         {
-            if (listener is ISceneChangeListener sceneChangeListener)
-                _sceneChangeListeners.Add(sceneChangeListener);
-            if (listener is IWorldSceneListener worldSceneListener)
+            if (listener is IWorldSceneChangeListener worldSceneListener)
                 _worldSceneListeners.Add(worldSceneListener);
 
             if (listener is IExplorationSubmitListener submitListener)
@@ -38,9 +33,7 @@ namespace ExplorationSystem
         }
         public void UnSubscribe(IExplorationEventListener listener)
         {
-            if (listener is ISceneChangeListener sceneChangeListener)
-                _sceneChangeListeners.Remove(sceneChangeListener);
-            if (listener is IWorldSceneListener worldSceneListener)
+            if (listener is IWorldSceneChangeListener worldSceneListener)
                 _worldSceneListeners.Remove(worldSceneListener);
 
             if (listener is IExplorationSubmitListener submitListener)
@@ -49,22 +42,22 @@ namespace ExplorationSystem
                 _onCombatListeners.Remove(combatListener);
         }
 
-        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)
-        {
-            foreach (var listener in _sceneChangeListeners) 
-                listener.OnWorldSelectSceneLoad(sceneData);
-        }
-
-        public void OnWorldSceneOpen(IExplorationSceneDataHolder lastMap)
+        public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
         {
             foreach (var listener in _worldSceneListeners) 
-                listener.OnWorldSceneOpen(lastMap);
+                listener.OnWorldSceneEnters(lastMap);
         }
 
-        public void OnWorldMapClose(IExplorationSceneDataHolder targetMap)
+        public void OnWorldSceneSubmit(IExplorationSceneDataHolder targetMap)
         {
             foreach (var listener in _worldSceneListeners) 
-                listener.OnWorldMapClose(targetMap);
+                listener.OnWorldSceneSubmit(targetMap);
+        }
+
+        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder loadedMap)
+        {
+            foreach (var listener in _worldSceneListeners)
+                listener.OnWorldSelectSceneLoad(loadedMap);
         }
 
         public void OnExplorationRequest(EnumExploration.ExplorationType type)
@@ -87,13 +80,35 @@ namespace ExplorationSystem
     }
 
 
-    internal interface IExplorationEventsHolder : ISceneChangeListener, IWorldSceneListener,
+    internal interface IExplorationEventsHolder : 
+        IWorldSceneChangeListener,
         IExplorationSubmitListener,
         IExplorationOnCombatListener
     { }    
     public interface IExplorationEventListener { }
 
 
+    public interface IWorldSceneChangeListener : IExplorationEventListener
+    {
+        /// <summary>
+        /// Event call once the player goes the World Selection Scene by Menu or returns after defeating the Bosses;
+        /// </summary>
+        /// <param name="lastMap">The map which the player came from after defeating the Boss of the level;<br></br>
+        /// >Note: In case of [NULL] it means that the previous map was the CharacterSelector or loading screen</param>
+        void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap);
+        /// <summary>
+        /// Event call when there's a change from the World Selection Scene(as main) to another scene(generally
+        /// towards an Exploration Scene)
+        /// </summary>
+        /// <param name="targetMap">The target map towards the player is switching towards to;<br></br>
+        /// >Note: in case of NULL it means is leaving towards the Main Menu from the World Map selection Scene</param>
+        void OnWorldSceneSubmit(IExplorationSceneDataHolder targetMap);
+
+        /// <summary>
+        /// Event call on the very first frame after loading the map.
+        /// </summary>
+        void OnWorldSelectSceneLoad(IExplorationSceneDataHolder loadedMap);
+    }
     public interface IExplorationSubmitListener : IExplorationEventListener
     {
         void OnExplorationRequest(EnumExploration.ExplorationType type);

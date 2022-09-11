@@ -23,6 +23,8 @@ namespace ExplorationSystem
             ExplorationEventsDebugLogs = new ExplorationEventsDebugLogs();
             EventsHolder.Subscribe(ExplorationEventsDebugLogs);
 #endif
+
+            EventsHolder.Subscribe(WorldExplorationHandler);
         }
 
         [Title("Core")]

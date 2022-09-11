@@ -1,40 +1,39 @@
 using System;
 using System.Collections.Generic;
 using Common;
-using ExplorationSystem.Elements;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Utils;
 
 namespace ExplorationSystem.Structures
 {
-    public class UExplorationThemeSpawner : MonoBehaviour
+    public class UExplorationElementsSpawner : MonoBehaviour, IWorldSceneChangeListener
     {
         [SerializeField]
-        private PrefabHolder prefabHolder = new PrefabHolder();
+        private PoolHolder elementsHolder = new PoolHolder();
 
-        [SerializeField, DisableInEditorMode,DisableInPlayMode] 
-        private List<UExplorationElementHolder> instantiatedElements;
-
-        private void Start()
+        private void Awake()
         {
-            if(instantiatedElements.Count > 0) return;
-            DoInstantiations();
+            elementsHolder.Awake();
+            ExplorationSingleton.EventsHolder.Subscribe(this);
+        }
+
+        private void OnDestroy()
+        {
+            ExplorationSingleton.EventsHolder.UnSubscribe(this);
         }
 
         [Button]
-        private void DoInstantiations()
+        private void SpawnElements()
         {
             var themeHolder= PlayerExplorationSingleton.ExplorationThemeHolder;
             var themeEnumerable = UtilsExploration.GetEnumerable(EnumExploration.StaticEnums, themeHolder);
 
-            if (instantiatedElements.Count > 0) DestroyInstantiatedElements();
 
             int i = 0;
             foreach ((EnumExploration.ExplorationType explorationType, IThemeHolder themeElement) in themeEnumerable)
             {
-                var spawnElement = prefabHolder.SpawnElement();
-                instantiatedElements.Add(spawnElement);
+                var spawnElement = elementsHolder.PopElementSafe(true);
 
                 spawnElement.Injection(themeElement.GetThemeIcon());
                 spawnElement.Injection(explorationType);
@@ -49,22 +48,32 @@ namespace ExplorationSystem.Structures
                 i++;
             }
         }
+        public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
+        {
+        }
+
+        public void OnWorldSceneSubmit(IExplorationSceneDataHolder targetMap)
+        {
+        }
+
+        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder loadedMap)
+        {
+            SpawnElements();
+        }
+
 
         [Button]
         private void DestroyInstantiatedElements()
         {
-            foreach (var element in instantiatedElements)
-            {
-                DestroyImmediate(element.gameObject);
-            }
-            instantiatedElements.Clear();
+            elementsHolder.ReturnElementsToPool();
         }
 
 
         [Serializable]
-        private sealed class PrefabHolder : PrefabInstantiationHandler<UExplorationElementHolder>
+        private sealed class PoolHolder : TrackedMonoObjectPool<UExplorationElementHolder>
         {
             
         }
+
     }
 }

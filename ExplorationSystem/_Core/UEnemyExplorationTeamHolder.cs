@@ -11,7 +11,7 @@ namespace ExplorationSystem
 {
     // todo make it to a normal Object and use it in the ExplorationSystem
     public class UEnemyExplorationTeamHolder : MonoBehaviour, 
-        ISceneChangeListener, IWorldSceneListener, 
+        IWorldSceneChangeListener, 
         IExplorationOnCombatListener
     {
 
@@ -34,26 +34,28 @@ namespace ExplorationSystem
         {
             ExplorationSingleton.EventsHolder.UnSubscribe(this);
         }
-        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)
-        {
-            _teamWrapper.Injection(sceneData);
+        
 
-#if UNITY_EDITOR
-            if (sceneData is SExplorationSceneDataHolder assetDataHolder)
-                _dataHolder = assetDataHolder;
-#endif
-
-        }
-
-        public void OnWorldSceneOpen(IExplorationSceneDataHolder lastMap)
+        public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
         {
             _teamWrapper.ResetState();
+
         }
 
-        public void OnWorldMapClose(IExplorationSceneDataHolder targetMap)
+        public void OnWorldSceneSubmit(IExplorationSceneDataHolder targetMap)
         {
             if (targetMap == null)
                 _teamWrapper.ResetState();
+            _teamWrapper.Injection(targetMap);
+
+#if UNITY_EDITOR
+            if (targetMap is SExplorationSceneDataHolder assetDataHolder)
+                _dataHolder = assetDataHolder;
+#endif
+        }
+
+        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)
+        {
         }
 
         public ICombatTeamProvider OnExplorationRequest(EnumExploration.ExplorationType type)

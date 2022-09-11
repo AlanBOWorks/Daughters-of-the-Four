@@ -15,8 +15,8 @@ namespace ExplorationSystem._Core
     /// For just the data: see [<seealso cref="UWorldExplorationDataHolder"/>]
     /// </summary>
     public class UExplorationCombatSceneHandler : MonoBehaviour,
-        ISceneChangeListener,
         IExplorationSubmitListener,
+        IWorldSceneChangeListener,
         ISceneHiddenListener
     {
         private IExplorationSceneDataHolder _sceneDataHolder;
@@ -36,6 +36,14 @@ namespace ExplorationSystem._Core
         private void OnDestroy()
         {
             ExplorationSingleton.EventsHolder.UnSubscribe(this);
+        }
+
+        public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
+        {
+        }
+
+        public void OnWorldSceneSubmit(IExplorationSceneDataHolder targetMap)
+        {
         }
 
         public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder sceneData)

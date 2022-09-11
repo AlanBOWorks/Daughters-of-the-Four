@@ -8,11 +8,11 @@ using Utils_Project.Scene;
 
 namespace ExplorationSystem
 {
-    public sealed class WorldExplorationHandler : ISceneHiddenListener, IWorldSceneListener
+    public sealed class WorldExplorationHandler : ISceneHiddenListener, IWorldSceneChangeListener
     {
         [Title("Current")]
         [ShowInInspector]
-        private IExplorationSceneDataHolder _currentSceneHolder;
+        private IExplorationSceneDataHolder _currentScene;
         [ShowInInspector]
         private string _currentSceneName;
         [Title("Last")]
@@ -21,12 +21,12 @@ namespace ExplorationSystem
 
         public int CurrentWorldIndex;
 
-        public ref IExplorationSceneDataHolder GetDataHolder() => ref _currentSceneHolder;
+        public ref IExplorationSceneDataHolder GetDataHolder() => ref _currentScene;
 
         private bool IsTheSameSceneLoad() => _lastSceneName == _currentSceneName;
         public void OnStartLoading()
         {
-            ExplorationSingleton.EventsHolder.OnWorldMapClose(_currentSceneHolder);
+            ExplorationSingleton.EventsHolder.OnWorldSceneSubmit(_currentScene);
             if (IsTheSameSceneLoad() || _lastSceneName == null) return;
 
             SceneManager.UnloadSceneAsync(_lastSceneName);
@@ -34,8 +34,9 @@ namespace ExplorationSystem
 
         public void OnLoadingFinish()
         {
+            ExplorationSingleton.EventsHolder.OnWorldSelectSceneLoad(_currentScene);
         }
-        public void OnWorldSceneOpen(IExplorationSceneDataHolder lastMap)
+        public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
         {
             /*
              * VVVVVVVVVV THIS SHOULDN'T BE DONE VVVVVVVVVVVVV
@@ -47,16 +48,20 @@ namespace ExplorationSystem
              */
         }
 
-        public void OnWorldMapClose(IExplorationSceneDataHolder targetMap)
+        public void OnWorldSceneSubmit(IExplorationSceneDataHolder targetMap)
         {
             if (targetMap == null)
                 CurrentWorldIndex = 0; // this is a safe value override (in case this object is used outside of its Mono
         }
 
+        public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder loadedMap)
+        {
+        }
+
         public void LoadExplorationScene(IExplorationSceneDataHolder targetScene)
         {
             _lastSceneName = _currentSceneName;
-            _currentSceneHolder = targetScene;
+            _currentScene = targetScene;
 
             string targetSceneName = null;
             bool loadFromBackUp = false;
@@ -66,7 +71,7 @@ namespace ExplorationSystem
                 const string folderPath = AssetPaths.ExplorationScenesScriptablesFolderPath;
                 var assetPath = folderPath + GetNullReferenceLevelPathByLevel();
                 var backUpSceneAsset = AssetDatabase.LoadAssetAtPath<SExplorationSceneDataHolder>(assetPath);
-                _currentSceneHolder = backUpSceneAsset;
+                _currentScene = backUpSceneAsset;
 
                 string GetNullReferenceLevelPathByLevel()
                 {
@@ -105,20 +110,4 @@ namespace ExplorationSystem
 
     }
 
-    public interface IWorldSceneListener : IExplorationEventListener
-    {
-        /// <summary>
-        /// Event call once the player reach the World Selection Scene;
-        /// </summary>
-        /// <param name="lastMap">The map which the player came from after defeating the Boss of the level;<br></br>
-        /// >Note: In case of [NULL] it means that the previous map was the CharacterSelector or loading screen</param>
-        void OnWorldSceneOpen(IExplorationSceneDataHolder lastMap);
-        /// <summary>
-        /// Event call when there's a change from the World Selection Scene(as main) to another scene(generally
-        /// towards an Exploration Scene)
-        /// </summary>
-        /// <param name="targetMap">The target map towards the player is switching towards to;<br></br>
-        /// >Note: in case of NULL it means is leaving towards the Main Menu from the World Map selection Scene</param>
-        void OnWorldMapClose(IExplorationSceneDataHolder targetMap);
-    }
 }
