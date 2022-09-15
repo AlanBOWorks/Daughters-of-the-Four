@@ -17,11 +17,14 @@ namespace ExplorationSystem._Core
     public class UExplorationCombatSceneHandler : MonoBehaviour,
         IExplorationSubmitListener,
         IWorldSceneChangeListener,
-        ISceneHiddenListener
+        ISceneHiddenListener,
+        IExplorationOnCombatListener
     {
+
+        private Scene _worldSelectionScene;
         private IExplorationSceneDataHolder _sceneDataHolder;
         [Title("Exploration Scene")] 
-        private Scene _explorationScene;
+        private Scene _currentExplorationScene;
 
         [Title("Combat Scenes")]
         [ShowInInspector, DisableInEditorMode]
@@ -30,6 +33,7 @@ namespace ExplorationSystem._Core
         private void Awake()
         {
             _combatScenesPool = new Dictionary<SceneAsset, Scene>();
+            _worldSelectionScene = SceneManager.GetActiveScene();
             ExplorationSingleton.EventsHolder.Subscribe(this);
         }
 
@@ -51,7 +55,7 @@ namespace ExplorationSystem._Core
             _sceneDataHolder = sceneData;
 
             var explorationMap = sceneData.GetBackgroundSceneAsset();
-            _explorationScene = SceneManager.GetSceneByName(explorationMap.name);
+            _currentExplorationScene = SceneManager.GetSceneByName(explorationMap.name);
         }
 
         private EnumExploration.ExplorationType _requestedType;
@@ -85,7 +89,7 @@ namespace ExplorationSystem._Core
         }
 
         private const string OnNullLoadCombatScene = AssetPaths.InGameScenesCombatFolder + "[CombatBackground]OnNullSceneBackUp.unity";
-        private SceneAsset _currentLoadScene;
+        private SceneAsset _currentCombatScene;
         private void GoToCombatMap(SceneAsset targetScene)
         {
             if (targetScene == null)
@@ -93,7 +97,7 @@ namespace ExplorationSystem._Core
                 targetScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(OnNullLoadCombatScene);
             }
 
-            _currentLoadScene = targetScene;
+            _currentCombatScene = targetScene;
 
             //OnStartLoading(Combat) && OnLoadingFinish(Combat)
             bool isFirstLoad = !_combatScenesPool.ContainsKey(targetScene);
@@ -113,22 +117,23 @@ namespace ExplorationSystem._Core
 
         public void OnStartLoading() //OnStartLoading(Combat)
         {
-            var explorationScene = SceneManager.GetSceneByName(_explorationScene.name);
+            var explorationScene = SceneManager.GetSceneByName(_currentExplorationScene.name);
             ToggleSceneObjects(explorationScene,false);
         }
 
         public void OnLoadingFinish() //OnLoadingFinish(Combat)
         {
+            ToggleSceneObjects(_worldSelectionScene,false);
             Scene combatScene;
-            if (_combatScenesPool.ContainsKey(_currentLoadScene))
+            if (_combatScenesPool.ContainsKey(_currentCombatScene))
             {
-                combatScene = _combatScenesPool[_currentLoadScene];
+                combatScene = _combatScenesPool[_currentCombatScene];
                 ToggleSceneObjects(combatScene, true);
             }
             else
             {
-                combatScene = SceneManager.GetSceneByName(_currentLoadScene.name);
-                _combatScenesPool.Add(_currentLoadScene,combatScene);
+                combatScene = SceneManager.GetSceneByName(_currentCombatScene.name);
+                _combatScenesPool.Add(_currentCombatScene,combatScene);
             }
 
             SceneManager.SetActiveScene(combatScene);
@@ -144,6 +149,16 @@ namespace ExplorationSystem._Core
             }
             _combatScenesPool.Clear();
             yield return Timing.WaitForOneFrame;
+        }
+
+        public void OnExplorationCombatLoadFinish(EnumExploration.ExplorationType type)
+        {
+        }
+
+        public void OnExplorationReturnFromCombat(EnumExploration.ExplorationType fromCombatType)
+        {
+            ToggleSceneObjects(_worldSelectionScene, false);
+            ToggleSceneObjects(_currentExplorationScene, false);
         }
     }
 }

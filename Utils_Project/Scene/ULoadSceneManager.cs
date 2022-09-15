@@ -65,6 +65,85 @@ namespace Utils_Project.Scene
                 Timing.RunCoroutine(_SceneSwapSequence(parameters, listener));
         }
 
+
+
+        private IEnumerator<float> _TransitionSequence(
+            LoadSceneParameters.LoadType type,
+            float deltaModifier,
+            AsyncActions feedback,
+            LoadSceneParameters.ISceneLoadCallback feedbackListener,
+            float afterLoadDelay = .2f)
+        {
+            ExtractCallersValues(feedbackListener,
+                out var firstLastListener,
+                out var hiddenListener,
+                out var tickingListener);
+            var onHideAction = feedback.OnHideSceneFeedback;
+            var isFinishFunc = feedback.IsFinishFunc;
+            var currentPercentFunc = feedback.CurrentPercent;
+
+            _GetTransitionType(type,
+                out var transitionIn,
+                out var transitionOut,
+                out var handler,
+                deltaModifier);
+
+            gameObject.SetActive(true);
+            yield return Timing.WaitForOneFrame;
+            CallInitialEvents();
+
+            yield return Timing.WaitUntilDone(transitionIn);
+            hiddenListener?.OnStartLoading();
+            onHideAction?.Invoke();
+
+            while (!isFinishFunc())
+            {
+                yield return Timing.WaitForOneFrame;
+                var currentLoad = currentPercentFunc.Invoke();
+                CallTickingEvents(currentLoad);
+            }
+
+
+            yield return Timing.WaitForOneFrame;
+            yield return Timing.WaitForSeconds(afterLoadDelay);
+            handler.OnFinishLoad(type);
+            hiddenListener?.OnLoadingFinish();
+            yield return Timing.WaitUntilDone(transitionOut);
+            CallLastEvents();
+
+
+            firstLastListener?.OnFinishTransition();
+            gameObject.SetActive(false);
+
+
+            void CallInitialEvents()
+            {
+                handler.OnStartTransition(type);
+                firstLastListener?.OnStartTransition();
+                foreach (var listener in _percentListeners)
+                {
+                    listener.OnShowLoadScreen(type);
+                }
+            }
+            void CallTickingEvents(float currentLoad)
+            {
+                foreach (var listener in _loadPercentListeners)
+                {
+                    listener.OnPercentTick(currentLoad);
+                }
+                tickingListener?.OnLoadSceneTick(currentLoad);
+            }
+
+            void CallLastEvents()
+            {
+               
+                foreach (var listener in _percentListeners)
+                {
+                    listener.OnHideLoadScreen(type);
+                }
+            }
+        }
+
         //// LOAD SCENE SEGMENT
         #region LOAD SCENE
         private AsyncOperation _currentLoadingAsyncOperation;
@@ -125,7 +204,7 @@ namespace Utils_Project.Scene
 
         public void DoJustScreenTransition(
             float waitUntilHide, bool fromLeft, float deltaModifier = 1,
-            LoadSceneParameters.ISceneLoadCallback feedbackListener = null)
+            LoadSceneParameters.ISceneLoadCallback feedbackListener = null, float delayAfterTransition = .2f)
         {
             Timing.KillCoroutines(_fillingCoroutineHandle);
 
@@ -141,7 +220,7 @@ namespace Utils_Project.Scene
             {
                 var targetType = LoadSceneParameters.GetMainLoadType(fromLeft);
                 var actions = new AsyncActions(null, _isSimpleTransitionFinish, _simpleTransitionPercent);
-                return _TransitionSequence(targetType, deltaModifier, actions, feedbackListener);
+                return _TransitionSequence(targetType, deltaModifier, actions, feedbackListener, delayAfterTransition);
             }
         }
 
@@ -184,82 +263,6 @@ namespace Utils_Project.Scene
             }
         }
 
-        private IEnumerator<float> _TransitionSequence(
-            LoadSceneParameters.LoadType type,
-            float deltaModifier,
-            AsyncActions feedback,
-            LoadSceneParameters.ISceneLoadCallback feedbackListener,
-            float delay = 0)
-        {
-            ExtractCallersValues(feedbackListener,
-                out var firstLastListener,
-                out var hiddenListener,
-                out var tickingListener);
-            var onHideAction = feedback.OnHideSceneFeedback;
-            var isFinishFunc = feedback.IsFinishFunc;
-            var currentPercentFunc = feedback.CurrentPercent;
-
-            _GetTransitionType(type,
-                out var transitionIn,
-                out var transitionOut,
-                out var handler,
-                deltaModifier);
-
-            gameObject.SetActive(true);
-            yield return Timing.WaitForOneFrame;
-            CallInitialEvents();
-
-            yield return Timing.WaitUntilDone(transitionIn);
-
-            hiddenListener?.OnStartLoading();
-            onHideAction?.Invoke();
-
-            while (!isFinishFunc())
-            {
-                yield return Timing.WaitForOneFrame;
-                var currentLoad = currentPercentFunc.Invoke();
-                CallTickingEvents(currentLoad);
-            }
-
-
-            yield return Timing.WaitForOneFrame;
-            yield return Timing.WaitForSeconds(delay);
-            CallLastEvents();
-            yield return Timing.WaitUntilDone(transitionOut);
-
-
-            firstLastListener?.OnFinishTransition();
-            gameObject.SetActive(false);
-
-
-            void CallInitialEvents()
-            {
-                handler.OnStartTransition(type);
-                firstLastListener?.OnStartTransition();
-                foreach (var listener in _percentListeners)
-                {
-                    listener.OnShowLoadScreen(type);
-                }
-            }
-            void CallTickingEvents(float currentLoad)
-            {
-                foreach (var listener in _loadPercentListeners)
-                {
-                    listener.OnPercentTick(currentLoad);
-                }
-                tickingListener?.OnLoadSceneTick(currentLoad);
-            }
-
-            void CallLastEvents()
-            {
-                handler.OnFinishLoad(type);
-                hiddenListener?.OnLoadingFinish();
-                foreach (var listener in _percentListeners)
-                {
-                    listener.OnHideLoadScreen(type);
-                }
-            }
-        }
         private readonly struct AsyncActions
         {
             public readonly Action OnHideSceneFeedback;

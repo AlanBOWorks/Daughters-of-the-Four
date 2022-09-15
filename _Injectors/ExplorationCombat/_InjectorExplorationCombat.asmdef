@@ -1,0 +1,17 @@
+{
+    "name": "_InjectorExplorationCombat",
+    "rootNamespace": "",
+    "references": [
+        "GUID:936a48a91e3577b40b29f1a840c2d834",
+        "GUID:d548366e5cb87b645aaecd97e4e2c2d4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

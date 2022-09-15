@@ -67,7 +67,8 @@ namespace CombatSystem._Core
 
     internal sealed class CombatEventsLogs : 
         ICombatEventsHolderBase,
-        ITempoTickListener, IDamageDoneListener
+        ITempoTickListener, IDamageDoneListener,
+        ICombatTerminationListener
     {
         [TitleGroup("Team")] 
         public bool ShowTeamLogs = false;
@@ -459,6 +460,28 @@ namespace CombatSystem._Core
 
         }
 
+        [Title("Finish")]
+        public bool ShowCombatTerminationLogs = false;
+        private class TerminationLogs
+        {
+            public bool OnCombatFinish = true;
+            public bool OnCombatFinishHide = false;
+        }
+        [ShowInInspector]
+        private TerminationLogs _terminationLogs = new TerminationLogs();
+
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
+            if(!ShowCombatTerminationLogs || !_terminationLogs.OnCombatFinish) return;
+            
+            Debug.Log($"Combat Finish: {finishType}");
+        }
+
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
+        {
+            if(!ShowCombatTerminationLogs || !_terminationLogs.OnCombatFinishHide) return;
+            Debug.Log($"Combat Finish[Hide]: {finishType}");
+        }
     }
 
 

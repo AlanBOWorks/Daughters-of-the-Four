@@ -55,6 +55,7 @@ namespace Utils_Project
         }
 
 
+        private const float AfterBattleLoadDelay = .4f;
         public static void LoadBattleScene(string sceneName, bool isFirstLoad,
             LoadSceneParameters.ISceneLoadCallback loadCombatCallback,
             float deltaModifier = 1)
@@ -66,23 +67,16 @@ namespace Utils_Project
             {
                 LoadSceneParameters.LoadType targetType = LoadSceneParameters.LoadType.CombatLoad;
                 LoadSceneParameters parameters = new LoadSceneParameters(
-                    sceneName, targetType, true, deltaModifier);
+                    sceneName, targetType, true, deltaModifier, AfterBattleLoadDelay);
                 DoSceneTransition(parameters, loadCombatCallback);
             }
             else
             {
-                DoJustVisualTransition(.4f, true, deltaModifier,loadCombatCallback);
+                 var sceneManager = LoadSceneManagerSingleton.ManagerInstance;
+            sceneManager.DoJustScreenTransition(.4f, true, 
+                deltaModifier, loadCombatCallback, AfterBattleLoadDelay);
             }
         }
-
-        
-        public static void DoJustVisualTransition(float waitUntilHide, bool fromLeft, float deltaModifier = 1, 
-            LoadSceneParameters.ISceneLoadCallback listener = null)
-        {
-            var sceneManager = LoadSceneManagerSingleton.ManagerInstance;
-            sceneManager.DoJustScreenTransition(waitUntilHide, fromLeft, deltaModifier, listener);
-        }
-
     }
 
     public readonly struct LoadSceneParameters

@@ -115,7 +115,13 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public virtual void OnCombatEnd()
+        private static void DisableSpawner(in EntityElementSpawner spawner)
+        {
+            spawner.Disable();
+        }
+
+
+        public virtual void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
             foreach (var pair in ActiveElementsDictionary)
             {
@@ -128,23 +134,12 @@ namespace CombatSystem.Player.UI
             ActiveElementsDictionary.Clear();
             DisableSpawner(in playerElementSpawner);
             DisableSpawner(in enemyElementSpawner);
-
-            
-        }
-        private static void DisableSpawner(in EntityElementSpawner spawner)
-        {
-            spawner.Disable();
         }
 
-
-        public virtual void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
         }
 
-        public virtual void OnCombatQuit()
-        {
-            
-        }
 
 
 
@@ -216,11 +211,12 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        public override void OnCombatEnd()
+        public override void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
-            base.OnCombatEnd();
+            base.OnCombatFinish(finishType);
             Clear();
         }
+
 
 
         public void Clear()

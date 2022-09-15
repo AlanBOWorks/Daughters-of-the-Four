@@ -97,7 +97,11 @@ namespace CombatSystem.Animations
             _enemyTeam = null;
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
+        }
+
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
         }
 

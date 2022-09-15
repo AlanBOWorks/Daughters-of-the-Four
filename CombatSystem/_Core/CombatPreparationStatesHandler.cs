@@ -58,7 +58,7 @@ namespace CombatSystem._Core
                 {
                     yield return Timing.WaitForOneFrame;
                 }
-                CombatSystemSingleton.EventsHolder.OnCombatFinish(false);
+                Debug.LogError("UnWanted Combat Finish [Alive Reference were killed]");
             }
         }
         
@@ -98,22 +98,4 @@ namespace CombatSystem._Core
         void OnCombatStart();
     }
 
-    public interface ICombatTerminationListener : ICombatEventListener
-    {
-        /// <summary>
-        /// First event invoked for ending the Combat; is triggers for both [<see cref="OnCombatFinish"/>] and
-        /// [<see cref="OnCombatQuit"/>]
-        /// </summary>
-        void OnCombatEnd();
-
-        /// <summary>
-        /// Invoked only if the combat is finish by natural conditions
-        /// </summary>
-        /// <param name="isPlayerWin"></param>
-        void OnCombatFinish(bool isPlayerWin);
-        /// <summary>
-        /// Invoked only if the combat is ended by forced means (quitting the game, by an event...)
-        /// </summary>
-        void OnCombatQuit();
-    }
 }

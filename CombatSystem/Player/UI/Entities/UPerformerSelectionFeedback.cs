@@ -80,17 +80,14 @@ namespace CombatSystem.Player.UI
             gameObject.SetActive(false);
         }
 
-        public void OnCombatEnd()
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
+        }
+
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
             Hide();
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-        }
     }
 }

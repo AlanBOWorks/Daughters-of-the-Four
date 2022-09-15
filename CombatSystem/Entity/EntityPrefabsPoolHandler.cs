@@ -50,20 +50,16 @@ namespace CombatSystem.Entity
         {
         }
 
-        public void OnCombatEnd()
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
+        }
+
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
             _playerTeamType.OnFinishCombat();
             _enemyTeamType.OnFinishCombat();
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-
-        }
 
 
         private sealed class PlayerPrefabsHolder : PrefabsHolder

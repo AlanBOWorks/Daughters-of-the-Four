@@ -87,24 +87,21 @@ namespace CombatSystem.Player.UI.Info
         {
         }
 
-        public void OnCombatEnd()
-        {
-            _dictionary.Clear();
-            Action<UVitalityInfo> onFinishAction = HideVitality;
-            ReturnElements(onFinishAction);
-        }
 
         private static void HideVitality(UVitalityInfo element)
         {
             element.HideElement();
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
+            _dictionary.Clear();
         }
 
-        public void OnCombatQuit()
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
+            Action<UVitalityInfo> onFinishAction = HideVitality;
+            ReturnElements(onFinishAction);
         }
 
 

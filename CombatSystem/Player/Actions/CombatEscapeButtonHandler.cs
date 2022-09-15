@@ -107,17 +107,12 @@ namespace CombatSystem.Player
             _lastOverridingElement = overridingPauseAction;
         }
 
-
-        public void OnCombatEnd()
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
             ResetState();
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
         }
 

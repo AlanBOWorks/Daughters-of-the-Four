@@ -12,18 +12,15 @@ namespace CombatSystem.Others
             CombatSystemSingleton.EventsHolder.Subscribe(this);
         }
 
-        public void OnCombatEnd()
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
+        }
+
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
             gameObject.SetActive(false);
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-        }
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {

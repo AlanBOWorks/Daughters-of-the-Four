@@ -38,7 +38,7 @@ namespace ExplorationSystem.Elements
         }
         private void VariateDeltas()
         {
-            float randomUnit = Random.value;
+            float randomUnit = Random.Range(0.25f,.5f);
             _currentIconLerp = randomUnit;
             TickRotations(randomUnit * 75f);
 

@@ -14,7 +14,9 @@ namespace CombatSystem._Core
     {
         [ShowInInspector] 
         internal readonly HashSet<ITempoTickListener> TickListeners;
-        [ShowInInspector] internal readonly CombatEntitiesTempoTicker EntitiesTempoTicker;
+        [ShowInInspector] 
+        internal readonly CombatEntitiesTempoTicker EntitiesTempoTicker;
+
 
         private readonly IPlayerPauseValues _playerPauseValues;
 
@@ -57,16 +59,13 @@ namespace CombatSystem._Core
             CombatSystemSingleton.LinkCoroutineToMaster(in _tickingHandle);
         }
 
-        public void OnCombatEnd()
+
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
             Timing.KillCoroutines(_tickingHandle);
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
         }
 
@@ -93,12 +92,14 @@ namespace CombatSystem._Core
         {
             var teamControllersHandler = CombatSystemSingleton.TeamControllers;
             var skillQueuePerformer = CombatSystemSingleton.SkillQueuePerformer;
+            var currentFinishHandler = CombatSystemSingleton.CombatFinishHandler;
+            var combatEvents = CombatSystemSingleton.EventsHolder;
 
             foreach (var listener in TickListeners)
             {
                 listener.OnStartTicking();
             }
-            while (true)
+            while (!currentFinishHandler.IsCombatFinish())
             {
                 yield return Timing.WaitForSeconds(TickPeriodSeconds);
                 _roundTickCount++;
@@ -125,7 +126,6 @@ namespace CombatSystem._Core
                 if (controllersWaiting)
                 {
                     var controllersEnumerator = teamControllersHandler.GetActiveControllers();
-                    var combatEvents = CombatSystemSingleton.EventsHolder;
 
                     // ----- Wait For Animations
                     do
@@ -187,6 +187,12 @@ namespace CombatSystem._Core
 
                 yield return Timing.WaitForOneFrame;
             }
+
+
+
+            bool isPlayerWin = currentFinishHandler.CheckIfPlayerWon();
+            var finishType = UtilsCombatFinish.GetEnumByBoolean(isPlayerWin);
+            combatEvents.OnCombatFinish(finishType);
         }
 
     }

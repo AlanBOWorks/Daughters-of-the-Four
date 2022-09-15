@@ -165,9 +165,9 @@ namespace CombatSystem._Core
         }
 
         [Button, EnableIf("CanFinish"), DisableInEditorMode]
-        private void FinishCombat(bool isWin = true)
+        private void FinishCombat(UtilsCombatFinish.FinishType type = UtilsCombatFinish.FinishType.PlayerWon)
         {
-            CombatFinishHandler.FinishCombat(isWin);
+            UtilsCombatFinish.FinishCombat(type);
         }
 
         private static void TestStartCombat(SPlayerPresetTeam playerTeam, SEnemyPredefinedTeam enemyTeam)

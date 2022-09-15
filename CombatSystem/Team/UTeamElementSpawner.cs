@@ -91,20 +91,17 @@ namespace CombatSystem.Team
         }
 
 
-        public void OnCombatEnd()
+        public virtual void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
+        }
+
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
             _playerTeamReferences.DeSpawn();
             _enemyTeamReferences.DeSpawn();
             CallEndCombatEvents();
         }
 
-        public virtual void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public virtual void OnCombatQuit()
-        {
-        }
 
         public virtual void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {

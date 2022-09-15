@@ -40,18 +40,16 @@ namespace CombatSystem._Core
        
         public bool IsActing() => _queueCoroutineHandle.IsRunning;
 
-        public void OnCombatEnd()
+
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
             Timing.KillCoroutines(_queueCoroutineHandle);
             Queue.Clear();
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
         }
 
-        public void OnCombatQuit()
-        {
-        }
     }
 }

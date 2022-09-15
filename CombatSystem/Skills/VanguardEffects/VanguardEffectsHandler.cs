@@ -130,21 +130,16 @@ namespace CombatSystem.Skills.VanguardEffects
 
             return allEntitiesInteractionCount;
         }
-
-
-
-        public void OnCombatEnd()
+        
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
             _queue.Clear();
             Timing.KillCoroutines(_queueCoroutineHandle);
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
         }
 
-        public void OnCombatQuit()
-        {
-        }
     }
 }

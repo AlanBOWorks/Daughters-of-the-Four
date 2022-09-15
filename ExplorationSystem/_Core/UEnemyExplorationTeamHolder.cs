@@ -80,6 +80,9 @@ namespace ExplorationSystem
 
         private sealed class EnemyTeamWrapper : IExplorationThreatsStructureRead<ICombatTeamProvider>
         {
+            [ShowInInspector] 
+            private IExplorationSceneEntitiesHolder _priorityEntities;
+
             [ShowInInspector,HorizontalGroup]
             private IExplorationSceneEntitiesHolder _entitiesHolder;
             [ShowInInspector,HorizontalGroup, ShowIf("_halfMapEntitiesHolder")]
@@ -99,6 +102,7 @@ namespace ExplorationSystem
 
             public void ResetState()
             {
+                _priorityEntities = null;
                 _selectedEntities.Clear();
                 IsHalfMapReached = false;
             }
@@ -112,6 +116,8 @@ namespace ExplorationSystem
 
             private IExplorationSceneEntitiesHolder GetCurrentEntitiesHolder()
             {
+                if (_priorityEntities != null) return _priorityEntities;
+
                 return (_halfMapEntitiesHolder == null || !IsHalfMapReached) 
                     ? _entitiesHolder 
                     : _halfMapEntitiesHolder;
@@ -166,6 +172,27 @@ namespace ExplorationSystem
                         if(entityProvider == null) continue;
                         Add(entityProvider);
                     }
+                }
+            }
+
+            private sealed class TemporalPriorityEnemyTeams : IExplorationSceneEntitiesHolder
+            {
+                public TemporalPriorityEnemyTeams()
+                {
+                    basicEnemies = new List<SEnemyPreparationEntity>();
+                }
+                public List<SEnemyPreparationEntity> basicEnemies;
+                public List<SEnemyPreparationEntity> eliteEnemies;
+
+
+                public IEnumerable<ICombatEntityProvider> GetBasicEntities()
+                {
+                    return basicEnemies;
+                }
+
+                public IEnumerable<ICombatEntityProvider> GetEliteEntities()
+                {
+                    return eliteEnemies ?? basicEnemies;
                 }
             }
         }

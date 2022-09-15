@@ -119,18 +119,16 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        public void OnCombatEnd()
+
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
+        }
+
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
             HideAll();
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-        }
 
         private void EnableHolder()
         {

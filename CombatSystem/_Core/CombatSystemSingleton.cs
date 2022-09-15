@@ -26,7 +26,9 @@ namespace CombatSystem._Core
                 = systemEventsHolder;
             CombatPreparationStatesHandler 
                 = new CombatPreparationStatesHandler(systemEventsHolder);
-            TeamsHolder 
+            CombatFinishHandler 
+                = new CombatFinishHandler();
+            TeamsHolder
                 = new CombatTeamsHolder();
             TeamControllers 
                 = new CombatTeamControllersHandler();
@@ -42,7 +44,7 @@ namespace CombatSystem._Core
 
             var controlGainHandler = new CombatTeamControlGainHandler();
 
-
+            systemEventsHolder.Subscribe(CombatFinishHandler);
             systemEventsHolder.Subscribe(KnockOutHandler);
             systemEventsHolder.Subscribe(SkillQueuePerformer);
             systemEventsHolder.Subscribe(VanguardEffectsHandler);
@@ -72,6 +74,7 @@ namespace CombatSystem._Core
         // ------- EVENTS ------
         [ShowInInspector]
         public static SystemCombatEventsHolder EventsHolder { get; private set; }
+        public static ICombatFinishHandler CombatFinishHandler { get; }
 
         // ------- ESSENTIALS ------
         [ShowInInspector]

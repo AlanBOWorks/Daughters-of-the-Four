@@ -100,17 +100,7 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        private void ResetHandlerStates()
-        {
-            punishRootHolder.SetActive(false);
-            revengeRootHolder.SetActive(false);
 
-            punishPool.ReturnToElementsToPool();
-            revengePool.ReturnToElementsToPool();
-
-            punishCountHandler.ResetCount();
-            revengeCountHandler.ResetCount();
-        }
 
         public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
         {
@@ -129,21 +119,39 @@ namespace CombatSystem.Player.UI
 
         public void OnCombatEnd()
         {
+        }
+
+
+        private void ResetHandlerStates()
+        {
+            punishRootHolder.SetActive(false);
+            revengeRootHolder.SetActive(false);
+        }
+
+        private void HideHandlers()
+        {
+            punishPool.ReturnToElementsToPool();
+            revengePool.ReturnToElementsToPool();
+
+            punishCountHandler.ResetCount();
+            revengeCountHandler.ResetCount();
+        }
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
             ResetHandlerStates();
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
+            HideHandlers();
         }
 
-        public void OnCombatQuit()
-        {
-        }
 
         public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
         {
-            if(controller.ControllingTeam.VanguardEffectsHolder.IsMainEntityTurn())
-                ResetHandlerStates();
+            if (!controller.ControllingTeam.VanguardEffectsHolder.IsMainEntityTurn()) return;
+            ResetHandlerStates();
+            HideHandlers();
         }
 
         public void LateOnAllActorsNoActions(CombatEntity lastActor)

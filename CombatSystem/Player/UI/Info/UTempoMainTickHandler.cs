@@ -63,7 +63,13 @@ namespace CombatSystem.Player.UI
         {
             holder.HideElement();
         }
-        public void OnCombatEnd()
+
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
+           
+        }
+
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
             Action<UTempoTrackerHolder> onFinishCallBack = HideActiveTracker;
 
@@ -71,13 +77,6 @@ namespace CombatSystem.Player.UI
             ReturnElements(onFinishCallBack);
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
-        {
-        }
-
-        public void OnCombatQuit()
-        {
-        }
 
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {

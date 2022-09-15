@@ -5,12 +5,10 @@ using CombatSystem.Entity;
 using CombatSystem.Passives;
 using CombatSystem.Player;
 using CombatSystem.Skills;
-using CombatSystem.Skills.Effects;
 using CombatSystem.Skills.VanguardEffects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace CombatSystem._Core
 {
@@ -152,32 +150,24 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatEnd()
+
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
             foreach (var eventsHolder in _mainEventsEnumerable)
             {
-                eventsHolder.OnCombatEnd();
+                eventsHolder.OnCombatFinish(finishType);
             }
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
-            OnCombatEnd();
             foreach (var eventsHolder in _mainEventsEnumerable)
             {
-                eventsHolder.OnCombatFinish(isPlayerWin);
+                eventsHolder.OnCombatFinishHide(finishType);
             }
+
         }
 
-        public void OnCombatQuit()
-        {
-            OnCombatEnd();
-
-            foreach (var eventsHolder in _mainEventsEnumerable)
-            {
-                eventsHolder.OnCombatQuit();
-            }
-        }
 
 
         // ------ ------ TEMPO ----- ------ 
@@ -861,29 +851,23 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnCombatEnd()
+
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
             foreach (var listener in _combatTerminationListeners)
             {
-                listener.OnCombatEnd();
+                listener.OnCombatFinish(finishType);
             }
         }
 
-        public void OnCombatFinish(bool isPlayerWin)
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
             foreach (var listener in _combatTerminationListeners)
             {
-                listener.OnCombatFinish(isPlayerWin);
+                listener.OnCombatFinishHide(finishType);
             }
         }
 
-        public void OnCombatQuit()
-        {
-            foreach (var listener in _combatTerminationListeners)
-            {
-                listener.OnCombatQuit();
-            }
-        }
 
         public void OnCreateEntity(in CombatEntity entity, in bool isPlayers)
         {
