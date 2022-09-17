@@ -228,7 +228,7 @@ namespace Utils_Project.Scene
 
         private static void ExtractCallersValues(LoadSceneParameters.ISceneLoadCallback listener,
             out ISceneLoadFirstLastCallListener firstLastListener,
-            out ISceneHiddenListener hiddenListener,
+            out ISceneHiddenCallBack hiddenListener,
             out ISceneLoadingListener tickingListener)
         {
             firstLastListener = null;
@@ -239,7 +239,7 @@ namespace Utils_Project.Scene
 
             if (listener is ISceneLoadFirstLastCallListener firstLastCall)
                 firstLastListener = firstLastCall;
-            if (listener is ISceneHiddenListener transition)
+            if (listener is ISceneHiddenCallBack transition)
                 hiddenListener = transition;
             if (listener is ISceneLoadingListener loadingListener)
                 tickingListener = loadingListener;

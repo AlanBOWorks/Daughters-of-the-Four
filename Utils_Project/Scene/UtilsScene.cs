@@ -127,7 +127,7 @@ namespace Utils_Project
         /// <br></br>
         /// Base type for: <br></br>
         /// - <seealso cref="ISceneLoadFirstLastCallListener"/><br></br>
-        /// - <seealso cref="ISceneHiddenListener"/><br></br>
+        /// - <seealso cref="ISceneHiddenCallBack"/><br></br>
         /// - <seealso cref="ISceneLoadingListener"/>
         /// </summary>
         public interface ISceneLoadCallback { }
@@ -141,13 +141,13 @@ namespace Utils_Project
     {
         /// <summary>
         /// The very first invoke on load, before everything else (before the first frame of transition is done);<br></br>
-        /// > For the moment in which the scene is hidden use [<seealso cref="ISceneHiddenListener.OnStartLoading"/>]
+        /// > For the moment in which the scene is hidden use [<seealso cref="ISceneHiddenCallBack.OnStartLoading"/>]
         /// instead
         /// </summary>
         void OnStartTransition();
         /// <summary>
         /// The very fast invoke on load, right after the last frame after the transition is done. <br></br>
-        /// > For the moment in which the scene is shown use [<seealso cref="ISceneHiddenListener.OnLoadingFinish"/>]
+        /// > For the moment in which the scene is shown use [<seealso cref="ISceneHiddenCallBack.OnLoadingFinish"/>]
         /// </summary>
         void OnFinishTransition();
     }
@@ -155,7 +155,7 @@ namespace Utils_Project
     /// <summary>
     /// Invokes before and after the Scene Transition's hiding Object appears in screen.
     /// </summary>
-    public interface ISceneHiddenListener : LoadSceneParameters.ISceneLoadCallback
+    public interface ISceneHiddenCallBack : LoadSceneParameters.ISceneLoadCallback
     {
         /// <summary>
         /// The very first frame after the scene is hidden behind the transition object and

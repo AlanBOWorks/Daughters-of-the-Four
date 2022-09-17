@@ -8,7 +8,7 @@ using Utils_Project.Scene;
 
 namespace ExplorationSystem
 {
-    public sealed class WorldExplorationHandler : ISceneHiddenListener, IWorldSceneChangeListener
+    public sealed class WorldExplorationHandler : ISceneHiddenCallBack, IWorldSceneChangeListener
     {
         [Title("Current")]
         [ShowInInspector]

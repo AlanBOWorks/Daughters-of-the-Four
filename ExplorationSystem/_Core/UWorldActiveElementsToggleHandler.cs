@@ -1,12 +1,16 @@
 using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace ExplorationSystem._Core
 {
-    public class UWorldActiveElementsToggleHandler : MonoBehaviour, IWorldSceneChangeListener
+    public class UWorldActiveElementsToggleHandler : MonoBehaviour, IWorldSceneChangeListener, IExplorationOnCombatListener
     {
+        [Title("World change")]
         [SerializeField] private GameObject[] onWorldSelectedHide;
         [SerializeField] private GameObject[] onWorldMapReturnsHide;
+
+        [Title("Combat")] [SerializeField] private GameObject[] onCombatEnterHide;
 
         private void Awake()
         {
@@ -44,6 +48,22 @@ namespace ExplorationSystem._Core
         public void OnWorldSelectSceneLoad(IExplorationSceneDataHolder loadedMap)
         {
             ToggleElements(true);
+        }
+
+        public void OnExplorationCombatLoadFinish(EnumExploration.ExplorationType type)
+        {
+            foreach (var o in onCombatEnterHide)
+            {
+                o.SetActive(false);
+            }
+        }
+
+        public void OnExplorationReturnFromCombat(EnumExploration.ExplorationType fromCombatType)
+        {
+            foreach (var o in onCombatEnterHide)
+            {
+                o.SetActive(true);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
-using System;
 using System.Collections.Generic;
+using CombatSystem._Core;
+using ExplorationSystem;
 using MEC;
 using Sirenix.OdinInspector;
 using UnityEditor;
@@ -7,43 +8,32 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils_Project;
 
-namespace ExplorationSystem._Core
+namespace _Injectors.ExplorationCombat
 {
-    /// <summary>
-    /// Keeps track of the SceneBackgrounds and handles the load and unLoad of additive scenes.<br></br><br></br>
-    ///
-    /// For just the data: see [<seealso cref="UWorldExplorationDataHolder"/>]
-    /// </summary>
-    public class UExplorationCombatSceneHandler : MonoBehaviour,
-        IExplorationSubmitListener,
+    public class ExplorationCombatScenesTransitionHandler : IExplorationSubmitListener, 
         IWorldSceneChangeListener,
-        ISceneHiddenListener,
-        IExplorationOnCombatListener
-    {
+        IExplorationOnCombatListener,
+        ISceneHiddenCallBack,
 
+        ICombatTerminationListener
+    {
         private Scene _worldSelectionScene;
         private IExplorationSceneDataHolder _sceneDataHolder;
-        [Title("Exploration Scene")] 
+        [Title("Exploration Scene")]
         private Scene _currentExplorationScene;
 
         [Title("Combat Scenes")]
         [ShowInInspector, DisableInEditorMode]
-        private Dictionary<SceneAsset, Scene> _combatScenesPool;
+        private readonly Dictionary<SceneAsset, Scene> _combatScenesPool;
 
-        private void Awake()
+        public ExplorationCombatScenesTransitionHandler()
         {
             _combatScenesPool = new Dictionary<SceneAsset, Scene>();
-            _worldSelectionScene = SceneManager.GetActiveScene();
-            ExplorationSingleton.EventsHolder.Subscribe(this);
-        }
-
-        private void OnDestroy()
-        {
-            ExplorationSingleton.EventsHolder.UnSubscribe(this);
         }
 
         public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
         {
+            _worldSelectionScene = SceneManager.GetActiveScene();
         }
 
         public void OnWorldSceneSubmit(IExplorationSceneDataHolder targetMap)
@@ -101,13 +91,13 @@ namespace ExplorationSystem._Core
 
             //OnStartLoading(Combat) && OnLoadingFinish(Combat)
             bool isFirstLoad = !_combatScenesPool.ContainsKey(targetScene);
-            UtilsScene.LoadBattleScene(targetScene.name,isFirstLoad, this, 1); 
+            UtilsScene.LoadBattleScene(targetScene.name, isFirstLoad, this, 1);
         }
 
 
         private static void ToggleSceneObjects(Scene targetScene, bool active)
         {
-            if(!targetScene.isLoaded) return;
+            if (!targetScene.isLoaded) return;
 
             foreach (var element in targetScene.GetRootGameObjects())
             {
@@ -118,12 +108,13 @@ namespace ExplorationSystem._Core
         public void OnStartLoading() //OnStartLoading(Combat)
         {
             var explorationScene = SceneManager.GetSceneByName(_currentExplorationScene.name);
-            ToggleSceneObjects(explorationScene,false);
+            ToggleSceneObjects(explorationScene, false);
         }
+
 
         public void OnLoadingFinish() //OnLoadingFinish(Combat)
         {
-            ToggleSceneObjects(_worldSelectionScene,false);
+            ToggleSceneObjects(_worldSelectionScene, false);
             Scene combatScene;
             if (_combatScenesPool.ContainsKey(_currentCombatScene))
             {
@@ -133,7 +124,7 @@ namespace ExplorationSystem._Core
             else
             {
                 combatScene = SceneManager.GetSceneByName(_currentCombatScene.name);
-                _combatScenesPool.Add(_currentCombatScene,combatScene);
+                _combatScenesPool.Add(_currentCombatScene, combatScene);
             }
 
             SceneManager.SetActiveScene(combatScene);
@@ -159,6 +150,27 @@ namespace ExplorationSystem._Core
         {
             ToggleSceneObjects(_worldSelectionScene, false);
             ToggleSceneObjects(_currentExplorationScene, false);
+        }
+
+
+
+        // VVVVVVVVV from COMBAT todo make it to individual Class for ISceneLoadCallback
+        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
+        {
+            switch (finishType)
+            {
+                case UtilsCombatFinish.FinishType.PlayerWon:
+                default:
+                // todo invoke transition to explorationScene
+
+                    break;
+            }
+        }
+
+        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
+        {
+            var combatScene = _combatScenesPool[_currentCombatScene];
+            ToggleSceneObjects(combatScene,false);
         }
     }
 }
