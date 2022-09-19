@@ -1,53 +1,21 @@
 using System;
-using System.Collections.Generic;
-using MEC;
-using MPUIKIT;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
 namespace Utils_Project.Scene
 {
-    public class ULoadingIcon : MonoBehaviour, ILoadPercentListener
+    public class ULoadingDotsAnimator : MonoBehaviour
     {
-        [Title("Loading")]
-        [SerializeField] private MPImage loadingIcon;
-
-        private void Awake()
-        {
-            LoadSceneManagerSingleton.LoadPercentListeners.Add(this);
-        }
-
-        private IEnumerator<float> _Ticking()
-        {
-            while (enabled)
-            {
-                UpdateDotsText();
-
-                yield return Timing.WaitForOneFrame;
-            }
-        }
-
-        private void OnEnable()
-        {
-            _dotsCounter = 0;
-            _dotsTextCounter = 0;
-            loadingIcon.fillAmount = 0;
-
-            Timing.RunCoroutine(_Ticking(), Segment.SlowUpdate);
-        }
-
-
-        public void OnPercentTick(float loadPercent)
-        {
-            loadingIcon.fillAmount = loadPercent;
-        }
-
-
-
         [Title("Text")]
         [SerializeField] private TextMeshProUGUI dotsTextHolder;
         [SerializeField, Range(1, 20), SuffixLabel("deltas")] private int dotsUpdateFrameRate = 4;
+
+
+        private void Update()
+        {
+            UpdateDotsText();
+        }
 
         private const string OneDotsText = ".";
         private const string TwoDotsText = "..";

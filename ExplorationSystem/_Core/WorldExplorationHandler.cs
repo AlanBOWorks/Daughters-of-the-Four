@@ -8,7 +8,7 @@ using Utils_Project.Scene;
 
 namespace ExplorationSystem
 {
-    public sealed class WorldExplorationHandler : ISceneHiddenCallBack, IWorldSceneChangeListener
+    public sealed class WorldExplorationHandler : IWorldSceneChangeListener
     {
         [Title("Current")]
         [ShowInInspector]
@@ -104,7 +104,9 @@ namespace ExplorationSystem
             _currentSceneName = targetSceneName;
 
             if (IsTheSameSceneLoad()) return;
-            UtilsScene.DoTransitionExplorationScene(targetSceneName, true, this, 2);
+
+            var loadCallbacks = new LoadCallBacks(OnStartLoading,OnLoadingFinish);
+            UtilsScene.DoTransitionExplorationScene(targetSceneName, true, loadCallbacks);
         }
 
 

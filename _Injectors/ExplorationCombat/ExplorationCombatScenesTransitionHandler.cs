@@ -13,7 +13,6 @@ namespace _Injectors.ExplorationCombat
     public class ExplorationCombatScenesTransitionHandler : IExplorationSubmitListener, 
         IWorldSceneChangeListener,
         IExplorationOnCombatListener,
-        ISceneHiddenCallBack,
 
         ICombatTerminationListener
     {
@@ -91,7 +90,8 @@ namespace _Injectors.ExplorationCombat
 
             //OnStartLoading(Combat) && OnLoadingFinish(Combat)
             bool isFirstLoad = !_combatScenesPool.ContainsKey(targetScene);
-            UtilsScene.LoadBattleScene(targetScene.name, isFirstLoad, this, 1);
+            var loadCallbacks = new LoadCallBacks(OnStartLoading,OnLoadingFinish);
+            UtilsScene.LoadBattleScene(targetScene.name, isFirstLoad, loadCallbacks);
         }
 
 

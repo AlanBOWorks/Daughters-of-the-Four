@@ -1,6 +1,7 @@
 using CombatSystem.Player;
 using UnityEngine;
 using Utils_Extended.UI;
+using Utils_Project;
 
 namespace CharacterSelector
 {
@@ -8,7 +9,7 @@ namespace CharacterSelector
     {
         private static void ReturnToMainMenu()
         {
-            Utils_Project.UtilsScene.LoadMainMenuScene(false);
+            Utils_Project.UtilsScene.LoadMainMenuScene(false, LoadCallBacks.NullCallBacks);
         }
 
         protected override void DoAction()
