@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utils_Project;
+using LoadSceneParameters = Utils_Project.LoadSceneParameters;
 
 namespace _Injectors.ExplorationCombat
 {
@@ -154,16 +155,21 @@ namespace _Injectors.ExplorationCombat
 
 
 
-        // VVVVVVVVV from COMBAT todo make it to individual Class for ISceneLoadCallback
+        // VVVVVVVVV from COMBAT
         public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
             switch (finishType)
             {
                 case UtilsCombatFinish.FinishType.PlayerWon:
                 default:
-                // todo invoke transition to explorationScene
+                var callBacks = new LoadCallBacks(CallOnCombatFinishEvent, null);
+                UtilsScene.DoTransition(LoadSceneParameters.LoadType.CombatLoad,.2f, 0, callBacks);
+                break;
+            }
 
-                    break;
+            void CallOnCombatFinishEvent()
+            {
+                CombatSystemSingleton.EventsHolder.OnCombatFinishHide(finishType);
             }
         }
 
@@ -171,6 +177,9 @@ namespace _Injectors.ExplorationCombat
         {
             var combatScene = _combatScenesPool[_currentCombatScene];
             ToggleSceneObjects(combatScene,false);
+            ToggleSceneObjects(_currentExplorationScene,true);
+            ToggleSceneObjects(_worldSelectionScene, true);
+            ExplorationSingleton.EventsHolder.OnExplorationReturnFromCombat(_requestedType);
         }
     }
 }

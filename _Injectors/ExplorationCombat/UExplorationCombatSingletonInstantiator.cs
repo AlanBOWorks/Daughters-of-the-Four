@@ -25,6 +25,7 @@ namespace _Injectors.ExplorationCombat
 
                 // Combat's
                 var combatEvents = CombatSystemSingleton.EventsHolder;
+                combatEvents.Subscribe(sceneTransitionHandler);
                 Debug.Log("ExplorationCombat Singleton Instantiated");
             }
 

@@ -73,7 +73,19 @@ namespace Utils_Project
             }
         }
 
+        public static void DoTransition(LoadSceneParameters.LoadType type, 
+            float fakeLoadTimer, float afterLoadDelay,
+            LoadCallBacks callBacks)
+        {
+            var sceneManager = GetManager();
+            sceneManager.JustTransition(type,fakeLoadTimer, callBacks, afterLoadDelay);
+        }
 
+        public static void LoadScene(LoadSceneParameters parameters, LoadCallBacks callBacks, LoadSceneMode loadMode)
+        {
+            var sceneManager = GetManager();
+            sceneManager.LoadScene(parameters, callBacks, loadMode);
+        }
     }
 
     public readonly struct LoadSceneParameters

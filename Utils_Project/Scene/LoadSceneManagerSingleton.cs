@@ -10,7 +10,7 @@ namespace Utils_Project.Scene
         public static void Injection(ULoadSceneManager manager)
         {
             var currentInstance = ManagerInstance;
-            if (currentInstance) Object.Destroy(currentInstance);
+            if (currentInstance) Object.Destroy(currentInstance.transform.gameObject);
 
             ManagerInstance = manager;
         }

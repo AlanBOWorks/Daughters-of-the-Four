@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MEC;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,14 +11,29 @@ namespace Utils_Project.Scene
     {
         [SerializeField]
         private MainSceneLoadTransitionWrapper mainLoadTransitionWrapper = new MainSceneLoadTransitionWrapper();
+        [SerializeField]
+        private CombatLoadTransitionWrapper combatLoadTransitionWrapper = new CombatLoadTransitionWrapper();
 
         public ILoadSceneAnimator MainLoadType => mainLoadTransitionWrapper;
-        public ILoadSceneAnimator CombatLoadType => MainLoadType;
+        public ILoadSceneAnimator CombatLoadType => combatLoadTransitionWrapper;
+
+        [Button]
+        private void TryMainLoadAnimation(float animationTime = 1) => TryAnimation(MainLoadType, animationTime);
+
+        [Button]
+        private void TryCombatLoadAnimation(float animationTime = 1) => TryAnimation(CombatLoadType, animationTime);
+
+        private void TryAnimation(ILoadSceneAnimator animator, float animationTime = 1)
+        {
+            _transitionHandle =
+                Timing.RunCoroutine(_DoTransition(animationTime, LoadCallBacks.NullCallBacks, animator, 0));
+        }
 
         private void Awake()
         {
             LoadSceneManagerSingleton.Injection(this);
             mainLoadTransitionWrapper.Awake();
+            combatLoadTransitionWrapper.Awake();
         }
 
 
@@ -61,7 +77,7 @@ namespace Utils_Project.Scene
             switch (type)
             {
                 case LoadSceneParameters.LoadType.CombatLoad:
-                    return CombatLoadType;
+                    return combatLoadTransitionWrapper;
                 default:
                     mainLoadTransitionWrapper.InitializeState(true);
                     return mainLoadTransitionWrapper;

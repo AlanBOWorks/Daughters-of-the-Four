@@ -109,4 +109,68 @@ namespace Utils_Project.Scene
             } while (fillerImageMask.fillAmount > 0);
         }
     }
+
+    [Serializable]
+    internal sealed class CombatLoadTransitionWrapper : ILoadSceneAnimator
+    {
+        [Title("References")]
+        [SerializeField] private GameObject rootGameObject;
+        [SerializeField] private CanvasGroup alphaGroup;
+        [SerializeField] private RectTransform mainIconRoot;
+        [SerializeField] private MPImage percentLoadImage;
+
+        [Title("Params")] 
+        [SerializeField] private float deltaSpeed = 4f;
+        [SerializeField] private AnimationCurve alphaCurve = new AnimationCurve();
+
+        public void Awake()
+        {
+            rootGameObject.SetActive(false);
+        }
+
+        public void SetActive(bool active)
+        {
+            rootGameObject.SetActive(active);
+        }
+
+
+        private void Animate(float percent)
+        {
+            mainIconRoot.localScale = Vector3.LerpUnclamped(_mainIconInitialScale, Vector3.one, percent);
+            alphaGroup.alpha = alphaCurve.Evaluate(percent);
+        }
+
+        private static Vector3 _mainIconInitialScale = new Vector3(.5f,.5f,1);
+        public IEnumerator<float> _DoInitialAnimation()
+        {
+            float percent = 0;
+            do
+            {
+                percent += Timing.DeltaTime * deltaSpeed;
+                if (percent > 1) percent = 1;
+                Animate(percent);
+                yield return Timing.WaitForOneFrame;
+            }
+            while (percent < 1);
+        }
+
+        public void TickingLoad(float currentPercent)
+        {
+            percentLoadImage.fillAmount = currentPercent;
+        }
+
+        public IEnumerator<float> _OnAfterLoadAnimation()
+        {
+            float percent = 1;
+            do
+            {
+                percent -= Timing.DeltaTime * deltaSpeed;
+                if (percent < 0) percent = 0;
+                Animate(percent);
+                yield return Timing.WaitForOneFrame;
+            }
+            while (percent > 0);
+
+        }
+    }
 }
