@@ -45,6 +45,8 @@ namespace CombatSystem._Core
 
 
         private CoroutineHandle _tickingHandle;
+        public CoroutineHandle GetHandle() => _tickingHandle;
+        public bool IsTicking() => _tickingHandle.IsRunning;
         public void OnCombatPreStarts(CombatTeam playerTeam, CombatTeam enemyTeam)
         {
         }
@@ -55,8 +57,7 @@ namespace CombatSystem._Core
 
             PauseTicking = false;
 
-            _tickingHandle = Timing.RunCoroutine(_TickingLoop(), Segment.RealtimeUpdate);
-            CombatSystemSingleton.LinkCoroutineToMaster(in _tickingHandle);
+            _tickingHandle = CombatCoroutinesTracker.StartCombatCoroutineAsMain(_TickingLoop());
         }
 
 

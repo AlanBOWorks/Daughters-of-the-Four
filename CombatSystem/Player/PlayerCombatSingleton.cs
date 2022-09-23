@@ -17,6 +17,7 @@ namespace CombatSystem.Player
 
             PlayerCombatEvents = new PlayerCombatEventsHolder();
             PlayerTeamController = new PlayerTeamController();
+            CameraEvents = new CombatCameraEvents();
 
             SelectedCharactersHolder = new PlayerSelectedCharactersHolder();
 
@@ -52,6 +53,8 @@ namespace CombatSystem.Player
         [ShowInInspector]
         public static PlayerCombatEventsHolder PlayerCombatEvents { get; private set; }
 
+        public static readonly CombatCameraEvents CameraEvents;
+
         public static IEscapeButtonHandler GetCombatEscapeButtonHandler() => CombatEscapeButtonHandler;
 
         [ShowInInspector] 
@@ -71,14 +74,8 @@ namespace CombatSystem.Player
         [ShowInInspector]
         internal static readonly PlayerSelectedCharactersHolder SelectedCharactersHolder;
 
-        [Title("Mono References")]
-        [ShowInInspector]
-        public static IPlayerCameraStructureRead<Camera> CamerasHolder { get; private set; }
-
-
         public static bool IsInPauseMenu => CombatEscapeButtonHandler.IsInPause();
 
-        public static void Injection(IPlayerCameraStructureRead<Camera> holder) => CamerasHolder = holder;
 
 
         // ----- EDITOR WINDOW -----

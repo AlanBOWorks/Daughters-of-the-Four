@@ -56,7 +56,6 @@ namespace CombatSystem._Core
         private CombatSystemSingleton() { }
         public static CombatSystemSingleton GetInstance() => Instance;
 
-        public static bool GetIsCombatActive() => AliveGameObjectReference;
 
 
         internal static AssetPrefabInstantiationHandler PrefabInstantiationHandler;
@@ -66,8 +65,6 @@ namespace CombatSystem._Core
         [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
         internal static GameObject CombatHolderNotDestroyReference;
 
-        [ShowInInspector, DisableInEditorMode, DisableInPlayMode]
-        public static GameObject AliveGameObjectReference { get; internal set; }
 
 
         public static CombatPreparationStatesHandler CombatPreparationStatesHandler { get; }
@@ -120,27 +117,7 @@ namespace CombatSystem._Core
         public static readonly CombatControllerAnimationHandler CombatControllerAnimationHandler;
 
 
-
-        public const int CombatCoroutineLayer = 4;
-        public static CoroutineHandle MasterCoroutineHandle;
-        public static CoroutineHandle LinkCoroutineToMaster(
-            in IEnumerator<float> coroutineIterator, in MEC.Segment tickSegment = Segment.RealtimeUpdate)
-        {
-            CoroutineHandle handle = Timing.RunCoroutine(coroutineIterator, tickSegment, AliveGameObjectReference);
-            LinkCoroutineToMaster(in handle);
-            return handle;
-        }
-        public static void LinkCoroutineToMaster(in CoroutineHandle handle)
-        {
-            Timing.LinkCoroutines(MasterCoroutineHandle, handle);
-        }
-
-
-        public static void Clear()
-        {
-            Timing.KillCoroutines(CombatCoroutineLayer);
-        }
-
+        public static bool GetIsCombatActive() => TempoTicker.IsTicking();
     }
 
 

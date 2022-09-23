@@ -9,27 +9,42 @@ using Utils;
 namespace CombatSystem.Player.UI.Info
 {
     public class UPassivePopUpHandler : MonoBehaviour,
-        ICombatPassiveListener
+        ICombatPassiveListener,
+        ICameraHolderListener
     {
         [SerializeField] private PopUpPool popUpPool = new PopUpPool();
 
         private Camera _combatCamera;
         private void OnEnable()
         {
-            _combatCamera = PlayerCombatSingleton.CamerasHolder.GetMainCameraType;
+            _combatCamera = CombatCameraHandler.MainCamera;
         }
 
         private void Awake()
         {
             PlayerCombatSingleton.PlayerCombatEvents.Subscribe(this);
+            PlayerCombatSingleton.CameraEvents.Subscribe(this);
         }
 
         private void OnDestroy()
         {
             PlayerCombatSingleton.PlayerCombatEvents.UnSubscribe(this);
+            PlayerCombatSingleton.CameraEvents.UnSubscribe(this);
         }
 
 
+        public void OnSwitchMainCamera(Camera combatCamera)
+        {
+            _combatCamera = combatCamera;
+        }
+
+        public void OnSwitchBackCamera(Camera combatBackCamera)
+        {
+        }
+
+        public void OnSwitchFrontCamera(Camera combatFrontCamera)
+        {
+        }
         public void OnPassiveTrigged(CombatEntity entity, ICombatPassive passive, ref float value)
         {
             popUpPool.OnPassiveTrigged(_combatCamera,entity,passive);

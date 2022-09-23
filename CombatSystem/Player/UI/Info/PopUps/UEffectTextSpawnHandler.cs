@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
-using CombatSystem.Localization;
 using CombatSystem.Skills;
-using CombatSystem.Skills.Effects;
 using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,7 +12,7 @@ using Random = UnityEngine.Random;
 
 namespace CombatSystem.Player.UI
 {
-    public class UEffectTextSpawnHandler : MonoBehaviour, IEffectUsageListener
+    public class UEffectTextSpawnHandler : MonoBehaviour, IEffectUsageListener, ICameraHolderListener
     {
         [SerializeField]
         private EffectPopupHandler effectPopupHandler = new EffectPopupHandler();
@@ -28,6 +26,7 @@ namespace CombatSystem.Player.UI
             _popUpQueue = new Queue<KeyValuePair<Transform, SubmitEffectValues>>(16);
             _popUpPlayerCheck = new Queue<bool>();
             CombatSystemSingleton.EventsHolder.Subscribe(this);
+            PlayerCombatSingleton.CameraEvents.Subscribe(this);
 
             effectPopupHandler.Awake();
         }
@@ -35,8 +34,7 @@ namespace CombatSystem.Player.UI
         private Camera _combatCamera;
         private void OnEnable()
         {
-            _combatCamera = PlayerCombatSingleton.CamerasHolder.GetMainCameraType;
-
+            _combatCamera = CombatCameraHandler.MainCamera;
         }
 
         private void Update()
@@ -47,6 +45,7 @@ namespace CombatSystem.Player.UI
         private void OnDestroy()
         {
             CombatSystemSingleton.EventsHolder.UnSubscribe(this);
+            PlayerCombatSingleton.CameraEvents.UnSubscribe(this);
         }
 
 
@@ -57,6 +56,18 @@ namespace CombatSystem.Player.UI
             Timing.KillCoroutines(_loopHandle);
         }
 
+        public void OnSwitchMainCamera(Camera combatCamera)
+        {
+            _combatCamera = combatCamera;
+        }
+
+        public void OnSwitchBackCamera(Camera combatBackCamera)
+        {
+        }
+
+        public void OnSwitchFrontCamera(Camera combatFrontCamera)
+        {
+        }
 
         public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
@@ -242,5 +253,6 @@ namespace CombatSystem.Player.UI
                 }
             }
         }
+
     }
 }

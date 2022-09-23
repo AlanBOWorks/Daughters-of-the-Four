@@ -22,14 +22,8 @@ namespace _Injectors.ExplorationCombat
         [Title("Exploration Scene")]
         private Scene _currentExplorationScene;
 
-        [Title("Combat Scenes")]
-        [ShowInInspector, DisableInEditorMode]
-        private readonly Dictionary<SceneAsset, Scene> _combatScenesPool;
-
-        public ExplorationCombatScenesTransitionHandler()
-        {
-            _combatScenesPool = new Dictionary<SceneAsset, Scene>();
-        }
+        [Title("Combat Scenes")] 
+        private Scene _currentCombatScene;
 
         public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
         {
@@ -79,7 +73,7 @@ namespace _Injectors.ExplorationCombat
         }
 
         private const string OnNullLoadCombatScene = AssetPaths.InGameScenesCombatFolder + "[CombatBackground]OnNullSceneBackUp.unity";
-        private SceneAsset _currentCombatScene;
+        private SceneAsset _currentCombatAsset;
         private void GoToCombatMap(SceneAsset targetScene)
         {
             if (targetScene == null)
@@ -87,12 +81,11 @@ namespace _Injectors.ExplorationCombat
                 targetScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(OnNullLoadCombatScene);
             }
 
-            _currentCombatScene = targetScene;
+            _currentCombatAsset = targetScene;
 
             //OnStartLoading(Combat) && OnLoadingFinish(Combat)
-            bool isFirstLoad = !_combatScenesPool.ContainsKey(targetScene);
             var loadCallbacks = new LoadCallBacks(OnStartLoading,OnLoadingFinish);
-            UtilsScene.LoadBattleScene(targetScene.name, isFirstLoad, loadCallbacks);
+            UtilsScene.LoadBattleScene(targetScene.name, true, loadCallbacks);
         }
 
 
@@ -116,32 +109,11 @@ namespace _Injectors.ExplorationCombat
         public void OnLoadingFinish() //OnLoadingFinish(Combat)
         {
             ToggleSceneObjects(_worldSelectionScene, false);
-            Scene combatScene;
-            if (_combatScenesPool.ContainsKey(_currentCombatScene))
-            {
-                combatScene = _combatScenesPool[_currentCombatScene];
-                ToggleSceneObjects(combatScene, true);
-            }
-            else
-            {
-                combatScene = SceneManager.GetSceneByName(_currentCombatScene.name);
-                _combatScenesPool.Add(_currentCombatScene, combatScene);
-            }
-
-            SceneManager.SetActiveScene(combatScene);
+            _currentCombatScene = SceneManager.GetSceneByName(_currentCombatAsset.name);
+            SceneManager.SetActiveScene(_currentCombatScene);
             ExplorationSingleton.EventsHolder.OnExplorationCombatLoadFinish(_requestedType);
         }
 
-        private IEnumerator<float> UnLoadAllCombatScenes()
-        {
-            foreach (var pair in _combatScenesPool)
-            {
-                var unloadOperation = SceneManager.UnloadSceneAsync(pair.Value);
-                yield return Timing.WaitUntilDone(unloadOperation);
-            }
-            _combatScenesPool.Clear();
-            yield return Timing.WaitForOneFrame;
-        }
 
         public void OnExplorationCombatLoadFinish(EnumExploration.ExplorationType type)
         {
@@ -175,8 +147,7 @@ namespace _Injectors.ExplorationCombat
 
         public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
-            var combatScene = _combatScenesPool[_currentCombatScene];
-            ToggleSceneObjects(combatScene,false);
+            SceneManager.UnloadSceneAsync(_currentCombatScene);
             ToggleSceneObjects(_currentExplorationScene,true);
             ToggleSceneObjects(_worldSelectionScene, true);
             ExplorationSingleton.EventsHolder.OnExplorationReturnFromCombat(_requestedType);

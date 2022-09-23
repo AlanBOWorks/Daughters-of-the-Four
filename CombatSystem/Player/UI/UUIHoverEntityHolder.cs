@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
+using CombatSystem.Player.Events;
 using MEC;
 using SCharacterCreator.Bones;
 using Sirenix.OdinInspector;
@@ -35,7 +36,8 @@ namespace CombatSystem.Player.UI
         }
     }
 
-    public abstract class UUIHoverEntityBase : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityBase>
+    public abstract class UUIHoverEntityBase : MonoBehaviour, IEntityExistenceElement<UUIHoverEntityBase>,
+        ICameraHolderListener
     {
         protected abstract Transform GetFollowTransform(ICombatEntityBody body);
 
@@ -78,10 +80,29 @@ namespace CombatSystem.Player.UI
         {
             _rectTransform = (RectTransform)transform;
             KeepTrackPosition = true;
+            PlayerCombatSingleton.CameraEvents.Subscribe(this);
         }
+
+        private void OnDestroy()
+        {
+            PlayerCombatSingleton.CameraEvents.UnSubscribe(this);
+        }
+
         private void OnEnable()
         {
-            _playerCamera = PlayerCombatSingleton.CamerasHolder.GetMainCameraType;
+            _playerCamera = CombatCameraHandler.MainCamera;
+        }
+        public void OnSwitchMainCamera(Camera combatCamera)
+        {
+            _playerCamera = combatCamera;
+        }
+
+        public void OnSwitchBackCamera(Camera combatBackCamera)
+        {
+        }
+
+        public void OnSwitchFrontCamera(Camera combatFrontCamera)
+        {
         }
 
         private void LateUpdate()
@@ -114,5 +135,6 @@ namespace CombatSystem.Player.UI
         {
             gameObject.SetActive(false);
         }
+
     }
 }

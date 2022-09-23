@@ -208,8 +208,7 @@ namespace CombatSystem.Player.UI
         private void ShowSkillsAnimated(bool canAct, bool doMoveAnimation)
         {
             Timing.KillCoroutines(_animationHandle);
-            _animationHandle = Timing.RunCoroutine(_ShowAll());
-            CombatSystemSingleton.LinkCoroutineToMaster(_animationHandle);
+            CombatCoroutinesTracker.StartCombatCoroutine(_ShowAll());
             IEnumerator<float> _ShowAll()
             {
                 int index = 0;

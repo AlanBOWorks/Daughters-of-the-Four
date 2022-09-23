@@ -57,9 +57,7 @@ namespace CombatSystem.Animations
         private const float IterationWait = .12f;
         public void DoInitialAnimations(CombatTeam team)
         {
-            var coroutineLayer = CombatSystemSingleton.CombatCoroutineLayer;
-
-            Timing.RunCoroutine(_IterationCall(), coroutineLayer);
+            CombatCoroutinesTracker.StartCombatCoroutine(_IterationCall());
             IEnumerator<float> _IterationCall()
             {
                 foreach (var entity in team.GetAllMembers())

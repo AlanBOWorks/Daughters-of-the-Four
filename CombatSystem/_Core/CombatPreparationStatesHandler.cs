@@ -18,7 +18,6 @@ namespace CombatSystem._Core
 
         public void OnCombatPrepares(IReadOnlyCollection<CombatEntity> allMembers, CombatTeam playerTeam, CombatTeam enemyTeam)
         {
-            CreateAliveReference();
             _eventsHolder.OnCombatPrepares(allMembers, playerTeam, enemyTeam);
 
             Timing.RunCoroutine(_WaitForPreparesToFinish());
@@ -42,25 +41,6 @@ namespace CombatSystem._Core
         {
         }
 
-        private static void CreateAliveReference()
-        {
-            var aliveReference = new GameObject("-- Combat System Alive Reference --");
-            CombatSystemSingleton.AliveGameObjectReference = aliveReference;
-            const int layer = CombatSystemSingleton.CombatCoroutineLayer;
-            const Segment segment = Segment.RealtimeUpdate;
-            CombatSystemSingleton.MasterCoroutineHandle 
-                = Timing.RunCoroutine(_TrackAlive(), segment, layer);
-
-
-            IEnumerator<float> _TrackAlive()
-            {
-                while (aliveReference)
-                {
-                    yield return Timing.WaitForOneFrame;
-                }
-                Debug.LogError("UnWanted Combat Finish [Alive Reference were killed]");
-            }
-        }
         
     }
 

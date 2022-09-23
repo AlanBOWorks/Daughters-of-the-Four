@@ -75,11 +75,11 @@ namespace CombatSystem.Entity
                 }
                 else
                 {
-                    Pool(in team);
+                    Pool(team);
                 }
             }
 
-            private void Pool(in CombatTeam team)
+            private void Pool(CombatTeam team)
             {
                 
                 var members = team.GetAllEntities();

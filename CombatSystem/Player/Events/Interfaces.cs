@@ -111,11 +111,5 @@ namespace CombatSystem.Player.Events
 
     }
 
-    internal interface ICameraHolderListener : ICombatEventListener
-    {
-        void OnSwitchMainCamera(in Camera combatCamera);
-        void OnSwitchBackCamera(in Camera combatBackCamera);
-        void OnSwitchFrontCamera(in Camera combatFrontCamera);
-    }
 
 }

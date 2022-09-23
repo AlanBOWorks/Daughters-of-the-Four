@@ -10,15 +10,15 @@ using UnityEngine;
 
 namespace CombatSystem.Player
 {
-    public sealed class PlayerCombatEventsHolder : ControllerCombatEventsHolder, ITempoTickListener, IDiscriminationEventsHolder,
+    public sealed class PlayerCombatEventsHolder : ControllerCombatEventsHolder, 
+        ITempoTickListener, IDiscriminationEventsHolder,
         ICombatPauseListener,
         IPlayerCombatEventListener,
 
         ISkillPointerListener, ISkillSelectionListener,
         ISkillTooltipListener,
 
-        ITargetPointerListener, ITargetSelectionListener, IHoverInteractionEffectTargetsListener,
-        ICameraHolderListener
+        ITargetPointerListener, ITargetSelectionListener, IHoverInteractionEffectTargetsListener
     {
         public PlayerCombatEventsHolder() : base()
         {
@@ -36,7 +36,6 @@ namespace CombatSystem.Player
             _targetSelectionListeners = new HashSet<ITargetSelectionListener>();
             _hoverTargetsListeners = new HashSet<IHoverInteractionEffectTargetsListener>();
 
-            _cameraHolderListeners = new HashSet<ICameraHolderListener>();
 
 #if UNITY_EDITOR
             Subscribe(CombatDebuggerSingleton.CombatPlayerEventsLogs);
@@ -63,8 +62,6 @@ namespace CombatSystem.Player
         [ShowInInspector, TitleGroup("Target")]
         private readonly HashSet<IHoverInteractionEffectTargetsListener> _hoverTargetsListeners;
 
-        [ShowInInspector] 
-        private readonly HashSet<ICameraHolderListener> _cameraHolderListeners;
 
         public override void Subscribe(ICombatEventListener listener)
         {
@@ -80,7 +77,6 @@ namespace CombatSystem.Player
         /// <br></br>- <see cref="ITargetPointerListener"/>
         /// <br></br>- <see cref="ITargetSelectionListener"/>
         /// <br></br>- <see cref="IHoverInteractionEffectTargetsListener"/>
-        /// <br></br>- <see cref="ICameraHolderListener"/>
         /// </summary>
         public void SubscribeAsPlayerEvent(ICombatEventListener listener)
         {
@@ -102,10 +98,6 @@ namespace CombatSystem.Player
                 _targetSelectionListeners.Add(targetSelectionListener);
             if (listener is IHoverInteractionEffectTargetsListener hoverTargetsListener)
                 _hoverTargetsListeners.Add(hoverTargetsListener);
-
-
-            if (listener is ICameraHolderListener cameraHolderListener)
-                _cameraHolderListeners.Add(cameraHolderListener);
         }
         public override void UnSubscribe(ICombatEventListener listener)
         {
@@ -130,9 +122,6 @@ namespace CombatSystem.Player
                 _targetSelectionListeners.Remove(targetSelectionListener);
             if (listener is IHoverInteractionEffectTargetsListener hoverTargetsListener)
                 _hoverTargetsListeners.Remove(hoverTargetsListener);
-
-            if (listener is ICameraHolderListener cameraHolderListener)
-                _cameraHolderListeners.Remove(cameraHolderListener);
         }
 
 
@@ -157,11 +146,6 @@ namespace CombatSystem.Player
         internal void ManualSubscribe(ITargetSelectionListener targetSelectionListener)
         {
             _targetSelectionListeners.Add(targetSelectionListener);
-        }
-
-        internal void ManualSubscribe(ICameraHolderListener cameraHolderListener)
-        {
-            _cameraHolderListeners.Add(cameraHolderListener);
         }
 
         internal void ManualSubscribe(ICombatPauseListener pauseListener)
@@ -193,29 +177,6 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnSwitchMainCamera(in Camera combatCamera)
-        {
-            foreach (var listener in _cameraHolderListeners)
-            {
-                listener.OnSwitchMainCamera(in combatCamera);
-            }
-        }
-
-        public void OnSwitchBackCamera(in Camera combatBackCamera)
-        {
-            foreach (var listener in _cameraHolderListeners)
-            {
-                listener.OnSwitchBackCamera(in combatBackCamera);
-            }
-        }
-
-        public void OnSwitchFrontCamera(in Camera combatFrontCamera)
-        {
-            foreach (var listener in _cameraHolderListeners)
-            {
-                listener.OnSwitchFrontCamera(in combatFrontCamera);
-            }
-        }
 
         public void OnPerformerSwitch(CombatEntity performer)
         {

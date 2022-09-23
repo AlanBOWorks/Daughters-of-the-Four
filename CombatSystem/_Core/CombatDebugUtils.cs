@@ -9,10 +9,7 @@ namespace CombatSystem._Core
 #if UNITY_EDITOR
     internal sealed class CombatDebugUtils
     {
-        private bool IsCombatActive()
-        {
-            return CombatSystemSingleton.GetIsCombatActive();
-        }
+       
         [Button("Knock Out [Enemy]"), EnableIf("IsCombatActive")]
         private void KnockOutEnemy(EnumTeam.ActiveRole target)
         {

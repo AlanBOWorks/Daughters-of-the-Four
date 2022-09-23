@@ -25,6 +25,8 @@ namespace CombatSystem.Team
                     prefabPool.PlayerOnNullPositionReference = this;
                 else
                     prefabPool.EnemyOnNullPositionReference = this;
+
+                gameObject.SetActive(false);
                 return;
             }
 

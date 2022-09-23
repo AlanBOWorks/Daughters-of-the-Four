@@ -88,21 +88,7 @@ namespace CombatSystem._Core
 
         public static void FinishCombat(FinishType finishType)
         {
-            if(!CombatSystemSingleton.GetIsCombatActive()) return;
-
-            var combatCoroutine = CombatSystemSingleton.MasterCoroutineHandle;
-
-            Timing.KillCoroutines(combatCoroutine); //safe kill
-            Timing.KillCoroutines(CombatSystemSingleton.CombatCoroutineLayer);
-
-            CombatSystemSingleton.EventsHolder.OnCombatFinish(finishType);
-
-            var aliveReference = CombatSystemSingleton.AliveGameObjectReference;
-            if (aliveReference)
-            {
-                Object.Destroy(aliveReference);
-            }
-
+            CombatCoroutinesTracker.KillCombatCoroutines();
         }
     }
 }

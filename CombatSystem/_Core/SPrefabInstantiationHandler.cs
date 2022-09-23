@@ -22,8 +22,8 @@ namespace CombatSystem._Core
             Debug.Log("------ Instantiation (CORE) : " + AssetDatabase.GetAssetPath(this));
 #endif
             string holderName = "----- CORE System [HOLDER] ------";
-            InstantiateHolder(in holderName, out holder, out var holderTransform);
-            InstantiateObjects(in holderTransform, in coreInstantiateObjects);
+            InstantiateHolder(holderName, out holder, out var holderTransform);
+            InstantiateObjects(holderTransform, coreInstantiateObjects);
 
         }
 
@@ -33,19 +33,19 @@ namespace CombatSystem._Core
             Debug.Log("------ Instantiation (COMBAT) : " + AssetDatabase.GetAssetPath(this));
 #endif
             string holderName = "----- Combat System [HOLDER] ------";
-            InstantiateHolder(in holderName,out var holder, out var holderTransform);
-            InstantiateObjects(in holderTransform,in combatInstantiateObjects);
+            InstantiateHolder(holderName,out var holder, out var holderTransform);
+            InstantiateObjects(holderTransform,combatInstantiateObjects);
             
             CombatSystemSingleton.CombatHolderNotDestroyReference = holder;
         }
 
-        private static void InstantiateHolder(in string holderName, out GameObject holder, out Transform holderTransform)
+        private static void InstantiateHolder(string holderName, out GameObject holder, out Transform holderTransform)
         {
             holder = new GameObject(holderName);
             holderTransform = holder.transform;
             DontDestroyOnLoad(holder);
         }
-        private static void InstantiateObjects(in Transform parent, in PrefabValues[] prefabs)
+        private static void InstantiateObjects(Transform parent, PrefabValues[] prefabs)
         {
             foreach (var values in prefabs)
             {

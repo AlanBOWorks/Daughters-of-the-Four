@@ -39,7 +39,6 @@ namespace CombatSystem._Core
                 // This is just in case these weren't instantiated
                 var playerSingleton = PlayerCombatSingleton.Instance;
                 var enemySingleton = EnemyCombatSingleton.Instance;
-                yield return Timing.WaitForOneFrame;
                 AssetPrefabInstantiationHandler.FirstCombatObjectsInstantiation();
                 yield return Timing.WaitForOneFrame;
 
