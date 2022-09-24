@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Team;
 using Sirenix.OdinInspector;
@@ -7,22 +8,24 @@ using Object = UnityEngine.Object;
 
 namespace CombatSystem.Entity
 {
-    public sealed class EntityPrefabsPoolHandler : IOppositionTeamStructureRead<ITeamFullStructureRead<Transform>>,
-        ICombatTerminationListener
+    public sealed class EntityPrefabsPoolHandler : ICombatTerminationListener
     {
+        [Title("Player")]
         [ShowInInspector,HorizontalGroup()]
-        private readonly PrefabsHolder _playerTeamType;
+        private readonly Dictionary<ICombatEntityProvider, GameObject> _playerPrefabs;
         [ShowInInspector,HorizontalGroup()]
-        private readonly PrefabsHolder _enemyTeamType;
+        private readonly Queue<GameObject> _playerActiveMembers;
+        [Title("Enemy")]
+        [ShowInInspector, HorizontalGroup()]
+        private readonly Queue<GameObject> _enemyEntitiesObjects;
 
         public EntityPrefabsPoolHandler()
         {
-            _playerTeamType = new PlayerPrefabsHolder();
-            _enemyTeamType = new PrefabsHolder();
+            _playerPrefabs = new Dictionary<ICombatEntityProvider, GameObject>();
+            _playerActiveMembers = new Queue<GameObject>();
+            _enemyEntitiesObjects = new Queue<GameObject>();
         }
 
-        public ITeamFullStructureRead<Transform> PlayerTeamType => _playerTeamType;
-        public ITeamFullStructureRead<Transform> EnemyTeamType => _enemyTeamType;
 
         public ITeamFullStructureRead<Transform> PlayerOnNullPositionReference;
         public ITeamFullStructureRead<Transform> EnemyOnNullPositionReference;
@@ -32,12 +35,13 @@ namespace CombatSystem.Entity
             var playerPositions = CombatSystemSingleton.PlayerPositionTransformReferences 
                 ? CombatSystemSingleton.PlayerPositionTransformReferences 
                 : PlayerOnNullPositionReference;
-            _playerTeamType.PoolMembers(playerTeam, playerPositions);
 
             var enemyPositions = CombatSystemSingleton.EnemyPositionTransformReferences 
                 ? CombatSystemSingleton.EnemyPositionTransformReferences 
                 : EnemyOnNullPositionReference;
-            _enemyTeamType.PoolMembers(enemyTeam, enemyPositions);
+
+            HandlePlayerEntities(playerTeam, playerPositions);
+            HandleEnemyEntities(enemyTeam,enemyPositions);
         }
 
 
@@ -56,121 +60,76 @@ namespace CombatSystem.Entity
 
         public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
         {
-            _playerTeamType.OnFinishCombat();
-            _enemyTeamType.OnFinishCombat();
+           HidePlayerEntities();
+           ClearEnemies();
         }
 
-
-
-        private sealed class PlayerPrefabsHolder : PrefabsHolder
+        private void HandlePlayerEntities(CombatTeam team, ITeamFullStructureRead<Transform> positions)
         {
-            private bool _instantiated;
-
-            public override void PoolMembers(CombatTeam team, ITeamFullStructureRead<Transform> positions)
+            foreach (var entity in team.GetAllMembers())
             {
-                if(!_instantiated)
+                var entityProvider = entity.Provider;
+                var providerPrefab = entityProvider.GetVisualPrefab();
+                GameObject entityGameObject;
+                if (_playerPrefabs.ContainsKey(entityProvider))
                 {
-                    base.PoolMembers(team, positions);
-                    _instantiated = true;
+                    entityGameObject = _playerPrefabs[entityProvider];
+                    entityGameObject.SetActive(true);
+                    UtilsEntity.HandleInjections(entity, entityGameObject);
                 }
                 else
                 {
-                    Pool(team);
+                    entityGameObject = UtilsEntity.InstantiateProviderBody(entity);
+                    _playerPrefabs.Add(entityProvider, entityGameObject);
+                    Object.DontDestroyOnLoad(entityGameObject);
                 }
-            }
-
-            private void Pool(CombatTeam team)
-            {
-                
-                var members = team.GetAllEntities();
-                var keyValuePairs = UtilsTeam.GetEnumerable(members, this);
-                int index = 0;
-                foreach ((CombatEntity entity, Transform entityTransform) in keyValuePairs)
-                {
-                    if(entity == null) continue;
-
-                    var entityGO = entityTransform.gameObject;
-
-                    UtilsEntity.HandleInjections(in entity, in entityGO);
-                    entityGO.SetActive(true);
-
-                    var body = entity.Body;
-                    body.Injection(in entity);
-                    body.InjectPositionReference(entityTransform);
-                    index++;
-                }
-            }
-
-            public override void OnFinishCombat()
-            {
-                Hide();
-            }
-
-            private void Hide()
-            {
-                var allMembers = UtilsTeam.GetEnumerable(this as ITeamFullStructureRead<Transform>);
-                foreach (var member in allMembers)
-                {
-                    if(member == null) continue;
-                    member.gameObject.SetActive(false);
-                }
-            }
-
-            public void OnMembersSwitch()
-            {
-                Destroy();
-                _instantiated = false;
+                HandleEntity(entity, entityGameObject, positions);
+                _playerActiveMembers.Enqueue(entityGameObject);
             }
         }
 
-        private class PrefabsHolder : TeamFullGroupStructure<Transform>
+        private void HandleEnemyEntities(CombatTeam team, ITeamFullStructureRead<Transform> positions)
         {
-
-            public virtual void PoolMembers(CombatTeam team, ITeamFullStructureRead<Transform> positions)
+            foreach (var entity in team.GetAllMembers())
             {
-                var members = team.GetAllEntities();
-                var keyValuePairs = UtilsTeam.GetEnumerable(members, positions);
-                int index = 0;
-                foreach (var pair in keyValuePairs)
-                {
-                    int i = index;
-                    index++;
-
-                    var entity = pair.Key;
-                    if(entity == null) continue;
-                    var positionTransform = pair.Value;
-                    if(!positionTransform) 
-                        throw new NullReferenceException("Positions Transform was Null; it's necessary for instantiation");
-
-                    var entityGameObject = UtilsEntity.InstantiateProviderBody(entity);
-                    var entityTransform = entityGameObject.transform;
-
-                    entityGameObject.layer = CombatRenderLayers.CombatCharacterBackIndex;
-                    entityTransform.position = positionTransform.position;
-                    entityTransform.rotation = positionTransform.rotation;
-
-                    var entityBody = entity.Body;
-                    entityBody.InjectPositionReference(entityTransform);
-                    entityBody.GetAnimator().Injection(entity);
-
-                    UtilsTeam.SetElement(i,this, entityTransform);
-
-                }
+                var entityGameObject = UtilsEntity.InstantiateProviderBody(entity);
+                HandleEntity(entity,entityGameObject, positions);
+                _enemyEntitiesObjects.Enqueue(entityGameObject);
             }
+        }
 
-            public virtual void OnFinishCombat()
+        private static void HandleEntity(CombatEntity entity, GameObject entityGameObject, ITeamFullStructureRead<Transform> positions)
+        {
+            var positionTransform = UtilsTeam.GetElement(entity.ActiveRole, positions);
+            HandleEntity(entity, entityGameObject, positionTransform);
+        }
+        private static void HandleEntity(CombatEntity entity, GameObject entityGameObject, Transform positionTransform)
+        {
+            var entityTransform = entityGameObject.transform;
+
+            entityGameObject.layer = CombatRenderLayers.CombatCharacterBackIndex;
+            entityTransform.position = positionTransform.position;
+            entityTransform.rotation = positionTransform.rotation;
+
+            var entityBody = entity.Body;
+            entityBody.InjectPositionReference(entityTransform);
+            entityBody.GetAnimator().Injection(entity);
+        }
+
+        private void HidePlayerEntities()
+        {
+            while (_playerActiveMembers.Count > 0)
             {
-                Destroy();
+                var entityObject = _playerActiveMembers.Dequeue();
+                entityObject.gameObject.SetActive(false);
             }
-
-            protected void Destroy()
+        }
+        private void ClearEnemies()
+        {
+            while (_enemyEntitiesObjects.Count > 0)
             {
-                var allMembers = UtilsTeam.GetEnumerable(this as ITeamFullStructureRead<Transform>);
-                foreach (var member in allMembers)
-                {
-                    if(!member) continue;
-                    Object.Destroy(member.gameObject);
-                }
+                var entityObject = _enemyEntitiesObjects.Dequeue();
+                Object.Destroy(entityObject);
             }
         }
 

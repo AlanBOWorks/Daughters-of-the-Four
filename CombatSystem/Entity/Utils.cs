@@ -8,7 +8,7 @@ namespace CombatSystem.Entity
         public static GameObject InstantiateProviderBody(CombatEntity entity)
         {
             InstantiateProviderBody(entity.Provider,out GameObject instantiatedGameObject);
-            HandleInjections(in entity,in instantiatedGameObject);
+            HandleInjections(entity,instantiatedGameObject);
 
             return instantiatedGameObject;
         }
@@ -29,7 +29,7 @@ namespace CombatSystem.Entity
             instantiatedGameObject.name = provider.GetProviderEntityName() + "(Clone) " + instantiatedGameObject.GetInstanceID();
         }
 
-        public static void HandleInjections(in CombatEntity entity, in GameObject instantiatedGameObject)
+        public static void HandleInjections(CombatEntity entity, GameObject instantiatedGameObject)
         {
             var entityBody = instantiatedGameObject.GetComponent<ICombatEntityBody>();
             entity.Body = entityBody;
