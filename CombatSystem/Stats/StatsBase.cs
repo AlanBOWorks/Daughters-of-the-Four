@@ -141,26 +141,26 @@ namespace CombatSystem.Stats
     public class StatsBase<T> : IBasicStats<T>
     {
         [HorizontalGroup("Top")]
-        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] protected T attackType;
-        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] protected T overTimeType;
-        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] protected T deBuffType;
-        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(100)] protected T followUpType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(50)] protected T attackType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(50)] protected T overTimeType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(50)] protected T deBuffType;
+        [SerializeField, BoxGroup("Top/Offensive"), LabelWidth(50)] protected T followUpType;
 
-        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] protected T healType;
-        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] protected T shieldingType;
-        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] protected T buffType;
-        [SerializeField, BoxGroup("Top/Support"), LabelWidth(100)] protected T receiveBuffType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(50)] protected T healType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(50)] protected T shieldingType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(50)] protected T buffType;
+        [SerializeField, BoxGroup("Top/Support"), LabelWidth(50)] protected T receiveBuffType;
 
         [HorizontalGroup("Bottom")]
-        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] protected T healthType;
-        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] protected T mortalityType;
-        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] protected T damageReductionType;
-        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(100)] protected T deBuffResistanceType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(50)] protected T healthType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(50)] protected T mortalityType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(50)] protected T damageReductionType;
+        [SerializeField, BoxGroup("Bottom/Vitality"), LabelWidth(50)] protected T deBuffResistanceType;
 
-        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T actionsType;
-        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T speedType;
-        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T controlType;
-        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(100)] protected T luckType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(50)] protected T actionsType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(50)] protected T speedType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(50)] protected T controlType;
+        [SerializeField, BoxGroup("Bottom/Concentration"), LabelWidth(50)] protected T luckType;
 
         public StatsBase()
         { }
@@ -425,16 +425,16 @@ namespace CombatSystem.Stats
     {
         [SerializeField] private SPreparationEntityBase referencedEntity;
 
-        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100),
+        [SerializeReference, 
          InfoBox("Using Preset reference", "OffensiveStatsNull")]
         private IOffensiveStats offensiveStats;
-        [SerializeReference, HorizontalGroup("Top"), LabelWidth(100),
+        [SerializeReference, 
          InfoBox("Using Preset reference", "SupportStatsNull")]
         private ISupportStats supportStats;
-        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100),
+        [SerializeReference, 
          InfoBox("Using Preset reference", "VitalityStatsNull")]
         private IVitalityStats vitalityStats;
-        [SerializeReference, HorizontalGroup("Bottom"), LabelWidth(100),
+        [SerializeReference, 
          InfoBox("Using Preset reference", "ConcentrationStatsNull")]
         private IConcentrationStats concentrationStats;
 

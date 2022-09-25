@@ -193,6 +193,18 @@ namespace CombatSystem.Team
             }
         }
 
+        public static Positioning ParsePositioning(Role role)
+        {
+            return role switch
+            {
+                Role.Vanguard => Positioning.FrontLine,
+                Role.Attacker => Positioning.MidLine,
+                Role.Support => Positioning.BackLine,
+                Role.Flex => Positioning.FlexLine,
+                _ => Positioning.ByRolePosition
+            };
+        }
+
         public static ActiveRole ParseMainActiveRole(Positioning positioning)
         {
             return positioning switch

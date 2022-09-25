@@ -12,26 +12,27 @@ namespace _Injectors.ExplorationCombat
             ExplorationCombatSingleton.Instantiate();
             Destroy(this);
         }
-
-        private sealed class ExplorationCombatSingleton
-        {
-            static ExplorationCombatSingleton()
-            {
-                var sceneTransitionHandler = new ExplorationCombatScenesTransitionHandler();
-
-                // Exploration's
-                var explorationEvents = ExplorationSingleton.EventsHolder;
-                explorationEvents.Subscribe(sceneTransitionHandler);
-
-                // Combat's
-                var combatEvents = CombatSystemSingleton.EventsHolder;
-                combatEvents.Subscribe(sceneTransitionHandler);
-                Debug.Log("ExplorationCombat Singleton Instantiated");
-            }
-
-            public static void Instantiate() { }
-        }
     }
 
-    
+    internal sealed class ExplorationCombatSingleton
+    {
+
+        static ExplorationCombatSingleton()
+        {
+            SceneTransitionHandler = new ExplorationCombatScenesTransitionHandler();
+
+            // Exploration's
+            var explorationEvents = ExplorationSingleton.EventsHolder;
+            explorationEvents.Subscribe(SceneTransitionHandler);
+
+            // Combat's
+            var combatEvents = CombatSystemSingleton.EventsHolder;
+            combatEvents.Subscribe(SceneTransitionHandler);
+            Debug.Log("ExplorationCombat Singleton Instantiated");
+        }
+
+        public static void Instantiate() { }
+
+        public static readonly ExplorationCombatScenesTransitionHandler SceneTransitionHandler;
+    }
 }

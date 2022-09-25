@@ -25,6 +25,8 @@ namespace _Injectors.ExplorationCombat
         [Title("Combat Scenes")] 
         private Scene _currentCombatScene;
 
+        public bool IgnoreMapTransitionAfterCombat;
+
         public void OnWorldSceneEnters(IExplorationSceneDataHolder lastMap)
         {
             _worldSelectionScene = SceneManager.GetActiveScene();
@@ -130,6 +132,8 @@ namespace _Injectors.ExplorationCombat
         // VVVVVVVVV from COMBAT
         public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
         {
+            if(IgnoreMapTransitionAfterCombat) return;
+
             switch (finishType)
             {
                 case UtilsCombatFinish.FinishType.PlayerWon:

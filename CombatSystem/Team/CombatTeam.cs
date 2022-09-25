@@ -192,6 +192,9 @@ namespace CombatSystem.Team
         public TeamAreaData(TeamAreaData data) : this(data.RoleType,data.PositioningType)
         { }
 
+        public TeamAreaData(EnumTeam.Role roleType) : this(roleType, EnumTeam.ParsePositioning(roleType))
+        { }
+
         [SerializeField] private EnumTeam.Role role;
         [SerializeField] private EnumTeam.Positioning positioning;
 

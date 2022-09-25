@@ -15,7 +15,7 @@ namespace CombatSystem._Core
 
         public bool IsCombatFinish()
         {
-            return IsEnemyTeamDefeat() || IsEnemyTeamDefeat();
+            return IsEnemyTeamDefeat() || IsPlayerTeamDefeat();
         }
 
         public bool CheckIfPlayerWon()

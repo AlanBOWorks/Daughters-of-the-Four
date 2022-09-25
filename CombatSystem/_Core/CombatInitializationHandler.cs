@@ -20,6 +20,8 @@ namespace CombatSystem._Core
 
         private const string OnNullPlayerTeamAsset = AssetPaths.ScriptablesPlayerTeams + 
                                                 "OnNull[Player Predefined Team].asset";
+
+
         public static void StartCombat(
             ICombatTeamProvider playerTeam,
             ICombatTeamProvider enemyTeam)
@@ -59,8 +61,6 @@ namespace CombatSystem._Core
             ICombatTeamProvider playerTeam,
             ICombatTeamProvider enemyTeam)
         {
-            var systemEvents = CombatSystemSingleton.EventsHolder;
-
             var playerCombatTeam = new CombatTeam(true,playerTeam);
             var enemyCombatTeam = new CombatTeam(false,enemyTeam);
             var allMembers = new CombatMembersHolder(playerCombatTeam, enemyCombatTeam);
