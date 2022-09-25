@@ -19,7 +19,6 @@ namespace ExplorationSystem
 
         private void OnDisable()
         {
-            _currentBehaviour = EnumExploration.ExplorationType.Undefined;
             _elementSelected = false;
         }
 
@@ -39,7 +38,8 @@ namespace ExplorationSystem
         public void OnPointerClick(PointerEventData eventData)
         {
             _elementSelected = !_elementSelected;
-            ExplorationSingleton.EventsHolder.OnExplorationRequest(_currentBehaviour);
+            if(_elementSelected)
+                ExplorationSingleton.EventsHolder.OnExplorationRequest(_currentBehaviour);
         }
     }
 
