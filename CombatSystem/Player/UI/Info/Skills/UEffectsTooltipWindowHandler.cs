@@ -14,7 +14,7 @@ using Utils_Project;
 
 namespace CombatSystem.Player.UI
 {
-    public class UEffectsTooltipWindowHandler : MonoBehaviour
+    public class UEffectsTooltipWindowHandler : UEffectsTooltipWindowBase
     {
         [Title("Mono References")]
         [SerializeField]
@@ -49,95 +49,71 @@ namespace CombatSystem.Player.UI
         }
 
 
+
         public void HandleEffects(ICombatSkill skill, IEnumerable<PerformEffectValues> effects, CombatEntity performer)
         {
-            float accumulatedHeight = 0;
-            CombatStats stats = performer?.Stats;
-            foreach (var value in effects)
-            {
-                var holder = pool.PopElementSafe();
-                UtilsEffectTooltip.HandleText(holder, in value, stats, skill);
-                UtilsEffectTooltip.HandleIcon(holder, value.Effect);
-
-                UtilsEffectTooltip.HandleTextHeight(holder.GetTextHolder(), ref accumulatedHeight);
-            }
-            HeightResize(accumulatedHeight);
+            var handleParams = new HandlerParams(resizeWindow, verticalPadding, pool);
+            var skillParams = new SkillParams(skill, effects, performer);
+            HandleEffects(in handleParams, in skillParams);
         }
 
-
-        protected void HeightResize(float accumulatedHeight)
-        {
-            UtilsEffectTooltip.HandleRootHeight(resizeWindow,accumulatedHeight,verticalPadding);
-        }
     }
 
-    public static class UtilsEffectTooltip
+    public abstract class UEffectsTooltipWindowBase : MonoBehaviour
     {
-        public static void HandleText(
-            UEffectTooltipHolder holder, 
-            in PerformEffectValues values, 
-            CombatStats stats = null, 
-            ICombatSkill skill = null)
+
+        protected void HandleEffects(
+            in HandlerParams handlerParams,
+            in SkillParams skillParams)
         {
-            var textHolder = holder.GetTextHolder();
-            LocalizeEffects.LocalizeEffectTooltip(in values, out var effectText);
-
-            var effect = values.Effect;
-            bool isPercentSuffix = effect.IsPercentTooltip();
-            float effectValue = values.EffectValue;
-
-            string digitText;
-            HandleTextWithDigits(); void HandleTextWithDigits()
+            float accumulatedHeight = 0;
+            CombatStats stats = skillParams.Performer?.Stats;
+            var skill = skillParams.Skill;
+            foreach (var value in skillParams.Effects)
             {
-                if(skill == null || stats == null)
-                {
-                    digitText = LocalizeMath.LocalizeMathfValue(effectValue,isPercentSuffix);
-                }
-                else
-                {
-                    effectValue = effect.CalculateEffectByStatValue(stats, effectValue);
+                var holder = handlerParams.Pool.PopElementSafe();
+                holder.HandleText(in value, stats, skill);
+                holder.HandleIcon(value.Effect);
 
-                    float skillLuck = skill.LuckModifier;
-                    float statsLuck = UtilsStatsFormula.CalculateLuckAmount(stats);
-                    float highValue = effectValue * (1+ skillLuck * statsLuck);
-                    digitText = LocalizeMath.LocalizeMathfValue(effectValue,highValue,isPercentSuffix);
-                }
+                holder.HandleTextHeight(ref accumulatedHeight);
             }
 
-            textHolder.text = effectText + ":\n <b>" + digitText + "</b>";
-
+            var windowTransform = handlerParams.WindowTransform;
+            var verticalSeparation = handlerParams.VerticalSeparation;
+            HeightResize(windowTransform, accumulatedHeight, verticalSeparation);
         }
-
-        public static void MultiplyEffectText(UEffectTooltipHolder holder, float modifier, CombatStats stats = null)
-        {
-            var currentValues = holder.EffectValues;
-            PerformEffectValues nextValues = currentValues * modifier;
-            HandleText(holder, nextValues, stats);
-        }
-
-
-        public static void HandleIcon(UEffectTooltipHolder holder, IEffectBasicInfo effect)
-        {
-            var icon = UtilsVisual.GetEffectSprite(effect);
-            var iconHolder = holder.GetIconHolder();
-            iconHolder.sprite = icon;
-        }
-
-        public static void HandleTextHeight(TMP_Text text, ref float accumulatedHeight)
-        {
-            var textTransform = text.rectTransform;
-            float textHeight = text.preferredHeight;
-
-            float pivotHeight = accumulatedHeight;
-            UtilsRectTransform.SetPivotVertical(textTransform, -pivotHeight);
-
-            accumulatedHeight += textHeight;
-        }
-
-        public static void HandleRootHeight(RectTransform resizeWindow, float accumulatedHeight,float verticalPadding)
+        
+        protected static void HeightResize(RectTransform resizeWindow, float accumulatedHeight, float verticalPadding = 0)
         {
             accumulatedHeight += verticalPadding;
             resizeWindow.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, accumulatedHeight);
+        }
+
+        protected readonly struct HandlerParams
+        {
+            public readonly RectTransform WindowTransform;
+            public readonly float VerticalSeparation;
+            public readonly MonoObjectPool<UEffectTooltipHolder> Pool;
+
+            public HandlerParams(RectTransform windowTransform, float verticalSeparation, MonoObjectPool<UEffectTooltipHolder> pool)
+            {
+                WindowTransform = windowTransform;
+                VerticalSeparation = verticalSeparation;
+                Pool = pool;
+            }
+        }
+        protected readonly struct SkillParams
+        {
+            public readonly ICombatSkill Skill;
+            public readonly IEnumerable<PerformEffectValues> Effects;
+            public readonly CombatEntity Performer;
+
+            public SkillParams(ICombatSkill skill, IEnumerable<PerformEffectValues> effects, CombatEntity performer)
+            {
+                Skill = skill;
+                Effects = effects;
+                Performer = performer;
+            }
         }
     }
 }

@@ -57,6 +57,8 @@ namespace CombatSystem.Skills
     /// </summary>
     public readonly struct SkillUsageValues
     {
+        public static SkillUsageValues NullValues = new SkillUsageValues(); 
+
         public readonly CombatEntity Performer;
         public readonly CombatEntity Target;
         public readonly ICombatSkill UsedSkill;
@@ -81,19 +83,20 @@ namespace CombatSystem.Skills
         }
     }
 
-    public readonly struct VanguardSkillUsageValues
+    public readonly struct VanguardEffectUsageValues
     {
-        public readonly VanguardEffectsHolder EffectsHolder;
-        public readonly IVanguardSkill UsedSkill;
-        public readonly int Accumulation;
+        public readonly CombatEntity EffectPerformer;
+        public readonly CombatEntity Attacker;
+        public readonly IEffect Effect;
+        public readonly float Accumulation;
 
-        public VanguardSkillUsageValues(
-            VanguardEffectsHolder effectsHolder, 
-            IVanguardSkill usedSkill, 
-            int accumulation)
+
+        public VanguardEffectUsageValues(CombatEntity effectPerformer, CombatEntity attacker, IEffect effect,
+            float accumulation)
         {
-            EffectsHolder = effectsHolder;
-            UsedSkill = usedSkill;
+            EffectPerformer = effectPerformer;
+            Attacker = attacker;
+            Effect = effect;
             Accumulation = accumulation;
         }
     }

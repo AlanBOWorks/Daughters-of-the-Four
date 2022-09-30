@@ -2,16 +2,21 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
+using CombatSystem.Skills.VanguardEffects;
 using UnityEngine;
 
 namespace CombatSystem.Skills
 {
-    public interface ISkillInteractionStructureRead<out T>
+    public interface ISkillTargetingStructureRead<out T>
     {
-        T SingleType { get; }
-        T TargetLine { get; }
-        T TargetTeam { get; }
+        T TargetSingleType { get; }
+        T TargetLineType { get; }
+        T TargetTeamType { get; }
+        T PerformerSingleType { get; }
+        T PerformerLineType { get; }
+        T PerformerTeamType { get; }
     }
+
 
     public interface ISkillArchetypeStructureRead<out T>
     {
@@ -49,6 +54,20 @@ namespace CombatSystem.Skills
         float LuckModifier { get; }
     }
 
+    public interface IVanguardSkill : ISkill
+    {
+        EnumsVanguardEffects.VanguardEffectType MainVanguardType { get; }
+
+        IEnumerable<PerformEffectValues> GetCounterEffects();
+        bool HasCounterEffects();
+        IEnumerable<PerformEffectValues> GetPunishEffects();
+        bool HasPunishEffects();
+
+    }
+
+    public interface IAttackerSkill : ISkill { }
+
+    public interface ISupportSkill : ISkill { }
 
     public interface ISkillUsageListener : ICombatEventListener
     {

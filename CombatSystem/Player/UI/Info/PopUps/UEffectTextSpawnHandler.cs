@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
+using CombatSystem.Skills.VanguardEffects;
 using MEC;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,7 +13,8 @@ using Random = UnityEngine.Random;
 
 namespace CombatSystem.Player.UI
 {
-    public class UEffectTextSpawnHandler : MonoBehaviour, IEffectUsageListener, ICameraHolderListener
+    public class UEffectTextSpawnHandler : MonoBehaviour, ICameraHolderListener, 
+        IEffectUsageListener 
     {
         [SerializeField]
         private EffectPopupHandler effectPopupHandler = new EffectPopupHandler();
@@ -164,7 +166,8 @@ namespace CombatSystem.Player.UI
         private const float PopUpVectorMagnitude = 72;
         private const float PopUpPositionOffset = 10;
         private const float RandomMagnitude = 50;
-        private static void CalculatePopUpsVector(IEffectBasicInfo effect, bool isPlayer, 
+        private static void CalculatePopUpsVector(
+            IEffectBasicInfo effect, bool isPlayer, 
             out Vector3 popUpMovement,
             out Vector3 popUpOffsetPoint)
         {

@@ -2,29 +2,24 @@ using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
 using CombatSystem.Skills.Effects;
+using CombatSystem.Stats;
 using CombatSystem.Team;
 using MEC;
+using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace CombatSystem.Skills.VanguardEffects
 {
-    public sealed class VanguardEffectsHandler : ISkillUsageListener, ICombatTerminationListener
+    public sealed class VanguardEffectsHandler : ISkillUsageListener
     {
-        public VanguardEffectsHandler()
-        {
-            _queue = new Queue<VanguardEffectsHolder>();
-        }
-
-        private const float WaitForNextEffect = .2f;
-        private const float WaitBetweenTeams = .6f;
-        private readonly Queue<VanguardEffectsHolder> _queue;
-
-        public bool IsActive() => _queueCoroutineHandle.IsRunning;
-
-
         public void OnCombatSkillSubmit(in SkillUsageValues values)
         {
+            _callVanguardEffects = false;
         }
 
+
+        private bool _callVanguardEffects;
+        private SkillUsageValues _skillUsageValues;
         public void OnCombatSkillPerform(in SkillUsageValues values)
         {
             var skill = values.UsedSkill;
@@ -32,114 +27,143 @@ namespace CombatSystem.Skills.VanguardEffects
 
             var attacker = values.Performer;
             var onTarget = values.Target;
-            HandleVanguardOffensive();
+            var targetTeam = onTarget.Team;
 
-            void HandleVanguardOffensive()
-            {
-                var targetTeam = onTarget.Team;
-                if (targetTeam.Contains(attacker)) return;
+            if (targetTeam.Contains(attacker)) return;
 
-                // Events are handled inside this
-                targetTeam.VanguardEffectsHolder.OnOffensiveDone(attacker, onTarget);
-            }
+
+            var counterEffectsHolder = onTarget.CounterEffects;
+            var punishEffectsHolder = targetTeam.PunishEffectsHolder;
+
+            if (!counterEffectsHolder.HasEffects() && !punishEffectsHolder.HasEffects()) return;
+
+            _callVanguardEffects = true;
+            _skillUsageValues = values;
+
         }
         public void OnCombatSkillFinish(CombatEntity performer)
         {
+            if(!_callVanguardEffects) return;
+
+
+            var attacker = _skillUsageValues.Performer;
+            var onTarget = _skillUsageValues.Target;
+            var targetTeam = onTarget.Team;
+
+            var counterEffectsHolder = onTarget.CounterEffects;
+            var punishEffectsHolder = targetTeam.PunishEffectsHolder;
+
+            CombatSystemSingleton.EventsHolder.OnVanguardEffectsPerform(attacker, onTarget);
+            counterEffectsHolder.OnOffensiveDone(onTarget, attacker);
+            punishEffectsHolder.OnOffensiveDone(onTarget, attacker);
         }
-        public void EnqueueVanguardEffects(CombatTeam team)
-        {
-            var vanguardEffectsHolder = team.VanguardEffectsHolder;
-            if (!vanguardEffectsHolder.CanPerform()) return;
+    }
 
-            _queue.Enqueue(team.VanguardEffectsHolder);
-            if(IsActive()) return;
-            _queueCoroutineHandle = Timing.RunCoroutine(_DoDeQueue());
+
+    public abstract class VanguardEffectsHolder
+    {
+        protected VanguardEffectsHolder(CombatEntity mainResponsibleEntity)
+        {
+            if (mainResponsibleEntity == null) return;
+
+            MainEntity = mainResponsibleEntity;
+            VanguardEffects = new VanguardSkillAccumulationWrapper();
+
         }
 
-        private CoroutineHandle _queueCoroutineHandle;
-        private IEnumerator<float> _DoDeQueue()
-        {
-            var eventsHolder = CombatSystemSingleton.EventsHolder;
-            var animator = CombatSystemSingleton.CombatControllerAnimationHandler;
+        [Title("Entity")]
+        [ShowInInspector]
+        public readonly CombatEntity MainEntity;
 
-            while (_queue.Count > 0)
+        [Title("Effects")]
+        [ShowInInspector]
+        protected readonly VanguardSkillAccumulationWrapper VanguardEffects;
+        public CombatEntity GetMainEntity() => MainEntity;
+
+
+
+
+
+        public bool CanPerform()
+        {
+            var stats = MainEntity.Stats;
+            return UtilsCombatStats.IsInitiativeEnough(stats)
+                   && UtilsCombatStats.IsAlive(stats)
+                   && HasEffects();
+        }
+
+        public bool HasEffects() => VanguardEffects.HasEffects();
+
+        public void Clear()
+        {
+            VanguardEffects.Clear();
+        }
+
+        public void AddSkillEffects(IVanguardSkill skill)
+        {
+            var punishEffects = GetVanguardEffects(skill);
+            foreach (var effect in punishEffects)
             {
-                yield return Timing.WaitForSeconds(WaitBetweenTeams);
-                var vanguardEffectsHolder = _queue.Dequeue();
-                var performer = vanguardEffectsHolder.GetMainEntity();
+                VanguardEffects.AddEffect(effect.TargetType, effect.Effect, effect.EffectValue);
+            }
+        }
 
+        protected abstract IEnumerable<PerformEffectValues> GetVanguardEffects(IVanguardSkill skill);
 
-                var vanguardEffects
-                    = vanguardEffectsHolder.GetEffectsStructure();
-                var vanguardOffensiveRecords
-                    = vanguardEffectsHolder.GetOffensiveRecordsStructure();
-                
+        public virtual void OnOffensiveDone(CombatEntity onTarget, CombatEntity attacker)
+        {
+            PerformEffects(onTarget, attacker);
+        }
 
-                // REVENGE
-                if (vanguardEffectsHolder.HasRevengeEffects())
+        protected void PerformEffects(CombatEntity effectPerformer, CombatEntity attacker)
+        {
+            foreach ((EnumsEffect.TargetType targetType, var dictionary) in VanguardEffects.GetEnumerableWithType())
+            {
+                DoEffect(targetType, dictionary);
+            }
+
+            void DoEffect(EnumsEffect.TargetType type, Dictionary<IEffect, float> dictionary)
+            {
+                foreach ((IEffect effect, var value) in dictionary)
                 {
-                    //Do animation Once
-                    animator.PerformActionAnimation(StaticSkillTypes.RevengeVanguardSkill, performer, performer);
-                    foreach ((IVanguardSkill vanguardSkill, var accumulation) in vanguardEffects.VanguardCounterType)
-                    {
-                        InvokeVanguardEffect(vanguardSkill, accumulation, vanguardOffensiveRecords.VanguardCounterType);
-                        yield return Timing.WaitForSeconds(WaitForNextEffect);
-                    }
-                }
-
-                // PUNISH
-                if (vanguardEffectsHolder.HasPunishEffects())
-                {
-                    //Do animation Once
-                    animator.PerformActionAnimation(StaticSkillTypes.PunishVanguardSkill, performer, performer);
-                    foreach ((IVanguardSkill vanguardSkill, var accumulation) in vanguardEffects.VanguardPunishType)
-                    {
-                        InvokeVanguardEffect(vanguardSkill, accumulation, vanguardOffensiveRecords.VanguardPunishType);
-                        yield return Timing.WaitForSeconds(WaitForNextEffect);
-                    }
-                }
-                
-
-                yield return Timing.WaitForOneFrame;
-                vanguardEffectsHolder.Clear();
-                yield return Timing.WaitForOneFrame;
-
-
-                void InvokeVanguardEffect(IVanguardSkill skill, int accumulation, IReadOnlyDictionary<CombatEntity,int> offensiveRecords)
-                {
-                    var vanguardValues = new VanguardSkillUsageValues(
-                        vanguardEffectsHolder,
-                        skill,
-                        accumulation);
-                    eventsHolder.OnVanguardEffectPerform(vanguardValues);
-
-                    UtilsCombatSkill.DoVanguardSkillOnPerformer(in vanguardValues, offensiveRecords);
+                    var vanguardEffectValues = new VanguardEffectUsageValues(
+                        effectPerformer, attacker,
+                        effect, value);
+                    UtilsCombatSkill.DoVanguardEffects(type, in vanguardEffectValues);
                 }
             }
         }
 
+    }
 
+    public class VanguardSkillAccumulationWrapper : SkillTargetingStructureClass<Dictionary<IEffect, float>>
+    {
+        private bool _hasEffects;
+        public bool HasEffects() => _hasEffects;
 
-        private static int CalculateIterationCount(Dictionary<CombatEntity, int> collection)
+        public void AddEffect(EnumsEffect.TargetType targetType, IEffect effect, float accumulation)
         {
-            int allEntitiesInteractionCount = 0;
-            foreach (var pair in collection)
+            _hasEffects = true;
+            var collection = UtilsEffect.GetElement(targetType, this);
+            if (collection.ContainsKey(effect))
             {
-                allEntitiesInteractionCount += pair.Value;
+                collection[effect] += accumulation;
+            }
+            else
+            {
+                collection.Add(effect, accumulation);
+            }
+        }
+
+        public void Clear()
+        {
+            var enumerable = UtilsEffect.GetEnumerable(this);
+            foreach (var dictionary in enumerable)
+            {
+                dictionary.Clear();
             }
 
-            return allEntitiesInteractionCount;
+            _hasEffects = false;
         }
-        
-        public void OnCombatFinish(UtilsCombatFinish.FinishType finishType)
-        {
-            _queue.Clear();
-            Timing.KillCoroutines(_queueCoroutineHandle);
-        }
-
-        public void OnCombatFinishHide(UtilsCombatFinish.FinishType finishType)
-        {
-        }
-
     }
 }

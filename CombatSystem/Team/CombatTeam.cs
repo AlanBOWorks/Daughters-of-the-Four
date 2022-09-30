@@ -45,7 +45,7 @@ namespace CombatSystem.Team
             var mainVanguardResponsible = mainVanguards[0];
             if(mainVanguardResponsible == null) return;
 
-            VanguardEffectsHolder = new VanguardEffectsHolder(mainVanguardResponsible);
+            PunishEffectsHolder = new VanguardPunishEffectsHolder(mainVanguardResponsible);
         }
 
         public CombatTeam(bool isPlayerTeam, ICombatTeamProvider provider) : this(isPlayerTeam,provider.GetSelectedCharacters())
@@ -61,7 +61,7 @@ namespace CombatSystem.Team
         public readonly TeamDataValues DataValues;
         public readonly TeamLineBlockerHandler GuardHandler;
         [ShowInInspector]
-        public readonly VanguardEffectsHolder VanguardEffectsHolder;
+        public readonly VanguardPunishEffectsHolder PunishEffectsHolder;
 
 
 

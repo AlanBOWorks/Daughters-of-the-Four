@@ -139,14 +139,6 @@ namespace CombatSystem._Core
                     foreach (var controller in controllersEnumerator)
                     {
                         // ----- Wait For VanguardEffects
-                        var vanguardSkillHandler = CombatSystemSingleton.VanguardEffectsHandler;
-                        vanguardSkillHandler.EnqueueVanguardEffects(controller.ControllingTeam);
-                        yield return Timing.WaitForOneFrame;
-                        do
-                        {
-                            yield return Timing.WaitForOneFrame;
-                        } while (vanguardSkillHandler.IsActive());
-
                         yield return Timing.WaitForOneFrame;
                         var controllerTeam = controller.ControllingTeam;
                         combatEvents.OnTempoPreStartControl(controller, GetFirstActor());

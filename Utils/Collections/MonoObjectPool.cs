@@ -33,14 +33,75 @@ namespace Utils
     }
 
     /// <summary>
+    /// <inheritdoc cref="MonoObjectPool{T}"/>
+    /// </summary>
+    [Serializable]
+    public abstract class MonoObjectPoolBasic<T> : IObjectPool<T>, IObjectPoolBasic where T : Component
+    {
+        [Title("Element")]
+        [SerializeField] private T poolElement;
+        [Title("Pools")]
+        [SerializeField, DisableInEditorMode, HorizontalGroup("Pool"), ShowInInspector]
+        protected Queue<T> inactivePool = new Queue<T>();
+
+        public T GetCloneableElement() => poolElement;
+
+
+        public T Pop()
+        {
+            return inactivePool.Count > 0 ? inactivePool.Dequeue() : Object.Instantiate(poolElement);
+        }
+
+        public T Pop(Transform onParent)
+        {
+            if (inactivePool.Count > 0)
+            {
+                var popElement = inactivePool.Dequeue();
+                popElement.transform.SetParent(onParent);
+                return poolElement;
+            }
+            else
+                return Object.Instantiate(poolElement, onParent);
+        }
+
+
+        public void Release(T element)
+        {
+            Release(element, false);
+        }
+
+        public void Release(T element, bool active)
+        {
+            element.gameObject.SetActive(active);
+            inactivePool.Enqueue(element);
+        }
+
+
+        public void Awake()
+        {
+            poolElement.gameObject.SetActive(false);
+        }
+
+        public void Clear()
+        {
+            while (inactivePool.Count > 0)
+            {
+                var element = inactivePool.Dequeue();
+                Object.Destroy(element);
+            }
+        }
+
+        public int CountInactive => inactivePool.Count;
+    }
+
+    /// <summary>
     /// Pool for [<see cref="Component"/>]; <br></br>
     ///<br></br>
     /// CAUTION:<br></br>
     /// Requires instantiation through [<seealso cref="Awake"/>]
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     [Serializable]
-    public abstract class MonoObjectPoolBase<T> : IObjectPool<T>, IObjectPoolBasic where T : Component
+    public abstract class MonoObjectPool<T> : IObjectPool<T>, IObjectPoolBasic where T : Component
     {
         [Title("Parents")] 
         [Tooltip("After pool/instantiate element, which parent the created element should go")]
@@ -107,10 +168,10 @@ namespace Utils
 
 
     /// <summary>
-    /// <inheritdoc cref="MonoObjectPoolBase{T}"/>
+    /// <inheritdoc cref="MonoObjectPool{T}"/>
     /// </summary>
     [Serializable]
-    public abstract class TrackedMonoObjectPool<T> : MonoObjectPoolBase<T>, IObjectPool<T>, IObjectPoolTracked<T> where T : Component
+    public abstract class TrackedMonoObjectPool<T> : MonoObjectPool<T>, IObjectPool<T>, IObjectPoolTracked<T> where T : Component
     {
         [Title("Actives")]
         [NonSerialized, DisableInEditorMode,HorizontalGroup("Pool"),ShowInInspector]

@@ -49,7 +49,7 @@ namespace CombatSystem.Skills.Effects
             effectValue = UtilsStatsEffects.CalculateStatsDeBuffValue(effectValue, debuffPower, debuffResistance);
             effectValue *= luckModifier;
 
-            effectValue = UtilsEffect.RoundEffectValueWithHalf_Percent(effectValue);
+            effectValue = UtilsEffect.RoundEffectValueWithHalf_Percent(effectValue, IsPercentSuffix());
             DoDeBuff(debuffStats, ref effectValue);
             CombatSystemSingleton.EventsHolder.OnDeBuffDone(entities,this, effectValue);
         }

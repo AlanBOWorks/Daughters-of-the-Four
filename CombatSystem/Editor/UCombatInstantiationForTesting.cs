@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using CombatSystem._Core;
 using CombatSystem.Entity;
@@ -12,6 +13,8 @@ namespace CombatSystem.Editor
 {
     public class UCombatInstantiationForTesting : MonoBehaviour
     {
+        [SerializeField] private bool invokeInStart;
+
         [SerializeReference]
         private ICombatTeamProvider playerTeam = new PlayerTeam();
         [SerializeReference]
@@ -22,8 +25,15 @@ namespace CombatSystem.Editor
             return !CombatSystemSingleton.GetIsCombatActive();
         }
 
+        private IEnumerator Start()
+        {
+            yield return new WaitForEndOfFrame();
+            if(invokeInStart)
+                InvokeCombat();
+        }
+
         [Button,EnableIf("CanInvoke"), DisableInEditorMode]
-        private void Invoke()
+        private void InvokeCombat()
         {
             CombatInitializationHandler.StartCombat(playerTeam,enemyTeam);
         }

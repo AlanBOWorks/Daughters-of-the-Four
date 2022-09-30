@@ -401,38 +401,34 @@ namespace CombatSystem._Core
         private class VanguardEffectsLogs
         {
             public bool OnEffectSubscribe = true;
-            public bool OnEffectIncrement = true;
-            public bool OnRevengePerform = true;
-            public bool OnPunishPerform = true;
+            public bool OnSkillPerform = true;
+            public bool OnEffectPerform = true;
         }
         [ShowInInspector]
         private VanguardEffectsLogs _vanguardEffectsLogs = new VanguardEffectsLogs();
 
 
-        public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
+        public void OnVanguardSkillSubscribe(IVanguardSkill skill, CombatEntity performer)
         {
             if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnEffectSubscribe) return;
-            Debug.Log($"Vanguard Subscribe [{values.Type}] >>>> {values.Skill}");
+            Debug.Log($"Vanguard({performer.CombatCharacterName}) Subscribe [{skill.MainVanguardType}] >>>> {skill}");
 
         }
 
-        public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
+        public void OnVanguardEffectsPerform(CombatEntity attacker, CombatEntity onTarget)
         {
-            if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnEffectIncrement) return;
-            Debug.Log($"Vanguard Increment [{type}] <<<< {attacker.CombatCharacterName}");
+            if (!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnSkillPerform) return;
+            Debug.Log($"VANGUARD Skill - Target: {onTarget.CombatCharacterName}");
         }
 
-        public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
+
+        public void OnVanguardEffectPerform(EnumsEffect.TargetType targetType, VanguardEffectUsageValues values)
         {
-            if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnRevengePerform) return;
-            Debug.Log($"REVENGE Perform: {values.UsedSkill} [{values.Accumulation}]");
+            if(!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnEffectPerform) return;
+            Debug.Log($"VANGUARD effect Performer.[{values.EffectPerformer.CombatCharacterName}] > Attacker.[{values.Attacker}]: " +
+                      $"{values.Effect} [{values.Accumulation}]");
         }
 
-        public void OnVanguardPunishEffectPerform(IVanguardSkill skill, int iterations)
-        {
-            if (!ShowVanguardEffectsLogs || !_vanguardEffectsLogs.OnPunishPerform) return;
-            Debug.Log($"PUNISH Perform: {skill} [{iterations}]");
-        }
 
         [TitleGroup("Team")] 
         public bool ShowTeamValuesChangeLogs = false;

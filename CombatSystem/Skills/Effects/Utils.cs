@@ -11,84 +11,36 @@ namespace CombatSystem.Skills
 {
     public static class UtilsCombatSkill
     {
-        public static void DoSkillOnTarget(ISkill skill, CombatEntity performer, CombatEntity onTarget)
+        public static void DoSkillOnTarget(ICombatSkill skill, CombatEntity performer, CombatEntity onTarget)
         {
             CombatEntity exclusion = skill.IgnoreSelf() ? performer : null;
             var effects = skill.GetEffects();
             DoSkillOnTarget();
 
+            if (skill.Preset is IVanguardSkill vanguardSkill)
+            {
+                bool callEvents = false;
+                if(vanguardSkill.HasPunishEffects())
+                {
+                    performer.Team.PunishEffectsHolder.AddSkillEffects(vanguardSkill);
+                    callEvents = true;
+                }
+                if(vanguardSkill.HasCounterEffects())
+                {
+                    performer.CounterEffects.AddSkillEffects(vanguardSkill);
+                    callEvents = true;
+                }
+
+                if(callEvents)
+                    CombatSystemSingleton.EventsHolder.OnVanguardSkillSubscribe(vanguardSkill, performer);
+            }
+
             void DoSkillOnTarget()
             {
                 var actors = new EffectActors(performer, exclusion, onTarget);
                 DoEffectsOnTarget(actors, effects, skill.LuckModifier);
-
             }
         }
-
-        public static void DoVanguardSkillOnPerformer(
-            in VanguardSkillUsageValues values, 
-            IReadOnlyDictionary<CombatEntity, int> offensiveRecords)
-        {
-            var skill = values.UsedSkill;
-            var performer = values.EffectsHolder.GetMainEntity();
-            var iterations = values.Accumulation;
-            var luckModifier = skill.LuckModifier;
-
-
-            float totalOffensiveIterations = 0;
-            foreach (var offensiveRecord in offensiveRecords)
-            {
-                totalOffensiveIterations += offensiveRecord.Value;
-            }
-
-            foreach (var effect in skill.GetPerformVanguardEffects())
-            {
-                var effectType = effect.TargetType;
-                switch (effectType)
-                {
-                    case EnumsEffect.TargetType.Target:
-                    case EnumsEffect.TargetType.TargetTeam:
-                    case EnumsEffect.TargetType.TargetLine:
-                        DoEffectOnTargets();
-                        break;
-                    default:
-                        DoEffectOnPerformer();
-                        break;
-                }
-
-
-                void DoEffectOnTargets()
-                {
-                    foreach ((CombatEntity combatEntity, var i) in offensiveRecords)
-                    {
-                        DoEffectOnTarget(combatEntity, i);
-                    }
-                }
-
-                void DoEffectOnTarget(CombatEntity onTarget, int targetIterations)
-                {
-                    var actors = new EffectActors(performer,onTarget);
-                    PerformEffectValues performValue = new PerformEffectValues(
-                        effect.Effect,
-                        effect.EffectValue * iterations * targetIterations,
-                        effect.TargetType);
-                    DoEffect(actors, performValue, luckModifier);
-                }
-
-                void DoEffectOnPerformer()
-                {
-                    var actors = new EffectActors(performer,performer);
-                    PerformEffectValues performValue = new PerformEffectValues(
-                        effect.Effect,
-                        totalOffensiveIterations * effect.EffectValue * iterations,
-                        effectType);
-                    DoEffect(actors, performValue, luckModifier);
-                }
-            }
-
-           
-        }
-
 
         private static void DoEffectsOnTarget(
            EffectActors actors,
@@ -135,6 +87,7 @@ namespace CombatSystem.Skills
                         float targetEffectValue = effectValue;
                         float luckValue = CalculateFinalLuck();
 
+                        // HERE do effect is done
                         effect.DoEffect(entities,ref targetEffectValue, ref luckValue);
                         var submitEffect = new SubmitEffectValues(effect ,targetEffectValue);
 
@@ -172,6 +125,29 @@ namespace CombatSystem.Skills
             }
         }
 
+
+        public static void DoVanguardEffects(EnumsEffect.TargetType type, in VanguardEffectUsageValues values)
+        {
+            var effectPerformer = values.EffectPerformer;
+            var attacker = values.Attacker;
+            var effect = values.Effect;
+            var effectAccumulation = values.Accumulation;
+
+            var effectTargets = UtilsTarget.GetEffectTargets(type, effectPerformer, attacker);
+            float luckModifier = 1;
+
+            var eventHolder = CombatSystemSingleton.EventsHolder;
+            foreach (var target in effectTargets)
+            {
+                var entitiesPair = new EntityPairInteraction(effectPerformer, target);
+                effect.DoEffect(entitiesPair, ref effectAccumulation, ref luckModifier);
+
+                eventHolder.OnVanguardEffectPerform(type, values);
+                eventHolder.OnCombatVanguardEffectPerform(entitiesPair,
+                    new SubmitEffectValues(effect,effectAccumulation));
+            }
+        }
+
         private readonly struct EffectActors
         {
             public readonly CombatEntity Performer;
@@ -202,12 +178,39 @@ namespace CombatSystem.Skills
         /// <summary>
         /// Rounds the effect value to snap values between [.25f] values as a Percent
         /// </summary>
-        public static float RoundEffectValueWithHalf_Percent(float currentEffectValue)
+        public static float RoundEffectValueWithHalf_Percent(float currentEffectValue, bool isPercentType)
         {
             // Note: by design, values snaps in 25% so it's easier for the player tracking the percentages
-            return Mathf.Round(currentEffectValue * 4) * .25f;
+            if(!isPercentType)
+                return Mathf.Round(currentEffectValue * 4) * .25f;
+
+            float amount = Mathf.Round(currentEffectValue * 4 * 100) * .25f;
+            return amount * .01f;
         }
 
+        public static IEnumerable<T> GetEnumerable<T>(ISkillTargetingStructureRead<T> structure)
+        {
+            yield return structure.TargetSingleType;
+            yield return structure.TargetLineType;
+            yield return structure.TargetTeamType;
+            yield return structure.PerformerSingleType;
+            yield return structure.PerformerLineType;
+            yield return structure.PerformerTeamType;
+        }
+
+        public static T GetElement<T>(EnumsEffect.TargetType type, ISkillTargetingStructureRead<T> structure)
+        {
+            return type switch
+            {
+                EnumsEffect.TargetType.Target => structure.TargetSingleType,
+                EnumsEffect.TargetType.TargetLine => structure.TargetLineType,
+                EnumsEffect.TargetType.TargetTeam => structure.TargetTeamType,
+                EnumsEffect.TargetType.Performer => structure.PerformerSingleType,
+                EnumsEffect.TargetType.PerformerLine => structure.PerformerLineType,
+                EnumsEffect.TargetType.PerformerTeam => structure.PerformerTeamType,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
     }
 
     public static class UtilsCombatEffect

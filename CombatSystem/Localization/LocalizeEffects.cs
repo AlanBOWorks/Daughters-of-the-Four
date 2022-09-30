@@ -9,15 +9,19 @@ namespace CombatSystem.Localization
 {
     public static class LocalizeEffects 
     {
-        public static void LocalizeEffectTooltip(in PerformEffectValues values, out string localizedEffect)
+        public static void LocalizeEffectTooltip(in PerformEffectValues values, out string localizedEffect, bool handleTargeting = true)
         {
             var effect = values.Effect;
             var targeting = values.TargetType;
             string localizationTag = effect.EffectTag;
             string localizedName = LocalizationsCombat.LocalizeEffectTag(localizationTag);
+
+            localizedEffect = localizedName;
+
+            if(!handleTargeting) return;
             string localizeTargeting = LocalizeLineTargeting(targeting);
 
-            localizedEffect = "[" + localizeTargeting + "]\n" + localizedName;
+            localizedEffect = "[" + localizeTargeting + "]\n" + localizedEffect;
         }
 
 

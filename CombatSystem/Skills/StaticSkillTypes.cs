@@ -70,26 +70,25 @@ namespace CombatSystem.Skills
         {
             public VanguardPresetSkill(EnumsVanguardEffects.VanguardEffectType vanguardEffectType)
             {
-                _vanguardEffectType = vanguardEffectType;
+                MainVanguardType = vanguardEffectType;
             }
-
-            private readonly EnumsVanguardEffects.VanguardEffectType _vanguardEffectType;
 
             public int SkillCost => 0;
             public EnumsSkill.TeamTargeting TeamTargeting => EnumsSkill.TeamTargeting.Self;
             public IEffect GetMainEffectArchetype() => null;
             public IEnumerable<PerformEffectValues> GetEffects() => null;
-            public IEnumerable<PerformEffectValues> GetPerformVanguardEffects() => null;
-            public int VanguardEffectCount => 0;
 
             public bool IgnoreSelf() => false;
-            public EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType() => _vanguardEffectType;
-            public bool IsMultiTrigger() => false;
-            public PerformEffectValues GetVanguardEffectTooltip() => new PerformEffectValues();
 
             public float LuckModifier => -1;
-            public bool CanCrit() => false;
 
+            public EnumsVanguardEffects.VanguardEffectType MainVanguardType { get; }
+
+            public IEnumerable<PerformEffectValues> GetCounterEffects() => null;
+            public bool HasCounterEffects() => false;
+
+            public IEnumerable<PerformEffectValues> GetPunishEffects() => null;
+            public bool HasPunishEffects() => false;
         }
     }
 

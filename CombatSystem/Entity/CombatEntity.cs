@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CombatSystem.Luck;
 using CombatSystem.Skills;
+using CombatSystem.Skills.VanguardEffects;
 using CombatSystem.Stats;
 using CombatSystem.Team;
 using Localization.Characters;
@@ -104,6 +105,11 @@ namespace CombatSystem.Entity
         [ShowInInspector, HorizontalGroup("Heal Tracker")]
         public readonly CombatEntityVitalityTracker ProtectionReceiveTracker;
 
+        [ShowInInspector]
+        private VanguardCounterEffectsHolder _counterEffects;
+        public VanguardCounterEffectsHolder CounterEffects 
+            => _counterEffects ??= new VanguardCounterEffectsHolder(this);
+
         /// <summary>
         /// The provider's name; this is for Dev purposes.<br></br>
         /// For Player's info, use [<seealso cref="CombatCharacterName"/>] instead
@@ -111,15 +117,6 @@ namespace CombatSystem.Entity
         /// <returns></returns>
         public string GetProviderEntityName() => Provider.GetProviderEntityName();
 
-        public string GetProviderEntityFullName()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetProviderShorterName()
-        {
-            throw new NotImplementedException();
-        }
 
         public IReadOnlyCollection<CombatSkill> AllSkills => _skillsHolder;
 

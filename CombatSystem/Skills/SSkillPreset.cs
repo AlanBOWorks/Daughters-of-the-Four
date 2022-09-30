@@ -217,14 +217,4 @@ namespace CombatSystem.Skills
     }
 
 
-    public interface IVanguardSkill : ISkill
-    {
-        EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType();
-        IEnumerable<PerformEffectValues> GetPerformVanguardEffects();
-        int VanguardEffectCount { get; }
-    }
-
-    public interface IAttackerSkill : ISkill { }
-
-    public interface ISupportSkill : ISkill { }
 }

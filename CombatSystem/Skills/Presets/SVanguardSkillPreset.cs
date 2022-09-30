@@ -23,97 +23,60 @@ namespace CombatSystem.Skills
         [SerializeField]
         private bool ignoreSelf = true;
 
-        [TitleGroup("Values")]
-        [InfoBox("Target Type [Target]: enemy who did the Offensive is the Target\n" +
-                 "Target Type [Performer]: the main vanguard is the Performer")]
-        [SerializeField, Tooltip("Counter: increases when Vanguard is hit;\n" +
-                                 "Punish: increases when Vanguard is ignored")]
-        private EnumsVanguardEffects.VanguardEffectType responseType;
-        private VanguardEffect _vanguardEffectPreset;
+        [TitleGroup("Vanguard effects")]
+        [SerializeField]
+        private EnumsVanguardEffects.VanguardEffectType vanguardVisualType;
+        [SerializeField]
+        private PresetEffectValues[] counterEffects = new PresetEffectValues[0];
+        [SerializeField] 
+        private PresetEffectValues[] punishEffects = new PresetEffectValues[0];
+
+
 
         protected override string GetAssetPrefix() => VanguardAssetPrefix;
 
-        protected override void OnEnable()
+
+        public override IEffect GetMainEffectArchetype()
         {
-            base.OnEnable();
-            _vanguardEffectPreset = new VanguardEffect(this);
+            return null;
         }
 
-
-        public override IEffect GetMainEffectArchetype() => _vanguardEffectPreset;
         public override bool IgnoreSelf() => ignoreSelf;
 
 
 
-        public PerformEffectValues GenerateVanguardValues() =>
-            new PerformEffectValues(_vanguardEffectPreset, 1, EnumsEffect.TargetType.Performer);
-        public override IEnumerable<PerformEffectValues> GetEffects()
-        {
-            yield return GenerateVanguardValues();
-        }
         public override IEnumerable<PerformEffectValues> GetEffectsFeedBacks() 
-            => GetPerformVanguardEffects();
-        public IEnumerable<PerformEffectValues> GetPerformVanguardEffects() 
-            => base.GetEffects();
+            => GetEffects();
 
-        public int VanguardEffectCount => effects.Length;
+        public EnumsVanguardEffects.VanguardEffectType MainVanguardType => vanguardVisualType;
+
+        public IEnumerable<PerformEffectValues> GetCounterEffects()
+        {
+            foreach (var effect in counterEffects)
+                yield return effect.GenerateValues();
+        }
+
+        public bool HasCounterEffects() => counterEffects.Length > 0;
+
+        public IEnumerable<PerformEffectValues> GetPunishEffects()
+        {
+            foreach (var effect in punishEffects)
+                yield return effect.GenerateValues();
+        }
+
+        public bool HasPunishEffects() => punishEffects.Length > 0;
 
 
         public override EnumsSkill.TeamTargeting TeamTargeting => EnumsSkill.TeamTargeting.Self;
-        public EnumsVanguardEffects.VanguardEffectType GetVanguardEffectType() => responseType;
         
 
 
         protected override string GenerateAssetName()
         {
-            return "#VANGUARD " +responseType.ToString().ToUpper() + " - " + base.GenerateAssetName();
+            return "#VANGUARD - " + base.GenerateAssetName();
         }
 
-        private sealed class VanguardEffect : IEffect
-        {
-            public VanguardEffect(SVanguardSkillPreset preset)
-            {
-                _skill = preset;
-                _skillIcon = preset.GetSkillIcon();
-            }
 
-            private readonly SVanguardSkillPreset _skill;
-            [ShowInInspector]
-            private readonly Sprite _skillIcon;
 
-            private const string VanguardEffectTag = "Vanguard_Effect";
-            private const string VanguardEffectPrefix = "Vgrd";
-
-            public string EffectTag => VanguardEffectTag;
-            public string EffectSmallPrefix => VanguardEffectPrefix;
-            public EnumsEffect.ConcreteType EffectType => EnumsEffect.ConcreteType.DefaultTeam;
-            public Sprite GetIcon() => _skillIcon;
-
-            // VanguardSkills uses this object as a primary effect, thus this secondaryParticles is never used
-            public GameObject GetSecondaryParticlesPrefab()
-            {
-                return null;
-            }
-
-            public void DoEffect(EntityPairInteraction entities, ref float effectValue, ref float luckModifier)
-            {
-                var performer = entities.Performer;
-                var vanguardEffectsHolder = performer.Team.VanguardEffectsHolder;
-
-                vanguardEffectsHolder.AddEffect(_skill);
-            }
-            public string GetEffectValueTootLip(CombatStats performerStats, ref float effectValue)
-            {
-                return LocalizeMath.LocalizePercentValue(effectValue);
-            }
-
-            public float CalculateEffectByStatValue(CombatStats performerStats, float effectValue)
-            {
-                return 1;
-            }
-
-            public bool IsPercentSuffix() => true;
-            public bool IsPercentTooltip() => true;
-        }
     }
 }

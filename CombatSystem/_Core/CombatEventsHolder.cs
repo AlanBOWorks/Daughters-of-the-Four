@@ -355,6 +355,15 @@ namespace CombatSystem._Core
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnCombatSkillPerform(in values);
         }
+        public void OnCombatSkillFinish(CombatEntity performer)
+        {
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+                eventsHolder.OnCombatSkillFinish(performer);
+
+            OnEntityFinishAction(performer);
+        }
+
+        // ---- EFFECTS
 
         public void OnCombatPrimaryEffectPerform(EntityPairInteraction entities, in SubmitEffectValues values)
         {
@@ -374,12 +383,24 @@ namespace CombatSystem._Core
                 eventsHolder.OnCombatVanguardEffectPerform(entities,in values);
         }
 
-        public void OnCombatSkillFinish(CombatEntity performer)
+        // ---- VANGUARD EFFECTS
+        public void OnVanguardSkillSubscribe(IVanguardSkill skill, CombatEntity performer)
         {
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnCombatSkillFinish(performer);
+                eventsHolder.OnVanguardSkillSubscribe(skill, performer);
+        }
 
-            OnEntityFinishAction(performer);
+        public void OnVanguardEffectsPerform(CombatEntity attacker, CombatEntity onTarget)
+        {
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+                eventsHolder.OnVanguardEffectsPerform(attacker, onTarget);
+        }
+
+
+        public void OnVanguardEffectPerform(EnumsEffect.TargetType targetType, VanguardEffectUsageValues values)
+        {
+            foreach (var eventsHolder in _discriminatedEventsEnumerable)
+                eventsHolder.OnVanguardEffectPerform(targetType, values);
         }
 
 
@@ -388,30 +409,9 @@ namespace CombatSystem._Core
         {
             foreach (var eventHolder in _discriminatedEventsEnumerable)
             {
-                eventHolder.OnPassiveTrigged(entity,passive, ref value);
+                eventHolder.OnPassiveTrigged(entity, passive, ref value);
             }
         }
-
-        // ---- VANGUARD EFFECTS
-        public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
-        {
-            foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnVanguardEffectSubscribe(in values);
-        }
-
-        public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
-        {
-            foreach (var eventsHolder in _oppositeDiscriminatedEventsEnumerable)
-                eventsHolder.OnVanguardEffectIncrement(type,attacker);
-        }
-
-        public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
-        {
-            foreach (var eventsHolder in _discriminatedEventsEnumerable)
-                eventsHolder.OnVanguardEffectPerform(values);
-        }
-
-
         // ---- ENTITIES
         public void OnCreateEntity(in CombatEntity entity, in bool isPlayers)
         {
@@ -1373,27 +1373,27 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnVanguardEffectSubscribe(in VanguardSkillAccumulation values)
+        public void OnVanguardSkillSubscribe(IVanguardSkill skill, CombatEntity performer)
         {
             foreach (var listener in _vanguardEffectUsageListeners)
             {
-                listener.OnVanguardEffectSubscribe(in values);
+                listener.OnVanguardSkillSubscribe(skill, performer);
             }
         }
 
-        public void OnVanguardEffectIncrement(EnumsVanguardEffects.VanguardEffectType type, CombatEntity attacker)
+        public void OnVanguardEffectsPerform(CombatEntity attacker, CombatEntity onTarget)
         {
             foreach (var listener in _vanguardEffectUsageListeners)
             {
-                listener.OnVanguardEffectIncrement(type,attacker);
+                listener.OnVanguardEffectsPerform(attacker, onTarget);
             }
         }
 
-        public void OnVanguardEffectPerform(VanguardSkillUsageValues values)
+        public void OnVanguardEffectPerform(EnumsEffect.TargetType targetType, VanguardEffectUsageValues values)
         {
             foreach (var listener in _vanguardEffectUsageListeners)
             {
-                listener.OnVanguardEffectPerform(values);
+                listener.OnVanguardEffectPerform(targetType, values);
             }
         }
 

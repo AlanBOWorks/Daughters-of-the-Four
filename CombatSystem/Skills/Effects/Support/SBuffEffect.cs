@@ -49,7 +49,7 @@ namespace CombatSystem.Skills.Effects
 
             effectValue = UtilsStatsEffects.CalculateStatsBuffValue(effectValue, bufferPower, receivePower);
             effectValue *= luckModifier;
-            effectValue = UtilsEffect.RoundEffectValueWithHalf_Percent(effectValue);
+            effectValue = UtilsEffect.RoundEffectValueWithHalf_Percent(effectValue, IsPercentSuffix());
             DoBuff(buffingStats, ref effectValue);
             CombatSystemSingleton.EventsHolder.OnBuffDone(entities, this,  effectValue);
         }
