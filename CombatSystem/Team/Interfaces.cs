@@ -97,7 +97,8 @@ namespace CombatSystem.Team
     
     public interface ITeamEventListener : ICombatEventListener
     {
-        void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange);
+        /// <param name="isForcedChange">If the change was forced by the enemy or external sources</param>
+        void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isForcedChange);
         void OnControlChange(CombatTeam team, float phasedControl);
     }
 

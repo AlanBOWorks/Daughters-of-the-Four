@@ -283,7 +283,7 @@ namespace CombatSystem._Core
         public void OnTempoPreStartControl(CombatTeamControllerBase controller, CombatEntity firstEntity)
         {
             HandleCurrentDiscriminationEventsHolder(in controller);
-            _combatSubEventsSequence.OnTempoPreStartControl(in controller);
+            _combatSubEventsSequence.OnTempoPreStartControl(controller);
 
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoPreStartControl(controller, firstEntity);
@@ -317,13 +317,13 @@ namespace CombatSystem._Core
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoFinishControl(controller);
             
-            _combatSubEventsSequence.OnTempoFinishControl(in controller);
+            _combatSubEventsSequence.OnTempoFinishControl(controller);
             OnTempoFinishLastCall(controller);
         }
 
         public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
-            _combatSubEventsSequence.OnTempoFinishLastCall(in controller);
+            _combatSubEventsSequence.OnTempoFinishLastCall(controller);
 
             foreach (var eventsHolder in _discriminatedEventsEnumerable)
                 eventsHolder.OnTempoFinishLastCall(controller);
@@ -530,15 +530,15 @@ namespace CombatSystem._Core
                 ? _playerCombatEvents.DiscriminationEventsHolder 
                 : _enemyCombatEvents.DiscriminationEventsHolder;
         }
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isForcedChange)
         {
-            _combatSubEventsSequence.OnStanceChance(team, switchedStance, isControlChange);
+            _combatSubEventsSequence.OnStanceChance(team, switchedStance, isForcedChange);
 
             foreach (var eventsHolder in _mainEventsEnumerable)
-                eventsHolder.OnStanceChange(team, switchedStance, isControlChange);
+                eventsHolder.OnStanceChange(team, switchedStance, isForcedChange);
 
             var discriminationEventsHolder = GetTeamEventsHolder(team);
-            discriminationEventsHolder.OnStanceChange(team,switchedStance, isControlChange);
+            discriminationEventsHolder.OnStanceChange(team,switchedStance, isForcedChange);
         }
 
         public void OnControlChange(CombatTeam team, float phasedControl)
@@ -1333,11 +1333,11 @@ namespace CombatSystem._Core
             }
         }
 
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isForcedChange)
         {
             foreach (var listener in _teamEventListeners)
             {
-                listener.OnStanceChange(team, switchedStance, isControlChange);
+                listener.OnStanceChange(team, switchedStance, isForcedChange);
             }
         }
 

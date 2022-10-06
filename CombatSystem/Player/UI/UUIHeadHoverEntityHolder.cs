@@ -62,7 +62,7 @@ namespace CombatSystem.Player.UI
         }
         public void UpdateActions(CombatStats stats)
         {
-            float speed = UtilsStatsFormula.CalculateActionsAmount(stats);
+            float speed = UtilsCombatStats.CalculateActionsLimitRounded(stats);
             actionsInfoHandler.UpdateActionAmount(speed);
         }
 

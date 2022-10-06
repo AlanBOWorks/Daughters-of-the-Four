@@ -727,15 +727,31 @@ namespace CombatSystem.Team
 
     public static class UtilsCombatTeam
     {
-        public static void SwitchStance(CombatTeam team, EnumTeam.Stance targetStance, bool isControlChange)
+        public static void SwitchStance(CombatTeam team, EnumTeam.Stance targetStance, bool isForcedChange)
         {
             var fullStance = UtilsTeam.ParseStance(targetStance);
-            SwitchStance(team, fullStance, isControlChange);
+            SwitchStance(team, fullStance, isForcedChange);
         }
-        public static void SwitchStance(CombatTeam team, EnumTeam.StanceFull targetStance, bool isControlChange)
+        public static void SwitchStance(CombatTeam team, EnumTeam.StanceFull targetStance, bool isForcedChange)
         {
             team.DataValues.CurrentStance = targetStance;
-            CombatSystemSingleton.EventsHolder.OnStanceChange(team, targetStance, isControlChange);
+            var eventsHolder = CombatSystemSingleton.EventsHolder;
+            OnStanceChange();
+            eventsHolder.OnStanceChange(team, targetStance, isForcedChange);
+
+            void OnStanceChange()
+            {
+                if (isForcedChange) return;
+
+                var activeEntities = team.GetControllingMembers();
+                foreach (var entity in activeEntities)
+                {
+                    UtilsCombatStats.ResetActions(entity.Stats);
+                }
+
+                team.DataValues.CurrentControl = 0;
+                eventsHolder.OnControlChange(team, -1);
+            }
         }
 
         public static void GainControl(CombatTeam team, float controlVariation)

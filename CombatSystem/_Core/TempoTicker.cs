@@ -214,7 +214,7 @@ namespace CombatSystem._Core
             Entity = entity;
             CurrentTick = entityInitiativeAmount;
             CurrentPercent = UtilsCombatStats.CalculateTempoPercent(entityInitiativeAmount);
-            RemainingSteps = UtilsCombatStats.CalculateRemainingSteps(stats);
+            RemainingSteps = UtilsCombatStats.CalculateRemainingInitiativeSteps(stats);
         }
         public TempoTickValues(CombatEntity entity) : this(entity, entity.Stats.TotalInitiative)
         { }

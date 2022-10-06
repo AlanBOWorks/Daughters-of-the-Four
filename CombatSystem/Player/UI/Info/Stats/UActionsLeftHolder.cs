@@ -61,7 +61,7 @@ namespace CombatSystem.Player.UI
 
         private void UpdateLimitText()
         {
-            var actionsLimitValue = UtilsStatsFormula.CalculateActionsAmount(_currentEntity.Stats);
+            var actionsLimitValue = UtilsCombatStats.CalculateActionsLimitRounded(_currentEntity.Stats);
             string limitText = actionsLimitValue.ToString("00");
             actionsLimitText.text = limitText;
             actionsLimitTextBackground.text = limitText;

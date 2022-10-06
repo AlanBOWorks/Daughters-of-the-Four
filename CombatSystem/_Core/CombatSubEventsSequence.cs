@@ -15,29 +15,29 @@ namespace CombatSystem._Core
         }
         private readonly SystemCombatEventsHolder _eventsHolder;
 
-        public void OnTempoPreStartControl(in CombatTeamControllerBase controller)
+        public void OnTempoPreStartControl(CombatTeamControllerBase controller)
         {
             var team = controller.ControllingTeam;
             team.OnControlStart();
         }
 
-        public void OnTempoFinishControl(in CombatTeamControllerBase controller)
+        public void OnTempoFinishControl(CombatTeamControllerBase controller)
         {
             var remainingEntities = controller.ControllingTeam.GetControllingMembers();
             if (remainingEntities.Count == 0) return;
 
-            OnTempoForceFinish(in controller, in remainingEntities);
+            OnTempoForceFinish(controller, remainingEntities);
         }
 
-        public void OnTempoFinishLastCall(in CombatTeamControllerBase controller)
+        public void OnTempoFinishLastCall(CombatTeamControllerBase controller)
         {
             var controllingTeam = controller.ControllingTeam;
             controllingTeam.OnControlFinnish();
 
         }
 
-        public void OnTempoForceFinish(in CombatTeamControllerBase controller,
-            in IReadOnlyList<CombatEntity> remainingMembers)
+        public void OnTempoForceFinish(CombatTeamControllerBase controller,
+            IReadOnlyList<CombatEntity> remainingMembers)
         {
 
             var allActives = remainingMembers;

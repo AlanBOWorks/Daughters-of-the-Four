@@ -26,24 +26,20 @@ namespace CombatSystem.Player.UI.Skills
         [Title("Shortcut's")] 
         [SerializeField] private TextMeshProUGUI shortcutText;
 
-        private Color _initialColor;
+
+        [SerializeReference]
+        private ColorsHolder initialColorsHolder = new ColorsHolder();
         private Color _activeColor;
-        private Color _backgroundInitialColor;
         private float _initialFontSize;
 
         private UCombatControlStanceHandler _handler;
 
         private const float BackgroundIconAlpha = .6f;
-        private Color CalculateIconColor(Color fromColor)
-        {
-            return new Color(fromColor.r, fromColor.g, fromColor.b, BackgroundIconAlpha);
-        }
+       
         private void Awake()
         {
             LocalizationsCombat.LocalizeStance(stanceName.name);
-            _initialColor = stanceName.color;
             _initialFontSize = stanceName.fontSize;
-            _backgroundInitialColor = backgroundHolder.color;
         }
 
         private void OnDisable()
@@ -74,11 +70,14 @@ namespace CombatSystem.Player.UI.Skills
             DOTween.Kill(backgroundHolder);
             DOTween.Kill(backgroundIcon);
 
-            backgroundHolder.color = _backgroundInitialColor;
-            backgroundIcon.color = CalculateIconColor(_initialColor);
+            backgroundHolder.color = initialColorsHolder.GetInitialBackgroundColor();
+            backgroundIcon.color = CalculateIconColor(initialColorsHolder.GetInitialMainColor());
+        }
+        private static Color CalculateIconColor(Color fromColor)
+        {
+            return new Color(fromColor.r, fromColor.g, fromColor.b, BackgroundIconAlpha);
         }
 
-        
 
 
         private const float OnAnimateIncrementFontAmount = 2;
@@ -120,12 +119,13 @@ namespace CombatSystem.Player.UI.Skills
 
         public void DoActiveButton()
         {
-            stanceName.color = _backgroundInitialColor;
-            shortcutText.color = _backgroundInitialColor;
+            var mainColor = initialColorsHolder.GetInitialMainColor();
+            stanceName.color = mainColor;
+            shortcutText.color = mainColor;
 
             StopBackgroundAnimations();
             backgroundHolder.DOColor(_activeColor, AnimationDuration);
-            var iconTargetColor = CalculateIconColor(_backgroundInitialColor);
+            var iconTargetColor = CalculateIconColor(mainColor);
             backgroundIcon.DOColor(iconTargetColor, AnimationDuration);
 
         }
@@ -133,8 +133,20 @@ namespace CombatSystem.Player.UI.Skills
         {
             StopTextAnimations();
             StopBackgroundAnimations();
-            stanceName.color = _initialColor;
-            shortcutText.color = _initialColor;
+
+            var initialColor = initialColorsHolder.GetInitialMainColor();
+            stanceName.color = initialColor;
+            shortcutText.color = initialColor;
+        }
+
+        [Serializable]
+        private sealed class ColorsHolder
+        {
+            [SerializeField] private Color initialMainColor;
+            [SerializeField] private Color initialBackgroundColor;
+
+            public Color GetInitialMainColor() => initialMainColor;
+            public Color GetInitialBackgroundColor() => initialBackgroundColor;
         }
     }
 }

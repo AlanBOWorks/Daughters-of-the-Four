@@ -131,7 +131,9 @@ namespace CombatSystem.Player.UI
         private void EnableButton(CombatEntity entity)
         {
             if(!_buttonsDictionary.ContainsKey(entity)) return;
-            _buttonsDictionary[entity].DoEnable(true);
+            var button = _buttonsDictionary[entity];
+            button.DoEnable(true);
+            button.UpdateActionsInfo();
         }
         private void DisableButton(CombatEntity entity)
         {
@@ -244,9 +246,10 @@ namespace CombatSystem.Player.UI
 
        public void OnEntityBeforeSkill(CombatEntity entity)
        {
+           _buttonsDictionary[entity].UpdateCurrentActionsAmount();
        }
 
-       public void OnEntityFinishAction(CombatEntity entity)
+        public void OnEntityFinishAction(CombatEntity entity)
        {
        }
 

@@ -46,7 +46,6 @@ namespace CombatSystem.Stats
             return skillsCount > 0;
         }
 
-        private const float MaxActionAmount = 12f;
 
         /// <summary>
         /// Check if is Alive and its actionsLimit > 0;
@@ -75,14 +74,23 @@ namespace CombatSystem.Stats
             return usedActionsAmount < actionsLimit;
         }
 
+        private const float MaxActionAmount = 12f;
+
+        private static float CalculateActionsAmountRaw(CombatStats stats) =>
+            stats.BaseStats.ActionsType + stats.BuffStats.ActionsType + stats.BurstStats.ActionsType;
+
         public static float CalculateActionsLimit(CombatStats stats)
         {
-            float actionsLimit =
-                stats.BaseStats.ActionsType + stats.BuffStats.ActionsType + stats.BurstStats.ActionsType;
+            float actionsLimit = CalculateActionsAmountRaw(stats);
             if (actionsLimit > MaxActionAmount) return MaxActionAmount;
             return actionsLimit;
         }
-
+        public static float CalculateActionsLimitRounded(CombatStats stats)
+        {
+            float actionsLimit = CalculateActionsAmountRaw(stats);
+            if (actionsLimit > MaxActionAmount) return MaxActionAmount;
+            return Mathf.Round(actionsLimit);
+        }
 
         /// <summary>
         /// <inheritdoc cref="CanControlAct"/> and if the entity is [<seealso cref="CombatTeam.IsActive(CombatEntity)"/>]= true;
@@ -190,13 +198,22 @@ namespace CombatSystem.Stats
         }
 
 
-        public static int CalculateRemainingSteps(CombatStats stats)
+        public static int CalculateRemainingInitiativeSteps(CombatStats stats)
         {
             var speed = UtilsStatsFormula.CalculateInitiativeSpeed(stats);
             var currentInitiative = stats.CurrentInitiative;
             var remainingTicks = InitiativeThreshold - currentInitiative;
 
             return Mathf.RoundToInt(remainingTicks / speed);
+        }
+
+        /// <summary>
+        /// Calculates the total amount of steal amount of step for Initiative
+        /// </summary>
+        public static int CalculateMaxInitiativeSteps(float speed)
+        {
+            if (speed <= 0) return 99;
+            return Mathf.RoundToInt(InitiativeThreshold / speed);
         }
 
 

@@ -77,25 +77,7 @@ namespace CombatSystem.Stats
             return Mathf.Round(speedAmount * 10) * .1f;
         }
 
-        private const float MaxActionsAmount = 12f;
-        public static float CalculateActionsAmount(CombatStats stats)
-        {
-            float actionsAmount =
-                stats.BaseStats.ActionsType
-                + stats.BuffStats.ActionsType
-                + stats.BurstStats.ActionsType;
-
-            if (actionsAmount > MaxActionsAmount)
-                actionsAmount = MaxActionsAmount;
-            else if (actionsAmount < 0)
-                actionsAmount = 0;
-            else
-            {
-                actionsAmount = Mathf.Round(actionsAmount);
-            }
-
-            return actionsAmount;
-        }
+        
         public static float CalculateLuckAmount(CombatStats stats)
         {
             return stats.BaseStats.CriticalType

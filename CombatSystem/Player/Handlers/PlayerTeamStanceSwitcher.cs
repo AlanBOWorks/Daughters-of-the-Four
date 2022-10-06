@@ -30,7 +30,7 @@ namespace CombatSystem.Player.Handlers
             var teamValues = _team.DataValues;
             if(teamValues.CurrentControl < 1 || teamValues.CurrentStance == _selectedStance) return;
 
-            CombatSystemSingleton.EventsHolder.OnStanceChange(_team, _selectedStance, true);
+            UtilsCombatTeam.SwitchStance(_team,_selectedStance,false);
         }
 
         public void OnCombatSkillPerform(in SkillUsageValues values)

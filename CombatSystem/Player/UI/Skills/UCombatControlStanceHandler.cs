@@ -115,7 +115,7 @@ namespace CombatSystem.Player.UI.Skills
             _currentButton.DoActiveButton();
         }
 
-        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isControlChange)
+        public void OnStanceChange(CombatTeam team, EnumTeam.StanceFull switchedStance, bool isForcedChange)
         {
             if(!team.IsPlayerTeam) return;
             DisableStanceSwitching();

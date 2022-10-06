@@ -17,14 +17,15 @@ namespace CombatSystem.Player.UI
         [Title("Images")] 
         [SerializeField] private MPImage backgroundImage;
         [SerializeField] private Image backgroundIcon;
+        [SerializeField] private Image roleIcon;
 
         [Title("Texts")]
         [SerializeField] private TextMeshProUGUI entityName;
         [SerializeField] private TextMeshProUGUI currentTick;
+        [SerializeField] private TextMeshProUGUI maxTick;
         [SerializeField] private TextMeshProUGUI entitySpeed;
         [SerializeField] private TextMeshProUGUI remainingStepsText;
 
-        [SerializeField] private Image roleIcon;
         private Color _roleColor;
         
         [ShowInInspector,DisableInEditorMode]
@@ -58,6 +59,7 @@ namespace CombatSystem.Player.UI
             }
 
             TickTempo(in TempoTickValues.ZeroValues);
+            UpdateEntityMaxTempo();
         }
 
         public void Injection(Sprite roleSprite)
@@ -124,6 +126,15 @@ namespace CombatSystem.Player.UI
 
             OnControlClose();
         }
+
+        private void UpdateEntityMaxTempo()
+        {
+            float targetSpeed = UtilsStatsFormula.CalculateInitiativeSpeed(_user.Stats);
+            float targetAmount = UtilsCombatStats.CalculateMaxInitiativeSteps(targetSpeed);
+
+            maxTick.text = targetAmount.ToString("00");
+        }
+
 
         public void UpdateToCurrent()
         {

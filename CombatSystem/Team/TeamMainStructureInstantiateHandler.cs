@@ -5,30 +5,22 @@ using UnityEngine;
 namespace CombatSystem.Team
 {
     /// <summary>
-    /// Extends from [<seealso cref="FullPositionMainGroupStructureStructure{T}"/>]; also Instantiates prefabs object to a parent Transform
-    /// on Awake
+    /// Should instantiates prefabs object to a parent Transform on Awake
     /// </summary>
     [Serializable]
-    public class TeamMainStructureInstantiateHandler<T> : FlexPositionMainGroupStructure<T> where T : MonoBehaviour
+    public class TeamMainStructureInstantiateHandler<T> : TeamMainStructureInstantiateHandlerBasic<T> where T : MonoBehaviour
     {
-        [InfoBox("Listeners will be called in this parent")]
-        [SerializeField] private Transform instantiationParent;
-        [SerializeField] private T instantiationPrefab;
-
-        [ReadOnly]
-        public int activeCount;
-
-        public virtual void InstantiateElements()
+        public override void InstantiateElements()
         {
-            if(!instantiationParent || !instantiationPrefab) return;
+            base.InstantiateElements();
 
-            VanguardType = OnInstantiation(0);
-            AttackerType = OnInstantiation(1);
-            SupportType = OnInstantiation(2);
-            FlexType = OnInstantiation(3);
+          
+            ITeamMainStructureInstantiationListener<T>[] listeners;
+            if (instantiationParent != null)
+                listeners = instantiationParent.GetComponents<ITeamMainStructureInstantiationListener<T>>();
+            else
+                return;
 
-            var listeners
-                = instantiationParent.GetComponents<ITeamMainStructureInstantiationListener<T>>();
             if (listeners == null) return;
             CallListeners(VanguardType, EnumTeam.Role.Vanguard);
             CallListeners(AttackerType, EnumTeam.Role.Attacker);
@@ -44,6 +36,29 @@ namespace CombatSystem.Team
             }
         }
 
+    }
+
+    [Serializable]
+    public class TeamMainStructureInstantiateHandlerBasic<T> : FlexPositionMainGroupStructure<T> where T : MonoBehaviour
+    {
+        [InfoBox("Listeners will be called in this parent")]
+        [SerializeField]
+        protected Transform instantiationParent;
+        [SerializeField] protected T instantiationPrefab;
+
+        [ReadOnly]
+        public int activeCount;
+
+        public virtual void InstantiateElements()
+        {
+            if (!instantiationPrefab) return;
+
+            VanguardType = OnInstantiation(0);
+            AttackerType = OnInstantiation(1);
+            SupportType = OnInstantiation(2);
+            FlexType = OnInstantiation(3);
+        }
+
         protected virtual T OnInstantiation(int index)
         {
             return UnityEngine.Object.Instantiate(instantiationPrefab, instantiationParent);
@@ -51,7 +66,7 @@ namespace CombatSystem.Team
 
         public void HidePrefab()
         {
-            if(!instantiationPrefab) return;
+            if (!instantiationPrefab) return;
             instantiationPrefab.gameObject.SetActive(false);
         }
     }

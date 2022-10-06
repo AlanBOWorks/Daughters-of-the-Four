@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CombatSystem.Skills
 {
-    public sealed class CombatEntityEventHandler 
+    public sealed class CombatEntityEventHandler
     {
         public void OnCombatSkillPreSubmit(ICombatSkill usedSkill, CombatEntity performer)
         {
@@ -16,9 +16,10 @@ namespace CombatSystem.Skills
             UtilsCombatStats.TickActions(performerStats, usedSkill);
             usedSkill.IncreaseCost();
         }
-
         public void OnCombatSkillSubmit(ICombatSkill usedSkill, CombatEntity performer)
         {
+           
+
             var eventHolder = CombatSystemSingleton.EventsHolder;
             eventHolder.OnEntityBeforeSkill(performer);
 
