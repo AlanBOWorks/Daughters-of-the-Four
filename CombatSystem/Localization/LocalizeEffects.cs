@@ -9,7 +9,9 @@ namespace CombatSystem.Localization
 {
     public static class LocalizeEffects 
     {
-        public static void LocalizeEffectTooltip(in PerformEffectValues values, out string localizedEffect, bool handleTargeting = true)
+        public static void LocalizeEffectTooltip(in PerformEffectValues values, 
+            out string localizedEffect, 
+            bool handleTargeting = false)
         {
             var effect = values.Effect;
             var targeting = values.TargetType;

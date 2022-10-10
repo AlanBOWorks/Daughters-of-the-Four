@@ -165,5 +165,9 @@ namespace CombatSystem.Skills.VanguardEffects
 
             _hasEffects = false;
         }
+
+        public VanguardSkillAccumulationWrapper() : base(true)
+        {
+        }
     }
 }

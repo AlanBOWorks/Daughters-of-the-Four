@@ -64,7 +64,10 @@ namespace Utils
                 return Object.Instantiate(poolElement, onParent);
         }
 
-
+        public void RawRelease(T element)
+        {
+            inactivePool.Enqueue(element);
+        }
         public void Release(T element)
         {
             Release(element, false);

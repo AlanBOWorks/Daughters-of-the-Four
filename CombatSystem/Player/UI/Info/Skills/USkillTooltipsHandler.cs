@@ -27,12 +27,7 @@ namespace CombatSystem.Player.UI
 
         [Title("Holder")]
         [SerializeField] 
-        private UEffectsTooltipWindowHandler tooltipWindow;
-
-        [SerializeField] 
-        private UEffectsTooltipWindowHandler counterTooltipWindow;
-        [SerializeField] 
-        private UEffectsTooltipWindowHandler punishTooltipWindow;
+        private UMainSkillEffectsHandler tooltipWindow;
 
         private void Awake()
         {
@@ -42,9 +37,13 @@ namespace CombatSystem.Player.UI
                 CombatShortcutsSingleton.InputActions.SkillInfoShortCut.action;
             shortcutAction.performed += ShortcutShowSkillInfo;
             shortcutAction.canceled += ShortcutHideSkillInfo;
-
-            _vanguardHorizontalPosition = punishTooltipWindow.transform.localPosition.x;
         }
+
+        private void Start()
+        {
+            gameObject.SetActive(false);
+        }
+
 
         private void OnDestroy()
         {
@@ -56,7 +55,7 @@ namespace CombatSystem.Player.UI
             shortcutAction.canceled -= ShortcutHideSkillInfo;
         }
 
-        private ICombatSkill _hoverSkill; //todo 
+        private ICombatSkill _hoverSkill;
         public void OnSkillButtonHover(ICombatSkill skill)
         {
             if(_shortcutSelectedSkill != null)
@@ -67,7 +66,6 @@ namespace CombatSystem.Player.UI
         }
 
 
-        private float _vanguardHorizontalPosition;
         private void ShowSkillInfo(ICombatSkill skill)
         {
             ExtractTheme(skill, out var roleColor, out var roleIcon);
@@ -77,57 +75,31 @@ namespace CombatSystem.Player.UI
             
 
             var performer = PlayerCombatSingleton.PlayerTeamController.GetPerformer();
-            var skillEffects = skill.GetEffects();
 
             bool ignoreSelfTargetText = skill.IgnoreSelf();
             ignoreSelfTextHolder.SetActive(ignoreSelfTargetText);
-            HandleTooltipWindow(tooltipWindow,skillEffects);
-
+            tooltipWindow.HandleMainEffects(skill.GetEffects(), skill, performer);
 
             if (skill.Preset is IVanguardSkill vanguardSkill)
             {
                 bool hasCounterEffects = vanguardSkill.HasCounterEffects();
+                if (hasCounterEffects)
+                {
+                    tooltipWindow.HandleCounterEffects(vanguardSkill.GetCounterEffects(),skill, performer);
+                }
                 bool hasPunishEffects = vanguardSkill.HasPunishEffects();
-                
-                HandleCounterWindow(hasCounterEffects);
-                HandlePunishEffects(hasPunishEffects, hasCounterEffects);
+                if (hasPunishEffects)
+                {
+                    tooltipWindow.HandlePunishEffects(vanguardSkill.GetPunishEffects(),skill, performer);
+                }
+
+                tooltipWindow.Show(hasCounterEffects, hasPunishEffects);
             }
             else
             {
-                counterTooltipWindow.gameObject.SetActive(false);
-                punishTooltipWindow.gameObject.SetActive(false);
+                tooltipWindow.Show(false,false);
             }
-
-            void HandleCounterWindow(bool hasEffects)
-            {
-                var windowGameObject = counterTooltipWindow.gameObject;
-                windowGameObject.SetActive(hasEffects);
-                if (!hasEffects) return;
-                HandleTooltipWindow(counterTooltipWindow, vanguardSkill.GetCounterEffects());
-            }
-
-            void HandlePunishEffects(bool hasEffects, bool counterHasEffects)
-            {
-                var windowGameObject = counterTooltipWindow.gameObject;
-                windowGameObject.SetActive(hasEffects);
-                if (!hasEffects) return;
-
-                var windowTransform = windowGameObject.transform;
-                var windowPosition = windowTransform.localPosition;
-                if (!counterHasEffects)
-                    windowPosition.x = 0;
-                else
-                    windowPosition.x = _vanguardHorizontalPosition;
-                windowTransform.localPosition = windowPosition;
-
-                HandleTooltipWindow(punishTooltipWindow, vanguardSkill.GetPunishEffects());
-            }
-
-            void HandleTooltipWindow(UEffectsTooltipWindowHandler window, IEnumerable<PerformEffectValues> effects)
-            {
-                window.HandleEffects(skill, effects, performer);
-                window.Show();
-            }
+            gameObject.SetActive(true);
         }
 
 
@@ -144,8 +116,7 @@ namespace CombatSystem.Player.UI
         private void HideSkillInfo(ICombatSkill skill)
         {
             tooltipWindow.Hide();
-            counterTooltipWindow.Hide();
-            punishTooltipWindow.Hide();
+            gameObject.SetActive(false);
         }
 
         private static void ExtractTheme(ISkill skill, out Color roleColor, out Sprite roleIcon)

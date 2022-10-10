@@ -9,39 +9,37 @@ using Utils_Project;
 
 namespace CombatSystem.Player.UI
 {
-    public class UEffectTooltipHolder : MonoBehaviour
+    public sealed class UEffectTooltipHolder : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI effectTextHolder;
         [SerializeField] private Image iconHolder;
 
-
-        public TextMeshProUGUI GetTextHolder() => effectTextHolder;
-        public Image GetIconHolder() => iconHolder;
-
-
-        public void HandleText(in PerformEffectValues values, CombatStats stats = null, ICombatSkill skill = null)
+        private string _effectMainText;
+        private float _effectValue;
+        private bool _isPercentSuffix;
+        public void HandleText(in PerformEffectValues values, CombatStats stats = null, ISkill skill = null)
         {
             LocalizeEffects.LocalizeEffectTooltip(in values, out var effectText);
 
             var effect = values.Effect;
-            bool isPercentSuffix = effect.IsPercentTooltip();
-            float effectValue = values.EffectValue;
+            _isPercentSuffix = effect.IsPercentTooltip();
+            _effectValue = values.EffectValue;
 
             string digitText;
             HandleTextWithDigits(); void HandleTextWithDigits()
             {
                 if (skill == null || stats == null)
                 {
-                    digitText = LocalizeMath.LocalizeMathfValue(effectValue, isPercentSuffix);
+                    digitText = LocalizeMath.LocalizeMathfValue(_effectValue, _isPercentSuffix);
                 }
                 else
                 {
-                    effectValue = effect.CalculateEffectByStatValue(stats, effectValue);
+                    _effectValue = effect.CalculateEffectByStatValue(stats, _effectValue);
 
                     float skillLuck = skill.LuckModifier;
                     float statsLuck = UtilsStatsFormula.CalculateLuckAmount(stats);
-                    float highValue = effectValue * (1 + skillLuck * statsLuck);
-                    digitText = LocalizeMath.LocalizeMathfValue(effectValue, highValue, isPercentSuffix);
+                    float highValue = _effectValue * (1 + skillLuck * statsLuck);
+                    digitText = LocalizeMath.LocalizeMathfValue(_effectValue, highValue, _isPercentSuffix);
                 }
             }
 
@@ -49,26 +47,23 @@ namespace CombatSystem.Player.UI
         }
 
 
-        protected void UpdateEffectTextHolder(string effectText, string digitText)
+        private void UpdateEffectTextHolder(string effectText, string digitText)
         {
+            _effectMainText = effectText;
             effectTextHolder.text = effectText + ":\n <b>" + digitText + "</b>";
+        }
+
+        public void UpdateEffectDigitText(float variation)
+        {
+            _effectValue += variation;
+            var digitText = LocalizeMath.LocalizeMathfValue(_effectValue, _isPercentSuffix);
+            UpdateEffectTextHolder(_effectMainText, digitText);
         }
 
         public void HandleIcon(IEffectBasicInfo effect)
         {
             var icon = UtilsVisual.GetEffectSprite(effect);
             iconHolder.sprite = icon;
-        }
-
-        public void HandleTextHeight(ref float accumulatedHeight)
-        {
-            var textTransform = effectTextHolder.rectTransform;
-            float textHeight = effectTextHolder.preferredHeight;
-
-            float pivotHeight = accumulatedHeight;
-            UtilsRectTransform.SetPivotVertical(textTransform, -pivotHeight);
-
-            accumulatedHeight += textHeight;
         }
 
     }

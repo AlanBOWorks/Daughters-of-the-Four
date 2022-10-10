@@ -50,7 +50,7 @@ namespace CombatSystem.Player.UI
         public void OnVanguardSkillSubscribe(IVanguardSkill skill, CombatEntity performer)
         {
             var window = GetWindowHandler(performer);
-            window.AddVanguardEffects(skill);
+            window.AddVanguardEffects(skill,performer);
         }
 
         public void OnVanguardEffectsPerform(CombatEntity attacker, CombatEntity onTarget)

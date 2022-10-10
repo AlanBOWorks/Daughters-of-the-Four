@@ -13,5 +13,17 @@ namespace _Injectors.ExplorationCombat
             ExplorationCombatSingleton.SceneTransitionHandler.IgnoreMapTransitionAfterCombat =
                 avoidGoingToExplorationMapAfterCombat;
         }
+
+        [Button]
+        private void Test()
+        {
+            int i = 0;
+            foreach (var element in transform)
+            {
+                i++;
+            }
+
+            Debug.Log(i);
+        }
     }
 }
