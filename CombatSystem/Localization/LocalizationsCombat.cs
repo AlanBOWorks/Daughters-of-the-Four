@@ -20,6 +20,11 @@ namespace CombatSystem.Localization
             return stanceString;
         }
 
+        public static string LocalizeLuck(float luckAmount)
+        {
+            string luckAmountText = luckAmount.ToString("P0");
+            return luckAmountText;
+        }
 
     }
 }

@@ -112,7 +112,7 @@ namespace CombatSystem.Skills
 
             IReadOnlyList<CombatEntity> GetSupportTargetType()
             {
-                bool isSelfIgnore = skill.IgnoreSelf();
+                bool isSelfIgnore = skill.IgnoreSelf;
                 return (isSelfIgnore)
                     ? GetIgnoreSelfSupportPossibleTargets(performer)
                     : performer.Team.GetAllMembers();

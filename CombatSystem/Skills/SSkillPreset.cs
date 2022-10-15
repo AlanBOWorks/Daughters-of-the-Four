@@ -44,10 +44,8 @@ namespace CombatSystem.Skills
 
             return mainEffect;
         }
-        public override bool IgnoreSelf() => ignoreSelf && TeamTargeting != EnumsSkill.TeamTargeting.Self;
 
-
-       
+        public override bool IgnoreSelf => ignoreSelf && TeamTargeting != EnumsSkill.TeamTargeting.Self;
     }
 
     public abstract class SSkillPresetBase : ScriptableObject, IFullSkill
@@ -136,7 +134,7 @@ namespace CombatSystem.Skills
 
 
         public abstract IEffect GetMainEffectArchetype();
-        public abstract bool IgnoreSelf();
+        public abstract bool IgnoreSelf { get; }
 
         public float LuckModifier
         {

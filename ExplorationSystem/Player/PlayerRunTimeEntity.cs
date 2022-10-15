@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CombatSystem.Entity;
 using CombatSystem.Skills;
@@ -9,9 +10,7 @@ using UnityEngine;
 namespace ExplorationSystem
 {
     public sealed class PlayerRunTimeEntity : 
-        ICombatEntityProvider, 
-        IStanceStructureRead<IReadOnlyCollection<IFullSkill>>,
-        IDamageableStats<float>,
+        ICombatEntityProvider, IDamageableStats<float>,
         IVitalityStatsRead<float>
     {
         public PlayerRunTimeEntity(ICombatEntityProvider preset)
@@ -20,9 +19,8 @@ namespace ExplorationSystem
             _statsBase = new StatsBase<float>(preset.GetBaseStats());
 
             var presetSkills = preset.GetPresetSkills();
-            AttackingSkills = new List<IFullSkill>(presetSkills.AttackingStance);
-            SupportSkills = new List<IFullSkill>(presetSkills.SupportingStance);
-            DefendingSkills = new List<IFullSkill>(presetSkills.DefendingStance);
+            _basicSkillsHolder = new SkillsHolder(presetSkills);
+            _craftedSkillsHolder = new SkillsHolder();
 
             CurrentHealth = HealthType;
             CurrentMortality = MortalityType;
@@ -42,15 +40,16 @@ namespace ExplorationSystem
 
         public GameObject GetVisualPrefab() => Preset.GetVisualPrefab();
 
-        public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => this;
+        public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetPresetSkills() => _basicSkillsHolder;
+        public IStanceStructureRead<IReadOnlyCollection<IFullSkill>> GetCraftedSkills() => _craftedSkillsHolder;
 
-        [TabGroup("Skills"), ShowInInspector] public readonly List<IFullSkill> AttackingSkills;
-        [TabGroup("Skills"), ShowInInspector] public readonly List<IFullSkill> SupportSkills;
-        [TabGroup("Skills"), ShowInInspector] public readonly List<IFullSkill> DefendingSkills;
+        internal IStanceStructureRead<IList<IFullSkill>> GetBasicsSkillsHolder() => _basicSkillsHolder;
+        internal IStanceStructureRead<IList<IFullSkill>> GetCraftsSkillsHolder() => _basicSkillsHolder;
 
-        public IReadOnlyCollection<IFullSkill> AttackingStance => AttackingSkills;
-        public IReadOnlyCollection<IFullSkill> SupportingStance => SupportSkills;
-        public IReadOnlyCollection<IFullSkill> DefendingStance => DefendingSkills;
+        [ShowInInspector] 
+        private readonly SkillsHolder _basicSkillsHolder;
+        private readonly SkillsHolder _craftedSkillsHolder;
+
 
 
 
@@ -61,6 +60,32 @@ namespace ExplorationSystem
         public float MortalityType => _statsBase.MortalityType;
         public float DamageReductionType => _statsBase.DamageReductionType;
         public float DeBuffResistanceType => _statsBase.DeBuffResistanceType;
+
+        private sealed class SkillsHolder : IStanceStructureRead<List<IFullSkill>>
+        {
+            [ShowInInspector] public readonly List<IFullSkill> AttackingSkills;
+            [ShowInInspector] public readonly List<IFullSkill> SupportSkills;
+            [ShowInInspector] public readonly List<IFullSkill> DefendingSkills;
+
+            public List<IFullSkill> AttackingStance => AttackingSkills;
+            public List<IFullSkill> SupportingStance => SupportSkills;
+            public List<IFullSkill> DefendingStance => DefendingSkills;
+
+            private const int ListSize = 4;
+            public SkillsHolder()
+            {
+                AttackingSkills = new List<IFullSkill>(ListSize);
+                SupportSkills = new List<IFullSkill>(ListSize);
+                DefendingSkills = new List<IFullSkill>(ListSize);
+            }
+
+            public SkillsHolder(IStanceStructureRead<IEnumerable<IFullSkill>> skillsHolder)
+            {
+                AttackingSkills = new List<IFullSkill>(skillsHolder.AttackingStance);
+                SupportSkills = new List<IFullSkill>(skillsHolder.SupportingStance);
+                DefendingSkills = new List<IFullSkill>(skillsHolder.DefendingStance);
+            }
+        }
     }
 
     public sealed class PlayerRunTimeTeam : ITeamFlexStructureRead<PlayerRunTimeEntity>,

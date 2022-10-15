@@ -11,7 +11,7 @@ namespace CombatSystem.Player.UI
     public class UPunishEffectsTooltipWindowHandler : MonoBehaviour
     {
         [SerializeField] 
-        private UTopEffectTooltipsHandler punishEffectHandler;
+        private UAllEffectTooltipsHandler punishEffectHandler;
 
 
         public void AddVanguardEffects(IVanguardSkill skill, CombatEntity performer)

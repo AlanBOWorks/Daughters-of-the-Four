@@ -13,7 +13,7 @@ namespace CombatSystem.Skills
     {
         public static void DoSkillOnTarget(ICombatSkill skill, CombatEntity performer, CombatEntity onTarget)
         {
-            CombatEntity exclusion = skill.IgnoreSelf() ? performer : null;
+            CombatEntity exclusion = skill.IgnoreSelf ? performer : null;
             var effects = skill.GetEffects();
             DoSkillOnTarget();
 

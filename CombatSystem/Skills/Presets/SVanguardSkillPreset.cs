@@ -41,8 +41,7 @@ namespace CombatSystem.Skills
             return null;
         }
 
-        public override bool IgnoreSelf() => ignoreSelf;
-
+        public override bool IgnoreSelf => ignoreSelf;
 
 
         public override IEnumerable<PerformEffectValues> GetEffectsFeedBacks() 

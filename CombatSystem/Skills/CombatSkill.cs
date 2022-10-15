@@ -29,7 +29,7 @@ namespace CombatSystem.Skills
         public IEffect GetMainEffectArchetype() => Preset.GetMainEffectArchetype();
 
 
-        public bool IgnoreSelf() => Preset.IgnoreSelf();
+        public bool IgnoreSelf => Preset.IgnoreSelf;
         public float LuckModifier => Preset.LuckModifier;
 
 

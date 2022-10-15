@@ -165,7 +165,6 @@ namespace CombatSystem.Player.UI
 
         private const float PopUpVectorMagnitude = 72;
         private const float PopUpPositionOffset = 10;
-        private const float RandomMagnitude = 50;
         private static void CalculatePopUpsVector(
             IEffectBasicInfo effect, bool isPlayer, 
             out Vector3 popUpMovement,
@@ -203,15 +202,24 @@ namespace CombatSystem.Player.UI
         static Vector3 DoLeftMovement() => new Vector3(-PopUpVectorMagnitude, 0);
 
 
+        private const float PopUpVariationMagnitude = 100;
+        private const float LerpStep = .2f;
+
+        private static float _horizontalLerp = LerpStep * 3;
         private static Vector3 CalculateRandomPointInHorizontalPlane(float verticalOffset)
         {
-            float horizontalValue = Random.Range(-RandomMagnitude, RandomMagnitude);
+            float horizontalValue = Mathf.Lerp(-PopUpVariationMagnitude, PopUpVariationMagnitude, _horizontalLerp);
+            _horizontalLerp += LerpStep;
+            if (_horizontalLerp > 1) _horizontalLerp = 0;
             return new Vector3(horizontalValue,verticalOffset, 0);
         }
 
+        private static float _verticalLerp = LerpStep * 3;
         private static Vector3 CalculateRandomPointInVerticalPlane(float horizontalOffset)
         {
-            float verticalValue = Random.Range(-RandomMagnitude, RandomMagnitude);
+            float verticalValue = Mathf.Lerp(-PopUpVariationMagnitude, PopUpVariationMagnitude, _verticalLerp);
+            _verticalLerp += LerpStep;
+            if (_verticalLerp > 1) _verticalLerp = 0;
             return new Vector3(horizontalOffset,verticalValue,  0);
         }
 

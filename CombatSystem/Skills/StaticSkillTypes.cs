@@ -54,7 +54,7 @@ namespace CombatSystem.Skills
             public EnumsSkill.TeamTargeting TeamTargeting { get; }
             public IEffect GetMainEffectArchetype() => _effect;
 
-            public bool IgnoreSelf() => true;
+            public bool IgnoreSelf => true;
             public float LuckModifier => -1;
             public bool CanCrit() => false;
 
@@ -78,7 +78,7 @@ namespace CombatSystem.Skills
             public IEffect GetMainEffectArchetype() => null;
             public IEnumerable<PerformEffectValues> GetEffects() => null;
 
-            public bool IgnoreSelf() => false;
+            public bool IgnoreSelf => false;
 
             public float LuckModifier => -1;
 

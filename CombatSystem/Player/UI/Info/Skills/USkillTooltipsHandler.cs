@@ -76,7 +76,7 @@ namespace CombatSystem.Player.UI
 
             var performer = PlayerCombatSingleton.PlayerTeamController.GetPerformer();
 
-            bool ignoreSelfTargetText = skill.IgnoreSelf();
+            bool ignoreSelfTargetText = skill.IgnoreSelf;
             ignoreSelfTextHolder.SetActive(ignoreSelfTargetText);
             tooltipWindow.HandleMainEffects(skill.GetEffects(), skill, performer);
 
@@ -226,8 +226,7 @@ namespace CombatSystem.Player.UI
 
             private void HandleLuckText(float luckAmount)
             {
-                string luckAmountText = luckAmount.ToString("P0");
-                luckAmountHolder.text = luckAmountText;
+                luckAmountHolder.text = LocalizationsCombat.LocalizeLuck(luckAmount);
             }
 
             private void HandleLuckColor(Color color)

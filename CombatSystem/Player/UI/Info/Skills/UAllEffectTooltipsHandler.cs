@@ -12,7 +12,7 @@ using Utils;
 
 namespace CombatSystem.Player.UI
 {
-    public class UTopEffectTooltipsHandler : MonoBehaviour
+    public class UAllEffectTooltipsHandler : MonoBehaviour
     {
         [Title("Params")] 
         [SerializeField, SuffixLabel("px")] 
@@ -29,10 +29,12 @@ namespace CombatSystem.Player.UI
          Tooltip("Overrides the effect's tooltip info if it exits in the specific targeting group.\n" +
                                  "- OnFalse: pools without caring of repetitions")] 
         private bool overrideEffectRepetition = false;
+        [TitleGroup("Collections")]
         [ShowInInspector,HideInEditorMode, ShowIf("overrideEffectRepetition")]
         private DictionaryEffectTooltips _dictionaryEffectTooltips;
 
-        [ShowInInspector,HideInEditorMode, HideIf("overrideEffectRepetition")]
+        [TitleGroup("Collections")]
+        [ShowInInspector, HideInEditorMode, HideIf("overrideEffectRepetition")]
         private HashSet<UEffectTooltipHolder> _hashSetEffectTooltips;
 
 

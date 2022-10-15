@@ -49,7 +49,7 @@ namespace CombatSystem.Skills
         IEffect GetMainEffectArchetype();
         IEnumerable<PerformEffectValues> GetEffects();
 
-        bool IgnoreSelf();
+        bool IgnoreSelf { get; }
 
         float LuckModifier { get; }
     }

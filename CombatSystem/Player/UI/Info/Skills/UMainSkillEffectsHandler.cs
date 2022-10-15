@@ -11,9 +11,9 @@ namespace CombatSystem.Player.UI
     public class UMainSkillEffectsHandler : MonoBehaviour
     {
         [Title("References")]
-        [SerializeField] private UTopEffectTooltipsHandler mainEffectsHandler;
-        [SerializeField] private UTopEffectTooltipsHandler counterEffectsHandler;
-        [SerializeField] private UTopEffectTooltipsHandler punishEffectsHandler;
+        [SerializeField] private UAllEffectTooltipsHandler mainEffectsHandler;
+        [SerializeField] private UAllEffectTooltipsHandler counterEffectsHandler;
+        [SerializeField] private UAllEffectTooltipsHandler punishEffectsHandler;
        
 
         public void HandleMainEffects(IEnumerable<PerformEffectValues> effects, ISkill skill, CombatEntity performer)
