@@ -283,7 +283,7 @@ namespace CombatSystem._Core
             values.Extract(out var performer, out var target, out var usedSkill);
             Debug.Log($"----------------- SKILL --------------- \n" +
                       $"Random Controller: {performer.GetProviderEntityName()} / " +
-                      $"Used : {usedSkill.Preset} /" +
+                      $"Used : {usedSkill.GetSkillName()} /" +
                       $"Target: {target.GetProviderEntityName()}");
             Debug.Log($"Performer ACTIONS: {performer.Stats.UsedActions}");
         }
@@ -520,16 +520,16 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private SkillPointerLogs _skillPointerLogs = new SkillPointerLogs();
         
-        public void OnSkillButtonHover(ICombatSkill skill)
+        public void OnSkillButtonHover(IFullSkill skill)
         {
             if(!ShowSkillButtonLogs || !_skillPointerLogs.OnButtonHover) return;
-            Debug.Log($"Skill-Button Hover: {skill.Preset}");
+            Debug.Log($"Skill-Button Hover: {skill.GetSkillName()}");
         }
 
-        public void OnSkillButtonExit(ICombatSkill skill)
+        public void OnSkillButtonExit(IFullSkill skill)
         {
             if(!ShowSkillButtonLogs || !_skillPointerLogs.OnButtonExit) return;
-            Debug.Log($"Skill-Button Exit: {skill.Preset}");
+            Debug.Log($"Skill-Button Exit: {skill.GetSkillName()}");
         }
 
         [Title("Skill Selections")]
@@ -546,28 +546,28 @@ namespace CombatSystem._Core
         [ShowInInspector]
         private SkillSelectionLogs _skillSelectionLogs = new SkillSelectionLogs();
 
-        public void OnSkillSelect(CombatSkill skill)
+        public void OnSkillSelect(IFullSkill skill)
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSelect) return;
-            Debug.Log($"Skill Select: {skill.Preset}");
+            Debug.Log($"Skill Select: {skill.GetSkillName()}");
         }
 
-        public void OnSkillSelectFromNull(CombatSkill skill)
+        public void OnSkillSelectFromNull(IFullSkill skill)
         {
             if (!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSelectFromNull) return;
-            Debug.Log($"Skill Select (From NULL): {skill.Preset}");
+            Debug.Log($"Skill Select (From NULL): {skill.GetSkillName()}");
         }
 
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        public void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSwitch) return;
-            Debug.Log($"Skill SWITCH: {skill.Preset} FROM {previousSelection.Preset}");
+            Debug.Log($"Skill SWITCH: {skill.GetSkillName()} FROM {previousSelection.GetSkillName()}");
         }
 
-        public void OnSkillDeselect(CombatSkill skill)
+        public void OnSkillDeselect(IFullSkill skill)
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnDeselect) return;
-            Debug.Log($"Skill DESELECTED: {skill.Preset}");
+            Debug.Log($"Skill DESELECTED: {skill.GetSkillName()}");
         }
 
         public void OnSkillCancel(CombatSkill skill)
@@ -576,10 +576,10 @@ namespace CombatSystem._Core
             Debug.Log($"Skill CANCEL: {skill.Preset}");
         }
 
-        public void OnSkillSubmit(CombatSkill skill)
+        public void OnSkillSubmit(IFullSkill skill)
         {
             if(!ShowSkillSelectionLogs || !_skillSelectionLogs.OnSubmit) return;
-            Debug.Log($"xxxx - Skill Submit: {skill.Preset}");
+            Debug.Log($"xxxx - Skill Submit: {skill.GetSkillName()}");
         }
 
         [Title("Target Buttons")]

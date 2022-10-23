@@ -316,6 +316,18 @@ namespace CombatSystem.Team
             }
         }
 
+        public static EnumTeam.Stance ParseStance(EnumTeam.Role role)
+        {
+            return role switch
+            {
+                EnumTeam.Role.Vanguard => EnumTeam.Stance.Defending,
+                EnumTeam.Role.Attacker => EnumTeam.Stance.Attacking,
+                EnumTeam.Role.Flex => EnumTeam.Stance.Supporting,
+                EnumTeam.Role.Support => EnumTeam.Stance.Supporting,
+                _ => EnumTeam.Stance.Attacking
+            };
+        }
+
 
         public static T GetElement<T>(EnumTeam.ActiveRole role, ITeamFullStructureRead<T> structure)
         {

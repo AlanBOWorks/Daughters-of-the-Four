@@ -102,21 +102,21 @@ namespace CombatSystem.Player.UI
             
         }
 
-        public void OnSkillSelect(CombatSkill skill)
+        public void OnSkillSelect(IFullSkill skill)
         {
         }
 
-        public void OnSkillSelectFromNull(CombatSkill skill)
+        public void OnSkillSelectFromNull(IFullSkill skill)
         {
         }
 
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        public void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {
             _currentSkill = skill;
             _activeMembers.Clear();
         }
 
-        public void OnSkillDeselect(CombatSkill skill)
+        public void OnSkillDeselect(IFullSkill skill)
         {
         }
 
@@ -124,7 +124,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnSkillSubmit(CombatSkill skill)
+        public void OnSkillSubmit(IFullSkill skill)
         {
         }
     }

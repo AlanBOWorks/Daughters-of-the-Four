@@ -82,7 +82,7 @@ namespace CombatSystem.Player.UI
             focusHolder.color = targetColor;
         }
 
-        public void OnSkillButtonHover(ICombatSkill skill)
+        public void OnSkillButtonHover(IFullSkill skill)
         {
             var targetButton = skillButtonsHolder.GetDictionary()[skill];
 
@@ -94,22 +94,22 @@ namespace CombatSystem.Player.UI
 
         }
 
-        public void OnSkillButtonExit(ICombatSkill skill)
+        public void OnSkillButtonExit(IFullSkill skill)
         {
             Hide(hoverHolder);
         }
 
 
-        public void OnSkillSelect(CombatSkill skill)
+        public void OnSkillSelect(IFullSkill skill)
         {
 
         }
 
-        public void OnSkillSelectFromNull(CombatSkill skill)
+        public void OnSkillSelectFromNull(IFullSkill skill)
         {
         }
 
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        public void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {
             var targetButton = skillButtonsHolder.GetDictionary()[skill];
 
@@ -120,7 +120,7 @@ namespace CombatSystem.Player.UI
             DoAnimate(focusHolder.transform, buttonTransform.position, HoverImageAnimationDuration);
         }
 
-        public void OnSkillDeselect(CombatSkill skill)
+        public void OnSkillDeselect(IFullSkill skill)
         {
             Hide(focusHolder);
         }
@@ -130,7 +130,7 @@ namespace CombatSystem.Player.UI
             Hide(focusHolder);
         }
 
-        public void OnSkillSubmit(CombatSkill skill)
+        public void OnSkillSubmit(IFullSkill skill)
         {
         }
 

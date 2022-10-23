@@ -36,7 +36,7 @@ namespace CombatSystem.Player.UI
         private UCombatSkillButtonsHolder _holder;
 
         [ShowInInspector,DisableInEditorMode]
-        private CombatSkill _skill;
+        private IFullSkill _skill;
 
         private bool _canSubmitSkill;
 

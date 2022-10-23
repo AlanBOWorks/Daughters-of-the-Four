@@ -33,26 +33,36 @@ namespace CombatSystem.Skills
         void ResetCost();
     }
 
-    public interface IFullSkill : ISkill
+    public interface IFullSkill : ISkill, ISkillInfoHolder
     {
-        string GetSkillName();
-        Sprite GetSkillIcon();
 
         IEnumerable<PerformEffectValues> GetEffectsFeedBacks();
     }
 
-    public interface ISkill
+    public interface ISkillInfoHolder
+    {
+        string GetSkillName();
+        Sprite GetSkillIcon();
+    }
+
+
+    public interface ISkill : IEffectsHolder
     {
         int SkillCost { get; }
         EnumsSkill.TeamTargeting TeamTargeting { get; }
 
-        IEffect GetMainEffectArchetype();
-        IEnumerable<PerformEffectValues> GetEffects();
 
         bool IgnoreSelf { get; }
 
         float LuckModifier { get; }
     }
+
+    public interface IEffectsHolder
+    {
+        IEffect GetMainEffectArchetype();
+        IEnumerable<PerformEffectValues> GetEffects();
+    }
+
 
     public interface IVanguardSkill : ISkill
     {

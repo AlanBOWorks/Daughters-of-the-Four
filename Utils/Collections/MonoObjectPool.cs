@@ -230,6 +230,86 @@ namespace Utils
         public int CountActive => _activePool.Count;
     }
 
+
+    [Serializable]
+    public abstract class DictionaryPool<TKey, TValue> where TValue : Component
+    {
+        [SerializeField, TitleGroup("References")] 
+        private TValue prefab;
+        [SerializeField, TitleGroup("Params")] 
+        private bool toggleActiveOnPool = true;
+
+        protected TValue GetPrefab() => prefab;
+        protected readonly Dictionary<TKey, TValue> Dictionary;
+        protected readonly Queue<TValue> InactivePool;
+        public IReadOnlyDictionary<TKey, TValue> GetDictionary() => Dictionary;
+
+        protected DictionaryPool()
+        {
+            Dictionary = new Dictionary<TKey, TValue>();
+            InactivePool = new Queue<TValue>();
+        }
+
+        public virtual void Awake()
+        {
+            if(toggleActiveOnPool)
+                prefab.gameObject.SetActive(false);
+        }
+
+        private void ToggleElement(TValue element, bool active)
+        {
+            if(!toggleActiveOnPool) return;
+            element.gameObject.SetActive(active);
+        }
+
+        private TValue GetElement()
+        {
+            if (InactivePool.Count > 0) return InactivePool.Dequeue();
+            return Object.Instantiate(prefab);
+        }
+
+        public virtual TValue Pop(TKey key)
+        {
+            var element = GetElement();
+            Dictionary.Add(key,element);
+
+            if(toggleActiveOnPool)
+                element.gameObject.SetActive(true);
+
+            return element;
+        }
+
+        protected virtual void OnRelease(TKey key, TValue element)
+        {
+            InactivePool.Enqueue(element);
+
+            if (!toggleActiveOnPool) return;
+            element.gameObject.SetActive(false);
+        }
+
+        public void Release(TKey key)
+        {
+            var element = Dictionary[key];
+            Dictionary.Remove(key);
+            OnRelease(key,element);
+        }
+
+        public void ReleaseSafe(TKey key)
+        {
+            if(!Dictionary.ContainsKey(key)) return;
+            Release(key);
+        }
+
+        public void Clear()
+        {
+            foreach ((TKey key, TValue value) in Dictionary)
+            {
+                OnRelease(key,value);
+            }
+            Dictionary.Clear();
+        }
+    }
+
     public interface IObjectPool<T>
     {
         T Pop();

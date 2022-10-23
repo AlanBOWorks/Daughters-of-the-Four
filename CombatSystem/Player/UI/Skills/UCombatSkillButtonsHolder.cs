@@ -21,7 +21,7 @@ namespace CombatSystem.Player.UI
         ISkillUsageListener, ICombatTerminationListener,
         ISkillSelectionListener
     {
-        private Dictionary<ICombatSkill,UCombatSkillButton> _activeButtons;
+        private Dictionary<IFullSkill,UCombatSkillButton> _activeButtons;
 
         [Title("Parameters")] 
         [SerializeField]
@@ -30,7 +30,7 @@ namespace CombatSystem.Player.UI
 
 
         [ShowInInspector, HideInEditorMode,DisableInPlayMode]
-        private CombatSkill _currentSelectedSkill;
+        private IFullSkill _currentSelectedSkill;
         [ShowInInspector, HideInEditorMode, DisableInPlayMode]
         private CombatEntity _currentControlEntity;
 
@@ -45,11 +45,11 @@ namespace CombatSystem.Player.UI
 
         }
 
-        public IReadOnlyDictionary<ICombatSkill, UCombatSkillButton> GetDictionary() => _activeButtons;
+        public IReadOnlyDictionary<IFullSkill, UCombatSkillButton> GetDictionary() => _activeButtons;
 
         private void Awake()
         {
-            _activeButtons = new Dictionary<ICombatSkill, UCombatSkillButton>();
+            _activeButtons = new Dictionary<IFullSkill, UCombatSkillButton>();
 
             PreparePrefab();
             PrepareShortCutElements();
@@ -333,7 +333,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void DoSkillSelect(CombatSkill skill)
+        public void DoSkillSelect(IFullSkill skill)
         {
             if (!enabled) return;
             if(PlayerCombatSingleton.IsInPauseMenu) return;
@@ -344,7 +344,7 @@ namespace CombatSystem.Player.UI
             DoSkillSwitch(skill, _currentSelectedSkill);
         }
 
-        private void DoSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        private void DoSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {
             if (skill == null)
                 return; //this prevents null skills and (_currentSelectedSkill = null) == skill check
@@ -368,7 +368,7 @@ namespace CombatSystem.Player.UI
                 playerEvents.OnSkillSwitch(skill, previousSelection);
             }
         }
-        private void DeselectSkill(ICombatSkill skill)
+        private void DeselectSkill(IFullSkill skill)
         {
             if (skill == null || skill != _currentSelectedSkill) return;
 
@@ -379,21 +379,21 @@ namespace CombatSystem.Player.UI
 
             _currentSelectedSkill = null;
         }
-        private UCombatSkillButton GetButton(in CombatSkill skill)
+        private UCombatSkillButton GetButton(in IFullSkill skill)
         {
             return _activeButtons.ContainsKey(skill)
                 ? _activeButtons[skill]
                 : null;
         }
 
-        public void OnSkillSelect(CombatSkill skill)
+        public void OnSkillSelect(IFullSkill skill)
         {}
-        public void OnSkillSelectFromNull(CombatSkill skill)
+        public void OnSkillSelectFromNull(IFullSkill skill)
         {}
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        public void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {}
 
-        public void OnSkillDeselect(CombatSkill skill)
+        public void OnSkillDeselect(IFullSkill skill)
         {
             DeselectSkill(skill);
         }
@@ -401,18 +401,18 @@ namespace CombatSystem.Player.UI
         {
             DeselectSkill(skill);
         }
-        public void OnSkillSubmit(CombatSkill skill)
+        public void OnSkillSubmit(IFullSkill skill)
         {
         }
 
 
 
-        public void DoSkillButtonHover(CombatSkill skill)
+        public void DoSkillButtonHover(IFullSkill skill)
         {
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonHover(skill);
         }
 
-        public void DoSkillButtonExit(CombatSkill skill)
+        public void DoSkillButtonExit(IFullSkill skill)
         {
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillButtonExit(skill);
         }

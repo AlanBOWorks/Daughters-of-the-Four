@@ -86,7 +86,7 @@ namespace CombatSystem.Player.UI
         }
 
         private const string OverflowText = "XX";
-        private void UpdateActionsToolTip(ICombatSkill skill)
+        private void UpdateActionsToolTip(IFullSkill skill)
         {
             float cost = skill.SkillCost + _usedActions;
             var costText = cost > 99 
@@ -105,27 +105,27 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        private CombatSkill _selectedSkill;
+        private IFullSkill _selectedSkill;
 
 
 
-        public void OnSkillSelect(CombatSkill skill)
+        public void OnSkillSelect(IFullSkill skill)
         {
 
         }
 
-        public void OnSkillSelectFromNull(CombatSkill skill)
+        public void OnSkillSelectFromNull(IFullSkill skill)
         {
         }
 
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        public void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {
             _selectedSkill = skill;
             UpdateActionsToolTip(skill);
             ToggleActiveToolTip(true);
         }
 
-        public void OnSkillDeselect(CombatSkill skill)
+        public void OnSkillDeselect(IFullSkill skill)
         {
             _selectedSkill = null;
             ToggleActiveToolTip(false);
@@ -136,7 +136,7 @@ namespace CombatSystem.Player.UI
             //todo reset all to the current values of the entity as fresh
         }
 
-        public void OnSkillSubmit(CombatSkill skill)
+        public void OnSkillSubmit(IFullSkill skill)
         {
             _selectedSkill = null;
             ToggleActiveToolTip(false);
@@ -145,14 +145,14 @@ namespace CombatSystem.Player.UI
             UpdateUsedActionsText();
         }
 
-        public void OnSkillButtonHover(ICombatSkill skill)
+        public void OnSkillButtonHover(IFullSkill skill)
         {
             if(_selectedSkill != null) return;
             UpdateActionsToolTip(skill);
             ToggleActiveToolTip(true);
         }
 
-        public void OnSkillButtonExit(ICombatSkill skill)
+        public void OnSkillButtonExit(IFullSkill skill)
         {
             if(_selectedSkill != null) return;
             ToggleActiveToolTip(false);

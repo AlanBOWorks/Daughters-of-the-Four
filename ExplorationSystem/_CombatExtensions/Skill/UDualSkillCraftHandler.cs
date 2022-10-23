@@ -73,7 +73,7 @@ namespace ExplorationSystem
                 throw new InvalidOperationException("Combining same skills is not allow.");
 
             _combinationSkill.DoInjection(_currentMainSkill.Skill,_currentSecondarySkill.Skill);
-            resultSkillHolder.Injection(_combinationSkill);
+            resultSkillHolder.DoInjection(_combinationSkill);
         }
 
         private void HandleResultHolder()

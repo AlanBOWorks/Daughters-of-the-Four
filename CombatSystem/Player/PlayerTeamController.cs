@@ -20,13 +20,13 @@ namespace CombatSystem.Player
         [ShowInInspector] 
         private CombatEntity _selectedPerformer;
         [ShowInInspector]
-        private CombatSkill _selectedSkill;
+        private IFullSkill _selectedSkill;
         [ShowInInspector]
         private CombatEntity _selectedTarget;
 
 
         internal CombatEntity GetPerformer() => _selectedPerformer;
-        internal CombatSkill GetSkill() => _selectedSkill;
+        internal IFullSkill GetSkill() => _selectedSkill;
 
 
         public void OnPauseInputReturnState(IOverridePauseElement lastElement)
@@ -51,22 +51,22 @@ namespace CombatSystem.Player
 
         }
 
-        public void OnSkillSelect(CombatSkill skill)
+        public void OnSkillSelect(IFullSkill skill)
         {
         }
 
-        public void OnSkillSelectFromNull(CombatSkill skill)
+        public void OnSkillSelectFromNull(IFullSkill skill)
         {
             PlayerCombatSingleton.GetCombatEscapeButtonHandler().PushOverridingAction(this);
         }
 
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        public void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {
             _selectedSkill = skill;
 
         }
 
-        public void OnSkillDeselect(CombatSkill skill)
+        public void OnSkillDeselect(IFullSkill skill)
         {
         }
 
@@ -74,7 +74,7 @@ namespace CombatSystem.Player
         {
         }
 
-        public void OnSkillSubmit(CombatSkill skill)
+        public void OnSkillSubmit(IFullSkill skill)
         {
         }
 
@@ -126,7 +126,7 @@ namespace CombatSystem.Player
         }
 
 
-        private static void HandleSkillCancel(ref CombatSkill skill)
+        private static void HandleSkillCancel(ref IFullSkill skill)
         {
             if (skill == null) return;
             PlayerCombatSingleton.PlayerCombatEvents.OnSkillDeselect(skill);

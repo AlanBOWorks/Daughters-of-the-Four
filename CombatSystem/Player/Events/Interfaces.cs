@@ -16,8 +16,8 @@ namespace CombatSystem.Player.Events
 
     internal interface ISkillPointerListener : ICombatEventListener
     {
-        void OnSkillButtonHover(ICombatSkill skill);
-        void OnSkillButtonExit(ICombatSkill skill);
+        void OnSkillButtonHover(IFullSkill skill);
+        void OnSkillButtonExit(IFullSkill skill);
     }
 
     internal interface ISkillSelectionListener : ICombatEventListener
@@ -25,24 +25,24 @@ namespace CombatSystem.Player.Events
         /// <summary>
         /// Triggers always even if the selected is the same
         /// </summary>
-        void OnSkillSelect(CombatSkill skill);
+        void OnSkillSelect(IFullSkill skill);
 
         /// <summary>
         /// Triggers only when the skill selected was from Null (the invert of [<seealso cref="OnSkillSwitch"/>])
         /// </summary>
         /// <param name="skill"></param>
-        void OnSkillSelectFromNull(CombatSkill skill);
+        void OnSkillSelectFromNull(IFullSkill skill);
 
         /// <summary>
         /// Is the same that <see cref="OnSkillSelect"/> but triggers when the selected is only different (and not null)
         /// </summary>
-        void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection);
+        void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection);
         /// <summary>
         /// Happens only if the same skill is deselected (things should become null);<br></br><br></br>
         /// Note: <br></br>
         /// Used [<seealso cref="OnSkillSwitch"/>] for switching without deselecting (selected skill becomes null)
         /// </summary>
-        void OnSkillDeselect(CombatSkill skill);
+        void OnSkillDeselect(IFullSkill skill);
 
         /// <summary>
         /// A cancel the selection; could be because it selected the same skill, use ESC, time-out, target is invalid
@@ -60,7 +60,7 @@ namespace CombatSystem.Player.Events
         /// a lot of skills in the Queue to be performed, in which case the submit > perform will be out of sync
         /// because of the Wait.
         /// </summary>
-        void OnSkillSubmit(CombatSkill skill);
+        void OnSkillSubmit(IFullSkill skill);
     }
     internal interface ISkillTooltipListener : ICombatEventListener
     {

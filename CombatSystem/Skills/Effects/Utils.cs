@@ -11,13 +11,15 @@ namespace CombatSystem.Skills
 {
     public static class UtilsCombatSkill
     {
-        public static void DoSkillOnTarget(ICombatSkill skill, CombatEntity performer, CombatEntity onTarget)
+        public static void DoSkillOnTarget(IFullSkill skill, CombatEntity performer, CombatEntity onTarget)
         {
             CombatEntity exclusion = skill.IgnoreSelf ? performer : null;
             var effects = skill.GetEffects();
             DoSkillOnTarget();
 
-            if (skill.Preset is IVanguardSkill vanguardSkill)
+
+
+            if (skill is ICombatSkill combatSkill && combatSkill.Preset is IVanguardSkill vanguardSkill)
             {
                 bool callEvents = false;
                 if(vanguardSkill.HasPunishEffects())

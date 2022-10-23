@@ -2,17 +2,18 @@
     "name": "Dotf_ExplorationSystem",
     "rootNamespace": "",
     "references": [
+        "GUID:eec0964c48f6f4e40bc3ec2257ccf8c5",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:87fd9a71d0e81d643aa5b23f99b71b96",
+        "GUID:c9832f79af8c4c840920098fafddfa4b",
+        "GUID:57a6d82589ae03c4cabdc058f719f231",
         "GUID:48ac1fc174448a74b8792bf80c74ddb7",
         "GUID:1c543dec6154b7241809187723ffc905",
         "GUID:afbb84f8421750f47ae60ae09139b10c",
         "GUID:936a48a91e3577b40b29f1a840c2d834",
-        "GUID:c9832f79af8c4c840920098fafddfa4b",
         "GUID:6fa701fd2d6cf254bbbc85e452e546a9",
         "GUID:e0fbab4982b62544cbb0e0e541e53d46",
-        "GUID:4a5ea05c7d01a9e4ca1cec6f5cb8a745",
-        "GUID:57a6d82589ae03c4cabdc058f719f231"
+        "GUID:4a5ea05c7d01a9e4ca1cec6f5cb8a745"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

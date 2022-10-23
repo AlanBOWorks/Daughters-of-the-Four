@@ -55,8 +55,8 @@ namespace CombatSystem.Player.UI
             shortcutAction.canceled -= ShortcutHideSkillInfo;
         }
 
-        private ICombatSkill _hoverSkill;
-        public void OnSkillButtonHover(ICombatSkill skill)
+        private IFullSkill _hoverSkill;
+        public void OnSkillButtonHover(IFullSkill skill)
         {
             if(_shortcutSelectedSkill != null)
                 HideSkillInfo(skill);
@@ -66,7 +66,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        private void ShowSkillInfo(ICombatSkill skill)
+        private void ShowSkillInfo(IFullSkill skill)
         {
             ExtractTheme(skill, out var roleColor, out var roleIcon);
             skillInfo.HandleSkillName(skill, roleColor, roleIcon);
@@ -80,7 +80,7 @@ namespace CombatSystem.Player.UI
             ignoreSelfTextHolder.SetActive(ignoreSelfTargetText);
             tooltipWindow.HandleMainEffects(skill.GetEffects(), skill, performer);
 
-            if (skill.Preset is IVanguardSkill vanguardSkill)
+            if (skill is ICombatSkill combatSkill && combatSkill.Preset is IVanguardSkill vanguardSkill)
             {
                 bool hasCounterEffects = vanguardSkill.HasCounterEffects();
                 if (hasCounterEffects)
@@ -104,7 +104,7 @@ namespace CombatSystem.Player.UI
 
 
 
-        public void OnSkillButtonExit(ICombatSkill skill)
+        public void OnSkillButtonExit(IFullSkill skill)
         {
             HideSkillInfo(skill);
             if(_shortcutSelectedSkill != null)
@@ -113,7 +113,7 @@ namespace CombatSystem.Player.UI
             if (skill == _hoverSkill) _hoverSkill = null;
         }
 
-        private void HideSkillInfo(ICombatSkill skill)
+        private void HideSkillInfo(IFullSkill skill)
         {
             tooltipWindow.Hide();
             gameObject.SetActive(false);
@@ -128,7 +128,7 @@ namespace CombatSystem.Player.UI
             roleIcon = roleTheme.GetThemeIcon();
         }
 
-        private ICombatSkill _shortcutSelectedSkill;
+        private IFullSkill _shortcutSelectedSkill;
         private bool _isShortcutPressed;
         private void ShortcutShowSkillInfo(InputAction.CallbackContext context)
         {
@@ -154,15 +154,15 @@ namespace CombatSystem.Player.UI
             HideSkillInfo(skill);
 
         }
-        public void OnSkillSelect(CombatSkill skill)
+        public void OnSkillSelect(IFullSkill skill)
         {
         }
 
-        public void OnSkillSelectFromNull(CombatSkill skill)
+        public void OnSkillSelectFromNull(IFullSkill skill)
         {
         }
 
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        public void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {
             if(!_isShortcutPressed) return;
             if(_shortcutSelectedSkill != null)
@@ -172,7 +172,7 @@ namespace CombatSystem.Player.UI
             ShowSkillInfo(skill);
         }
 
-        public void OnSkillDeselect(CombatSkill skill)
+        public void OnSkillDeselect(IFullSkill skill)
         {
         }
 
@@ -180,7 +180,7 @@ namespace CombatSystem.Player.UI
         {
         }
 
-        public void OnSkillSubmit(CombatSkill skill)
+        public void OnSkillSubmit(IFullSkill skill)
         {
             skillInfo.UpdateCost(skill);
         }
@@ -194,7 +194,7 @@ namespace CombatSystem.Player.UI
             [SerializeField] private Image roleIconHolder;
             [SerializeField] private TextMeshProUGUI skillCostHolder;
 
-            public void HandleSkillName(ICombatSkill skill, Color roleColor, Sprite roleIcon)
+            public void HandleSkillName(IFullSkill skill, Color roleColor, Sprite roleIcon)
             {
                 var skillName = LocalizeSkills.LocalizeSkill(skill);
                 nameHolder.text = skillName;

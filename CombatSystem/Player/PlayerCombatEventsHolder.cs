@@ -196,7 +196,7 @@ namespace CombatSystem.Player
 
 
         // SKILL Events
-        public void OnSkillButtonHover(ICombatSkill skill)
+        public void OnSkillButtonHover(IFullSkill skill)
         {
             foreach (var listener in _skillPointerListeners)
             {
@@ -204,7 +204,7 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnSkillButtonExit(ICombatSkill skill)
+        public void OnSkillButtonExit(IFullSkill skill)
         {
             foreach (var listener in _skillPointerListeners)
             {
@@ -212,7 +212,7 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnSkillSelect(CombatSkill skill)
+        public void OnSkillSelect(IFullSkill skill)
         {
             foreach (var listener in _skillSelectionListeners)
             {
@@ -220,7 +220,7 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnSkillSelectFromNull(CombatSkill skill)
+        public void OnSkillSelectFromNull(IFullSkill skill)
         {
             foreach (var listener in _skillSelectionListeners)
             {
@@ -228,7 +228,7 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        public void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {
             foreach (var listener in _skillSelectionListeners)
             {
@@ -236,7 +236,7 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnSkillDeselect(CombatSkill skill)
+        public void OnSkillDeselect(IFullSkill skill)
         {
             foreach (var listener in _skillSelectionListeners)
             {
@@ -252,7 +252,7 @@ namespace CombatSystem.Player
             }
         }
 
-        public void OnSkillSubmit(CombatSkill skill)
+        public void OnSkillSubmit(IFullSkill skill)
         {
             foreach (var listener in _skillSelectionListeners)
             {

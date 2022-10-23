@@ -99,6 +99,13 @@ namespace ExplorationSystem
             FlexType = HandleInstantiation(team.FlexType.GetEntityProvider());
         }
 
+        public PlayerRunTimeTeam(ITeamFlexStructureRead<ICombatEntityProvider> team)
+        {
+            VanguardType = HandleInstantiation(team.VanguardType);
+            AttackerType = HandleInstantiation(team.AttackerType);
+            SupportType = HandleInstantiation(team.SupportType);
+            FlexType = HandleInstantiation(team.FlexType);
+        }
 
         [ShowInInspector, EnableIf("VanguardType"), HorizontalGroup("FrontLine")]
         public PlayerRunTimeEntity VanguardType { get; }

@@ -1,3 +1,4 @@
+using System;
 using CombatSystem.Skills;
 using CombatSystem.Team;
 using ExplorationSystem.UI;
@@ -12,6 +13,13 @@ namespace ExplorationSystem
         [SerializeField] private UDualSkillCombinationElement myHolder;
 
         [SerializeField] private bool isMainSkill;
+
+        private void Awake()
+        {
+            if(!isMainSkill)
+                myHolder.HideExtraData();
+        }
+
         public void SelectSkill(IFullSkill skill, EnumTeam.Stance stance)
         {
             if (skill == null)
@@ -20,7 +28,7 @@ namespace ExplorationSystem
                 return;
             }
 
-            myHolder.Injection(skill);
+            myHolder.DoInjection(skill);
             mainHandler.InjectSkill(skill, stance, isMainSkill);
         }
 

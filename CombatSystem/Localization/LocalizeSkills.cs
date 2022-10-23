@@ -4,9 +4,9 @@ namespace CombatSystem.Localization
 {
     public static class LocalizeSkills 
     {
-        public static string LocalizeSkill(ICombatSkill skill)
+        public static string LocalizeSkill(IFullSkill skill)
         {
-            var skillTag = skill.Preset.GetSkillName();
+            var skillTag = skill.GetSkillName();
             return LocalizationsCombat.LocalizeSkillName(skillTag);
         }
 

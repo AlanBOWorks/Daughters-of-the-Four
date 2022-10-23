@@ -13,8 +13,12 @@ namespace CombatSystem._Core
         private const string AssetFolderPath = "Assets/ScriptableObjects/_Core/Instantiations/";
         private const string AssetName = "Prefab Instantiations [Handler]";
 
+        [Title("Core")]
         [SerializeField] private PrefabValues[] coreInstantiateObjects;
+        [SerializeField] private SInstantiationScriptable[] coreInstantiateScriptableObjects;
+        [Title("OnCombat")]
         [SerializeField] private PrefabValues[] combatInstantiateObjects;
+
 
         public void CoreInstantiationRequiredObjects(out GameObject holder)
         {
@@ -25,6 +29,10 @@ namespace CombatSystem._Core
             InstantiateHolder(holderName, out holder, out var holderTransform);
             InstantiateObjects(holderTransform, coreInstantiateObjects);
 
+            foreach (var scriptableObject in coreInstantiateScriptableObjects)
+            {
+                scriptableObject.DoInstantiation();
+            }
         }
 
         public void CombatInstantiateRequiredObjects()
@@ -100,5 +108,10 @@ namespace CombatSystem._Core
             SPrefabInstantiationHandler instantiationHandler = SPrefabInstantiationHandler.GetAsset();
             instantiationHandler.CombatInstantiateRequiredObjects();
         }
+    }
+
+    public abstract class SInstantiationScriptable : ScriptableObject
+    {
+        public abstract void DoInstantiation();
     }
 }

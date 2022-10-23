@@ -12,8 +12,8 @@ namespace ExplorationSystem
     public sealed class PlayerExplorationSingleton 
     {
         public static readonly PlayerExplorationSingleton Instance;
-        public static ITeamFlexStructureRead<PlayerRunTimeEntity> GetCurrentSelectedTeam() => Instance._playerTeam;
-        public static ICombatTeamProvider GetPlayerTeamProvider() => Instance._playerTeam;
+        public static ITeamFlexStructureRead<PlayerRunTimeEntity> GetCurrentSelectedTeam() => Instance.SelectedTeam;
+        public static ICombatTeamProvider GetPlayerTeamProvider() => Instance.SelectedTeam;
 
         static PlayerExplorationSingleton()
         { 
@@ -27,15 +27,19 @@ namespace ExplorationSystem
 
         public void InjectTeam(ITeamFlexStructureRead<ICombatEntityProviderHolder> team)
         {
-            _playerTeam = new PlayerRunTimeTeam(team);
+            SelectedTeam = new PlayerRunTimeTeam(team);
+        }
+        public void InjectTeam(ITeamFlexStructureRead<ICombatEntityProvider> team)
+        {
+            SelectedTeam = new PlayerRunTimeTeam(team);
         }
 
 
+        [field: Title("Entities")]
+        [field: ShowInInspector]
+        [field: DisableInEditorMode]
+        public PlayerRunTimeTeam SelectedTeam { get; private set; }
 
-
-        [Title("Entities")]
-        [ShowInInspector, DisableInEditorMode]
-        private PlayerRunTimeTeam _playerTeam;
 
         [Title("Theme")]
         [ShowInInspector, InlineEditor()]

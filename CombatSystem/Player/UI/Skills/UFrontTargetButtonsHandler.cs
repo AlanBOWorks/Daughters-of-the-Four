@@ -62,7 +62,7 @@ namespace CombatSystem.Player.UI
         private CombatEntity _currentControl;
 
         [ShowInInspector, DisableInEditorMode] 
-        private CombatSkill _currentSkill;
+        private IFullSkill _currentSkill;
 
 
         public void OnPerformerSwitch(CombatEntity performer)
@@ -77,14 +77,14 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnSkillSelect(CombatSkill skill)
+        public void OnSkillSelect(IFullSkill skill)
         { }
 
-        public void OnSkillSelectFromNull(CombatSkill skill)
+        public void OnSkillSelectFromNull(IFullSkill skill)
         { }
 
         private CoroutineHandle _switchHandle;
-        public void OnSkillSwitch(CombatSkill skill, CombatSkill previousSelection)
+        public void OnSkillSwitch(IFullSkill skill, IFullSkill previousSelection)
         {
             _currentSkill = skill;
 
@@ -98,7 +98,7 @@ namespace CombatSystem.Player.UI
             }
         }
 
-        public void OnSkillDeselect(CombatSkill skill)
+        public void OnSkillDeselect(IFullSkill skill)
         {
             if (_currentSkill != skill) return;
 
@@ -109,10 +109,10 @@ namespace CombatSystem.Player.UI
         public void OnSkillCancel(CombatSkill skill)
         { }
 
-        public void OnSkillSubmit(CombatSkill skill)
+        public void OnSkillSubmit(IFullSkill skill)
         { }
 
-        private void ShowTargets(ICombatSkill skill)
+        private void ShowTargets(ISkill skill)
         {
             var possibleTargets = UtilsTarget.GetPossibleTargets(skill, _currentControl);
             foreach (var target in possibleTargets)
@@ -171,7 +171,7 @@ namespace CombatSystem.Player.UI
         }
 
 
-        public void OnSkillButtonHover(ICombatSkill skill)
+        public void OnSkillButtonHover(IFullSkill skill)
         {
             if(_currentControl == null) return;
 
@@ -180,7 +180,7 @@ namespace CombatSystem.Player.UI
             ShowTargets(skill);
         }
 
-        public void OnSkillButtonExit(ICombatSkill skill)
+        public void OnSkillButtonExit(IFullSkill skill)
         {
             HideTargets();
             if (_currentSkill != null)

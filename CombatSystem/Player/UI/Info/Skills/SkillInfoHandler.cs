@@ -6,7 +6,7 @@ namespace CombatSystem.Player.UI
 {
     public class SkillInfoHandler : ISkillPointerListener
     {
-        public void OnSkillButtonHover(ICombatSkill skill)
+        public void OnSkillButtonHover(IFullSkill skill)
         {
             var effects = skill.GetEffectsFeedBacks();
             foreach (PerformEffectValues values in effects)
@@ -15,7 +15,7 @@ namespace CombatSystem.Player.UI
             }
             PlayerCombatSingleton.PlayerCombatEvents.OnFinishPoolEffects();
         }
-        public void OnSkillButtonExit(ICombatSkill skill)
+        public void OnSkillButtonExit(IFullSkill skill)
         {
         }
 

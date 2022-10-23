@@ -61,16 +61,16 @@ namespace CombatSystem.Skills
 
         public readonly CombatEntity Performer;
         public readonly CombatEntity Target;
-        public readonly ICombatSkill UsedSkill;
+        public readonly IFullSkill UsedSkill;
 
-        public SkillUsageValues(CombatEntity performer, CombatEntity target, ICombatSkill usedSkill)
+        public SkillUsageValues(CombatEntity performer, CombatEntity target, IFullSkill usedSkill)
         {
             Performer = performer;
             Target = target;
             UsedSkill = usedSkill;
         }
 
-        public void Extract(out CombatEntity performer, out CombatEntity target, out ICombatSkill usedSkill)
+        public void Extract(out CombatEntity performer, out CombatEntity target, out IFullSkill usedSkill)
         {
             Extract(out performer, out target);
             usedSkill = UsedSkill;

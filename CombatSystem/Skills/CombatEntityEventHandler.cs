@@ -10,13 +10,16 @@ namespace CombatSystem.Skills
 {
     public sealed class CombatEntityEventHandler
     {
-        public void OnCombatSkillPreSubmit(ICombatSkill usedSkill, CombatEntity performer)
+        public void OnCombatSkillPreSubmit(IFullSkill usedSkill, CombatEntity performer)
         {
             var performerStats = performer.Stats;
             UtilsCombatStats.TickActions(performerStats, usedSkill);
-            usedSkill.IncreaseCost();
+            if (usedSkill is ICombatSkill combatSkill)
+            {
+                combatSkill.IncreaseCost();
+            }
         }
-        public void OnCombatSkillSubmit(ICombatSkill usedSkill, CombatEntity performer)
+        public void OnCombatSkillSubmit(IFullSkill usedSkill, CombatEntity performer)
         {
            
 
@@ -35,7 +38,7 @@ namespace CombatSystem.Skills
             eventHolder.OnAllActorsNoActions(performer);
         }
 
-        public void OnCombatSkillPerform(ICombatSkill usedSkill, CombatEntity performer, CombatEntity target)
+        public void OnCombatSkillPerform(IFullSkill usedSkill, CombatEntity performer, CombatEntity target)
         {
             UtilsCombatSkill.DoSkillOnTarget(usedSkill,performer, target);
         }
