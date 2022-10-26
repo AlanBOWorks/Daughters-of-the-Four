@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using CombatSystem.Entity;
 using CombatSystem.Player.UI;
 using CombatSystem.Team;
@@ -7,9 +8,12 @@ using UnityEngine;
 
 namespace ExplorationSystem.UI
 {
-    public class UTeamVitalityHandler : MonoBehaviour
+    public class UExplorationTeamWindowHandler : MonoBehaviour
     {
-        [SerializeField] private SpawnReferences spawner = new SpawnReferences();
+        [SerializeField] 
+        private UExplorationSkillsWindowHandler skillsWindow;
+        [SerializeField] 
+        private SpawnReferences spawner = new SpawnReferences();
 
         private void Awake()
         {
@@ -25,6 +29,40 @@ namespace ExplorationSystem.UI
             InjectDataValues(team);
         }
 
+#if UNITY_EDITOR
+        private IEnumerator Start()
+        {
+            yield return new WaitForEndOfFrame();
+            HandleTeam();
+        }
+#endif
+        private void HandleTeam()
+        {
+            var team = PlayerExplorationSingleton.GetCurrentSelectedTeam();
+            if (team == null) return;
+
+            InjectDataValues(team);
+        }
+
+
+        private ICombatEntityProvider _currentEntity;
+        public void ShowSkillList(ICombatEntityProvider entity)
+        {
+            if (_currentEntity != null && entity == _currentEntity)
+            {
+                _currentEntity = null;
+                HideSkillList();
+                return;
+            }
+            _currentEntity = entity;
+            skillsWindow.SwitchEntity(entity);
+        }
+
+        public void HideSkillList()
+        {
+            skillsWindow.Hide();
+        }
+
 
         private const float MarginHeightSeparation = 36;
         private void HandleIcons()
@@ -38,7 +76,7 @@ namespace ExplorationSystem.UI
             var elementHeight = prefabTransform.rect.height;
 
             int i = EnumTeam.RoleTypesCount -1;
-            foreach ((UHealthInfo component, CombatThemeHolder theme) in enumerable)
+            foreach ((UExplorationTeamMemberElement component, CombatThemeHolder theme) in enumerable)
             {
                 var componentTransform = (RectTransform) component.transform;
 
@@ -58,15 +96,17 @@ namespace ExplorationSystem.UI
         {
             var enumerable = UtilsTeam.GetEnumerable(team, spawner);
 
-            foreach ((PlayerRunTimeEntity member, UHealthInfo healthHolder) in enumerable)
+            foreach ((PlayerRunTimeEntity member, UExplorationTeamMemberElement memberElement) in enumerable)
             {
-                healthHolder.UpdateHealth(member,member);
+                memberElement.Injection(this);
+                memberElement.Injection(member);
+                memberElement.UpdateHealth();
             }
         }
        
 
         [Serializable]
-        private sealed class SpawnReferences : TeamPrefabElementsSpawner<ICombatEntityProvider,UHealthInfo>
+        private sealed class SpawnReferences : TeamPrefabElementsSpawner<ICombatEntityProvider,UExplorationTeamMemberElement>
         {
             
         }

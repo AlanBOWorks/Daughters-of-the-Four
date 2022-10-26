@@ -13,14 +13,19 @@ namespace CombatSystem.UI
     {
         [SerializeField] 
         private Image iconHolder;
-
         [SerializeField] 
         private TextMeshProUGUI costHolder;
+
+        [SerializeField] 
+        private RectTransform onActiveBackground;
 
         [ShowInInspector, HideInEditorMode]
         public IFullSkill CurrentSkill { get; private set; }
 
         private ISkillElementEventsHandler _eventsHandler;
+
+        public Image GetIconHolder() => iconHolder;
+        public RectTransform GetIconBackgroundColor() => onActiveBackground;
 
         public void Injection(IFullSkill skill)
         {
@@ -49,24 +54,24 @@ namespace CombatSystem.UI
 
         public interface ISkillElementEventsHandler
         {
-            void OnPointerEnter(IFullSkill skill);
-            void OnPointerExit(IFullSkill skill);
-            void OnPointerClick(IFullSkill skill);
+            void OnPointerEnter(USkillElementHolder element, IFullSkill skill);
+            void OnPointerExit(USkillElementHolder element, IFullSkill skill);
+            void OnPointerClick(USkillElementHolder element, IFullSkill skill);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            _eventsHandler?.OnPointerClick(CurrentSkill);
+            _eventsHandler?.OnPointerEnter(this,CurrentSkill);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            _eventsHandler?.OnPointerExit(CurrentSkill);
+            _eventsHandler?.OnPointerExit(this, CurrentSkill);
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _eventsHandler?.OnPointerClick(CurrentSkill);
+            _eventsHandler?.OnPointerClick(this, CurrentSkill);
         }
     }
 }

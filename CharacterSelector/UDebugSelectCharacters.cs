@@ -18,7 +18,7 @@ namespace CharacterSelector
         private void Start()
         {
             var singleton = PlayerExplorationSingleton.Instance;
-            if (singleton.SelectedTeam == null) return;
+            if (singleton.SelectedTeam != null) return;
 
             singleton.InjectTeam(this);
         }

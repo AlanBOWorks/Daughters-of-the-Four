@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
 
 namespace CombatSystem.Team
 {
     public static class EnumTeam
     {
+        public const int PerStanceSkillAmount = 4;
+        public const int PerStanceSkillWithSharedAmount = PerStanceSkillAmount + 4;
+
         public enum StructureType
         {
             TeamRole,
@@ -227,5 +231,13 @@ namespace CombatSystem.Team
         /// The total amount of indexes in a FullTeam Structure (Mains + Offs)
         /// </summary>
         public const int FullTeamIndexCount = RoleTypesCount+OffRoleIndexCount;
+
+
+        public static IEnumerable<Stance> GetStancesEnumerable()
+        {
+            yield return Stance.Defending;
+            yield return Stance.Attacking;
+            yield return Stance.Supporting;
+        }
     }
 }

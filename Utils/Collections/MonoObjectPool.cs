@@ -239,7 +239,7 @@ namespace Utils
         [SerializeField, TitleGroup("Params")] 
         private bool toggleActiveOnPool = true;
 
-        protected TValue GetPrefab() => prefab;
+        public TValue GetPrefab() => prefab;
         protected readonly Dictionary<TKey, TValue> Dictionary;
         protected readonly Queue<TValue> InactivePool;
         public IReadOnlyDictionary<TKey, TValue> GetDictionary() => Dictionary;
@@ -270,6 +270,8 @@ namespace Utils
 
         public virtual TValue Pop(TKey key)
         {
+            if (Dictionary.ContainsKey(key)) return null;
+
             var element = GetElement();
             Dictionary.Add(key,element);
 

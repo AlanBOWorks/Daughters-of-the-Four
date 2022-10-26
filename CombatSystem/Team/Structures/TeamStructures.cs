@@ -233,4 +233,74 @@ namespace CombatSystem.Team
         public T SecondaryRole => null;
         public T ThirdRole => null;
     }
+
+    [Serializable]
+    public class StanceStructure<T> : IStanceStructureRead<T>, ITeamTrinityStructureRead<T>
+    {
+        [SerializeField] private T defendingType;
+        [SerializeField] private T attackingType;
+        [SerializeField] private T supportingType;
+
+        public StanceStructure()
+        { }
+        public StanceStructure(T defendingType, T attackingType, T supportingType)
+        {
+            this.defendingType = defendingType;
+            this.attackingType = attackingType;
+            this.supportingType = supportingType;
+        }
+
+        public T this[EnumTeam.Stance stance]
+        {
+            get
+            {
+                return stance switch
+                {
+                    EnumTeam.Stance.Defending => defendingType,
+                    EnumTeam.Stance.Attacking => attackingType,
+                    EnumTeam.Stance.Supporting => supportingType,
+                    _ => throw new ArgumentOutOfRangeException(nameof(stance), stance, null)
+                };
+            }
+            set
+            {
+                switch (stance)
+                {
+                    case EnumTeam.Stance.Defending:
+                        defendingType = value;
+                        break;
+                    case EnumTeam.Stance.Attacking:
+                        attackingType = value;
+                        break;
+                    case EnumTeam.Stance.Supporting:
+                        supportingType = value;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(stance), stance, null);
+                }
+            }
+        }
+
+        public T AttackingStance
+        {
+            get => attackingType;
+            set => attackingType = value;
+        }
+
+        public T SupportingStance
+        {
+            get => supportingType;
+            set => supportingType = value;
+        }
+
+        public T DefendingStance
+        {
+            get => defendingType;
+            set => defendingType = value;
+        }
+
+        public T VanguardType => defendingType;
+        public T AttackerType => attackingType;
+        public T SupportType => supportingType;
+    }
 }

@@ -44,6 +44,17 @@ namespace ExplorationSystem.Team
 
         public TElement GetPrefabElement() => prefabHolder;
 
+        public TElement this[EnumTeam.Role role] =>
+            role switch
+            {
+                EnumTeam.Role.Vanguard => _vanguardType,
+                EnumTeam.Role.Attacker => _attackerType,
+                EnumTeam.Role.Support => _supportType,
+                EnumTeam.Role.Flex => _flexType,
+                _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
+            };
+
+        public TElement this[TKey key] => this[key.GetAreaData().RoleType];
 
         public void DoInstantiations()
         {
